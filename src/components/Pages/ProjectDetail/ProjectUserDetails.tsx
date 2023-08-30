@@ -1,0 +1,446 @@
+// Component that shows the details of a project member, including their role, time allocation, whether they are the leader, and their position in 
+// the manage team component (drag and droppable by Admins and leader)
+
+import { Avatar, Image, Box, Button, Center, Flex, Grid, Icon, Spacer, Spinner, Text, useColorMode, Slider, SliderTrack, SliderFilledTrack, SliderThumb, FormControl, InputGroup, Select, FormHelperText } from "@chakra-ui/react"
+import { FiCopy } from "react-icons/fi";
+import { FcApproval } from "react-icons/fc";
+import { AiFillCloseCircle } from "react-icons/ai";
+import { useState } from "react";
+import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
+import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
+import { useCopyText } from "../../../lib/hooks/useCopyText";
+
+interface Props {
+    pk: number;
+    is_leader: boolean;
+    role: string;
+    position: number;
+    time_allocation: number;
+}
+
+export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocation }: Props) => {
+
+    const { userLoading: loading, userData: user } = useFullUserByPk(pk);
+    const formatted_date = useFormattedDate(user?.date_joined);
+
+    const { colorMode } = useColorMode();
+    const borderColor = colorMode === "light" ? "gray.300" : "gray.500";
+    const sectionTitleColor = colorMode === "light" ? "gray.600" : "gray.300";
+    const subsectionTitleColor = colorMode === "light" ? "gray.500" : "gray.500"
+
+    const copyEmail = useCopyText(user?.email);
+
+
+    const [fteValue, setFteValue] = useState(time_allocation);
+    const [userRole, setUserRole] = useState(role);
+
+    const handleUpdateRole = (newRole: string) => {
+        // POST TO API HERE
+        setUserRole(newRole);
+    }
+
+    const handleUpdateFTE = (newFTE: number) => {
+        // POST TO API HERE
+        console.log(`Changed to ${newFTE}`)
+        setFteValue(newFTE);
+    }
+
+    const humanReadableRoleName = (role: string) => {
+
+        let humanReadable = ""
+
+        switch (role) {
+            case "academicsuper":
+                humanReadable = "Academic Supervisor"
+                break;
+            case "consulted":
+                humanReadable = "Consulted Peer"
+                break;
+            case "externalcol":
+                humanReadable = "External Collaborator"
+                break;
+            case "externalpeer":
+                humanReadable = "External Peer"
+                break;
+            case "group":
+                humanReadable = "Involved Group"
+                break;
+            case "research":
+                humanReadable = "Research Scientist"
+                break;
+            case "supervising":
+                humanReadable = "Supervising Scientist"
+                break;
+            case "student":
+                humanReadable = "Supervised Student"
+                break;
+            case "technical":
+                humanReadable = "Technical Officer"
+                break;
+
+            default:
+                humanReadable = "None"
+                break;
+        }
+        return humanReadable
+    }
+
+    return (
+        (loading || pk === undefined) ?
+            <Center
+                w={"100%"}
+                h={"100%"}
+            >
+                <Spinner
+                    size={"xl"}
+                />
+            </Center>
+            :
+            <Flex
+                flexDir={"column"}
+                h={"100%"}
+            >
+                <Flex
+                    mt={4}
+                >
+                    <Avatar
+                        src={user?.image?.file ? user.image.file : user?.image?.old_file ? user.image.old_file : ""}
+                        size={"2xl"}
+                    />
+
+                    <Flex
+                        flexDir={"column"}
+                        flex={1}
+                        justifyContent={"center"}
+                        ml={4}
+                        overflow={"auto"}
+                    >
+                        <Text userSelect={"none"} fontWeight={"bold"}>{!user?.first_name.startsWith("None") ?
+                            `${user.first_name} ${user.last_name}` : `${user.username}`}</Text>
+                        <Text userSelect={"none"} >{user?.expertise}</Text>
+                        <Text userSelect={"none"} >{user?.phone ? user.phone : "No Phone number"}</Text>
+                        <Flex>
+                            <Text userSelect={"none"}>{user?.email.startsWith("unset") ? "No Email" : user?.email}</Text>
+                            {!user?.email.startsWith("unset") && (
+
+                                <Button
+                                    ml={2}
+                                    size={"xs"}
+                                    variant={"ghost"}
+                                    colorScheme="blue"
+                                    onClick={copyEmail}
+                                >
+                                    <Icon
+                                        as={FiCopy}
+                                    />
+                                </Button>
+                            )}
+
+                        </Flex>
+                    </Flex>
+
+                </Flex>
+
+                <Grid
+                    gridTemplateColumns={"repeat(2, 1fr)"}
+                    gridGap={4}
+                    mt={4} pt={2} pb={4}>
+
+                    {!user?.is_staff && (
+                        <Button
+                            bg={colorMode === "light" ? "blue.500" : "blue.400"}
+                            color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
+                            isDisabled={user.email.startsWith("unset")}
+                        >
+                            Email
+                        </Button>
+                    )}
+                    {user?.is_staff && (
+                        <Button
+                            bg={colorMode === "light" ? "blue.500" : "blue.400"}
+                            color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
+                            isDisabled={true}
+                        >
+                            Chat
+                        </Button>
+                    )}
+
+                    <Button
+                        bg={colorMode === "light" ? "red.500" : "red.400"}
+                        color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
+
+                    >
+                        Remove from Project
+                    </Button>
+
+                </Grid>
+
+
+
+
+                <Flex
+                    border={"1px solid"}
+                    rounded={"xl"}
+                    borderColor={borderColor}
+                    padding={4}
+                    mb={4}
+                    flexDir={"column"}
+                    mt={2}
+                >
+                    <Flex>
+                        <Text
+                            fontWeight={"bold"}
+                            fontSize={"sm"}
+                            mb={1}
+                            color={sectionTitleColor}
+
+                        >
+                            Project Role ({userRole ? humanReadableRoleName(userRole) : 'None'})
+                        </Text>
+                    </Flex>
+                    <FormControl
+                        py={2}
+                    >
+                        <InputGroup>
+                            <Select
+                                variant='filled' placeholder='Select a Role for the User'
+                                onChange={(e) => handleUpdateRole(e.target.value)}
+                                value={userRole}
+                            >
+                                <option value='academicsuper'>Academic Supervisor</option>
+                                <option value='consulted'>Consulted Peer</option>
+                                <option value='externalcol'>External Collaborator</option>
+                                <option value='externalpeer'>External Peer</option>
+                                <option value='group'>Involved Group</option>
+                                <option value='research'>Research Scientist</option>
+                                <option value='supervising'>Supervising Scientist</option>
+                                <option value='student'>Supervised Student</option>
+                                <option value='technical'>Technical Officer</option>
+                            </Select>
+                        </InputGroup>
+                        <FormHelperText>The role this team member fills within this project.</FormHelperText>
+                    </FormControl>
+
+                    <Flex
+                        mt={4}
+                    >
+                        <Text
+                            fontWeight={"bold"}
+                            fontSize={"sm"}
+                            mb={1}
+                            color={sectionTitleColor}
+
+                        >
+                            Time Allocation ({fteValue} FTE)
+                        </Text>
+                    </Flex>
+                    {/* <Text>-</Text> */}
+                    <Slider defaultValue={fteValue} min={0} max={1} step={0.1}
+                        onChangeEnd={(sliderValue) => {
+                            handleUpdateFTE(sliderValue);
+                        }}
+
+                    >
+                        <SliderTrack bg='blue.100'>
+                            <Box position='relative' right={10} />
+                            <SliderFilledTrack bg='blue.500' />
+                        </SliderTrack>
+                        <SliderThumb boxSize={6}
+                            bg="blue.300"
+                        />
+                    </Slider>
+
+
+                    <Flex
+                        mt={4}
+                    >
+                        <Text
+                            fontWeight={"bold"}
+                            fontSize={"sm"}
+                            mb={1}
+                            color={sectionTitleColor}
+                        >
+                            Short Code
+                        </Text>
+                    </Flex>
+                    <Text>-</Text>
+                </Flex>
+
+                <Box
+                // mt={2}
+                >
+
+                    <Flex
+                        border={"1px solid"}
+                        rounded={"xl"}
+                        borderColor={borderColor}
+                        padding={4}
+                        mb={4}
+                        flexDir={"column"}
+                    >
+
+                        <Flex
+                            flexDir={"column"}
+                        >
+                            {user?.is_staff && (
+                                <Flex
+                                    h={"60px"}
+                                >
+                                    <Image
+                                        rounded={"lg"}
+                                        w="60px" h="60px"
+                                        src={user?.agency?.image?.file ? user.agency.image.file : user?.agency?.image?.old_file ? user.agency.image.old_file : ""}
+                                        objectFit="cover"
+                                    />
+                                    <Center>
+                                        <Flex ml={3} flexDir="column">
+                                            <Text fontWeight="bold" color={sectionTitleColor}>
+                                                {user.agency !== null ? user.agency.name : "agency returning none"}
+                                            </Text>
+                                            <Text fontSize="sm" color={colorMode === "light" ? "gray.600" : "gray.400"}>
+                                                {user.branch !== null ? `${user.branch} Branch` : "Branch not set"}
+                                            </Text>
+                                        </Flex>
+
+                                    </Center>
+                                </Flex>
+                            )}
+                            {!user?.is_staff && (
+                                <Text
+                                    color={colorMode === "light" ? "gray.600" : "gray.300"}
+                                >
+                                    <b>External User</b> - This user does not belong to DBCA
+                                </Text>
+                            )}
+
+                        </Flex>
+
+                    </Flex>
+
+                    <Flex
+                        border={"1px solid"}
+                        rounded={"xl"}
+                        borderColor={borderColor}
+                        padding={4}
+                        mb={4}
+                        flexDir={"column"}
+                        mt={2}
+                    >
+                        <Flex>
+                            <Text
+                                fontWeight={"bold"}
+                                fontSize={"sm"}
+                                mb={1}
+                                color={sectionTitleColor}
+
+                            >
+                                About
+                            </Text>
+                        </Flex>
+                        <Text>{user.about ? user.about : "This user has not filled in their 'About' section."}</Text>
+                        <Flex
+                            mt={4}
+                        >
+                            <Text
+                                fontWeight={"bold"}
+                                fontSize={"sm"}
+                                mb={1}
+                                color={sectionTitleColor}
+
+                            >
+                                Expertise
+                            </Text>
+                        </Flex>
+                        <Text>{user?.expertise ? user.expertise : "This user has not filled in their 'Expertise' section."}</Text>
+
+
+                    </Flex>
+
+
+                    <Spacer />
+
+
+                    <Flex
+                        border={"1px solid"}
+                        rounded={"xl"}
+                        borderColor={borderColor}
+                        padding={4}
+                        mb={4}
+                        flexDir={"column"}
+                        mt={2}
+                    >
+                        <Flex>
+                            <Text
+                                fontWeight={"bold"}
+                                fontSize={"sm"}
+                                mb={1}
+                                color={sectionTitleColor}
+
+                            >
+                                Details
+                            </Text>
+                        </Flex>
+                        <Grid
+                            gridTemplateColumns="1fr 3fr"
+                        >
+                            <Text color={subsectionTitleColor}><b>Role: </b></Text><Text >{user?.role ? user.role : "This user has not filled in their 'role' section."}</Text>
+                            <Text color={subsectionTitleColor}><b>Joined: </b></Text><Text>{formatted_date}</Text>
+                        </Grid>
+                        <Flex
+                            mt={4}
+                            rounded="xl"
+                            p={4}
+                            bg={colorMode === 'light' ? 'gray.50' : 'gray.600'}
+                        >
+                            <Grid
+                                gridTemplateColumns="repeat(3, 1fr)"
+                                gap={3}
+                                w="100%"
+                            >
+                                <Grid
+                                    gridTemplateColumns={"repeat(1, 1fr)"}
+                                    display="flex"
+                                    flexDirection="column"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                >
+                                    <Text mb='8px' fontWeight={"bold"} color={subsectionTitleColor}>Active?</Text>
+                                    {user?.is_active ? <FcApproval /> : <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                                        <AiFillCloseCircle />
+                                    </Box>}
+                                </Grid>
+
+                                <Grid
+                                    gridTemplateColumns={"repeat(1, 1fr)"}
+                                    display="flex"
+                                    flexDirection="column"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                >
+                                    <Text mb='8px' fontWeight={"bold"} color={subsectionTitleColor}>Staff?</Text>
+                                    {user?.is_staff ? <FcApproval /> :
+                                        <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                                            <AiFillCloseCircle />
+                                        </Box>
+                                    }
+                                </Grid>
+
+                                <Grid
+                                    gridTemplateColumns={"repeat(1, 1fr)"}
+                                    display="flex"
+                                    flexDirection="column"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                >
+                                    <Text mb='8px' fontWeight={"bold"} color={subsectionTitleColor}>Superuser?</Text>
+                                    {user?.is_superuser ? <FcApproval /> : <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                                        <AiFillCloseCircle />
+                                    </Box>}
+                                </Grid>
+                            </Grid>
+                        </Flex>
+                    </Flex>
+                </Box>
+            </Flex>
+    )
+}

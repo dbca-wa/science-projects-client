@@ -1,0 +1,186 @@
+
+/* Text */
+
+.editor-italics {
+    font-style: italic;
+    color: aquamarine;
+}
+
+.editor-bold {
+    font-weight: bold;
+    color: black;
+}
+
+.editor-underline {
+    text-decoration: underline;
+}
+
+.editor-strikethrough {
+    text-decoration: line-through;
+}
+
+.editor-underline-strikethrough {
+    text-decoration: underline line-through;
+}
+
+.editor-p-light {
+  font-size: 18px;
+  color: #333;
+      /* background-color: black; */
+      margin-bottom: 8px;
+      position: relative;
+}
+
+.editor-h1-light {
+  font-size: 30px;
+
+    /* background-color: black; */
+    color: #333;
+
+}
+
+.editor-h2-light {
+  font-size: 26px;
+    /* background-color: black; */
+    color: #333;
+}
+
+.editor-h3-light {
+  font-size: 22px;
+
+    /* background-color: black; */
+    color: #333;
+}
+
+.editor-p-dark {
+  font-size: 18px;
+  color: #eee;
+      /* background-color: black; */
+      margin-bottom: 8px;
+      position: relative;
+}
+
+.editor-h1-dark {
+  font-size: 30px;
+
+    /* background-color: black; */
+    color: #eee;
+
+}
+
+.editor-h2-dark {
+  font-size: 26px;
+    /* background-color: black; */
+    color: #eee;
+}
+
+.editor-h3-dark {
+  font-size: 22px;
+
+    /* background-color: black; */
+    color: #eee;
+}
+
+
+
+.editor-quote {
+    margin: 0;
+    margin-left: 20px;
+    font-size: 15px;
+    color: rgb(101, 103, 107);
+    border-left-color: rgb(206, 208, 212);
+    border-left-width: 4px;
+    border-left-style: solid;
+    padding-left: 16px;
+}
+
+.editor-listitem {
+    margin: 8px 32px 8px 32px;
+  }
+
+  .editor-nested-listitem {
+    list-style-type: none;
+  }
+  
+
+.editor-ol {
+    padding: 0;
+    margin: 0;
+    margin-left: 16px;
+}
+
+.editor-ul {
+    padding: 0;
+    margin: 0;
+    margin-left: 16px;
+}
+
+.rtl {
+
+}
+
+.ltr {
+
+}
+
+
+
+.link-editor .link-input {
+    display: block;
+    width: calc(100% - 24px);
+    box-sizing: border-box;
+    margin: 8px 12px;
+    padding: 8px 12px;
+    border-radius: 15px;
+    background-color: #eee;
+    font-size: 15px;
+    color: rgb(5, 5, 5);
+    border: 0;
+    outline: 0;
+    position: relative;
+    font-family: inherit;
+  }
+  
+  .link-editor div.link-edit {
+    background-size: 16px;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 35px;
+    vertical-align: -0.25em;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+  }
+  
+  .link-editor .link-input a {
+    color: rgb(33, 111, 219);
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-right: 30px;
+    text-overflow: ellipsis;
+  }
+  
+  .link-editor .link-input a:hover {
+    text-decoration: underline;
+  }
+  
+  .link-editor .button {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    padding: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 0 2px;
+  }
+  
+  .link-editor .button.hovered {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background-color: #eee;
+  }
