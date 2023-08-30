@@ -1,0 +1,1 @@
+The React-based frontend for the science projects app.
