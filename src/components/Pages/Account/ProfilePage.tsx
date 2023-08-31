@@ -86,6 +86,7 @@ export const ProfilePage = () => {
                         <EditProfileModal
                             userId={me.pk}
                             isOpen={isEditProfileModalOpen} onClose={onCloseEditProfileModal}
+                            currentImage={me.image.file}
                         />
 
                         <EditMembershipModal
