@@ -9,9 +9,13 @@ export const useBusinessAreas = () => {
         {
             retry: false,
         });
+    // Sort the branches alphabetically
+    const sortedBA = data
+        ? [...data].sort((a, b) => a.name.localeCompare(b.name))
+        : [];
 
     return {
         baLoading: isLoading,
-        baData: data,
+        baData: sortedBA,
     };
 };

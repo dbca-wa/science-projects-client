@@ -333,6 +333,9 @@ export interface IPIUpdateError {
     error: string;
 }
 
+
+
+
 export const getPersonalInformation = ({ queryKey }: QueryFunctionContext): Promise<IPersonalInformation> => {
     const [_, userId] = queryKey;
     return instance
@@ -356,6 +359,23 @@ export const updatePersonalInformation = async ({ userPk, title, phone, fax }: I
 
 }
 
+export interface IMembershipUpdateVariables {
+    userPk: number;
+    branch: number;
+    business_area: number;
+}
+
+export const updateMembership = async ({ userPk, branch, business_area }: IMembershipUpdateVariables) => {
+    console.log(userPk, branch, business_area)
+    const response = await instance.put(
+        `users/${userPk}/membership`, {
+        user_pk: userPk,
+        branch_pk: branch,
+        business_area: business_area,
+    }
+    )
+    return response.data
+}
 
 export const updateProfile = async ({ userPk, image, about, expertise }: IProfileUpdateVariables) => {
 
