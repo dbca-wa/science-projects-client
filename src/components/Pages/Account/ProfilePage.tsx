@@ -92,7 +92,8 @@ export const ProfilePage = () => {
                         <EditMembershipModal
                             currentOrganisationData={me?.entity}
                             currentBranchData={me?.branch}
-
+                            currentBaData={me?.business_area}
+                            userId={me.pk}
                             isOpen={isEditMembershipModalOpen} onClose={onCloseEditMembershipModal}
                         />
 
@@ -131,9 +132,9 @@ export const ProfilePage = () => {
                                         is_staff={me.is_staff}
                                         is_superuser={me.is_superuser}
                                         image={me.image}
-                                        business_area={me.business_area}
+                                        business_area={me.business_area.name}
                                         role={me.role}
-                                        branch={me.branch}
+                                        branch={me.branch.name}
                                         is_active={me.is_active}
                                         affiliation={me.affiliation}
                                     />
@@ -475,7 +476,7 @@ export const ProfilePage = () => {
                                             >
                                                 Branch
                                             </Text>
-                                            <Text>{me?.branch ? me?.branch : NoDataText}</Text>
+                                            <Text>{me?.branch.name ? me?.branch.name : NoDataText}</Text>
                                         </Flex>
                                         <Flex
                                             flexDir={"column"}
@@ -486,7 +487,7 @@ export const ProfilePage = () => {
                                             >
                                                 Business Area
                                             </Text>
-                                            <Text>{me?.business_area ? me?.business_area : NoDataText}</Text>
+                                            <Text>{me?.business_area.name ? me?.business_area.name : NoDataText}</Text>
                                         </Flex>
                                     </>
                                 )}
