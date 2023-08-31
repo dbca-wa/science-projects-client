@@ -286,6 +286,9 @@ export interface IProfileUpdateSuccess {
 
 export interface IProfileUpdateError {
     error: string;
+    response: {
+        data: string;
+    }
 }
 export interface IPIUpdateVariables {
     userPk: string;
