@@ -11,9 +11,10 @@ import { IProjectMember } from "../../../types"
 
 interface Props {
     team: IProjectMember[];
+    project_id: number;
 }
 
-export const ManageTeam = ({ team }: Props) => {
+export const ManageTeam = ({ team, project_id }: Props) => {
     const [rearrangedTeam, setRearrangedTeam] = useState<IProjectMember[]>([]);
 
     useEffect(() => {
@@ -94,6 +95,8 @@ export const ManageTeam = ({ team }: Props) => {
                             role={tm.role}
                             position={tm.position}
                             time_allocation={tm.time_allocation}
+                            usersCount={rearrangedTeam.length}
+                            project_id={project_id}
                         />
                     ))
                 }

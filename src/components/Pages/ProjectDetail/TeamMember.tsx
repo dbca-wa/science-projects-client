@@ -21,9 +21,11 @@ interface ITeamMember {
     image: IImageData;
     time_allocation: number;
     position: number;
+    usersCount: number;
+    project_id: number;
 }
 
-export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_allocation, position, username }: ITeamMember) => {
+export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_allocation, position, username, usersCount, project_id }: ITeamMember) => {
 
 
     const [isGrabbed, setIsGrabbed] = useState(false);
@@ -101,11 +103,13 @@ export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_
 
                     <DrawerBody>
                         <ProjectUserDetails
+                            project_id={project_id}
                             pk={user_id}
                             is_leader={is_leader}
                             role={role}
                             position={position}
                             time_allocation={time_allocation}
+                            usersCount={usersCount}
                         />
                     </DrawerBody>
 

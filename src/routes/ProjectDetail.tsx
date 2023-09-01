@@ -113,7 +113,7 @@ export const ProjectDetail = () => {
                                         />
 
                                         {/* <ManageTeam /> */}
-                                        <ManageTeam team={members} />
+                                        <ManageTeam team={members} project_id={projectPk !== undefined ? Number(projectPk) : 0} />
                                     </>
                                 ) :
                                 <Spinner />

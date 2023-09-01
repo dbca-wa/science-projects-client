@@ -5,10 +5,11 @@ import { Avatar, Image, Box, Button, Center, Flex, Grid, Icon, Spacer, Spinner, 
 import { FiCopy } from "react-icons/fi";
 import { FcApproval } from "react-icons/fc";
 import { AiFillCloseCircle } from "react-icons/ai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
 import { useCopyText } from "../../../lib/hooks/useCopyText";
+import { useUser } from "../../../lib/hooks/useUser";
 
 interface Props {
     pk: number;
@@ -16,9 +17,11 @@ interface Props {
     role: string;
     position: number;
     time_allocation: number;
+    usersCount: number;
+    project_id: number;
 }
 
-export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocation }: Props) => {
+export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocation, usersCount, project_id }: Props) => {
 
     const { userLoading: loading, userData: user } = useFullUserByPk(pk);
     const formatted_date = useFormattedDate(user?.date_joined);
@@ -30,17 +33,32 @@ export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocat
 
     const copyEmail = useCopyText(user?.email);
 
+    const me = useUser();
 
     const [fteValue, setFteValue] = useState(time_allocation);
     const [userRole, setUserRole] = useState(role);
 
+    useEffect(() => {
+        if (userRole && userRole !== role) {
+            // POST TO API HERE
+            console.log(project_id)
+
+        }
+    }, [userRole])
+
+
+    useEffect(() => {
+        if (fteValue && fteValue !== time_allocation) {
+            // POST TO API HERE
+            console.log(project_id)
+        }
+    }, [fteValue])
+
     const handleUpdateRole = (newRole: string) => {
-        // POST TO API HERE
         setUserRole(newRole);
     }
 
     const handleUpdateFTE = (newFTE: number) => {
-        // POST TO API HERE
         console.log(`Changed to ${newFTE}`)
         setFteValue(newFTE);
     }
@@ -168,7 +186,8 @@ export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocat
                     <Button
                         bg={colorMode === "light" ? "red.500" : "red.400"}
                         color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
-
+                        isDisabled={usersCount === 1}
+                    // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
                     >
                         Remove from Project
                     </Button>
@@ -298,7 +317,7 @@ export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocat
                                                 {user.agency !== null ? user.agency.name : "agency returning none"}
                                             </Text>
                                             <Text fontSize="sm" color={colorMode === "light" ? "gray.600" : "gray.400"}>
-                                                {user.branch !== null ? `${user.branch} Branch` : "Branch not set"}
+                                                {user.branch !== null ? `${user.branch.name} Branch` : "Branch not set"}
                                             </Text>
                                         </Flex>
 

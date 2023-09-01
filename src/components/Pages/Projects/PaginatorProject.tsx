@@ -4,6 +4,7 @@ import { Box, Button, Center, Grid, Spinner } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ModernProjectCard } from "./ModernProjectCard";
 import { useEffect } from "react";
+import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
 
 interface IPaginationProps {
     loading: boolean;
@@ -38,6 +39,8 @@ export const PaginatorProject = ({
         startPage = Math.max(1, endPage - maxDisplayedPages + 1);
     }
 
+    const { layout } = useLayoutSwitcher();
+
     return (
         <Box>
             <Box>
@@ -49,13 +52,19 @@ export const PaginatorProject = ({
                         <Grid
                             mt={8}
                             gridTemplateColumns={
-                                {
+                                layout === "modern" ? {
                                     base: "repeat(1, 1fr)",
                                     "740px": "repeat(2, 1fr)",
                                     lg: "repeat(3, 1fr)",
                                     xl: "repeat(4, 1fr)",
 
-                                }
+                                } :
+                                    {
+                                        base: "repeat(1, 1fr)",
+                                        "740px": "repeat(2, 1fr)",
+                                        lg: "repeat(2, 1fr)",
+                                        xl: "repeat(3, 1fr)",
+                                    }
                             }
                             gridGap={8}
                         >

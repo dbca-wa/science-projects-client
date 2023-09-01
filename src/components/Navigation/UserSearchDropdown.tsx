@@ -1,10 +1,11 @@
 // Dropdown search component for users. Displays 5 users below the search box.
 
-import { Avatar, Box, Flex, FormControl, FormHelperText, FormLabel, IconButton, Input, InputGroup, Text } from "@chakra-ui/react";
+import { Avatar, Box, Flex, FormControl, FormHelperText, FormLabel, IconButton, Input, InputGroup, Text, useQuery } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IUserData } from "../../types";
-import { getInternalUsersBasedOnSearchTerm } from "../../lib/api";
+import { getFullUser, getInternalUsersBasedOnSearchTerm } from "../../lib/api";
 import { CloseIcon } from "@chakra-ui/icons";
+import { useFullUserByPk } from "../../lib/hooks/useFullUserByPk";
 
 interface IUserSearchDropdown {
     onlyInternal?: boolean;
@@ -13,6 +14,7 @@ interface IUserSearchDropdown {
     label: string;
     placeholder: string;
     helperText: any;
+    preselectedUserPk?: number;
 }
 
 
@@ -22,7 +24,8 @@ export const UserSearchDropdown = ({
     setUserFunction,
     label,
     placeholder,
-    helperText
+    helperText,
+    preselectedUserPk
 }: IUserSearchDropdown) => {
     const [searchTerm, setSearchTerm] = useState(''); // Local state for search term
     const [filteredItems, setFilteredItems] = useState<IUserData[]>([]); // Local state for filtered items
@@ -45,6 +48,17 @@ export const UserSearchDropdown = ({
         }
     }, [searchTerm]);
 
+    const { userLoading, userData } = useFullUserByPk(preselectedUserPk !== undefined ? preselectedUserPk : 0);
+
+    useEffect(() => {
+        if (!userLoading && userData) {
+            setUserFunction(userData.pk);
+            setIsMenuOpen(false);
+            setSelectedUser(userData); // Update the selected user
+            setSearchTerm(''); // Clear the search term when a user is selected    
+        }
+    }, [userLoading, userData])
+
     const handleSelectUser = (user: IUserData) => {
         setUserFunction(user.pk);
         setIsMenuOpen(false);
@@ -53,6 +67,9 @@ export const UserSearchDropdown = ({
     };
 
     const handleClearUser = () => {
+        if (preselectedUserPk !== null && preselectedUserPk !== undefined) {
+            return
+        }
         setUserFunction(0); // Clear the selected user by setting the userPk to 0 (or any value that represents no user)
         setSelectedUser(null); // Clear the selected user state
         setIsMenuOpen(true); // Show the menu again when the user is cleared
@@ -163,7 +180,7 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
             {...rest}
         >
             <Avatar
-                src={user.image?.file ? user.image?.file : user.image?.old_file}
+                src={user?.image?.file ? user.image.file : user?.image?.old_file ? user.image.old_file : undefined}
             />
             <Box
                 display="flex"
@@ -217,6 +234,7 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
             <Text ml={2}
                 color={user.is_staff ? user.is_superuser ? "blue.500" : "green.500" : "gray.500"}
             >{`${user.first_name} ${user.last_name} ${user.is_staff ? user.is_superuser ? '(Admin)' : '(Staff)' : '(External)'}`}</Text>
+
             <IconButton
                 aria-label="Clear selected user"
                 icon={<CloseIcon />}
@@ -226,7 +244,9 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
                 right={2}
                 transform="translateY(-50%)"
                 onClick={onClear}
+
             />
+
         </Flex>
     );
 };

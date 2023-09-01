@@ -85,7 +85,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                     userIsMe={userInQuestionIsMe}
                     userIsExternal={!user.is_staff}
                 />
-                <AddUserToProjectModal isOpen={isAddToProjectModalOpen} onClose={onAddToProjectModalClose} />
+                <AddUserToProjectModal isOpen={isAddToProjectModalOpen} onClose={onAddToProjectModalClose} preselectedUser={user.pk} />
 
                 <EditUserDetailsModal
                     isOpen={isEditUserDetailsModalOpen}
