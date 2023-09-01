@@ -13,10 +13,12 @@ export interface IUserData {
     is_staff: boolean;
     is_active: boolean;
     image: IImageData;
-    business_area: string | undefined;
+    business_area: IBusinessArea | undefined;
     role: string;
-    branch: string;
+    branch: IBranch;
     affiliation: string;
+    branches?: IBranch[];
+    businessAreas?: IBusinessArea[];
 }
 
 export interface IMemberUserDetails {

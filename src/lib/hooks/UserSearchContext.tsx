@@ -29,6 +29,7 @@ interface IUserSearchContext {
         onlyExternal: boolean;
         onlyStaff: boolean;
     }) => void;
+    reFetch: () => void;
 
 }
 
@@ -53,6 +54,9 @@ const UserSearchContext = createContext<IUserSearchContext>({
     onlyExternal: false,
     onlyStaff: false,
     setSearchFilters: () => {
+        throw new Error('setSearchFilters function must be implemented');
+    },
+    reFetch: () => {
         throw new Error('setSearchFilters function must be implemented');
     },
 });
@@ -87,6 +91,25 @@ export const UserSearchProvider = ({ children }: IUserSearchProviderProps) => {
         setCurrentUserResultsPage(1);
     };
 
+
+    const reFetch = () => {
+        setLoading(true);
+        getUsersBasedOnSearchTerm(searchTerm, currentUserResultsPage, {
+            onlySuperuser,
+            onlyExternal,
+            onlyStaff,
+        })
+            .then((data) => {
+                setFilteredItems(data.users);
+                setTotalPages(data.total_pages);
+                setTotalResults(data.total_results);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching users:', error);
+                setLoading(false);
+            });
+    }
 
     useEffect(() => {
         if (isOnUserPage) {
@@ -129,6 +152,7 @@ export const UserSearchProvider = ({ children }: IUserSearchProviderProps) => {
         onlyExternal,
         onlyStaff,
         setSearchFilters,
+        reFetch,
     };
 
     return (

@@ -3,6 +3,7 @@
 import { Grid, Flex, Box, Button, Text, BoxProps, useBreakpointValue, useDisclosure, Avatar, useColorMode, Drawer, DrawerContent, DrawerOverlay, DrawerBody, DrawerFooter } from "@chakra-ui/react";
 import { IUserData } from "../../../types";
 import { UserProfile } from "./UserProfile";
+import { useEffect } from "react";
 
 
 interface BoxContainerProps extends BoxProps {
@@ -26,7 +27,7 @@ export const BoxContainer: React.FC<BoxContainerProps> = ({ children, ...props }
 
 export const UserGridItem = ({
     pk, username, email, first_name, last_name, is_staff, is_superuser,
-    business_area, role, branch, image, affiliation,
+    business_area, role, branch, image, affiliation, branches, businessAreas
 }: IUserData) => {
 
     const fullName = (first_name !== null && last_name !== null) ? `${first_name} ${last_name}` : `No Name (${username})`;
@@ -43,6 +44,10 @@ export const UserGridItem = ({
         onUserOpen();
     }
 
+    useEffect(() => {
+        console.log(business_area)
+    }, [])
+
     return (
         <>
             <Drawer
@@ -56,6 +61,8 @@ export const UserGridItem = ({
                     <DrawerBody>
                         <UserProfile
                             pk={pk}
+                            branches={branches}
+                            businessAreas={businessAreas}
                         />
                     </DrawerBody>
 
@@ -162,7 +169,7 @@ export const UserGridItem = ({
                                             fontSize={"xs"}
                                             color={colorMode === "light" ? "gray.600" : "gray.300"}
                                         >
-                                            {branch ? branch : `Branch Not Set`}
+                                            {branch ? branch.name : `Branch Not Set`}
                                         </Text>) : (
                                             <Text
                                                 fontSize={"xs"}
@@ -247,7 +254,7 @@ export const UserGridItem = ({
                     textOverflow={"ellipsis"}
                 >
                     <Text>
-                        {business_area ? business_area : "-"}
+                        {business_area ? business_area.name : "-"}
                     </Text>
                 </BoxContainer>
 

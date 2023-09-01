@@ -28,15 +28,17 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
     const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
         data?.image?.file || data?.image?.old_file || null
     );
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
     // Check if the selected image URL is valid
     const isValidImageUrl = selectedImageUrl !== null &&
         selectedImageUrl !== undefined &&
-        selectedImageUrl.startsWith("https") &&
         selectedImageUrl.trim() !== "" &&
-        selectedImageUrl.match(/\.(jpg|jpeg|png)$/i) || selectedImageUrl?.startsWith('https://imagedelivery.net/');
-
-    const [imageLoadFailed, setImageLoadFailed] = useState(false);
+        (selectedImageUrl.startsWith("https://") ||
+            selectedImageUrl.startsWith("http://") || selectedImageUrl.startsWith("blob")) &&
+        selectedImageUrl.match(/\.(jpg|jpeg|png)$/i) ||
+        selectedImageUrl?.startsWith('https://imagedelivery.net/');
 
     const handleImageLoadError = () => {
         setImageLoadFailed(true);
@@ -45,7 +47,6 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
     const handleImageLoadSuccess = () => {
         setImageLoadFailed(false);
     };
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const initialData: IProfile = data || {
         image: null,
@@ -162,6 +163,11 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
     }, [data, isLoading]);
 
 
+    // useEffect(() => {
+    //     console.log(currentImage);
+    //     console.log(selectedFile);
+    //     console.log(selectedImageUrl);
+    // }, [selectedFile, currentImage, selectedImageUrl])
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -227,17 +233,18 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
                                                 rounded="lg"
                                                 overflow="hidden"
                                             >
-                                                {isValidImageUrl && !imageLoadFailed ? (
+                                                {!imageLoadFailed ? (
                                                     <Image
                                                         objectFit="cover"
                                                         src={
-                                                            selectedImageUrl !== null &&
-                                                                selectedImageUrl !== undefined &&
-                                                                selectedImageUrl.trim() !== ""
-                                                                ? selectedImageUrl
-                                                                : currentImage
-                                                                    ? currentImage
-                                                                    : noImageLink
+                                                            activeOption === 'url' && selectedImageUrl &&
+                                                                ((selectedImageUrl) || selectedImageUrl.trim() === "")
+                                                                ? isValidImageUrl ? selectedImageUrl : noImageLink
+                                                                : activeOption === 'upload' && selectedFile
+                                                                    ? URL.createObjectURL(selectedFile)
+                                                                    : currentImage
+                                                                        ? currentImage
+                                                                        : noImageLink
                                                         }
                                                         alt="Preview"
                                                         userSelect="none"
@@ -248,15 +255,12 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
                                                 ) : (
                                                     <Image
                                                         objectFit="cover"
-                                                        src={noImageLink
-                                                        }
+                                                        src={noImageLink}
                                                         alt="Preview"
                                                         userSelect="none"
                                                         bg="gray.800"
                                                     />
-
                                                 )}
-
                                             </Center>
                                         </Box>
                                         <FormControl ml={4} mt={10}>
@@ -274,10 +278,10 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
                                                     </Button>
                                                     {activeOption === 'url' && (
                                                         <Input
-                                                            value={selectedImageUrl || ''}
+                                                            // value={selectedImageUrl || ''}
                                                             onChange={(e) => {
-                                                                setImageLoadFailed(false)
-                                                                setSelectedImageUrl(e.target.value)
+                                                                setImageLoadFailed(false);
+                                                                setSelectedImageUrl(e.target.value);
                                                             }}
                                                         />
                                                     )}
@@ -308,7 +312,6 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
                                                                 }}
                                                             />
                                                         </FormControl>
-
                                                     )}
                                                     <FormHelperText>Upload an image for your display picture.</FormHelperText>
                                                     {errors.image && (
@@ -347,9 +350,39 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
 
 
 
-                         // maxH={
-                                                //     {
-                                                //         base: "200px",
-                                                //         xl: "300px"
-                                                //     }
-                                                // }
+// maxH={
+//     {
+//         base: "200px",
+//         xl: "300px"
+//     }
+// }
+
+
+
+{/* {!imageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={
+                                                            currentImage ?
+                                                                currentImage :
+                                                                selectedImageUrl !== undefined && selectedImageUrl !== null && isValidImageUrl && selectedImageUrl?.trim() !== ""
+                                                                    ? selectedImageUrl
+                                                                    : noImageLink
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                        onLoad={handleImageLoadSuccess}
+                                                        onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+
+                                                )} */}
