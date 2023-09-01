@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Grid, Tag, Text, ToastId, useToast } from "@chakra-ui/react"
+import { Box, Button, Flex, Grid, Tag, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react"
 import { ITaskDisplayCard } from "../../../types";
 import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
@@ -153,7 +153,7 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
         taskCompletionMutation.mutate({ pk });
     }
 
-
+    const { colorMode } = useColorMode();
 
     return (
         <Flex
@@ -167,13 +167,13 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
             >
                 <Text
                     color={
-                        "blue.200"
+                        colorMode === "dark" ? "blue.200" : "blue.400"
                     }
                     fontWeight={"bold"}
                     cursor={"pointer"}
                     _hover={
                         {
-                            color: "blue.100",
+                            color: colorMode === "dark" ? "blue.100" : "blue.300",
                             textDecoration: "underline",
                         }
                     }

@@ -247,13 +247,13 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                 key={index}
 
                                                                 color={
-                                                                    "blue.200"
+                                                                    colorMode === "dark" ? "blue.200" : "blue.400"
                                                                 }
                                                                 fontWeight={"bold"}
                                                                 cursor={"pointer"}
                                                                 _hover={
                                                                     {
-                                                                        color: "blue.100",
+                                                                        color: colorMode === "dark" ? "blue.100" : "blue.300",
                                                                         textDecoration: "underline",
                                                                     }
                                                                 }

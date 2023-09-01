@@ -1,12 +1,12 @@
 // Component for adding users to a project
 
 import {
-    Button, FormControl,
-    FormHelperText, FormLabel,
+    Button, Flex, FormControl,
+    FormHelperText, FormLabel, Text,
     Grid, Icon, Input, InputGroup,
     InputLeftElement, Modal, ModalBody,
     ModalCloseButton, ModalContent, ModalFooter,
-    ModalHeader, ModalOverlay, Select, Textarea, useColorMode
+    ModalHeader, ModalOverlay, Select, Textarea, useColorMode, Slider, SliderTrack, Box, SliderFilledTrack, SliderThumb
 } from "@chakra-ui/react"
 import { useState } from "react";
 import { MdAccessTimeFilled } from "react-icons/md"
@@ -17,9 +17,10 @@ import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
 interface IAddUserToProjectModalProps {
     isOpen: boolean;
     onClose: () => void;
+    preselectedUser?: number;
 }
 
-export const AddUserToProjectModal = ({ isOpen, onClose }: IAddUserToProjectModalProps) => {
+export const AddUserToProjectModal = ({ isOpen, onClose, preselectedUser }: IAddUserToProjectModalProps) => {
 
     const { colorMode } = useColorMode();
 
@@ -29,6 +30,63 @@ export const AddUserToProjectModal = ({ isOpen, onClose }: IAddUserToProjectModa
     const [shortCode, setShortCode] = useState('');
     const [newUserRole, setNewUserRole] = useState('');
     const [comments, setComments] = useState('');
+
+
+    const borderColor = colorMode === "light" ? "gray.300" : "gray.500";
+    const sectionTitleColor = colorMode === "light" ? "gray.600" : "gray.300";
+    const subsectionTitleColor = colorMode === "light" ? "gray.500" : "gray.500"
+
+    const [fteValue, setFteValue] = useState(0);
+    const [userRole, setUserRole] = useState("research");
+
+
+    const humanReadableRoleName = (role: string) => {
+        let humanReadable = ""
+        switch (role) {
+            case "academicsuper":
+                humanReadable = "Academic Supervisor"
+                break;
+            case "consulted":
+                humanReadable = "Consulted Peer"
+                break;
+            case "externalcol":
+                humanReadable = "External Collaborator"
+                break;
+            case "externalpeer":
+                humanReadable = "External Peer"
+                break;
+            case "group":
+                humanReadable = "Involved Group"
+                break;
+            case "research":
+                humanReadable = "Research Scientist"
+                break;
+            case "supervising":
+                humanReadable = "Supervising Scientist"
+                break;
+            case "student":
+                humanReadable = "Supervised Student"
+                break;
+            case "technical":
+                humanReadable = "Technical Officer"
+                break;
+
+            default:
+                humanReadable = "None"
+                break;
+        }
+        return humanReadable
+    }
+
+    const handleUpdateRole = (newRole: string) => {
+        setUserRole(newRole);
+    }
+
+    const handleUpdateFTE = (newFTE: number) => {
+        console.log(`Changed to ${newFTE}`)
+        setFteValue(newFTE);
+    }
+
 
     const handleTimeAllocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTimeAllocation(event.target.value);
@@ -67,6 +125,7 @@ export const AddUserToProjectModal = ({ isOpen, onClose }: IAddUserToProjectModa
                             onlyInternal={false}
                             isRequired={true}
                             setUserFunction={setSelectedUser}
+                            preselectedUserPk={preselectedUser}
                             label="User"
                             placeholder="Search for a user"
                             helperText={
@@ -75,84 +134,94 @@ export const AddUserToProjectModal = ({ isOpen, onClose }: IAddUserToProjectModa
                                 </>
                             }
                         />
-                        <Grid
-                            gridTemplateColumns={"repeat(2, 1fr)"}
-                            gridColumnGap={4}
-                            my={4}
+                        <Flex
+                            border={"1px solid"}
+                            rounded={"xl"}
+                            borderColor={borderColor}
+                            padding={4}
+                            mb={4}
+                            flexDir={"column"}
+                            mt={2}
                         >
-                            <FormControl isRequired >
-                                <FormLabel>Time Allocation (0 to 1 FTE)</FormLabel>
-                                <InputGroup>
-                                    <InputLeftElement children={<Icon as={MdAccessTimeFilled} />} />
-                                    <Input
-                                        type="text"
-                                        placeholder="0"
-                                        value={timeAllocation}
-                                        onChange={handleTimeAllocationChange}
-                                        maxLength={30}
-                                    // pattern="[A-Za-z0-9@.+_-]*" 
-                                    />
-                                </InputGroup>
-                                <FormHelperText>Indicative time allocation as a fraction of a Full Time Equivalent (210 person-days). Values between 0 and 1. Fill in estimated allocation for the next 12 months.</FormHelperText>
-                            </FormControl>
+                            <Flex>
+                                <Text
+                                    fontWeight={"bold"}
+                                    fontSize={"sm"}
+                                    mb={1}
+                                    color={sectionTitleColor}
 
-                            <FormControl isRequired mb={4}>
-                                <FormLabel>Short Code</FormLabel>
-                                <InputGroup>
-                                    <InputLeftElement children={<Icon as={BsCashCoin} />} />
-                                    <Input
-                                        type="text"
-                                        placeholder="100"
-                                        value={shortCode}
-                                        onChange={handleShortCodeChange}
-                                        maxLength={30}
-                                    // pattern="[A-Za-z0-9@.+_-]*"
-                                    />
-                                </InputGroup>
-                                <FormHelperText>Cost code for this project membership's salary. Allocated by divisional admin.</FormHelperText>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid
-                            gridTemplateColumns={"repeat(1, 1fr)"}
-                            gridColumnGap={4}
-                            my={4}
-
-                        >
-
-                            <FormControl isRequired mb={4}>
-                                <FormLabel>Role</FormLabel>
+                                >
+                                    Project Role ({userRole ? humanReadableRoleName(userRole) : 'None'})
+                                </Text>
+                            </Flex>
+                            <FormControl
+                                py={2}
+                            >
                                 <InputGroup>
                                     <Select
                                         variant='filled' placeholder='Select a Role for the User'
-                                        onChange={handleNewUserRoleChange}
-                                        value={newUserRole}
+                                        onChange={(e) => handleUpdateRole(e.target.value)}
+                                        value={userRole}
                                     >
-                                        <option value='academicsupervisor'>Academic Supervisor</option>
-                                        <option value='consultedpeer'>Consulted Peer</option>
-                                        <option value='externalcollaborator'>External Collaborator</option>
+                                        <option value='academicsuper'>Academic Supervisor</option>
+                                        <option value='consulted'>Consulted Peer</option>
+                                        <option value='externalcol'>External Collaborator</option>
                                         <option value='externalpeer'>External Peer</option>
-                                        <option value='involvedgroup'>Involved Group</option>
-                                        <option value='researchscientist'>Research Scientist</option>
-                                        <option value='supervisingscientist'>Supervising Scientist</option>
-                                        <option value='supervisedstudent'>Supervised Student</option>
-                                        <option value='technicalofficer'>Technical Officer</option>
+                                        <option value='group'>Involved Group</option>
+                                        <option value='research'>Research Scientist</option>
+                                        <option value='supervising'>Supervising Scientist</option>
+                                        <option value='student'>Supervised Student</option>
+                                        <option value='technical'>Technical Officer</option>
                                     </Select>
                                 </InputGroup>
                                 <FormHelperText>The role this team member fills within this project.</FormHelperText>
                             </FormControl>
-                        </Grid>
 
-                        <FormControl isRequired my={4}>
-                            <FormLabel>Comments</FormLabel>
-                            <InputGroup>
-                                <Textarea
-                                    placeholder='Here is a sample placeholder'
-                                    onChange={handleCommentsChange}
+                            <Flex
+                                mt={4}
+                            >
+                                <Text
+                                    fontWeight={"bold"}
+                                    fontSize={"sm"}
+                                    mb={1}
+                                    color={sectionTitleColor}
+
+                                >
+                                    Time Allocation ({fteValue} FTE)
+                                </Text>
+                            </Flex>
+                            {/* <Text>-</Text> */}
+                            <Slider defaultValue={fteValue} min={0} max={1} step={0.1}
+                                onChangeEnd={(sliderValue) => {
+                                    handleUpdateFTE(sliderValue);
+                                }}
+
+                            >
+                                <SliderTrack bg='blue.100'>
+                                    <Box position='relative' right={10} />
+                                    <SliderFilledTrack bg='blue.500' />
+                                </SliderTrack>
+                                <SliderThumb boxSize={6}
+                                    bg="blue.300"
                                 />
-                            </InputGroup>
-                            <FormHelperText>Any comments clarifying the project membership.</FormHelperText>
-                        </FormControl>
+                            </Slider>
+
+
+                            <Flex
+                                mt={4}
+                            >
+                                <Text
+                                    fontWeight={"bold"}
+                                    fontSize={"sm"}
+                                    mb={1}
+                                    color={sectionTitleColor}
+                                >
+                                    Short Code
+                                </Text>
+                            </Flex>
+                            <Text>-</Text>
+                        </Flex>
+
                     </ModalBody>
                     <ModalFooter>
                         <Button onClick={onClose}>Cancel</Button>
@@ -169,3 +238,82 @@ export const AddUserToProjectModal = ({ isOpen, onClose }: IAddUserToProjectModa
 
     )
 }
+
+// <Grid
+// gridTemplateColumns={"repeat(2, 1fr)"}
+// gridColumnGap={4}
+// my={4}
+// >
+// <FormControl isRequired >
+//     <FormLabel>Time Allocation (0 to 1 FTE)</FormLabel>
+//     <InputGroup>
+//         <InputLeftElement children={<Icon as={MdAccessTimeFilled} />} />
+//         <Input
+//             type="text"
+//             placeholder="0"
+//             value={timeAllocation}
+//             onChange={handleTimeAllocationChange}
+//             maxLength={30}
+//         // pattern="[A-Za-z0-9@.+_-]*"
+//         />
+//     </InputGroup>
+//     <FormHelperText>Indicative time allocation as a fraction of a Full Time Equivalent (210 person-days). Values between 0 and 1. Fill in estimated allocation for the next 12 months.</FormHelperText>
+// </FormControl>
+
+// <FormControl isRequired mb={4}>
+//     <FormLabel>Short Code</FormLabel>
+//     <InputGroup>
+//         <InputLeftElement children={<Icon as={BsCashCoin} />} />
+//         <Input
+//             type="text"
+//             placeholder="100"
+//             value={shortCode}
+//             onChange={handleShortCodeChange}
+//             maxLength={30}
+//         // pattern="[A-Za-z0-9@.+_-]*"
+//         />
+//     </InputGroup>
+//     <FormHelperText>Cost code for this project membership's salary. Allocated by divisional admin.</FormHelperText>
+// </FormControl>
+// </Grid>
+
+// <Grid
+// gridTemplateColumns={"repeat(1, 1fr)"}
+// gridColumnGap={4}
+// my={4}
+
+// >
+
+// <FormControl isRequired mb={4}>
+//     <FormLabel>Role</FormLabel>
+//     <InputGroup>
+//         <Select
+//             variant='filled' placeholder='Select a Role for the User'
+//             onChange={handleNewUserRoleChange}
+//             value={newUserRole}
+//         >
+//             <option value='academicsupervisor'>Academic Supervisor</option>
+//             <option value='consultedpeer'>Consulted Peer</option>
+//             <option value='externalcollaborator'>External Collaborator</option>
+//             <option value='externalpeer'>External Peer</option>
+//             <option value='involvedgroup'>Involved Group</option>
+//             <option value='researchscientist'>Research Scientist</option>
+//             <option value='supervisingscientist'>Supervising Scientist</option>
+//             <option value='supervisedstudent'>Supervised Student</option>
+//             <option value='technicalofficer'>Technical Officer</option>
+//         </Select>
+//     </InputGroup>
+//     <FormHelperText>The role this team member fills within this project.</FormHelperText>
+// </FormControl>
+// </Grid>
+
+// <FormControl isRequired my={4}>
+// <FormLabel>Comments</FormLabel>
+// <InputGroup>
+//     <Textarea
+//         placeholder='Here is a sample placeholder'
+//         onChange={handleCommentsChange}
+//     />
+// </InputGroup>
+// <FormHelperText>Any comments clarifying the project membership.</FormHelperText>
+// </FormControl>
