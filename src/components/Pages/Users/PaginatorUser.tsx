@@ -3,6 +3,9 @@
 import { Box, Button, Center, Grid, Spinner, Stack } from "@chakra-ui/react";
 import { UserGridItem } from "./UserGridItem";
 import { AnimatePresence, motion } from "framer-motion";
+import { useBranches } from "../../../lib/hooks/useBranches";
+import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
+import { useEffect } from "react";
 
 interface IPaginationProps {
     data: any;
@@ -23,6 +26,9 @@ export const PaginatorUser = ({
         setCurrentUserResultsPage(pageNumber);
     };
 
+    const { branchesLoading, branchesData } = useBranches();
+    const { baLoading, baData } = useBusinessAreas();
+
     const maxDisplayedPages = 8;
 
     // Calculate the start and end page numbers for rendering
@@ -31,6 +37,11 @@ export const PaginatorUser = ({
     if (endPage - startPage < maxDisplayedPages - 1) {
         startPage = Math.max(1, endPage - maxDisplayedPages + 1);
     }
+
+    useEffect(() => {
+        if (!loading)
+            console.log(data)
+    }, [data, loading])
 
     return (
         <Box>
@@ -66,6 +77,8 @@ export const PaginatorUser = ({
                                         branch={u.branch}
                                         is_active={u.is_active}
                                         affiliation={u.affiliation}
+                                        branches={!branchesLoading ? branchesData : undefined}
+                                        businessAreas={!baLoading ? baData : undefined}
                                     />
                                 </motion.div>
                             ))}

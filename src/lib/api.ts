@@ -180,6 +180,22 @@ export const getMyPartnerships = async () => {
 
 // USERS ======================================================
 
+
+export interface AdminSwitchVar {
+    userPk: number | string;
+}
+
+export const switchAdmin = async ({ userPk }: AdminSwitchVar) => {
+    const res = instance.post(`users/${userPk}/admin`).then(res => { return res.data })
+    return res;
+}
+
+export const deleteUserAdmin = async ({ userPk }: AdminSwitchVar) => {
+    const res = instance.delete(`users/${userPk}`).then(res => { return res.data })
+    return res;
+}
+
+
 export const getMe = async () => {
     const res = instance.get(`users/me`).then(res => {
         return res.data
@@ -190,6 +206,7 @@ export const getMe = async () => {
 interface IFullUserProps {
     pk: string;
 }
+
 export const getFullUser = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
     const res = instance.get(`users/${pk}`).then(res => {
@@ -198,6 +215,8 @@ export const getFullUser = async ({ queryKey }: QueryFunctionContext) => {
     })
     return res;
 }
+
+
 
 export const getSingleUser = async ({ queryKey }: QueryFunctionContext) => {
     const [_, userPk] = queryKey;
@@ -349,18 +368,61 @@ export const getProfile = ({ queryKey }: QueryFunctionContext): Promise<IProfile
         .get(`users/${userId}/profile`).then(res => res.data);
 }
 
-export const updatePersonalInformation = async ({ userPk, title, phone, fax }: IPIUpdateVariables) => {
-    console.log(
-        userPk, title, phone, fax
-    )
-    return instance.put(
-        `users/${userPk}/pi`,
-        { title, phone, fax }).then(res => res.data);
+
+export interface IFullUserUpdateVariables {
+    userPk: string | number;
+    title: string;
+    phone: string;
+    fax: string;
+    branch: number | string;
+    business_area: number | string;
+    image?: File | string | null | undefined;
+    about?: string;
+    expertise?: string;
 
 }
 
+export const adminUpdateUser = async ({ userPk, title, phone, fax, branch, business_area, image, about, expertise }: IFullUserUpdateVariables) => {
+    console.log(
+        userPk, title, phone, fax, branch, business_area, image, about, expertise
+    )
+
+    try {
+        console.log(branch)
+        console.log(business_area)
+
+        const membershipData = {
+            userPk: userPk,
+            branch: (branch !== null && branch !== '') ? Number(branch) : 0,
+            business_area: (business_area !== null && branch !== '') ? Number(business_area) : 0,
+        };
+        await updateMembership(membershipData);
+
+        const profileData = {
+            userPk: userPk.toString(),
+            image: image !== undefined && image !== null ? image : '',
+            about: about !== undefined && about !== '' ? about : '',
+            expertise: expertise !== undefined && expertise !== '' ? expertise : '',
+        };
+        await updateProfile(profileData);
+
+        const piData = {
+            userPk: userPk.toString(),
+            title: title !== undefined && title !== '' ? title : '',
+            phone: phone !== undefined && phone !== '' ? phone : '',
+            fax: fax !== undefined && fax !== '' ? fax : '',
+        };
+        await updatePersonalInformation(piData);
+
+
+        return { ok: "Update successful" };
+    } catch (error: any) {
+        throw new Error(error.message || 'An unknown error occurred');
+    }
+}
+
 export interface IMembershipUpdateVariables {
-    userPk: number;
+    userPk: string | number;
     branch: number;
     business_area: number;
 }
@@ -376,6 +438,19 @@ export const updateMembership = async ({ userPk, branch, business_area }: IMembe
     )
     return response.data
 }
+
+
+
+export const updatePersonalInformation = async ({ userPk, title, phone, fax }: IPIUpdateVariables) => {
+    console.log(
+        userPk, title, phone, fax
+    )
+    return instance.put(
+        `users/${userPk}/pi`,
+        { title, phone, fax }).then(res => res.data);
+
+}
+
 
 export const updateProfile = async ({ userPk, image, about, expertise }: IProfileUpdateVariables) => {
 

@@ -15,12 +15,17 @@ import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
 import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
 import { useNavigate } from "react-router-dom";
 import { useUpdatePage } from "../../../lib/hooks/useUpdatePage";
+import { useBranches } from "../../../lib/hooks/useBranches";
+import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
+import { IBranch, IBusinessArea } from "../../../types";
 
 interface Props {
     pk: number;
+    branches: IBranch[] | undefined;
+    businessAreas: IBusinessArea[] | undefined;
 }
 
-export const UserProfile = ({ pk }: Props) => {
+export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
     const { userLoading: loading, userData: user } = useFullUserByPk(pk);
     const formatted_date = useFormattedDate(user?.date_joined);
@@ -54,7 +59,7 @@ export const UserProfile = ({ pk }: Props) => {
     const navigate = useNavigate();
 
     return (
-        (loading || pk === undefined) ?
+        (loading || !user || pk === undefined) ?
             <Center
                 w={"100%"}
                 h={"100%"}
@@ -70,16 +75,25 @@ export const UserProfile = ({ pk }: Props) => {
                     isOpen={isDeleteModalOpen}
                     onClose={onDeleteModalClose}
                     userIsSuper={userInQuestionIsSuperuser}
-                    userIsMe={userInQuestionIsMe}
+                    userIsMe={userInQuestionIsMe} userPk={user.pk}
                 />
                 <PromoteUserModal
                     isOpen={isPromoteModalOpen}
                     onClose={onPromoteModalClose}
+                    userPk={user.pk}
                     userIsSuper={userInQuestionIsSuperuser}
                     userIsMe={userInQuestionIsMe}
+                    userIsExternal={!user.is_staff}
                 />
                 <AddUserToProjectModal isOpen={isAddToProjectModalOpen} onClose={onAddToProjectModalClose} />
-                <EditUserDetailsModal isOpen={isEditUserDetailsModalOpen} onClose={onEditUserDetailsModalClose} />
+
+                <EditUserDetailsModal
+                    isOpen={isEditUserDetailsModalOpen}
+                    onClose={onEditUserDetailsModalClose}
+                    user={user}
+                    branches={branches}
+                    businessAreas={businessAreas}
+                />
                 <Flex
                     flexDir={"column"}
                     h={"100%"}
@@ -88,7 +102,7 @@ export const UserProfile = ({ pk }: Props) => {
                         mt={4}
                     >
                         <Avatar
-                            src={user?.image?.old_file}
+                            src={user?.image?.file ? user.image.file : user?.image?.old_file}
                             size={"2xl"}
                             userSelect={"none"}
                         />
@@ -205,7 +219,7 @@ export const UserProfile = ({ pk }: Props) => {
                                                 {user.agency !== null ? user.agency.name : "agency returning none"}
                                             </Text>
                                             <Text fontSize="sm" color={colorMode === "light" ? "gray.600" : "gray.400"}>
-                                                {user.branch !== null ? `${user.branch} Branch` : "Branch not set"}
+                                                {user.branch !== null ? `${user.branch.name} Branch` : "Branch not set"}
                                             </Text>
                                         </Flex>
 
@@ -248,7 +262,7 @@ export const UserProfile = ({ pk }: Props) => {
                                     About
                                 </Text>
                             </Flex>
-                            <Text>{user.about ? user.about : "This user has not filled in their 'About' section."}</Text>
+                            <Text>{user.about ? user.about : "This user has not filled in this section."}</Text>
                             <Flex
                                 mt={4}
                             >
@@ -263,7 +277,7 @@ export const UserProfile = ({ pk }: Props) => {
                                     Expertise
                                 </Text>
                             </Flex>
-                            <Text>{user?.expertise ? user.expertise : "This user has not filled in their 'Expertise' section."}</Text>
+                            <Text>{user?.expertise ? user.expertise : "This user has not filled in this section."}</Text>
 
 
                         </Flex>
@@ -296,10 +310,10 @@ export const UserProfile = ({ pk }: Props) => {
                             <Grid
                                 gridTemplateColumns="1fr 3fr"
                             >
-                                <Text color={subsectionTitleColor}
+                                {/* <Text color={subsectionTitleColor}
                                     userSelect={"none"}
                                     fontSize={"sm"}
-                                ><b>Role: </b></Text><Text >{user?.role ? user.role : "This user has not filled in their 'role' section."}</Text>
+                                ><b>Role: </b></Text><Text >{user?.role ? user.role : "This user has not filled in their 'role' section."}</Text> */}
                                 <Text color={subsectionTitleColor}
                                     userSelect={"none"}
                                     fontSize={"sm"}
@@ -433,7 +447,7 @@ export const UserProfile = ({ pk }: Props) => {
                                             }
 
                                         >
-                                            {user?.is_superuser ? "Demote" : "Promote"}
+                                            {user.is_superuser ? "Demote" : "Promote"}
                                         </Button>
                                         <Button
                                             onClick={onDeleteModalOpen}
