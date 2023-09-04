@@ -191,7 +191,9 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
             >
                 <Text ml={2}
                     color={user.is_staff ? user.is_superuser ? "blue.500" : "green.500" : "gray.500"}
-                >{`${user.first_name} ${user.last_name} ${user.is_staff ? user.is_superuser ? '(Admin)' : '(Staff)' : '(External)'}`}</Text>
+                >
+                    {`${user.first_name === "None" ? user.username : user.first_name} ${user.last_name === "None" ? "" : user.last_name} ${user.is_staff ? user.is_superuser ? '(Admin)' : '(Staff)' : '(External)'}`}
+                </Text>
             </Box>
         </Flex>
     );
@@ -233,7 +235,10 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
             />
             <Text ml={2}
                 color={user.is_staff ? user.is_superuser ? "blue.500" : "green.500" : "gray.500"}
-            >{`${user.first_name} ${user.last_name} ${user.is_staff ? user.is_superuser ? '(Admin)' : '(Staff)' : '(External)'}`}</Text>
+            >
+                {/* {`${user.first_name} ${user.last_name} ${user.is_staff ? user.is_superuser ? '(Admin)' : '(Staff)' : '(External)'}`} */}
+                {`${user.first_name === "None" ? user.username : user.first_name} ${user.last_name === "None" ? "" : user.last_name} ${user.is_staff ? user.is_superuser ? '(Admin)' : '(Staff)' : '(External)'}`}
+            </Text>
 
             <IconButton
                 aria-label="Clear selected user"

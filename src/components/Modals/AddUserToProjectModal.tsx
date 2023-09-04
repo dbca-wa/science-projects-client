@@ -121,6 +121,20 @@ export const AddUserToProjectModal = ({ isOpen, onClose, preselectedUser }: IAdd
                 <ModalCloseButton />
                 <form onSubmit={handleSubmit}>
                     <ModalBody>
+                        {/* <ProjectSearchDropdown
+                            allProjects={false}
+                            isRequired={true}
+                            setProjectFunction={setSelectedProject}
+                            user={ }
+                            label="Project"
+                            placeholder="Search for a project"
+                            helperText={
+                                <>
+                                    The project you would like to add the user to.
+                                </>
+                            }
+                        /> */}
+
                         <UserSearchDropdown
                             onlyInternal={false}
                             isRequired={true}

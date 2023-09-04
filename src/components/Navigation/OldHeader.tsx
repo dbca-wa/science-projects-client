@@ -18,14 +18,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import theme from "../../theme";
 
 // Icon imports
-import { GiHamburgerMenu } from "react-icons/gi";
+import { GiArchiveResearch, GiHamburgerMenu } from "react-icons/gi";
 import { IoMdDocument } from "react-icons/io";
 import { AiFillProject } from "react-icons/ai";
 import { BsFillPeopleFill } from "react-icons/bs"
 import { AiFillPrinter } from "react-icons/ai";
 import { CgViewList } from "react-icons/cg";
-import { ImBook, ImUsers } from "react-icons/im";
-import { FaUserPlus } from "react-icons/fa";
+import { ImBook, ImBriefcase, ImUsers } from "react-icons/im";
+import { FaAddressCard, FaLocationArrow, FaUserPlus } from "react-icons/fa";
 
 
 import { Navitar } from "./Navitar";
@@ -35,6 +35,11 @@ import { SearchUsers } from "./SearchUsers";
 import { SearchProjects } from "./SearchProjects";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
+import { useUser } from "../../lib/hooks/useUser";
+import { RiAdminFill, RiOrganizationChart } from "react-icons/ri";
+import { MdManageHistory, MdOutlineSettingsSuggest } from "react-icons/md";
+import { GoOrganization } from "react-icons/go";
+import { FcApproval, FcDataBackup } from "react-icons/fc";
 
 
 const ProjectMenuContents = () => {
@@ -196,6 +201,142 @@ const UserMenuContents = () => {
     )
 }
 
+const AdminMenuContents = () => {
+    const navigate = useNavigate();
+
+    const handleDataDump = () => {
+        console.log("Dumping data...");
+    }
+
+    const handleBatchApproveReports = () => {
+        console.log("Batch approving...")
+    }
+
+
+    return (
+        <>
+            <MenuGroup
+                title="CRUD" fontSize={"12px"} color={"gray.500"} textAlign={"center"}
+
+            >
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/addresses')
+                    }}
+                >
+                    {<FaAddressCard />}
+                    <Text ml={2}
+                    >
+                        Manage Addresses
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/reports')
+                    }}
+                >
+                    {<MdManageHistory />}
+                    <Text ml={2}
+                    >
+                        Manage Reports
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/branches')
+                    }}
+                >
+                    {<RiOrganizationChart />}
+                    <Text ml={2}
+                    >
+                        Manage Branches
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/businessareas')
+                    }}
+                >
+                    {<ImBriefcase />}
+                    <Text ml={2}
+                    >
+                        Manage Business Areas
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/divisions')
+                    }}
+                >
+                    {<GoOrganization />}
+                    <Text ml={2}
+                    >
+                        Manage Divisions
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/locations')
+                    }}
+                >
+                    {<FaLocationArrow />}
+                    <Text ml={2}
+                    >
+                        Manage Locations
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/researchfunctions')
+                    }}
+                >
+                    {<GiArchiveResearch />}
+                    <Text ml={2}
+                    >
+                        Manage Research Functions
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/services')
+                    }}
+                >
+                    {<MdOutlineSettingsSuggest />}
+                    <Text ml={2}
+                    >
+                        Manage Services
+                    </Text>
+                </MenuItem>
+            </MenuGroup>
+
+            <MenuGroup
+                title="BATCH" fontSize={"12px"} color={"gray.500"} textAlign={"center"}
+
+            >
+                <MenuItem
+                    onClick={handleDataDump}
+                >
+                    {<FcDataBackup />}
+                    <Text ml={2}
+                    >
+                        Dump Data
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={handleBatchApproveReports}
+                >
+                    {<FcApproval />}
+                    <Text ml={2}
+                    >
+                        Batch Approve Reports
+                    </Text>
+                </MenuItem>
+            </MenuGroup>
+        </>
+    )
+
+}
+
 const OldHeader = () => {
 
     const navigate = useNavigate();
@@ -247,6 +388,13 @@ const OldHeader = () => {
                 setShouldRenderProjectSearch(false);
         }
     }, [location.pathname])
+
+    const { userLoading, userData } = useUser();
+
+    useEffect(() => {
+        if (!userLoading)
+            console.log(userData);
+    }, [userLoading, userData])
 
     return (
         <Box>
@@ -408,6 +556,16 @@ const OldHeader = () => {
                                                                 <ReportMenuContents />
                                                             }
                                                         />
+
+                                                        {!userLoading && userData.is_superuser && (
+                                                            <SidebarNavMenu
+                                                                menuName="Admin"
+                                                                leftIcon={<RiAdminFill />}
+                                                                children={
+                                                                    <AdminMenuContents />
+                                                                }
+                                                            />
+                                                        )}
                                                     </Grid>
                                                 </VStack>
                                             </DrawerBody>
@@ -439,6 +597,17 @@ const OldHeader = () => {
                                     <NavMenu menuName="Reports" children={
                                         <ReportMenuContents />
                                     } />
+
+                                    {!userLoading && userData.is_superuser && (
+                                        <NavMenu
+                                            menuName="Admin"
+                                            children={
+                                                <AdminMenuContents />
+                                            }
+                                        />
+                                    )}
+
+
                                 </HStack>
 
                                 {/* RHS Items */}
