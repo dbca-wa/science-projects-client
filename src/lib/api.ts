@@ -505,6 +505,23 @@ export const getFullProject = async ({ queryKey }: QueryFunctionContext) => {
     return res;
 }
 
+// export const getMyProjectsBasedOnSearchTerm = async ({queryKey}: QueryFunctionContext) => {
+//     const [_, pk] = queryKey;
+//     const res = instance.get()
+// }
+
+// export const setUserFTE = async () => {
+//     return res
+// }
+
+// export const setUserRole = async () => {
+//     return res
+// }
+
+// export const setUserPosition = async () => {
+//     return res
+// }
+
 
 // PROJECT CREATION ==========================================================================
 
