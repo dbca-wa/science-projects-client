@@ -391,10 +391,10 @@ const OldHeader = () => {
 
     const { userLoading, userData } = useUser();
 
-    useEffect(() => {
-        if (!userLoading)
-            console.log(userData);
-    }, [userLoading, userData])
+    // useEffect(() => {
+    //     if (!userLoading)
+    //         console.log(userData);
+    // }, [userLoading, userData])
 
     return (
         <Box>
