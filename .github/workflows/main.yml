@@ -8,5 +8,5 @@ jobs:
         - name: Build and Push Image
           run: | 
               docker login --username idabblewith --password ${{ secrets.GH_PAT }} ghcr.io
-              docker build . --tag ghcr.io/idabblewith/cycle-frontend:latest
-              docker push ghcr.io/idabblewith/cycle-frontend:latest
+              docker build . --tag ghcr.io/dbca-wa/science-projects-client:latest
+              docker push ghcr.io/dbca-wa/science-projects-client:latest
