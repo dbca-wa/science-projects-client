@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom"
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext"
 import { TraditionalTaskDisplay } from "./TraditionalTaskDisplay"
 import { AddIcon } from "@chakra-ui/icons"
+import { GoProjectRoadmap } from "react-icons/go"
 
 
 interface ITaskFromAPI {
@@ -148,33 +149,10 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
 
                                 <AccordionPanel pb={4}
                                     userSelect={"none"}
+                                    px={0}
+                                    pt={0}
                                 >
-                                    <Box
-                                        display="flex"
-                                        justifyContent={"flex-end"}
-                                        alignItems="center"
-                                        minWidth="100%" py={1}
-                                    >
-                                        <Button
-                                            bg={colorMode === "dark" ? "green.500" : "green.400"}
-                                            _hover={
-                                                {
-                                                    bg: colorMode === "dark" ? "green.400" : "green.300",
-                                                }
-                                            }
-                                            variant="solid"
-                                            px={3} // Adjust the padding to your preference
-                                            mr={0}
-                                            display="flex"
-                                            alignItems="center"
-                                            onClick={handleAddTaskClick}
-                                            color="white"
-                                            size={"xs"}
-                                        >
-                                            Add Task
-                                            {/* <AddIcon ml={2} color="white" /> */}
-                                        </Button>
-                                    </Box>
+
                                     {combinedData.length >= 1 ? (
                                         <Grid
                                             gridTemplateColumns={"repeat(1, 1fr)"}
@@ -191,7 +169,9 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                     )
                                         : <Center>
                                             <Flex>
-                                                <Center>
+                                                <Center
+                                                    pt={10}
+                                                >
                                                     <FcOk />
                                                     &nbsp;
                                                     <Text>All done!</Text>
@@ -199,6 +179,32 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                             </Flex>
                                         </Center>
                                     }
+                                    <Box
+                                        display="flex"
+                                        justifyContent={"flex-end"}
+                                        alignItems="center"
+                                        minWidth="100%" py={4}
+                                    >
+                                        <Button
+                                            bg={colorMode === "dark" ? "green.500" : "green.400"}
+                                            _hover={
+                                                {
+                                                    bg: colorMode === "dark" ? "green.400" : "green.300",
+                                                }
+                                            }
+                                            variant="solid"
+                                            px={3} // Adjust the padding to your preference
+                                            mr={0}
+                                            display="flex"
+                                            alignItems="center"
+                                            onClick={handleAddTaskClick}
+                                            color="white"
+                                            size={"sm"}
+                                        >
+                                            Add Task
+                                            {/* <AddIcon ml={2} color="white" /> */}
+                                        </Button>
+                                    </Box>
                                 </AccordionPanel>
                             </AccordionItem>
                             <AccordionItem
@@ -230,42 +236,71 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                     <AccordionIcon />
                                 </AccordionButton>
 
-                                <AccordionPanel pb={4}
+                                <AccordionPanel
+                                    pb={4}
                                     userSelect={"none"}
+                                    // w={"100%"}
+                                    // bg={"red"}
+                                    px={0}
+                                    pt={0}
                                 >
                                     {
 
                                         projectData?.length >= 1 ?
                                             (
                                                 <Grid
+                                                    // bg={"orange"}
                                                     justifyItems={"start"}
+                                                    w={"100%"}
                                                 >
-                                                    {projectData?.map((project: IProjectData, index: number) => {
-                                                        return (
+                                                    {projectData?.map((project: IProjectData, index: number) => (
+                                                        <Flex
+                                                            key={index}
+                                                            alignItems={"center"}
+                                                            border={"1px solid"}
+                                                            borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
+                                                            w={"100%"}
+                                                            p={2}
+                                                            onClick={() => goToProject(project?.pk ? project.pk : project.id)}
+                                                            _hover={{
+                                                                color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                                                textDecoration: "underline",
+                                                                cursor: "pointer"
+                                                            }}
+                                                        >
+                                                            <Center
+                                                                color={colorMode === "light" ? "blue.600" : "gray.200"}
+                                                                mr={3}
+                                                                alignItems={"center"}
+                                                                alignContent={"center"}
+                                                                boxSize={3}
+                                                            >
+                                                                <GoProjectRoadmap />
+                                                            </Center>
                                                             <Text
-                                                                py={2}
-                                                                key={index}
-
-                                                                color={
-                                                                    colorMode === "dark" ? "blue.200" : "blue.400"
-                                                                }
+                                                                color={colorMode === "dark" ? "blue.200" : "blue.400"}
                                                                 fontWeight={"bold"}
                                                                 cursor={"pointer"}
-                                                                _hover={
-                                                                    {
-                                                                        color: colorMode === "dark" ? "blue.100" : "blue.300",
-                                                                        textDecoration: "underline",
-                                                                    }
-                                                                }
-                                                                onClick={() => goToProject(project?.pk ? project.pk : project.id)}
+                                                                _hover={{
+                                                                    color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                                                    textDecoration: "underline",
+                                                                }}
                                                             >
-                                                                {`- ${project.title}`}
+
+                                                                {`${project.title}`}
                                                             </Text>
-                                                        )
-                                                    })}
+
+                                                        </Flex>
+                                                    ))}
                                                 </Grid>
                                             ) :
-                                            "You are currently not associated with any projects."
+                                            <Text
+                                                mt={4}
+                                                mx={2}
+                                            >
+                                                You are currently not associated with any projects.
+
+                                            </Text>
                                     }
                                 </AccordionPanel>
 

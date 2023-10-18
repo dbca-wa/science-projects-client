@@ -1,7 +1,7 @@
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
 import { QueryFunctionContext } from "@tanstack/react-query";
-import { IAddLocationForm, IAddress, IBranch, IBusinessArea, IDepartmentalService, IDivision, IPersonalInformation, IProfile, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData } from "../types";
+import { EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveProgressReport, IBranch, IBusinessArea, IDepartmentalService, IDivision, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
 
 // INSTANCE SETUP ==================================================================
 
@@ -9,6 +9,8 @@ const instance = axios.create({
     baseURL:
         // process.env.NODE_ENV === "development" ?
         "http://127.0.0.1:8000/api/v1/"
+    // "http://127.0.0.1/api/v1/"
+    // This is for nginx
     //  :
     // "PRODUCTION URL GOES HERE"
     ,
@@ -21,6 +23,9 @@ instance.interceptors.request.use(config => {
     config.headers["X-CSRFToken"] = csrfToken;
     return config;
 });
+
+
+
 
 
 // AUTHENTICATION ==============================================================
@@ -169,6 +174,7 @@ export const getMyProjects = async () => {
 }
 
 
+
 export const getMyPartnerships = async () => {
     const res = instance.get(`partnerships/mine`
     ).then(res => {
@@ -209,12 +215,22 @@ interface IFullUserProps {
 
 export const getFullUser = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
+    // if (pk !== 0)
+    // {
     const res = instance.get(`users/${pk}`).then(res => {
         // console.log(res.data)
         return res.data
     })
     return res;
+
+    // }
+    // else {
+    //     return {
+
+    //     }
+    // }
 }
+
 
 
 
@@ -452,6 +468,16 @@ export const updatePersonalInformation = async ({ userPk, title, phone, fax }: I
 }
 
 
+// export const updateTeamMemberPosition = async (user_id: number, project_id: number, newPosition: number) => {
+//     const data = {
+//         user_id: user_id,
+//         new_position: newPosition,
+//     };
+
+//     const response = await instance.put(`projects/${project_id}/team`, data);
+//     return response.data; // Assuming your backend returns updated data
+// };
+
 export const updateProfile = async ({ userPk, image, about, expertise }: IProfileUpdateVariables) => {
 
     console.log(
@@ -469,10 +495,13 @@ export const updateProfile = async ({ userPk, image, about, expertise }: IProfil
         formData.append('expertise', expertise);
     }
 
-    if (image instanceof File) {
-        formData.append('image', image);
-    } else if (typeof image === 'string') {
-        formData.append('image', image);
+    if (image !== null) {
+        if (image instanceof File) {
+            formData.append('image', image);
+        } else if (typeof image === 'string') {
+            formData.append('image', image);
+        }
+
     }
 
     console.log(formData);
@@ -487,6 +516,7 @@ export const updateProfile = async ({ userPk, image, about, expertise }: IProfil
 
 
 }
+
 
 // return instance.put(
 //     `users/${userPk}/profile`,
@@ -505,10 +535,117 @@ export const getFullProject = async ({ queryKey }: QueryFunctionContext) => {
     return res;
 }
 
-// export const getMyProjectsBasedOnSearchTerm = async ({queryKey}: QueryFunctionContext) => {
-//     const [_, pk] = queryKey;
-//     const res = instance.get()
-// }
+export const getFullProjectSimple = async (preselectedProjectPk: number) => {
+    try {
+        const res = await instance.get(`projects/${preselectedProjectPk}`);
+        console.log(res.data);
+        return res.data;
+    } catch (error) {
+        console.error('Error fetching project:', error);
+        throw error; // You can handle errors as needed
+    }
+};
+
+
+export interface INewMember {
+    user: number;
+    project: number;
+    role: string;
+    timeAllocation: number;
+    shortCode?: number;
+    comments?: string;
+    isLeader?: boolean;
+    position?: number;
+    oldId?: number;
+}
+
+export const createTeamMember = async ({ user, project, role, timeAllocation, shortCode, comments }: INewMember) => {
+    const data = {
+        user: user,
+        project: project,
+        role: role,
+        time_allocation: timeAllocation,
+        short_code: shortCode,
+        comments: comments,
+        is_leader: false,
+        position: 100,
+        old_id: 1,
+    }
+
+    console.log(data);
+
+    const response = await instance.post(`projects/project_members`, data);
+    return response.data;
+}
+
+export type RemoveUserMutationType = {
+    user: number;
+    project: number;
+};
+
+export const removeTeamMemberFromProject = async (formData: RemoveUserMutationType) => {
+
+    console.log(formData);
+
+    const response = await instance.delete(`projects/project_members/${formData.project}/${formData.user}`);
+    console.log(response.data === "");
+    console.log(response.status);
+    return response;
+
+}
+
+
+export const promoteUserToLeader = async (formData: RemoveUserMutationType) => {
+    console.log(formData);
+
+    const response = await instance.post(
+        `projects/promote`,
+        {
+            "user": formData.user,
+            "project": formData.project,
+        }
+    );
+
+    console.log(response.data === "");
+    console.log(response.status);
+    return response.data;
+}
+
+
+
+
+export const updateTeamMemberPosition = async (project_id: number, reorderedTeam: IProjectMember[]) => {
+    const data = {
+        reordered_team: reorderedTeam, // Include the reorderedTeam data in the request
+    };
+
+    const response = await instance.put(`projects/${project_id}/team`, data);
+    return response.data.sorted_team; // Assuming your backend returns sorted_team
+};
+
+export const getProjectTeam = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+    const res = instance.get(`projects/${pk}/team`).then(res => {
+        console.log(res.data)
+        return res.data
+    })
+    return res;
+}
+
+
+export const getDirectorateMembers = async ({ queryKey }: QueryFunctionContext) => {
+
+    // GET DIRECTORATE FROM BACKEND HERE!!
+    const res = instance.get(`users/directorate`).then(res => {
+        console.log(res.data)
+        return res.data
+    })
+    return res;
+}
+
+
+
+
 
 // export const setUserFTE = async () => {
 //     return res
@@ -545,17 +682,30 @@ export interface ICreateProjectDetails {
     dates: Date[];
 }
 
+export interface ICreateProjectExternalDetails {
+    externalDescription: string;
+    aims: string;
+    budget: string;
+    collaborationWith: string;
+}
+export interface ICreateProjectStudentDetails {
+    level: string;
+    organisation: string;
+}
+
 
 export interface IProjectCreationVariables {
     baseInformationData: ICreateProjectBaseInfo;
     detailsData: ICreateProjectDetails;
     locationData: number[];
+    externalData: ICreateProjectExternalDetails;
+    studentData: ICreateProjectStudentDetails;
 }
 
-export const createProject = async ({ baseInformationData, detailsData, locationData }: IProjectCreationVariables) => {
+export const createProject = async ({ baseInformationData, detailsData, locationData, externalData, studentData }: IProjectCreationVariables) => {
 
     console.log(
-        baseInformationData, detailsData, locationData
+        baseInformationData, detailsData, locationData, externalData, studentData
     )
 
     const formData = new FormData();
@@ -567,7 +717,14 @@ export const createProject = async ({ baseInformationData, detailsData, location
     formData.append('keywords', baseInformationData.keywords.join(', '));
 
     if (baseInformationData.imageData !== null) {
-        formData.append('imageData', baseInformationData.imageData);
+        if (baseInformationData.imageData instanceof File) {
+
+            formData.append('imageData', baseInformationData.imageData);
+        } else if (typeof baseInformationData.imageData === 'string') {
+            formData.append('imageData', baseInformationData.imageData);
+
+        }
+
     }
 
     formData.append('businessArea', detailsData.businessArea.toString());
@@ -584,6 +741,20 @@ export const createProject = async ({ baseInformationData, detailsData, location
         formData.append('locations', location.toString());
     });
 
+    if (baseInformationData.kind === "student") {
+        formData.append('organisation', studentData.organisation);
+        formData.append('level', studentData.level);
+
+    }
+    else if (baseInformationData.kind === "external") {
+        formData.append('externalDescription', externalData.externalDescription);
+        formData.append('aims', externalData.aims);
+        formData.append('budget', externalData.budget);
+        formData.append('collaborationWith', externalData.collaborationWith);
+    }
+
+    console.log(formData);
+
     return instance.post(
         `projects/`,
         formData,
@@ -593,6 +764,71 @@ export const createProject = async ({ baseInformationData, detailsData, location
             },
         }
     ).then(res => res.data);
+
+}
+
+export interface IUpdateProjectDetails {
+    // departmentalService: number;
+    // researchFunction: number;
+    // businessArea: number;
+    description: string;
+    // dates: Date[];
+}
+
+export const updateProjectDetails = async ({
+    description
+}: IUpdateProjectDetails) => {
+    return instance.get('google.com')
+}
+
+// export const getInternalUsersBasedOnSearchTerm = async (searchTerm: string, onlyInternal: boolean) => {
+//     try {
+//         let url = `users/smallsearch`;
+
+//         if (searchTerm !== "") {
+//             url += `?searchTerm=${searchTerm}`;
+//         }
+
+//         url += `&onlyInternal=${(onlyInternal === undefined || onlyInternal == false) ? "False" : "True"}`
+
+//         const response = await instance.get(url);
+
+//         const { users } = response.data;
+//         return { users };
+//     } catch (error) {
+//         console.error("Error fetching users based on search term:", error);
+//         throw error;
+//     }
+// };
+
+// return (
+//     { "status": "Ok" }
+// )
+
+export const getMyProjectsBasedOnSearchTerm = async (
+    searchTerm: string, userPk: number
+) => {
+    try {
+        let url = `projects/smallsearch`;
+
+        if (userPk !== null && userPk !== 0 && userPk !== undefined) {
+            if (searchTerm !== "") {
+                url += `?searchTerm=${searchTerm}`;
+                url += `&userPk=${userPk}`
+            }
+            else {
+                url += `?userPk=${userPk}`
+            }
+        }
+
+        const response = await instance.get(url);
+
+        const { projects } = response.data;
+        return { projects };
+    } catch (error) {
+        console.error("Error fetching projects based on search term:", error);
+        throw error;
+    }
 
 }
 
@@ -679,6 +915,152 @@ export const getProjects = async ({ searchTerm }: ISearchTerm) => {
 
 
 // DOCUMENTS ==========================================================================
+
+export interface IDocGenerationProps {
+    docPk: number | string;
+    kind: string;
+}
+
+export const downloadProjectDocument = async ({ docPk }: IDocGenerationProps) => {
+    if (docPk === undefined) return;
+    console.log(docPk);
+    const pk = Number(docPk);
+
+    const url = "documents/downloadProjectDocument"
+    const params = {
+        "document_id": pk
+    }
+
+    return instance.post(
+        url,
+        params,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    ).then(res => res.data);
+}
+
+export const generateProjectDocument = async ({
+    docPk,
+    kind,
+}: IDocGenerationProps) => {
+    if (docPk === undefined) return;
+    console.log(docPk);
+    const pk = Number(docPk);
+    const url = `documents/generateProjectDocument/${pk}`
+    const params = {
+        "kind": kind,
+    }
+
+    instance.post(
+        url,
+        params,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    ).then(res => {
+        console.log(res.data);
+        return res.data;
+    });
+
+}
+
+
+export const handleProgressReportAction = async ({ action, stage, documentPk, progressReportPk }: IApproveProgressReport) => {
+
+    let url = ""
+    if (action === "approve") {
+        url = `documents/progressreports/approve`
+    } else if (action === "recall") {
+        url = `documents/progressreports/recall`
+
+    } else if (action === "send_back") {
+        url = `documents/progressreports/send_back`
+    }
+    const params = {
+        "action": action,
+        "stage": stage,
+        "documentPk": documentPk,
+        "progressReportPk": progressReportPk,
+    }
+    console.log(params)
+
+    return instance.post(
+        url,
+        params,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    ).then(res => res.data);
+}
+
+
+// export const recallProgressReport = async ({ stage, documentPk, progressReportPk }: IApproveProgressReport) => {
+//     const url = `documents/progressreports/recall`
+//     const params = {
+//         "stage": stage,
+//         "documentPk": documentPk,
+//         "progressReportPk": progressReportPk,
+//     }
+//     console.log(params)
+
+//     return instance.post(
+//         url,
+//         params,
+//         {
+//             headers: {
+//                 'Content-Type': 'multipart/form-data',
+//             },
+//         }
+//     ).then(res => res.data);
+// }
+
+
+
+export interface IHTMLSave {
+    editorType: EditorType;
+    htmlData: string;
+
+    project_pk: null | number;
+    document_pk: null | number;
+    section: null | EditorSubsections;
+}
+
+// Also have this handle directors message, research intro etc. (annual report)
+export const saveHtmlToDB = async ({ editorType, htmlData, project_pk, document_pk, section }: IHTMLSave) => {
+
+    if (editorType === "ProjectDocument") {
+        const data = {
+            "html": htmlData,
+            "project": project_pk,
+            "document": document_pk,
+            "section": section,
+        }
+        console.log(data)
+
+    }
+    else if (editorType === "ProjectDetail") {
+        // Null document is okay - that will be handled on the backend (as the description)
+        // if document is None and section is not None, make changes to the projects title or description
+        // based on section
+        const data = {
+            "html": htmlData,
+            "project": project_pk,
+            "section": section,
+        }
+        console.log(data)
+        // GO to project endpoint
+    }
+
+
+}
+
 
 interface ISpawnDocument {
     project_pk: number;
@@ -1002,6 +1384,17 @@ export const getAllBusinessAreas = async () => {
     })
     return res;
 }
+
+export const getSingleBusinessArea = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+
+    const res = instance.get(`agencies/business_areas/${pk}`)
+        .then(res => {
+            return res.data
+        })
+    return res;
+}
+
 
 export const createBusinessArea = async (formData: IBusinessArea) => {
     return instance.post(

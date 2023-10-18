@@ -90,7 +90,9 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
             // bg={"red"}
             >
                 <Flex justifyContent="flex-start">
-                    <Text>{branch ? branch.name : null}</Text>
+                    <Text
+                        fontWeight={"semibold"}
+                    >{branch ? branch.name : null}</Text>
 
                 </Flex>
                 <Flex>

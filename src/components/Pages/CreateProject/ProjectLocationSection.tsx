@@ -11,10 +11,11 @@ interface IProjectLocationProps {
     locationFilled: boolean;
     setLocationFilled: (val: boolean) => void;
     locationData: number[];
-    setLocationData: (data: any) => void;
+    setLocationData: React.Dispatch<React.SetStateAction<any>>;
     createClick: () => void;
     onClose: () => void;
     backClick: () => void;
+    nextClick?: (data: any) => void;
     projectType: string;
     currentYear: number;
     colorMode: string;
@@ -23,10 +24,13 @@ interface IProjectLocationProps {
 export const ProjectLocationSection = (
     {
         backClick,
+        nextClick,
         createClick,
         locationFilled,
         setLocationFilled,
-        locationData, setLocationData,
+        locationData,
+        setLocationData,
+        projectType
     }: IProjectLocationProps) => {
     const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } = useGetLocations();
 
@@ -46,17 +50,25 @@ export const ProjectLocationSection = (
         ]);
     }, [selectedRegions, selectedIbras, selectedDistricts, selectedImcras, selectedNrms, setLocationData]);
 
+    // useEffect(() => {
+    //     if (locationData.length > 0) {
+    //         console.log(locationData)
+    //         setLocationFilled(true)
+    //     }
+    //     else {
+    //         setLocationFilled(false);
+    //     }
+    // }, [locationData, setLocationFilled])
+
     useEffect(() => {
         if (locationData.length > 0) {
             console.log(locationData)
             setLocationFilled(true)
         }
-        else {
+        else if (locationData.length === 0) {
             setLocationFilled(false);
         }
-    }, [locationData, setLocationFilled])
-
-
+    }, [locationData])
 
     return (
         <>
@@ -128,15 +140,30 @@ export const ProjectLocationSection = (
                     ml={3}
                     type="submit"
                     colorScheme="blue"
-                    isDisabled={!locationFilled} onClick={() => {
+                    isDisabled={!locationFilled}
+                    onClick={() => {
                         console.log('Here is the location data'
                         )
                         console.log(locationData)
-                        createClick()
+                        if (projectType.includes("External") || projectType.includes("Student")) {
+                            if (locationFilled) {
+                                console.log("going next")
+                                console.log(locationData)
+                                setLocationFilled(true)
+                                nextClick(
+
+                                    locationData
+                                    // "locations": [...locationData]
+
+                                )
+                            } else return;
+                        } else {
+                            createClick()
+                        }
                     }}
-                    rightIcon={<IoIosCreate />}
+                    rightIcon={(projectType.includes("External") || projectType.includes("Student")) ? undefined : <IoIosCreate />}
                 >
-                    Create
+                    {(projectType.includes("External") || projectType.includes("Student")) ? `Next` : `Create`}
                 </Button>
             </ModalFooter>
         </>

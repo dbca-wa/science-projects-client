@@ -1,7 +1,7 @@
 // Route for displaying the Project Details of a given project.
 
 import { useParams } from "react-router-dom"
-import { Tab, TabList, TabPanel, TabPanels, Tabs, useColorMode, Spinner, Select } from "@chakra-ui/react";
+import { Tab, TabList, TabPanel, TabPanels, Tabs, useColorMode, Spinner, Select, FormControl, FormHelperText, FormLabel, Box, Text, Flex } from "@chakra-ui/react";
 import { ProjectOverviewCard } from "../components/Pages/ProjectDetail/ProjectOverviewCard";
 import { ConceptPlanContents } from "../components/Pages/ProjectDetail/ConceptPlanContents";
 import { ProjectPlanContents } from "../components/Pages/ProjectDetail/ProjectPlanContents";
@@ -14,32 +14,17 @@ import { ProjectClosureContents } from "../components/Pages/ProjectDetail/Projec
 import { StudentReportContents } from "../components/Pages/ProjectDetail/StudentReportContents";
 import { Head } from "../components/Base/Head";
 import { DocumentActions } from "../components/Pages/ProjectDetail/DocumentActions";
+// import { ProgressReportSelector } from "../components/Pages/ProjectDetail/ProgressReportSelector";
 
 export const ProjectDetail = () => {
 
     const { projectPk } = useParams();
-    const { isLoading, projectData } = useProject(projectPk);
+    const { isLoading, projectData, refetch } = useProject(projectPk);
 
     const [baseInformation, setBaseInformation] = useState<IProjectData | null>();
     const [details, setDetails] = useState<IFullProjectDetails | null>();
     const [documents, setDocuments] = useState<IProjectDocuments | null>();
     const [members, setMembers] = useState<IProjectMember[]>([]);
-
-
-    const [selectedProgressReportYear, setSelectedProgressReportYear] = useState(0);
-    const [selectedStudentReportYear, setSelectedStudentReportYear] = useState(0);
-
-    // Update the selected progress report year
-    const handleProgressReportYearSelect = (year: number) => {
-        setSelectedProgressReportYear(year);
-    };
-
-    // Update the selected student report year
-    const handleStudentReportYearSelect = (year: number) => {
-        setSelectedStudentReportYear(year);
-    };
-
-
 
     useEffect(() => {
         if (!isLoading && projectData) {
@@ -50,44 +35,54 @@ export const ProjectDetail = () => {
         }
     }, [isLoading, projectData])
 
-    const { colorMode } = useColorMode();
 
-    console.log(
-        documents
-    )
+    // Refetch data on tab change
+    const [tabIndex, setTabIndex] = useState(0)
+
+    useEffect(() => {
+        refetch();
+    }, [tabIndex])
+
 
     return (
         <>
             <Head title={projectData?.project?.title} />
             <Tabs
+                isLazy
                 isFitted
                 variant={'enclosed'}
+                onChange={(index) => setTabIndex(index)}
             >
                 <TabList mb='1em'>
-                    <Tab fontSize="sm">Overview</Tab>
+                    <Tab
+                        fontSize="sm"
+                    >Overview</Tab>
                     {documents?.concept_plan && (
-                        <Tab fontSize="sm">Concept Plan</Tab>
+                        <Tab fontSize="sm"
+                        >Concept Plan</Tab>
                     )}
                     {documents?.project_plan && (
-                        <Tab fontSize="sm">Project Plan</Tab>
+                        <Tab fontSize="sm"
+                        >Project Plan</Tab>
 
                     )}
                     {documents?.progress_reports && documents.progress_reports.length !== 0 && (
-                        <Tab fontSize="sm">
+                        <Tab fontSize="sm"
+                        >
                             Progress Reports
-                            <ProgressReportsTab documents={documents.progress_reports} onYearSelect={handleProgressReportYearSelect} />
                         </Tab>
 
                     )}
                     {documents?.student_reports && documents.student_reports.length !== 0 && (
-                        <Tab fontSize="sm">Student Reports
-                            <StudentReportsTab documents={documents.student_reports} onYearSelect={handleStudentReportYearSelect} />
-
+                        <Tab fontSize="sm"
+                        >
+                            Student Reports
                         </Tab>
 
                     )}
                     {documents?.project_closure && (
-                        <Tab fontSize="sm">Progress Closure</Tab>
+                        <Tab fontSize="sm"
+                        >Project Closure</Tab>
 
                     )}
                 </TabList>
@@ -99,11 +94,7 @@ export const ProjectDetail = () => {
                             baseInformation ?
                                 (
                                     <>
-                                        <DocumentActions
-                                            tabType="overview"
-                                            documents={documents}
-                                            projectData={projectData}
-                                        />
+
 
 
                                         <ProjectOverviewCard
@@ -113,7 +104,16 @@ export const ProjectDetail = () => {
                                         />
 
                                         {/* <ManageTeam /> */}
-                                        <ManageTeam team={members} project_id={projectPk !== undefined ? Number(projectPk) : 0} />
+                                        <ManageTeam
+                                            // team={members}
+                                            project_id={projectPk !== undefined ? Number(projectPk) : 0}
+                                        />
+
+                                        {/* <DocumentActions
+                                            tabType="overview"
+                                            documents={documents}
+                                            projectData={projectData}
+                                        /> */}
                                     </>
                                 ) :
                                 <Spinner />
@@ -124,11 +124,12 @@ export const ProjectDetail = () => {
                     {/* CONCEPT PLAN */}
                     {
                         documents?.concept_plan && (
-                            <TabPanel>
-                                <DocumentActions tabType="concept" documents={documents}
-                                    projectData={projectData}
+                            <TabPanel
+                            >
+                                <ConceptPlanContents
+                                    document={documents.concept_plan}
+                                    projectPk={Number(projectPk)}
                                 />
-                                <ConceptPlanContents document={documents.concept_plan} />
                             </TabPanel>
                         )
                     }
@@ -137,9 +138,6 @@ export const ProjectDetail = () => {
                     {/* PROJECT PLAN */}
                     {documents?.project_plan && (
                         <TabPanel>
-                            <DocumentActions tabType="projectplan" documents={documents}
-                                projectData={projectData}
-                            />
                             <ProjectPlanContents document={documents.project_plan} />
                         </TabPanel>
                     )}
@@ -149,10 +147,10 @@ export const ProjectDetail = () => {
                     {
                         documents?.progress_reports && documents.progress_reports.length !== 0 && (
                             <TabPanel>
-                                <DocumentActions tabType="progress" documents={documents}
-                                    projectData={projectData}
+                                <ProgressReportContents
+                                    documents={documents.progress_reports}
+                                    refetch={refetch}
                                 />
-                                <ProgressReportContents documents={documents.progress_reports} selectedYear={selectedProgressReportYear} />
                             </TabPanel>
                         )
                     }
@@ -161,10 +159,10 @@ export const ProjectDetail = () => {
                     {
                         documents?.student_reports && documents.student_reports.length !== 0 && (
                             <TabPanel>
-                                <DocumentActions tabType="student" documents={documents}
-                                    projectData={projectData}
+                                <StudentReportContents
+                                    documents={documents.student_reports}
+                                //  selectedYear={selectedStudentReportYear}
                                 />
-                                <StudentReportContents documents={documents.student_reports} selectedYear={selectedStudentReportYear} />
                             </TabPanel>
                         )
                     }
@@ -174,9 +172,6 @@ export const ProjectDetail = () => {
                     {
                         documents?.project_closure && (
                             <TabPanel>
-                                <DocumentActions tabType="closure" documents={documents}
-                                    projectData={projectData}
-                                />
                                 <ProjectClosureContents document={documents.project_closure} />
                             </TabPanel>
                         )
@@ -188,78 +183,3 @@ export const ProjectDetail = () => {
 }
 
 
-interface ProgressReportsTabProps {
-    documents: IProgressReport[];
-    onYearSelect: (year: number) => void;
-}
-
-
-const ProgressReportsTab: React.FC<ProgressReportsTabProps> = ({ documents, onYearSelect }) => {
-    const years = Array.from(new Set(documents.map(report => report.year))).sort((a, b) => b - a);
-
-    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedYear = parseInt(event.target.value, 10);
-        onYearSelect(selectedYear);
-    };
-
-    // If there are no reports, do not render the dropdown
-    if (years.length === 0) {
-        return null;
-    }
-
-    // Set the default selected year to the latest year
-    const defaultSelectedYear = years[0];
-
-    return (
-        <>
-            <Select value={defaultSelectedYear} onChange={handleChange}>
-                <option value="" disabled>
-                    Select a year
-                </option>
-                {years.map(year => (
-                    <option key={year} value={year}>
-                        {year}
-                    </option>
-                ))}
-            </Select>
-        </>
-    );
-};
-
-// Similar component for Student Reports Tab
-interface StudentReportsTabProps {
-    documents: IStudentReport[];
-    onYearSelect: (year: number) => void;
-}
-
-const StudentReportsTab: React.FC<StudentReportsTabProps> = ({ documents, onYearSelect }) => {
-    const years = Array.from(new Set(documents.map(report => report.year))).sort((a, b) => b - a);
-
-    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedYear = parseInt(event.target.value, 10);
-        onYearSelect(selectedYear);
-    };
-
-    // If there are no reports, do not render the dropdown
-    if (years.length === 0) {
-        return null;
-    }
-
-    // Set the default selected year to the latest year
-    const defaultSelectedYear = years[0];
-
-    return (
-        <>
-            <Select value={defaultSelectedYear} onChange={handleChange}>
-                <option value="" disabled>
-                    Select a year
-                </option>
-                {years.map(year => (
-                    <option key={year} value={year}>
-                        {year}
-                    </option>
-                ))}
-            </Select>
-        </>
-    );
-};

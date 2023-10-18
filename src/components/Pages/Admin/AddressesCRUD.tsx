@@ -111,6 +111,7 @@ export const AddressesCRUD = () => {
                                 value={searchTerm}
                                 onChange={handleSearchChange}
                                 w={"65%"}
+                                zIndex={1}
                             />
 
 

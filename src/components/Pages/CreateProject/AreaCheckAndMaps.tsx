@@ -76,8 +76,7 @@ export const AreaCheckAndMaps = ({
                                     }}
                                     isChecked={isChecked}
                                     isDisabled={isDisabled}
-                                />
-                                <Text ml={3}>{area["name"]}</Text>
+                                >{area["name"]}</Checkbox>
                             </Flex>
                         );
                     })}

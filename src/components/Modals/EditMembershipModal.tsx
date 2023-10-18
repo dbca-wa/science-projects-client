@@ -149,7 +149,9 @@ export const EditMembershipModal = ({ isOpen, onClose, currentOrganisationData, 
 
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose}
+            size={"3xl"} scrollBehavior='inside'
+        >
             <ModalOverlay />
             <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
                 <Flex
@@ -250,7 +252,9 @@ export const EditMembershipModal = ({ isOpen, onClose, currentOrganisationData, 
 
                         </Grid>
                     </ModalBody>
-                    <ModalFooter pos="absolute" bottom={0} right={0}>
+                    <ModalFooter
+                    // pos="absolute" bottom={0} right={0}
+                    >
                         <Button
                             isLoading={mutation.isLoading}
                             type="submit"

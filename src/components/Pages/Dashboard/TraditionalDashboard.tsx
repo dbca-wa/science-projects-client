@@ -77,28 +77,35 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                 >
                     <Head title="Home" />
 
-                    <Heading>
+                    <Heading
+                        mb={0}
+                        pb={shouldConcat ? 4 : 0}
+                    >
                         <div dangerouslySetInnerHTML={{ __html: spmsText }} />
                     </Heading>
-                    <br />
+                    {/* <br /> */}
+                    {!shouldConcat && (
+                        <Text
+                            py={4}
+                            fontSize={"19px"}
+                            fontWeight={"normal"}
+                        >
+                            {
+                                welcomeUser
+                            }
+                        </Text>
+
+                    )}
+                    {/* <br /> */}
                     <Text
-                        fontSize={"19px"}
-                        fontWeight={"medium"}
+                        fontWeight={"thin"}
+
                     >
-                        {
-                            welcomeUser
-                        }
-                    </Text>
-                    <br />
-                    <Text>
                         Please update and submit (when ready) all documents awaiting your attention in "My Tasks", update project details and team lists of "My Projects" and "My Partnerships", create new projects and initiate closure of old projects as appropriate. If you get stuck, the User Manual has all the anwers!
                     </Text>
                 </Box>
-
-                <TraditionalTasksAndProjects onAddTaskOpen={onAddTaskOpen} />
-
                 <Grid
-                    mt={10}
+                    my={5}
                     templateColumns={{
                         base: "repeat(1, 1fr)",
                         md: "repeat(2, 1fr)",
@@ -176,6 +183,9 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                     </Button>
 
                 </Grid>
+                <TraditionalTasksAndProjects onAddTaskOpen={onAddTaskOpen} />
+
+
 
                 <Center mt={6}>
                 </Center>

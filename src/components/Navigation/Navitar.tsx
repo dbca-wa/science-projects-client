@@ -112,7 +112,7 @@ export const Navitar = (
                                     mx={3}
                                 >
                                     {
-                                        userData !== undefined && userData !== "none" &&
+                                        userData !== undefined && userData &&
                                         (
                                             userData.first_name ?
                                                 (
@@ -174,9 +174,10 @@ export const Navitar = (
                                 <ToggleDarkMode />
                                 <MenuItem
                                     onClick={() => {
-                                        layout === "modern" ?
-                                            navigate('/howto') :
-                                            window.open("https://sdis.readthedocs.io", "_blank");
+                                        // layout === "modern" ?
+                                        //     navigate('/howto') :
+                                        //     navigate('/howto')
+                                        window.open("https://sdis.readthedocs.io", "_blank");
                                     }}
                                 >
                                     {<SiReadthedocs />}

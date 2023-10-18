@@ -38,9 +38,10 @@ import { RefObject, useCallback, useState } from "react";
 
 interface Props {
     editorRef: RefObject<HTMLTextAreaElement>; // Use RefObject to represent the textarea element reference
+    currentlySelectedNode?: string;
 }
 
-export const useToolbarClickListener = ({ editorRef }: Props) => {
+export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Props) => {
     const [editor] = useLexicalComposerContext();
     const [blockType, setBlockType] = useState("paragraph");
     const [selectedElementKey, setSelectedElementKey] = useState(null);
@@ -54,49 +55,72 @@ export const useToolbarClickListener = ({ editorRef }: Props) => {
 
         // console.log(event)
         if (event === "formatUndo") {
-            editor.dispatchCommand(UNDO_COMMAND, undefined);
+            // editor.dispatchCommand(UNDO_COMMAND, undefined);
+            console.log("undo")
         } else if (event === "formatRedo") {
-            editor.dispatchCommand(REDO_COMMAND, undefined);
+            // editor.dispatchCommand(REDO_COMMAND, undefined);
+            console.log("redo")
         }
-        else if (event === "paragraph") {
+        else if (event === "paragraph" && currentlySelectedNode !== "paragraph") {
             formatParagraph();
+            console.log("set paragraph")
+            console.log(event)
+
         }
-        else if (event === "h1") {
-            formatLargeHeading();
+        else if (event === "h1" && currentlySelectedNode !== "h1") {
+            // formatLargeHeading();
+            console.log("set h1")
+
         }
-        else if (event === "h2") {
-            formatMidHeading();
+        else if (event === "h2" && currentlySelectedNode !== "h2") {
+            // formatMidHeading();
+            console.log("set h2")
+
         }
-        else if (event === "h3") {
-            formatSmallHeading();
+        else if (event === "h3" && currentlySelectedNode !== "h3") {
+            // formatSmallHeading();
+            console.log("set h3")
+
         }
-        else if (event === "ol") {
-            formatNumberedList();
+        else if (event === "ol" && currentlySelectedNode !== "ol") {
+            // formatNumberedList();
+            console.log("set ol")
+
         }
-        else if (event === "ul") {
+        else if (event === "ul" && (currentlySelectedNode !== "ul" || "li")) {
             formatBulletList();
+            console.log("set ul")
+
         }
-        else if (event === "quote") {
-            formatQuote();
+        else if (event === "li" && (currentlySelectedNode !== "ul" || "li")) {
+            // formatBulletList();
+            console.log("set li")
+
+        }
+        else if (event === "quote" && currentlySelectedNode !== "quote") {
+            // formatQuote();
+            console.log("set quote")
+
         }
 
         else if (event === "formatAlignLeft") {
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
+            // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
         } else if (event === "formatAlignCenter") {
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
+            // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
         } else if (event === "formatAlignRight") {
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
+            // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
         } else if (event === "formatAlignJustify") {
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")
+            // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")
         }
         else if (event === "formatBold") {
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+            // editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
         } else if (event === "formatItalic") {
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
+            // editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
         }
         else if (event === "formatUnderline") {
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
+            // editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
         }
+
     }
     // else if (event === "formatInsertLink") {
     //     insertLink();
@@ -111,15 +135,15 @@ export const useToolbarClickListener = ({ editorRef }: Props) => {
 
     const formatParagraph = () => {
         // console.log(blockType)
-        // if (blockType !== "paragraph") {
-        editor.update(() => {
-            const selection = $getSelection();
+        if (blockType !== "paragraph") {
+            editor.update(() => {
+                const selection = $getSelection();
 
-            if ($isRangeSelection(selection)) {
-                $wrapNodes(selection, () => $createParagraphNode());
-            }
-        });
-        // }
+                if ($isRangeSelection(selection)) {
+                    $wrapNodes(selection, () => $createParagraphNode());
+                }
+            });
+        }
     };
 
     const formatLargeHeading = () => {
@@ -160,7 +184,7 @@ export const useToolbarClickListener = ({ editorRef }: Props) => {
     };
 
     const formatBulletList = () => {
-        if (blockType !== "ul") {
+        if (blockType !== "ul" && blockType !== "li") {
             console.log("dispatch command ");
             editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
         } else {

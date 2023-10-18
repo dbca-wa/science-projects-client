@@ -26,6 +26,13 @@ import { ResearchFunctionsCRUD } from "./components/Pages/Admin/ResearchFunction
 import { LocationsCRUD } from "./components/Pages/Admin/LocationsCRUD";
 import { AddressesCRUD } from "./components/Pages/Admin/AddressesCRUD";
 import { BranchesCRUD } from "./components/Pages/Admin/BranchesCRUD";
+import { ProjectClosuresCRUD } from "./components/Pages/Admin/ProjectClosuresCRUD";
+import { StudentReportsCRUD } from "./components/Pages/Admin/StudentReportsCRUD";
+import { ProjectMembershipsCRUD } from "./components/Pages/Admin/ProjectMembershipsCRUD";
+import { ConceptPlansCRUD } from "./components/Pages/Admin/ConceptPlansCRUD";
+import { ProjectPlansCRUD } from "./components/Pages/Admin/ProjectPlansCRUD";
+import { ProgressReportsCRUD } from "./components/Pages/Admin/ProgressReportsCRUD";
+import { ProjectMembershipsCRUDDetail } from "./components/Pages/Admin/ProjectMembershipsCRUDDetail";
 
 export const router = createBrowserRouter([
     // Login
@@ -129,6 +136,71 @@ export const router = createBrowserRouter([
                     <ContentWrapper>
                         <AdminOnlyPage>
                             <BranchesCRUD />
+                        </AdminOnlyPage>
+                    </ContentWrapper>,
+            },
+
+            // Project CRUD
+            {
+                path: "crud/memberships",
+                element:
+                    <ContentWrapper>
+                        <AdminOnlyPage>
+                            <ProjectMembershipsCRUD />
+                        </AdminOnlyPage>
+                    </ContentWrapper>,
+            },
+            {
+                path: "crud/memberships/:projectPk",
+                element:
+                    <ContentWrapper>
+                        <AdminOnlyPage>
+                            <ProjectMembershipsCRUDDetail />
+                        </AdminOnlyPage>
+                    </ContentWrapper>,
+            },
+            {
+                path: "crud/conceptplans",
+                element:
+                    <ContentWrapper>
+                        <AdminOnlyPage>
+                            <ConceptPlansCRUD />
+                        </AdminOnlyPage>
+                    </ContentWrapper>,
+            },
+            {
+                path: "crud/projectplans",
+                element:
+                    <ContentWrapper>
+                        <AdminOnlyPage>
+                            <ProjectPlansCRUD />
+                        </AdminOnlyPage>
+                    </ContentWrapper>,
+            },
+            {
+                path: "crud/progressreports",
+                element:
+                    <ContentWrapper>
+                        <AdminOnlyPage>
+                            <ProgressReportsCRUD />
+                        </AdminOnlyPage>
+                    </ContentWrapper>,
+            },
+            {
+                path: "crud/studentreports",
+                element:
+                    <ContentWrapper>
+                        <AdminOnlyPage>
+                            <StudentReportsCRUD />
+                        </AdminOnlyPage>
+                    </ContentWrapper>,
+            },
+            {
+                path: "crud/closures",
+                element:
+                    <ContentWrapper>
+                        <AdminOnlyPage>
+                            <ProjectClosuresCRUD />
                         </AdminOnlyPage>
                     </ContentWrapper>,
             },

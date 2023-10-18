@@ -15,7 +15,7 @@ export const Head = ({ title }: IProps) => {
         <HelmetProvider>
             <Helmet>
                 <title>{title ? `${layout === "traditional" ? "SPMS" : "Cycle"} | ${title}` : "Loading..."}</title>
-                <link rel="icon" type="image/ico" href="favicon.ico" />
+                <link rel="icon" type="image/ico" href="/favicon.ico" />
             </Helmet>
         </HelmetProvider>
     )

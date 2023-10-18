@@ -1,11 +1,19 @@
 // Displayed when looking at the Project Details by selecting it on the projects page. Displays more data about the project and allows editing.
 
-import { Box, Button, Flex, Grid, Image, Tag, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
+import { Box, Button, Center, Flex, Grid, Image, Tag, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
 import { AiFillCalendar, AiFillEdit, AiFillTag } from "react-icons/ai"
 import { Link } from "react-router-dom";
 import { HiOutlineExternalLink } from 'react-icons/hi'
 import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
 import { IFullProjectDetails, IProjectData, IProjectMember } from "../../../types";
+import { FaUserFriends } from "react-icons/fa";
+import { GiMaterialsScience } from "react-icons/gi";
+import { MdScience } from "react-icons/md";
+import { RiBook3Fill } from 'react-icons/ri'
+import { useNoImage } from "../../../lib/hooks/useNoImage";
+import { useEffect } from "react";
+import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
+import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
 
 interface IProjectOverviewCardProps {
     baseInformation: IProjectData;
@@ -20,6 +28,9 @@ export const ProjectOverviewCard = (
 
     const { isOpen: isEditProjectDetailModalOpen, onOpen: onEditProjectDetailModalOpen, onClose: onEditProjectDetailModalClose } = useDisclosure()
     const { colorMode } = useColorMode();
+    useEffect(() => {
+        console.log(baseInformation)
+    })
 
     const determineAuthors = (members: IProjectMember[]) => {
         // Filters members with non-null first and last names
@@ -59,7 +70,32 @@ export const ProjectOverviewCard = (
     const keywords = determineKeywords();
 
     const determineProjectLabel = () => {
-        const label = ""
+        const year = baseInformation.year;
+        const number = baseInformation.number;
+        let stringified_number = ""
+        if (number < 10) {
+            stringified_number = "00" + String(number)
+        }
+        else if (number >= 10 && number < 100) {
+            stringified_number = "0" + String(number)
+        }
+        else {
+            stringified_number = String(number)
+        }
+        let type = baseInformation.kind;
+        if (type === "student") {
+            type = "STP"
+        } else if (type === "external") {
+            type = "EXT"
+        } else if (type === "science") {
+            type = "SP"
+
+        } else {
+            // Core Function
+            type = "CF"
+        }
+
+        const label = `${type}-${year}-${stringified_number}`
         return label
     }
 
@@ -97,36 +133,63 @@ export const ProjectOverviewCard = (
     const projectYears = determineProjectYears(baseInformation);
     // division
 
+    const noImage = useNoImage();
+
+    useEffect(() => {
+        console.log(baseInformation)
+    }, [])
+
+    const { layout } = useLayoutSwitcher();
+
+
+    // const editorKey = selectedYear.toString() + colorMode;
+
 
     return (
         <>
             <Box
                 minH={"100px"}
-                bg={colorMode === "light" ? "gray.50" : "gray.700"}
+                bg={colorMode === "light" ? "gray.100" : "gray.700"}
                 color={colorMode === "light" ? "black" : "whiteAlpha.900"}
                 rounded={"lg"}
                 overflow={"hidden"}
             >
                 <Grid
                     p={4}
+                    pt={6}
+                    px={6}
                     templateColumns={{
                         base: "1fr", // Single column layout for small screens (mobile)
-                        lg: "minmax(200px, 4fr) 5fr", // Left column takes minimum 200px and can grow up to 4fr, right column takes 5fr
+                        lg: "minmax(300px, 4fr) 5fr", // Left column takes minimum 200px and can grow up to 4fr, right column takes 5fr
                     }}
                     gap={3}
                 >
-                    <Image
-                        src={
-                            baseInformation?.image?.file
-                                ? baseInformation?.image?.file
-                                : baseInformation?.image?.old_file ?
-                                    baseInformation?.image?.old_file :
-                                    "/sad-face.png"
+                    <Box
+                        // bg={"red"}
+                        h={
+                            {
+                                base: "350px",
+                                "2xl": "500px",
+                                "3xl": "600px"
+                            }
                         }
-                        objectFit={"cover"}
-                        rounded={"lg"}
-                        w={"100%"}
-                    />
+                        rounded={"xl"}
+                        overflow={"hidden"}
+                    >
+                        <Image
+                            src={
+                                baseInformation?.image?.file
+                                    ? baseInformation?.image?.file
+                                    : baseInformation?.image?.old_file ?
+                                        baseInformation?.image?.old_file :
+                                        noImage
+                            }
+                            objectFit={"cover"}
+                            w={"100%"}
+                            h={"100%"}
+                        />
+
+                    </Box>
 
                     <Box
                         px={2}
@@ -141,7 +204,7 @@ export const ProjectOverviewCard = (
                                 whiteSpace={"normal"}
                                 textAlign={"left"}
                             >
-                                <Link to={`/projects/${baseInformation.pk}`}>
+                                <Link to={`/projects/${baseInformation.pk !== undefined ? baseInformation.pk : baseInformation.id}`}>
                                     {baseInformation.title}
                                 </Link>
                             </Button>
@@ -155,48 +218,10 @@ export const ProjectOverviewCard = (
                         </Box>
 
 
-
-                        {/* Rest of the project details */}
-
                         <Box
-                            // pb={4}
-                            display="inline-flex"
-                            alignItems="center"
-                        >
-                            <AiFillTag size={"16px"} />
-                            <Grid
-                                ml={3}
-                                templateColumns={{
-                                    base: "repeat(1, 1fr)",
-                                    sm: "repeat(2, 1fr)",
-                                    md: "repeat(3, 1fr)",
-                                    lg: "repeat(4, 1fr)",
-                                    xl: "repeat(6, 1fr)",
-                                }}
-                                gridTemplateRows={"28px"}
-                                gap={4}
-                            >
-                                {keywords?.map((tag, index) => {
-                                    return (
-                                        <Tag
-                                            size={"sm"}
-                                            key={index}
-                                            textAlign={"center"}
-                                            justifyContent={"center"}
-                                            p={"10px"}
-                                            bgColor={colorMode === "light" ? "gray.300" : "gray.800"}
-                                            color={colorMode === "light" ? "black" : "white"}
-                                        >
-                                            {tag}
-                                        </Tag>
-                                    );
-                                })}
-                            </Grid>
-                        </Box>
-
-                        <Box
-                            pt={5}
-                            display="inline-flex"
+                            pt={2}
+                            pb={5}
+                            display="flex"
                             alignItems="center"
                         >
                             <AiFillCalendar size={"16px"} />
@@ -212,13 +237,12 @@ export const ProjectOverviewCard = (
                                 gridTemplateRows={"28px"}
                                 gap={4}
                             >
-
                                 <Tag
-                                    size={"md"}
+                                    size={"sm"}
                                     textAlign={"center"}
                                     justifyContent={"center"}
                                     p={"10px"}
-                                    bgColor={colorMode === "light" ? "gray.300" : "gray.800"}
+                                    bgColor={colorMode === "light" ? "gray.200" : "gray.800"}
                                     color={colorMode === "light" ? "black" : "white"}
                                 >
                                     {projectYears}
@@ -227,11 +251,59 @@ export const ProjectOverviewCard = (
                             </Grid>
                         </Box>
 
-                        <Box py={4} pb={0}>
-                            <Button variant={"link"} colorScheme="blue" leftIcon={<HiOutlineExternalLink />}>
-                                Review Datasets tagged with {projectLabel}
-                            </Button>
+                        {/* Rest of the project details */}
+
+                        <Box
+                            // pb={4}
+                            display="inline-flex"
+                            alignItems="center"
+                        >
+                            <AiFillTag size={"16px"} />
+                            <Grid
+                                ml={3}
+                                templateColumns={
+                                    layout === "traditional"
+                                        ? {
+                                            base: "repeat(1, 1fr)",
+                                            sm: "repeat(2, 1fr)",
+                                            md: "repeat(3, 1fr)",
+                                            lg: "repeat(2, 1fr)",
+                                            "1200px": "repeat(3, 1fr)",
+                                            xl: "repeat(4, 1fr)",
+                                        }
+                                        : {
+                                            base: "repeat(1, 1fr)",
+                                            sm: "repeat(2, 1fr)",
+                                            md: "repeat(3, 1fr)",
+                                            lg: "repeat(4, 1fr)",
+                                            xl: "repeat(6, 1fr)",
+                                        }
+                                }
+                                // gridTemplateRows={"28px"}
+                                gap={4}
+                            >
+                                {keywords?.map((tag, index) => (
+
+                                    <Tag
+                                        height={"100%"}
+                                        size={"sm"}
+                                        key={index}
+                                        textAlign={"center"}
+                                        justifyContent={"center"}
+                                        // p={"10px"}
+                                        minH={"50px"}
+                                        bgColor={colorMode === "light" ? "gray.200" : "gray.800"}
+                                        color={colorMode === "light" ? "black" : "white"}
+                                        style={{ flex: "1" }} // Make each tag expand to fill available space
+                                    >
+                                        {tag}
+                                    </Tag>
+
+                                ))}
+                            </Grid>
                         </Box>
+
+
 
                     </Box>
                 </Grid>
@@ -246,20 +318,105 @@ export const ProjectOverviewCard = (
                             : <Text><b>Tagline:</b> This project has no tagline</Text>
                         }
                     </Box> */}
-                    <Box>
-                        {baseInformation?.description
+                    <Box
+                        mt={4}
+                    >
+                        {/* {baseInformation?.description
                             ? <Text><b>Description:</b> {baseInformation.description}</Text>
-                            : <Text><b>Description:</b> This project has no description</Text>}
+                            : <Text><b>Description:</b> This project has no description</Text>} */}
+
+                        <SimpleRichTextEditor
+                            key={`description${colorMode}`} // Change the key to force a re-render
+                            data={baseInformation.description}
+                            section={"description"}
+                            titleTextSize={"20px"}
+                        />
                     </Box>
 
+                    <Flex py={4} pb={0}
+                        w={"100%"}
+                        justifyContent={"flex-end"}
+                    >
+                        {/* <Button
+                                variant={"link"}
+                                colorScheme="blue"
+                                leftIcon={<HiOutlineExternalLink />}
+                                onClick={() => {
+                                    window.open('https://data.dbca.wa.gov.au/', "_blank")
+                                }}
+                            >
+                                Review datasets tagged with {projectLabel}
+                            </Button> */}
+
+                        <Text
+                            color={
+                                colorMode === "dark" ? "blue.200" : "blue.400"
+                            }
+                            fontWeight={"bold"}
+                            cursor={"pointer"}
+                            _hover={
+                                {
+                                    color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                    textDecoration: "underline",
+                                }
+                            }
+                            onClick={() => {
+                                window.open('https://data.dbca.wa.gov.au/', "_blank")
+                            }}
+                        >
+                            Review datasets tagged with {projectLabel}
+                        </Text>
+                        <Box
+                            mt={1}
+                            ml={2}
+                            // mr={2}
+                            color={colorMode === "dark" ? "blue.200" : "blue.400"}
+                            // mr={3}
+                            alignItems={"center"}
+                            alignContent={"center"}
+                        // boxSize={3}
+                        // bg={"red"}
+                        >
+                            <HiOutlineExternalLink />
+                        </Box>
+                    </Flex>
                     <Flex pt={6} justifyContent={"right"}>
                         <ProjectDetailEditModal
+                            projectType={
+                                baseInformation.kind === "student" ? "Student Project" :
+                                    baseInformation.kind === "external" ? "External Project" :
+                                        baseInformation.kind === "science" ? "Science Project" : "Core Function"}
+                            isOpen={isEditProjectDetailModalOpen}
+                            onClose={onEditProjectDetailModalClose}
+                            icon={
+                                baseInformation.kind === "student" ? RiBook3Fill :
+                                    baseInformation.kind === "external" ? FaUserFriends :
+                                        baseInformation.kind === "science" ? MdScience : GiMaterialsScience
+                            }
+                            baseInformation={baseInformation}
+                            details={details}
+
+                        />
+
+                        {/* <ProjectDetailEditModal
                             onClose={onEditProjectDetailModalClose}
                             isOpen={isEditProjectDetailModalOpen}
-                        />
-                        <Button leftIcon={<AiFillEdit />} onClick={onEditProjectDetailModalOpen}>
+                        /> */}
+                        {/* <Button
+                            bg={
+                                colorMode === "light" ? "green.500" : "green.600"
+                            }
+                            color={"white"}
+                            _hover={
+
+                                {
+                                    bg: colorMode === "light" ? "green.400" : "green.500"
+                                }
+                            }
+                            leftIcon={<AiFillEdit />}
+                            onClick={onEditProjectDetailModalOpen}>
                             Edit Project Details
-                        </Button>
+                        </Button> */}
                     </Flex>
                 </Box>
 

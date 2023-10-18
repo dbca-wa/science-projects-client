@@ -79,18 +79,18 @@ export const ProfilePage = () => {
                 (
                     <>
                         <EditPersonalInformationModal
-                            userId={me.pk}
+                            userId={`${me.pk}`}
                             isOpen={isEditPersonalInformationModalOpen} onClose={onCloseEditPersonalInformationModal}
                         />
 
                         <EditProfileModal
-                            userId={me.pk}
+                            userId={`${me.pk}`}
                             isOpen={isEditProfileModalOpen} onClose={onCloseEditProfileModal}
                             currentImage={me.image.file}
                         />
 
                         <EditMembershipModal
-                            currentOrganisationData={me?.entity}
+                            currentOrganisationData={`${me?.agency?.pk}`}
                             currentBranchData={me?.branch}
                             currentBaData={me?.business_area}
                             userId={me.pk}
@@ -132,9 +132,9 @@ export const ProfilePage = () => {
                                         is_staff={me.is_staff}
                                         is_superuser={me.is_superuser}
                                         image={me.image}
-                                        business_area={me.business_area.name}
+                                        business_area={me.business_area}
                                         role={me.role}
-                                        branch={me.branch.name}
+                                        branch={me.branch}
                                         is_active={me.is_active}
                                         affiliation={me.affiliation}
                                     />

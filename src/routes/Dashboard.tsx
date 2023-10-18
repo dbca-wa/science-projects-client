@@ -15,6 +15,7 @@ export const Dashboard = ({ activeTab }: IDashProps) => {
             (<>
                 <Head title="Home" />
                 <Box
+                    h={"100%"}
                 >
                     <TraditionalDashboard activeTab={activeTab} />
                 </Box>
@@ -23,6 +24,7 @@ export const Dashboard = ({ activeTab }: IDashProps) => {
             (<>
                 <Head title="Home" />
                 <Box
+                    h={"100%"}
                 >
                     <ModernDashboard activeTab={activeTab} />
                 </Box>

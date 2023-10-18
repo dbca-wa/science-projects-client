@@ -20,8 +20,10 @@ import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSe
 import { ProjectBaseInformation } from "../Pages/CreateProject/ProjectBaseInformation"
 import "../../styles/modalscrollbar.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { ICreateProjectBaseInfo, ICreateProjectDetails, IProjectCreationVariables, MutationError, MutationSuccess, ProjectCreationMutationSuccess, createProject, spawnDocument } from "../../lib/api"
+import { ICreateProjectBaseInfo, ICreateProjectDetails, ICreateProjectExternalDetails, ICreateProjectStudentDetails, IProjectCreationVariables, MutationError, MutationSuccess, ProjectCreationMutationSuccess, createProject, spawnDocument } from "../../lib/api"
 import { useNavigate } from "react-router-dom"
+import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection"
+import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection"
 
 interface INewProjectModalProps {
     projectType: string;
@@ -41,12 +43,16 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
     const [baseInformationFilled, setBaseInformationFilled] = useState<boolean>(false);
     const [projectDetailsFilled, setProjectDetailsFilled] = useState<boolean>(false);
     const [locationFilled, setLocationFilled] = useState<boolean>(false);
+    const [externalFilled, setExternalFilled] = useState<boolean>(false);
+    const [studentFilled, setStudentFilled] = useState<boolean>(false);
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
 
     const [baseInformationData, setBaseInformationData] = useState<ICreateProjectBaseInfo>({} as ICreateProjectBaseInfo);
     const [detailsData, setDetailsData] = useState<ICreateProjectDetails>({} as ICreateProjectDetails);
     const [locationData, setLocationData] = useState([]);
+    const [externalData, setExternalData] = useState<ICreateProjectExternalDetails>({} as ICreateProjectExternalDetails);
+    const [studentData, setStudentData] = useState<ICreateProjectStudentDetails>({} as ICreateProjectStudentDetails);
 
     const goBack = () => {
         setActiveTabIndex(activeTabIndex !== 0 ? activeTabIndex - 1 : 0)
@@ -67,10 +73,17 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
         setActiveTabIndex(2);
     };
 
+    const goToFinalTab = (data: any) => {
+        setLocationData(data);
+        setLocationFilled(true);
+        setActiveTabIndex(3);
+    };
+
+
 
     const kickOffMutation = () => {
 
-        mutation.mutate({ baseInformationData, detailsData, locationData });
+        mutation.mutate({ baseInformationData, detailsData, locationData, externalData, studentData });
     }
 
 
@@ -116,8 +129,16 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                 // Close the modal
                 if (onClose) {
                     onClose();
-                    if (projectType !== "student" && projectType !== "external")
+                    if (!projectType.includes("Student") && !projectType.includes("External"))
                         await spawnDocument({ project_pk: data.pk, kind: data.kind });
+                    else {
+                        if (projectType.includes("Student")) {
+                            console.log("Spawn document for Student here")
+                        }
+                        else {
+                            console.log("Spawn document for External here")
+                        }
+                    }
 
                     queryClient.refetchQueries([`projects`])
                     navigate(`/projects/${data.pk}`);
@@ -126,6 +147,7 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
             // Error handling based on API-file-declared interface
             onError: (error) => {
                 let errorMessage = "";
+                console.log(error)
                 if (error.response?.data) {
                     const errorKeys = Object.keys(error.response.data);
                     if (errorKeys.length > 0) {
@@ -155,9 +177,15 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
     )
 
 
+    useEffect(() => {
+        console.log(projectType)
+    }, [projectType])
+
 
     return (
-        <Modal isOpen={isOpen} onClose={controlledClose} scrollBehavior="inside">
+        <Modal isOpen={isOpen} onClose={controlledClose} scrollBehavior="inside"
+            size={"full"}
+        >
             <ModalOverlay />
             <ModalContent
                 bg={colorMode === "light" ? "white" : "gray.800"}
@@ -200,8 +228,23 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                         <Tab
                             isDisabled={!baseInformationFilled || !projectDetailsFilled}
                         >
-                            Location</Tab>
+                            Location
+                        </Tab>
+                        {projectType.includes("External") && (
+                            <Tab
+                                isDisabled={!locationFilled}
+                            >
+                                External Details
+                            </Tab>
+                        )}
 
+                        {projectType === "Student Project" && (
+                            <Tab
+                                isDisabled={!locationFilled}
+                            >
+                                Student Details
+                            </Tab>
+                        )}
                     </TabList>
                     <TabPanels>
                         <TabPanel>
@@ -233,19 +276,69 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                             />
                         </TabPanel>
                         <TabPanel>
-                            <ProjectLocationSection
-                                locationFilled={locationFilled}
-                                locationData={locationData}
-                                setLocationData={setLocationData}
-                                setLocationFilled={setLocationFilled}
-                                onClose={onClose}
-                                projectType={projectType}
-                                currentYear={currentYear}
-                                colorMode={colorMode}
-                                backClick={goBack}
-                                createClick={kickOffMutation}
-                            />
+                            {
+                                projectType.includes("External") || projectType.includes("Student") ?
+                                    <ProjectLocationSection
+                                        locationFilled={locationFilled}
+                                        locationData={locationData}
+                                        setLocationData={setLocationData}
+                                        setLocationFilled={setLocationFilled}
+                                        onClose={onClose}
+                                        projectType={projectType}
+                                        currentYear={currentYear}
+                                        colorMode={colorMode}
+                                        backClick={goBack}
+                                        nextClick={goToFinalTab}
+                                        createClick={kickOffMutation}
+                                    />
+                                    :
+
+                                    <ProjectLocationSection
+                                        locationFilled={locationFilled}
+                                        locationData={locationData}
+                                        setLocationData={setLocationData}
+                                        setLocationFilled={setLocationFilled}
+                                        onClose={onClose}
+                                        projectType={projectType}
+                                        currentYear={currentYear}
+                                        colorMode={colorMode}
+                                        backClick={goBack}
+                                        createClick={kickOffMutation}
+                                    />
+
+                            }
                         </TabPanel>
+                        {projectType.includes("External") && (
+                            <TabPanel>
+                                <ProjectExternalSection
+                                    externalFilled={externalFilled}
+                                    externalData={externalData}
+                                    setExternalData={setExternalData}
+                                    setExternalFilled={setExternalFilled}
+                                    onClose={onClose}
+                                    backClick={goBack}
+                                    createClick={kickOffMutation}
+                                // projectPk={}
+                                />
+                            </TabPanel>
+                        )}
+
+                        {projectType.includes("Student") && (
+                            <TabPanel>
+
+                                <ProjectStudentSection
+                                    studentFilled={studentFilled}
+                                    studentData={studentData}
+                                    setStudentData={setStudentData}
+                                    setStudentFilled={setStudentFilled}
+                                    onClose={onClose}
+                                    backClick={goBack}
+                                    createClick={kickOffMutation}
+                                // projectPk={}
+                                />
+                            </TabPanel>
+
+                        )}
                     </TabPanels>
                 </Tabs>
             </ModalContent>

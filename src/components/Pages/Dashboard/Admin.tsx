@@ -6,13 +6,13 @@ import { Center, Text, Flex, Grid, Icon, Divider, useColorMode } from "@chakra-u
 import { motion } from "framer-motion"
 import { useState } from "react"
 import { IconType } from "react-icons"
-import { FaAddressCard, FaLocationArrow } from "react-icons/fa"
+import { FaAddressCard, FaLocationArrow, FaUsers } from "react-icons/fa"
 import { FcApproval, FcDataBackup } from "react-icons/fc"
 import { GiArchiveResearch, GiBrainDump } from "react-icons/gi"
 import { GoOrganization } from "react-icons/go"
 import { ImBriefcase } from "react-icons/im"
 import { MdManageHistory, MdOutlineSettingsSuggest } from "react-icons/md"
-import { RiOrganizationChart } from "react-icons/ri"
+import { RiNewspaperFill, RiOrganizationChart } from "react-icons/ri"
 import { useNavigate } from "react-router-dom"
 
 export const Admin = () => {
@@ -49,6 +49,35 @@ export const Admin = () => {
                 gridGap={6}
             >
                 {sortedCrudAdminActions.map((action, index) => (
+                    <AdminOptionBox
+                        key={index}
+                        name={action.name}
+                        description={action.description}
+                        onClick={() => console.log(action.description)}
+                        route={action.route}
+                        reactIcon={action.reactIcon}
+                    />
+                ))}
+            </Grid>
+
+
+
+            <Text
+                my={3}
+                fontWeight={"bold"}
+                fontSize={"lg"}
+                color={colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.700"}
+            >
+                PROJECTS CRUD
+            </Text>
+            <Divider my={4} />
+
+            <Grid
+                mt={6}
+                gridTemplateColumns={"repeat(3, 1fr)"}
+                gridGap={6}
+            >
+                {projectAdminActions.map((action, index) => (
                     <AdminOptionBox
                         key={index}
                         name={action.name}
@@ -115,6 +144,46 @@ const adminActions = [
         onClick: handleBatchApproveReports,
     },
 
+]
+
+const projectAdminActions = [
+
+    {
+        name: "Manage Project Memberships",
+        description: "CRUD operations for Project Memberships",
+        reactIcon: FaUsers,
+        route: "/crud/memberships"
+    },
+    {
+        name: "Manage Concept Plans",
+        description: "CRUD operations for Concept Plans",
+        reactIcon: RiNewspaperFill,
+        route: "/crud/conceptplans"
+    },
+    {
+        name: "Manage Project Plans",
+        description: "CRUD operations for Project Plans",
+        reactIcon: RiNewspaperFill,
+        route: "/crud/projectplans"
+    },
+    {
+        name: "Manage Progress Reports",
+        description: "CRUD operations for Progress Reports",
+        reactIcon: RiNewspaperFill,
+        route: "/crud/progressreports"
+    },
+    {
+        name: "Manage Student Reports",
+        description: "CRUD operations for Student Reports",
+        reactIcon: RiNewspaperFill,
+        route: "/crud/studentreports"
+    },
+    {
+        name: "Manage Project Closures",
+        description: "CRUD operations for Project Closures",
+        reactIcon: RiNewspaperFill,
+        route: "/crud/closures"
+    },
 ]
 
 

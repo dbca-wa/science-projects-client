@@ -57,7 +57,7 @@ export const ProjectBaseInformation = ({ projectKind, baseInformationFilled, set
             projectTitle !== '' &&
             projectSummary !== '' &&
             keywords.length !== 0 &&
-            selectedFile !== null &&
+            // selectedFile !== null &&
             meData !== undefined &&
             meData.pk !== 0 && meData.pk !== undefined
         ) {

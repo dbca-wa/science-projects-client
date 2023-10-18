@@ -10,6 +10,7 @@ import { ParticipatingProjects } from "../components/Pages/CurrentReport/Partici
 import { ParticipatingStudentReports } from "../components/Pages/CurrentReport/ParticipatingStudentReports"
 import { AnnualReportDetails } from "../components/Pages/CurrentReport/AnnualReportDetails"
 import { AnnualReportMedia } from "../components/Pages/CurrentReport/AnnualReportMedia"
+import { SDSChartCreator } from "../components/Pages/CurrentReport/SDSChartCreator"
 
 
 export const CurrentReport = () => {
@@ -69,7 +70,9 @@ export const CurrentReport = () => {
                                 <Tabs>
 
                                     <TabList>
-
+                                        <Tab>
+                                            SDS Chart
+                                        </Tab>
                                         <Tab>
                                             Participating Projects
                                         </Tab>
@@ -83,8 +86,12 @@ export const CurrentReport = () => {
                                             Media
                                         </Tab>
 
+
                                     </TabList>
                                     <TabPanels>
+                                        <TabPanel>
+                                            <SDSChartCreator />
+                                        </TabPanel>
                                         <TabPanel>
                                             <ParticipatingProjects
                                                 dateOpen={thisReport?.date_open}
@@ -94,15 +101,15 @@ export const CurrentReport = () => {
                                         </TabPanel>
                                         <TabPanel>
                                             <ParticipatingStudentReports />
-                                            2
-                                        </TabPanel>
-                                        <TabPanel>
-                                            <AnnualReportDetails />
                                             3
                                         </TabPanel>
                                         <TabPanel>
-                                            <AnnualReportMedia />
+                                            <AnnualReportDetails />
                                             4
+                                        </TabPanel>
+                                        <TabPanel>
+                                            <AnnualReportMedia />
+                                            5
                                         </TabPanel>
 
                                     </TabPanels>

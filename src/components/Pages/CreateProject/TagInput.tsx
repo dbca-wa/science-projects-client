@@ -33,17 +33,30 @@ const TagInput = ({ setTagFunction }: Props) => {
         setTags(updatedTags);
     };
 
+    useEffect(() => {
+        if (tags) {
+            console.log(tags)
+        }
+    }, [tags])
+
     const addTags = () => {
         const newTags = inputValue
+
             .split(', ')
             .map((tag) => tag.trim())
-            .filter((tag) => tag !== '' && !tags.includes(tag));
+            .filter((tag) => tag !== '')
+            .filter((tag) => !tags.some((existingTag) => existingTag.toLowerCase() === tag.toLowerCase()));
+
+        console.log(newTags)
 
         if (newTags.length > 0) {
             const updatedTags = [...tags, ...newTags.map(capitalizeFirstLetter)];
             updateTags(updatedTags);
-            setInputValue('');
         }
+
+        // Clear after adding/detecting duplicate tags
+        setInputValue('');
+
     };
 
     const removeTag = (tag: string) => {
@@ -69,11 +82,15 @@ const TagInput = ({ setTagFunction }: Props) => {
                 />
             </InputGroup>
             <FormHelperText>Add some keywords as a comma-separated list. Press space after a comma to add the tag.</FormHelperText>
-            <Flex flexWrap="wrap" gap={2} pt={3}>
+            <Flex flexWrap="wrap" gap={2} pt={3} userSelect={"none"}>
                 {tags.map((tag, index) => (
-                    <Tag key={index} size="md" borderRadius="full" variant="solid" colorScheme="blue">
-                        <TagLabel pl={1}>{tag}</TagLabel>
-                        <TagCloseButton onClick={() => removeTag(tag)} />
+                    <Tag key={index} size="md" borderRadius="full" variant="solid" colorScheme="blue" userSelect={"none"}>
+                        <TagLabel pl={1} userSelect={"none"}>{tag}</TagLabel>
+                        <TagCloseButton
+                            onClick={() => removeTag(tag)}
+                            userSelect={"none"}
+                            tabIndex={-1}
+                        />
                     </Tag>
                 ))}
             </Flex>
@@ -82,3 +99,8 @@ const TagInput = ({ setTagFunction }: Props) => {
 };
 
 export default TagInput;
+
+
+// .split(', ')
+// .map((tag) => tag.trim())
+// .filter((tag) => tag !== '' && !tags.includes(tag));

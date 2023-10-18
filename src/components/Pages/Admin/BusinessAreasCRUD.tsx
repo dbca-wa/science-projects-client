@@ -22,6 +22,7 @@ export const BusinessAreasCRUD = () => {
     };
 
 
+
     const { register, handleSubmit } = useForm<IBusinessArea>();
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();

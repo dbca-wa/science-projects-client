@@ -1,20 +1,27 @@
 // Dropdown search component for users. Displays 5 users below the search box.
 
-import { Avatar, Box, Flex, FormControl, FormHelperText, FormLabel, IconButton, Input, InputGroup, Text, useQuery } from "@chakra-ui/react";
+import { Avatar, Box, Flex, FormControl, FormHelperText, FormLabel, IconButton, Input, InputGroup, Skeleton, Text, useQuery } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { IProjectData, IUserData } from "../../types";
-import { getFullUser, getInternalUsersBasedOnSearchTerm, getMyProjects, getProjectsBasedOnSearchTerm } from "../../lib/api";
+import { IFullProjectDetails, IProjectData, IUserData } from "../../types";
+import { getFullProject, getFullProjectSimple, getMyProjectsBasedOnSearchTerm } from "../../lib/api";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useFullUserByPk } from "../../lib/hooks/useFullUserByPk";
+import { useUser } from "../../lib/hooks/useUser";
+import { useProject } from "../../lib/hooks/useProject";
+import { useNoImage } from "../../lib/hooks/useNoImage";
 
 interface IProjectSearchDropdown {
     allProjects: boolean;
     isRequired: boolean;
-    setProjectFunction: (setUserPk: number) => void;
+    setProjectFunction: (setProjectPk: number) => void;
     user: number;
     label: string;
     placeholder: string;
     helperText: any;
+    preselectedProjectPk?: number;
+    inputRef: React.RefObject<HTMLInputElement | null>;
+
+    // register: any;
 }
 
 
@@ -25,97 +32,144 @@ export const ProjectSearchDropdown = ({
     label,
     placeholder,
     helperText,
+    preselectedProjectPk,
+    inputRef,
+    // register
 }: IProjectSearchDropdown) => {
     const [searchTerm, setSearchTerm] = useState(''); // Local state for search term
     const [filteredItems, setFilteredItems] = useState<IProjectData[]>([]); // Local state for filtered items
     const [isMenuOpen, setIsMenuOpen] = useState(true); // Stores the menu open state
     const [selectedProject, setSelectedProject] = useState<IProjectData | null>(); // New state to store the selected name
 
-    // useEffect(() => {
-    //     if (searchTerm.trim() !== '') {
-    //         getMyProjectsBasedOnSearchTerm(searchTerm, userPk)
-    //             .then((data) => {
-    //                 console.log(data.projects);
-    //                 setFilteredItems(data.projects);
-    //             })
-    //             .catch((error) => {
-    //                 console.error('Error fetching users:', error);
-    //                 setFilteredItems([]);
-    //             });
-    //     } else {
-    //         const data = getMyProjects(); // Clear the filtered items when the search term is empty
-    //         setFilteredItems(data.projects)
-    //     }
-    // }, [searchTerm]);
+    const { userLoading, userData } = useUser();
 
-    // const { projectsLoading, projectData } = getProjectsByUserPk(user);
+    useEffect(() => {
+        if (!userLoading) {
+            if (preselectedProjectPk === undefined || preselectedProjectPk === null) {
+                getMyProjectsBasedOnSearchTerm(searchTerm, userData.pk)
+                    .then((data) => {
+                        console.log(data.projects);
+                        setFilteredItems(data.projects);
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching users:', error);
+                        setFilteredItems([]);
+                    });
+
+            }
+            else {
+                console.log("Preselected Project PK:", preselectedProjectPk)
+                getFullProjectSimple(preselectedProjectPk)
+                    .then((projectData) => {
+                        console.log(projectData.project);
+                        setProjectFunction(projectData.project.pk)
+                        setIsMenuOpen(false);
+
+                        // setFilteredItems([]);
+                        setSelectedProject(projectData.project)
+                        setSearchTerm(''); // Clear the search term when a user is selected    
+
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching users:', error);
+                        // setFilteredItems([]);
+                        // setSelectedProject             
+                    });
+            }
+        }
+
+    }, [searchTerm, userLoading, userData, preselectedProjectPk]);
+
+    // const { isLoading, projectData } = useProject(String(preselectedProjectPk));
 
     // useEffect(() => {
-    //     if (!projectsLoading && projectData) {
+    //     if (!isLoading && projectData) {
+    //         console.log("Preselected Project PK:", preselectedProjectPk)
+
     //         setProjectFunction(projectData.pk);
     //         setIsMenuOpen(false);
-    //         setSelectedProject(projectData); // Update the selected user
+    //         setSelectedProject(projectData); // Update the selected project
     //         setSearchTerm(''); // Clear the search term when a user is selected    
     //     }
-    // }, [projectsLoading, projectData])
+    // }, [isLoading, projectData])
+
+
+    // useEffect(() => {
+    //     console.log(filteredItems)
+    // }, [])
 
     const handleSelectProject = (project: IProjectData) => {
         setProjectFunction(project.pk);
         setIsMenuOpen(false);
-        setSelectedProject(project); // Update the selected user
-        setSearchTerm(''); // Clear the search term when a user is selected
+        setSelectedProject(project); // Update the selected project
+        setSearchTerm(''); // Clear the search term when a project is selected
     };
 
     const handleClearProject = () => {
-        setProjectFunction(0); // Clear the selected user by setting the userPk to 0 (or any value that represents no user)
-        setSelectedProject(null); // Clear the selected user state
-        setIsMenuOpen(true); // Show the menu again when the user is cleared
+        if (preselectedProjectPk !== null && preselectedProjectPk !== undefined) {
+            return
+        }
+
+        setProjectFunction(0); // Clear the selected project by setting the projectPk to 0 (or any value that represents no project)
+        setSelectedProject(null); // Clear the selected project state
+        setIsMenuOpen(true); // Show the menu again when the project is cleared
     };
 
 
     return (
-        <FormControl isRequired={isRequired} mb={4}
-            // bg={"red"}
-            w={"100%"}
-            h={"100%"}
-        >
-            {/* <FormLabel>{label}</FormLabel>
-            {selectedProject ? (
-                <Box mb={2} color="blue.500">
-                    <SelectedProjectInput user={selectedProject} onClear={handleClearProject} />
-                </Box>
-            ) : (
-                <InputGroup>
-                    <Input
-                        type="text"
-                        value={searchTerm}
-                        onChange={(event) => setSearchTerm(event.target.value)}
-                        placeholder={placeholder}
-                        onFocus={() => setIsMenuOpen(true)}
-                    />
-                </InputGroup>
-            )}
+        // isLoading || 
+        userLoading ? null :
+            <FormControl isRequired={isRequired} mb={4}
+                // bg={"red"}
+                w={"100%"}
+                h={"100%"}
+            >
+                <FormLabel>{label}</FormLabel>
+                {selectedProject ? (
+                    <Box mb={2} color="blue.500">
+                        <SelectedProjectInput
+                            project={selectedProject}
+                            onClear={handleClearProject}
+                            isPreselected={preselectedProjectPk !== null && preselectedProjectPk !== undefined}
+                        // register={register} 
+                        />
+                    </Box>
+                ) : (
+                    <InputGroup>
+                        <Input
+                            ref={inputRef}
+                            type="text"
+                            value={searchTerm}
+                            onChange={(event) => setSearchTerm(event.target.value)}
+                            placeholder={placeholder}
+                            onFocus={() => setIsMenuOpen(true)}
+                            autoFocus
+                        />
+                    </InputGroup>
+                )}
 
-            {selectedProject ? null : (
-                <Box pos="relative" w="100%">
-                    <CustomMenu isOpen={filteredItems.length > 0 && isMenuOpen}>
-                        <CustomMenuList minWidth="100%">
-                            {filteredItems.map((user) => (
-                                <CustomMenuItem
-                                    key={user.pk}
-                                    onClick={() => handleSelectUser(user)}
-                                    user={user}
-                                />
-                            ))}
-                        </CustomMenuList>
-                    </CustomMenu>
-                </Box>
-            )}
-            {/* <Box h="50px">
+                {selectedProject ? null :
+                    filteredItems.length > 0 && (
+                        <Box pos="relative" w="100%">
+                            <CustomMenu isOpen={filteredItems.length > 0 && isMenuOpen}>
+                                <CustomMenuList minWidth="100%">
+
+                                    {filteredItems?.map((project) => (
+                                        <CustomMenuItem
+                                            key={project?.pk}
+                                            onClick={() => handleSelectProject(project)}
+                                            project={project}
+                                        />
+                                    ))}
+                                </CustomMenuList>
+                            </CustomMenu>
+                        </Box>
+                    )}
+                {/* <Box h="50px">
                 {helperText}
             </Box> */}
-            <FormHelperText>{helperText}</FormHelperText>
-        </FormControl>
+                <FormHelperText>{helperText}</FormHelperText>
+            </FormControl>
     );
 };
 
@@ -130,7 +184,7 @@ interface CustomMenuProps {
 
 interface CustomMenuItemProps {
     onClick: () => void;
-    user: IUserData;
+    project: IProjectData;
 }
 
 interface CustomMenuListProps {
@@ -154,7 +208,7 @@ const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
     );
 };
 
-const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
+const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const handleClick = () => {
@@ -162,35 +216,61 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
         onClick();
     }
 
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    const handleImageLoad = () => {
+        setImageLoaded(true);
+    };
+    const noImage = useNoImage();
+
     return (
-        <Flex
-            as="button"
-            type="button"
-            w="100%"
-            textAlign="left"
-            p={2}
-            onClick={handleClick}
-            onMouseOver={() => setIsHovered(true)}
-            onMouseOut={() => setIsHovered(false)}
-            bg={isHovered ? "gray.200" : "transparent"}
-            alignItems="center"
-            {...rest}
-        >
-            <Avatar
-                src={user?.image?.file ? user.image.file : user?.image?.old_file ? user.image.old_file : undefined}
-            />
-            <Box
-                display="flex"
+        project ?
+            <Flex
+                as="button"
+                type="button"
+                w="100%"
+                textAlign="left"
+                p={2}
+                onClick={handleClick}
+                onMouseOver={() => setIsHovered(true)}
+                onMouseOut={() => setIsHovered(false)}
+                bg={isHovered ? "gray.200" : "transparent"}
                 alignItems="center"
-                justifyContent="start"
-                ml={3}
-                h="100%"
+                {...rest}
             >
-                <Text ml={2}
-                    color={user.is_staff ? user.is_superuser ? "blue.500" : "green.500" : "gray.500"}
-                >{`${user.first_name} ${user.last_name} ${user.is_staff ? user.is_superuser ? '(Admin)' : '(Staff)' : '(External)'}`}</Text>
-            </Box>
-        </Flex>
+                {project?.image ? (
+                    <Skeleton isLoaded={imageLoaded} startColor="gray.200" endColor="gray.400"
+                        rounded={"full"}
+                    >
+                        <Avatar
+                            src={project?.image?.file ? project.image?.file : project.image?.old_file ? project.image.old_file : noImage}
+                            onLoad={handleImageLoad}
+                        />
+                    </Skeleton>
+                ) : (
+                    <Avatar
+                        src={project?.image?.file ? project.image?.file : project.image?.old_file ? project.image.old_file : noImage}
+                        onLoad={handleImageLoad}
+
+                    />
+                )}
+
+
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="start"
+                    ml={3}
+                    h="100%"
+                >
+                    <Text ml={2}
+                        color={"green.500"}
+                    >
+                        {`${project.title}`}
+                    </Text>
+                </Box>
+            </Flex>
+            : null
     );
 };
 
@@ -208,12 +288,22 @@ const CustomMenuList = ({ minWidth, children, ...rest }: CustomMenuListProps) =>
 };
 
 
-interface SelectedUserInputProps {
-    user: IUserData;
+interface SelectedProjectInputProps {
+    project: IProjectData;
     onClear: () => void;
+    isPreselected: boolean;
+    // register: any;
 }
 
-const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
+const SelectedProjectInput = ({ project, onClear, isPreselected
+    // , register 
+}: SelectedProjectInputProps) => {
+    // console.log(project)
+    // const {watch} 
+    const noImage = useNoImage();
+
+    const [projectPk, setProjectPk] = useState(project.pk);
+
     return (
         <Flex
             align="center"
@@ -226,23 +316,35 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
         >
             <Avatar
                 size="sm"
-                src={user.image?.file ? user.image?.file : user.image?.old_file}
+                src={project?.image?.file ? project.image?.file : project.image?.old_file ? project.image.old_file : noImage}
             />
             <Text ml={2}
-                color={user.is_staff ? user.is_superuser ? "blue.500" : "green.500" : "gray.500"}
-            >{`${user.first_name} ${user.last_name} ${user.is_staff ? user.is_superuser ? '(Admin)' : '(Staff)' : '(External)'}`}</Text>
-
-            <IconButton
-                aria-label="Clear selected user"
-                icon={<CloseIcon />}
-                size="xs"
-                position="absolute"
-                top="50%"
-                right={2}
-                transform="translateY(-50%)"
-                onClick={onClear}
-
+                color={"green.500"}
+            >{`${project?.title}`}</Text>
+            <input
+                // {...register("project", { required: true })}
+                value={projectPk}
+                onChange={() => {
+                    setProjectPk(project.pk)
+                }}
+                hidden
             />
+
+            {!isPreselected &&
+                (
+                    <IconButton
+                        aria-label="Clear selected user"
+                        icon={<CloseIcon />}
+                        size="xs"
+                        position="absolute"
+                        top="50%"
+                        right={2}
+                        transform="translateY(-50%)"
+                        onClick={onClear}
+
+                    />
+
+                )}
 
         </Flex>
     );

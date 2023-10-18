@@ -15,6 +15,17 @@ import { FaUserFriends } from 'react-icons/fa'
 export const CreateProject = () => {
     const creationData = [
         {
+            title: "Science Project",
+            description: "A project with a defined period of scientific activities.",
+            bulletPoints: [
+                "Approval process to determine how it fits within Departmental stragegy and priorities.",
+                "Formal Closure Process",
+                "Requires Annual Reporting"
+            ],
+            colorScheme: "green",
+            buttonIcon: MdScience,
+        },
+        {
             title: "Core Function",
             description: "An ongoing science function with an indefinite period of activity.",
             bulletPoints: [
@@ -27,15 +38,15 @@ export const CreateProject = () => {
         },
 
         {
-            title: "Science Project",
-            description: "A project with a defined period of scientific activities.",
+            title: "Student Project",
+            description: "Supervision of a tertiary student.",
             bulletPoints: [
-                "Approval process to determine how it fits within Departmental stragegy and priorities.",
-                "Formal Closure Process",
+                "No formal approval process",
+                "Immediate closure without formal process",
                 "Requires Annual Reporting"
             ],
-            colorScheme: "green",
-            buttonIcon: MdScience,
+            colorScheme: "blue",
+            buttonIcon: RiBook3Fill,
         },
         {
             title: "External Partnership",
@@ -48,17 +59,7 @@ export const CreateProject = () => {
             colorScheme: "gray",
             buttonIcon: FaUserFriends,
         },
-        {
-            title: "Student Project",
-            description: "Supervision of a tertiary student.",
-            bulletPoints: [
-                "No formal approval process",
-                "Immediate closure without formal process",
-                "Requires Annual Reporting"
-            ],
-            colorScheme: "blue",
-            buttonIcon: RiBook3Fill,
-        },
+
     ]
     const { colorMode } = useColorMode();
     const { layout } = useLayoutSwitcher();

@@ -36,7 +36,7 @@ export const TraditionalLayout = () => {
                     bgColor={"white"}
                     rounded={6}
                     py={10}
-                    bg={colorMode === "light" ? "white" : "blackAlpha.700"}
+                    bg={colorMode === "light" ? "white" : "blackAlpha.800"}
 
                 >
                     <Box mx={10}
