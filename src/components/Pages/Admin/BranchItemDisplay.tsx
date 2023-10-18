@@ -120,7 +120,9 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                 // bg={"red"}
                 >
                     <Flex justifyContent="flex-start">
-                        <Text>{name}</Text>
+                        <Text
+                            fontWeight={"bold"}
+                        >{name}</Text>
 
                     </Flex>
                     <Flex>

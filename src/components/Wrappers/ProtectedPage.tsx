@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../lib/hooks/useUser";
+import { IUserData } from "../../types";
 
 interface IProtectedPageProps {
     children: React.ReactNode;
 }
+
 
 export const ProtectedPage = ({ children }: IProtectedPageProps) => {
     const { isLoggedIn, userData, userLoading } = useUser();
@@ -15,7 +17,7 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
 
     useEffect(() => {
         if (!userLoading) {
-            if (!isLoggedIn || userData === "none") {
+            if (!isLoggedIn || userData?.pk === undefined) {
                 // console.log("Protected Page: Loaded, not logged in, userdata none!")
                 navigate("/login")
                 return;

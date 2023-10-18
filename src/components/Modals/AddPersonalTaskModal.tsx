@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, Input, InputGroup, InputLeftAddon, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, ToastId, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
+import { Button, FormControl, FormLabel, Input, InputGroup, InputLeftAddon, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, ToastId, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
 import { MdOutlineTitle } from "react-icons/md"
 import { IQuickTask } from "../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -94,7 +94,9 @@ export const AddPersonalTaskModal = ({ user, isAnimating, setIsAnimating, isAddT
         <Modal
             isOpen={isAddTaskOpen}
             onClose={onAddTaskClose}
-
+            size={"sm"}
+        // scrollBehavior="inside"
+        // isCentered={true}
         >
             <ModalOverlay />
             <ModalContent
@@ -105,6 +107,8 @@ export const AddPersonalTaskModal = ({ user, isAnimating, setIsAnimating, isAddT
                 >
                     Create Personal Task
                 </ModalHeader>
+                <ModalCloseButton />
+
                 <ModalBody
                     as="form" id="taskcreation-form"
                     onSubmit={handleSubmit(onSubmitTaskCreation)}

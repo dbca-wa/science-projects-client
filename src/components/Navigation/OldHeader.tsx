@@ -25,7 +25,8 @@ import { BsFillPeopleFill } from "react-icons/bs"
 import { AiFillPrinter } from "react-icons/ai";
 import { CgViewList } from "react-icons/cg";
 import { ImBook, ImBriefcase, ImUsers } from "react-icons/im";
-import { FaAddressCard, FaLocationArrow, FaUserPlus } from "react-icons/fa";
+import { RiNewspaperFill } from "react-icons/ri"
+import { FaAddressCard, FaLocationArrow, FaUserPlus, FaUsers } from "react-icons/fa";
 
 
 import { Navitar } from "./Navitar";
@@ -305,6 +306,72 @@ const AdminMenuContents = () => {
                     <Text ml={2}
                     >
                         Manage Services
+                    </Text>
+                </MenuItem>
+            </MenuGroup>
+
+            <MenuGroup
+                title="PROJECT CRUD" fontSize={"12px"} color={"gray.500"} textAlign={"center"}
+
+            >
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/memberships')
+                    }}                 >
+                    {<FaUsers />}
+                    <Text ml={2}
+                    >
+                        Project Memberships
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/conceptplans')
+                    }}                 >
+                    {<RiNewspaperFill />}
+                    <Text ml={2}
+                    >
+                        Manage Concept Plans
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/projectplans')
+                    }}                 >
+                    {<RiNewspaperFill />}
+                    <Text ml={2}
+                    >
+                        Manage Project Plans
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/progressreports')
+                    }}                 >
+                    {<RiNewspaperFill />}
+                    <Text ml={2}
+                    >
+                        Manage Progress Reports
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/studentreports')
+                    }}                 >
+                    {<RiNewspaperFill />}
+                    <Text ml={2}
+                    >
+                        Manage Student Reports
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/closures')
+                    }}                >
+                    {<RiNewspaperFill />}
+                    <Text ml={2}
+                    >
+                        Manage Closure Forms
                     </Text>
                 </MenuItem>
             </MenuGroup>

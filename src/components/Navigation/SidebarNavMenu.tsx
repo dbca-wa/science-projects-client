@@ -43,12 +43,16 @@ export const SidebarNavMenu = (
 
     return (
         // Box required to prevent popper console.log on click
-        <Box        >
+        <Box
+            zIndex={99999}
+        >
             <Menu
                 isOpen={isOpen}
+
             >
                 <MenuButton
                     colorScheme={cScheme}
+                    zIndex={99999}
 
                     bg={bgStyle}
 
@@ -138,6 +142,8 @@ export const SidebarNavMenu = (
                     onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}
                     mt={"-7.5px"}
                     w={"100%"}
+                    zIndex={99999}
+
                 >
                     {children}
                 </MenuList>

@@ -163,6 +163,7 @@ export const PromoteUserModal = ({ isOpen, onClose, userPk, userIsSuper, userIsM
                 <ModalCloseButton />
                 <Flex
                     as={"form"}
+                    id="promotion-form"
                     onSubmit={handleSubmit(onSubmit)}
                 >
                     <ModalBody>
@@ -186,35 +187,40 @@ export const PromoteUserModal = ({ isOpen, onClose, userPk, userIsSuper, userIsM
                         }
 
                     </ModalBody>
-                    <ModalFooter pos="absolute" bottom={0} right={0}>
-
-                        <Grid
-                            gridTemplateColumns={"repeat(2, 1fr)"}
-                            gridGap={4}
-                        >
-                            <Button
-                                colorScheme="gray"
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                // isDisabled={!changesMade}
-                                isDisabled={userIsExternal}
-                                isLoading={promotionMutation.isLoading}
-                                type="submit"
-                                bgColor={colorMode === "light" ? `green.500` : `green.600`}
-                                color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-                                _hover={{
-                                    bg: colorMode === "light" ? `green.600` : `green.400`,
-                                    color: colorMode === "light" ? `white` : `white`
-                                }}
-                                ml={3}
-                            >
-                                {userIsSuper ? "Demote" : "Promote"}
-                            </Button>
-                        </Grid>
-                    </ModalFooter>
                 </Flex>
+                <ModalFooter
+                // pos="absolute" bottom={0} right={0}
+                >
+
+                    <Grid
+                        gridTemplateColumns={"repeat(2, 1fr)"}
+                        gridGap={4}
+                    >
+                        <Button
+                            colorScheme="gray"
+                            onClick={onClose}
+
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            // isDisabled={!changesMade}
+                            isDisabled={userIsExternal}
+                            isLoading={promotionMutation.isLoading}
+                            form="promotion-form"
+                            type="submit"
+                            bgColor={colorMode === "light" ? `green.500` : `green.600`}
+                            color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+                            _hover={{
+                                bg: colorMode === "light" ? `green.600` : `green.400`,
+                                color: colorMode === "light" ? `white` : `white`
+                            }}
+                            ml={3}
+                        >
+                            {userIsSuper ? "Demote" : "Promote"}
+                        </Button>
+                    </Grid>
+                </ModalFooter>
 
             </ModalContent>
 

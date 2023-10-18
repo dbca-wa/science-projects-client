@@ -2,7 +2,7 @@
 
 import { Box, Image, Button, Center, FormControl, FormErrorMessage, FormLabel, Grid, Icon, Input, InputGroup, InputLeftAddon, InputLeftElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, ToastId, useColorMode, useDisclosure, useQuery, useToast, FormHelperText, TabList, Tabs, Tab, TabPanels, TabPanel, Flex } from "@chakra-ui/react"
 import { useEffect, useRef, useState } from "react";
-import { IBranch, IBusinessArea, IPersonalInformation, IProfile, IUser, IUserData } from "../../types";
+import { IBranch, IBusinessArea, IPersonalInformation, IProfile, IUserData } from "../../types";
 import { useBranches } from "../../lib/hooks/useBranches";
 import { GiGraduateCap } from "react-icons/gi";
 import { AiFillPhone } from "react-icons/ai";
@@ -235,7 +235,7 @@ export const EditUserDetailsModal = ({ isOpen, onClose, user, branches, business
         <Modal
             isOpen={isOpen}
             onClose={handleToastClose}
-            size={"sm"}
+            size={"3xl"}
 
         >
             <ModalOverlay />
@@ -245,7 +245,7 @@ export const EditUserDetailsModal = ({ isOpen, onClose, user, branches, business
                 <Flex
                     as={"form"}
                     onSubmit={handleSubmit(onSubmit)}
-
+                    id="edit-details"
                 >
                     <ModalBody
 
@@ -674,35 +674,38 @@ export const EditUserDetailsModal = ({ isOpen, onClose, user, branches, business
                         }
 
                     </ModalBody>
-                    <ModalFooter pos="absolute" bottom={0} right={0}>
-                        <Grid
-                            gridTemplateColumns={"repeat(2, 1fr)"}
-                            gridGap={4}
-                        >
-                            <Button
-                                colorScheme="gray"
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                // isDisabled={!changesMade}
-                                isLoading={fullMutation.isLoading}
-                                type="submit"
-                                bgColor={colorMode === "light" ? `green.500` : `green.600`}
-                                color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-                                _hover={{
-                                    bg: colorMode === "light" ? `green.600` : `green.400`,
-                                    color: colorMode === "light" ? `white` : `white`
-                                }}
-                                ml={3}
-                            >
-                                Update
-                            </Button>
-                        </Grid>
-                    </ModalFooter>
+
                 </Flex>
 
-
+                <ModalFooter
+                //  pos="absolute" bottom={0} right={0}
+                >
+                    <Grid
+                        gridTemplateColumns={"repeat(2, 1fr)"}
+                        gridGap={4}
+                    >
+                        <Button
+                            colorScheme="gray"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            // isDisabled={!changesMade}
+                            isLoading={fullMutation.isLoading}
+                            form="edit-details"
+                            type="submit"
+                            bgColor={colorMode === "light" ? `green.500` : `green.600`}
+                            color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+                            _hover={{
+                                bg: colorMode === "light" ? `green.600` : `green.400`,
+                                color: colorMode === "light" ? `white` : `white`
+                            }}
+                            ml={3}
+                        >
+                            Update
+                        </Button>
+                    </Grid>
+                </ModalFooter>
             </ModalContent>
         </Modal>
     )

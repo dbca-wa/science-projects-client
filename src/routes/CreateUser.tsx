@@ -22,7 +22,14 @@ const capitalizeAfterSpaceOrHyphen = (name: string) => {
     });
 };
 
-export const CreateUser = ({ onSuccess }: { onSuccess?: () => void }) => {
+interface IProps {
+    onSuccess?: () => void;
+    isModal?: boolean;
+}
+
+
+// { onSuccess }: { onSuccess?: () => void }
+export const CreateUser = ({ onSuccess, isModal }: IProps) => {
     const { colorMode } = useColorMode();
     const toast = useToast();
     const navigate = useNavigate();
@@ -217,21 +224,25 @@ export const CreateUser = ({ onSuccess }: { onSuccess?: () => void }) => {
                     Add External User
                 </Text>
             </Box>
-            <Box
-                bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
-                rounded={6}
-                flexDir={"column"}
-                p={6}
-                pos={"relative"}
-                mt={5}
-                mb={7}
-                color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
-                userSelect={"none"}
-            >
-                <TypewriterText text={
-                    "Please note that this is for adding external users only. Enter the external user's details, not your own.\nIf you are trying to add a staff member, don't. They will be added to the system upon accessing this site with their DBCA microsoft account.\nAll existing users can be found on the users page.\n"}
-                />
-            </Box>
+
+
+            {!isModal && (
+                <Box
+                    bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
+                    rounded={6}
+                    flexDir={"column"}
+                    p={6}
+                    pos={"relative"}
+                    mt={5}
+                    mb={7}
+                    color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
+                    userSelect={"none"}
+                >
+                    <TypewriterText text={
+                        "Please note that this is for adding external users only. Enter the external user's details, not your own.\nIf you are trying to add a staff member, don't. They will be added to the system upon accessing this site with their DBCA microsoft account.\nAll existing users can be found on the users page.\n"}
+                    />
+                </Box>
+            )}
 
             <form onSubmit={handleSubmit}>
                 <Grid
@@ -366,6 +377,25 @@ export const CreateUser = ({ onSuccess }: { onSuccess?: () => void }) => {
 
                 </Grid>
 
+                {isModal && (
+                    <Box
+                        bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
+                        rounded={6}
+                        flexDir={"column"}
+                        p={6}
+                        pos={"relative"}
+                        mt={5}
+                        mb={7}
+                        color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
+                        userSelect={"none"}
+                    >
+                        <TypewriterText text={
+                            "Please note that this is for adding external users only. Enter the external user's details, not your own.\nIf you are trying to add a staff member, don't. They will be added to the system upon accessing this site with their DBCA microsoft account.\nAll existing users can be found on the users page.\n"}
+                        />
+                    </Box>
+                )}
+
+
                 <Flex mt={5} justifyContent="end">
                     <Button
                         type="submit"
@@ -385,6 +415,7 @@ export const CreateUser = ({ onSuccess }: { onSuccess?: () => void }) => {
                     </Button>
                 </Flex>
             </form>
+
         </>
     );
 };

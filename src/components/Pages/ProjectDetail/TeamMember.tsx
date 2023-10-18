@@ -3,19 +3,17 @@
 import { Avatar, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, Grid, HStack, Tag, useColorMode, useDisclosure } from "@chakra-ui/react"
 import { BsGripVertical } from "react-icons/bs";
 import { ProjectUserDetails } from "./ProjectUserDetails";
-import { CSS } from '@dnd-kit/utilities';
-
-import { useSortable } from '@dnd-kit/sortable';
 import { useEffect, useState } from "react";
-import { IImageData } from "../../../types";
+import { IImageData, IUserData } from "../../../types";
 import { FaCrown } from "react-icons/fa";
+import { DraggableProvided } from "react-beautiful-dnd"; // Import DraggableProvided
 
 
 interface ITeamMember {
-    index: number;
     user_id: number;
     username: string | null;
     is_leader: boolean;
+    leader_pk: number;
     name: string;
     role: string;
     image: IImageData;
@@ -23,34 +21,32 @@ interface ITeamMember {
     position: number;
     usersCount: number;
     project_id: number;
+    draggableProps: DraggableProvided['draggableProps'];
+    dragHandleProps: DraggableProvided['dragHandleProps'];
+    isCurrentlyDragging: boolean;
+    draggingUser: IUserData;
+    backgroundColor: string | undefined; // Add backgroundColor prop
+    refetchTeamData: () => void;
 }
 
-export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_allocation, position, username, usersCount, project_id }: ITeamMember) => {
+export const TeamMember = ({ refetchTeamData, user_id, is_leader, leader_pk, name, role, image, time_allocation, position, username, usersCount, project_id,
+    isCurrentlyDragging,
+    draggableProps,
+    dragHandleProps,
+    backgroundColor, // Accept backgroundColor prop
+    draggingUser,
+    // isDragging, // Receive isDragging prop
 
 
-    const [isGrabbed, setIsGrabbed] = useState(false);
+}: ITeamMember) => {
 
+    // Define your styles for the dragged state
     const { colorMode } = useColorMode();
 
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-    } = useSortable({
-        id: index,
-    });
-
     useEffect(() => {
-        if (transform) {
-            setIsGrabbed(true);
-        }
-        else {
-            setIsGrabbed(false);
-        }
-    }, [transform])
-
+        if (isCurrentlyDragging === true)
+            console.log(`${name} dragging: ${isCurrentlyDragging}`);
+    }, [isCurrentlyDragging])
 
     const roleColors: { [key: string]: { bg: string; color: string } } = {
         "Research Scientist": { bg: "green.700", color: "white" },
@@ -90,6 +86,37 @@ export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_
 
     const { isOpen: isUserOpen, onOpen: onUserOpen, onClose: onUserClose } = useDisclosure();
 
+
+    // useEffect(() => {
+    //     if (isCurrentlyDragging) {
+    //         setBackgroundColor("blue.500")
+    //     } else {
+    //         // When dragging stops (transition from true to false), flash green and reset to default
+    //         setBackgroundColor("green.500");
+
+    //         // After 1 second, reset the background color to default
+    //         const timer = setTimeout(() => {
+    //             setBackgroundColor(undefined);
+    //         }, 1000);
+
+    //         // Clear the timer when component unmounts
+    //         return () => clearTimeout(timer);
+    //     }
+
+
+    // }, [isCurrentlyDragging])
+
+    const draggedStyles = {
+        background: "blue.500",
+        //  colorMode === "light" ? "blue.500" : "blue.500",
+        scale: 1.1,
+        borderRadius: '10px',
+        cursor: 'grabbing',
+        zIndex: 999,
+    };
+
+
+
     return (
         <>
             <Drawer
@@ -106,10 +133,13 @@ export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_
                             project_id={project_id}
                             pk={user_id}
                             is_leader={is_leader}
+                            leader_pk={leader_pk}
                             role={role}
                             position={position}
                             time_allocation={time_allocation}
                             usersCount={usersCount}
+                            refetchTeamData={refetchTeamData}
+                            onClose={onUserClose}
                         />
                     </DrawerBody>
 
@@ -119,8 +149,16 @@ export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_
             </Drawer>
 
             <HStack
+                {...draggableProps}
+                {...dragHandleProps}
+                style={isCurrentlyDragging ? draggedStyles : {}}
 
-                bg={colorMode === "light" ? "white" : "gray.800"}
+                scale={isCurrentlyDragging ? 1.1 : 1}
+                borderRadius={isCurrentlyDragging ? "10px" : "0px"}
+                bg={
+                    isCurrentlyDragging ? "blue.500" : backgroundColor
+                    // isCurrentlyDragging ? "blue.500" : colorMode === "light" ? "white" : "gray.800"
+                }
                 justifyContent={"space-between"}
                 _hover={
                     {
@@ -132,19 +170,9 @@ export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_
 
                     }
                 }
+                border={"1px solid"}
+                borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
 
-                sx={
-                    transform ? {
-                        transform: CSS.Transform.toString(transform),
-                        zIndex: 99999,
-                        background:
-                            isGrabbed ? colorMode === "light" ? "blue.500" : "blue.500" : "red",
-                        scale: 1.1,
-                        borderRadius: '10px',
-                        cursor: "grabbing",
-                    }
-                        : undefined
-                }
             >
                 {/* Left Section */}
                 <Flex
@@ -182,7 +210,7 @@ export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_
                             colorScheme="blue"
                             onClick={onUserOpen}
                             cursor="pointer"
-                            color={isGrabbed ? "white" : "blue.400"}
+                            color={isCurrentlyDragging ? "white" : "blue.400"}
                         >
                             {name !== "undefined undefined" && name !== "None None" ? name : username}
                         </Button>
@@ -198,25 +226,25 @@ export const TeamMember = ({ index, user_id, is_leader, name, role, image, time_
 
                 </Flex>
 
-                {/* Right Section */}
+
+            </HStack>
+        </>
+    )
+}
+
+
+
+{/* Right Section
                 <Box
                     userSelect={"none"}
                     right={0}
                     h={20}
-                    cursor={isGrabbed ? "grabbing" : "grab"}
+                    // cursor={isGrabbed ? "grabbing" : "grab"}
                     p={4}
                     flex={1}
                     display="flex"
                     alignItems="center"
                     justifyContent="flex-end"
-                    style={{ transition }}
-                    ref={setNodeRef}
-                    {...listeners}
-                    {...attributes}
                 >
                     {<BsGripVertical />}
-                </Box>
-            </HStack>
-        </>
-    )
-}
+                </Box> */}

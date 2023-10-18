@@ -1,5 +1,20 @@
 import { ReactNode } from "react";
 
+// Editor ============================================================================
+
+type ProjectSection = "title" | "description" | "tagline";
+type ConceptPlanSection = "background" | "aims" | "outcome" | "collaborations" | "strategic_context" | "staff_time_allocation" | "budget";
+type ProjectPlanSection = "background" | "aims" | "outcome" | "knowledge_transfer" | "project_tasks" | "listed_references" | "data_management" | "methodology" | "specimens" | "operating_budget" | "operating_budget_external" | "related_projects";
+type ProgressReportSection = "context" | "aims" | "progress" | "implications" | "future";
+type StudentReportSection = "progress_report";
+type ProjectClosureSection = "reason" | "intended_outcome" | "knowledge_transfer" | "data_location" | "hardcopy_location" | "backup_location" | "scientific_outputs";
+
+
+export type EditorType = "ProjectDetail" | "ProjectDocument";
+export type EditorSections = "Description" | "Concept Plan" | "Project Plan" | "Progress Report" | "Student Report" | "Project Closure";
+type EditorSubsections = ProjectSection | ConceptPlanSection | ProjectPlanSection | ProgressReportSection | StudentReportSection | ProjectClosureSection;
+
+
 
 // USER ============================================================================
 
@@ -16,6 +31,31 @@ export interface IUserData {
     business_area: IBusinessArea | undefined;
     role: string;
     branch: IBranch;
+    affiliation: string;
+    branches?: IBranch[];
+    businessAreas?: IBusinessArea[];
+}
+
+export interface IUserMe {
+    pk: number;
+    about: string;
+    agency: IAgency;
+    branch: IBranch;
+    business_area: IBusinessArea | undefined;
+    date_joined: Date;
+    email: string;
+    expertise: string;
+    phone: string;
+    fax: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    title: string;
+    is_superuser: boolean;
+    is_staff: boolean;
+    is_active: boolean;
+    image: IImageData;
+    role: string | null;
     affiliation: string;
     branches?: IBranch[];
     businessAreas?: IBusinessArea[];
@@ -129,11 +169,37 @@ interface IEndorsement {
     data_manager_endorsement: boolean;
     data_management: string;
     no_specimens: string;
+
+}
+
+interface ProjectPDFData {
+    pk: number;
+    old_file: string | null;
+    file: string | null;
+    document: MainDoc;
+    project: IProjectData;
+}
+
+interface MainDoc {
+    pk: number;
+    created_year: number;
+    created_at: Date;
+    creator: number;
+    modifier: number;
+    updated_at: Date;
+    kind: string;
+    project: IProjectData;
+    status: string;
+    project_lead_approval_granted: boolean;
+    business_area_lead_approval_granted: boolean;
+    directorate_approval_granted: boolean;
+    pdf_generation_in_progress: boolean;
+    pdf: string;
 }
 
 interface IProjectPlan {
     pk: number;
-    document: number;
+    document: MainDoc;
     background: string | null;
     aims: string | null;
     outcome: string | null;
@@ -149,9 +215,13 @@ interface IProjectPlan {
     endorsemeents: IEndorsement;
 }
 
+
+
 interface IProgressReport {
     pk: number;
-    document: number;
+    created_at: Date;
+    updated_at: Date;
+    document: MainDoc;
     year: number;
     is_final_report: boolean;
     context: string | null;
@@ -163,14 +233,14 @@ interface IProgressReport {
 
 interface IStudentReport {
     pk: number;
-    document: number;
+    document: MainDoc;
     progress_report: string;
     year: number;
 }
 
 interface IProjectClosure {
     pk: number;
-    document: number;
+    document: MainDoc;
     intended_outcome: string | null;
     reason: string | null;
     scientific_outputs: string | null;
@@ -193,6 +263,7 @@ interface IProjectDocuments {
 
 
 interface IProjectMember {
+    id: number;
     pk: number;
     project: number;
     is_leader: boolean;
@@ -209,7 +280,7 @@ interface IProjectMember {
 
 
 interface IProjectData {
-    pk: number;
+    pk: number | undefined;
     id?: number;
     kind: string;
     title: string;
@@ -222,7 +293,7 @@ interface IProjectData {
     number: number;
     start_date: Date;
     end_date: Date;
-    business_area_id: number;
+    business_area: IBusinessArea;
 
     created_at: Date;
     updated_at: Date;
@@ -267,6 +338,14 @@ export interface IQuickTask {
     name: string;
     description: string;
 }
+
+export interface IApproveProgressReport {
+    action: "approve" | "recall" | "send_back";
+    stage: number; // 1-3
+    documentPk: number;
+    progressReportPk: number;
+}
+
 
 export interface ITaskDisplayCard {
     pk: number;
@@ -348,18 +427,16 @@ interface IBusinessArea {
     leader: number;
     finance_admin: number;
     data_custodian: number;
-
-
-    // effective_from: Date;
-    //effective_to: Date;   // always null, delete ?
-
-    // creator_id: number; // necessary?
-    // modifier_id: number; // necessary?
-
-    //  date_created: Date;     // Converter needed?
-    // last_modified: Date;
 }
 
+// effective_from: Date;
+//effective_to: Date;   // always null, delete ?
+
+// creator_id: number; // necessary?
+// modifier_id: number; // necessary?
+
+//  date_created: Date;     // Converter needed?
+// last_modified: Date;
 
 // RESEARCH FUNCTION ============================================================================
 
@@ -385,6 +462,7 @@ interface IDepartmentalService {
 
 interface IAgency {
     pk: number;
+    name: string;
     key_stakeholder: number;
     is_active: boolean;
 }
@@ -520,12 +598,12 @@ interface IReaction {
     count: number;
 }
 
-interface IUser {
-    first_name: string;
-    last_name: string;
-    username: string;
-    avatar: string | null;
-}
+// interface IUser {
+//     first_name: string;
+//     last_name: string;
+//     username: string;
+//     avatar: string | null;
+// }
 
 interface IChatMessage {
     sendingUser: IUser;

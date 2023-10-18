@@ -124,7 +124,7 @@ export const EditPersonalInformationModal = ({ isOpen, onClose, userId }: IEditP
 
 
     return (
-        <Modal isOpen={isOpen} onClose={handleCloseModal}>
+        <Modal isOpen={isOpen} onClose={handleCloseModal} size={"3xl"} scrollBehavior='inside'>
             <ModalOverlay />
             <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
                 <ModalHeader>Edit Personal Information</ModalHeader>

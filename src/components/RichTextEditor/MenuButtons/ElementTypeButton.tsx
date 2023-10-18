@@ -12,22 +12,24 @@ import {
 import { MdFormatListBulleted, MdFormatListNumbered } from "react-icons/md";
 import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton";
 
-import { useEffect, useState } from "react";
-import { NodeType, useSelectedNode } from "../../../lib/hooks/LexicalSelectedNodeContext";
+import { SetStateAction, useEffect, useState } from "react";
+// import { NodeType, useSelectedNode } from "../../../lib/hooks/LexicalSelectedNodeContext";
 
 interface Props {
     isSmall?: boolean;
+    shouldFurtherConcat?: boolean;
     onClick: (event: string) => void;
+    currentlyClickedNode: string;
+    setCurrentlyClickedNode: React.Dispatch<SetStateAction<string>>;
 }
 
-export const ElementTypeButton = ({ isSmall, onClick }: Props) => {
-    const [currentTitle, setCurrentTitle] = useState<string>(isSmall ? "Norm" : "Normal");
-
-    const { selectedNodeType, setSelectedNodeType } = useSelectedNode();
+export const ElementTypeButton = ({ isSmall, onClick, shouldFurtherConcat, setCurrentlyClickedNode, currentlyClickedNode }: Props) => {
+    const [currentTitle, setCurrentTitle] = useState<string>(shouldFurtherConcat || isSmall ? "Norm" : "Normal");
+    // const { selectedNodeType, setSelectedNodeType } = useSelectedNode();
 
 
     useEffect(() => {
-        let eventType: NodeType = 'paragraph'; // Initialize eventType as paragraph
+        let eventType = ''; // 
 
         switch (currentTitle) {
             case 'Normal':
@@ -64,16 +66,27 @@ export const ElementTypeButton = ({ isSmall, onClick }: Props) => {
             default:
                 eventType = 'paragraph';
         }
-        if (setSelectedNodeType) {
-            setSelectedNodeType(eventType);
+        // if (setSelectedNodeType) {
+        //     setSelectedNodeType(eventType);
 
-        }
+        // }
         onClick(eventType);
 
         // console.log(currentTitle)
     }, [currentTitle, onClick]);
 
 
+    // useEffect(() => {
+    //     console.log(currentTitle)
+    //     console.log(currentlyClickedNode)
+    //     if (currentlyClickedNode === "paragraph" && currentTitle !== "Norm") {
+    //         HeadingOneFunc()
+    //     }
+    //     else if (currentlyClickedNode === "li" && (currentTitle !== "Bullets" || "Bullet List")) {
+    //         BulletListFunc()
+    //     }
+
+    // }, [currentlyClickedNode, currentTitle])
 
     const NormalFunc = () => {
         setCurrentTitle("Norm");
@@ -81,31 +94,31 @@ export const ElementTypeButton = ({ isSmall, onClick }: Props) => {
 
     const HeadingOneFunc = () => {
         setCurrentTitle(
-            isSmall ? "H1" : "Heading 1"
+            shouldFurtherConcat || isSmall ? "H1" : "Heading 1"
         );
     };
 
     const HeadingTwoFunc = () => {
         setCurrentTitle(
-            isSmall ? "H2" : "Heading 2"
+            shouldFurtherConcat || isSmall ? "H2" : "Heading 2"
         );
     };
 
     const HeadingThreeFunc = () => {
         setCurrentTitle(
-            isSmall ? "H3" : "Heading 3"
+            shouldFurtherConcat || isSmall ? "H3" : "Heading 3"
         );
     };
 
     const BulletListFunc = () => {
         setCurrentTitle(
-            isSmall ? "Bullets" : "Bullet List"
+            shouldFurtherConcat || isSmall ? "Bullets" : "Bullet List"
         );
     };
 
     const NumberedListFunc = () => {
         setCurrentTitle(
-            isSmall ? "Nums" : "Numbered List"
+            shouldFurtherConcat || isSmall ? "Nums" : "Numbered List"
         );
     };
 
@@ -115,14 +128,14 @@ export const ElementTypeButton = ({ isSmall, onClick }: Props) => {
 
     const CodeBlockFunc = () => {
         setCurrentTitle(
-            isSmall ? "Code" : "Code Block"
+            shouldFurtherConcat || isSmall ? "Code" : "Code Block"
         );
     };
 
     return (
         <BaseToolbarMenuButton
             menuIcon={
-                currentTitle === "Normal" ?
+                currentTitle === ("Normal" || "Norm") ?
                     BsTextParagraph :
                     currentTitle === "Heading 1" || currentTitle === "H1" ?
                         BsTypeH1 :

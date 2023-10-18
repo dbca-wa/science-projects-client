@@ -15,6 +15,7 @@ interface IUserSearchDropdown {
     placeholder: string;
     helperText: any;
     preselectedUserPk?: number;
+    isEditable?: boolean;
 }
 
 
@@ -25,7 +26,8 @@ export const UserSearchDropdown = ({
     label,
     placeholder,
     helperText,
-    preselectedUserPk
+    preselectedUserPk,
+    isEditable
 }: IUserSearchDropdown) => {
     const [searchTerm, setSearchTerm] = useState(''); // Local state for search term
     const [filteredItems, setFilteredItems] = useState<IUserData[]>([]); // Local state for filtered items
@@ -67,7 +69,7 @@ export const UserSearchDropdown = ({
     };
 
     const handleClearUser = () => {
-        if (preselectedUserPk !== null && preselectedUserPk !== undefined) {
+        if (preselectedUserPk !== null && preselectedUserPk !== undefined && isEditable !== true) {
             return
         }
         setUserFunction(0); // Clear the selected user by setting the userPk to 0 (or any value that represents no user)
@@ -241,6 +243,7 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
             </Text>
 
             <IconButton
+                tabIndex={-1}
                 aria-label="Clear selected user"
                 icon={<CloseIcon />}
                 size="xs"

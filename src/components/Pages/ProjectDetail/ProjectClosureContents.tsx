@@ -4,6 +4,7 @@
 import { Box, Text } from "@chakra-ui/react"
 import { IProjectClosure } from "../../../types"
 import { DocumentActions } from "./DocumentActions"
+import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
 
 interface Props {
     document: IProjectClosure | null;
@@ -12,7 +13,7 @@ interface Props {
 export const ProjectClosureContents = ({ document }: Props) => {
     return (
         <>
-            <DocumentActions />
+            {/* <DocumentActions /> */}
             <Box
                 pb={6}
             >
@@ -23,11 +24,15 @@ export const ProjectClosureContents = ({ document }: Props) => {
                     Reason
                 </Text>
 
-                <Box
+                {/* <Box
                     mt={4}
                 >
                     {document?.reason}
-                </Box>
+                </Box> */}
+                {/* <SimpleRichTextEditor
+                    data={document?.reason}
+
+                /> */}
             </Box>
             <Box
                 pb={6}
@@ -39,11 +44,15 @@ export const ProjectClosureContents = ({ document }: Props) => {
                     Intended Outcome
                 </Text>
 
-                <Box
+                {/* <Box
                     mt={4}
                 >
                     {document?.intended_outcome}
-                </Box>
+                </Box> */}
+                {/* <SimpleRichTextEditor
+                    data={document?.intended_outcome}
+
+                /> */}
             </Box>
 
 
@@ -56,11 +65,15 @@ export const ProjectClosureContents = ({ document }: Props) => {
                 >
                     Knowledge Transfer
                 </Text>
-                <Box
+                {/* <Box
                     my={4}
                 >
                     {document?.knowledge_transfer}
-                </Box>
+                </Box> */}
+                {/* <SimpleRichTextEditor
+                    data={document?.knowledge_transfer}
+
+                /> */}
             </Box>
 
             <Box
@@ -72,11 +85,15 @@ export const ProjectClosureContents = ({ document }: Props) => {
                 >
                     Data Location
                 </Text>
-                <Box
+                {/* <Box
                     my={4}
                 >
                     {document?.data_location}
-                </Box>
+                </Box> */}
+                {/* <SimpleRichTextEditor
+                    data={document?.data_location}
+
+                /> */}
             </Box>
 
             <Box
@@ -88,11 +105,15 @@ export const ProjectClosureContents = ({ document }: Props) => {
                 >
                     Hardcopy Location
                 </Text>
-                <Box
+                {/* <Box
                     my={4}
                 >
                     {document?.hardcopy_location}
-                </Box>
+                </Box> */}
+                {/* <SimpleRichTextEditor
+                    data={document?.hardcopy_location}
+
+                /> */}
             </Box>
 
             <Box
@@ -104,11 +125,15 @@ export const ProjectClosureContents = ({ document }: Props) => {
                 >
                     Backup Location
                 </Text>
-                <Box
+                {/* <Box
                     my={4}
                 >
                     {document?.backup_location}
-                </Box>
+                </Box> */}
+                {/* <SimpleRichTextEditor
+                    data={document?.backup_location}
+
+                /> */}
             </Box>
 
 
@@ -121,12 +146,16 @@ export const ProjectClosureContents = ({ document }: Props) => {
                 >
                     Scientific Outputs
                 </Text>
-                <Box
+                {/* <Box
                     my={4}
                 >
                     {document?.scientific_outputs}
 
-                </Box>
+                </Box> */}
+                {/* <SimpleRichTextEditor
+                    data={document?.scientific_outputs}
+
+                /> */}
             </Box>
 
         </>

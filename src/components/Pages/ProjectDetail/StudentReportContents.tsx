@@ -5,19 +5,21 @@ import { IStudentReport } from "../../../types"
 import { DocumentActions } from "./DocumentActions"
 
 interface Props {
-    documents: IStudentReport[] | [];
-    selectedYear: number;
+    documents: IStudentReport[];
+    // selectedYear: number;
 }
 
-export const StudentReportContents = ({ documents, selectedYear }: Props) => {
+export const StudentReportContents = ({ documents
+    // , selectedYear 
+}: Props) => {
 
-
-    const selectedReport = documents.find(report => report.year === selectedYear);
+    // const selectedReport = documents.find((report) => report.year === selectedYear);
 
 
     return (
         <>
-            <DocumentActions />
+            <p>none</p>
+            {/* <DocumentActions />
             <Box>{selectedReport?.year}</Box>
             <Box
                 pb={6}
@@ -34,7 +36,7 @@ export const StudentReportContents = ({ documents, selectedYear }: Props) => {
                 >
                     {selectedReport?.progress_report}
                 </Box>
-            </Box>
+            </Box> */}
 
 
         </>

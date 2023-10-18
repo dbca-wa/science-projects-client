@@ -25,13 +25,15 @@ export const CreateUserModal = ({ isOpen, onClose }: IAddUserModalProps) => {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={handleToastClose}>
+        <Modal isOpen={isOpen} onClose={handleToastClose}
+            size={"3xl"}
+        >
             <ModalOverlay />
             <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
                 <ModalHeader>Add User</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <CreateUser onSuccess={openToast} />
+                    <CreateUser onSuccess={openToast} isModal={true} />
                 </ModalBody>
             </ModalContent>
         </Modal>

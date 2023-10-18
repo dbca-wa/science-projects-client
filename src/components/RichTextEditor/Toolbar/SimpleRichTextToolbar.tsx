@@ -2,7 +2,7 @@
 
 import { Box, Divider, Flex, useBreakpointValue, useColorMode } from "@chakra-ui/react"
 import { AlignButton } from "../MenuButtons/AlignButton"
-import { RefObject, useState } from "react"
+import { RefObject, SetStateAction, useEffect, useState } from "react"
 import { useToolbarClickListener } from "../../../lib/hooks/useToolbarClickListener"
 import { TimeButtons } from "./TimeButtons";
 import { ElementTypeButton } from "../MenuButtons/ElementTypeButton";
@@ -17,13 +17,19 @@ import { ToolbarToggleBtn } from "../Buttons/ToolbarToggleBtn";
 
 interface Props {
     editorRef: RefObject<HTMLTextAreaElement>;
+    selectedNodeType: string;
+    setSelectedNodeType: React.Dispatch<SetStateAction<string>>;
 }
 
-export const SimpleRichTextToolbar = ({ editorRef }: Props) => {
+export const SimpleRichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeType }: Props) => {
 
-    const { colorMode } = useColorMode();
-    const { onClick } = useToolbarClickListener({ editorRef: editorRef });
+    const { onClick } = useToolbarClickListener({ currentlySelectedNode: selectedNodeType, editorRef: editorRef });
 
+    useEffect(() => {
+        console.log(selectedNodeType)
+    }, [selectedNodeType]
+
+    )
     const shouldShowToolbarToggleBtnWhenNotSmall = useBreakpointValue(
         {
             base: true,
@@ -40,12 +46,16 @@ export const SimpleRichTextToolbar = ({ editorRef }: Props) => {
     )
     const [currentToolbarPage, setCurrentToolbarPage] = useState<number>(1);
     const [currentToolbarPageMd, setCurrentToolbarPageMd] = useState<number>(1);
+    const { colorMode } = useColorMode();
+
+    useEffect(() => console.log(colorMode), [colorMode])
 
     return (
         <>
             {/* <AutoFocusPlugin clickFunction={onClick} /> */}
             <Flex
                 width={"100%"}
+                // mt={2}
                 p={2}
                 borderRadius={"20px 20px 0 0"}
                 backgroundColor={
@@ -71,7 +81,10 @@ export const SimpleRichTextToolbar = ({ editorRef }: Props) => {
                                 {
                                     currentToolbarPage === 1 ?
                                         <>
-                                            <ElementTypeButton onClick={onClick} isSmall />
+                                            <ElementTypeButton onClick={onClick} isSmall
+                                                currentlyClickedNode={selectedNodeType}
+                                                setCurrentlyClickedNode={setSelectedNodeType}
+                                            />
                                             <VerticalDivider />
 
                                             <InsertButton />
@@ -111,7 +124,10 @@ export const SimpleRichTextToolbar = ({ editorRef }: Props) => {
                                         {
                                             currentToolbarPageMd === 1 ?
                                                 <>
-                                                    <ElementTypeButton onClick={onClick} />
+                                                    <ElementTypeButton onClick={onClick}
+                                                        currentlyClickedNode={selectedNodeType}
+                                                        setCurrentlyClickedNode={setSelectedNodeType}
+                                                    />
                                                     <VerticalDivider />
 
                                                     <InsertButton />
@@ -145,7 +161,11 @@ export const SimpleRichTextToolbar = ({ editorRef }: Props) => {
                                         <TimeButtons onClick={onClick} />
                                         <VerticalDivider />
 
-                                        <ElementTypeButton onClick={onClick} />
+                                        <ElementTypeButton onClick={onClick} shouldFurtherConcat={true}
+
+                                            currentlyClickedNode={selectedNodeType}
+                                            setCurrentlyClickedNode={setSelectedNodeType}
+                                        />
                                         <VerticalDivider />
                                         <InsertButton />
                                         <VerticalDivider />

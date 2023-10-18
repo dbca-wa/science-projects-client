@@ -1,35 +1,137 @@
 
 /* Text */
 
-.editor-italics {
+.editor-italics-light {
     font-style: italic;
-    color: aquamarine;
+    color: #333;
 }
 
-.editor-bold {
+.editor-italics-dark {
+  font-style: italic;
+  color: aquamarine;
+}
+
+.editor-bold-light {
     font-weight: bold;
     color: black;
 }
 
-.editor-underline {
+
+.editor-bold-dark {
+  font-weight: bold;
+  color: white;
+}
+
+.editor-underline-light {
     text-decoration: underline;
+    color: #333;
+}
+.editor-underline-dark {
+  text-decoration: underline;
+  color: orange;
 }
 
-.editor-strikethrough {
+
+.editor-strikethrough-light {
     text-decoration: line-through;
+        color: #333;
+
 }
 
-.editor-underline-strikethrough {
+.editor-strikethrough-dark {
+  text-decoration: line-through;
+      color: #eee;
+
+}
+
+.editor-underline-strikethrough-light {
     text-decoration: underline line-through;
+        color: #333;
+
+}
+
+.editor-underline-strikethrough-dark {
+  text-decoration: underline line-through;
+      color: #eee;
+
 }
 
 .editor-p-light {
-  font-size: 18px;
+  font-size: 14px;
   color: #333;
       /* background-color: black; */
       margin-bottom: 8px;
       position: relative;
 }
+
+.editor-p-dark {
+  font-size: 14px;
+  color: #eee;
+      /* background-color: black; */
+      margin-bottom: 8px;
+      position: relative;
+}
+
+.editor-ol-light {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  color: #333;
+
+}
+
+.editor-ol-dark {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  color: #eee;
+
+}
+
+.editor-ul-light {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  margin-bottom: 20px;
+  color: #333;
+
+}
+
+.editor-ul-dark {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  margin-bottom: 20px;
+  color: #eee;
+
+}
+
+.editor-li-light {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 22px;
+  /* color: #723; */
+  color: #333;
+
+}
+
+.editor-li-dark {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 22px;
+  /* color: #723; */
+  color: #eee;
+
+}
+
+
+
 
 .editor-h1-light {
   font-size: 30px;
@@ -38,28 +140,6 @@
     color: #333;
 
 }
-
-.editor-h2-light {
-  font-size: 26px;
-    /* background-color: black; */
-    color: #333;
-}
-
-.editor-h3-light {
-  font-size: 22px;
-
-    /* background-color: black; */
-    color: #333;
-}
-
-.editor-p-dark {
-  font-size: 18px;
-  color: #eee;
-      /* background-color: black; */
-      margin-bottom: 8px;
-      position: relative;
-}
-
 .editor-h1-dark {
   font-size: 30px;
 
@@ -68,19 +148,30 @@
 
 }
 
+.editor-h2-light {
+  font-size: 26px;
+    /* background-color: black; */
+    color: #333;
+}
 .editor-h2-dark {
   font-size: 26px;
     /* background-color: black; */
     color: #eee;
 }
 
+
+.editor-h3-light {
+  font-size: 22px;
+
+    /* background-color: black; */
+    color: #333;
+}
 .editor-h3-dark {
   font-size: 22px;
 
     /* background-color: black; */
     color: #eee;
 }
-
 
 
 .editor-quote {
@@ -103,17 +194,7 @@
   }
   
 
-.editor-ol {
-    padding: 0;
-    margin: 0;
-    margin-left: 16px;
-}
 
-.editor-ul {
-    padding: 0;
-    margin: 0;
-    margin-left: 16px;
-}
 
 .rtl {
 
@@ -184,3 +265,36 @@
     display: inline-block;
     background-color: #eee;
   }
+
+
+
+/* CSS for the tooltip container */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* CSS for the tooltip text */
+.tooltip-text {
+  visibility: hidden;
+  width: 120px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%; /* Position above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  user-select: none;
+}
+
+/* Show the tooltip text on hover */
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}

@@ -21,8 +21,8 @@ import { IBranch, IBusinessArea } from "../../../types";
 
 interface Props {
     pk: number;
-    branches: IBranch[] | undefined;
-    businessAreas: IBusinessArea[] | undefined;
+    branches?: IBranch[] | undefined;
+    businessAreas?: IBusinessArea[] | undefined;
 }
 
 export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
@@ -85,7 +85,12 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                     userIsMe={userInQuestionIsMe}
                     userIsExternal={!user.is_staff}
                 />
-                <AddUserToProjectModal isOpen={isAddToProjectModalOpen} onClose={onAddToProjectModalClose} preselectedUser={user.pk} />
+                <AddUserToProjectModal
+                    isOpen={isAddToProjectModalOpen}
+                    onClose={onAddToProjectModalClose}
+                    preselectedUser={pk}
+
+                />
 
                 <EditUserDetailsModal
                     isOpen={isEditUserDetailsModalOpen}
@@ -210,7 +215,10 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                                     <Image
                                         rounded={"lg"}
                                         w="60px" h="60px"
-                                        src={user?.agency?.image ? user.agency.image.old_file : ""}
+                                        src={
+                                            // user?.agency?.image ? user.agency.image.old_file : ""
+                                            "/dbca.jpg"
+                                        }
                                         objectFit="cover"
                                     />
                                     <Center>

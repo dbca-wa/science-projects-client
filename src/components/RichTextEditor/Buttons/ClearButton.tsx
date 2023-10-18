@@ -2,14 +2,33 @@
 
 import { FaTrashAlt } from "react-icons/fa"
 import { BaseOptionsButton } from "./BaseOptionsButton"
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
+import { CLEAR_EDITOR_COMMAND, LexicalEditor } from "lexical"
 
 
-export const ClearButton = () => {
+interface Props {
+    editor: LexicalEditor;
+}
+
+export const ClearButton = (
+    // { editor }: Props
+) => {
+    const [editor] = useLexicalComposerContext();
+
+    const clearEditor = () => {
+        console.log("clear button clicked")
+        console.log(editor.getEditorState())
+
+        editor.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
+        editor.focus();
+
+    }
     return (
         <BaseOptionsButton
             icon={FaTrashAlt}
             colorScheme={"red"}
-            onClick={() => { console.log('hello') }}
+            onClick={clearEditor}
+            toolTipText="Clear"
         />
     )
 }

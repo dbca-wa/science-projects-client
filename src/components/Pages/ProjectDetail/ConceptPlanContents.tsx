@@ -1,103 +1,77 @@
 // Maps out the document provided to the rich text editor components for concept plan documents. 
 
-import { Box, Text } from "@chakra-ui/react"
+import { Box, Text, useColorMode } from "@chakra-ui/react"
 import { DocumentActions } from "./DocumentActions"
 import { IConceptPlan } from "../../../types";
+import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
 
 interface Props {
     document: IConceptPlan | null;
+    projectPk: number;
 }
 
-export const ConceptPlanContents = ({ document }: Props) => {
+export const ConceptPlanContents = ({ document, projectPk }: Props) => {
+
+
+    // Force a rerender when dark mode or year changed to update design and content
+    // const editorKey = selectedYear.toString() + colorMode;
+    const { colorMode } = useColorMode();
+
+    const documentType = "conceptplan"
+    const editorKey = colorMode + documentType;
+
+
     return (
         <>
 
             <DocumentActions
-            // type={} data={}
+                tabType={"concept"}
+                document={document}
+                projectPk={projectPk}
             />
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Background
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.background}
-                </Box>
-            </Box >
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Aims
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.aims}
+            <SimpleRichTextEditor
+                key={`background${editorKey}`} // Change the key to force a re-render
+                data={document?.background}
+                section={"background"}
+            />
+            <SimpleRichTextEditor
+                key={`aims${editorKey}`} // Change the key to force a re-render
+                data={document?.aims}
+                section={"aims"}
+            />
 
-                </Box>
-            </Box>
+            <SimpleRichTextEditor
+                key={`outcome${editorKey}`} // Change the key to force a re-render
+                data={document?.outcome}
+                section={"outcome"}
+            />
+            <SimpleRichTextEditor
+                key={`collaborations${editorKey}`} // Change the key to force a re-render
+                data={document?.collaborations}
+                section={"collaborations"}
+            />
+            <SimpleRichTextEditor
+                key={`strategic_context${editorKey}`} // Change the key to force a re-render
+                data={document?.strategic_context}
+                section={"strategic_context"}
+            />
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Expected Outcome
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.outcome}
-                </Box>
-            </Box>
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Expected Collaborations
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.collaborations}
-                </Box>
-            </Box>
+            <SimpleRichTextEditor
+                key={`staff_time_allocation${editorKey}`} // Change the key to force a re-render
+                data={document?.staff_time_allocation}
+                section={"staff_time_allocation"}
+            />
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Strategic Context
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.strategic_context}
-                </Box>
-            </Box>
+            <SimpleRichTextEditor
+                key={`budget${editorKey}`} // Change the key to force a re-render
+                data={document?.budget}
+                section={"budget"}
+            />
 
-            <Box
+            {/* <Box
                 pb={6}
             >
                 <Text
@@ -111,8 +85,11 @@ export const ConceptPlanContents = ({ document }: Props) => {
 
                 >
                     {document?.staff_time_allocation}
-                    {/* [["Role", "Year 1", "Year 2", "Year 3"], ["Scientist", "", "", ""], ["Technical", "", "", ""], ["Volunteer", "", "", ""], ["Collaborator", "", "", ""]] */}
+                    [["Role", "Year 1", "Year 2", "Year 3"], ["Scientist", "", "", ""], ["Technical", "", "", ""], ["Volunteer", "", "", ""], ["Collaborator", "", "", ""]]
                 </Box>
+                <SimpleRichTextEditor
+                    data={document?.staff_time_allocation}
+                />
             </Box>
 
             <Box
@@ -128,9 +105,12 @@ export const ConceptPlanContents = ({ document }: Props) => {
                     mt={4}
                 >
                     {document?.budget}
-                    {/* [["Source", "Year 1", "Year 2", "Year 3"], ["Consolidated Funds (DBCA)", "", "", ""], ["External Funding", "", "", ""]] */}
+                    [["Source", "Year 1", "Year 2", "Year 3"], ["Consolidated Funds (DBCA)", "", "", ""], ["External Funding", "", "", ""]]
                 </Box>
-            </Box>
+                <SimpleRichTextEditor
+                    data={document?.budget}
+                />
+            </Box> */}
         </>
 
     )

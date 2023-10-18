@@ -1,33 +1,69 @@
 // Used for all documents. WIP - need to update the content shown based on doc, and parametise the document sent in.
 
-import { Box, Button, Center, Collapse, Flex, Grid, GridItem, Tag, Text } from '@chakra-ui/react'
-import { useState } from 'react';
-import { IProjectData, IProjectDocuments } from '../../../types';
+import { Box, Button, Center, Collapse, Flex, Grid, GridItem, Tag, Text, useColorMode } from '@chakra-ui/react'
+import { useEffect, useState } from 'react';
+import { IConceptPlan, IProgressReport, IProjectClosure, IProjectData, IProjectDocuments, IProjectPlan, IStudentReport } from '../../../types';
 import { spawnDocument } from '../../../lib/api';
 
 
 interface IDocumentActions {
     tabType: string;
-    documents: IProjectDocuments | null | undefined;
-    projectData: IProjectData;
+    document: IConceptPlan | IProjectPlan | IProgressReport | IStudentReport | IProjectClosure | null | undefined;
+    projectPk: number;
 }
 
 
-export const DocumentActions = ({ tabType, documents, projectData }: IDocumentActions) => {
+export const DocumentActions = ({ tabType, document, projectPk }: IDocumentActions) => {
     const [showActions, setShowActions] = useState(false);
     const handleToggleActionsVisibility = () => {
         setShowActions(!showActions);
     }
+    const { colorMode } = useColorMode();
 
+    useEffect(() => {
+        console.log(document)
+
+    }, [])
     return (
-        <>
+        <Box
+            bg={colorMode === "light" ? "gray.100" : "gray.700"}
+            rounded={"lg"}
+            p={4}
+            my={6}
+
+        >
+            <Flex
+                w={"100%"}
+            >
+                <Text
+                    flex={1}
+                    fontWeight={"bold"}
+                    fontSize={"lg"}
+                    color={colorMode === "light" ? "gray.800" : "gray.100"}
+                    userSelect={"none"}
+                    pb={4}
+                >
+                    Document Actions
+                </Text>
+                <Tag
+                    bg={"green.500"}
+                    color={"white"}
+                >
+                    STATUS
+                </Tag>
+            </Flex>
+
             {tabType === "overview" ?
                 (
                     <Grid mb={4} gridGap={4} gridTemplateColumns={"1fr 1fr"}>
-                        <Button
+                        {/* <Button
 
-                            colorScheme='blue'
-                            onClick={
+                            bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
+                            color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+                            _hover={{
+                                bg: colorMode === "light" ? `blue.600` : `blue.400`,
+                                color: colorMode === "light" ? `white` : `white`
+                            }} onClick={
                                 async () => {
                                     await spawnDocument({ project_pk: projectData.pk, kind: "concept" })
                                 }
@@ -42,8 +78,12 @@ export const DocumentActions = ({ tabType, documents, projectData }: IDocumentAc
                                     await spawnDocument({ project_pk: projectData.pk, kind: "projectplan" })
                                 }
                             }
-                            colorScheme='blue'
-
+                            bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
+                            color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+                            _hover={{
+                                bg: colorMode === "light" ? `blue.600` : `blue.400`,
+                                color: colorMode === "light" ? `white` : `white`
+                            }}
                             isDisabled={!documents?.concept_plan}
                         >
                             Create Project Plan
@@ -54,8 +94,12 @@ export const DocumentActions = ({ tabType, documents, projectData }: IDocumentAc
                                     await spawnDocument({ project_pk: projectData.pk, kind: "progressreport" })
                                 }
                             }
-                            colorScheme='blue'
-
+                            bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
+                            color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+                            _hover={{
+                                bg: colorMode === "light" ? `blue.600` : `blue.400`,
+                                color: colorMode === "light" ? `white` : `white`
+                            }}
                             isDisabled={!documents?.project_plan}
                         >
                             Create Progress Report
@@ -66,14 +110,25 @@ export const DocumentActions = ({ tabType, documents, projectData }: IDocumentAc
                                     await spawnDocument({ project_pk: projectData.pk, kind: "studentreport" })
                                 }
                             }
-                            colorScheme='blue'
-
+                            bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
+                            color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+                            _hover={{
+                                bg: colorMode === "light" ? `blue.600` : `blue.400`,
+                                color: colorMode === "light" ? `white` : `white`
+                            }}
                             isDisabled={!documents?.project_plan}
                         >
                             Create Student Report
                         </Button>
 
-                        <Button gridColumn="span 2" colorScheme='red'
+                        <Button
+                            gridColumn="span 2"
+                            bgColor={colorMode === "light" ? `red.500` : `red.600`}
+                            color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+                            _hover={{
+                                bg: colorMode === "light" ? `red.600` : `red.400`,
+                                color: colorMode === "light" ? `white` : `white`
+                            }}
                             onClick={
                                 async () => {
                                     await spawnDocument({ project_pk: projectData.pk, kind: "projectclosure" })
@@ -81,9 +136,43 @@ export const DocumentActions = ({ tabType, documents, projectData }: IDocumentAc
                             }
                             isDisabled={documents?.project_closure !== null}>
                             Create Project Closure
-                        </Button>
+                        </Button> */}
                     </Grid>
-                ) : (<Box>Bye</Box>)}
+                ) :
+                tabType === "concept" ? (
+                    <Box>
+                        Concept Plan (Project: {projectPk}, Pk: {document?.pk})
+                    </Box>
+                )
+                    :
+                    tabType === "project" ? (
+                        <Box>
+                            Project Plan  (Project: {projectPk}, Pk: {document?.pk})
+                        </Box>
+                    )
+                        :
+                        tabType === "progress" ? (
+                            <Box>
+                                Progress Reports  (Project: {projectPk}, Pk: {document?.pk})
+                            </Box>
+                        )
+                            :
+                            tabType === "student" ? (
+                                <Box>
+                                    Student Reports  (Project: {projectPk}, Pk: {document?.pk})
+                                </Box>
+                            )
+                                :
+                                tabType === "closure" ? (
+                                    <Box>
+                                        Closure  (Project: {projectPk}, Pk: {document.pk})
+                                    </Box>
+                                )
+                                    :
+                                    (<Box>
+                                        Unimplemented: neither concept, progress, student, project, closure
+                                    </Box>)
+            }
             {/* <Grid
                 mb={4}
                 gridTemplateColumns={"repeat(1, 1fr)"}
@@ -176,6 +265,6 @@ export const DocumentActions = ({ tabType, documents, projectData }: IDocumentAc
                     </Flex>
                 </Collapse>
             </Grid> */}
-        </>
+        </Box>
     )
 }

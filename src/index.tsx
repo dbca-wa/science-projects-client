@@ -8,7 +8,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { LayoutSwitcherProvider } from './lib/hooks/LayoutSwitcherContext'
 import { UserSearchProvider } from './lib/hooks/UserSearchContext'
 import { ProjectSearchProvider } from './lib/hooks/ProjectSearchContext'
-import { LexicalSelectedNodeProvider } from './lib/hooks/LexicalSelectedNodeContext'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,9 +39,7 @@ root.render(
         <UserSearchProvider>
 
           <ProjectSearchProvider>
-            <LexicalSelectedNodeProvider>
-              <RouterProvider router={router} />
-            </LexicalSelectedNodeProvider>
+            <RouterProvider router={router} />
           </ProjectSearchProvider>
 
         </UserSearchProvider>

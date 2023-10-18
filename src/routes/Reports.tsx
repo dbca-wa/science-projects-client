@@ -23,11 +23,17 @@ export const Reports = () => {
 
                 </Grid>
 
-                <SimpleRichTextEditor
+                <div style={{ fontSize: 20 }}>
+                    {/* <Latex>
+
+            </Latex> */}
+                    Not yet implemented.
+                </div>
+                {/* <SimpleRichTextEditor
                     data={
                         "<p>Test</p><ol><li>Hiii\nMy name is Jaridnbsp;Mark</li><li>Bye</li></ol><hr/><p>Did it work?</p>"
                     }
-                />
+                /> */}
             </Box>
         </>
     )

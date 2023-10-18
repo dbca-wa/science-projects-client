@@ -207,6 +207,8 @@ export const DeleteUserModal = ({ isOpen, onClose, userIsSuper, userIsMe, userPk
                         >
                             <Button
                                 colorScheme="gray"
+                                onClick={onClose}
+
                             >
                                 Cancel
                             </Button>

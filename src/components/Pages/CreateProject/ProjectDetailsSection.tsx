@@ -36,6 +36,10 @@ export const ProjectDetailsSection = ({
     const [selectedDates, setSelectedDates] = useState();
 
     useEffect(() => {
+        // Adjust to auto set, but allow for closing and re-setting data custodian.
+        // if (selectedSupervisingScientist && !selectedDataCustodian) {
+        //     setSelectedDataCustodian(selectedSupervisingScientist);
+        // }
         if (
             selectedBusinessArea
             && selectedDepartmentalService
@@ -114,13 +118,13 @@ export const ProjectDetailsSection = ({
                     <UserSearchDropdown
                         isRequired={true}
                         setUserFunction={setSelectedSupervisingScientist}
-                        label="Supervising Scientist"
-                        placeholder="Search for a Supervising Scientist"
+                        label={projectType !== "Student Project" ? "Research Scientist" : "Supervising Scientist"}
+                        placeholder={projectType === "Student Project" ? "Search for a Supervising Scientist" : "Search for a Research Scientist"}
                         helperText={
                             <Box
                                 mt={2}
                             >
-                                The supervising scientist.
+                                {projectType === "Student Project" ? "The supervising scientist." : "Research Scientist (Project Leader)"}
                             </Box>
                         }
                     />
@@ -128,6 +132,8 @@ export const ProjectDetailsSection = ({
                     <UserSearchDropdown
                         isRequired={true}
                         setUserFunction={setSelectedDataCustodian}
+                        preselectedUserPk={selectedDataCustodian}
+                        isEditable={true}
                         label="Data Custodian"
                         placeholder="Search for a data custodian"
                         helperText={

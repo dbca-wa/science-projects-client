@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { getMe } from "../api";
+import { IUserMe } from "../../types";
 
 export const useUser = () => {
     const { isLoading, data, isError } = useQuery(["me"], getMe, {
@@ -9,7 +10,7 @@ export const useUser = () => {
     });
     return {
         userLoading: isLoading,
-        userData: data,
+        userData: data as IUserMe,
         isLoggedIn: !isError,
     }
 }

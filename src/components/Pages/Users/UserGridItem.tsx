@@ -45,8 +45,8 @@ export const UserGridItem = ({
     }
 
     useEffect(() => {
-        console.log(business_area)
-    }, [])
+        console.log(business_area?.name)
+    }, [business_area])
 
     return (
         <>

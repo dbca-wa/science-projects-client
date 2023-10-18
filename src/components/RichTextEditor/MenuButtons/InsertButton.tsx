@@ -12,7 +12,7 @@ import { TbAlphabetGreek, TbBinaryTree2 } from "react-icons/tb"
 import { MdPoll } from "react-icons/md"
 
 interface Props {
-    editorType: string;
+    editorType?: string;
 }
 
 

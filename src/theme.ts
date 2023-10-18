@@ -14,6 +14,7 @@ const breakpoints = {
     'mdlg': '780px',
     lg: '960px',
     "1080px": "1080px",
+    "1200px": "1200px",
     "1240px": "1240px",
     xl: '1455px',
     '1xl': '1550px',
@@ -25,20 +26,20 @@ const breakpoints = {
 
 const theme = extendTheme({
     config, breakpoints,
-    components: {
-        // MultiSelect: MultiSelectTheme,
-        Modal: {
-            baseStyle: (props: any) => ({
-                dialog: {
-                    maxWidth: ["65%", "85%", "85%"],
-                    minWidth: ["65%", "85%", "85%"],
-                    maxHeight: ["65%", "85%", "85%"],
-                    minHeight: ["65%", "85%", "85%"],
-                    bg: '#000000'
-                }
-            })
-        }
-    }
+    // components: {
+    //     // MultiSelect: MultiSelectTheme,
+    //     Modal: {
+    //         baseStyle: (props: any) => ({
+    //             dialog: {
+    //                 maxWidth: ["65%", "85%", "85%"],
+    //                 minWidth: ["65%", "85%", "85%"],
+    //                 maxHeight: ["65%", "85%", "85%"],
+    //                 minHeight: ["65%", "85%", "85%"],
+    //                 bg: '#000000'
+    //             }
+    //         })
+    //     }
+    // }
 })
 
 

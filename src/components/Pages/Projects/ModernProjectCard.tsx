@@ -1,11 +1,12 @@
 // Modern implementation of project cards for display when searching projects and on the projects tab of dashboard
 
-import { Box, Flex, Image, Tag, Text, useColorMode } from "@chakra-ui/react"
+import { Box, Flex, Image, Skeleton, Tag, Text, useColorMode } from "@chakra-ui/react"
 import { IProjectData } from "../../../types"
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
+import { useNoImage } from "../../../lib/hooks/useNoImage";
 
 export const ModernProjectCard = ({
     pk,
@@ -67,6 +68,7 @@ export const ModernProjectCard = ({
         }
     }
 
+    const noImage = useNoImage();
     return (
         <motion.div
             variants={cardVariants}
@@ -74,6 +76,7 @@ export const ModernProjectCard = ({
             initial="rest"
             style={{ perspective: 1000 }}
         >
+
             <Box
                 onMouseOver={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
@@ -85,11 +88,17 @@ export const ModernProjectCard = ({
                 style={{ transformStyle: "preserve-3d" }}
                 boxShadow="0px 20px 30px -10px rgba(0, 0, 0, 0.3), 0px 4px 5px -2px rgba(0, 0, 0, 0.06), -3px 0px 10px -2px rgba(0, 0, 0, 0.1), 3px 0px 10px -2px rgba(0, 0, 0, 0.1)"
                 onClick={() => { goToProject() }}
+                border={colorMode === "dark" ? "1px solid" : undefined}
+                borderColor={"gray.700"}
             >
                 <Image
+                    rounded={"2xl"}
+
                     src={
-                        image ? image?.old_file : "sad-face.png" //or .gif or noimage.jpg
-                        // image.file ? image.file : image.old_file ? image.old_file : "sad-face.gif" : "sad-face.gif"
+                        image ?
+                            image?.file ? image.file :
+                                image?.old_file ? image.old_file
+                                    : noImage : noImage
                     }
                     objectFit={"cover"}
                     h={"100%"}
@@ -191,6 +200,7 @@ export const ModernProjectCard = ({
                     bgGradient="linear(to-t, rgba(0,0,0,0.7), transparent)" // Add gradient overlay
                 />
             </Box>
+
         </motion.div >
     );
 };

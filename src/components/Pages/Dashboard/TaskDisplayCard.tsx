@@ -1,6 +1,6 @@
 // Component for rendering the actual task to the dashboard; this is the design and how the data is mapped for a single task
 
-import { Box, Button, Center, Flex, Image, Spacer, Tag, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, Image, Tag, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
 import { ITaskDisplayCard } from "../../../types";
 import { useRef, useState } from "react";
 

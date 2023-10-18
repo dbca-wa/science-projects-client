@@ -4,19 +4,7 @@ import {
     Box,
     Button,
     Center,
-    FormControl,
-    FormLabel,
-    Input,
-    InputGroup,
-    InputLeftAddon,
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay,
     Tab, TabList, TabPanel, TabPanels, Tabs,
-    Textarea,
     ToastId,
     useColorMode,
     useDisclosure
@@ -26,7 +14,6 @@ import theme from "../../../theme";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MyTasksSection } from "./MyTasksSection";
 import { useUser } from "../../../lib/hooks/useUser";
-
 
 import { useGetMyTasks } from "../../../lib/hooks/useGetMyTasks";
 import { useGetMyProjects } from "../../../lib/hooks/useGetMyProjects";
@@ -39,8 +26,6 @@ import { useForm } from "react-hook-form";
 import { useToast } from '@chakra-ui/react';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPersonalTask } from "../../../lib/api";
-import { FaSign } from "react-icons/fa";
-import { MdOutlineTitle } from "react-icons/md";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 
 

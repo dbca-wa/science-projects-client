@@ -7,8 +7,9 @@ import { FaSign } from "react-icons/fa";
 import { deleteBusinessArea, updateBusinessArea } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
+import { useNoImage } from "../../../lib/hooks/useNoImage";
 // import { useEffect } from "react";
-import NoImageFile from '/sad-face.gif'
+// import NoImageFile from '/sad-face.gif'
 
 export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin, data_custodian, focus, introduction, image }: IBusinessArea) => {
 
@@ -23,6 +24,8 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
     const { userLoading: leaderLoading, userData: leaderData } = useFullUserByPk(leader);
     const { userLoading: financeAdminLoading, userData: financeAdminData } = useFullUserByPk(finance_admin);
     const { userLoading: dataCustodianLoading, userData: dataCustodianData } = useFullUserByPk(data_custodian);
+
+    const NoImageFile = useNoImage();
 
     // useEffect(() => {
     //     console.log(leader, finance_admin, data_custodian);

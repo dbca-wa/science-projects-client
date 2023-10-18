@@ -1,191 +1,93 @@
 // Maps out the document provided to the rich text editor components for project plan documents. 
 
-import { Box, Checkbox, Grid, Text } from "@chakra-ui/react"
+import { Box, Checkbox, Grid, Text, useColorMode } from "@chakra-ui/react"
 import { DocumentActions } from "./DocumentActions"
 import { IProjectPlan } from "../../../types";
+import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
 
 interface Props {
     document: IProjectPlan | null;
 }
 
 export const ProjectPlanContents = ({ document }: Props) => {
+
+
+    // Force a rerender when dark mode or year changed to update design and content
+    // const editorKey = selectedYear.toString() + colorMode;
+    const { colorMode } = useColorMode();
+
+    const documentType = "projectplan"
+    const editorKey = colorMode + documentType;
+
+
     return (
         <>
-            <DocumentActions />
+            {/* <DocumentActions /> */}
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Background
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.background ? document.background : "This document has no background"}
-                </Box>
+            <SimpleRichTextEditor
+                key={`background${editorKey}`} // Change the key to force a re-render
+                data={document?.background}
+                section={"background"}
+            />
 
-            </Box>
+            <SimpleRichTextEditor
+                key={`aims${editorKey}`} // Change the key to force a re-render
+                data={document?.aims}
+                section={"aims"}
+            />
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Aims
-                </Text>
-
-                <Box
-                    // ml={8}
-                    my={4}
-                >
-
-                    {document?.aims ? document.aims : "This document has no aims"}
-
-                </Box>
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Expected Outcome
-                </Text>
-                <Box
-                    // ml={8}
-                    my={4}
-                >
-                    {document?.outcome ? document.outcome : "This program has no outcomes"}
-                </Box>
-
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Knowledge Transfer
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.knowledge_transfer ? document?.knowledge_transfer : "This document has no knowledge transfer"}
-
-                </Box>
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Tasks and Milestones
-                </Text>
-                <Box
-                    // ml={8}
-                    my={4}
-                >
-                    {document?.project_tasks ? document.project_tasks : "This document has no project tasks"}
-
-                </Box>
-
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Related Science Projects
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.related_projects ? document.related_projects : "This document has no related projects"}
-                </Box>
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    References
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.listed_references ? document.listed_references : "This document has no refrences"}
-                </Box>
-            </Box>
+            <SimpleRichTextEditor
+                key={`outcome${editorKey}`} // Change the key to force a re-render
+                data={document?.outcome}
+                section={"outcome"}
+            />
+            <SimpleRichTextEditor
+                key={`knowledge_transfer${editorKey}`} // Change the key to force a re-render
+                data={document?.knowledge_transfer}
+                section={"knowledge_transfer"}
+            />
+            <SimpleRichTextEditor
+                key={`project_tasks${editorKey}`} // Change the key to force a re-render
+                data={document?.project_tasks}
+                section={"project_tasks"}
+            />
+            <SimpleRichTextEditor
+                key={`related_projects${editorKey}`} // Change the key to force a re-render
+                data={document?.related_projects}
+                section={"related_projects"}
+            />
+            <SimpleRichTextEditor
+                key={`listed_references${editorKey}`} // Change the key to force a re-render
+                data={document?.listed_references}
+                section={"listed_references"}
+            />
 
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Data Management
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.endorsemeents?.data_management ? document?.endorsemeents?.data_management : "This document has no data management information"}
-                </Box>
-            </Box>
+            <SimpleRichTextEditor
+                key={`data_management${editorKey}`} // Change the key to force a re-render
+                data={document?.endorsemeents?.data_management}
+                section={"data_management"}
+            />
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Methodology
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.methodology ? document.methodology : "This document has no methodology"}
-                </Box>
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    No. of Specimens
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.endorsemeents?.no_specimens ? document.endorsemeents.no_specimens : "This document has no specimen data"}
-                </Box>
-            </Box>
+            <SimpleRichTextEditor
+                key={`methodology${editorKey}`} // Change the key to force a re-render
+                data={document?.methodology}
+                section={"methodology"}
+            />
 
 
+            <SimpleRichTextEditor
+                key={`no_specimens${editorKey}`} // Change the key to force a re-render
+                data={document?.endorsemeents?.no_specimens}
+                section={"specimens"}
+            />
+
+
+            {/* <SimpleRichTextEditor
+                key={`no_specimens${editorKey}`} // Change the key to force a re-render
+                data={document?.endorsemeents?.no_specimens}
+                section={"specimens"}
+            /> */}
             <Box
                 pb={6}
             >
@@ -240,12 +142,29 @@ export const ProjectPlanContents = ({ document }: Props) => {
                 </Text>
                 <Grid
                     mt={4}
+                    gridRowGap={10}
                 >
-                    <Box>
+                    {/* <Box>
                         External Funds: {document?.operating_budget_external}
+                    </Box> */}
+                    <Box>
+                        <Text
+                            fontWeight={"semibold"}
+                        >External Budget:</Text>
+                        {/* <SimpleRichTextEditor
+                            data={document?.operating_budget_external}
+                        /> */}
+
                     </Box>
                     <Box>
-                        Consolidated Funds: {document?.operating_budget}
+                        <Text
+                            fontWeight={"semibold"}
+                        >Operating Budget:</Text>
+
+                        {/* <SimpleRichTextEditor
+                            data={document?.operating_budget}
+                        /> */}
+
                     </Box>
                 </Grid>
 

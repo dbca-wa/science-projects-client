@@ -92,6 +92,7 @@ export const Users = () => {
             )}
             <Head title="Users" />
             <Flex width={"100%"}
+                mt={2}
                 mb={6}
                 flexDir={"row"}
             >

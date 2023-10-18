@@ -6,6 +6,7 @@ import { BaseOptionsButton } from "./BaseOptionsButton"
 export const DownloadButton = () => {
     return (
         <BaseOptionsButton
+            toolTipText="Download"
             icon={FaDownload}
             // colorScheme=""
             onClick={() => { console.log('downloading') }}

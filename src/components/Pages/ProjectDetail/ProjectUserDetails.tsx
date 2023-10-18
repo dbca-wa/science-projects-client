@@ -1,27 +1,33 @@
 // Component that shows the details of a project member, including their role, time allocation, whether they are the leader, and their position in 
 // the manage team component (drag and droppable by Admins and leader)
 
-import { Avatar, Image, Box, Button, Center, Flex, Grid, Icon, Spacer, Spinner, Text, useColorMode, Slider, SliderTrack, SliderFilledTrack, SliderThumb, FormControl, InputGroup, Select, FormHelperText } from "@chakra-ui/react"
+import { Avatar, Image, Box, Button, Center, Flex, Grid, Icon, Spacer, Spinner, Text, useColorMode, Slider, SliderTrack, SliderFilledTrack, SliderThumb, FormControl, InputGroup, Select, FormHelperText, useToast, ToastId } from "@chakra-ui/react"
 import { FiCopy } from "react-icons/fi";
 import { FcApproval } from "react-icons/fc";
 import { AiFillCloseCircle } from "react-icons/ai";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
 import { useCopyText } from "../../../lib/hooks/useCopyText";
 import { useUser } from "../../../lib/hooks/useUser";
+import { RemoveUserMutationType, promoteUserToLeader, removeTeamMemberFromProject } from "../../../lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
     pk: number;
     is_leader: boolean;
+    leader_pk: number;
     role: string;
     position: number;
     time_allocation: number;
     usersCount: number;
     project_id: number;
+    refetchTeamData: () => void;
+    onClose: () => void;
 }
 
-export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocation, usersCount, project_id }: Props) => {
+export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, position, time_allocation, usersCount, project_id, refetchTeamData }: Props) => {
 
     const { userLoading: loading, userData: user } = useFullUserByPk(pk);
     const formatted_date = useFormattedDate(user?.date_joined);
@@ -102,6 +108,177 @@ export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocat
         }
         return humanReadable
     }
+
+    const removeThisUser = () => {
+        if (!is_leader && usersCount > 1) {
+            const user_pk = user.pk;
+            const formData: RemoveUserMutationType = {
+                user: user_pk,
+                project: project_id,
+            };
+            console.log(formData);
+            console.log("removing");
+            removeUserMutation.mutate(formData);
+        }
+    };
+
+    const promoteThisUser = () => {
+        if (!is_leader) {
+            console.log(
+                "This user is not the leader, so this section will perform demotion of the previous leader, and promotion of this user to leader. Their positions will swap."
+            );
+            const user_pk = user.pk;
+            const formData: RemoveUserMutationType = {
+                user: user_pk,
+                project: project_id,
+            };
+            console.log(formData);
+            console.log("promoting");
+            promoteUserMutation.mutate(formData);
+        }
+    }
+
+
+
+    // Toast
+    const toast = useToast();
+    const toastIdRef = useRef<ToastId>();
+    const addToast = (data: any) => {
+        toastIdRef.current = toast(data)
+    }
+
+
+    // removeUserMutation.mutate()
+    // await removeTeamMemberFromProject({ user: user.pk, project: project_id });
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+
+    const promoteUserMutation = useMutation(promoteUserToLeader,
+        {
+            onMutate: () => {
+                console.log("Promoting user");
+
+                addToast({
+                    status: "loading",
+                    title: "Promoting Member",
+                    position: "top-right"
+                })
+            },
+
+            onSuccess: (data) => {
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Success',
+                        description: `User Promoted`,
+                        status: 'success',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+                // reset()
+
+                setTimeout(
+                    // async 
+                    () => {
+                        // await 
+                        queryClient.invalidateQueries(
+                            [
+                                "projects",
+                                project_id
+                            ]
+                        );
+
+                        refetchTeamData && refetchTeamData();
+                        // const url = 
+                        if (!location.pathname.includes('project')) {
+                            navigate(`/projects/${project_id}`);
+                        } else {
+                            onClose();
+                        }
+                    }, 350)
+
+
+            },
+            onError: (error) => {
+                console.log(error);
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Could Not Promote User',
+                        description: `${error}`,
+                        status: 'error',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+            }
+        })
+
+
+
+    const removeUserMutation = useMutation(removeTeamMemberFromProject,
+        {
+            onMutate: () => {
+                console.log("Removing user");
+
+                addToast({
+                    status: "loading",
+                    title: "Removing Member",
+                    position: "top-right"
+                })
+            },
+
+            onSuccess: (data) => {
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Success',
+                        description: `User Removed`,
+                        status: 'success',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+                // reset()
+
+                setTimeout(
+                    // async 
+                    () => {
+                        // await 
+                        queryClient.invalidateQueries(
+                            [
+                                "projects",
+                                project_id
+                            ]
+                        );
+
+                        refetchTeamData && refetchTeamData();
+                        // const url = 
+                        if (!location.pathname.includes('project')) {
+                            navigate(`/projects/${project_id}`);
+                        } else {
+                            onClose();
+                        }
+                    }, 350)
+
+
+            },
+            onError: (error) => {
+                console.log(error);
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Could Not Remove User',
+                        description: `${error}`,
+                        status: 'error',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+            }
+        })
+
 
     return (
         (loading || pk === undefined) ?
@@ -184,8 +361,14 @@ export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocat
                     )}
 
                     <Button
-                        bg={colorMode === "light" ? "red.500" : "red.400"}
+                        bg={colorMode === "light" ? "red.500" : "red.600"}
                         color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
+                        _hover={
+                            {
+                                bg: colorMode === "light" ? "red.400" : "red.500"
+                            }
+                        }
+                        onClick={removeThisUser}
                         isDisabled={usersCount === 1}
                     // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
                     >
@@ -283,6 +466,28 @@ export const ProjectUserDetails = ({ pk, is_leader, role, position, time_allocat
                         </Text>
                     </Flex>
                     <Text>-</Text>
+                    {(!is_leader && (me?.userData?.is_superuser || me?.userData?.pk === leader_pk)) && (
+                        <Button
+                            mt={4}
+                            // bg={colorMode === "light" ? "green.500" : "green.600"}
+                            // color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
+                            bg={colorMode === "dark" ? "green.600" : "green.500"}
+                            color={"white"}
+                            _hover={
+                                {
+                                    bg: colorMode === "dark" ? "green.500" : "green.400",
+                                }
+                            }
+
+                            isDisabled={usersCount === 1}
+                            onClick={promoteThisUser}
+
+                        // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
+                        >
+                            Promote to Leader
+                        </Button>
+
+                    )}
                 </Flex>
 
                 <Box

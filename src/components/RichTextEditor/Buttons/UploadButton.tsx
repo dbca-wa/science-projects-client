@@ -8,6 +8,7 @@ export const UploadButton = () => {
     return (
 
         <BaseOptionsButton
+            toolTipText="Upload"
             icon={FaUpload}
             onClick={() => { console.log('uploading') }}
         />

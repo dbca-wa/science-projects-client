@@ -108,14 +108,30 @@ export const Projects = () => {
                 userSelect="none"
                 p={4}
             >
-                <Stack
+                <Grid
                     w={"100%"}
                     flex={1}
-                    spacing={[1, 5]}
-                    direction={["column", "row"]}
+                    gridTemplateColumns={
+                        {
+                            base: "repeat(1, 1fr)",
+                            lg: "repeat(2, 1fr)",
+                        }
+                    }
+                    gridRowGap={4}
+                    // spacing={[1, 5]}
+                    // direction={["column", "row"]}
                     justifyContent="space-between" // Set justifyContent to "space-between" to push the box to the right
                 >
-                    <Center>
+                    <Grid
+
+                        gridGap={4}
+                        gridTemplateColumns={
+                            {
+                                base: "repeat(1, 1fr)",
+                                md: "repeat(2, 1fr)",
+                            }
+                        }
+                    >
                         <Checkbox
                             size="md"
                             colorScheme="green"
@@ -126,7 +142,7 @@ export const Projects = () => {
                             Only Active
                         </Checkbox>
                         <Checkbox
-                            ml={4}
+                            // ml={4}
                             size="md"
                             colorScheme="gray"
                             onChange={handleOnlyInactiveProjectsChange}
@@ -136,17 +152,24 @@ export const Projects = () => {
                             Only Inactive
                         </Checkbox>
 
-                    </Center>
+                    </Grid>
 
                     <Grid
 
                         gridGap={4}
-                        gridTemplateColumns={"repeat(2, 1fr)"}
+                        gridTemplateColumns={
+                            {
+                                base: "repeat(1, 1fr)",
+                                md: "repeat(2, 1fr)",
+                            }
+                        }
                         px={4}
+                        w={"100%"}
+                    // bg={"red"}
                     >
                         <Select onChange={handleOnlySelectedProjectKindChange}
                             size={"sm"}
-                            mx={4}
+                            // mx={4}
                             rounded={"5px"}
                             style={
                                 colorMode === "light" ? {
@@ -173,7 +196,7 @@ export const Projects = () => {
                         </Select>
                         <Select onChange={handleOnlySelectedStatusChange}
                             size={"sm"}
-                            mx={4}
+                            // mx={4}
                             rounded={"5px"}
                             style={
                                 colorMode === "light" ? {
@@ -201,7 +224,7 @@ export const Projects = () => {
                             <option value={"suspended"}>Suspended</option>
                         </Select>
                     </Grid>
-                </Stack>
+                </Grid>
             </Box>
 
             <PaginatorProject

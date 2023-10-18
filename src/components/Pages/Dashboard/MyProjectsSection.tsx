@@ -71,7 +71,7 @@ export const MyProjectsSection = ({ data, loading }: IProjectSection) => {
 
                                         >
                                             <ModernProjectCard
-                                                pk={project.pk}
+                                                pk={project.pk !== undefined ? project.pk : project.id}
                                                 image={project.image}
                                                 title={project.title}
                                                 description={project.description}
@@ -81,7 +81,7 @@ export const MyProjectsSection = ({ data, loading }: IProjectSection) => {
                                                 tagline={project.tagline}
                                                 year={project.year}
                                                 number={project.number}
-                                                business_area_id={project.business_area_id}
+                                                business_area={project.business_area}
                                                 start_date={project.start_date}
                                                 end_date={project.end_date}
                                                 created_at={project.created_at}
