@@ -5,15 +5,11 @@ import { EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveProg
 
 // INSTANCE SETUP ==================================================================
 
+const baseBackendUrl = process.env.NODE_ENV === "development" ? "http://127.0.0.1:8000/api/v1/" : "http://cycle-test-clusterip.cycle:8000/api/v1";
+// Prod - points to the clusterip in cycle kubernetes namespace (instead of http://scienceprojects-test-api.dbca.wa.gov.au/api/v1)
+
 const instance = axios.create({
-    baseURL:
-        // process.env.NODE_ENV === "development" ?
-        "http://127.0.0.1:8000/api/v1/"
-    // "http://127.0.0.1/api/v1/"
-    // This is for nginx
-    //  :
-    // "PRODUCTION URL GOES HERE"
-    ,
+    baseURL: baseBackendUrl,
     withCredentials: true,
 })
 

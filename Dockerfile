@@ -22,7 +22,7 @@ COPY --from=BUILD_IMAGE /app/dist/ /client/dist/
 
 COPY package.json .
 COPY vite.config.ts .
-RUN npm install typescript
+RUN npm cache clean --force && npm install typescript
 
 EXPOSE 3000
 CMD ["npm", "run", "preview"]
