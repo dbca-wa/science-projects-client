@@ -2,7 +2,7 @@
 
 import { Box, Button, Center, Input, InputGroup, InputLeftElement, VStack, useToast, ToastId } from "@chakra-ui/react"
 import { AnimatePresence, motion } from "framer-motion"
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { FaLock, FaUser } from "react-icons/fa"
 import {
     IUsernameLoginError, IUsernameLoginSuccess, IUsernameLoginVariables, logInOrdinary
@@ -99,6 +99,8 @@ export const Login = ({ onClose }: IIsModal) => {
             { username, password }
         );
     }
+
+    useEffect(() => console.log(process.env.NODE_ENV))
 
     return (
         <AnimatePresence>
