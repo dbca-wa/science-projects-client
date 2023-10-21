@@ -10,6 +10,7 @@ import {
 import { useForm, } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../lib/hooks/useUser";
 
 interface ILoginData {
     username: string;
@@ -101,6 +102,12 @@ export const Login = ({ onClose }: IIsModal) => {
     }
 
     useEffect(() => console.log(process.env.NODE_ENV))
+    const { userData, userLoading } = useUser();
+    useEffect(() => {
+        if (!userLoading) {
+            console.log(userData)
+        }
+    }, [userLoading, userData])
 
     return (
         <AnimatePresence>
