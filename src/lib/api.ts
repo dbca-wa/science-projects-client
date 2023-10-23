@@ -7,12 +7,11 @@ import { EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveProg
 
 const baseBackendUrl = process.env.NODE_ENV === "development" ?
     "http://127.0.0.1:8000/api/v1/" :
-    "http://10.43.151.168:8000/api/v1/"
-// process.env.PRODUCTION_API_URL
-
+    "https://10.43.151.168:8000/api/v1/"
 // "https://cycle-test-clusterip.cycle:8000/api/v1/"
 // "https://scienceprojects-test-api.dbca.wa.gov.au/api/v1/"
-// "http://cycle-test-clusterip.cycle:8000/api/v1/" 
+// "http://cycle-test-clusterip.cycle:8000/api/v1/" (Mixed Content error due to http)
+// process.env.PRODUCTION_API_URL (this doesnt work as the site is built as a static site, so cannot dynamically set)
 
 const instance = axios.create({
     baseURL: baseBackendUrl,
