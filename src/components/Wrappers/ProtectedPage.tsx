@@ -8,7 +8,17 @@ import { IUserData } from "../../types";
 interface IProtectedPageProps {
     children: React.ReactNode;
 }
-
+// if (!isLoggedIn) {
+//     console.log("Not logged in")
+//     navigate("/login")
+// }
+// if (userData.pk === undefined) {
+//     console.log("No user pk")
+// }
+// console.log("Protected Page: Loaded, not logged in, userdata none!")
+// console.log("Protected Page: Legit User, showing content")
+// console.log(userData)
+// return;
 
 export const ProtectedPage = ({ children }: IProtectedPageProps) => {
     const { isLoggedIn, userData, userLoading } = useUser();
@@ -18,24 +28,12 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
     useEffect(() => {
         if (!userLoading) {
             if (!isLoggedIn || userData?.pk === undefined) {
-                if (!isLoggedIn) {
-                    console.log("Not logged in")
-                }
-                if (userData.pk === undefined) {
-                    console.log("No user pk")
-                }
-                // console.log("Protected Page: Loaded, not logged in, userdata none!")
+                console.log("No user. Navigating to login...")
                 navigate("/login")
-                return;
             }
             else {
-                // console.log("Protected Page: Legit User, showing content")
-                // console.log(userData)
                 setShowContent(true);
             }
-        }
-        else {
-            // console.log("Protected Page: User Loading...")
         }
     }, [userLoading])
 
