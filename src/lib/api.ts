@@ -7,11 +7,20 @@ import { EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveProg
 
 const baseBackendUrl = process.env.NODE_ENV === "development" ?
     "http://127.0.0.1:8000/api/v1/" :
-    "https://10.43.151.168:8000/api/v1/"
+    "https://scienceprojects-test-api.dbca.wa.gov.au/api/v1/"
+// "https://10.43.151.168:8000/api/v1/" 
+// (net::ERR_CONNECTION_TIMED_OUT)
 // "https://cycle-test-clusterip.cycle:8000/api/v1/"
+// (Fails to resolve)
+
+// "http://cycle-test-clusterip.cycle:8000/api/v1/" 
+//  (Mixed Content error due to http)
+
 // "https://scienceprojects-test-api.dbca.wa.gov.au/api/v1/"
-// "http://cycle-test-clusterip.cycle:8000/api/v1/" (Mixed Content error due to http)
-// process.env.PRODUCTION_API_URL (this doesnt work as the site is built as a static site, so cannot dynamically set)
+// (CORS error, although all origins allowed and urls specified)
+
+// process.env.PRODUCTION_API_URL 
+// (this doesnt work as the site is built as a static site, so cannot dynamically set via rancher)
 
 const instance = axios.create({
     baseURL: baseBackendUrl,
