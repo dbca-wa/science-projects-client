@@ -28,6 +28,7 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
     useEffect(() => {
         if (!userLoading) {
             if (!isLoggedIn || userData?.pk === undefined) {
+                console.log("Prod API: ", process.env.PRODUCTION_API_URL);
                 console.log("No user. Navigating to login...")
                 navigate("/login")
             }
