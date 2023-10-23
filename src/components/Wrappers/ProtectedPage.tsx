@@ -18,7 +18,7 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
         if (!userLoading) {
             if (!isLoggedIn || userData?.pk === undefined) {
                 console.log("Talking to: ",
-                    "https://10.43.151.168:8000/api/v1/"
+                    "https://scienceprojects-test-api.dbca.wa.gov.au/api/v1/"
                     // process.env.PRODUCTION_API_URL
                 );
                 console.log("No user. Navigating to login.")
