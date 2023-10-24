@@ -7,9 +7,10 @@ import { EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveProg
 
 const baseBackendUrl = process.env.NODE_ENV === "development" ?
     "http://127.0.0.1:8000/api/v1/" :
-    "https://scienceprojects-test-api.dbca.wa.gov.au/api/v1/"
+    "http://cycle-test-clusterip.cycle:8000/api/v1/"
 // "https://10.43.151.168:8000/api/v1/" 
-// (net::ERR_CONNECTION_TIMED_OUT)
+// (Results in net::ERR_CONNECTION_TIMED_OUT)
+
 // "https://cycle-test-clusterip.cycle:8000/api/v1/"
 // (Fails to resolve)
 
