@@ -30,7 +30,8 @@ export const LayoutSwitcherProvider = ({ children }: ILayoutSwitcherProviderProp
 
     const [layout, setLayout] = useState<Layout>(() => {
         const savedLayout = window.localStorage.getItem('layout');
-        return savedLayout as Layout || 'modern';
+        // Default traditional if not set
+        return savedLayout as Layout || 'traditional';
     });
 
     useEffect(() => {
@@ -47,7 +48,7 @@ export const LayoutSwitcherProvider = ({ children }: ILayoutSwitcherProviderProp
 
     const switchLayout = () => {
         setLoading(true);
-
+        // Sets new layout based on previous one (opposite)
         setLayout(prevLayout => prevLayout === 'modern' ? 'traditional' : 'modern');
     };
 
