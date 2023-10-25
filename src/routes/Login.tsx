@@ -101,11 +101,12 @@ export const Login = ({ onClose }: IIsModal) => {
         );
     }
 
-    useEffect(() => console.log(process.env.NODE_ENV))
+    // useEffect(() => console.log(process.env.NODE_ENV))
     const { userData, userLoading } = useUser();
     useEffect(() => {
-        if (!userLoading) {
-            console.log(userData)
+        if (!userLoading && userData) {
+            // console.log(userData)
+            navigate("/")
         }
     }, [userLoading, userData])
 
