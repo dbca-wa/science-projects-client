@@ -15,7 +15,7 @@ interface ILayoutContext {
 }
 
 const LayoutSwitcherContext = createContext<ILayoutContext>({
-    layout: 'modern',
+    layout: 'traditional',
     switchLayout: () => { throw new Error('switchLayout function must be overridden') },
     loading: false,
     setLoading: () => { throw new Error('setLoading function must be overridden') },

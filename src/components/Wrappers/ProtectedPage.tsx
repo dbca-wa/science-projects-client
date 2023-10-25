@@ -17,10 +17,10 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
     useEffect(() => {
         if (!userLoading) {
             if (!isLoggedIn || userData?.pk === undefined) {
-                console.log("Talking to: ",
-                    "https://scienceprojects-test-api.dbca.wa.gov.au/api/v1/"
-                    // process.env.PRODUCTION_API_URL
-                );
+                // console.log("Talking to: ",
+                //     "https://scienceprojects-test-api.dbca.wa.gov.au/api/v1/"
+                //     // process.env.PRODUCTION_API_URL
+                // );
                 console.log("No user. Navigating to login.")
                 navigate("/login")
             }
