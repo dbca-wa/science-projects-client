@@ -17,13 +17,7 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
     useEffect(() => {
         if (!userLoading) {
             if (!isLoggedIn || userData?.pk === undefined) {
-                // console.log("Talking to: ",
-                //     "https://scienceprojects-test-api.dbca.wa.gov.au/api/v1/"
-                //     // process.env.PRODUCTION_API_URL
-                // );
                 console.log("No user. Navigating to login.")
-                console.log("NE:", process.env.NODE_ENV)
-                console.log("RAE:", process.env.REACT_APP_ENV)
                 navigate("/login")
             }
             else {

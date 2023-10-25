@@ -11,23 +11,6 @@ const baseBackendUrl =
         :
         "https://scienceprojects-test.dbca.wa.gov.au/api/v1/"
 
-
-// "http://cycle-test-clusterip.cycle:8000/api/v1/"
-// "https://10.43.151.168:8000/api/v1/" 
-// (Results in net::ERR_CONNECTION_TIMED_OUT)
-
-// "https://cycle-test-clusterip.cycle:8000/api/v1/"
-// (Fails to resolve)
-
-// "http://cycle-test-clusterip.cycle:8000/api/v1/" 
-//  (Mixed Content error due to http)
-
-// "https://scienceprojects-test-api.dbca.wa.gov.au/api/v1/"
-// (CORS error, although all origins allowed and urls specified)
-
-// process.env.PRODUCTION_API_URL 
-// (this doesnt work as the site is built as a static site, so cannot dynamically set via rancher)
-
 const instance = axios.create({
     baseURL: baseBackendUrl,
     withCredentials: true,
@@ -37,7 +20,7 @@ const instance = axios.create({
 instance.interceptors.request.use(config => {
     const csrfToken = Cookie.get("csrftoken") || "";
     config.headers["X-CSRFToken"] = csrfToken;
-    console.log(config.headers);
+    // console.log(config.headers);
     return config;
 });
 
