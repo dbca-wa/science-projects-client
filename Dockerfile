@@ -2,6 +2,7 @@
 FROM node:20-alpine3.17 as BUILD_IMAGE
 # This command sets the working directory inside the Docker container to "/app". This is the directory where subsequent commands will be executed.
 WORKDIR /app
+
 # Required for vite
 COPY package.json .
 RUN npm install
@@ -23,7 +24,6 @@ COPY --from=BUILD_IMAGE /app/dist/ /client/dist/
 COPY package.json .
 COPY vite.config.ts .
 RUN npm cache clean --force && npm install typescript
-
 EXPOSE 3000
 CMD ["npm", "run", "preview"]
 

@@ -48,7 +48,7 @@ export const LayoutSwitcherProvider = ({ children }: ILayoutSwitcherProviderProp
 
     const switchLayout = () => {
         setLoading(true);
-        // Sets new layout based on previous one (opposite)
+        // Sets new layout based on previous one (opposite of prev)
         setLayout(prevLayout => prevLayout === 'modern' ? 'traditional' : 'modern');
     };
 
