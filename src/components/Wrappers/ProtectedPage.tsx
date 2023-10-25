@@ -22,6 +22,8 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
                 //     // process.env.PRODUCTION_API_URL
                 // );
                 console.log("No user. Navigating to login.")
+                console.log("NE:", process.env.NODE_ENV)
+                console.log("RAE:", process.env.REACT_APP_ENV)
                 navigate("/login")
             }
             else {
