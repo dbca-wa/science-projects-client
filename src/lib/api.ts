@@ -82,7 +82,7 @@ export const logOut = () => {
         .post(`users/log-out`, null,)
         .then((response) => {
             if (response.data.ok) {
-                window.location.href = 'scienceprojects-test.dbca.wa.gov.au/sso/auth_logout'
+                window.location.href = 'https://scienceprojects-test.dbca.wa.gov.au/sso/auth_logout'
                 return response.data;
             } else {
                 throw new Error('Error logging out.', response.data.error);
