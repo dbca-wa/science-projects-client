@@ -76,18 +76,24 @@ export const logInOrdinary = ({
             throw error;
         });
 
-export const logOut = () =>
-    instance
-        .post(`users/log-out`, null,)
-        .then((response) => {
-            if (response.data.ok) {
-                return response.data;
-            } else {
-                throw new Error('Error logging out.', response.data.error);
-            }
-        }).catch((e) => {
-            throw e;
-        });
+export const logOut = () => {
+    if (process.env.NODE_ENV === "development") {
+        return instance
+            .post(`users/log-out`, null,)
+            .then((response) => {
+                if (response.data.ok) {
+                    window.location.href = 'scienceprojects-test.dbca.wa.gov.au/sso/auth_logout'
+                    return response.data;
+                } else {
+                    throw new Error('Error logging out.', response.data.error);
+                }
+            }).catch((e) => {
+                throw e;
+            });
+    }
+
+}
+
 
 
 // USER CREATION ==============================================================
