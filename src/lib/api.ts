@@ -77,12 +77,13 @@ export const logInOrdinary = ({
         });
 
 export const logOut = () => {
-    // if (process.env.NODE_ENV === "development") {
     return instance
         .post(`users/log-out`, null,)
         .then((response) => {
             if (response.data.ok) {
-                window.location.href = 'https://scienceprojects-test.dbca.wa.gov.au/sso/auth_logout'
+                if (process.env.NODE_ENV !== "development") {
+                    window.location.href = 'https://scienceprojects-test.dbca.wa.gov.au/sso/auth_logout'
+                }
                 return response.data;
             } else {
                 throw new Error('Error logging out.', response.data.error);
@@ -90,7 +91,6 @@ export const logOut = () => {
         }).catch((e) => {
             throw e;
         });
-    // }
 
 }
 
