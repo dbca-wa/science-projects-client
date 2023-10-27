@@ -274,7 +274,9 @@ export const EditUserDetailsModal = ({ isOpen, onClose, user, branches, business
                                             <>
                                                 <FormControl my={2} mb={4} userSelect="none">
                                                     <InputGroup>
-                                                        <Input type="hidden" {...register("userPk", { required: true, value: user.pk })} readOnly />
+                                                        <Input
+                                                            autoComplete="off"
+                                                            type="hidden" {...register("userPk", { required: true, value: user.pk })} readOnly />
                                                     </InputGroup>
                                                 </FormControl>
                                                 <Grid
@@ -353,6 +355,8 @@ export const EditUserDetailsModal = ({ isOpen, onClose, user, branches, business
                                                                 <Icon as={AiFillPhone} />
                                                             </InputLeftElement>
                                                             <Input
+                                                                autoComplete="off"
+
                                                                 type="text"
                                                                 placeholder={
                                                                     "Enter a phone number"
@@ -383,6 +387,8 @@ export const EditUserDetailsModal = ({ isOpen, onClose, user, branches, business
                                                                 <Icon as={MdFax} />
                                                             </InputLeftElement>
                                                             <Input
+                                                                autoComplete="off"
+
                                                                 type="text"
                                                                 placeholder={
                                                                     "Enter a fax number"
@@ -434,6 +440,8 @@ export const EditUserDetailsModal = ({ isOpen, onClose, user, branches, business
                                                                 <Icon as={RiNumber1} />
                                                             </InputLeftElement>
                                                             <Input
+                                                                autoComplete="off"
+
                                                                 type="text"
                                                                 placeholder={userData?.first_name}
                                                                 value={userData?.first_name}

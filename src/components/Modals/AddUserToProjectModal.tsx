@@ -466,6 +466,8 @@ export const AddUserToProjectModal = ({ isOpen, onClose, preselectedUser, presel
                                 //     setValue("shortCode", Number(e.target.value))
                                 // }}
                                 type="number"
+                                autoComplete="off"
+
                             />
                         </Flex>
                     </Box>

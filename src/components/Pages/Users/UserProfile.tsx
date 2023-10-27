@@ -119,8 +119,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                             ml={4}
                             overflow={"auto"}
                         >
-                            <Text userSelect={"none"} fontWeight={"bold"}>{!user?.first_name.startsWith("None") ?
-                                `${user.first_name} ${user.last_name}` : `${user.username}`}</Text>
+                            <Text userSelect={"none"} fontWeight={"bold"}>{!user?.first_name?.startsWith("None") ?
+                                `${user?.first_name} ${user?.last_name}` : `${user?.username}`}</Text>
                             <Text userSelect={"none"} >{user?.phone ? user.phone : "No Phone number"}</Text>
                             <Flex>
                                 <Text userSelect={"none"}>{user?.email.startsWith("unset") ? "No Email" : user?.email}</Text>

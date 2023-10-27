@@ -239,7 +239,7 @@ export const CreateUser = ({ onSuccess, isModal }: IProps) => {
                     userSelect={"none"}
                 >
                     <TypewriterText text={
-                        "Please note that this is for adding external users only. Enter the external user's details, not your own.\nIf you are trying to add a staff member, don't. They will be added to the system upon accessing this site with their DBCA microsoft account.\nAll existing users can be found on the users page.\n"}
+                        "Please note that this is for adding external users only. Enter the external user's details, not your own.\nIf you are trying to add a DBCA staff member, please send them a link to this website and an account will be created when they visit.\nAll existing users can be found on the users page.\n"}
                     />
                 </Box>
             )}
@@ -390,7 +390,7 @@ export const CreateUser = ({ onSuccess, isModal }: IProps) => {
                         userSelect={"none"}
                     >
                         <TypewriterText text={
-                            "Please note that this is for adding external users only. Enter the external user's details, not your own.\nIf you are trying to add a staff member, don't. They will be added to the system upon accessing this site with their DBCA microsoft account.\nAll existing users can be found on the users page.\n"}
+                            "Please note that this is for adding external users only. Enter the external user's details, not your own.\nIf you are trying to add a DBCA staff member, please send them a link to this website and an account will be created when they visit.\nAll existing users can be found on the users page.\n"}
                         />
                     </Box>
                 )}

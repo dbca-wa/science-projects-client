@@ -8,12 +8,16 @@ import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IBranch } from "../../../types";
 import { BranchItemDisplay } from "./BranchItemDisplay";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 
 
 export const BranchesCRUD = () => {
-    const { register, handleSubmit } = useForm<IBranch>();
+    const { register, handleSubmit, watch } = useForm<IBranch>();
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
+    const [selectedUser, setSelectedUser] = useState<number>();
+
+    const nameData = watch('name');
 
     const queryClient = useQueryClient();
     const mutation = useMutation(createBranch,
@@ -42,9 +46,20 @@ export const BranchesCRUD = () => {
 
             }
         });
-    const onSubmit = (formData: IBranch) => {
+
+
+    const onSubmitBranchCreation = (formData: IBranch) => {
         mutation.mutate(formData);
     }
+
+
+    const onSubmit = (formData: IBranch) => {
+        formData.manager = selectedUser;
+        mutation.mutate(formData);
+    }
+
+
+
     const { isLoading, data: slices } = useQuery<IBranch[]>(
         {
             queryFn: getAllBranches,
@@ -174,17 +189,18 @@ export const BranchesCRUD = () => {
                             <DrawerHeader>Add Branch</DrawerHeader>
                             <DrawerBody>
                                 <VStack spacing={10} as="form" id="add-form" onSubmit={handleSubmit(onSubmit)} >
-                                    <FormControl>
-                                        <FormLabel>Agency</FormLabel>
-                                        <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
-                                            <Input
-                                                {...register("agency", { required: true })}
-                                                required
-                                                type="text"
-                                            />
-                                        </InputGroup>
-                                    </FormControl>
+                                    {/* <FormControl> */}
+                                    {/* <FormLabel>Agency</FormLabel> */}
+                                    {/* <InputGroup> */}
+                                    {/* <InputLeftAddon children={<FaSign />} /> */}
+                                    <Input
+                                        {...register("agency", { required: true })}
+                                        value={1}
+                                        required
+                                        type="hidden"
+                                    />
+                                    {/* </InputGroup> */}
+                                    {/* </FormControl> */}
                                     <FormControl>
                                         <FormLabel>Name</FormLabel>
                                         <Input
@@ -193,9 +209,23 @@ export const BranchesCRUD = () => {
                                     </FormControl>
                                     <FormControl>
                                         <FormLabel>Manager</FormLabel>
-                                        <Input
+                                        <UserSearchDropdown
                                             {...register("manager", { required: true })}
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedUser}
+                                            label="User"
+                                            placeholder="Search for a user"
+                                            helperText={
+                                                <>
+                                                    The manager of the branch.
+                                                </>
+                                            }
                                         />
+                                        {/* <Input
+                                            {...register("manager", { required: true })}
+                                        /> */}
                                     </FormControl>
                                     {mutation.isError
                                         ? <Text color={"red.500"}>
@@ -207,8 +237,21 @@ export const BranchesCRUD = () => {
                             </DrawerBody>
                             <DrawerFooter>
                                 <Button
-                                    form="add-form"
-                                    type="submit"
+                                    // form="add-form"
+                                    // type="submit"
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onSubmitBranchCreation(
+                                            {
+                                                "old_id": 1, //default
+                                                "agency": 1, // dbca
+                                                "name": nameData,
+                                                "manager": selectedUser,
+                                            }
+                                        )
+
+                                    }}
+
                                     isLoading={mutation.isLoading}
                                     colorScheme="blue" size="lg" width={"100%"}>Create</Button>
                             </DrawerFooter>

@@ -4,6 +4,7 @@ import { Grid, Flex, Box, Button, Text, BoxProps, useBreakpointValue, useDisclos
 import { IUserData } from "../../../types";
 import { UserProfile } from "./UserProfile";
 import { useEffect } from "react";
+import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 
 
 interface BoxContainerProps extends BoxProps {
@@ -33,6 +34,8 @@ export const UserGridItem = ({
     const fullName = (first_name !== null && last_name !== null) ? `${first_name} ${last_name}` : `No Name (${username})`;
     const isLgOrLarger = useBreakpointValue({ base: false, sm: false, md: false, lg: true, xlg: true })
     const isOver690 = useBreakpointValue({ false: true, sm: false, md: false, 'over690': true, 'mdlg': true, lg: true, xlg: true })
+
+    const baseAPI = useApiEndpoint();
 
     const { colorMode } = useColorMode();
 
@@ -89,11 +92,9 @@ export const UserGridItem = ({
                     scale: 1.1,
                     boxShadow:
                         colorMode === "light"
-                            ? "0px 7.5px 15px -3.75px rgba(0, 0, 0, 0.15), -0.75px 1.5px 3px -0.75px rgba(0, 0, 0, 0.03), -2.25px 0px 3.75px -0.75px rgba(0, 0, 0, 0.0375), 0.75px 0px 3.75px -0.75px rgba(0, 0, 0, 0.0375)"
-                            : "0px 1.5px 2.25px -0.75px rgba(255, 255, 255, 0.0375), -0.75px 0.75px 1.5px -0.75px rgba(255, 255, 255, 0.0225)",
+                            ? "0px 5px 10px -2.5px rgba(0, 0, 0, 0.15), -0.5px 1px 2px -0.5px rgba(0, 0, 0, 0.03), -1.5px 0px 2.5px -0.5px rgba(0, 0, 0, 0.0375), 0.5px 0px 2.5px -0.5px rgba(0, 0, 0, 0.0375)"
+                            : "0px 1.5px 2.25px -0.75px rgba(255, 255, 255, 0.02), -0.5px 0.5px 1px -0.5px rgba(255, 255, 255, 0.015)",
                 }}
-
-
             >
                 {
                     // isLgOrLarger ?
@@ -107,7 +108,12 @@ export const UserGridItem = ({
                                 mr={4}
                             >
                                 <Avatar
-                                    src={image?.file ? image.file : image?.old_file ? image.old_file : ""}
+                                    src={
+                                        image?.file ?
+                                            image.file.startsWith(baseAPI) ? image.file : `${baseAPI}${image.file}` :
+                                            image?.old_file ? image.old_file.startsWith(baseAPI) ? image.old_file : `${baseAPI}${image.old_file}` :
+                                                ""
+                                    }
                                     draggable={false}
                                     userSelect={"none"}
                                     h={55}

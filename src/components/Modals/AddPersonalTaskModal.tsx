@@ -133,6 +133,8 @@ export const AddPersonalTaskModal = ({ user, isAnimating, setIsAnimating, isAddT
                                 placeholder="Enter the title of the task..."
                                 {...register("name", { required: true })}
                                 type="text"
+                                autoComplete="off"
+
                             />
                         </InputGroup>
                     </FormControl>

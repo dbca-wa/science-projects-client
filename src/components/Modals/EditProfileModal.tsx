@@ -22,31 +22,33 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
 
     const { colorMode } = useColorMode();
 
-    const [activeOption, setActiveOption] = useState<'url' | 'upload'>(
-        data?.image?.old_file ? 'url' : 'upload'
-    );
     const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
         data?.image?.file || data?.image?.old_file || null
     );
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
-    // Check if the selected image URL is valid
-    const isValidImageUrl = selectedImageUrl !== null &&
-        selectedImageUrl !== undefined &&
-        selectedImageUrl.trim() !== "" &&
-        (selectedImageUrl.startsWith("https://") ||
-            selectedImageUrl.startsWith("http://") || selectedImageUrl.startsWith("blob")) &&
-        selectedImageUrl.match(/\.(jpg|jpeg|png)$/i) ||
-        selectedImageUrl?.startsWith('https://imagedelivery.net/');
-
     const handleImageLoadError = () => {
+        console.log(`There was an error loading images. Selected: ${selectedImageUrl}. Current ${currentImage}`)
         setImageLoadFailed(true);
     };
 
     const handleImageLoadSuccess = () => {
         setImageLoadFailed(false);
     };
+
+    // Update this useEffect to set the selectedImageUrl when a new file is selected
+    useEffect(() => {
+        if (selectedFile) {
+            setSelectedImageUrl(URL.createObjectURL(selectedFile));
+        }
+    }, [selectedFile]);
+
+    const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        setSelectedFile(file || null);
+    };
+
 
     const initialData: IProfile = data || {
         image: null,
@@ -55,20 +57,12 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
         // Initialize other properties with default values
     };
 
-    // const isFieldChanged = (fieldName: keyof IProfile) => {
-    //     return data ? data[fieldName] !== initialData[fieldName] : false;
-    // };
     const isFieldChanged = (fieldName: keyof IProfile, fieldValue: string) => {
         return data ? data[fieldName] !== fieldValue : false;
     };
 
-    const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        setSelectedFile(file || null);
-    };
 
     //  React Hook Form
-
     const {
         register,
         handleSubmit,
@@ -146,14 +140,13 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
         about,
         expertise,
     }: IProfileUpdateVariables) => {
-        const image = activeOption === 'url' ? selectedImageUrl : selectedFile;
+        const image = selectedFile;
         console.log(selectedFile)
-        console.log(selectedImageUrl)
         // Check if about and expertise fields have changed
         const aboutChanged = about !== undefined && isFieldChanged('about', about);
         const expertiseChanged = expertise !== undefined && isFieldChanged('expertise', expertise);
 
-        if (selectedFile !== null || selectedImageUrl !== null || aboutChanged || expertiseChanged) {
+        if (selectedFile !== null || aboutChanged || expertiseChanged) {
             if (aboutChanged && expertiseChanged) {
                 console.log('image + about and expertise changed');
                 await mutation.mutateAsync({ userPk, image, about, expertise });
@@ -198,13 +191,6 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
         }
     }, [data, isLoading]);
 
-
-    // useEffect(() => {
-    //     console.log(currentImage);
-    //     console.log(selectedFile);
-    //     console.log(selectedImageUrl);
-    // }, [selectedFile, currentImage, selectedImageUrl])
-
     return (
         <Modal isOpen={isOpen} onClose={onClose}
             size={"3xl"} scrollBehavior='inside'
@@ -213,14 +199,7 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
             <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}
                 as="form"
                 onSubmit={handleSubmit(onSubmit)}
-            // display="flex" flexDirection="column" as={"form"} onSubmit={handleSubmit(onSubmit)}
             >
-                {/* <Flex
-                    direction="column"
-                    height="100%"
-                    as="form"
-                    onSubmit={handleSubmit(onSubmit)}
-                > */}
 
                 <ModalHeader>Edit Profile</ModalHeader>
                 <ModalCloseButton />
@@ -276,16 +255,7 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
                                             {!imageLoadFailed ? (
                                                 <Image
                                                     objectFit="cover"
-                                                    src={
-                                                        activeOption === 'url' && selectedImageUrl &&
-                                                            ((selectedImageUrl) || selectedImageUrl.trim() === "")
-                                                            ? isValidImageUrl ? selectedImageUrl : noImageLink
-                                                            : activeOption === 'upload' && selectedFile
-                                                                ? URL.createObjectURL(selectedFile)
-                                                                : currentImage
-                                                                    ? currentImage
-                                                                    : noImageLink
-                                                    }
+                                                    src={selectedImageUrl || currentImage || noImageLink}
                                                     alt="Preview"
                                                     userSelect="none"
                                                     bg="gray.800"
@@ -306,53 +276,22 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
                                     <FormControl ml={4} mt={10}>
                                         <InputGroup>
                                             <Grid gridGap={2} ml={4}>
-                                                <Button
-                                                    onClick={() => setActiveOption('url')}
-                                                    display="inline-flex"
-                                                    justifyContent="center"
-                                                    alignItems="center"
-                                                    bg={activeOption === 'url' ? 'blue.500' : (colorMode === "light" ? "gray.200" : "gray.700")}
-                                                    color={colorMode === "light" ? "black" : "white"}
-                                                >
-                                                    Enter URL
-                                                </Button>
-                                                {activeOption === 'url' && (
+                                                <FormControl>
                                                     <Input
-                                                        // value={selectedImageUrl || ''}
+                                                        autoComplete="off"
+
+                                                        alignItems={"center"}
+                                                        type="file"
+                                                        accept="image/*"
                                                         onChange={(e) => {
-                                                            setImageLoadFailed(false);
-                                                            setSelectedImageUrl(e.target.value);
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                setSelectedFile(file);
+                                                                setSelectedImageUrl(URL.createObjectURL(file));
+                                                            }
                                                         }}
                                                     />
-                                                )}
-                                                <Center>
-                                                    <Text>or</Text>
-                                                </Center>
-                                                <Button
-                                                    onClick={() => setActiveOption('upload')}
-                                                    display="inline-flex"
-                                                    justifyContent="center"
-                                                    alignItems="center"
-                                                    bg={activeOption === 'upload' ? 'blue.500' : (colorMode === "light" ? "gray.200" : "gray.700")}
-                                                    color={colorMode === "light" ? "black" : "white"}
-                                                >
-                                                    Upload
-                                                </Button>
-                                                {activeOption === 'upload' && (
-                                                    <FormControl>
-                                                        <Input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            onChange={(e) => {
-                                                                const file = e.target.files?.[0];
-                                                                if (file) {
-                                                                    setSelectedFile(file);
-                                                                    setSelectedImageUrl(URL.createObjectURL(file));
-                                                                }
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                )}
+                                                </FormControl>
                                                 <FormHelperText>Upload an image for your display picture.</FormHelperText>
                                                 {errors.image && (
                                                     <FormErrorMessage>{errors.image.message}</FormErrorMessage>
@@ -364,7 +303,6 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
                             </Grid>
                         </ModalBody>
                         <ModalFooter
-                        // pos="absolute" bottom={0} right={0}
                         >
                             <Button
                                 isLoading={mutation.isLoading}
@@ -377,9 +315,10 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
                                 }}
                                 ml={3}
                                 isDisabled={
-                                    (selectedFile === null && selectedImageUrl === null) && aboutValue === initialData.about && expertiseValue === initialData.expertise
+                                    selectedFile === null &&
+                                    aboutValue === initialData.about &&
+                                    expertiseValue === initialData.expertise
                                 }
-
                             >
                                 Update
                             </Button>
@@ -392,43 +331,3 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
         </Modal>);
 
 }
-
-
-
-
-// maxH={
-//     {
-//         base: "200px",
-//         xl: "300px"
-//     }
-// }
-
-
-
-{/* {!imageLoadFailed ? (
-                                                    <Image
-                                                        objectFit="cover"
-                                                        src={
-                                                            currentImage ?
-                                                                currentImage :
-                                                                selectedImageUrl !== undefined && selectedImageUrl !== null && isValidImageUrl && selectedImageUrl?.trim() !== ""
-                                                                    ? selectedImageUrl
-                                                                    : noImageLink
-                                                        }
-                                                        alt="Preview"
-                                                        userSelect="none"
-                                                        bg="gray.800"
-                                                        onLoad={handleImageLoadSuccess}
-                                                        onError={handleImageLoadError}
-                                                    />
-                                                ) : (
-                                                    <Image
-                                                        objectFit="cover"
-                                                        src={noImageLink
-                                                        }
-                                                        alt="Preview"
-                                                        userSelect="none"
-                                                        bg="gray.800"
-                                                    />
-
-                                                )} */}

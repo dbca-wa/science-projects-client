@@ -1,4 +1,4 @@
-import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
 import { IBranch } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -7,10 +7,12 @@ import { FaSign } from "react-icons/fa";
 import { deleteBranch, updateBranch } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { useState } from "react";
 
 
 export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
-    const { register, handleSubmit } = useForm<IBranch>();
+    const { register, handleSubmit, watch, reset } = useForm<IBranch>();
 
     const toast = useToast();
     const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
@@ -18,6 +20,10 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
     const queryClient = useQueryClient();
 
     const { userLoading: managerLoading, userData: managerData } = useFullUserByPk(manager);
+
+    const nameData = watch('name');
+    const [selectedUser, setSelectedUser] = useState<number>(manager);
+
 
 
     const updateMutation = useMutation(updateBranch,
@@ -31,7 +37,7 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                 })
                 onUpdateModalClose();
                 queryClient.invalidateQueries(["branches"]);
-
+                reset();
             },
             onError: () => {
                 // console.log("error")
@@ -76,12 +82,16 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
         deleteMutation.mutate(pk);
     }
 
-    const onUpdateSubmit = (formData: IBranch) => {
+    // const onUpdateSubmit = (formData: IBranch) => {
+    //     updateMutation.mutate(formData);
+    // }
+
+    const onSubmitBranchUpdate = (formData: IBranch) => {
         updateMutation.mutate(formData);
     }
 
-
     const { isOpen: isManagerOpen, onOpen: onManagerOpen, onClose: onManagerClose } = useDisclosure();
+
     const managerDrawerFunction = () => {
         console.log(`${managerData?.first_name} clicked`);
         onManagerOpen();
@@ -95,7 +105,7 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                 <Drawer
                     isOpen={isManagerOpen}
                     placement='right'
-                    onClose={onManagerOpen}
+                    onClose={onManagerClose}
                     size={"sm"} //by default is xs
                 >
                     <DrawerOverlay />
@@ -119,19 +129,21 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                     borderWidth={1}
                 // bg={"red"}
                 >
-                    <Flex justifyContent="flex-start">
+                    <Flex justifyContent="flex-start" alignItems={"center"}>
                         <Text
                             fontWeight={"bold"}
-                        >{name}</Text>
-
+                        >
+                            {name}
+                        </Text>
                     </Flex>
+
                     <Flex>
                         <Button
                             variant={"link"}
                             colorScheme="blue"
                             onClick={managerDrawerFunction}
                         >
-                            {managerData.first_name} {managerData.last_name}
+                            {managerData?.first_name ? `${managerData?.first_name} ${managerData?.last_name}` : `${managerData?.username}`}
                         </Button>
 
                     </Flex>
@@ -179,48 +191,41 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                 </Grid>
                 <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                     <ModalOverlay />
-                    <ModalHeader>Delete Division</ModalHeader>
-                    <ModalBody>
-                        <ModalContent bg="white" p={4}
-                            w={"100%"}
-                            h={"100%"}
-                        >
-                            <Center
-                                w={"100%"}
-                                h={"100%"}
-                            >
-                                <Grid
-                                    gridGap={20}
+                    <ModalContent bg="white">
+                        <ModalHeader>Delete Branch</ModalHeader>
+                        <ModalBody>
+                            <Box>
+                                <Text fontSize="lg" fontWeight="semibold">
+                                    Are you sure you want to delete this branch?
+                                </Text>
+
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color={"blue.500"}
+                                    mt={4}
                                 >
-                                    <Box
-                                        alignContent={"center"}
-                                    >
-                                        <Text fontSize={"xl"}
-                                            fontWeight={"bold"}
-                                        >
-                                            Are you sure you want to delete this division?
-                                        </Text>
+                                    "{name}"
+                                </Text>
 
-                                    </Box>
-                                    <Flex
-                                        // bg="red"
-                                        justifyContent={"space-evenly"}
-                                    >
-                                        <Button onClick={deleteLocationClick}>Yes</Button>
-                                        <Button onClick={onDeleteModalClose}>No</Button>
-                                    </Flex>
+                            </Box>
+                        </ModalBody>
+                        <ModalFooter justifyContent="flex-end">
+                            <Flex>
+                                <Button onClick={onDeleteModalClose} colorScheme="red">
+                                    No
+                                </Button>
+                                <Button onClick={deleteLocationClick} colorScheme="green" ml={3}>
+                                    Yes
+                                </Button>
+                            </Flex>
 
-
-
-                                </Grid>
-                            </Center>
-
-                        </ModalContent>
-                    </ModalBody>
+                        </ModalFooter>
+                    </ModalContent>
                 </Modal>
                 <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
                     <ModalOverlay />
-                    <ModalHeader>Update Division</ModalHeader>
+                    <ModalHeader>Update Branch</ModalHeader>
                     <ModalBody>
                         <ModalContent bg="white" p={4}>
                             <FormControl>
@@ -232,40 +237,56 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                                 />
                             </FormControl>
 
-                            <VStack spacing={10} as="form" id="update-form" onSubmit={handleSubmit(onUpdateSubmit)}>
-
-                                <FormControl>
-                                    <FormLabel>Agency</FormLabel>
-                                    <Input
-                                        {...register("agency", { required: true })}
-                                        defaultValue={agency} // Prefill 
-                                    />
-                                </FormControl>
+                            <VStack spacing={10} as="form" id="update-form" onSubmit={handleSubmit(onSubmitBranchUpdate)} >
+                                {/* <FormControl> */}
+                                {/* <FormLabel>Agency</FormLabel> */}
+                                {/* <InputGroup> */}
+                                {/* <InputLeftAddon children={<FaSign />} /> */}
+                                <Input
+                                    {...register("agency", { required: true })}
+                                    value={1}
+                                    required
+                                    type="hidden"
+                                />
+                                {/* </InputGroup> */}
+                                {/* </FormControl> */}
                                 <FormControl>
                                     <FormLabel>Name</FormLabel>
-                                    <InputGroup>
-                                        <InputLeftAddon children={<FaSign />} />
-                                        <Input
-                                            {...register("name", { required: true })}
-                                            required
-                                            type="text"
-                                            defaultValue={name} // Prefill with the 'name' prop
-                                        />
-                                    </InputGroup>
+                                    <Input
+                                        {...register("name", { required: true })}
+                                        value={name}
+                                    />
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>Manager</FormLabel>
-                                    <Input
+                                    <UserSearchDropdown
                                         {...register("manager", { required: true })}
-                                        defaultValue={manager} // Prefill 
+
+                                        onlyInternal={false}
+                                        isRequired={true}
+                                        setUserFunction={setSelectedUser}
+                                        preselectedUserPk={manager}
+                                        isEditable
+                                        label="User"
+                                        placeholder="Search for a user"
+                                        helperText={
+                                            <>
+                                                The manager of the branch.
+                                            </>
+                                        }
                                     />
+                                    {/* <Input
+                                            {...register("manager", { required: true })}
+                                        /> */}
                                 </FormControl>
-
-
-                                {updateMutation.isError ? (
-                                    <Text color={"red.500"}>Something went wrong</Text>
-                                ) : null}
+                                {updateMutation.isError
+                                    ? <Text color={"red.500"}>
+                                        Something went wrong
+                                    </Text>
+                                    : null
+                                }
                             </VStack>
+
                             <Grid
                                 mt={10}
                                 w={"100%"}
@@ -278,8 +299,22 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
 
                                 >Cancel</Button>
                                 <Button
-                                    form="update-form"
-                                    type="submit"
+                                    // form="update-form"
+                                    // type="submit"
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onSubmitBranchUpdate(
+                                            {
+                                                // "old_id": 1, //default
+                                                "pk": pk,
+                                                "agency": 1, // dbca
+                                                "name": nameData,
+                                                "manager": selectedUser,
+                                            }
+                                        )
+
+                                    }}
+
                                     isLoading={updateMutation.isLoading}
                                     colorScheme="blue"
                                     size="lg"
