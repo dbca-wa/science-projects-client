@@ -471,11 +471,12 @@ interface IAgency {
 // BRANCH ============================================================================
 
 interface IBranch {
-    pk: number;
+    pk?: number;
+    old_id?: number;
+
     agency: number;
     name: string;
     manager: number;
-    old_id: number;
 }
 
 // ADDRESS ============================================================================

@@ -1,6 +1,6 @@
 // Navitar - shown on both layouts. Uses useLayoutSwitcher to determine style
 
-import { Avatar, Menu, Text, MenuButton, MenuGroup, MenuItem, MenuList, Center, Box, useColorMode, useToast, ToastId } from "@chakra-ui/react"
+import { Avatar, Menu, Text, MenuButton, MenuGroup, MenuItem, MenuList, Center, Box, useColorMode, useToast, ToastId, Image } from "@chakra-ui/react"
 import { FaBook, FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { SiReadthedocs } from "react-icons/si";
@@ -16,6 +16,7 @@ import { TbWorldWww } from "react-icons/tb";
 import { MdPendingActions } from "react-icons/md";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
+import useApiEndpoint from "../../lib/hooks/useApiEndpoint";
 
 export const Navitar = (
     {
@@ -28,9 +29,11 @@ export const Navitar = (
     const { colorMode } = useColorMode();
     const { userData, userLoading } = useUser();
 
-    // useEffect(() => {
-    //     console.log(userData)
-    // }, [userData])
+    useEffect(() => {
+        console.log(userData)
+    }, [userData])
+
+    const baseAPI = useApiEndpoint();
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -86,6 +89,8 @@ export const Navitar = (
     };
 
 
+    // useEffect(() => console.log(userData))
+
     const { layout } = useLayoutSwitcher();
 
     return (
@@ -93,6 +98,7 @@ export const Navitar = (
 
             userSelect={"none"}
         >
+
             <Menu isOpen={isOpen}
             >
                 <MenuButton
@@ -129,12 +135,13 @@ export const Navitar = (
                                 </Text>
                                 : null
                         }
-                        <Avatar size="sm" name={
-                            userData?.username
-                        }
-                            src={
-                                userData?.image?.file ? userData.image.file : userData?.image?.old_file ? userData.image.old_file : ""
+                        <Avatar size="sm"
+                            name={
+                                userData?.username
                             }
+                            src={`${baseAPI}${userData?.image?.file ? userData.image.file : userData?.image?.old_file}`
+                            }
+
                         >
                         </Avatar>
                         <Center

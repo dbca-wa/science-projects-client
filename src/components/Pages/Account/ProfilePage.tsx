@@ -10,6 +10,7 @@ import { EditMembershipModal } from "../../Modals/EditMembershipModal";
 import { EditProfileModal } from "../../Modals/EditProfileModal";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 
 const AnimatedClickToEdit = () => {
     return (
@@ -33,6 +34,8 @@ const AnimatedClickToEdit = () => {
 }
 
 export const ProfilePage = () => {
+
+    const baseAPI = useApiEndpoint();
 
     const { userLoading: loading, userData: me } = useUser();
     useEffect(() => {
@@ -86,7 +89,7 @@ export const ProfilePage = () => {
                         <EditProfileModal
                             userId={`${me.pk}`}
                             isOpen={isEditProfileModalOpen} onClose={onCloseEditProfileModal}
-                            currentImage={me.image.file}
+                            currentImage={`${baseAPI}${me.image?.file}`}
                         />
 
                         <EditMembershipModal
@@ -341,7 +344,7 @@ export const ProfilePage = () => {
                                     >
                                         <Image
                                             objectFit={"cover"}
-                                            src={me?.image ? me.image.file : "/sad-face.png"}
+                                            src={me?.image ? `${baseAPI}${me.image.file}` : "/sad-face.png"}
 
                                             top={0}
                                             left={0}
@@ -476,7 +479,7 @@ export const ProfilePage = () => {
                                             >
                                                 Branch
                                             </Text>
-                                            <Text>{me?.branch.name ? me?.branch.name : NoDataText}</Text>
+                                            <Text>{me?.branch?.name ? me?.branch?.name : NoDataText}</Text>
                                         </Flex>
                                         <Flex
                                             flexDir={"column"}
@@ -487,7 +490,7 @@ export const ProfilePage = () => {
                                             >
                                                 Business Area
                                             </Text>
-                                            <Text>{me?.business_area.name ? me?.business_area.name : NoDataText}</Text>
+                                            <Text>{me?.business_area?.name ? me?.business_area?.name : NoDataText}</Text>
                                         </Flex>
                                     </>
                                 )}

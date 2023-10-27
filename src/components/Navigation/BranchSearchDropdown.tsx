@@ -1,7 +1,9 @@
 // Dropdown search component for branches. Displays 5 branches below the search box.
 
+// Dropdown search component for users. Displays 5 users below the search box.
+
 import { Box, Flex, FormControl, FormHelperText, FormLabel, IconButton, Input, InputGroup, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { IBranch } from "../../types";
 import { getBranchesBasedOnSearchTerm } from "../../lib/api";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -12,16 +14,19 @@ interface IBranchSearchDropdown {
     label: string;
     placeholder: string;
     helperText: any;
+    preselectedBranchPk?: number;
+    isEditable?: boolean;
 }
 
-
-export const BranchSearchDropdown = ({
+export const BranchSearchDropdown = forwardRef(({
     isRequired,
     setBranchFunction,
     label,
     placeholder,
     helperText
-}: IBranchSearchDropdown) => {
+}: IBranchSearchDropdown, ref) => {
+    const inputRef = useRef(null);
+
     const [searchTerm, setSearchTerm] = useState(''); // Local state for search term
     const [filteredItems, setFilteredItems] = useState<IBranch[]>([]); // Local state for filtered items
     const [isMenuOpen, setIsMenuOpen] = useState(true); // Stores the menu open state
@@ -67,6 +72,7 @@ export const BranchSearchDropdown = ({
             ) : (
                 <InputGroup>
                     <Input
+                        ref={inputRef} // Attach the ref to the input element
                         type="text"
                         value={searchTerm}
                         onChange={(event) => setSearchTerm(event.target.value)}
@@ -95,7 +101,8 @@ export const BranchSearchDropdown = ({
             <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
     );
-};
+});
+
 
 
 // =========================================== ADDITIONAL COMPONENTS ====================================================

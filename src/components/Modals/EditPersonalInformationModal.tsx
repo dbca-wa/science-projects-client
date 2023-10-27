@@ -207,6 +207,7 @@ export const EditPersonalInformationModal = ({ isOpen, onClose, userId }: IEditP
                                         <Icon as={AiFillPhone} />
                                     </InputLeftElement>
                                     <Input
+                                        autoComplete="off"
                                         type="text"
                                         placeholder={
                                             "Enter a phone number"
@@ -237,6 +238,8 @@ export const EditPersonalInformationModal = ({ isOpen, onClose, userId }: IEditP
                                         <Icon as={MdFax} />
                                     </InputLeftElement>
                                     <Input
+                                        autoComplete="off"
+
                                         type="text"
                                         placeholder={
                                             "Enter a fax number"
@@ -268,6 +271,7 @@ export const EditPersonalInformationModal = ({ isOpen, onClose, userId }: IEditP
                                         <Icon as={GrMail} />
                                     </InputLeftElement>
                                     <Input
+                                        autoComplete="off"
 
                                         type="email"
                                         placeholder={data?.email}
@@ -288,6 +292,8 @@ export const EditPersonalInformationModal = ({ isOpen, onClose, userId }: IEditP
                                         <Icon as={RiNumber1} />
                                     </InputLeftElement>
                                     <Input
+                                        autoComplete="off"
+
                                         type="text"
                                         placeholder={data?.first_name}
                                         value={data?.first_name}
@@ -306,6 +312,8 @@ export const EditPersonalInformationModal = ({ isOpen, onClose, userId }: IEditP
                                         <Icon as={RiNumber2} />
                                     </InputLeftElement>
                                     <Input
+                                        autoComplete="off"
+
                                         type="text"
                                         placeholder={data?.last_name}
                                         value={data?.last_name}

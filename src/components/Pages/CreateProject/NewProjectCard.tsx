@@ -56,7 +56,7 @@ export const NewProjectCard = ({ title, description, bulletPoints, colorScheme, 
                 cursor="pointer"
 
                 style={{ transformStyle: "preserve-3d" }}
-                boxShadow="0px 20px 30px -10px rgba(0, 0, 0, 0.3), 0px 4px 5px -2px rgba(0, 0, 0, 0.06), -3px 0px 10px -2px rgba(0, 0, 0, 0.1), 3px 0px 10px -2px rgba(0, 0, 0, 0.1)"
+                boxShadow="0px 14px 21px -7px rgba(0, 0, 0, 0.21), 0px 2.8px 3.5px -1.4px rgba(0, 0, 0, 0.042), -2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.07), 2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.07)"
 
                 initial={"rest"}
                 whileHover="hover" // Reference to the hover key in cardVariants

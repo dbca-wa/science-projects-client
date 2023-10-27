@@ -137,6 +137,8 @@ export const ProjectSearchDropdown = ({
                 ) : (
                     <InputGroup>
                         <Input
+                            autoComplete="off"
+
                             ref={inputRef}
                             type="text"
                             value={searchTerm}

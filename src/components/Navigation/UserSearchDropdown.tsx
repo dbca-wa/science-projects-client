@@ -1,7 +1,7 @@
 // Dropdown search component for users. Displays 5 users below the search box.
 
 import { Avatar, Box, Flex, FormControl, FormHelperText, FormLabel, IconButton, Input, InputGroup, Text, useQuery } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { IUserData } from "../../types";
 import { getFullUser, getInternalUsersBasedOnSearchTerm } from "../../lib/api";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -19,7 +19,7 @@ interface IUserSearchDropdown {
 }
 
 
-export const UserSearchDropdown = ({
+export const UserSearchDropdown = forwardRef(({
     onlyInternal = true,        // Default if not set
     isRequired,
     setUserFunction,
@@ -28,7 +28,8 @@ export const UserSearchDropdown = ({
     helperText,
     preselectedUserPk,
     isEditable
-}: IUserSearchDropdown) => {
+}: IUserSearchDropdown, ref) => {
+    const inputRef = useRef(null);
     const [searchTerm, setSearchTerm] = useState(''); // Local state for search term
     const [filteredItems, setFilteredItems] = useState<IUserData[]>([]); // Local state for filtered items
     const [isMenuOpen, setIsMenuOpen] = useState(true); // Stores the menu open state
@@ -78,6 +79,13 @@ export const UserSearchDropdown = ({
     };
 
 
+    useImperativeHandle(ref, () => ({
+        focusInput: () => {
+            inputRef.current && inputRef.current.focus();
+        }
+    }))
+
+
     return (
         <FormControl isRequired={isRequired} mb={4}
             // bg={"red"}
@@ -92,11 +100,14 @@ export const UserSearchDropdown = ({
             ) : (
                 <InputGroup>
                     <Input
+                        ref={inputRef} // Attach the ref to the input element
                         type="text"
                         value={searchTerm}
                         onChange={(event) => setSearchTerm(event.target.value)}
                         placeholder={placeholder}
                         onFocus={() => setIsMenuOpen(true)}
+                        autoComplete="off"
+
                     />
                 </InputGroup>
             )}
@@ -122,7 +133,7 @@ export const UserSearchDropdown = ({
             <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
     );
-};
+});
 
 
 // =========================================== ADDITIONAL COMPONENTS ====================================================

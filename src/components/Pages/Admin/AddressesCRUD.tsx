@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { AddressItemDisplay } from "./AddressItemDisplay";
+import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
 
 export const AddressesCRUD = () => {
     const { register, handleSubmit } = useForm<IAddress>();
@@ -86,6 +87,9 @@ export const AddressesCRUD = () => {
             setCountOfItems(slices.length);
         }
     }, [searchTerm, slices]);
+
+    const [selectedBranch, setSelectedBranch] = useState<number>();
+
 
 
     return (
@@ -207,13 +211,34 @@ export const AddressesCRUD = () => {
                         <DrawerOverlay />
                         <DrawerContent>
                             <DrawerCloseButton />
-                            <DrawerHeader>Add Business Area</DrawerHeader>
+                            <DrawerHeader>Add Address</DrawerHeader>
                             <DrawerBody>
                                 <VStack spacing={2} as="form" id="add-form" onSubmit={handleSubmit(onSubmit)} >
                                     <FormControl>
+                                        {/* <FormLabel>Branch</FormLabel> */}
+                                        {/* <Input
+                                            {...register("branch", { required: true })}
+                                        /> */}
+                                        <BranchSearchDropdown
+                                            {...register("branch", { required: true })}
+
+                                            isRequired={true}
+                                            setBranchFunction={setSelectedBranch}
+                                            isEditable
+                                            label="Branch"
+                                            placeholder="Search for a branch"
+                                            helperText={
+                                                <>
+                                                    The branch this address belongs to.
+                                                </>
+                                            }
+                                        />
+                                    </FormControl>
+
+                                    <FormControl>
                                         <FormLabel>Street</FormLabel>
                                         <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
+                                            {/* <InputLeftAddon children={<FaSign />} /> */}
                                             <Input
                                                 {...register("street", { required: true })}
                                                 required
@@ -231,6 +256,7 @@ export const AddressesCRUD = () => {
                                         <FormLabel>Country</FormLabel>
                                         <Input
                                             {...register("country", { required: true })}
+                                            value={"Australia"}
                                         />
                                     </FormControl>
                                     <FormControl>
@@ -239,18 +265,12 @@ export const AddressesCRUD = () => {
                                             {...register("pobox", { required: true })}
                                         />
                                     </FormControl>
-                                    <FormControl>
+                                    {/* <FormControl>
                                         <FormLabel>Agency</FormLabel>
                                         <Input
                                             {...register("agency", { required: true })}
                                         />
-                                    </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Branch</FormLabel>
-                                        <Input
-                                            {...register("branch", { required: true })}
-                                        />
-                                    </FormControl>
+                                    </FormControl> */}
                                     {mutation.isError
                                         ? <Text color={"red.500"}>
                                             Something went wrong
