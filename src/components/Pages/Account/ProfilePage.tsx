@@ -11,6 +11,7 @@ import { EditProfileModal } from "../../Modals/EditProfileModal";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
+import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 
 const AnimatedClickToEdit = () => {
     return (
@@ -71,6 +72,9 @@ export const ProfilePage = () => {
     const handleMouseLeave = () => {
         setHoveredItem(null);
     };
+
+    const imageUrl = useServerImageUrl(me.image.file);
+
 
     return (
         <Box
@@ -344,7 +348,10 @@ export const ProfilePage = () => {
                                     >
                                         <Image
                                             objectFit={"cover"}
-                                            src={me?.image ? `${baseAPI}${me.image.file}` : "/sad-face.png"}
+                                            src={
+                                                imageUrl
+                                                // me?.image ? `${baseAPI}${me.image.file}` : "/sad-face.png"
+                                            }
 
                                             top={0}
                                             left={0}

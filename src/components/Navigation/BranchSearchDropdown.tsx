@@ -72,6 +72,7 @@ export const BranchSearchDropdown = forwardRef(({
             ) : (
                 <InputGroup>
                     <Input
+                        autoComplete="off"
                         ref={inputRef} // Attach the ref to the input element
                         type="text"
                         value={searchTerm}
