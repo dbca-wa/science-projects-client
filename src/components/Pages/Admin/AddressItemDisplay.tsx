@@ -1,4 +1,4 @@
-import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
 import { IAddress } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -70,11 +70,10 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
         }
     );
 
-    const deleteAddressClick = () => {
+    const deleteBtnClicked = () => {
         // console.log("deleted")
         deleteMutation.mutate(pk);
     }
-
     const onUpdateSubmit = (formData: IAddress) => {
         updateMutation.mutate(formData);
     }
@@ -152,7 +151,7 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
 
 
             </Grid>
-            <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
+            {/* <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                 <ModalOverlay />
                 <ModalHeader>Delete Address</ModalHeader>
                 <ModalBody>
@@ -192,7 +191,42 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
 
                     </ModalContent>
                 </ModalBody>
+            </Modal> */}
+            <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
+                <ModalOverlay />
+                <ModalContent bg="white">
+                    <ModalHeader>Delete Branch</ModalHeader>
+                    <ModalBody>
+                        <Box>
+                            <Text fontSize="lg" fontWeight="semibold">
+                                Are you sure you want to delete the address for this branch?
+                            </Text>
+
+                            <Text
+                                fontSize="lg"
+                                fontWeight="semibold"
+                                color={"blue.500"}
+                                mt={4}
+                            >
+                                "{branch?.name}"
+                            </Text>
+
+                        </Box>
+                    </ModalBody>
+                    <ModalFooter justifyContent="flex-end">
+                        <Flex>
+                            <Button onClick={onDeleteModalClose} colorScheme="red">
+                                No
+                            </Button>
+                            <Button onClick={deleteBtnClicked} colorScheme="green" ml={3}>
+                                Yes
+                            </Button>
+                        </Flex>
+
+                    </ModalFooter>
+                </ModalContent>
             </Modal>
+
             <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
                 <ModalOverlay />
                 <ModalHeader>Update Address</ModalHeader>

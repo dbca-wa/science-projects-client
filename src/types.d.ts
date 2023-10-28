@@ -482,17 +482,18 @@ interface IBranch {
 // ADDRESS ============================================================================
 
 interface IAddress {
-    pk: number;
-    agency: IAgency;
-    branch: IBranch;
+    pk?: number;
+    agency?: number;
+    branch: number;
     street: string;
-    suburb: string;
+    suburb?: string;
     city: string;
-    zipcode: number;
+    zipcode?: number;
     state: string;
     country: string;
-    pobox: string;
+    pobox?: string;
 }
+
 
 // DIVISIONS ============================================================================
 

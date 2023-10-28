@@ -5,6 +5,7 @@ import { IUserData } from "../../../types";
 import { UserProfile } from "./UserProfile";
 import { useEffect } from "react";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
+import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 
 
 interface BoxContainerProps extends BoxProps {
@@ -35,7 +36,8 @@ export const UserGridItem = ({
     const isLgOrLarger = useBreakpointValue({ base: false, sm: false, md: false, lg: true, xlg: true })
     const isOver690 = useBreakpointValue({ false: true, sm: false, md: false, 'over690': true, 'mdlg': true, lg: true, xlg: true })
 
-    const baseAPI = useApiEndpoint();
+    // const baseAPI = useApiEndpoint();
+    const imageUrl = useServerImageUrl(image.file);
 
     const { colorMode } = useColorMode();
 
@@ -49,7 +51,8 @@ export const UserGridItem = ({
 
     useEffect(() => {
         console.log(business_area?.name)
-    }, [business_area])
+        console.log(image)
+    }, [business_area, image])
 
     return (
         <>
@@ -108,12 +111,7 @@ export const UserGridItem = ({
                                 mr={4}
                             >
                                 <Avatar
-                                    src={
-                                        image?.file ?
-                                            image.file.startsWith(baseAPI) ? image.file : `${baseAPI}${image.file}` :
-                                            image?.old_file ? image.old_file.startsWith(baseAPI) ? image.old_file : `${baseAPI}${image.old_file}` :
-                                                ""
-                                    }
+                                    src={imageUrl}
                                     draggable={false}
                                     userSelect={"none"}
                                     h={55}

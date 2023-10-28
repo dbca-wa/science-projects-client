@@ -77,7 +77,7 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
         }
     );
 
-    const deleteLocationClick = () => {
+    const deleteBtnClicked = () => {
         // console.log("deleted")
         deleteMutation.mutate(pk);
     }
@@ -215,7 +215,7 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                                 <Button onClick={onDeleteModalClose} colorScheme="red">
                                     No
                                 </Button>
-                                <Button onClick={deleteLocationClick} colorScheme="green" ml={3}>
+                                <Button onClick={deleteBtnClicked} colorScheme="green" ml={3}>
                                     Yes
                                 </Button>
                             </Flex>

@@ -8,6 +8,7 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { updateProfile, IProfileUpdateVariables, getProfile, IProfileUpdateError, IProfileUpdateSuccess } from '../../lib/api';
 import { IProfile } from '../../types';
 import noImageLink from "/sad-face.png"
+import useServerImageUrl from '../../lib/hooks/useServerImageUrl';
 
 interface IEditProfileModalProps {
     isOpen: boolean;
@@ -18,18 +19,22 @@ interface IEditProfileModalProps {
 
 
 export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEditProfileModalProps) => {
+    const imageUrl = useServerImageUrl(currentImage);
+
     const { isLoading, data } = useQuery<IProfile>(["profile", userId], getProfile);
 
     const { colorMode } = useColorMode();
 
     const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
-        data?.image?.file || data?.image?.old_file || null
+        currentImage
+        // imageUrl
+        // data?.image?.file || data?.image?.old_file || null
     );
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
     const handleImageLoadError = () => {
-        console.log(`There was an error loading images. Selected: ${selectedImageUrl}. Current ${currentImage}`)
+        console.log(`There was an error loading images. Selected: ${selectedImageUrl}. Current ${imageUrl}`)
         setImageLoadFailed(true);
     };
 
@@ -191,6 +196,19 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
         }
     }, [data, isLoading]);
 
+
+    useEffect(() => {
+        console.log(
+            {
+                "selectedImageUrl": selectedImageUrl,
+                "selectedFile": selectedFile,
+                "imageUrl": imageUrl,
+                "currentImage": currentImage,
+            }
+        )
+
+    }, [selectedImageUrl, selectedFile, imageUrl, currentImage])
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}
             size={"3xl"} scrollBehavior='inside'
@@ -255,12 +273,12 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
                                             {!imageLoadFailed ? (
                                                 <Image
                                                     objectFit="cover"
-                                                    src={selectedImageUrl || currentImage || noImageLink}
+                                                    src={selectedFile !== null && selectedImageUrl || imageUrl || noImageLink}
                                                     alt="Preview"
                                                     userSelect="none"
                                                     bg="gray.800"
-                                                    onLoad={handleImageLoadSuccess}
-                                                    onError={handleImageLoadError}
+                                                // onLoad={handleImageLoadSuccess}
+                                                // onError={handleImageLoadError}
                                                 />
                                             ) : (
                                                 <Image

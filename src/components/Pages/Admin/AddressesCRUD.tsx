@@ -1,17 +1,16 @@
 import { Text, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, Flex, FormControl, Input, InputGroup, InputLeftAddon, VStack, useDisclosure, Center, Spinner, Grid, DrawerOverlay, DrawerCloseButton, DrawerHeader, FormLabel, Textarea, Checkbox, useToast, Select } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IAddress } from "../../../types";
 import { createAddress, getAllAddresses } from "../../../lib/api";
 import _ from 'lodash';
-import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { AddressItemDisplay } from "./AddressItemDisplay";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
 
 export const AddressesCRUD = () => {
-    const { register, handleSubmit } = useForm<IAddress>();
+    const { register, handleSubmit, watch } = useForm<IAddress>();
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
 
@@ -42,9 +41,16 @@ export const AddressesCRUD = () => {
 
             }
         });
-    const onSubmit = (formData: IAddress) => {
+    // const onSubmit = (formData: IAddress) => {
+    //     mutation.mutate(formData);
+    // }
+
+    const onSubmitAddressCreation = (formData: IAddress) => {
         mutation.mutate(formData);
     }
+
+
+
     const { isLoading, data: slices } = useQuery<IAddress[]>(
         {
             queryFn: getAllAddresses,
@@ -90,6 +96,12 @@ export const AddressesCRUD = () => {
 
     const [selectedBranch, setSelectedBranch] = useState<number>();
 
+    const streetData = watch('street');
+    const cityData = watch('city');
+    const stateData = watch('state');
+    const countryData = watch('country');
+    const zipcodeData = watch('zipcode');
+    const poboxData = watch('pobox');
 
 
     return (
@@ -185,7 +197,7 @@ export const AddressesCRUD = () => {
 
                                     <Grid gridTemplateColumns={"repeat(1,1fr)"}>
                                         {filteredSlices
-                                            .sort((a, b) => a.branch.name.localeCompare(b.branch.name))
+                                            .sort((a, b) => a.branch?.name.localeCompare(b.branch?.name))
                                             .map((s) => (
                                                 <AddressItemDisplay
                                                     key={s.pk}
@@ -213,7 +225,7 @@ export const AddressesCRUD = () => {
                             <DrawerCloseButton />
                             <DrawerHeader>Add Address</DrawerHeader>
                             <DrawerBody>
-                                <VStack spacing={2} as="form" id="add-form" onSubmit={handleSubmit(onSubmit)} >
+                                <VStack spacing={2} as="form" id="add-form" onSubmit={handleSubmit(onSubmitAddressCreation)} >
                                     <FormControl>
                                         {/* <FormLabel>Branch</FormLabel> */}
                                         {/* <Input
@@ -247,11 +259,25 @@ export const AddressesCRUD = () => {
                                         </InputGroup>
                                     </FormControl>
                                     <FormControl>
+                                        <FormLabel>Zip Code</FormLabel>
+                                        <Input
+                                            {...register("zipcode", { required: true })}
+                                        />
+                                    </FormControl>
+                                    <FormControl>
                                         <FormLabel>City</FormLabel>
                                         <Input
                                             {...register("city", { required: true })}
                                         />
                                     </FormControl>
+                                    <FormControl>
+                                        <FormLabel>State</FormLabel>
+                                        <Input
+                                            {...register("state", { required: true })}
+                                            value={"WA"}
+                                        />
+                                    </FormControl>
+
                                     <FormControl>
                                         <FormLabel>Country</FormLabel>
                                         <Input
@@ -262,7 +288,7 @@ export const AddressesCRUD = () => {
                                     <FormControl>
                                         <FormLabel>PO Box</FormLabel>
                                         <Input
-                                            {...register("pobox", { required: true })}
+                                            {...register("pobox", { required: false })}
                                         />
                                     </FormControl>
                                     {/* <FormControl>
@@ -281,10 +307,26 @@ export const AddressesCRUD = () => {
                             </DrawerBody>
                             <DrawerFooter>
                                 <Button
-                                    form="add-form"
-                                    type="submit"
+                                    // form="add-form"
+                                    // type="submit"
                                     isLoading={mutation.isLoading}
                                     colorScheme="blue" size="lg" width={"100%"}
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onSubmitAddressCreation(
+                                            {
+                                                // "agency": 1,
+                                                "branch": selectedBranch,
+                                                "street": streetData,
+                                                "city": cityData,
+                                                "zipcode": zipcodeData,
+                                                "state": stateData,
+                                                "country": countryData,
+                                                "pobox": poboxData,
+                                            }
+                                        )
+                                    }}
+
                                 >
                                     Create
                                 </Button>
