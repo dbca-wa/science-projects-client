@@ -418,12 +418,14 @@ interface BusinessAreaImage {
 
 
 interface IBusinessArea {
-    pk: number;
+    agency?: number;
+    old_id?: number;
+    pk?: number;
     slug: string;
     name: string;
     focus: string;
     introduction: string;
-    image: BusinessAreaImage;
+    image: BusinessAreaImage | File;
     leader: number;
     finance_admin: number;
     data_custodian: number;

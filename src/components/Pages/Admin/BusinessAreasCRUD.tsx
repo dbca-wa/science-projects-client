@@ -1,4 +1,4 @@
-import { Text, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, Flex, FormControl, Input, InputGroup, InputLeftAddon, VStack, useDisclosure, Center, Spinner, Grid, DrawerOverlay, DrawerCloseButton, DrawerHeader, FormLabel, Textarea, Checkbox, useToast, Select, FormHelperText } from "@chakra-ui/react";
+import { Image, Text, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, Flex, FormControl, Input, InputGroup, InputLeftAddon, VStack, useDisclosure, Center, Spinner, Grid, DrawerOverlay, DrawerCloseButton, DrawerHeader, FormLabel, Textarea, Checkbox, useToast, Select, FormHelperText, FormErrorMessage } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,21 +9,14 @@ import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IBusinessArea } from "../../../types";
 import { ImagePreview } from "../CreateProject/ImagePreview";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { useNoImage } from "../../../lib/hooks/useNoImage";
+import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 
 
 export const BusinessAreasCRUD = () => {
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-    const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (files && files.length > 0) {
-            setSelectedFile(files[0]);
-        }
-    };
-
-
-
-    const { register, handleSubmit } = useForm<IBusinessArea>();
+    const { register, handleSubmit, watch, formState: { errors },
+    } = useForm<IBusinessArea>();
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
 
@@ -99,6 +92,65 @@ export const BusinessAreasCRUD = () => {
             setCountOfItems(slices.length);
         }
     }, [searchTerm, slices]);
+
+
+    const nameData = watch('name');
+    const slugData = watch('slug');
+    const focusData = watch('focus');
+    const introductionData = watch('introduction');
+    const imageData = watch('image');
+    const [selectedLeader, setSelectedLeader] = useState<number>();
+    const [selectedFinanceAdmin, setSelectedFinanceAdmin] = useState<number>();
+    const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
+
+    const onSubmitBusinessAreaCreation = (formData: IBusinessArea) => {
+        const {
+            agency,
+            old_id,
+            name,
+            slug,
+            leader,
+            data_custodian,
+            finance_admin,
+            focus,
+            introduction,
+        } = formData;
+        const image = selectedFile;
+
+        // Create an object to pass as a single argument to mutation.mutate
+        const payload = {
+            agency,
+            old_id,
+            name,
+            slug,
+            leader,
+            data_custodian,
+            finance_admin,
+            focus,
+            introduction,
+            image,
+        };
+
+
+        mutation.mutate(payload);
+    }
+
+
+
+    const [imageLoadFailed, setImageLoadFailed] = useState(false);
+    const noImageLink = useNoImage();
+    // const imageUrl = useServerImageUrl(noImageLink);
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>();
+
+
+    const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            setSelectedFile(files[0]);
+        }
+    };
 
 
     return (
@@ -207,42 +259,179 @@ export const BusinessAreasCRUD = () => {
                             <DrawerCloseButton />
                             <DrawerHeader>Add Business Area</DrawerHeader>
                             <DrawerBody>
-                                <VStack spacing={10} as="form" id="add-form" onSubmit={handleSubmit(onSubmit)} >
-                                    <FormControl>
+                                <VStack spacing={6} as="form" id="add-form" onSubmit={handleSubmit(onSubmit)} >
+                                    <FormControl isRequired>
+                                        <FormLabel>Name</FormLabel>
+                                        <Input
+                                            autoComplete="off"
+                                            autoFocus
+                                            {...register("name", { required: true })}
+                                        />
+                                        <FormHelperText>Name of the Business Area</FormHelperText>
+
+                                    </FormControl>
+
+                                    <FormControl isRequired>
                                         <FormLabel>Slug</FormLabel>
                                         <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
+                                            {/* <InputLeftAddon children={<FaSign />} /> */}
                                             <Input
                                                 {...register("slug", { required: true })}
                                                 required
                                                 type="text"
+                                                autoComplete="off"
                                             />
+
                                         </InputGroup>
+                                        <FormHelperText>Short text or acronym to quickly identify (e.g. BCS)</FormHelperText>
+                                    </FormControl>
+                                    <FormControl isRequired>
+                                        {/* <FormLabel>Image</FormLabel>
+                                        <InputGroup>
+                                            <Input
+                                                {...register("image", { required: true })}
+                                                required
+                                                type="text"
+                                            />
+
+                                        </InputGroup> */}
+
+                                        <Grid gridTemplateColumns={{ base: "3fr 10fr", md: "4fr 8fr" }} pos="relative" w="100%" h="100%">
+                                            <Box>
+                                                <FormLabel>Image</FormLabel>
+                                                <Center
+                                                    maxH={{ base: "200px", xl: "225px" }}
+                                                    bg="gray.50"
+                                                    mt={1}
+                                                    rounded="lg"
+                                                    overflow="hidden"
+                                                >
+                                                    {!imageLoadFailed ? (
+                                                        <Image
+                                                            objectFit="cover"
+                                                            src={selectedFile !== null && selectedImageUrl || noImageLink}
+                                                            alt="Preview"
+                                                            userSelect="none"
+                                                            bg="gray.800"
+                                                        // onLoad={handleImageLoadSuccess}
+                                                        // onError={handleImageLoadError}
+                                                        />
+                                                    ) : (
+                                                        <Image
+                                                            objectFit="cover"
+                                                            src={noImageLink}
+                                                            alt="Preview"
+                                                            userSelect="none"
+                                                            bg="gray.800"
+                                                        />
+                                                    )}
+                                                </Center>
+                                            </Box>
+                                            <FormControl ml={4} mt={10}>
+                                                <InputGroup>
+                                                    <Grid gridGap={2} ml={4}>
+                                                        <FormControl>
+                                                            <Input
+                                                                autoComplete="off"
+                                                                {...register("image", { required: true })}
+                                                                alignItems={"center"}
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={(e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (file) {
+                                                                        setSelectedFile(file);
+                                                                        setSelectedImageUrl(URL.createObjectURL(file));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormHelperText>Upload an image for your display picture.</FormHelperText>
+                                                        {errors.image && (
+                                                            <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                        )}
+                                                    </Grid>
+                                                </InputGroup>
+                                            </FormControl>
+                                        </Grid>
+
+                                        <FormHelperText>Select an image for the Business Area</FormHelperText>
                                     </FormControl>
                                     <FormControl>
-                                        <FormLabel>Name</FormLabel>
-                                        <Input
-                                            {...register("name", { required: true })}
-                                        />
-                                    </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Leader</FormLabel>
-                                        <Input
+                                        <UserSearchDropdown
                                             {...register("leader", { required: true })}
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedLeader}
+                                            label="Leader"
+                                            placeholder="Search for a user..."
+                                            helperText={
+                                                <>
+                                                    The leader of the Business Area
+                                                </>
+                                            }
                                         />
                                     </FormControl>
                                     <FormControl>
-                                        <FormLabel>Finance Admin</FormLabel>
-                                        <Input
+                                        {/* <FormLabel>Finance Admin</FormLabel> */}
+                                        <UserSearchDropdown
                                             {...register("finance_admin", { required: true })}
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedFinanceAdmin}
+                                            label="Finance Admin"
+                                            placeholder="Search for a user..."
+                                            helperText={
+                                                <>
+                                                    The finance admin of the Business Area
+                                                </>
+                                            }
                                         />
                                     </FormControl>
                                     <FormControl>
-                                        <FormLabel>Data Custodian</FormLabel>
-                                        <Input
+                                        <UserSearchDropdown
                                             {...register("data_custodian", { required: true })}
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedDataCustodian}
+                                            label="Data Custodian"
+                                            placeholder="Search for a user..."
+                                            helperText={
+                                                <>
+                                                    The data custodian of the Business Area
+                                                </>
+                                            }
                                         />
                                     </FormControl>
+                                    <FormControl isRequired>
+                                        <FormLabel>Focus</FormLabel>
+                                        <InputGroup>
+                                            <Textarea
+                                                {...register("focus", { required: true })}
+                                                required
+                                            />
+
+                                        </InputGroup>
+                                        <FormHelperText>Primary concerns of the Business Area</FormHelperText>
+                                    </FormControl>
+
+                                    <FormControl isRequired>
+                                        <FormLabel>Introduction</FormLabel>
+                                        <InputGroup>
+                                            <Textarea
+                                                {...register("introduction", { required: true })}
+                                                required
+                                            />
+
+                                        </InputGroup>
+                                        <FormHelperText>A description of the Business Area</FormHelperText>
+                                    </FormControl>
+
+
+
                                     {mutation.isError
                                         ? <Text color={"red.500"}>
                                             Something went wrong
@@ -253,10 +442,31 @@ export const BusinessAreasCRUD = () => {
                             </DrawerBody>
                             <DrawerFooter>
                                 <Button
-                                    form="add-form"
-                                    type="submit"
+                                    // form="add-form"
+                                    // type="submit"
                                     isLoading={mutation.isLoading}
-                                    colorScheme="blue" size="lg" width={"100%"}>Create</Button>
+                                    colorScheme="blue" size="lg" width={"100%"}
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onSubmitBusinessAreaCreation(
+                                            {
+                                                "agency": 1,
+                                                "old_id": 1,
+                                                "name": nameData,
+                                                "slug": slugData,
+                                                "leader": selectedLeader,
+                                                "data_custodian": selectedDataCustodian,
+                                                "finance_admin": selectedFinanceAdmin,
+                                                "focus": focusData,
+                                                "introduction": introductionData,
+                                                "image": imageData,
+                                            }
+                                        )
+
+                                    }}
+                                >
+                                    Create
+                                </Button>
                             </DrawerFooter>
                         </DrawerContent>
                     </Drawer>

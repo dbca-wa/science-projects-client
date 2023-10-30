@@ -7,8 +7,9 @@ import { useForm, useWatch, SubmitHandler } from 'react-hook-form';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { updateProfile, IProfileUpdateVariables, getProfile, IProfileUpdateError, IProfileUpdateSuccess } from '../../lib/api';
 import { IProfile } from '../../types';
-import noImageLink from "/sad-face.png"
+// import noImageLink from "/sad-face.png"
 import useServerImageUrl from '../../lib/hooks/useServerImageUrl';
+import { useNoImage } from '../../lib/hooks/useNoImage';
 
 interface IEditProfileModalProps {
     isOpen: boolean;
@@ -20,6 +21,8 @@ interface IEditProfileModalProps {
 
 export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEditProfileModalProps) => {
     const imageUrl = useServerImageUrl(currentImage);
+
+    const noImageLink = useNoImage();
 
     const { isLoading, data } = useQuery<IProfile>(["profile", userId], getProfile);
 

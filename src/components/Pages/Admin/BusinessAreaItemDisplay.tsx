@@ -1,4 +1,4 @@
-import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Image, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Image, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
 import { IBusinessArea } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -8,6 +8,10 @@ import { deleteBusinessArea, updateBusinessArea } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
 import { useNoImage } from "../../../lib/hooks/useNoImage";
+import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
+import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { useState } from "react";
 // import { useEffect } from "react";
 // import NoImageFile from '/sad-face.gif'
 
@@ -26,11 +30,9 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
     const { userLoading: dataCustodianLoading, userData: dataCustodianData } = useFullUserByPk(data_custodian);
 
     const NoImageFile = useNoImage();
+    const apiEndpoint = useApiEndpoint();
 
-    // useEffect(() => {
-    //     console.log(leader, finance_admin, data_custodian);
-    // }, [leader, finance_admin, data_custodian])
-
+    // console.log(image.file)
     const updateMutation = useMutation(updateBusinessArea,
         {
             onSuccess: () => {
@@ -41,7 +43,7 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                     position: "top-right"
                 })
                 onUpdateModalClose();
-                queryClient.invalidateQueries(["divisions"]);
+                queryClient.invalidateQueries(["businessAreas"]);
 
             },
             onError: () => {
@@ -68,7 +70,7 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                     position: "top-right"
                 })
                 onDeleteModalClose();
-                queryClient.invalidateQueries(["divisions"]);
+                queryClient.invalidateQueries(["businessAreas"]);
 
             },
             onError: () => {
@@ -82,10 +84,10 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
         }
     );
 
-    const deleteLocationClick = () => {
-        // console.log("deleted")
+    const deleteBtnClicked = () => {
         deleteMutation.mutate(pk);
     }
+
 
     const onUpdateSubmit = (formData: IBusinessArea) => {
         updateMutation.mutate(formData);
@@ -108,6 +110,10 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
         onDataCustodianOpen();
     }
 
+
+    const [selectedLeader, setSelectedLeader] = useState<number>();
+    const [selectedFinanceAdmin, setSelectedFinanceAdmin] = useState<number>();
+    const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
 
     return (
         !leaderLoading && leaderData ? (
@@ -194,8 +200,13 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                     <Flex justifyContent="flex-start">
                         <Box rounded="lg" overflow="hidden" w="100px" h="69px">
                             <Image
-                                src={image?.file ? image.file : image?.old_file ? image.old_file : NoImageFile}
-                                width={"100%"}
+                                src={
+                                    image instanceof File
+                                        ? `${apiEndpoint}/files/${image.name}` // Use the image directly for File
+                                        : image?.file
+                                            ? `${apiEndpoint}/files/${image.file}`
+                                            : NoImageFile
+                                } width={"100%"}
                                 height={"100%"}
                                 objectFit={"cover"}
 
@@ -292,44 +303,37 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                 </Grid>
                 <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                     <ModalOverlay />
-                    <ModalHeader>Delete Business Area</ModalHeader>
-                    <ModalBody>
-                        <ModalContent bg="white" p={4}
-                            w={"100%"}
-                            h={"100%"}
-                        >
-                            <Center
-                                w={"100%"}
-                                h={"100%"}
-                            >
-                                <Grid
-                                    gridGap={20}
+                    <ModalContent bg="white">
+                        <ModalHeader>Delete Business Area</ModalHeader>
+                        <ModalBody>
+                            <Box>
+                                <Text fontSize="lg" fontWeight="semibold">
+                                    Are you sure you want to delete this business area?
+                                </Text>
+
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color={"blue.500"}
+                                    mt={4}
                                 >
-                                    <Box
-                                        alignContent={"center"}
-                                    >
-                                        <Text fontSize={"xl"}
-                                            fontWeight={"bold"}
-                                        >
-                                            Are you sure you want to delete this Business Area?
-                                        </Text>
+                                    "{name}"
+                                </Text>
 
-                                    </Box>
-                                    <Flex
-                                        // bg="red"
-                                        justifyContent={"space-evenly"}
-                                    >
-                                        <Button onClick={deleteLocationClick}>Yes</Button>
-                                        <Button onClick={onDeleteModalClose}>No</Button>
-                                    </Flex>
+                            </Box>
+                        </ModalBody>
+                        <ModalFooter justifyContent="flex-end">
+                            <Flex>
+                                <Button onClick={onDeleteModalClose} colorScheme="red">
+                                    No
+                                </Button>
+                                <Button onClick={deleteBtnClicked} colorScheme="green" ml={3}>
+                                    Yes
+                                </Button>
+                            </Flex>
 
-
-
-                                </Grid>
-                            </Center>
-
-                        </ModalContent>
-                    </ModalBody>
+                        </ModalFooter>
+                    </ModalContent>
                 </Modal>
                 <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
                     <ModalOverlay />
@@ -352,12 +356,14 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                                     defaultValue={slug} // Prefill with the 'pk' prop
                                 />
                             </FormControl>
-                            <VStack spacing={10} as="form" id="update-form" onSubmit={handleSubmit(onUpdateSubmit)}>
+                            <VStack spacing={3} as="form" id="update-form" onSubmit={handleSubmit(onUpdateSubmit)}>
                                 <FormControl>
                                     <FormLabel>Name</FormLabel>
                                     <InputGroup>
-                                        <InputLeftAddon children={<FaSign />} />
+                                        {/* <InputLeftAddon children={<FaSign />} /> */}
                                         <Input
+                                            autoComplete="off"
+                                            autoFocus
                                             {...register("name", { required: true })}
                                             required
                                             type="text"
@@ -365,26 +371,67 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                                         />
                                     </InputGroup>
                                 </FormControl>
-                                <FormControl>
-                                    <FormLabel>Leader</FormLabel>
+                                <FormControl
+                                    mt={3}
+                                >
+                                    {/* <FormLabel>Leader</FormLabel>
                                     <Input
                                         {...register("leader", { required: true })}
                                         defaultValue={leader} // Prefill 
+                                    /> */}
+                                    <UserSearchDropdown
+                                        {...register("leader", { required: true })}
+
+                                        onlyInternal={false}
+                                        isRequired={true}
+                                        setUserFunction={setSelectedLeader}
+                                        preselectedUserPk={leader}
+                                        isEditable
+                                        label="Leader"
+                                        placeholder="Search for a user"
+                                        helperText={
+                                            <>
+                                                The leader of the business area.
+                                            </>
+                                        }
                                     />
+
                                 </FormControl>
 
                                 <FormControl>
-                                    <FormLabel>Finance Admin</FormLabel>
-                                    <Input
+                                    <UserSearchDropdown
                                         {...register("finance_admin", { required: true })}
-                                        defaultValue={finance_admin} // Prefill 
+
+                                        onlyInternal={false}
+                                        isRequired={true}
+                                        setUserFunction={setSelectedFinanceAdmin}
+                                        preselectedUserPk={finance_admin}
+                                        isEditable
+                                        label="Finance Admin"
+                                        placeholder="Search for a user"
+                                        helperText={
+                                            <>
+                                                The FA of the business area.
+                                            </>
+                                        }
                                     />
                                 </FormControl>
                                 <FormControl>
-                                    <FormLabel>Data Custodian</FormLabel>
-                                    <Input
+                                    <UserSearchDropdown
                                         {...register("data_custodian", { required: true })}
-                                        defaultValue={data_custodian} // Prefill 
+
+                                        onlyInternal={false}
+                                        isRequired={true}
+                                        setUserFunction={setSelectedDataCustodian}
+                                        preselectedUserPk={data_custodian}
+                                        isEditable
+                                        label="Data Custodian"
+                                        placeholder="Search for a user"
+                                        helperText={
+                                            <>
+                                                The DC of the business area.
+                                            </>
+                                        }
                                     />
                                 </FormControl>
                                 {updateMutation.isError ? (

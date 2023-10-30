@@ -207,17 +207,18 @@ export const BranchesCRUD = () => {
                                             autoFocus
                                             autoComplete="off"
                                             {...register("name", { required: true })}
+
                                         />
                                     </FormControl>
                                     <FormControl>
-                                        <FormLabel>Manager</FormLabel>
+                                        {/* <FormLabel>Manager</FormLabel> */}
                                         <UserSearchDropdown
                                             {...register("manager", { required: true })}
 
                                             onlyInternal={false}
                                             isRequired={true}
                                             setUserFunction={setSelectedUser}
-                                            label="User"
+                                            label="Manager"
                                             placeholder="Search for a user"
                                             helperText={
                                                 <>

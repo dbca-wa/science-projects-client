@@ -258,7 +258,7 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                                     />
                                 </FormControl>
                                 <FormControl>
-                                    <FormLabel>Manager</FormLabel>
+                                    {/* <FormLabel>Manager</FormLabel> */}
                                     <UserSearchDropdown
                                         {...register("manager", { required: true })}
 
@@ -267,7 +267,7 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                                         setUserFunction={setSelectedUser}
                                         preselectedUserPk={manager}
                                         isEditable
-                                        label="User"
+                                        label="Manager"
                                         placeholder="Search for a user"
                                         helperText={
                                             <>
