@@ -1400,8 +1400,48 @@ export const getSingleBusinessArea = async ({ queryKey }: QueryFunctionContext) 
 
 
 export const createBusinessArea = async (formData: IBusinessArea) => {
+
+    const newFormData = new FormData();
+
+    if (formData.old_id !== undefined) {
+        newFormData.append('old_id', formData.old_id.toString());
+    }
+    if (formData.name !== undefined) {
+        newFormData.append('name', formData.name);
+    }
+    if (formData.slug !== undefined) {
+        newFormData.append('slug', formData.slug);
+    }
+    if (formData.agency !== undefined) {
+        newFormData.append('agency', formData.agency.toString());
+    }
+    if (formData.focus !== undefined) {
+        newFormData.append('focus', formData.focus);
+    } if (formData.introduction !== undefined) {
+        newFormData.append('introduction', formData.introduction);
+    } if (formData.data_custodian !== undefined) {
+        newFormData.append('data_custodian', formData.data_custodian.toString());
+    }
+    if (formData.finance_admin !== undefined) {
+        newFormData.append('finance_admin', formData.finance_admin.toString());
+    }
+    if (formData.leader !== undefined) {
+        newFormData.append('leader', formData.leader.toString());
+    }
+
+    if (formData.image !== null) {
+        if (formData.image instanceof File) {
+            newFormData.append('image', formData.image);
+        } else if (typeof formData.image === 'string') {
+            newFormData.append('image', formData.image);
+        }
+
+    }
+
+    console.log(newFormData);
+
     return instance.post(
-        "agencies/business_areas", formData
+        "agencies/business_areas", newFormData
     ).then(res => {
         return res.data;
     }
