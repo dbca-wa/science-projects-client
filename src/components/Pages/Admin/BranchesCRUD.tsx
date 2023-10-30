@@ -149,7 +149,7 @@ export const BranchesCRUD = () => {
                             width="100%"
                             p={3}
                             borderWidth={1}
-                            borderBottomWidth={0}
+                            borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
                         >
                             <Flex justifyContent="flex-start">
                                 <Text as="b">Branch</Text>

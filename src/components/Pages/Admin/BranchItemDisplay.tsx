@@ -254,7 +254,7 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                                     <FormLabel>Name</FormLabel>
                                     <Input
                                         {...register("name", { required: true })}
-                                        value={name}
+                                        defaultValue={name}
                                     />
                                 </FormControl>
                                 <FormControl>
