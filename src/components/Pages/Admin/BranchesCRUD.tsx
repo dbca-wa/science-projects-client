@@ -204,6 +204,8 @@ export const BranchesCRUD = () => {
                                     <FormControl>
                                         <FormLabel>Name</FormLabel>
                                         <Input
+                                            autoFocus
+                                            autoComplete="off"
                                             {...register("name", { required: true })}
                                         />
                                     </FormControl>
