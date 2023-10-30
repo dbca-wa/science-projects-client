@@ -1,5 +1,5 @@
 import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
-import { IAddress } from "../../../types"
+import { IAddress, IBranch } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
@@ -18,6 +18,10 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
     const queryClient = useQueryClient();
     const { colorMode } = useColorMode();
     const [selectedBranch, setSelectedBranch] = useState<number>();
+
+
+    const branchObj = typeof branch === 'object' ? branch as IBranch : null;
+
 
     const updateMutation = useMutation(updateAddress,
         {
@@ -91,8 +95,9 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
                 <Flex justifyContent="flex-start">
                     <Text
                         fontWeight={"semibold"}
-                    >{branch ? branch.name : null}</Text>
-
+                    >
+                        {branchObj?.name ?? ""}
+                    </Text>
                 </Flex>
                 <Flex>
                     <Text>{street}</Text>
@@ -146,52 +151,8 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
                             </MenuItem>
                         </MenuList>
                     </Menu>
-                    {/* </Button> */}
                 </Flex>
-
-
             </Grid>
-            {/* <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
-                <ModalOverlay />
-                <ModalHeader>Delete Address</ModalHeader>
-                <ModalBody>
-                    <ModalContent bg="white" p={4}
-                        w={"100%"}
-                        h={"100%"}
-                    >
-                        <Center
-                            w={"100%"}
-                            h={"100%"}
-                        >
-                            <Grid
-                                gridGap={20}
-                            >
-                                <Box
-                                    alignContent={"center"}
-                                >
-                                    <Text fontSize={"xl"}
-                                        fontWeight={"bold"}
-                                    >
-                                        Are you sure you want to delete this address?
-                                    </Text>
-
-                                </Box>
-                                <Flex
-                                    // bg="red"
-                                    justifyContent={"space-evenly"}
-                                >
-                                    <Button onClick={deleteAddressClick}>Yes</Button>
-                                    <Button onClick={onDeleteModalClose}>No</Button>
-                                </Flex>
-
-
-
-                            </Grid>
-                        </Center>
-
-                    </ModalContent>
-                </ModalBody>
-            </Modal> */}
             <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                 <ModalOverlay />
                 <ModalContent bg="white">
@@ -208,7 +169,7 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
                                 color={"blue.500"}
                                 mt={4}
                             >
-                                "{branch?.name}"
+                                "{branchObj?.name}"
                             </Text>
 
                         </Box>
@@ -260,21 +221,6 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
                                     </>
                                 }
                             />
-
-                            {/* 
-                            <FormControl>
-                                <FormLabel>Branch</FormLabel>
-                                <InputGroup>
-                                    <InputLeftAddon children={<FaSign />} />
-                                    <Input
-                                        {...register("branch", { required: true })}
-                                        required
-                                        type="text"
-                                        defaultValue={branch ? branch.pk : undefined} // Prefill with the 'name' prop
-                                    />
-                                </InputGroup>
-                            </FormControl> */}
-
                             <FormControl>
 
                                 <FormLabel>Street</FormLabel>

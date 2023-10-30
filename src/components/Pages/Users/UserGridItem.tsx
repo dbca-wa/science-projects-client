@@ -37,7 +37,7 @@ export const UserGridItem = ({
     const isOver690 = useBreakpointValue({ false: true, sm: false, md: false, 'over690': true, 'mdlg': true, lg: true, xlg: true })
 
     // const baseAPI = useApiEndpoint();
-    const imageUrl = useServerImageUrl(image.file);
+    const imageUrl = useServerImageUrl(image?.file);
 
     const { colorMode } = useColorMode();
 

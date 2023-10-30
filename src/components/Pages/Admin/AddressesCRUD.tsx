@@ -2,15 +2,16 @@ import { Text, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, Fle
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { IAddress } from "../../../types";
+import { IAddress, IBranch } from "../../../types";
 import { createAddress, getAllAddresses } from "../../../lib/api";
 import _ from 'lodash';
 import { useQueryClient } from "@tanstack/react-query";
 import { AddressItemDisplay } from "./AddressItemDisplay";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
+import { AxiosError } from "axios";
 
 export const AddressesCRUD = () => {
-    const { register, handleSubmit, watch } = useForm<IAddress>();
+    const { register, handleSubmit, watch, reset } = useForm<IAddress>();
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
 
@@ -25,6 +26,7 @@ export const AddressesCRUD = () => {
                     position: "top-right"
                 })
                 console.log(data);
+                reset();
                 onAddClose();
                 queryClient.invalidateQueries(["addresses"]);
             },
@@ -73,11 +75,15 @@ export const AddressesCRUD = () => {
     };
 
 
+
     useEffect(() => {
         if (slices) {
             const filtered = slices.filter((s) => {
-                const nameMatch = s.branch.name.toLowerCase().includes(searchTerm.toLowerCase());
-                return nameMatch;
+                if (s.branch && typeof s.branch === 'object') {
+                    const branch = s.branch as IBranch;
+                    const nameMatch = branch.name.toLowerCase().includes(searchTerm.toLowerCase());
+                    return nameMatch;
+                }
             });
 
             setFilteredSlices(filtered);
@@ -127,7 +133,7 @@ export const AddressesCRUD = () => {
                                 value={searchTerm}
                                 onChange={handleSearchChange}
                                 w={"65%"}
-                                zIndex={1}
+                                zIndex={0}
                             />
 
 
@@ -197,11 +203,14 @@ export const AddressesCRUD = () => {
 
                                     <Grid gridTemplateColumns={"repeat(1,1fr)"}>
                                         {filteredSlices
-                                            .sort((a, b) => a.branch?.name.localeCompare(b.branch?.name))
+                                            .sort((a, b) => {
+                                                const nameA = typeof a.branch === 'object' ? (a.branch as IBranch)?.name : '';
+                                                const nameB = typeof b.branch === 'object' ? (b.branch as IBranch)?.name : '';
+                                                return nameA.localeCompare(nameB);
+                                            })
                                             .map((s) => (
                                                 <AddressItemDisplay
                                                     key={s.pk}
-                                                    pk={s.pk}
                                                     street={s.street}
                                                     country={s.country}
                                                     city={s.city}
@@ -214,6 +223,7 @@ export const AddressesCRUD = () => {
                                                 />
                                             ))}
                                     </Grid>
+
                                 </>
                         }
                     </Box>
@@ -297,12 +307,19 @@ export const AddressesCRUD = () => {
                                             {...register("agency", { required: true })}
                                         />
                                     </FormControl> */}
-                                    {mutation.isError
-                                        ? <Text color={"red.500"}>
-                                            Something went wrong
-                                        </Text>
-                                        : null
-                                    }
+                                    {mutation.isError && (
+                                        <Box mt={4}>
+                                            {Object.keys((mutation.error as AxiosError).response.data).map((key) => (
+                                                <Box key={key}>
+                                                    {((mutation.error as AxiosError).response.data[key] as string[]).map((errorMessage, index) => (
+                                                        <Text key={`${key}-${index}`} color="red.500">
+                                                            {`${key}: ${errorMessage}`}
+                                                        </Text>
+                                                    ))}
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    )}
                                 </VStack>
                             </DrawerBody>
                             <DrawerFooter>
