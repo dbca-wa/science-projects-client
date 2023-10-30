@@ -17,6 +17,7 @@ export const ContentWrapper = ({ children }: IPageWrapperProps) => {
             px={layout === "traditional" ? 0 : 9}
             flex={1}
             style={{
+                minHeight: "70vh",
                 height: "100%",
             }}
         >
