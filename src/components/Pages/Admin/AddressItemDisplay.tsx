@@ -75,7 +75,6 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
     );
 
     const deleteBtnClicked = () => {
-        // console.log("deleted")
         deleteMutation.mutate(pk);
     }
     const onUpdateSubmit = (formData: IAddress) => {
@@ -156,7 +155,7 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
             <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                 <ModalOverlay />
                 <ModalContent bg="white">
-                    <ModalHeader>Delete Branch</ModalHeader>
+                    <ModalHeader>Delete Address</ModalHeader>
                     <ModalBody>
                         <Box>
                             <Text fontSize="lg" fontWeight="semibold">

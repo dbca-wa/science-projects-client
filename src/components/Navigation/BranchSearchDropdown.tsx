@@ -16,6 +16,7 @@ interface IBranchSearchDropdown {
     helperText: any;
     preselectedBranchPk?: number;
     isEditable?: boolean;
+    autoFocus?: boolean;
 }
 
 export const BranchSearchDropdown = forwardRef(({
@@ -23,7 +24,8 @@ export const BranchSearchDropdown = forwardRef(({
     setBranchFunction,
     label,
     placeholder,
-    helperText
+    helperText,
+    autoFocus,
 }: IBranchSearchDropdown, ref) => {
     const inputRef = useRef(null);
 
@@ -72,6 +74,7 @@ export const BranchSearchDropdown = forwardRef(({
             ) : (
                 <InputGroup>
                     <Input
+                        autoFocus={autoFocus}
                         autoComplete="off"
                         ref={inputRef} // Attach the ref to the input element
                         type="text"
