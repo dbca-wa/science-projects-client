@@ -173,7 +173,7 @@ export const AddressesCRUD = () => {
                                         width="100%"
                                         p={3}
                                         borderWidth={1}
-                                        borderBottomWidth={0}
+                                        borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
                                     >
                                         <Flex justifyContent="flex-start">
                                             <Text as="b">Branch</Text>
@@ -211,6 +211,7 @@ export const AddressesCRUD = () => {
                                             .map((s) => (
                                                 <AddressItemDisplay
                                                     key={s.pk}
+                                                    pk={s.pk}
                                                     street={s.street}
                                                     country={s.country}
                                                     city={s.city}
@@ -243,7 +244,7 @@ export const AddressesCRUD = () => {
                                         /> */}
                                         <BranchSearchDropdown
                                             {...register("branch", { required: true })}
-
+                                            autoFocus
                                             isRequired={true}
                                             setBranchFunction={setSelectedBranch}
                                             isEditable

@@ -128,13 +128,12 @@ export const AddPersonalTaskModal = ({ user, isAnimating, setIsAnimating, isAddT
                     >
                         <FormLabel>Title</FormLabel>
                         <InputGroup>
-                            <InputLeftAddon children={<MdOutlineTitle />} />
+                            {/* <InputLeftAddon children={<MdOutlineTitle />} /> */}
                             <Input
+                                autoFocus
                                 placeholder="Enter the title of the task..."
                                 {...register("name", { required: true })}
                                 type="text"
-                                autoComplete="off"
-
                             />
                         </InputGroup>
                     </FormControl>
@@ -152,7 +151,9 @@ export const AddPersonalTaskModal = ({ user, isAnimating, setIsAnimating, isAddT
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button variant="ghost" mr={3} onClick={onAddTaskClose}>
+                    <Button
+                        // variant="ghost" 
+                        mr={3} onClick={onAddTaskClose}>
                         Cancel
                     </Button>
                     <Button
