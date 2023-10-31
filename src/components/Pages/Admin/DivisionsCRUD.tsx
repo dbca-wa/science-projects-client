@@ -8,10 +8,17 @@ import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IDivision } from "../../../types";
 import { DivisionItemDisplay } from "./DivisionItemDisplay";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 
 
 export const DivisionsCRUD = () => {
-    const { register, handleSubmit } = useForm<IDivision>();
+    const { register, handleSubmit, watch } = useForm<IDivision>();
+
+    const [selectedDirector, setSelectedDirector] = useState<number>();
+    const [selectedApprover, setSelectedApprover] = useState<number>();
+    const nameData = watch('name');
+    const slugData = watch('slug');
+
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
     const [searchLoading, setSearchLoading] = useState<boolean>(false);
@@ -43,7 +50,9 @@ export const DivisionsCRUD = () => {
 
             }
         });
+
     const onSubmit = (formData: IDivision) => {
+        console.log(formData)
         mutation.mutate(formData);
     }
     const { isLoading, data: slices } = useQuery<IDivision[]>(
@@ -177,7 +186,7 @@ export const DivisionsCRUD = () => {
                                 :
                                 <>
                                     <Grid
-                                        gridTemplateColumns="1fr 5fr 3fr 3fr 1fr"
+                                        gridTemplateColumns="2fr 2fr 3fr 3fr 1fr"
                                         mt={4}
                                         width="100%"
                                         p={3}
@@ -185,11 +194,13 @@ export const DivisionsCRUD = () => {
                                         borderBottomWidth={0}
                                     >
                                         <Flex justifyContent="flex-start">
-                                            <Text as="b">Slug</Text>
+                                            <Text as="b">Division</Text>
+
                                         </Flex>
                                         <Flex
                                         >
-                                            <Text as="b">Division</Text>
+                                            <Text as="b">Slug</Text>
+
                                         </Flex>
                                         <Flex
                                         >
@@ -241,34 +252,59 @@ export const DivisionsCRUD = () => {
                             <DrawerCloseButton />
                             <DrawerHeader>Add Division</DrawerHeader>
                             <DrawerBody>
-                                <VStack spacing={10} as="form" id="add-form" onSubmit={handleSubmit(onSubmit)} >
-                                    <FormControl>
-                                        <FormLabel>Slug</FormLabel>
-                                        <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
-                                            <Input
-                                                {...register("slug", { required: true })}
-                                                required
-                                                type="text"
-                                            />
-                                        </InputGroup>
-                                    </FormControl>
+                                <VStack spacing={6} as="form" id="add-form" onSubmit={handleSubmit(onSubmit)} >
                                     <FormControl>
                                         <FormLabel>Name</FormLabel>
                                         <Input
+                                            autoComplete="off"
+                                            autoFocus
                                             {...register("name", { required: true })}
                                         />
                                     </FormControl>
                                     <FormControl>
-                                        <FormLabel>Director</FormLabel>
-                                        <Input
+                                        <FormLabel>Slug</FormLabel>
+                                        <InputGroup>
+                                            {/* <InputLeftAddon children={<FaSign />} /> */}
+                                            <Input
+                                                {...register("slug", { required: true })}
+                                                required
+                                                type="text"
+                                                placeholder="eg. BCS"
+                                            />
+                                        </InputGroup>
+                                    </FormControl>
+
+                                    <FormControl>
+                                        <UserSearchDropdown
                                             {...register("director", { required: true })}
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedDirector}
+                                            label="Director"
+                                            placeholder="Search for a user..."
+                                            helperText={
+                                                <>
+                                                    The director of the Division
+                                                </>
+                                            }
                                         />
+
                                     </FormControl>
                                     <FormControl>
-                                        <FormLabel>Approver</FormLabel>
-                                        <Input
+                                        <UserSearchDropdown
                                             {...register("approver", { required: true })}
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedApprover}
+                                            label="Approver"
+                                            placeholder="Search for a user..."
+                                            helperText={
+                                                <>
+                                                    The approver of the Division
+                                                </>
+                                            }
                                         />
                                     </FormControl>
                                     {mutation.isError
@@ -281,10 +317,27 @@ export const DivisionsCRUD = () => {
                             </DrawerBody>
                             <DrawerFooter>
                                 <Button
-                                    form="add-form"
-                                    type="submit"
+                                    // form="add-form"
+                                    // type="submit"
                                     isLoading={mutation.isLoading}
-                                    colorScheme="blue" size="lg" width={"100%"}>Create</Button>
+                                    colorScheme="blue" size="lg" width={"100%"}
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onSubmit(
+                                            {
+                                                "old_id": 1,
+                                                "name": nameData,
+                                                "slug": slugData,
+                                                "approver": selectedApprover,
+                                                "director": selectedDirector,
+                                            }
+                                        )
+
+                                    }}
+
+                                >
+                                    Create
+                                </Button>
                             </DrawerFooter>
                         </DrawerContent>
                     </Drawer>

@@ -87,7 +87,7 @@ export const UserSearchDropdown = forwardRef(({
 
 
     return (
-        <FormControl isRequired={isRequired} mb={4}
+        <FormControl isRequired={isRequired} mb={0}
             // bg={"red"}
             w={"100%"}
             h={"100%"}

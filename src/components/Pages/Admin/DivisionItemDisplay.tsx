@@ -1,4 +1,4 @@
-import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
 import { IDivision } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -7,10 +7,12 @@ import { FaSign } from "react-icons/fa";
 import { deleteDivision, updateDivision } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { useState } from "react";
 
 export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id }: IDivision) => {
 
-    const { register, handleSubmit } = useForm<IDivision>();
+    const { register, handleSubmit, watch } = useForm<IDivision>();
 
     const toast = useToast();
     const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
@@ -20,7 +22,10 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
     const { userLoading: directorLoading, userData: directorData } = useFullUserByPk(director);
     const { userLoading: approverLoading, userData: approverData } = useFullUserByPk(approver);
 
-
+    const [selectedDirector, setSelectedDirector] = useState<number>(director);
+    const [selectedApprover, setSelectedApprover] = useState<number>(approver);
+    const slugData = watch('slug');
+    const nameData = watch('name');
     const updateMutation = useMutation(updateDivision,
         {
             onSuccess: () => {
@@ -72,12 +77,13 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
         }
     );
 
-    const deleteLocationClick = () => {
+    const deleteBtnClicked = () => {
         // console.log("deleted")
         deleteMutation.mutate(pk);
     }
 
     const onUpdateSubmit = (formData: IDivision) => {
+        console.log(formData)
         updateMutation.mutate(formData);
     }
 
@@ -137,18 +143,33 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
 
 
                 <Grid
-                    gridTemplateColumns="1fr 5fr 3fr 3fr 1fr"
+                    gridTemplateColumns="2fr 2fr 3fr 3fr 1fr"
                     width="100%"
                     p={3}
                     borderWidth={1}
                 // bg={"red"}
                 >
-                    <Flex justifyContent="flex-start">
-                        <Text>{slug}</Text>
+                    <Flex justifyContent="flex-start"
+                        alignItems={"center"}
+                    >
+                        <Text
+                            fontWeight={"semibold"}
+                        >
+                            <Button
+                                variant={"link"}
+                                colorScheme="blue"
+                                onClick={onUpdateModalOpen}
+                            >
+                                {name ?? ""}
+                            </Button>
+                        </Text>
 
                     </Flex>
-                    <Flex>
-                        <Text>{name}</Text>
+                    <Flex
+                        alignItems={"center"}
+                    >
+                        <Text fontWeight={"semibold"}>{slug}</Text>
+
 
                     </Flex>
                     <Flex>
@@ -214,44 +235,37 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
                 </Grid>
                 <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                     <ModalOverlay />
-                    <ModalHeader>Delete Division</ModalHeader>
-                    <ModalBody>
-                        <ModalContent bg="white" p={4}
-                            w={"100%"}
-                            h={"100%"}
-                        >
-                            <Center
-                                w={"100%"}
-                                h={"100%"}
-                            >
-                                <Grid
-                                    gridGap={20}
+                    <ModalContent bg="white">
+                        <ModalHeader>Delete Division</ModalHeader>
+                        <ModalBody>
+                            <Box>
+                                <Text fontSize="lg" fontWeight="semibold">
+                                    Are you sure you want to delete this division?
+                                </Text>
+
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color={"blue.500"}
+                                    mt={4}
                                 >
-                                    <Box
-                                        alignContent={"center"}
-                                    >
-                                        <Text fontSize={"xl"}
-                                            fontWeight={"bold"}
-                                        >
-                                            Are you sure you want to delete this division?
-                                        </Text>
+                                    "{name}"
+                                </Text>
 
-                                    </Box>
-                                    <Flex
-                                        // bg="red"
-                                        justifyContent={"space-evenly"}
-                                    >
-                                        <Button onClick={deleteLocationClick}>Yes</Button>
-                                        <Button onClick={onDeleteModalClose}>No</Button>
-                                    </Flex>
+                            </Box>
+                        </ModalBody>
+                        <ModalFooter justifyContent="flex-end">
+                            <Flex>
+                                <Button onClick={onDeleteModalClose} colorScheme="red">
+                                    No
+                                </Button>
+                                <Button onClick={deleteBtnClicked} colorScheme="green" ml={3}>
+                                    Yes
+                                </Button>
+                            </Flex>
 
-
-
-                                </Grid>
-                            </Center>
-
-                        </ModalContent>
-                    </ModalBody>
+                        </ModalFooter>
+                    </ModalContent>
                 </Modal>
                 <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
                     <ModalOverlay />
@@ -274,19 +288,18 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
                                     defaultValue={old_id} // Prefill with the 'pk' prop
                                 />
                             </FormControl>
-                            <FormControl>
-                                {/* Hidden input to capture the slug */}
+                            {/* <FormControl>
                                 <input
                                     type="hidden"
                                     {...register("slug")}
                                     defaultValue={slug} // Prefill with the 'pk' prop
                                 />
-                            </FormControl>
-                            <VStack spacing={10} as="form" id="update-form" onSubmit={handleSubmit(onUpdateSubmit)}>
+                            </FormControl> */}
+                            <VStack spacing={6} as="form" id="update-form" onSubmit={handleSubmit(onUpdateSubmit)}>
                                 <FormControl>
                                     <FormLabel>Name</FormLabel>
                                     <InputGroup>
-                                        <InputLeftAddon children={<FaSign />} />
+                                        {/* <InputLeftAddon children={<FaSign />} /> */}
                                         <Input
                                             {...register("name", { required: true })}
                                             required
@@ -296,18 +309,52 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
                                     </InputGroup>
                                 </FormControl>
                                 <FormControl>
-                                    <FormLabel>Director</FormLabel>
+                                    <FormLabel>Slug</FormLabel>
+
+                                    {/* Hidden input to capture the slug */}
                                     <Input
-                                        {...register("director", { required: true })}
-                                        defaultValue={director} // Prefill 
+                                        type="text"
+
+                                        {...register("slug")}
+                                        defaultValue={slug} // Prefill with the 'pk' prop
                                     />
                                 </FormControl>
-
                                 <FormControl>
-                                    <FormLabel>Approver</FormLabel>
-                                    <Input
+                                    <UserSearchDropdown
+                                        {...register("director", { required: true })}
+
+                                        onlyInternal={false}
+                                        isRequired={true}
+                                        setUserFunction={setSelectedDirector}
+                                        label="Director"
+                                        placeholder="Search for a user..."
+                                        preselectedUserPk={director}
+                                        isEditable
+                                        helperText={
+                                            <>
+                                                The director of the Division
+                                            </>
+                                        }
+                                    />
+
+                                </FormControl>
+                                <FormControl>
+                                    <UserSearchDropdown
                                         {...register("approver", { required: true })}
-                                        defaultValue={approver} // Prefill 
+
+                                        onlyInternal={false}
+                                        isRequired={true}
+                                        setUserFunction={setSelectedApprover}
+                                        label="Approver"
+                                        placeholder="Search for a user..."
+                                        preselectedUserPk={approver}
+
+                                        isEditable
+                                        helperText={
+                                            <>
+                                                The approver of the Division
+                                            </>
+                                        }
                                     />
                                 </FormControl>
                                 {updateMutation.isError ? (
@@ -324,13 +371,30 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
                                 <Button onClick={onUpdateModalClose}
                                     size="lg"
 
-                                >Cancel</Button>
+                                >
+                                    Cancel
+                                </Button>
                                 <Button
-                                    form="update-form"
-                                    type="submit"
+                                    // form="update-form"
+                                    // type="submit"
                                     isLoading={updateMutation.isLoading}
                                     colorScheme="blue"
                                     size="lg"
+
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onUpdateSubmit(
+                                            {
+                                                "pk": pk,
+                                                "name": nameData,
+                                                "slug": slugData,
+                                                "director": selectedDirector,
+                                                "approver": selectedApprover,
+                                            }
+                                        )
+
+                                    }}
+
                                 >
                                     Update
                                 </Button>
