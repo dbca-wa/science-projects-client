@@ -5,6 +5,7 @@ import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
 import { FaSign } from "react-icons/fa";
 import { deleteLocation, updateLocation } from "../../../lib/api";
+import { AxiosError } from "axios";
 
 export const LocationItemDisplay = ({ pk, name, area_type }: ISimpleLocationData) => {
 
@@ -231,7 +232,17 @@ export const LocationItemDisplay = ({ pk, name, area_type }: ISimpleLocationData
                                 </Select>
                             </FormControl>
                             {updateMutation.isError ? (
-                                <Text color={"red.500"}>Something went wrong</Text>
+                                <Box mt={4}>
+                                    {Object.keys((updateMutation.error as AxiosError).response.data).map((key) => (
+                                        <Box key={key}>
+                                            {((updateMutation.error as AxiosError).response.data[key] as string[]).map((errorMessage, index) => (
+                                                <Text key={`${key}-${index}`} color="red.500">
+                                                    {`${key}: ${errorMessage}`}
+                                                </Text>
+                                            ))}
+                                        </Box>
+                                    ))}
+                                </Box>
                             ) : null}
                         </VStack>
                         <Grid

@@ -8,6 +8,7 @@ import { createLocation, getAllLocations } from "../../../lib/api";
 import _ from 'lodash';
 import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 
 export const LocationsCRUD = () => {
     const { register, handleSubmit } = useForm<IAddLocationForm>();
@@ -386,9 +387,19 @@ export const LocationsCRUD = () => {
 
                                     </FormControl>
                                     {mutation.isError
-                                        ? <Text color={"red.500"}>
-                                            Something went wrong
-                                        </Text>
+                                        ?
+                                        <Box mt={4}>
+                                            {Object.keys((mutation.error as AxiosError).response.data).map((key) => (
+                                                <Box key={key}>
+                                                    {((mutation.error as AxiosError).response.data[key] as string[]).map((errorMessage, index) => (
+                                                        <Text key={`${key}-${index}`} color="red.500">
+                                                            {`${key}: ${errorMessage}`}
+                                                        </Text>
+                                                    ))}
+                                                </Box>
+                                            ))}
+                                        </Box>
+
                                         : null
                                     }
                                 </VStack>
