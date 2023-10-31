@@ -8,10 +8,16 @@ import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IDepartmentalService } from "../../../types";
 import { ServiceItemDisplay } from "./ServiceItemDisplay";
+import { AxiosError } from "axios";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 
 
 export const ServicesCRUD = () => {
-    const { register, handleSubmit } = useForm<IDepartmentalService>();
+    const { register, handleSubmit, watch } = useForm<IDepartmentalService>();
+    const [selectedDirector, setSelectedDirector] = useState<number>();
+    const nameData = watch('name')
+
+
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
 
@@ -125,12 +131,12 @@ export const ServicesCRUD = () => {
                             </Flex>
                         </Flex>
                         <Grid
-                            gridTemplateColumns="6fr 3fr 1fr"
+                            gridTemplateColumns="4fr 5fr 1fr"
                             mt={4}
                             width="100%"
                             p={3}
                             borderWidth={1}
-                            borderBottomWidth={0}
+                            borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
                         >
                             <Flex justifyContent="flex-start">
                                 <Text as="b">Service</Text>
@@ -172,8 +178,10 @@ export const ServicesCRUD = () => {
                                     <FormControl>
                                         <FormLabel>Name</FormLabel>
                                         <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
+                                            {/* <InputLeftAddon children={<FaSign />} /> */}
                                             <Input
+                                                autoComplete="off"
+                                                autoFocus
                                                 {...register("name", { required: true })}
                                                 required
                                                 type="text"
@@ -182,25 +190,60 @@ export const ServicesCRUD = () => {
                                     </FormControl>
 
                                     <FormControl>
-                                        <FormLabel>Director</FormLabel>
-                                        <Input
+                                        <UserSearchDropdown
                                             {...register("director", { required: true })}
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedDirector}
+                                            label="Director"
+                                            placeholder="Search for a user..."
+                                            isEditable
+                                            helperText={
+                                                <>
+                                                    The director of the Service
+                                                </>
+                                            }
                                         />
                                     </FormControl>
                                     {mutation.isError
-                                        ? <Text color={"red.500"}>
-                                            Something went wrong
-                                        </Text>
+                                        ? <Box mt={4}>
+                                            {Object.keys((mutation.error as AxiosError).response.data).map((key) => (
+                                                <Box key={key}>
+                                                    {((mutation.error as AxiosError).response.data[key] as string[]).map((errorMessage, index) => (
+                                                        <Text key={`${key}-${index}`} color="red.500">
+                                                            {`${key}: ${errorMessage}`}
+                                                        </Text>
+                                                    ))}
+                                                </Box>
+                                            ))}
+                                        </Box>
+
                                         : null
                                     }
                                 </VStack>
                             </DrawerBody>
                             <DrawerFooter>
                                 <Button
-                                    form="add-form"
-                                    type="submit"
+                                    // form="add-form"
+                                    // type="submit"
                                     isLoading={mutation.isLoading}
-                                    colorScheme="blue" size="lg" width={"100%"}>Create</Button>
+                                    colorScheme="blue" size="lg" width={"100%"}
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onSubmit(
+                                            {
+                                                "old_id": 1,
+                                                "name": nameData,
+                                                "director": selectedDirector,
+                                            }
+                                        )
+
+                                    }}
+
+                                >
+                                    Create
+                                </Button>
                             </DrawerFooter>
                         </DrawerContent>
                     </Drawer>

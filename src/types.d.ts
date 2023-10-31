@@ -458,7 +458,8 @@ interface IResearchFunction {
 interface IDepartmentalService {
     name: string;
     director: number;
-    pk: number;
+    pk?: number;
+    old_id?: number;
 }
 
 // AGENCY ============================================================================
