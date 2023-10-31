@@ -101,7 +101,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                         fontWeight={"thin"}
 
                     >
-                        Please update and submit (when ready) all documents awaiting your attention in "My Tasks", update project details and team lists of "My Projects" and "My Partnerships", create new projects and initiate closure of old projects as appropriate. If you get stuck, the User Manual has all the anwers!
+                        Please note that this web application is under reconstruction and not all features may work. Please update and submit (when ready) all documents awaiting your attention in the "My Tasks" section below. From the same section, you may manually add a simple todo to ensure you are on top of things. You can view and update project details of projects you belong to in the "My Projects" section below.
                     </Text>
                 </Box>
                 <Grid

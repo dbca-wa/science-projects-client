@@ -164,7 +164,7 @@ export const Sidebar = () => {
                         updatePageContext('/');
                     }}
                 >
-                    Cycle
+                    SPMS
                 </Button>
             </Flex>
 
