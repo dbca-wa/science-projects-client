@@ -246,7 +246,10 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                     borderWidth={1}
                 // bg={"red"}
                 >
-                    <Flex justifyContent="flex-start">
+                    <Flex justifyContent="flex-start"
+                        alignItems={"center"}
+
+                    >
                         <Box rounded="lg" overflow="hidden" w="80px" h="69px">
                             <Image
                                 src={
@@ -263,11 +266,22 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                             />
                         </Box>
                     </Flex>
-                    <Flex>
-                        <Text>{name}</Text>
+                    <Flex
+                        alignItems={"center"}
+                    >
+                        <Button
+                            variant={"link"}
+                            colorScheme="blue"
+                            onClick={onUpdateModalOpen}
+                        >
+                            {name ?? ""}
+                        </Button>
 
                     </Flex>
-                    <Flex>
+                    <Flex
+                        alignItems={"center"}
+
+                    >
                         <Button
                             variant={"link"}
                             colorScheme="blue"
@@ -276,23 +290,10 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                             {leaderData.first_name} {leaderData.last_name}
                         </Button>
                     </Flex>
-                    <Flex>
-                        {
-                            !dataCustodianLoading && (
-                                dataCustodianData ?
-                                    <Button
-                                        variant={"link"}
-                                        colorScheme="blue"
-                                        onClick={dataCustodianDrawerFunction}
-                                    >
-                                        {`${dataCustodianData.first_name} ${dataCustodianData.last_name}`}
-                                    </Button> :
-                                    <Text>Unset</Text>
+                    <Flex
+                        alignItems={"center"}
 
-                            )
-                        }
-                    </Flex>
-                    <Flex>
+                    >
                         {
                             !financeAdminLoading && (
                                 financeAdminData ?
@@ -302,6 +303,25 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                                         onClick={financeAdminDrawerFunction}
                                     >
                                         {`${financeAdminData.first_name} ${financeAdminData.last_name}`}
+                                    </Button> :
+                                    <Text>Unset</Text>
+
+                            )
+                        }
+
+                    </Flex>
+                    <Flex
+                        alignItems={"center"}
+                    >
+                        {
+                            !dataCustodianLoading && (
+                                dataCustodianData ?
+                                    <Button
+                                        variant={"link"}
+                                        colorScheme="blue"
+                                        onClick={dataCustodianDrawerFunction}
+                                    >
+                                        {`${dataCustodianData.first_name} ${dataCustodianData.last_name}`}
                                     </Button> :
                                     <Text>Unset</Text>
 
@@ -478,9 +498,9 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                                                         src={selectedFile !== null ? selectedImageUrl : image ?
                                                             image instanceof File ?
 
-                                                                `${apiEndpoint}/files/${image.name}` // Use the image directly for File
+                                                                `${apiEndpoint}${image.name}` // Use the image directly for File
                                                                 : image?.file
-                                                                    ? `${apiEndpoint}/files/${image.file}`
+                                                                    ? `${apiEndpoint}${image.file}`
                                                                     : NoImageFile
                                                             : NoImageFile
                                                         }

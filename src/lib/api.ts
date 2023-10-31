@@ -1489,9 +1489,12 @@ export const updateBusinessArea = async (formData: IBusinessArea) => {
     }
 
     if (formData.image !== null) {
+        console.log(formData.image)
         if (formData.image instanceof File) {
+            console.log('is file')
             newFormData.append('image', formData.image);
         } else if (typeof formData.image === 'string') {
+            console.log('is string')
             newFormData.append('image', formData.image);
         }
 
@@ -1499,10 +1502,8 @@ export const updateBusinessArea = async (formData: IBusinessArea) => {
 
     console.log(newFormData);
 
-
-
     return instance.put(
-        `agencies/business_areas/${formData.pk}`, formData
+        `agencies/business_areas/${formData.pk}`, newFormData
     ).then(res => {
         return res.data;
     }
