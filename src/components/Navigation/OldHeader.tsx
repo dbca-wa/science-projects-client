@@ -231,17 +231,7 @@ const AdminMenuContents = () => {
                         Manage Addresses
                     </Text>
                 </MenuItem>
-                <MenuItem
-                    onClick={() => {
-                        navigate('/crud/reports')
-                    }}
-                >
-                    {<MdManageHistory />}
-                    <Text ml={2}
-                    >
-                        Manage Reports
-                    </Text>
-                </MenuItem>
+
                 <MenuItem
                     onClick={() => {
                         navigate('/crud/branches')
@@ -284,6 +274,17 @@ const AdminMenuContents = () => {
                     <Text ml={2}
                     >
                         Manage Locations
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        navigate('/crud/reports')
+                    }}
+                >
+                    {<MdManageHistory />}
+                    <Text ml={2}
+                    >
+                        Manage Reports
                     </Text>
                 </MenuItem>
                 <MenuItem

@@ -130,11 +130,14 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                 // bg={"red"}
                 >
                     <Flex justifyContent="flex-start" alignItems={"center"}>
-                        <Text
-                            fontWeight={"bold"}
+                        <Button
+                            variant={"link"}
+                            colorScheme="blue"
+                            onClick={onUpdateModalOpen}
                         >
-                            {name}
-                        </Text>
+                            {name ?? ""}
+                        </Button>
+
                     </Flex>
 
                     <Flex>

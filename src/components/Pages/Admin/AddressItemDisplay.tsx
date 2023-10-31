@@ -98,23 +98,37 @@ export const AddressItemDisplay = ({ pk, street, city, zipcode, state, country, 
                 borderWidth={1}
             // bg={"red"}
             >
-                <Flex justifyContent="flex-start">
-                    <Text
-                        fontWeight={"semibold"}
+                <Flex justifyContent="flex-start"
+                    alignItems={"center"}
+
+                >
+                    <Button
+                        variant={"link"}
+                        colorScheme="blue"
+                        onClick={onUpdateModalOpen}
                     >
                         {branchObj?.name ?? ""}
-                    </Text>
+                    </Button>
+
                 </Flex>
-                <Flex>
+                <Flex
+                    alignItems={"center"}
+                >
                     <Text>{street}</Text>
                 </Flex>
-                <Flex>
+                <Flex
+                    alignItems={"center"}
+                >
                     <Text>{city}</Text>
                 </Flex>
-                <Flex>
+                <Flex
+                    alignItems={"center"}
+                >
                     <Text>{country}</Text>
                 </Flex>
-                <Flex>
+                <Flex
+                    alignItems={"center"}
+                >
                     <Text>{pobox ? pobox : "-"}</Text>
                 </Flex>
 
