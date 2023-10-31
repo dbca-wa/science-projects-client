@@ -244,6 +244,7 @@ export const LocationsCRUD = () => {
                                 justifyContent={"space-between"}
                                 px={4}
                                 w={"100%"}
+                            // bg={"red"}
                             >
                                 {Object.keys(areaTypeMap).map((key) => (
                                     <Checkbox
@@ -258,8 +259,8 @@ export const LocationsCRUD = () => {
                             </Flex>
 
                             <Flex justifyContent={"flex-end"}
-                                w={"100%"}
-
+                                // w={"100%"}
+                                pl={10}
                             >
                                 <Button onClick={onAddOpen}
 
@@ -294,16 +295,18 @@ export const LocationsCRUD = () => {
                                         width="100%"
                                         p={3}
                                         borderWidth={1}
-                                        borderBottomWidth={0}
+                                        borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
                                     >
                                         <Flex>
-                                            <Text as={"b"}>Location Type</Text>
+                                            <Text as={"b"}>Location Name</Text>
+
                                         </Flex>
                                         <Flex
                                             justifyContent={"space-between"}
 
                                         >
-                                            <Text as={"b"}>Location Name</Text>
+                                            <Text as={"b"}>Location Type</Text>
+
                                             <Text as={"b"}>Change</Text>
                                         </Flex>
                                     </Grid>
@@ -364,8 +367,11 @@ export const LocationsCRUD = () => {
                                     <FormControl>
                                         <FormLabel>Name</FormLabel>
                                         <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
-                                            <Input {...register("name", { required: true })} required type="text" />
+                                            {/* <InputLeftAddon children={<FaSign />} /> */}
+                                            <Input
+                                                autoFocus
+                                                autoComplete="off"
+                                                {...register("name", { required: true })} required type="text" />
                                         </InputGroup>
                                     </FormControl>
                                     <FormControl>
@@ -392,7 +398,21 @@ export const LocationsCRUD = () => {
                                     form="add-form"
                                     type="submit"
                                     isLoading={mutation.isLoading}
-                                    colorScheme="blue" size="lg" width={"100%"}>Create</Button>
+                                    colorScheme="blue" size="lg" width={"100%"}
+                                // onClick={() => {
+                                //     console.log("clicked")
+                                //     onSubmit(
+                                //         {
+                                //             "old_id": 1,
+                                //             "name": nameData,
+                                //             "area_type": slugData,
+                                //         }
+                                //     )
+
+                                // }}
+                                >
+                                    Create
+                                </Button>
                             </DrawerFooter>
                         </DrawerContent>
                     </Drawer>

@@ -383,8 +383,8 @@ interface ISimpleLocationData {
 }
 
 interface IAddLocationForm {
-    old_id: number;
-    pk: string;
+    old_id?: number;
+    pk?: string;
     name: string;
     area_type: string;
 }
