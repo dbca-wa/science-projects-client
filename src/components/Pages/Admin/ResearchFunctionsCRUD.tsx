@@ -278,6 +278,8 @@ export const ResearchFunctionsCRUD = () => {
                                         <FormLabel>Active?</FormLabel>
                                         <Checkbox
                                             {...register("is_active", { required: true })}
+                                            defaultValue={1}
+                                            defaultChecked
                                         />
                                     </FormControl>
                                     {mutation.isError

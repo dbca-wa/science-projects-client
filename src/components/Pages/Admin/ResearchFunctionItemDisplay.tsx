@@ -19,10 +19,7 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
     const descriptionData = watch('description');
     const associationData = watch('association');
     const [isChecked, setIsChecked] = useState(is_active);
-    const handleCheckboxChange = () => {
-        // Toggle the local state variable when the checkbox is clicked
-        setIsChecked(!isChecked);
-    };
+
 
     const activeData = watch('is_active');
     const [selectedLeader, setSelectedLeader] = useState<number>();
@@ -149,7 +146,7 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
                             <Center
                                 ml={3.5}
                             >
-                                {is_active === true ?
+                                {isChecked === true ?
                                     <FcOk /> : <FcCancel />
                                 }
                             </Center>
@@ -305,8 +302,7 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
                                         <Checkbox
                                             {...register("is_active", { required: true })}
                                             isChecked={isChecked} // Prefill 
-                                            onChange={handleCheckboxChange} // Handle checkbox changes
-
+                                            onChange={() => setIsChecked(!isChecked)}
                                         />
                                     </FormControl>
 
