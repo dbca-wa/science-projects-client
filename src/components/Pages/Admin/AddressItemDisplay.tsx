@@ -8,9 +8,9 @@ import { deleteAddress, updateAddress } from "../../../lib/api";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
 import { useState } from "react";
 
-export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, pobox }: IAddress) => {
+export const AddressItemDisplay = ({ pk, street, city, zipcode, state, country, agency, branch, pobox }: IAddress) => {
 
-    const { register, handleSubmit } = useForm<IAddress>();
+    const { register, handleSubmit, watch } = useForm<IAddress>();
 
     const toast = useToast();
     const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
@@ -21,7 +21,13 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
 
 
     const branchObj = typeof branch === 'object' ? branch as IBranch : null;
-
+    const streetData = watch('street')
+    // const suburbData = watch('suburb')
+    const cityData = watch('city')
+    const zipcodeData = watch('zipcode')
+    const stateData = watch('state')
+    const countryData = watch('country')
+    const poboxData = watch('pobox')
 
     const updateMutation = useMutation(updateAddress,
         {
@@ -78,6 +84,7 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
         deleteMutation.mutate(pk);
     }
     const onUpdateSubmit = (formData: IAddress) => {
+        console.log(formData)
         updateMutation.mutate(formData);
     }
 
@@ -205,13 +212,14 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
                                 defaultValue={1} // Prefill with the 'name' prop
                             />
                         </FormControl>
-                        <VStack spacing={10} as="form" id="update-form" onSubmit={handleSubmit(onUpdateSubmit)}>
+                        <VStack spacing={6} as="form" id="update-form" onSubmit={handleSubmit(onUpdateSubmit)}>
 
                             <BranchSearchDropdown
-                                // onlyInternal={false}
                                 {...register("branch", { required: true })}
                                 isRequired={true}
                                 setBranchFunction={setSelectedBranch}
+                                preselectedBranchPk={branchObj.pk}
+                                // isEditable
                                 label="Branch"
                                 placeholder="Search for a Branch"
                                 helperText={
@@ -229,13 +237,33 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
                                 />
                             </FormControl>
 
+
+
+                            <FormControl>
+                                <FormLabel>Zip Code</FormLabel>
+                                <Input
+                                    {...register("zipcode", { required: true })}
+                                    defaultValue={zipcode}
+                                    type="number"
+                                />
+                            </FormControl>
                             <FormControl>
                                 <FormLabel>City</FormLabel>
                                 <Input
                                     {...register("city", { required: true })}
                                     defaultValue={city}
+
                                 />
                             </FormControl>
+                            <FormControl>
+                                <FormLabel>State</FormLabel>
+                                <Input
+                                    {...register("state", { required: true })}
+                                    defaultValue={state}
+                                />
+                            </FormControl>
+
+
 
                             <FormControl>
                                 <FormLabel>Country</FormLabel>
@@ -268,8 +296,28 @@ export const AddressItemDisplay = ({ pk, street, city, country, agency, branch, 
 
                             >Cancel</Button>
                             <Button
-                                form="update-form"
-                                type="submit"
+                                // form="update-form"
+                                // type="submit"
+                                onClick={() => {
+                                    console.log("clicked")
+                                    onUpdateSubmit(
+                                        {
+                                            // "old_id": 1, //default
+                                            "pk": pk,
+                                            // "agency": 1, // dbca
+                                            // "branch": branchObj.pk,
+                                            "street": streetData,
+                                            // "suburb": suburbData,
+                                            "city": cityData,
+                                            "zipcode": zipcodeData,
+                                            "state": stateData,
+                                            "country": countryData,
+                                            "pobox": poboxData,
+                                        }
+                                    )
+
+                                }}
+
                                 isLoading={updateMutation.isLoading}
                                 colorScheme="blue"
                                 size="lg"

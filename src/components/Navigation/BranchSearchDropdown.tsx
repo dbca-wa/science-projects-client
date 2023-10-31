@@ -7,6 +7,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "re
 import { IBranch } from "../../types";
 import { getBranchesBasedOnSearchTerm } from "../../lib/api";
 import { CloseIcon } from "@chakra-ui/icons";
+import { useBranch } from "../../lib/hooks/useBranch";
 
 interface IBranchSearchDropdown {
     isRequired: boolean;
@@ -25,10 +26,11 @@ export const BranchSearchDropdown = forwardRef(({
     label,
     placeholder,
     helperText,
+    preselectedBranchPk,
+    isEditable,
     autoFocus,
 }: IBranchSearchDropdown, ref) => {
     const inputRef = useRef(null);
-
     const [searchTerm, setSearchTerm] = useState(''); // Local state for search term
     const [filteredItems, setFilteredItems] = useState<IBranch[]>([]); // Local state for filtered items
     const [isMenuOpen, setIsMenuOpen] = useState(true); // Stores the menu open state
@@ -50,6 +52,18 @@ export const BranchSearchDropdown = forwardRef(({
         }
     }, [searchTerm]);
 
+    const { branchLoading, branchData } = useBranch(preselectedBranchPk !== undefined ? preselectedBranchPk : 0);
+
+    useEffect(() => {
+        if (!branchLoading && branchData) {
+            setBranchFunction(branchData.pk);
+            setIsMenuOpen(false);
+            setSelectedBranch(branchData); // Update the selected branch
+            setSearchTerm(''); // Clear the search term when a branch is selected    
+        }
+    }, [branchLoading, branchData])
+
+
     const handleSelectBranch = (branch: IBranch) => {
         setBranchFunction(branch.pk);
         setIsMenuOpen(false);
@@ -58,10 +72,19 @@ export const BranchSearchDropdown = forwardRef(({
     };
 
     const handleClearBranch = () => {
+        if (preselectedBranchPk !== null && preselectedBranchPk !== undefined && isEditable !== true) {
+            return
+        }
         setBranchFunction(0); // Clear the selected branch by setting the branchpk to 0 (or any value that represents no user)
         setSelectedBranch(null); // Clear the selected branch state
         setIsMenuOpen(true); // Show the menu again when the branch is cleared
     };
+
+    useImperativeHandle(ref, () => ({
+        focusInput: () => {
+            inputRef.current && inputRef.current.focus();
+        }
+    }))
 
 
     return (
@@ -69,18 +92,20 @@ export const BranchSearchDropdown = forwardRef(({
             <FormLabel>{label}</FormLabel>
             {selectedBranch ? (
                 <Box mb={2} color="blue.500">
-                    <SelectedBranchInput branch={selectedBranch} onClear={handleClearBranch} />
+                    <SelectedBranchInput branch={selectedBranch} onClear={handleClearBranch} isEditable={isEditable} />
                 </Box>
             ) : (
                 <InputGroup>
                     <Input
-                        autoFocus={autoFocus}
-                        autoComplete="off"
                         ref={inputRef} // Attach the ref to the input element
                         type="text"
                         value={searchTerm}
+
                         onChange={(event) => setSearchTerm(event.target.value)}
                         placeholder={placeholder}
+                        autoComplete="off"
+                        // autoFocus={autoFocus}
+
                         onFocus={() => setIsMenuOpen(true)}
                     />
                 </InputGroup>
@@ -202,9 +227,10 @@ const CustomMenuList = ({ minWidth, children, ...rest }: CustomMenuListProps) =>
 interface SelectedBranchInputProps {
     branch: IBranch;
     onClear: () => void;
+    isEditable: boolean;
 }
 
-const SelectedBranchInput = ({ branch, onClear }: SelectedBranchInputProps) => {
+const SelectedBranchInput = ({ branch, onClear, isEditable }: SelectedBranchInputProps) => {
     return (
         <Flex
             align="center"
@@ -224,7 +250,7 @@ const SelectedBranchInput = ({ branch, onClear }: SelectedBranchInputProps) => {
             >
                 {`${branch.name}`}
             </Text>
-            <IconButton
+            {isEditable ? (<IconButton
                 aria-label="Clear selected branch"
                 icon={<CloseIcon />}
                 size="xs"
@@ -233,7 +259,8 @@ const SelectedBranchInput = ({ branch, onClear }: SelectedBranchInputProps) => {
                 right={2}
                 transform="translateY(-50%)"
                 onClick={onClear}
-            />
+            />) : null}
+
         </Flex>
     );
 };

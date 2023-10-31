@@ -486,7 +486,7 @@ interface IBranch {
 interface IAddress {
     pk?: number;
     agency?: number;
-    branch: number;
+    branch?: number;
     street: string;
     suburb?: string;
     city: string;

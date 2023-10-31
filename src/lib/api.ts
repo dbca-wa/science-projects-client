@@ -1309,6 +1309,14 @@ export const deleteReport = async (pk: number) => {
 // BRANCHES ==========================================================================
 
 
+export const getBranchByPk = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+    const res = instance.get(`agencies/branches/${pk}`)
+        .then(res => res.data);
+    return res;
+}
+
+
 export const getAllBranches = async () => {
     const res = instance.get(`agencies/branches`
     ).then(res => {
