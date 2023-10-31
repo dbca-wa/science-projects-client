@@ -73,7 +73,7 @@ export const ProfilePage = () => {
         setHoveredItem(null);
     };
 
-    const imageUrl = useServerImageUrl(me.image.file);
+    const imageUrl = useServerImageUrl(me?.image?.file);
 
 
     return (

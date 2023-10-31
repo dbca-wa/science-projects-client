@@ -206,7 +206,7 @@ export const AddressesCRUD = () => {
                                             .sort((a, b) => {
                                                 const nameA = typeof a.branch === 'object' ? (a.branch as IBranch)?.name : '';
                                                 const nameB = typeof b.branch === 'object' ? (b.branch as IBranch)?.name : '';
-                                                return nameA.localeCompare(nameB);
+                                                return nameA?.localeCompare(nameB);
                                             })
                                             .map((s) => (
                                                 <AddressItemDisplay

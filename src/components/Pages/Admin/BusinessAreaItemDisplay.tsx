@@ -1,4 +1,4 @@
-import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Image, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormErrorMessage, FormHelperText, FormLabel, Grid, HStack, Image, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
 import { IBusinessArea } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -17,7 +17,7 @@ import { useState } from "react";
 
 export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin, data_custodian, focus, introduction, image }: IBusinessArea) => {
 
-    const { register, handleSubmit } = useForm<IBusinessArea>();
+    const { register, handleSubmit, watch, formState: { errors } } = useForm<IBusinessArea>();
 
     const toast = useToast();
     const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
@@ -31,6 +31,16 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
 
     const NoImageFile = useNoImage();
     const apiEndpoint = useApiEndpoint();
+    // console.log(`${apiEndpoint}/files/${image.file}`)
+
+    const [imageLoadFailed, setImageLoadFailed] = useState(false);
+    const noImageLink = useNoImage();
+    // const imageUrl = useServerImageUrl(noImageLink);
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>();
+
+
 
     // console.log(image.file)
     const updateMutation = useMutation(updateBusinessArea,
@@ -90,7 +100,41 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
 
 
     const onUpdateSubmit = (formData: IBusinessArea) => {
-        updateMutation.mutate(formData);
+        console.log(formData)
+
+        const {
+            pk,
+            agency,
+            old_id,
+            name,
+            slug,
+            leader,
+            data_custodian,
+            finance_admin,
+            focus,
+            introduction,
+        } = formData;
+        const image = selectedFile;
+
+        // Create an object to pass as a single argument to mutation.mutate
+        const payload = {
+            pk,
+            agency,
+            old_id,
+            name,
+            slug,
+            leader,
+            data_custodian,
+            finance_admin,
+            focus,
+            introduction,
+            image,
+        };
+        console.log(payload)
+
+
+        updateMutation.mutate(payload);
+        // updateMutation.mutate(formData);
     }
 
 
@@ -114,6 +158,11 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
     const [selectedLeader, setSelectedLeader] = useState<number>();
     const [selectedFinanceAdmin, setSelectedFinanceAdmin] = useState<number>();
     const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
+    const nameData = watch('name');
+    // const slugData = watch('slug');
+    const focusData = watch('focus');
+    const introductionData = watch('introduction');
+    const imageData = watch('image');
 
     return (
         !leaderLoading && leaderData ? (
@@ -198,15 +247,16 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                 // bg={"red"}
                 >
                     <Flex justifyContent="flex-start">
-                        <Box rounded="lg" overflow="hidden" w="100px" h="69px">
+                        <Box rounded="lg" overflow="hidden" w="80px" h="69px">
                             <Image
                                 src={
                                     image instanceof File
-                                        ? `${apiEndpoint}/files/${image.name}` // Use the image directly for File
+                                        ? `${apiEndpoint}${image.name}` // Use the image directly for File
                                         : image?.file
-                                            ? `${apiEndpoint}/files/${image.file}`
+                                            ? `${apiEndpoint}${image.file}`
                                             : NoImageFile
-                                } width={"100%"}
+                                }
+                                width={"100%"}
                                 height={"100%"}
                                 objectFit={"cover"}
 
@@ -335,7 +385,10 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                         </ModalFooter>
                     </ModalContent>
                 </Modal>
-                <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
+                <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}
+                    size={"4xl"}
+                    scrollBehavior="outside"
+                >
                     <ModalOverlay />
                     <ModalHeader>Update Business Area</ModalHeader>
                     <ModalBody>
@@ -371,6 +424,114 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                                         />
                                     </InputGroup>
                                 </FormControl>
+                                <FormControl isRequired>
+                                    <FormLabel>Focus</FormLabel>
+                                    <InputGroup>
+                                        <Textarea
+                                            {...register("focus", { required: true })}
+                                            required
+                                            defaultValue={focus}
+                                        />
+
+                                    </InputGroup>
+                                    <FormHelperText>Primary concerns of the Business Area</FormHelperText>
+                                </FormControl>
+
+                                <FormControl isRequired>
+                                    <FormLabel>Introduction</FormLabel>
+                                    <InputGroup>
+                                        <Textarea
+                                            {...register("introduction", { required: true })}
+                                            required
+                                            defaultValue={introduction}
+
+                                        />
+
+                                    </InputGroup>
+                                    <FormHelperText>A description of the Business Area</FormHelperText>
+                                </FormControl>
+
+                                <FormControl isRequired>
+                                    {/* <FormLabel>Image</FormLabel>
+                                        <InputGroup>
+                                            <Input
+                                                {...register("image", { required: true })}
+                                                required
+                                                type="text"
+                                            />
+
+                                        </InputGroup> */}
+
+                                    <Grid gridTemplateColumns={{ base: "3fr 10fr", md: "4fr 8fr" }} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Image</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!imageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedFile !== null ? selectedImageUrl : image ?
+                                                            image instanceof File ?
+
+                                                                `${apiEndpoint}/files/${image.name}` // Use the image directly for File
+                                                                : image?.file
+                                                                    ? `${apiEndpoint}/files/${image.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl ml={4} mt={10}>
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedFile(file);
+                                                                    setSelectedImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Upload an image for your display picture.</FormHelperText>
+                                                    {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
+
+                                    <FormHelperText>Select an image for the Business Area</FormHelperText>
+                                </FormControl>
+
                                 <FormControl
                                     mt={3}
                                 >
@@ -448,13 +609,35 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                                 <Button onClick={onUpdateModalClose}
                                     size="lg"
 
-                                >Cancel</Button>
+                                >
+                                    Cancel
+                                </Button>
                                 <Button
-                                    form="update-form"
-                                    type="submit"
+                                    // form="update-form"
+                                    // type="submit"
                                     isLoading={updateMutation.isLoading}
                                     colorScheme="blue"
                                     size="lg"
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onUpdateSubmit(
+                                            {
+                                                "pk": pk,
+                                                "agency": 1,
+                                                "old_id": 1,
+                                                "name": nameData,
+                                                "slug": slug,
+                                                "leader": selectedLeader,
+                                                "data_custodian": selectedDataCustodian,
+                                                "finance_admin": selectedFinanceAdmin,
+                                                "focus": focusData,
+                                                "introduction": introductionData,
+                                                "image": imageData,
+                                            }
+                                        )
+
+                                    }}
+
                                 >
                                     Update
                                 </Button>

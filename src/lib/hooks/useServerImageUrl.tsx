@@ -16,14 +16,18 @@ const useServerImageUrl = (originalLink) => {
             return '';
         }
 
-        if (originalLink.startsWith('http://') || originalLink.startsWith('https://')) {
-            const url = new URL(originalLink);
-            return `${apiEndpoint}${url.pathname}`;
-        } else if (originalLink.startsWith('/')) {
-            return `${apiEndpoint}${originalLink}`;
-        } else {
-            return `${apiEndpoint}/${originalLink}`;
+        try {
+            new URL(originalLink);
+            return originalLink; // If it's a valid URL, return it as-is
+        } catch (error) {
+            // If it's not a valid URL, construct the modified link using apiEndpoint
+            if (originalLink.startsWith('/')) {
+                return `${apiEndpoint}${originalLink}`;
+            } else {
+                return `${apiEndpoint}/${originalLink}`;
+            }
         }
+
     };
 
     return getModifiedLink();

@@ -21,7 +21,7 @@ export const Footer = () => {
             userSelect={"none"}
         >
             <Center fontSize="12px" textAlign="center">
-                <Link color="whiteAlpha.800" href="https://github.com/dbca-wa/cycle">
+                <Link color="whiteAlpha.800" href="https://github.com/dbca-wa/science-projects-client">
                     {FooterText}
                 </Link>
                 &nbsp;
