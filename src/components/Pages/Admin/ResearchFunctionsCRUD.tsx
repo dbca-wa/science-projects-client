@@ -8,10 +8,21 @@ import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IResearchFunction } from "../../../types";
 import { ResearchFunctionItemDisplay } from "./ResearchFunctionItemDisplay";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { AxiosError } from "axios";
 
 
 export const ResearchFunctionsCRUD = () => {
-    const { register, handleSubmit } = useForm<IResearchFunction>();
+    const { register, handleSubmit, watch } = useForm<IResearchFunction>();
+
+    const nameData = watch('name');
+    const descriptionData = watch('description');
+    const associationData = watch('association');
+    const activeData = watch('is_active');
+
+    const [selectedLeader, setSelectedLeader] = useState<number>();
+
+
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
 
@@ -43,6 +54,7 @@ export const ResearchFunctionsCRUD = () => {
             }
         });
     const onSubmit = (formData: IResearchFunction) => {
+        console.log(formData);
         mutation.mutate(formData);
     }
     const { isLoading, data: slices } = useQuery<IResearchFunction[]>(
@@ -128,8 +140,9 @@ export const ResearchFunctionsCRUD = () => {
                                 w={"65%"}
 
                             />
-                            <Flex justifyContent={"space-between"} px={4} w={"100%"}>
+                            <Flex justifyContent={"flex-start"} px={4} w={"100%"}>
                                 <Checkbox
+                                    pr={5}
                                     checked={isActiveOnly}
                                     onChange={handleActiveOnlyChange}
                                     isDisabled={isInactiveOnly}
@@ -165,19 +178,21 @@ export const ResearchFunctionsCRUD = () => {
                             </Flex>
                         </Flex>
                         <Grid
-                            gridTemplateColumns="1fr 5fr 3fr 1fr"
+                            gridTemplateColumns="3fr 2fr 6fr 1fr"
                             mt={4}
                             width="100%"
                             p={3}
                             borderWidth={1}
-                            borderBottomWidth={0}
+                            borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
                         >
                             <Flex justifyContent="flex-start">
-                                <Text as="b">Active</Text>
+                                <Text as="b">Research Function</Text>
+
                             </Flex>
                             <Flex
                             >
-                                <Text as="b">Research Function</Text>
+                                <Text as="b">Active</Text>
+
                             </Flex>
                             <Flex
                             >
@@ -218,8 +233,10 @@ export const ResearchFunctionsCRUD = () => {
                                     <FormControl>
                                         <FormLabel>Name</FormLabel>
                                         <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
+                                            {/* <InputLeftAddon children={<FaSign />} /> */}
                                             <Input
+                                                autoComplete="off"
+                                                autoFocus
                                                 {...register("name", { required: true })}
                                                 required
                                                 type="text"
@@ -229,20 +246,33 @@ export const ResearchFunctionsCRUD = () => {
                                     <FormControl>
                                         <FormLabel>Description</FormLabel>
                                         <Input
+                                            autoComplete="off"
                                             {...register("description", { required: true })}
                                         />
                                     </FormControl>
                                     <FormControl>
                                         <FormLabel>Association</FormLabel>
                                         <Input
+                                            autoComplete="off"
                                             {...register("association", { required: true })}
                                         />
                                     </FormControl>
                                     <FormControl>
-                                        <FormLabel>Leader</FormLabel>
-                                        <Input
+                                        <UserSearchDropdown
                                             {...register("leader", { required: true })}
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedLeader}
+                                            label="Leader"
+                                            placeholder="Search for a user..."
+                                            helperText={
+                                                <>
+                                                    The leader of the Research Function
+                                                </>
+                                            }
                                         />
+
                                     </FormControl>
                                     <FormControl>
                                         <FormLabel>Active?</FormLabel>
@@ -251,19 +281,45 @@ export const ResearchFunctionsCRUD = () => {
                                         />
                                     </FormControl>
                                     {mutation.isError
-                                        ? <Text color={"red.500"}>
-                                            Something went wrong
-                                        </Text>
+                                        ? <Box mt={4}>
+                                            {Object.keys((mutation.error as AxiosError).response.data).map((key) => (
+                                                <Box key={key}>
+                                                    {((mutation.error as AxiosError).response.data[key] as string[]).map((errorMessage, index) => (
+                                                        <Text key={`${key}-${index}`} color="red.500">
+                                                            {`${key}: ${errorMessage}`}
+                                                        </Text>
+                                                    ))}
+                                                </Box>
+                                            ))}
+                                        </Box>
+
                                         : null
                                     }
                                 </VStack>
                             </DrawerBody>
                             <DrawerFooter>
                                 <Button
-                                    form="add-form"
-                                    type="submit"
+                                    // form="add-form"
+                                    // type="submit"
                                     isLoading={mutation.isLoading}
-                                    colorScheme="blue" size="lg" width={"100%"}>Create</Button>
+                                    colorScheme="blue" size="lg" width={"100%"}
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onSubmit(
+                                            {
+                                                "old_id": 1,
+                                                "name": nameData,
+                                                "description": descriptionData,
+                                                "association": associationData,
+                                                "leader": selectedLeader,
+                                                "is_active": activeData,
+                                            }
+                                        )
+
+                                    }}
+                                >
+                                    Create
+                                </Button>
                             </DrawerFooter>
                         </DrawerContent>
                     </Drawer>

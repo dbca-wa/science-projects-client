@@ -1,4 +1,4 @@
-import { Box, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
 import { IResearchFunction } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -8,10 +8,24 @@ import { deleteResearchFunction, updateResearchFunction } from "../../../lib/api
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
 import { FcOk, FcCancel } from "react-icons/fc";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { useState } from "react";
+import { AxiosError } from "axios";
 
 export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, description, leader }: IResearchFunction) => {
 
-    const { register, handleSubmit } = useForm<IResearchFunction>();
+    const { register, handleSubmit, watch } = useForm<IResearchFunction>();
+    const nameData = watch('name');
+    const descriptionData = watch('description');
+    const associationData = watch('association');
+    const [isChecked, setIsChecked] = useState(is_active);
+    const handleCheckboxChange = () => {
+        // Toggle the local state variable when the checkbox is clicked
+        setIsChecked(!isChecked);
+    };
+
+    const activeData = watch('is_active');
+    const [selectedLeader, setSelectedLeader] = useState<number>();
 
     const toast = useToast();
     const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
@@ -110,15 +124,30 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
                     </Drawer>
 
                     <Grid
-                        gridTemplateColumns="1fr 5fr 3fr 1fr"
+                        gridTemplateColumns="3fr 2fr 6fr 1fr"
                         width="100%"
                         p={3}
                         borderWidth={1}
                     >
                         <Flex justifyContent="flex-start"
                             ml={4}
+                            alignItems={"center"}
+                        >
+                            <Button
+                                variant={"link"}
+                                colorScheme="blue"
+                                onClick={onUpdateModalOpen}
+                            >
+                                {name ?? ""}
+                            </Button>
+
+                        </Flex>
+                        <Flex
+                            alignItems={"center"}
+                        // bg={"red"}
                         >
                             <Center
+                                ml={3.5}
                             >
                                 {is_active === true ?
                                     <FcOk /> : <FcCancel />
@@ -127,10 +156,7 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
 
                         </Flex>
                         <Flex
-                        >
-                            <Text>{name}</Text>
-                        </Flex>
-                        <Flex
+                            alignItems={"center"}
                         >
                             <Button
                                 variant={"link"}
@@ -177,42 +203,37 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
 
                     <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                         <ModalOverlay />
-                        <ModalHeader>Delete Research Function</ModalHeader>
-                        <ModalBody
-                        >
-                            <ModalContent bg="white" p={4}
-                                w={"100%"}
-                                h={"100%"}
-                            >
-                                <Center
-                                    w={"100%"}
-                                    h={"100%"}
-                                >
-                                    <Grid
-                                        gridGap={20}
+                        <ModalContent bg="white">
+                            <ModalHeader>Delete Division</ModalHeader>
+                            <ModalBody>
+                                <Box>
+                                    <Text fontSize="lg" fontWeight="semibold">
+                                        Are you sure you want to delete this research function?
+                                    </Text>
+
+                                    <Text
+                                        fontSize="lg"
+                                        fontWeight="semibold"
+                                        color={"blue.500"}
+                                        mt={4}
                                     >
-                                        <Box
-                                            alignContent={"center"}
-                                        >
-                                            <Text fontSize={"xl"}
-                                                fontWeight={"bold"}
-                                            >
-                                                Are you sure you want to delete this research function?
-                                            </Text>
+                                        "{name}"
+                                    </Text>
 
-                                        </Box>
-                                        <Flex
-                                            // bg="red"
-                                            justifyContent={"space-evenly"}
-                                        >
-                                            <Button onClick={deleteButtonClick}>Yes</Button>
-                                            <Button onClick={onDeleteModalClose}>No</Button>
-                                        </Flex>
-                                    </Grid>
-                                </Center>
+                                </Box>
+                            </ModalBody>
+                            <ModalFooter justifyContent="flex-end">
+                                <Flex>
+                                    <Button onClick={onDeleteModalClose} colorScheme="red">
+                                        No
+                                    </Button>
+                                    <Button onClick={deleteButtonClick} colorScheme="green" ml={3}>
+                                        Yes
+                                    </Button>
+                                </Flex>
 
-                            </ModalContent>
-                        </ModalBody>
+                            </ModalFooter>
+                        </ModalContent>
                     </Modal>
                     <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
                         <ModalOverlay />
@@ -231,8 +252,10 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
                                     <FormControl>
                                         <FormLabel>Name</FormLabel>
                                         <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
+                                            {/* <InputLeftAddon children={<FaSign />} /> */}
                                             <Input
+                                                autoFocus
+                                                autoComplete="off"
                                                 {...register("name", { required: true })}
                                                 required
                                                 type="text"
@@ -243,6 +266,8 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
                                     <FormControl>
                                         <FormLabel>Description</FormLabel>
                                         <Input
+                                            autoComplete="off"
+
                                             {...register("description", { required: true })}
                                             defaultValue={description} // Prefill 
                                         />
@@ -250,28 +275,53 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
                                     <FormControl>
                                         <FormLabel>Association</FormLabel>
                                         <Input
+                                            autoComplete="off"
+
                                             {...register("association", { required: true })}
                                             defaultValue={association} // Prefill 
                                         />
                                     </FormControl>
                                     <FormControl>
-                                        <FormLabel>Leader</FormLabel>
-                                        <Input
+                                        <UserSearchDropdown
                                             {...register("leader", { required: true })}
-                                            defaultValue={leader} // Prefill 
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedLeader}
+                                            preselectedUserPk={leader}
+                                            label="Leader"
+                                            placeholder="Search for a user..."
+                                            isEditable
+                                            helperText={
+                                                <>
+                                                    The leader of the Research Function
+                                                </>
+                                            }
                                         />
+
                                     </FormControl>
                                     <FormControl>
                                         <FormLabel>Active?</FormLabel>
                                         <Checkbox
                                             {...register("is_active", { required: true })}
-                                            isChecked={is_active} // Prefill 
+                                            isChecked={isChecked} // Prefill 
+                                            onChange={handleCheckboxChange} // Handle checkbox changes
+
                                         />
                                     </FormControl>
 
                                     {updateMutation.isError ? (
-                                        <Text color={"red.500"}>Something went wrong</Text>
-                                    ) : null}
+                                        <Box mt={4}>
+                                            {Object.keys((updateMutation.error as AxiosError).response.data).map((key) => (
+                                                <Box key={key}>
+                                                    {((updateMutation.error as AxiosError).response.data[key] as string[]).map((errorMessage, index) => (
+                                                        <Text key={`${key}-${index}`} color="red.500">
+                                                            {`${key}: ${errorMessage}`}
+                                                        </Text>
+                                                    ))}
+                                                </Box>
+                                            ))}
+                                        </Box>) : null}
                                 </VStack>
                                 <Grid
                                     mt={10}
@@ -285,11 +335,26 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
 
                                     >Cancel</Button>
                                     <Button
-                                        form="update-form"
-                                        type="submit"
+                                        // form="update-form"
+                                        // type="submit"
                                         isLoading={updateMutation.isLoading}
                                         colorScheme="blue"
                                         size="lg"
+                                        onClick={() => {
+                                            console.log("clicked")
+                                            onUpdateSubmit(
+                                                {
+                                                    "pk": pk,
+                                                    "old_id": 1,
+                                                    "name": nameData,
+                                                    "description": descriptionData,
+                                                    "association": associationData,
+                                                    "leader": selectedLeader,
+                                                    "is_active": activeData,
+                                                }
+                                            )
+
+                                        }}
                                     >
                                         Update
                                     </Button>

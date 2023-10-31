@@ -1658,6 +1658,7 @@ export const getAllResearchFunctions = async () => {
 }
 
 export const createResearchFunction = async (formData: IResearchFunction) => {
+    console.log(formData);
     return instance.post(
         "projects/research_functions", formData
     ).then(res => {

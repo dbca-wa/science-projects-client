@@ -444,12 +444,13 @@ interface IBusinessArea {
 
 
 interface IResearchFunction {
+    pk?: number;
+    old_id?: number;
     name: string;
     description: string;
     association: string; // What program this research funciton belongs to
     leader: number;
     is_active: boolean; // Whether Research Function is still active
-    pk: number;
 }
 
 // SERVICE ============================================================================
