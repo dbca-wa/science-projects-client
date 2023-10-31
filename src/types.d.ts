@@ -501,8 +501,8 @@ interface IAddress {
 
 
 interface IDivision {
-    pk: number;
-    old_id: number;
+    pk?: number;
+    old_id?: number;
     name: string;
     slug: string;
     director: number;
