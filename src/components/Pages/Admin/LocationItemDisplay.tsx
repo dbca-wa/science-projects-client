@@ -1,4 +1,4 @@
-import { Box, Button, Center, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
 import { IAddLocationForm, ISimpleLocationData } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -68,7 +68,7 @@ export const LocationItemDisplay = ({ pk, name, area_type }: ISimpleLocationData
         }
     );
 
-    const deleteLocationClick = () => {
+    const deleteBtnClicked = () => {
         // console.log("deleted")
         deleteMutation.mutate(pk);
     }
@@ -98,15 +98,21 @@ export const LocationItemDisplay = ({ pk, name, area_type }: ISimpleLocationData
                     // justifyContent={"center"}
                     alignItems={"center"}
                 >
-                    <Text>{areaTypeMap[area_type]}</Text>
-
+                    <Button
+                        variant={"link"}
+                        colorScheme="blue"
+                        onClick={onUpdateModalOpen}
+                    >
+                        {name ?? ""}
+                    </Button>
                 </Flex>
                 <Flex
                     justifyContent={"space-between"}
                     alignItems={"center"}
 
                 >
-                    <Text>{name}</Text>
+                    <Text>{areaTypeMap[area_type]}</Text>
+
                     <Flex
                         flexDir={"column"}
                         alignItems={"center"}
@@ -149,46 +155,39 @@ export const LocationItemDisplay = ({ pk, name, area_type }: ISimpleLocationData
             </Grid>
             <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                 <ModalOverlay />
-                <ModalHeader>Delete Location</ModalHeader>
-                <ModalBody
-                >
-                    <ModalContent bg="white" p={4}
-                        w={"100%"}
-                        h={"100%"}
-                    >
-                        <Center
-                            w={"100%"}
-                            h={"100%"}
-                        >
-                            <Grid
-                                gridGap={20}
+                <ModalContent bg="white">
+                    <ModalHeader>Delete Business Area</ModalHeader>
+                    <ModalBody>
+                        <Box>
+                            <Text fontSize="lg" fontWeight="semibold">
+                                Are you sure you want to delete this business area?
+                            </Text>
+
+                            <Text
+                                fontSize="lg"
+                                fontWeight="semibold"
+                                color={"blue.500"}
+                                mt={4}
                             >
-                                <Box
-                                    alignContent={"center"}
-                                >
-                                    <Text fontSize={"xl"}
-                                        fontWeight={"bold"}
-                                    >
-                                        Are you sure you want to delete this location?
-                                    </Text>
+                                "{name}"
+                            </Text>
 
-                                </Box>
-                                <Flex
-                                    // bg="red"
-                                    justifyContent={"space-evenly"}
-                                >
-                                    <Button onClick={deleteLocationClick}>Yes</Button>
-                                    <Button onClick={onDeleteModalClose}>No</Button>
-                                </Flex>
+                        </Box>
+                    </ModalBody>
+                    <ModalFooter justifyContent="flex-end">
+                        <Flex>
+                            <Button onClick={onDeleteModalClose} colorScheme="red">
+                                No
+                            </Button>
+                            <Button onClick={deleteBtnClicked} colorScheme="green" ml={3}>
+                                Yes
+                            </Button>
+                        </Flex>
 
-
-
-                            </Grid>
-                        </Center>
-
-                    </ModalContent>
-                </ModalBody>
+                    </ModalFooter>
+                </ModalContent>
             </Modal>
+
             <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
                 <ModalOverlay />
                 <ModalHeader>Update Location</ModalHeader>
@@ -206,9 +205,11 @@ export const LocationItemDisplay = ({ pk, name, area_type }: ISimpleLocationData
                             <FormControl>
                                 <FormLabel>Name</FormLabel>
                                 <InputGroup>
-                                    <InputLeftAddon children={<FaSign />} />
+                                    {/* <InputLeftAddon children={<FaSign />} /> */}
                                     <Input
                                         {...register("name", { required: true })}
+                                        autoFocus
+                                        autoComplete="off"
                                         required
                                         type="text"
                                         defaultValue={name} // Prefill with the 'name' prop
