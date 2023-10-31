@@ -273,6 +273,8 @@ export const AddressesCRUD = () => {
                                         <FormLabel>Zip Code</FormLabel>
                                         <Input
                                             {...register("zipcode", { required: true })}
+                                            type="number"
+
                                         />
                                     </FormControl>
                                     <FormControl>
