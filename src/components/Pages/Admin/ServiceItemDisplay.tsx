@@ -1,4 +1,4 @@
-import { Box, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
 import { IDepartmentalService } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -8,10 +8,14 @@ import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
 import { FcOk, FcCancel } from "react-icons/fc";
 import { deleteDepartmentalService, updateDepartmentalService } from "../../../lib/api";
+import { useState } from "react";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 
 export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService) => {
 
-    const { register, handleSubmit } = useForm<IDepartmentalService>();
+    const { register, handleSubmit, watch } = useForm<IDepartmentalService>();
+    const [selectedDirector, setSelectedDirector] = useState<number>();
+    const nameData = watch('name')
 
     const toast = useToast();
     const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
@@ -76,7 +80,7 @@ export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService)
         }
     );
 
-    const deleteButtonClick = () => {
+    const deleteBtnClicked = () => {
         // console.log("deleted")
         deleteMutation.mutate(pk);
     }
@@ -110,18 +114,22 @@ export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService)
                     </Drawer>
 
                     <Grid
-                        gridTemplateColumns="6fr 3fr 1fr"
+                        gridTemplateColumns="4fr 5fr 1fr"
                         width="100%"
                         p={3}
                         borderWidth={1}
                     >
                         <Flex justifyContent="flex-start"
                             ml={4}
+                            alignItems={"center"}
                         >
-                            <Center
+                            <Button
+                                variant={"link"}
+                                colorScheme="blue"
+                                onClick={onUpdateModalOpen}
                             >
-                                <Text>{name}</Text>
-                            </Center>
+                                {name ?? ""}
+                            </Button>
                         </Flex>
 
                         <Flex
@@ -171,44 +179,38 @@ export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService)
 
                     <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                         <ModalOverlay />
-                        <ModalHeader>Delete Research Function</ModalHeader>
-                        <ModalBody
-                        >
-                            <ModalContent bg="white" p={4}
-                                w={"100%"}
-                                h={"100%"}
-                            >
-                                <Center
-                                    w={"100%"}
-                                    h={"100%"}
-                                >
-                                    <Grid
-                                        gridGap={20}
+                        <ModalContent bg="white">
+                            <ModalHeader>Delete Service</ModalHeader>
+                            <ModalBody>
+                                <Box>
+                                    <Text fontSize="lg" fontWeight="semibold">
+                                        Are you sure you want to delete this service?
+                                    </Text>
+
+                                    <Text
+                                        fontSize="lg"
+                                        fontWeight="semibold"
+                                        color={"blue.500"}
+                                        mt={4}
                                     >
-                                        <Box
-                                            alignContent={"center"}
-                                        >
-                                            <Text fontSize={"xl"}
-                                                fontWeight={"bold"}
-                                            >
-                                                Are you sure you want to delete this research function?
-                                            </Text>
+                                        "{name}"
+                                    </Text>
 
-                                        </Box>
-                                        <Flex
-                                            // bg="red"
-                                            justifyContent={"space-evenly"}
-                                        >
-                                            <Button onClick={deleteButtonClick}>Yes</Button>
-                                            <Button onClick={onDeleteModalClose}>No</Button>
-                                        </Flex>
-                                    </Grid>
-                                </Center>
+                                </Box>
+                            </ModalBody>
+                            <ModalFooter justifyContent="flex-end">
+                                <Flex>
+                                    <Button onClick={onDeleteModalClose} colorScheme="red">
+                                        No
+                                    </Button>
+                                    <Button onClick={deleteBtnClicked} colorScheme="green" ml={3}>
+                                        Yes
+                                    </Button>
+                                </Flex>
 
-                            </ModalContent>
-                        </ModalBody>
-                    </Modal>
-                    <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
+                            </ModalFooter>
+                        </ModalContent>
+                    </Modal>                    <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
                         <ModalOverlay />
                         <ModalHeader>Update Research Function</ModalHeader>
                         <ModalBody>
@@ -225,8 +227,10 @@ export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService)
                                     <FormControl>
                                         <FormLabel>Name</FormLabel>
                                         <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
+                                            {/* <InputLeftAddon children={<FaSign />} /> */}
                                             <Input
+                                                autoComplete="off"
+                                                autoFocus
                                                 {...register("name", { required: true })}
                                                 required
                                                 type="text"
@@ -236,10 +240,21 @@ export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService)
                                     </FormControl>
 
                                     <FormControl>
-                                        <FormLabel>Director</FormLabel>
-                                        <Input
+                                        <UserSearchDropdown
                                             {...register("director", { required: true })}
-                                            defaultValue={director} // Prefill 
+
+                                            onlyInternal={false}
+                                            isRequired={true}
+                                            setUserFunction={setSelectedDirector}
+                                            label="Director"
+                                            placeholder="Search for a user..."
+                                            preselectedUserPk={director}
+                                            isEditable
+                                            helperText={
+                                                <>
+                                                    The director of the Service
+                                                </>
+                                            }
                                         />
                                     </FormControl>
 
@@ -259,11 +274,23 @@ export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService)
 
                                     >Cancel</Button>
                                     <Button
-                                        form="update-form"
-                                        type="submit"
+                                        // form="update-form"
+                                        // type="submit"
                                         isLoading={updateMutation.isLoading}
                                         colorScheme="blue"
                                         size="lg"
+                                        onClick={() => {
+                                            console.log("clicked")
+                                            onUpdateSubmit(
+                                                {
+                                                    "pk": pk,
+                                                    "name": nameData,
+                                                    "director": selectedDirector,
+                                                }
+                                            )
+
+                                        }}
+
                                     >
                                         Update
                                     </Button>
