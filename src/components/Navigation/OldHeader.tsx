@@ -315,7 +315,7 @@ const AdminMenuContents = () => {
                 title="PROJECT CRUD" fontSize={"12px"} color={"gray.500"} textAlign={"center"}
 
             >
-                <MenuItem
+                {/* <MenuItem
                     onClick={() => {
                         navigate('/crud/memberships')
                     }}                 >
@@ -324,7 +324,7 @@ const AdminMenuContents = () => {
                     >
                         Project Memberships
                     </Text>
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem
                     onClick={() => {
                         navigate('/crud/conceptplans')

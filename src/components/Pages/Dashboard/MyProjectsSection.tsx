@@ -37,7 +37,7 @@ export const MyProjectsSection = ({ data, loading }: IProjectSection) => {
                                 w={"100%"}
                                 h={"100%"}
                             >
-                                <Text>Nothing to see here...</Text>
+                                <Text>Your projects will be shown here...</Text>
                             </Box>
                         )
                         :

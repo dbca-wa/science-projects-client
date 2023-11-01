@@ -102,7 +102,7 @@ export const MyTasksSection = ({ data, loading }: ITaskSection) => {
                             w={"100%"}
                             h={"100%"}
                         >
-                            <Text>Nothing to see here...</Text>
+                            <Text>Your tasks will be shown here...</Text>
                         </Box>
                     )
                     :
