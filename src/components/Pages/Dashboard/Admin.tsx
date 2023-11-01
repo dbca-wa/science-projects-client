@@ -148,12 +148,12 @@ const adminActions = [
 
 const projectAdminActions = [
 
-    {
-        name: "Manage Project Memberships",
-        description: "CRUD operations for Project Memberships",
-        reactIcon: FaUsers,
-        route: "/crud/memberships"
-    },
+    // {
+    //     name: "Manage Project Memberships",
+    //     description: "CRUD operations for Project Memberships",
+    //     reactIcon: FaUsers,
+    //     route: "/crud/memberships"
+    // },
     {
         name: "Manage Concept Plans",
         description: "CRUD operations for Concept Plans",

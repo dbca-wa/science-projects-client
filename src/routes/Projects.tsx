@@ -174,13 +174,11 @@ export const Projects = () => {
                             style={
                                 colorMode === "light" ? {
                                     color: 'black',
-                                    backgroundColor: 'white',
                                     borderColor: 'gray.100',
                                     caretColor: 'black !important',
                                 } :
                                     {
                                         color: 'white',
-                                        // backgroundColor: 'white',
                                         borderColor: 'white',
                                         caretColor: 'black !important',
                                     }
@@ -201,7 +199,6 @@ export const Projects = () => {
                             style={
                                 colorMode === "light" ? {
                                     color: 'black',
-                                    backgroundColor: 'white',
                                     borderColor: 'gray.100',
                                     caretColor: 'black !important',
                                 } :

@@ -131,7 +131,7 @@ export const Sidebar = () => {
                 rounded={"full"}
                 top={"0.75rem"}
                 right={"-2rem"}
-                zIndex={999999}
+                zIndex={1}
                 transitionDuration={"500ms"}
                 transform={!open ? "rotate(-180deg)" : undefined}
                 onClick={handleToggleSidebar}

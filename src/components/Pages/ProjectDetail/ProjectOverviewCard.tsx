@@ -14,6 +14,8 @@ import { useNoImage } from "../../../lib/hooks/useNoImage";
 import { useEffect } from "react";
 import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
 import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
+import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
+import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 
 interface IProjectOverviewCardProps {
     baseInformation: IProjectData;
@@ -26,6 +28,7 @@ export const ProjectOverviewCard = (
     { baseInformation, details, members }: IProjectOverviewCardProps
 ) => {
 
+    const baseApi = useApiEndpoint();
     const { isOpen: isEditProjectDetailModalOpen, onOpen: onEditProjectDetailModalOpen, onClose: onEditProjectDetailModalClose } = useDisclosure()
     const { colorMode } = useColorMode();
     useEffect(() => {
@@ -145,6 +148,8 @@ export const ProjectOverviewCard = (
     // const editorKey = selectedYear.toString() + colorMode;
 
 
+    const imageUrl = useServerImageUrl(baseInformation?.image?.file)
+
     return (
         <>
             <Box
@@ -179,10 +184,8 @@ export const ProjectOverviewCard = (
                         <Image
                             src={
                                 baseInformation?.image?.file
-                                    ? baseInformation?.image?.file
-                                    : baseInformation?.image?.old_file ?
-                                        baseInformation?.image?.old_file :
-                                        noImage
+                                    ? imageUrl :
+                                    noImage
                             }
                             objectFit={"cover"}
                             w={"100%"}

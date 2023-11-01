@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
 import { useNoImage } from "../../../lib/hooks/useNoImage";
+import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
+import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 
 export const ModernProjectCard = ({
     pk,
@@ -21,6 +23,7 @@ export const ModernProjectCard = ({
     const { isOnProjectsPage } = useProjectSearchContext();
 
     const { colorMode } = useColorMode();
+    const imageurl = useServerImageUrl(image?.file);
 
     const cardVariants = {
         rest: { scale: 1, rotateX: 0 },
@@ -81,7 +84,7 @@ export const ModernProjectCard = ({
                 onMouseOver={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 rounded={"2xl"}
-                h={"300px"}
+                h={"325px"}
                 pos={"relative"}
                 overflow={"hidden"}
                 cursor={"pointer"}
@@ -96,9 +99,9 @@ export const ModernProjectCard = ({
 
                     src={
                         image ?
-                            image?.file ? image.file :
-                                image?.old_file ? image.old_file
-                                    : noImage : noImage
+                            imageurl
+
+                            : noImage
                     }
                     objectFit={"cover"}
                     h={"100%"}
@@ -197,7 +200,7 @@ export const ModernProjectCard = ({
                     bottom={0}
                     w="100%"
                     h="30%"
-                    bgGradient="linear(to-t, rgba(0,0,0,0.7), transparent)" // Add gradient overlay
+                    bgGradient="linear(to-t, rgba(0,0,0,0.55), transparent)" // Add gradient overlay
                 />
             </Box>
 
