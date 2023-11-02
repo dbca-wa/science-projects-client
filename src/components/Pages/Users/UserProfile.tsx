@@ -216,8 +216,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                                         rounded={"lg"}
                                         w="60px" h="60px"
                                         src={
-                                            user?.agency?.image ? user.agency.image.old_file : ""
-                                            // "/dbca.jpg"
+                                            // user?.agency?.image ? user.agency.image.old_file : ""
+                                            "/dbca.jpg"
                                         }
                                         objectFit="cover"
                                     />

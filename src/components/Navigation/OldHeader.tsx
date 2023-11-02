@@ -311,20 +311,11 @@ const AdminMenuContents = () => {
                 </MenuItem>
             </MenuGroup>
 
-            <MenuGroup
+            {/* <MenuGroup
                 title="PROJECT CRUD" fontSize={"12px"} color={"gray.500"} textAlign={"center"}
 
             >
-                {/* <MenuItem
-                    onClick={() => {
-                        navigate('/crud/memberships')
-                    }}                 >
-                    {<FaUsers />}
-                    <Text ml={2}
-                    >
-                        Project Memberships
-                    </Text>
-                </MenuItem> */}
+
                 <MenuItem
                     onClick={() => {
                         navigate('/crud/conceptplans')
@@ -375,7 +366,7 @@ const AdminMenuContents = () => {
                         Manage Closure Forms
                     </Text>
                 </MenuItem>
-            </MenuGroup>
+            </MenuGroup> */}
 
             <MenuGroup
                 title="BATCH" fontSize={"12px"} color={"gray.500"} textAlign={"center"}

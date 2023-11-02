@@ -62,7 +62,7 @@ export const Admin = () => {
 
 
 
-            <Text
+            {/* <Text
                 my={3}
                 fontWeight={"bold"}
                 fontSize={"lg"}
@@ -88,7 +88,7 @@ export const Admin = () => {
                     />
                 ))}
             </Grid>
-
+ */}
 
             <Text
                 my={3}

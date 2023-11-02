@@ -6,9 +6,10 @@ import Calendar from "react-calendar";
 
 interface IProps {
   onChange: (val: any) => void;
+  preselectedDates?: Date[];
 }
 
-export const CalendarWithCSS = ({ onChange }: IProps) => {
+export const CalendarWithCSS = ({ onChange, preselectedDates }: IProps) => {
   const { colorMode } = useColorMode();
   const [calendarStyles, setCalendarStyles] = useState("");
 
@@ -73,17 +74,33 @@ export const CalendarWithCSS = ({ onChange }: IProps) => {
 
 
   return (
-    <Box w="100%" h="100%" textAlign="center">
-      <style>{calendarStyles}</style>
-      <Calendar
-        minDate={new Date()}
-        selectRange
-        minDetail="month"
-        maxDate={new Date(Date.now() + 60 * 60 * 24 * 7 * 52 * 1000)} // One year from today max
-        prev2Label={null}
-        next2Label={null}
-        onChange={handleDateChange}
-      />
-    </Box>
+    preselectedDates ?
+      (<Box w="100%" h="100%" textAlign="center">
+        <style>{calendarStyles}</style>
+        <Calendar
+          minDate={new Date()}
+          selectRange
+          minDetail="month"
+          maxDate={new Date(Date.now() + 60 * 60 * 24 * 7 * 52 * 1000)} // One year from today max
+          prev2Label={null}
+          next2Label={null}
+          onChange={handleDateChange}
+          defaultValue={[preselectedDates[0], preselectedDates[1]]}
+        />
+      </Box>)
+      :
+      (<Box w="100%" h="100%" textAlign="center">
+        <style>{calendarStyles}</style>
+        <Calendar
+          minDate={new Date()}
+          selectRange
+          minDetail="month"
+          maxDate={new Date(Date.now() + 60 * 60 * 24 * 7 * 52 * 1000)} // One year from today max
+          prev2Label={null}
+          next2Label={null}
+          onChange={handleDateChange}
+        />
+      </Box>)
+
   );
 };

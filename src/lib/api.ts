@@ -1276,18 +1276,86 @@ export const getAllReports = async () => {
     return res;
 }
 
+export const getFullReport = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+    // if (pk !== 0)
+    // {
+    const res = instance.get(`documents/reports/${pk}`).then(res => {
+        // console.log(res.data)
+        return res.data
+    })
+    return res;
+}
+
+
+
+
+
 export const createReport = async (formData: IReport) => {
+
+    const { year, date_open, date_closed, ...otherData } = formData;
+
+
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const formattedDateOpen = formatDate(date_open);
+    const formattedDateClosed = formatDate(date_closed);
+
+    // Include the year in the data
+    const dataToSend = {
+        year,
+        date_open: formattedDateOpen,
+        date_closed: formattedDateClosed,
+        ...otherData,
+    };
+
+
     return instance.post(
-        "documents/reports", formData
+        "documents/reports", dataToSend
     ).then(res => {
         return res.data;
     }
     );
 }
 
+export const updateReportMedia = async (formData: IReport) => {
+    console.log(formData);
+    return {
+        "status": 200,
+        "message": "ok",
+    }
+}
+
 export const updateReport = async (formData: IReport) => {
+
+    const { date_open, date_closed, ...otherData } = formData;
+
+    const formatDate = (date) => {
+        if (typeof date === 'string') {
+            date = new Date(date); // Parse the string into a Date object
+        }
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const formattedDateOpen = formatDate(date_open);
+    const formattedDateClosed = formatDate(date_closed);
+
+    const dataToSend = {
+        date_open: formattedDateOpen,
+        date_closed: formattedDateClosed,
+        ...otherData,
+    };
+
     return instance.put(
-        `documents/reports/${formData.pk}`, formData
+        `documents/reports/${formData.pk}`, dataToSend
     ).then(res => {
         return res.data;
     }
