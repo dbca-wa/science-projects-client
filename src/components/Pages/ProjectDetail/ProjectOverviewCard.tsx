@@ -173,9 +173,9 @@ export const ProjectOverviewCard = (
                         // bg={"red"}
                         h={
                             {
-                                base: "350px",
-                                "2xl": "500px",
-                                "3xl": "600px"
+                                // base: "250px",
+                                base: "380px",
+                                xl: "450px",
                             }
                         }
                         rounded={"xl"}

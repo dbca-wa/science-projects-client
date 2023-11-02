@@ -533,15 +533,16 @@ export interface ISmallReport {
 
 
 export interface IReport {
-    pk: number;
-    created_at: Date;
-    updated_at: Date | null;
+    old_id?: number;
+    pk?: number;
+    created_at?: Date;
+    updated_at?: Date | null;
     date_open: Date | null;
     date_closed: Date | null;
     year: number;
 
-    creator: number;
-    modifier: number;
+    creator?: number;
+    modifier?: number;
 
     dm: string | null;
     publications: string | null;

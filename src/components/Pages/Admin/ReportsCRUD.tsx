@@ -1,4 +1,4 @@
-import { Text, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, Flex, FormControl, Input, InputGroup, InputLeftAddon, VStack, useDisclosure, Center, Spinner, Grid, DrawerOverlay, DrawerCloseButton, DrawerHeader, FormLabel, Textarea, Checkbox, useToast, Select } from "@chakra-ui/react";
+import { Text, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, Flex, FormControl, Input, InputGroup, InputLeftAddon, VStack, useDisclosure, Center, Spinner, Grid, DrawerOverlay, DrawerCloseButton, DrawerHeader, FormLabel, Textarea, Checkbox, useToast, Select, FormHelperText } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -8,9 +8,19 @@ import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IReport } from "../../../types";
 import { ReportItemDisplay } from "./ReportItemDisplay";
+import { CalendarWithCSS } from "../CreateProject/CalendarWithCSS";
+import { AxiosError } from "axios";
 
 export const ReportsCRUD = () => {
-    const { register, handleSubmit } = useForm<IReport>();
+    const { register, handleSubmit, watch } = useForm<IReport>();
+
+    const yearData = watch('year');
+    const [selectedDates, setSelectedDates] = useState([null, null]);
+
+    useEffect(() => {
+        console.log(selectedDates)
+    }, [selectedDates])
+
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
 
@@ -42,6 +52,7 @@ export const ReportsCRUD = () => {
             }
         });
     const onSubmit = (formData: IReport) => {
+        console.log(formData);
         mutation.mutate(formData);
     }
     const { isLoading, data: slices } = useQuery<IReport[]>(
@@ -110,11 +121,11 @@ export const ReportsCRUD = () => {
                             </Flex>
                             <Flex
                             >
-                                <Text as="b">Date Opened</Text>
+                                <Text as="b">Open Date</Text>
                             </Flex>
                             <Flex
                             >
-                                <Text as="b">Date Closed</Text>
+                                <Text as="b">Closing Date</Text>
                             </Flex>
                             <Flex
                             >
@@ -163,19 +174,28 @@ export const ReportsCRUD = () => {
                             <DrawerCloseButton />
                             <DrawerHeader>Add Report</DrawerHeader>
                             <DrawerBody>
-                                <VStack spacing={10} as="form" id="add-form" onSubmit={handleSubmit(onSubmit)} >
-                                    <FormControl>
+                                <VStack spacing={10}
+                                // as="form" id="add-form" onSubmit={handleSubmit(onSubmit)}
+                                >
+                                    <FormControl
+                                        isRequired
+                                    >
                                         <FormLabel>Year</FormLabel>
                                         <InputGroup>
-                                            <InputLeftAddon children={<FaSign />} />
+                                            {/* <InputLeftAddon children={<FaSign />} /> */}
                                             <Input
+                                                autoFocus
+                                                autoComplete="off"
                                                 {...register("year", { required: true })}
+                                                defaultValue={new Date().getFullYear()}
                                                 required
-                                                type="text"
+                                                type="number"
                                             />
                                         </InputGroup>
+                                        <FormHelperText>The year for the report. For example, if for FY 2022-2023, type 2023.</FormHelperText>
+
                                     </FormControl>
-                                    <FormControl>
+                                    {/* <FormControl>
                                         <FormLabel>Creator</FormLabel>
                                         <Input
                                             {...register("creator", { required: true })}
@@ -193,8 +213,8 @@ export const ReportsCRUD = () => {
                                         <Input
                                             {...register("updated_at", { required: true })}
                                         />
-                                    </FormControl>
-                                    <FormControl>
+                                    </FormControl> */}
+                                    {/* <FormControl>
                                         <FormLabel>Date Open</FormLabel>
                                         <Input
                                             {...register("date_open", { required: true })}
@@ -203,53 +223,84 @@ export const ReportsCRUD = () => {
                                     <FormControl>
                                         <FormLabel>Date Closed</FormLabel>
                                         <Input
-                                            {...register("date_open", { required: true })}
+                                            {...register("date_closed", { required: true })}
                                         />
+                                    </FormControl> */}
+
+                                    <FormControl
+                                        isRequired
+                                    >
+                                        <FormLabel>Start and End Dates</FormLabel>
+                                        <CalendarWithCSS onChange={setSelectedDates} />
+                                        <FormHelperText>Select the period in which entries for this annual report are allowed. First day clicked is the open date, second is the close date.</FormHelperText>
                                     </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Date Closed</FormLabel>
-                                        <Input
-                                            {...register("date_open", { required: true })}
-                                        />
-                                    </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Publications</FormLabel>
-                                        <Input
-                                            {...register("publications", { required: false })}
-                                        />
-                                    </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Research Intro</FormLabel>
-                                        <Input
-                                            {...register("research_intro", { required: false })}
-                                        />
-                                    </FormControl>
-                                    <FormControl>
+
+                                    {/* <FormControl>
                                         <FormLabel>Service Delivery Intro</FormLabel>
-                                        <Input
+                                        <Textarea
                                             {...register("service_delivery_intro", { required: false })}
                                         />
                                     </FormControl>
                                     <FormControl>
+                                        <FormLabel>Research Intro</FormLabel>
+                                        <Textarea
+                                            {...register("research_intro", { required: false })}
+                                        />
+                                    </FormControl>
+
+                                    <FormControl>
                                         <FormLabel>Student Intro</FormLabel>
-                                        <Input
+                                        <Textarea
                                             {...register("student_intro", { required: false })}
                                         />
                                     </FormControl>
+
+                                    <FormControl>
+                                        <FormLabel>Publications</FormLabel>
+                                        <Textarea
+                                            {...register("publications", { required: false })}
+                                        />
+                                    </FormControl> */}
                                     {mutation.isError
-                                        ? <Text color={"red.500"}>
-                                            Something went wrong
-                                        </Text>
+                                        ? <Box mt={4}>
+                                            {Object.keys((mutation.error as AxiosError).response.data).map((key) => (
+                                                <Box key={key}>
+                                                    {((mutation.error as AxiosError).response.data[key] as string[]).map((errorMessage, index) => (
+                                                        <Text key={`${key}-${index}`} color="red.500">
+                                                            {`${key}: ${errorMessage}`}
+                                                        </Text>
+                                                    ))}
+                                                </Box>
+                                            ))}
+                                        </Box>
                                         : null
                                     }
                                 </VStack>
                             </DrawerBody>
                             <DrawerFooter>
                                 <Button
-                                    form="add-form"
-                                    type="submit"
+                                    // form="add-form"
+                                    // type="submit"
                                     isLoading={mutation.isLoading}
                                     colorScheme="blue" size="lg" width={"100%"}
+                                    onClick={() => {
+                                        console.log("clicked")
+                                        onSubmit(
+                                            {
+                                                "old_id": 1,
+                                                "year": yearData,
+                                                "date_open": selectedDates[0],
+                                                "date_closed": selectedDates[1],
+                                                dm: "",
+                                                publications: "",
+                                                research_intro: "",
+                                                service_delivery_intro: "",
+                                                student_intro: ""
+                                            }
+                                        )
+
+
+                                    }}
                                 >
                                     Create
                                 </Button>
