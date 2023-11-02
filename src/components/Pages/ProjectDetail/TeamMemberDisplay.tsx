@@ -16,6 +16,7 @@ interface ITeamMember {
     name: string;
     role: string;
     image: IImageData;
+    short_code: string | number;
     time_allocation: number;
     position: number;
     usersCount: number;
@@ -36,6 +37,7 @@ export const TeamMemberDisplay = ({
     name,
     role,
     image,
+    short_code,
     time_allocation,
     position,
     username,
@@ -122,6 +124,7 @@ export const TeamMemberDisplay = ({
                             pk={user_id}
                             is_leader={is_leader}
                             role={role}
+                            shortCode={short_code}
                             position={position}
                             time_allocation={time_allocation}
                             usersCount={usersCount}

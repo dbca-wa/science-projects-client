@@ -597,6 +597,31 @@ export const removeTeamMemberFromProject = async (formData: RemoveUserMutationTy
 
 }
 
+export const updateProjectMember = async (formData: any) => {
+    console.log(formData);
+
+    const projectId = formData.projectPk;
+    const userId = formData.userPk;
+    const shortCode = formData.shortCode;
+    const fte = formData.fte;
+    const role = formData.role;
+
+    const response = await instance.put(
+        `projects/project_members/${projectId}/${userId}`,
+        {
+            "role": role,
+            "time_allocation": fte,
+            "short_code": shortCode,
+        }
+    );
+
+    console.log(response.data === "");
+    console.log(response.status);
+    return response.data;
+
+
+}
+
 
 export const promoteUserToLeader = async (formData: RemoveUserMutationType) => {
     console.log(formData);
@@ -1275,6 +1300,15 @@ export const getAllReports = async () => {
     })
     return res;
 }
+
+export const getReportPDFs = async () => {
+    const res = instance.get(`medias/report_pdfs`
+    ).then(res => {
+        return res.data
+    })
+    return res;
+}
+
 
 export const getFullReport = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;

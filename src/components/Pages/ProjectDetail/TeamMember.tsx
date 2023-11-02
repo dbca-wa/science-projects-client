@@ -18,6 +18,7 @@ interface ITeamMember {
     role: string;
     image: IImageData;
     time_allocation: number;
+    short_code: number | string;
     position: number;
     usersCount: number;
     project_id: number;
@@ -29,7 +30,9 @@ interface ITeamMember {
     refetchTeamData: () => void;
 }
 
-export const TeamMember = ({ refetchTeamData, user_id, is_leader, leader_pk, name, role, image, time_allocation, position, username, usersCount, project_id,
+export const TeamMember = ({
+    refetchTeamData, user_id, is_leader, leader_pk, name, short_code,
+    role, image, time_allocation, position, username, usersCount, project_id,
     isCurrentlyDragging,
     draggableProps,
     dragHandleProps,
@@ -136,6 +139,7 @@ export const TeamMember = ({ refetchTeamData, user_id, is_leader, leader_pk, nam
                             leader_pk={leader_pk}
                             role={role}
                             position={position}
+                            shortCode={short_code}
                             time_allocation={time_allocation}
                             usersCount={usersCount}
                             refetchTeamData={refetchTeamData}
