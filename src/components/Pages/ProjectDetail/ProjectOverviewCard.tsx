@@ -175,7 +175,8 @@ export const ProjectOverviewCard = (
                             {
                                 // base: "250px",
                                 base: "380px",
-                                xl: "450px",
+                                xl: "400px",
+                                '2xl': "4800px",
                             }
                         }
                         rounded={"xl"}

@@ -6,7 +6,7 @@ import { getFullReport } from "../api";
 // import { useEffect } from "react";
 
 export const useGetFullReport = (pk: number) => {
-    const { isLoading, data } = useQuery(["user", pk], getFullReport,
+    const { isLoading, data } = useQuery(["report", pk], getFullReport,
         {
             retry: false,
         });

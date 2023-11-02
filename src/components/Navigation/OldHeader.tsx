@@ -41,6 +41,7 @@ import { RiAdminFill, RiOrganizationChart } from "react-icons/ri";
 import { MdManageHistory, MdOutlineSettingsSuggest } from "react-icons/md";
 import { GoOrganization } from "react-icons/go";
 import { FcApproval, FcDataBackup } from "react-icons/fc";
+import { useGetReportPDFs } from "../../lib/hooks/useGetReportPDFs";
 
 
 const ProjectMenuContents = () => {
@@ -103,6 +104,15 @@ const ReportMenuContents = () => {
         },
     ]
 
+    const { reportPdfs, reportPdfsLoading } = useGetReportPDFs();
+
+    useEffect(() => {
+        if (!reportPdfsLoading) {
+            console.log(reportPdfs);
+
+        }
+    }, [reportPdfs, reportPdfsLoading])
+
     return (
         <>
             <MenuGroup
@@ -139,7 +149,7 @@ const ReportMenuContents = () => {
                 my={1}
             />
             <MenuGroup
-                title="Published" fontSize={"12px"}
+                title="ARAR PDF" fontSize={"12px"}
                 color={"gray.500"} textAlign={"center"}
             >
                 {

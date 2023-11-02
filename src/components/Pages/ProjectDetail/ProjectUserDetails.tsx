@@ -1,7 +1,7 @@
 // Component that shows the details of a project member, including their role, time allocation, whether they are the leader, and their position in 
 // the manage team component (drag and droppable by Admins and leader)
 
-import { Avatar, Image, Box, Button, Center, Flex, Grid, Icon, Spacer, Spinner, Text, useColorMode, Slider, SliderTrack, SliderFilledTrack, SliderThumb, FormControl, InputGroup, Select, FormHelperText, useToast, ToastId } from "@chakra-ui/react"
+import { Avatar, Image, Box, Button, Center, Flex, Grid, Icon, Spacer, Spinner, Text, useColorMode, Slider, SliderTrack, SliderFilledTrack, SliderThumb, FormControl, InputGroup, Select, FormHelperText, useToast, ToastId, Input } from "@chakra-ui/react"
 import { FiCopy } from "react-icons/fi";
 import { FcApproval } from "react-icons/fc";
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -10,7 +10,7 @@ import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
 import { useCopyText } from "../../../lib/hooks/useCopyText";
 import { useUser } from "../../../lib/hooks/useUser";
-import { RemoveUserMutationType, promoteUserToLeader, removeTeamMemberFromProject } from "../../../lib/api";
+import { RemoveUserMutationType, promoteUserToLeader, removeTeamMemberFromProject, updateProjectMember } from "../../../lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
@@ -23,11 +23,13 @@ interface Props {
     time_allocation: number;
     usersCount: number;
     project_id: number;
+    shortCode: number | string;
     refetchTeamData: () => void;
     onClose: () => void;
 }
 
-export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, position, time_allocation, usersCount, project_id, refetchTeamData }: Props) => {
+export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk,
+    role, shortCode, position, time_allocation, usersCount, project_id, refetchTeamData }: Props) => {
 
     const { userLoading: loading, userData: user } = useFullUserByPk(pk);
     const formatted_date = useFormattedDate(user?.date_joined);
@@ -43,6 +45,7 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, po
 
     const [fteValue, setFteValue] = useState(time_allocation);
     const [userRole, setUserRole] = useState(role);
+    const [shortCodeValue, setShortCodeValue] = useState(shortCode);
 
     useEffect(() => {
         if (userRole && userRole !== role) {
@@ -153,6 +156,76 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, po
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
+
+    const updateProjectUser = (formData: any) => {
+        console.log(formData);
+        updateMemberMutation.mutate(formData);
+    }
+
+    const updateMemberMutation = useMutation(updateProjectMember,
+        {
+            onMutate: () => {
+                console.log("Updating Project Membership");
+
+                addToast({
+                    status: "loading",
+                    title: "Updating Project Membership",
+                    position: "top-right"
+                })
+            },
+
+            onSuccess: (data) => {
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Success',
+                        description: `User Updated`,
+                        status: 'success',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+                // reset()
+
+                setTimeout(
+                    // async 
+                    () => {
+                        // await 
+                        queryClient.invalidateQueries(
+                            [
+                                "projects",
+                                project_id
+                            ]
+                        );
+
+                        refetchTeamData && refetchTeamData();
+                        // const url = 
+                        if (!location.pathname.includes('project')) {
+                            navigate(`/projects/${project_id}`);
+                        } else {
+                            onClose();
+                        }
+                    }, 350)
+
+
+            },
+            onError: (error) => {
+                console.log(error);
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Could Not Promote User',
+                        description: `${error}`,
+                        status: 'error',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+            }
+
+        })
+
+
     const promoteUserMutation = useMutation(promoteUserToLeader,
         {
             onMutate: () => {
@@ -242,6 +315,8 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, po
                 }
                 // reset()
 
+                onClose();
+
                 setTimeout(
                     // async 
                     () => {
@@ -258,7 +333,7 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, po
                         if (!location.pathname.includes('project')) {
                             navigate(`/projects/${project_id}`);
                         } else {
-                            onClose();
+                            // onClose();
                         }
                     }, 350)
 
@@ -465,7 +540,12 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, po
                             Short Code
                         </Text>
                     </Flex>
-                    <Text>-</Text>
+                    <Input
+                        autoComplete="off"
+                        defaultValue={shortCode}
+                        onChange={(e) => setShortCodeValue(e.target.value)}
+                    />
+                    {/* <Text>-</Text> */}
                     {(!is_leader && (me?.userData?.is_superuser || me?.userData?.pk === leader_pk)) && (
                         <Button
                             mt={4}
@@ -479,7 +559,7 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, po
                                 }
                             }
 
-                            isDisabled={usersCount === 1}
+                            isDisabled={usersCount === 1 || !user?.is_staff}
                             onClick={promoteThisUser}
 
                         // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
@@ -488,6 +568,19 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, po
                         </Button>
 
                     )}
+                    <Button
+                        colorScheme="blue"
+                        mt={4}
+                        onClick={() => updateProjectUser({
+                            "projectPk": project_id,
+                            "userPk": pk,
+                            "role": userRole,
+                            "fte": fteValue,
+                            "shortCode": shortCodeValue,
+                        })}
+                    >
+                        Save Changes
+                    </Button>
                 </Flex>
 
                 <Box
@@ -513,7 +606,10 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk, role, po
                                     <Image
                                         rounded={"lg"}
                                         w="60px" h="60px"
-                                        src={user?.agency?.image?.file ? user.agency.image.file : user?.agency?.image?.old_file ? user.agency.image.old_file : ""}
+                                        src={
+                                            "/dbca.jpg"
+                                            // user?.agency?.image?.file ? user.agency.image.file : user?.agency?.image?.old_file ? user.agency.image.old_file : ""
+                                        }
                                         objectFit="cover"
                                     />
                                     <Center>
