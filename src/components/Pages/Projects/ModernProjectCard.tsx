@@ -9,6 +9,7 @@ import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext
 import { useNoImage } from "../../../lib/hooks/useNoImage";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
+import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE";
 
 export const ModernProjectCard = ({
     pk,
@@ -184,14 +185,20 @@ export const ModernProjectCard = ({
                     <Box
                         zIndex={3}
                     >
-                        <Text
+                        {/* <Text
                             fontWeight={"semibold"}
                             color={"white"}
                             noOfLines={2}
                             textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)" // Add text shadow
                         >
                             {title}
-                        </Text>
+                        </Text> */}
+                        <SimpleDisplaySRTE
+
+                            data={title}
+                            displayData={title}
+                            displayArea="projectCardTitle"
+                        />
                     </Box>
                 </Flex>
                 <Box

@@ -43,6 +43,7 @@ export const BaseToolbarMenuButton = ({ title, menuIcon: MenuIcon, menuItems }: 
 
     return (
         <Menu isLazy
+
         >
             <MenuButton
                 as={Button}
@@ -57,12 +58,15 @@ export const BaseToolbarMenuButton = ({ title, menuIcon: MenuIcon, menuItems }: 
                 mx={1}
                 flex={1}
                 ref={buttonRef}
+
             >
                 {title ? title : null}
             </MenuButton>
             <MenuList
                 w={buttonWidth}
                 minW={"200px"}
+                zIndex={9999999999999}
+                pos={"absolute"}
             >
                 {menuItems.map((item, index) => {
                     return (
@@ -72,6 +76,8 @@ export const BaseToolbarMenuButton = ({ title, menuIcon: MenuIcon, menuItems }: 
                             w={"100%"}
                             display={"inline-flex"}
                             alignItems={"center"}
+                            zIndex={2}
+                        // pos={"absolute"}
                         >
                             {
                                 item.leftIcon ?
@@ -80,7 +86,10 @@ export const BaseToolbarMenuButton = ({ title, menuIcon: MenuIcon, menuItems }: 
                                     ) :
                                     null
                             }
-                            <Box pl={4}>
+                            <Box pl={4}
+                                zIndex={2}
+
+                            >
                                 <span
                                 >{item.text}</span>
                             </Box>

@@ -3,7 +3,7 @@
 import { Box, Center, Flex, Select, Spinner, Text, useColorMode } from "@chakra-ui/react"
 import { DocumentActions } from "./DocumentActions"
 import { IProgressReport } from "../../../types";
-import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
+import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { useEffect, useState } from "react";
 // import { ProgressReportSelector } from "./ProgressReportSelector";
 import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions";
@@ -171,31 +171,31 @@ export const ProgressReportContents = ({
 
                     >
 
-                        <SimpleRichTextEditor
+                        <RichTextEditor
                             key={`context${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.context}
                             section={"context"}
                         />
 
-                        <SimpleRichTextEditor
+                        <RichTextEditor
                             key={`aims${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.aims}
                             section={"aims"}
                         />
 
-                        <SimpleRichTextEditor
+                        <RichTextEditor
                             key={`progress${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.progress}
                             section={"progress"}
                         />
 
-                        <SimpleRichTextEditor
+                        <RichTextEditor
                             key={`implications${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.implications}
                             section={"implications"}
                         />
 
-                        <SimpleRichTextEditor
+                        <RichTextEditor
                             key={`future${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.future}
                             section={"future"}

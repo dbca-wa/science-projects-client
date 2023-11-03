@@ -105,7 +105,7 @@ export const ProjectDetailsSection = ({
         <>
             <ModalBody
                 overflowY={"auto"}
-                maxHeight={"59vh"}
+            // maxHeight={"59vh"}
             >
                 <Grid
                     gridTemplateColumns={"repeat(2, 1fr)"}

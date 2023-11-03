@@ -61,7 +61,7 @@ export const ProjectExternalSection = (
         <>
             <ModalBody
                 overflowY={"auto"}
-                maxHeight={"58vh"}
+            // maxHeight={"58vh"}
             >
                 <FormControl
                     pb={6}
