@@ -16,11 +16,7 @@ import { IHTMLSave, saveHtmlToDB } from "../../../lib/api";
 import { EditorType } from "../../../types";
 
 
-interface Props {
-    editorType: EditorType
-}
-
-export const SaveButton = ({ editorType }: Props) => {
+export const SaveButton = ({ editorType, htmlData, project_pk, document_pk, section, isUpdate }: IHTMLSave) => {
     const [isLocked, setIsLocked] = useState<boolean>(false);
     const [editor] = useLexicalComposerContext();
     // console.log(editor)
@@ -31,6 +27,8 @@ export const SaveButton = ({ editorType }: Props) => {
     //         console.log(htmlString)
     //     }
     // }, [editor, isLocked])
+
+    useEffect(() => console.log(htmlData), [htmlData])
 
 
     const { colorMode } = useColorMode();
@@ -47,17 +45,11 @@ export const SaveButton = ({ editorType }: Props) => {
             onMutate: () => {
                 addToast({
                     status: "loading",
-                    title: "Saving to DB...",
+                    title: "Updating...",
                     position: "top-right"
                 })
             },
             onSuccess: (data) => {
-                // if (setIsAnimating) {
-                //     setIsAnimating(true)
-
-                // }
-
-
                 if (toastIdRef.current) {
                     toast.update(toastIdRef.current, {
                         title: 'Success',
@@ -83,7 +75,7 @@ export const SaveButton = ({ editorType }: Props) => {
             onError: (error) => {
                 if (toastIdRef.current) {
                     toast.update(toastIdRef.current, {
-                        title: 'Could Not Save',
+                        title: 'Could Not Update',
                         description: `${error}`,
                         status: 'error',
                         position: "top-right",
@@ -96,11 +88,19 @@ export const SaveButton = ({ editorType }: Props) => {
 
         })
 
-    const saveProjectToDb = (formData: IHTMLSave) => {
+    const saveToDB = (formData: IHTMLSave) => {
         //
+        console.log("Saving to db")
+        // console.log({
+        //     "editorType": formData.editorType,
+        //     "htmlData": formData.htmlData,
+        //     "project_pk": formData.project_pk,
+        //     "document_pk": formData.document_pk,
+        //     "section": formData.section,
+        // })
+
         htmlSaveProjectMutation.mutate(formData);
 
-        console.log("Saving to db")
     }
 
 
@@ -109,11 +109,7 @@ export const SaveButton = ({ editorType }: Props) => {
         <BaseOptionsButton
             icon={FaSave}
             colorScheme="green"
-            onClick={handleSubmit(
-                // editorType === "project" ? 
-                saveProjectToDb
-                // : 
-            )}
+            onClick={() => saveToDB({ editorType, htmlData, project_pk, document_pk, section, isUpdate })}
             toolTipText="Save changes"
         // toolTip={"Save changes"}
         />

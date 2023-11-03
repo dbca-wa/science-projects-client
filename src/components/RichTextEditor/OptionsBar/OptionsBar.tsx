@@ -7,13 +7,21 @@ import { SaveButton } from "../Buttons/SaveButton";
 import { TreeButton } from "../Buttons/TreeButton";
 import { LexicalEditor } from "lexical";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
+import { EditorSubsections, EditorType } from "../../../types";
+import { useEffect } from "react";
 
 interface IOptionsBarProps {
     // editor: LexicalEditor;
+    isUpdate: boolean;
     editorText: string | null;
+    editorType: EditorType;
     shouldShowTree: boolean;
     setShouldShowTree: React.Dispatch<React.SetStateAction<boolean>>;
     rawHTML: string;
+    section: EditorSubsections;
+    project_pk: number;
+    document_pk: number;
+    displayData: string;
     editorIsOpen: boolean;
     setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setDisplayData: React.Dispatch<React.SetStateAction<string>>;
@@ -21,8 +29,11 @@ interface IOptionsBarProps {
 
 export const OptionsBar = ({
     // editor,
-    editorText, shouldShowTree, setShouldShowTree, rawHTML, editorIsOpen, setIsEditorOpen, setDisplayData }: IOptionsBarProps) => {
+    displayData, editorType, isUpdate,
+    editorText, shouldShowTree, setShouldShowTree, rawHTML, editorIsOpen, setIsEditorOpen, setDisplayData, section, project_pk, document_pk }: IOptionsBarProps) => {
     const { colorMode } = useColorMode();
+
+    // useEffect(() => console.log(displayData), [displayData])
 
     return (
 
@@ -62,7 +73,12 @@ export const OptionsBar = ({
                         {/* <UploadButton /> */}
                         {/* <DownloadButton /> */}
                         <SaveButton
-                            editorType={"ProjectDocument"}
+                            isUpdate={isUpdate}
+                            editorType={editorType}
+                            htmlData={displayData}
+                            project_pk={project_pk}
+                            document_pk={document_pk}
+                            section={section}
                         />
                         {/* <HideEditorButton
                             setIsEditorOpen={setIsEditorOpen}

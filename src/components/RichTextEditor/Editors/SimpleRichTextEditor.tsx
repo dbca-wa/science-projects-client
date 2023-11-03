@@ -36,18 +36,22 @@ import { HeadingNode } from "@lexical/rich-text";
 
 import { EditableSRTE } from "./Sections/EditableSRTE";
 import { DisplaySRTE } from "./Sections/DisplaySRTE";
-import { EditorSubsections } from "../../../types";
+import { EditorSubsections, EditorType } from "../../../types";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 
 
 
 interface IProps {
     data: string;
-    section: EditorSubsections;
     titleTextSize?: string;
+    section: EditorSubsections;
+    project_pk: number;
+    document_pk?: number;
+    editorType: EditorType;
+    isUpdate: boolean;
 }
 
-export const SimpleRichTextEditor = ({ data, section, titleTextSize }: IProps) => {
+export const SimpleRichTextEditor = ({ data, titleTextSize, section, project_pk, document_pk, editorType, isUpdate }: IProps) => {
 
     const [shouldShowTree, setShouldShowTree] = useState(false);
     const { colorMode } = useColorMode();
@@ -269,9 +273,18 @@ export const SimpleRichTextEditor = ({ data, section, titleTextSize }: IProps) =
 
                 {isEditorOpen ? (
                     <EditableSRTE
+
                         initialConfig={initialConfig}
                         editorRef={editorRef}
+
+
                         data={data}
+                        section={section}
+                        project_pk={project_pk}
+                        document_pk={document_pk}
+                        editorType={editorType}
+                        isUpdate={isUpdate}
+
                         displayData={displayData}
 
                         editorText={editorText}
@@ -308,14 +321,6 @@ export const SimpleRichTextEditor = ({ data, section, titleTextSize }: IProps) =
 
     )
 }
-
-// <Text
-// fontWeight={"semibold"}
-// >
-// Description:
-// </Text>
-
-
 
 
 const SelectionSetterPlugin = () => {

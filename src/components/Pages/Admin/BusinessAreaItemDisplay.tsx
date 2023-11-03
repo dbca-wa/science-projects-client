@@ -540,7 +540,7 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                                                             }}
                                                         />
                                                     </FormControl>
-                                                    <FormHelperText>Upload an image for your display picture.</FormHelperText>
+                                                    <FormHelperText>Select an image for the Business Area.</FormHelperText>
                                                     {errors.image && (
                                                         <FormErrorMessage>{errors.image.message}</FormErrorMessage>
                                                     )}
@@ -549,7 +549,7 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                                         </FormControl>
                                     </Grid>
 
-                                    <FormHelperText>Select an image for the Business Area</FormHelperText>
+                                    {/* <FormHelperText>Select an image for the Business Area</FormHelperText> */}
                                 </FormControl>
 
                                 <FormControl

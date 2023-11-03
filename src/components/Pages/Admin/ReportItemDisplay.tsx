@@ -1,4 +1,4 @@
-import { Box, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormHelperText, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spinner, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Image, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormHelperText, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spinner, Text, Textarea, VStack, useDisclosure, useToast, FormErrorMessage } from "@chakra-ui/react"
 import { IReport, IResearchFunction } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -14,6 +14,9 @@ import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { CalendarWithCSS } from "../CreateProject/CalendarWithCSS";
 import { useGetFullReport } from "../../../lib/hooks/useGetFullReport";
+import { useNoImage } from "../../../lib/hooks/useNoImage";
+import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
+import { useGetReportMedia } from "../../../lib/hooks/useGetReportMedia";
 
 export const ReportItemDisplay = ({
     pk, year, created_at, updated_at, date_closed, date_open, creator,
@@ -25,12 +28,75 @@ export const ReportItemDisplay = ({
     //     })
     // })
 
+    const NoImageFile = useNoImage();
+    const apiEndpoint = useApiEndpoint();
+    // console.log(`${apiEndpoint}/files/${image.file}`)
+    const noImageLink = useNoImage();
+
+    // cover
+    const [coverpageImageLoadFailed, setCoverpageImageLoadFailed] = useState(false);
+    const [selectedCoverpageFile, setSelectedCoverpageFile] = useState<File | null>(null);
+    const [selectedCoverpageImageUrl, setSelectedCoverpageImageUrl] = useState<string | null>();
+
+    // rear cover
+    const [rearCoverpageImageLoadFailed, setRearCoverpageImageLoadFailed] = useState(false);
+    const [selectedRearCoverpageFile, setSelectedRearCoverpageFile] = useState<File | null>(null);
+    const [selectedRearCoverpageImageUrl, setSelectedRearCoverpageImageUrl] = useState<string | null>();
+
+    // org chart
+    const [serviceDeliveryOrgChartImageLoadFailed, setServiceDeliveryOrgChartImageLoadFailed] = useState(false);
+    const [selectedServiceDeliveryOrgChartFile, setSelectedServiceDeliveryOrgChartFile] = useState<File | null>(null);
+    const [selectedServiceDeliveryOrgChartImageUrl, setSelectedServiceDeliveryOrgChartImageUrl] = useState<string | null>();
+
+    // service delivery 
+    const [serviceDeliveryChapterImageLoadFailed, setServiceDeliveryChapterImageLoadFailed] = useState(false);
+    const [selectedServiceDeliveryChapterFile, setSelectedServiceDeliveryChapterFile] = useState<File | null>(null);
+    const [selectedServiceDeliveryChapterImageUrl, setSelectedServiceDeliveryChapterImageUrl] = useState<string | null>();
+
+    // research
+    const [researchChapterImageLoadFailed, setResearchChapterImageLoadFailed] = useState(false);
+    const [selectedResearchChapterFile, setSelectedResearchChapterFile] = useState<File | null>(null);
+    const [selectedResearchChapterImageUrl, setSelectedResearchChapterImageUrl] = useState<string | null>();
+
+    // partnerships
+    const [partnershipsChapterImageLoadFailed, setPartnershipsChapterImageLoadFailed] = useState(false);
+    const [selectedPartnershipsChapterFile, setSelectedPartnershipsChapterFile] = useState<File | null>(null);
+    const [selectedPartnershipsChapterImageUrl, setSelectedPartnershipsChapterImageUrl] = useState<string | null>();
+
+    // collaborations
+    const [collaborationsChapterImageLoadFailed, setCollaborationsChapterImageLoadFailed] = useState(false);
+    const [selectedCollaborationsChapterFile, setSelectedCollaborationsChapterFile] = useState<File | null>(null);
+    const [selectedCollaborationsChapterImageUrl, setSelectedCollaborationsChapterImageUrl] = useState<string | null>();
+
+    // student projects
+    const [studentProjectsChapterImageLoadFailed, setStudentProjectsChapterImageLoadFailed] = useState(false);
+    const [selectedStudentProjectsChapterFile, setSelectedStudentProjectsChapterFile] = useState<File | null>(null);
+    const [selectedStudentProjectsChapterImageUrl, setSelectedStudentProjectsChapterImageUrl] = useState<string | null>();
+
+
+    // publications
+    const [publicationsChapterImageLoadFailed, setPublicationsChapterImageLoadFailed] = useState(false);
+    const [selectedPublicationsChapterFile, setSelectedPublicationsChapterFile] = useState<File | null>(null);
+    const [selectedPublicationsChapterImageUrl, setSelectedPublicationsChapterImageUrl] = useState<string | null>();
+
+
+
+
     const { reportData, reportLoading } = useGetFullReport(pk);
     useEffect(() => {
         if (!reportLoading)
 
             console.log(reportData);
     }, [reportData, reportLoading])
+
+
+    const { reportMediaData, reportMediaLoading } = useGetReportMedia(pk);
+    useEffect(() => {
+        if (!reportMediaLoading)
+
+            console.log(reportMediaData);
+    }, [reportMediaData, reportMediaLoading])
+
 
     const { register, handleSubmit, watch } = useForm<IReport>();
     // const [selectedCreator, setSelectedCreator] = useState<number>(creator);
@@ -388,35 +454,666 @@ export const ReportItemDisplay = ({
                                 />
                             </FormControl>
 
-                            <VStack spacing={6}>
-                                <FormControl>
-                                    <FormLabel>Coverpage</FormLabel>
+                            <Grid
+                                gridTemplateColumns={"repeat(2, 1fr)"}
+                                gap={4}
+                            >
+                                <FormControl isRequired>
+                                    <Grid gridTemplateColumns={"repeat(2, 1fr)"} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Cover Page</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                // w={"400px"}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!coverpageImageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedCoverpageFile !== null ? selectedCoverpageImageUrl : reportMediaData?.cover ?
+                                                            reportMediaData?.cover instanceof File ?
+
+                                                                `${apiEndpoint}${reportMediaData?.cover?.name}` // Use the image directly for File
+                                                                : reportMediaData?.cover?.file
+                                                                    ? `${apiEndpoint}${reportMediaData?.cover?.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl
+                                            // ml={4} 
+                                            mt={7}
+                                        >
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            // {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedCoverpageFile(file);
+                                                                    setSelectedCoverpageImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Select an image for the Cover Page.</FormHelperText>
+                                                    {/* {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )} */}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
                                 </FormControl>
-                                <FormControl>
-                                    <FormLabel>Rear Coverpage</FormLabel>
+                                <FormControl isRequired>
+                                    <Grid gridTemplateColumns={"repeat(2, 1fr)"} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Service Delivery Chapter Image</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                // w={"400px"}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!serviceDeliveryChapterImageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedServiceDeliveryChapterFile !== null ? selectedServiceDeliveryChapterImageUrl : reportMediaData?.service_delivery_chapter_image ?
+                                                            reportMediaData?.service_delivery_chapter_image instanceof File ?
+
+                                                                `${apiEndpoint}${reportMediaData?.service_delivery_chapter_image?.name}` // Use the image directly for File
+                                                                : reportMediaData?.service_delivery_chapter_image?.file
+                                                                    ? `${apiEndpoint}${reportMediaData?.service_delivery_chapter_image?.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl
+                                            // ml={4} 
+                                            mt={7}
+                                        >
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            // {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedServiceDeliveryChapterFile(file);
+                                                                    setSelectedServiceDeliveryChapterImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Select an image for the Service Delivery Chapter Image.</FormHelperText>
+                                                    {/* {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )} */}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
                                 </FormControl>
-                                <FormControl>
-                                    <FormLabel>Service Delivery Chapter Image</FormLabel>
+                                <FormControl isRequired>
+                                    <Grid gridTemplateColumns={"repeat(2, 1fr)"} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Service Delivery Org Chart</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                // w={"400px"}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!serviceDeliveryOrgChartImageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedServiceDeliveryOrgChartFile !== null ? selectedServiceDeliveryOrgChartImageUrl : reportMediaData?.org_chart ?
+                                                            reportMediaData?.org_chart instanceof File ?
+
+                                                                `${apiEndpoint}${reportMediaData?.org_chart.name}` // Use the image directly for File
+                                                                : reportMediaData?.org_chart?.file
+                                                                    ? `${apiEndpoint}${reportMediaData?.org_chart?.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl
+                                            // ml={4} 
+                                            mt={7}
+                                        >
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            // {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedServiceDeliveryOrgChartFile(file);
+                                                                    setSelectedServiceDeliveryOrgChartImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Select an image for the Org Chart.</FormHelperText>
+                                                    {/* {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )} */}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
                                 </FormControl>
-                                <FormControl>
-                                    <FormLabel>Service Delivery Org Chart</FormLabel>
+                                <FormControl isRequired>
+                                    <Grid gridTemplateColumns={"repeat(2, 1fr)"} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Research Chapter Image</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                // w={"400px"}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!researchChapterImageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedResearchChapterFile !== null ? selectedResearchChapterImageUrl : reportMediaData?.research ?
+                                                            reportMediaData?.research instanceof File ?
+
+                                                                `${apiEndpoint}${reportMediaData?.research?.name}` // Use the image directly for File
+                                                                : reportMediaData?.research?.file
+                                                                    ? `${apiEndpoint}${reportMediaData?.research?.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl
+                                            // ml={4} 
+                                            mt={7}
+                                        >
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            // {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedResearchChapterFile(file);
+                                                                    setSelectedResearchChapterImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Select an image for the Research Chapter Image.</FormHelperText>
+                                                    {/* {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )} */}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
                                 </FormControl>
-                                <FormControl>
-                                    <FormLabel>Research Chapter Image</FormLabel>
+
+                                <FormControl isRequired>
+                                    <Grid gridTemplateColumns={"repeat(2, 1fr)"} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Partnerships Chapter Image</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                // w={"400px"}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!partnershipsChapterImageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedPartnershipsChapterFile !== null ? selectedPartnershipsChapterImageUrl : reportMediaData?.partnerships ?
+                                                            reportMediaData?.partnerships instanceof File ?
+
+                                                                `${apiEndpoint}${reportMediaData?.partnerships?.name}` // Use the image directly for File
+                                                                : reportMediaData?.partnerships?.file
+                                                                    ? `${apiEndpoint}${reportMediaData?.partnerships?.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl
+                                            // ml={4} 
+                                            mt={7}
+                                        >
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            // {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedPartnershipsChapterFile(file);
+                                                                    setSelectedPartnershipsChapterImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Select an image for the Partnerships Chapter Image.</FormHelperText>
+                                                    {/* {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )} */}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
                                 </FormControl>
-                                <FormControl>
-                                    <FormLabel>Partnerships Chapter Image</FormLabel>
+
+                                <FormControl isRequired>
+                                    <Grid gridTemplateColumns={"repeat(2, 1fr)"} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Collaborations Chapter Image</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                // w={"400px"}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!collaborationsChapterImageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedCollaborationsChapterFile !== null ? selectedCollaborationsChapterImageUrl : reportMediaData?.collaborations ?
+                                                            reportMediaData?.collaborations instanceof File ?
+
+                                                                `${apiEndpoint}${reportMediaData?.collaborations?.name}` // Use the image directly for File
+                                                                : reportMediaData?.collaborations?.file
+                                                                    ? `${apiEndpoint}${reportMediaData?.collaborations?.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl
+                                            // ml={4} 
+                                            mt={7}
+                                        >
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            // {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedCollaborationsChapterFile(file);
+                                                                    setSelectedCollaborationsChapterImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Select an image for the Collaborations Chapter Image.</FormHelperText>
+                                                    {/* {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )} */}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
                                 </FormControl>
-                                <FormControl>
-                                    <FormLabel>Collaborations Chapter Image</FormLabel>
+
+
+                                <FormControl isRequired>
+                                    <Grid gridTemplateColumns={"repeat(2, 1fr)"} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Student Projects Chapter Image</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                // w={"400px"}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!studentProjectsChapterImageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedStudentProjectsChapterFile !== null ? selectedStudentProjectsChapterImageUrl : reportMediaData?.student ?
+                                                            reportMediaData?.student instanceof File ?
+
+                                                                `${apiEndpoint}${reportMediaData?.student?.name}` // Use the image directly for File
+                                                                : reportMediaData?.student?.file
+                                                                    ? `${apiEndpoint}${reportMediaData?.student?.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl
+                                            // ml={4} 
+                                            mt={7}
+                                        >
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            // {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedStudentProjectsChapterFile(file);
+                                                                    setSelectedStudentProjectsChapterImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Select an image for the Student Projects Chapter Image.</FormHelperText>
+                                                    {/* {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )} */}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
                                 </FormControl>
-                                <FormControl>
-                                    <FormLabel>Student Projects Chapter Image</FormLabel>
+
+                                <FormControl isRequired>
+                                    <Grid gridTemplateColumns={"repeat(2, 1fr)"} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Publications Chapter Image</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                // w={"400px"}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!publicationsChapterImageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedPublicationsChapterFile !== null ? selectedPublicationsChapterImageUrl : reportMediaData?.publications ?
+                                                            reportMediaData?.publications instanceof File ?
+
+                                                                `${apiEndpoint}${reportMediaData?.publications?.name}` // Use the image directly for File
+                                                                : reportMediaData?.publications?.file
+                                                                    ? `${apiEndpoint}${reportMediaData?.publications?.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl
+                                            // ml={4} 
+                                            mt={7}
+                                        >
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            // {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedPublicationsChapterFile(file);
+                                                                    setSelectedPublicationsChapterImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Select an image for the Publications Chapter Image.</FormHelperText>
+                                                    {/* {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )} */}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
                                 </FormControl>
-                                <FormControl>
-                                    <FormLabel>Publications Chapter Image</FormLabel>
+
+                                <FormControl isRequired>
+                                    <Grid gridTemplateColumns={"repeat(2, 1fr)"} pos="relative" w="100%" h="100%">
+                                        <Box>
+                                            <FormLabel>Rear Coverpage</FormLabel>
+                                            <Center
+                                                maxH={{ base: "200px", xl: "225px" }}
+                                                // w={"400px"}
+                                                bg="gray.50"
+                                                mt={1}
+                                                rounded="lg"
+                                                overflow="hidden"
+                                            >
+                                                {!rearCoverpageImageLoadFailed ? (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={selectedRearCoverpageFile !== null ? selectedRearCoverpageImageUrl : reportMediaData?.rear ?
+                                                            reportMediaData?.rear instanceof File ?
+
+                                                                `${apiEndpoint}${reportMediaData?.rear?.name}` // Use the image directly for File
+                                                                : reportMediaData?.rear?.file
+                                                                    ? `${apiEndpoint}${reportMediaData?.rear?.file}`
+                                                                    : NoImageFile
+                                                            : NoImageFile
+                                                        }
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    // onLoad={handleImageLoadSuccess}
+                                                    // onError={handleImageLoadError}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        objectFit="cover"
+                                                        src={noImageLink}
+                                                        alt="Preview"
+                                                        userSelect="none"
+                                                        bg="gray.800"
+                                                    />
+                                                )}
+                                            </Center>
+                                        </Box>
+                                        <FormControl
+                                            // ml={4} 
+                                            mt={7}
+                                        >
+                                            <InputGroup>
+                                                <Grid gridGap={2} ml={4}>
+                                                    <FormControl>
+                                                        <Input
+                                                            autoComplete="off"
+                                                            // {...register("image", { required: true })}
+                                                            alignItems={"center"}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setSelectedRearCoverpageFile(file);
+                                                                    setSelectedRearCoverpageImageUrl(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormHelperText>Select an image for the Rear Cover Page.</FormHelperText>
+                                                    {/* {errors.image && (
+                                                        <FormErrorMessage>{errors.image.message}</FormErrorMessage>
+                                                    )} */}
+                                                </Grid>
+                                            </InputGroup>
+                                        </FormControl>
+                                    </Grid>
                                 </FormControl>
-                            </VStack>
+
+                            </Grid>
                             <Center>
                                 {updateMediaMutation.isError ? (
                                     <Box mt={4}>

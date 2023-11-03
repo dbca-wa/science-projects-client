@@ -18,11 +18,18 @@ import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin"
 import { useEffect, useState } from "react";
 import { DataDisplayPlugin } from "../../Plugins/DataDisplayPlugin";
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
+import { EditorSubsections, EditorType } from "../../../../types";
 
 interface Props {
     initialConfig: any;
     editorRef: any;
     data: string;
+    section: EditorSubsections;
+    project_pk: number;
+    document_pk: number;
+    editorType: EditorType;
+    isUpdate: boolean;
+
     editorText: string;
     setEditorText: React.Dispatch<React.SetStateAction<string>>;
     shouldShowTree: boolean;
@@ -35,9 +42,17 @@ interface Props {
     textEditorName?: string;
 }
 
-export const EditableSRTE = ({ textEditorName, initialConfig, editorRef, data, editorText, setEditorText, isEditorOpen, setIsEditorOpen, displayData, setDisplayData, shouldShowTree, setShouldShowTree }: Props) => {
+export const EditableSRTE = (
+    { textEditorName, section, project_pk, document_pk, editorType, isUpdate,
+        initialConfig, editorRef,
+        data, editorText, setEditorText,
+        isEditorOpen, setIsEditorOpen,
+        displayData, setDisplayData,
+        shouldShowTree, setShouldShowTree }: Props) => {
 
     const [selectedNodeType, setSelectedNodeType] = useState<string>();
+
+    // useEffect(() => console.log(displayData), [displayData])
 
     return (
         <>
@@ -52,6 +67,7 @@ export const EditableSRTE = ({ textEditorName, initialConfig, editorRef, data, e
                         const root = $getRoot();
                         setEditorText(root.__cachedText);
                         const newHtml = $generateHtmlFromNodes(editor, null)
+                        // console.log(newHtml)
                         // console.log("DATA DISPLAY PLUGIN:", newHtml);
                         setDisplayData(newHtml);
                     })
@@ -107,10 +123,17 @@ export const EditableSRTE = ({ textEditorName, initialConfig, editorRef, data, e
 
                 <Box>
                     <OptionsBar
+                        editorType={editorType}
+                        displayData={displayData}
                         editorText={editorText}
                         shouldShowTree={shouldShowTree}
                         setShouldShowTree={setShouldShowTree}
-                        rawHTML={data}
+                        rawHTML={displayData}
+                        section={section}
+                        project_pk={project_pk}
+                        document_pk={document_pk}
+                        isUpdate={isUpdate}
+
                         editorIsOpen={isEditorOpen}
                         setIsEditorOpen={setIsEditorOpen}
                         setDisplayData={setDisplayData}
