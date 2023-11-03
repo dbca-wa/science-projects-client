@@ -346,7 +346,7 @@ export const BusinessAreasCRUD = () => {
                                                                 }}
                                                             />
                                                         </FormControl>
-                                                        <FormHelperText>Upload an image for your display picture.</FormHelperText>
+                                                        <FormHelperText>Select an image for the Business Area.</FormHelperText>
                                                         {errors.image && (
                                                             <FormErrorMessage>{errors.image.message}</FormErrorMessage>
                                                         )}
@@ -355,7 +355,7 @@ export const BusinessAreasCRUD = () => {
                                             </FormControl>
                                         </Grid>
 
-                                        <FormHelperText>Select an image for the Business Area</FormHelperText>
+                                        {/* <FormHelperText>Select an image for the Business Area</FormHelperText> */}
                                     </FormControl>
                                     <FormControl>
                                         <UserSearchDropdown

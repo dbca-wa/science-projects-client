@@ -1054,16 +1054,47 @@ export const handleProgressReportAction = async ({ action, stage, documentPk, pr
 export interface IHTMLSave {
     editorType: EditorType;
     htmlData: string;
-
+    isUpdate: boolean;
     project_pk: null | number;
     document_pk: null | number;
     section: null | EditorSubsections;
 }
 
 // Also have this handle directors message, research intro etc. (annual report)
-export const saveHtmlToDB = async ({ editorType, htmlData, project_pk, document_pk, section }: IHTMLSave) => {
+export const saveHtmlToDB = async (
+    { editorType, htmlData, project_pk, document_pk, section, isUpdate }: IHTMLSave) => {
 
-    if (editorType === "ProjectDocument") {
+    const urlType = isUpdate ? instance.put : instance.post;
+
+    if (editorType === "ProjectDetail") {
+        // Null document is okay - that will be handled on the backend (as the description)
+        // if document is None and section is not None, make changes to the projects title or description
+        // based on section
+        // const data = {
+        //     "html": htmlData,
+        //     "project": project_pk,
+        //     "section": section,
+        // }
+        // console.log(data)
+        // GO to project endpoint
+        let params;
+        if (section === "description") {
+            params = {
+                "description": htmlData,
+            }
+        }
+        return urlType(
+            `projects/${project_pk}`,
+            params,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        ).then(res => res.data);
+
+    }
+    else if (editorType === "ProjectDocument") {
         const data = {
             "html": htmlData,
             "project": project_pk,
@@ -1072,18 +1103,6 @@ export const saveHtmlToDB = async ({ editorType, htmlData, project_pk, document_
         }
         console.log(data)
 
-    }
-    else if (editorType === "ProjectDetail") {
-        // Null document is okay - that will be handled on the backend (as the description)
-        // if document is None and section is not None, make changes to the projects title or description
-        // based on section
-        const data = {
-            "html": htmlData,
-            "project": project_pk,
-            "section": section,
-        }
-        console.log(data)
-        // GO to project endpoint
     }
 
 
@@ -1304,6 +1323,18 @@ export const getAllReports = async () => {
 export const getReportPDFs = async () => {
     const res = instance.get(`medias/report_pdfs`
     ).then(res => {
+        return res.data
+    })
+    return res;
+}
+
+
+export const getReportMedia = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+    // if (pk !== 0)
+    // {
+    const res = instance.get(`documents/reports/${pk}/media`).then(res => {
+        // console.log(res.data)
         return res.data
     })
     return res;

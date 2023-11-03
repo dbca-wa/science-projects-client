@@ -330,10 +330,13 @@ export const ProjectOverviewCard = (
                             : <Text><b>Description:</b> This project has no description</Text>} */}
 
                         <SimpleRichTextEditor
-                            key={`description${colorMode}`} // Change the key to force a re-render
+                            editorType="ProjectDetail"
                             data={baseInformation.description}
+                            project_pk={baseInformation.id}
                             section={"description"}
+                            isUpdate={true}
                             titleTextSize={"20px"}
+                            key={`description${colorMode}`} // Change the key to force a re-render
                         />
                     </Box>
 
