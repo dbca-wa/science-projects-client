@@ -104,14 +104,14 @@ const ReportMenuContents = () => {
         },
     ]
 
-    const { reportPdfs, reportPdfsLoading } = useGetReportPDFs();
+    const { reportPdfsData, reportPdfsLoading } = useGetReportPDFs();
 
     useEffect(() => {
         if (!reportPdfsLoading) {
-            console.log(reportPdfs);
+            console.log(reportPdfsData);
 
         }
-    }, [reportPdfs, reportPdfsLoading])
+    }, [reportPdfsData, reportPdfsLoading])
 
     return (
         <>
@@ -152,23 +152,26 @@ const ReportMenuContents = () => {
                 title="ARAR PDF" fontSize={"12px"}
                 color={"gray.500"} textAlign={"center"}
             >
-                {
-                    arar_publications.map(publication => {
+                {!reportPdfsLoading && reportPdfsData && (
+
+                    reportPdfsData.map(publication => {
                         return (
                             <MenuItem
-                                key={publication.years}
+                                key={publication.report.year}
                                 onClick={() => {
-                                    window.open(publication.fileUrl, "_blank");
+                                    window.open(publication.file, "_blank");
                                 }}
                             >
                                 {<ImBook />}
                                 <Text ml={2}>
-                                    ARAR {publication.years}
+                                    ARAR {publication.report.year}
                                 </Text>
                             </MenuItem>
                         )
                     })
-                }
+
+                )}
+
             </MenuGroup>
         </>
     )
