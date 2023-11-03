@@ -11,7 +11,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
 import { $getRoot, $getSelection, ParagraphNode } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
-import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
+import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin"
@@ -25,8 +25,6 @@ interface Props {
     editorRef: any;
     data: string;
     section: EditorSubsections;
-    project_pk: number;
-    document_pk: number;
     editorType: EditorType;
     isUpdate: boolean;
 
@@ -34,19 +32,16 @@ interface Props {
     setEditorText: React.Dispatch<React.SetStateAction<string>>;
     shouldShowTree: boolean;
     setShouldShowTree: React.Dispatch<React.SetStateAction<boolean>>;
-    isEditorOpen: boolean;
-    setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
     displayData: string;
 
     setDisplayData: React.Dispatch<React.SetStateAction<string>>;
     textEditorName?: string;
 }
 
-export const EditableSRTE = (
-    { textEditorName, section, project_pk, document_pk, editorType, isUpdate,
+export const SimpleEditableRTE = (
+    { textEditorName, section, editorType, isUpdate,
         initialConfig, editorRef,
         data, editorText, setEditorText,
-        isEditorOpen, setIsEditorOpen,
         displayData, setDisplayData,
         shouldShowTree, setShouldShowTree }: Props) => {
 
@@ -81,10 +76,12 @@ export const EditableSRTE = (
                 {/* Text Area */}
                 <RichTextPlugin
                     contentEditable={
-                        <>
+                        <Box
+                            zIndex={2}
+                        >
                             {/* Toolbar */}
 
-                            <RichTextToolbar
+                            <SimpleRichTextToolbar
                                 editorRef={editorRef}
                                 selectedNodeType={selectedNodeType}
                                 setSelectedNodeType={setSelectedNodeType}
@@ -99,9 +96,10 @@ export const EditableSRTE = (
                                     paddingBottom: "16px",
                                     borderRadius: "0 0 25px 25px",
                                     outline: "none",
+                                    zIndex: 2,
                                 }}
                             />
-                        </>
+                        </Box>
                     }
                     placeholder={
                         <div
@@ -121,29 +119,6 @@ export const EditableSRTE = (
                 />
 
 
-                <Box>
-                    <OptionsBar
-                        editorType={editorType}
-                        displayData={displayData}
-                        editorText={editorText}
-                        shouldShowTree={shouldShowTree}
-                        setShouldShowTree={setShouldShowTree}
-                        rawHTML={displayData}
-                        section={section}
-                        project_pk={project_pk}
-                        document_pk={document_pk}
-                        isUpdate={isUpdate}
-
-                        editorIsOpen={isEditorOpen}
-                        setIsEditorOpen={setIsEditorOpen}
-                        setDisplayData={setDisplayData}
-                    />
-                </Box>
-                {
-                    shouldShowTree ?
-                        <TreeViewPlugin />
-                        : null
-                }
                 <ClearEditorPlugin />
                 <NodeEventPlugin
                     nodeType={ParagraphNode}

@@ -74,7 +74,7 @@ export const ProjectLocationSection = (
         <>
             <ModalBody
                 overflowY={"auto"}
-                maxHeight={"58vh"}
+            // maxHeight={"58vh"}
             >
                 {!locationsLoading && (
                     <>

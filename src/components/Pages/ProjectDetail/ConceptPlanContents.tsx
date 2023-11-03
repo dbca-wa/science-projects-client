@@ -3,7 +3,7 @@
 import { Box, Text, useColorMode } from "@chakra-ui/react"
 import { DocumentActions } from "./DocumentActions"
 import { IConceptPlan } from "../../../types";
-import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
+import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 
 interface Props {
     document: IConceptPlan | null;
@@ -31,41 +31,41 @@ export const ConceptPlanContents = ({ document, projectPk }: Props) => {
             />
 
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`background${editorKey}`} // Change the key to force a re-render
                 data={document?.background}
                 section={"background"}
             />
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`aims${editorKey}`} // Change the key to force a re-render
                 data={document?.aims}
                 section={"aims"}
             />
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`outcome${editorKey}`} // Change the key to force a re-render
                 data={document?.outcome}
                 section={"outcome"}
             />
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`collaborations${editorKey}`} // Change the key to force a re-render
                 data={document?.collaborations}
                 section={"collaborations"}
             />
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`strategic_context${editorKey}`} // Change the key to force a re-render
                 data={document?.strategic_context}
                 section={"strategic_context"}
             />
 
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`staff_time_allocation${editorKey}`} // Change the key to force a re-render
                 data={document?.staff_time_allocation}
                 section={"staff_time_allocation"}
             />
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`budget${editorKey}`} // Change the key to force a re-render
                 data={document?.budget}
                 section={"budget"}

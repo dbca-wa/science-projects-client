@@ -51,7 +51,7 @@ interface IProps {
     isUpdate: boolean;
 }
 
-export const SimpleRichTextEditor = ({ data, titleTextSize, section, project_pk, document_pk, editorType, isUpdate }: IProps) => {
+export const RichTextEditor = ({ data, titleTextSize, section, project_pk, document_pk, editorType, isUpdate }: IProps) => {
 
     const [shouldShowTree, setShouldShowTree] = useState(false);
     const { colorMode } = useColorMode();

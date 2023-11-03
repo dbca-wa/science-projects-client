@@ -183,12 +183,15 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
 
 
     return (
-        <Modal isOpen={isOpen} onClose={controlledClose} scrollBehavior="inside"
+        <Modal isOpen={isOpen} onClose={controlledClose}
+            scrollBehavior="inside"
             size={"full"}
         >
             <ModalOverlay />
             <ModalContent
                 bg={colorMode === "light" ? "white" : "gray.800"}
+                height={"100%"}
+                w={"100%"}
             >
                 <ModalHeader
                     display={"inline-flex"}
@@ -211,7 +214,9 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                     <Text>New {projectType} - {currentYear}</Text>
                 </ModalHeader>
                 <ModalCloseButton />
-                <Tabs isFitted variant='enclosed'
+                <Tabs
+                    isFitted
+                    // variant='enclosed'
                     index={activeTabIndex}
                 >
                     <TabList mb='1em'>
@@ -246,8 +251,11 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                             </Tab>
                         )}
                     </TabList>
-                    <TabPanels>
-                        <TabPanel>
+                    <TabPanels
+                        h={"100%"}
+                    >
+                        <TabPanel
+                            h={"100%"}>
                             <ProjectBaseInformation
                                 projectKind={projectType === "Core Function" ? 'core_function' :
                                     projectType === "Student Project" ? 'student' :
@@ -263,7 +271,8 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
 
                             />
                         </TabPanel>
-                        <TabPanel>
+                        <TabPanel
+                            h={"100%"}>
                             <ProjectDetailsSection
                                 backClick={goBack}
                                 nextClick={goToLocationTab}
@@ -275,7 +284,8 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                                 setProjectDetailsFilled={setProjectDetailsFilled}
                             />
                         </TabPanel>
-                        <TabPanel>
+                        <TabPanel
+                            h={"100%"}>
                             {
                                 projectType.includes("External") || projectType.includes("Student") ?
                                     <ProjectLocationSection
@@ -309,7 +319,8 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                             }
                         </TabPanel>
                         {projectType.includes("External") && (
-                            <TabPanel>
+                            <TabPanel
+                                h={"100%"}>
                                 <ProjectExternalSection
                                     externalFilled={externalFilled}
                                     externalData={externalData}
@@ -324,7 +335,8 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                         )}
 
                         {projectType.includes("Student") && (
-                            <TabPanel>
+                            <TabPanel
+                                h={"100%"}>
 
                                 <ProjectStudentSection
                                     studentFilled={studentFilled}

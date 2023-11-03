@@ -9,6 +9,8 @@ import { MdTitle } from "react-icons/md";
 import { useQueryClient } from '@tanstack/react-query';
 import { IUserData } from "../../../types";
 import { motion } from "framer-motion";
+import { SimpleStateRichTextEditor } from "../../RichTextEditor/Editors/SimpleStateRichTextEditor";
+import { StateRichTextEditor } from "../../RichTextEditor/Editors/StateRichTextEditor";
 
 interface IProjectBaseInformationProps {
     projectKind: string;
@@ -37,6 +39,7 @@ export const ProjectBaseInformation = ({ projectKind, baseInformationFilled, set
     }, [baseInformationFilled])
 
 
+
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,6 +53,8 @@ export const ProjectBaseInformation = ({ projectKind, baseInformationFilled, set
     const meData = queryClient.getQueryData<IUserData>(['me']);
 
     const [projectTitle, setProjectTitle] = useState('');
+    useEffect(() => console.log(projectTitle), [projectTitle]);
+
     const [projectSummary, setProjectSummary] = useState('');
     const [keywords, setKeywords] = useState<string[]>([]);
     useEffect(() => {
@@ -79,7 +84,9 @@ export const ProjectBaseInformation = ({ projectKind, baseInformationFilled, set
 
     return (
         <>
-            <ModalBody overflowY="auto" maxHeight="58vh">
+            <ModalBody overflowY="auto"
+            // maxHeight="58vh"
+            >
                 <Grid
                     gridTemplateColumns={"repeat(2, 1fr)"}
                     gridColumnGap={10}
@@ -108,14 +115,21 @@ export const ProjectBaseInformation = ({ projectKind, baseInformationFilled, set
                         <FormControl isRequired mb={4} >
                             <FormLabel>Project Title</FormLabel>
                             <InputGroup>
-                                <InputLeftElement children={<Icon as={MdTitle} />} />
-                                <Input
+                                {/* <InputLeftElement children={<Icon as={MdTitle} />} /> */}
+                                {/* <Input
                                     type="text"
                                     placeholder={`Type your Project Title here...`}
                                     value={projectTitle}
                                     onChange={(event) => setProjectTitle(event.target.value)}
                                     maxLength={30}
                                 // pattern="[A-Za-z0-9@.+_-]*" 
+                                /> */}
+                                <SimpleStateRichTextEditor
+                                    section="title"
+                                    editorType="ProjectDetail"
+                                    isUpdate={false}
+                                    value={projectTitle}
+                                    setValueFunction={setProjectTitle}
                                 />
                             </InputGroup>
                             <FormHelperText>The project title with formatting if required (e.g. for taxonomic names).</FormHelperText>
@@ -127,11 +141,20 @@ export const ProjectBaseInformation = ({ projectKind, baseInformationFilled, set
                         <FormControl isRequired mb={6}>
                             <FormLabel>Project Summary</FormLabel>
                             <InputGroup>
-                                <Textarea
+                                {/* <Textarea
                                     placeholder={`Type your summary here...`}
                                     value={projectSummary}
                                     onChange={(event) => setProjectSummary(event.target.value)}
+                                /> */}
+
+                                <StateRichTextEditor
+                                    section="description"
+                                    editorType="ProjectDetail"
+                                    isUpdate={false}
+                                    value={projectSummary}
+                                    setValueFunction={setProjectSummary}
                                 />
+
                             </InputGroup>
                             <FormHelperText>A concise project summary, or any additional useful information.</FormHelperText>
                         </FormControl>

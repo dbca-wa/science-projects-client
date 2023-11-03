@@ -64,6 +64,42 @@
       position: relative;
 }
 
+.editor-project-title-overview {
+  font-size: 26px;
+  color: #62a0f2;
+      /* background-color: black; */
+      margin-bottom: 8px;
+      position: relative; 
+}
+
+.editor-project-title-traditional {
+  font-size: 15px;
+  font-weight: bold;
+  color: #62a0f2;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+}
+
+
+.editor-project-title-card {
+  font-size: 17px;
+  color: #ffffff;
+  position: relative; 
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  font-weight: 600;
+  text-shadow: "2px 2px 4px rgba(0, 0, 0, 0.3)";
+}
+
+
 .editor-p-dark {
   font-size: 14px;
   color: #eee;
@@ -71,6 +107,9 @@
       margin-bottom: 8px;
       position: relative;
 }
+
+
+
 
 .editor-ol-light {
   font-size: 14px;

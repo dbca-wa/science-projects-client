@@ -2,7 +2,7 @@
 
 import { Box, Button, Center, Flex, Grid, Image, Tag, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
 import { AiFillCalendar, AiFillEdit, AiFillTag } from "react-icons/ai"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineExternalLink } from 'react-icons/hi'
 import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
 import { IFullProjectDetails, IProjectData, IProjectMember } from "../../../types";
@@ -13,9 +13,10 @@ import { RiBook3Fill } from 'react-icons/ri'
 import { useNoImage } from "../../../lib/hooks/useNoImage";
 import { useEffect } from "react";
 import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
-import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
+import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
+import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE";
 
 interface IProjectOverviewCardProps {
     baseInformation: IProjectData;
@@ -150,6 +151,8 @@ export const ProjectOverviewCard = (
 
     const imageUrl = useServerImageUrl(baseInformation?.image?.file)
 
+    const navigate = useNavigate();
+
     return (
         <>
             <Box
@@ -207,10 +210,26 @@ export const ProjectOverviewCard = (
                                 color={colorMode === "light" ? "blue.500" : "blue.300"}
                                 whiteSpace={"normal"}
                                 textAlign={"left"}
+                                onClick={() =>
+                                    navigate(
+                                        `/projects/${baseInformation.pk !== undefined ?
+                                            baseInformation.pk : baseInformation.id}`
+                                    )}
                             >
-                                <Link to={`/projects/${baseInformation.pk !== undefined ? baseInformation.pk : baseInformation.id}`}>
+                                {/* <Link
+                                    to={
+                                        `/projects/${baseInformation.pk !== undefined ?
+                                            baseInformation.pk : baseInformation.id}`
+                                    }
+                                >
                                     {baseInformation.title}
-                                </Link>
+                                </Link> */}
+                                <SimpleDisplaySRTE
+
+                                    data={baseInformation.title}
+                                    displayData={baseInformation.title}
+                                    displayArea="projectOverviewTitle"
+                                />
                             </Button>
                             <Text
                                 mt={2}
@@ -329,7 +348,7 @@ export const ProjectOverviewCard = (
                             ? <Text><b>Description:</b> {baseInformation.description}</Text>
                             : <Text><b>Description:</b> This project has no description</Text>} */}
 
-                        <SimpleRichTextEditor
+                        <RichTextEditor
                             editorType="ProjectDetail"
                             data={baseInformation.description}
                             project_pk={baseInformation.id}

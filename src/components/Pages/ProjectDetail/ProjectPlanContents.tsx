@@ -3,7 +3,7 @@
 import { Box, Checkbox, Grid, Text, useColorMode } from "@chakra-ui/react"
 import { DocumentActions } from "./DocumentActions"
 import { IProjectPlan } from "../../../types";
-import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
+import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 
 interface Props {
     document: IProjectPlan | null;
@@ -24,59 +24,59 @@ export const ProjectPlanContents = ({ document }: Props) => {
         <>
             {/* <DocumentActions /> */}
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`background${editorKey}`} // Change the key to force a re-render
                 data={document?.background}
                 section={"background"}
             />
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`aims${editorKey}`} // Change the key to force a re-render
                 data={document?.aims}
                 section={"aims"}
             />
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`outcome${editorKey}`} // Change the key to force a re-render
                 data={document?.outcome}
                 section={"outcome"}
             />
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`knowledge_transfer${editorKey}`} // Change the key to force a re-render
                 data={document?.knowledge_transfer}
                 section={"knowledge_transfer"}
             />
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`project_tasks${editorKey}`} // Change the key to force a re-render
                 data={document?.project_tasks}
                 section={"project_tasks"}
             />
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`related_projects${editorKey}`} // Change the key to force a re-render
                 data={document?.related_projects}
                 section={"related_projects"}
             />
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`listed_references${editorKey}`} // Change the key to force a re-render
                 data={document?.listed_references}
                 section={"listed_references"}
             />
 
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`data_management${editorKey}`} // Change the key to force a re-render
                 data={document?.endorsemeents?.data_management}
                 section={"data_management"}
             />
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`methodology${editorKey}`} // Change the key to force a re-render
                 data={document?.methodology}
                 section={"methodology"}
             />
 
 
-            <SimpleRichTextEditor
+            <RichTextEditor
                 key={`no_specimens${editorKey}`} // Change the key to force a re-render
                 data={document?.endorsemeents?.no_specimens}
                 section={"specimens"}

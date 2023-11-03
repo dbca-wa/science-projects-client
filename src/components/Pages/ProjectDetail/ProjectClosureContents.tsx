@@ -4,7 +4,7 @@
 import { Box, Text } from "@chakra-ui/react"
 import { IProjectClosure } from "../../../types"
 import { DocumentActions } from "./DocumentActions"
-import { SimpleRichTextEditor } from "../../RichTextEditor/Editors/SimpleRichTextEditor";
+import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 
 interface Props {
     document: IProjectClosure | null;

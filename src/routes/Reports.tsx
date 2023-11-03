@@ -3,7 +3,7 @@
 
 import { Box, Grid } from "@chakra-ui/react"
 import { Head } from "../components/Base/Head"
-import { SimpleRichTextEditor } from "../components/RichTextEditor/Editors/SimpleRichTextEditor"
+import { SimpleRichTextEditor } from "../components/RichTextEditor/Editors/RichTextEditor"
 
 export const Reports = () => {
 

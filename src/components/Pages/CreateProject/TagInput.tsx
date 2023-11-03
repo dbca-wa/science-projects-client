@@ -71,7 +71,10 @@ const TagInput = ({ setTagFunction }: Props) => {
     }, [inputValue]);
 
     return (
-        <FormControl isRequired mb={4}>
+        <FormControl isRequired mb={4}
+            zIndex={1}
+            pos={"relative"}
+        >
             <FormLabel>Keywords</FormLabel>
             <InputGroup>
                 <Input

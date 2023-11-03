@@ -13,6 +13,7 @@ import { ItalicsButton } from "../Buttons/ItalicsButton";
 import { UnderlineButton } from "../Buttons/UnderlineButton";
 import { FontFormatterButton } from "../MenuButtons/FontFormatterButton";
 import { ToolbarToggleBtn } from "../Buttons/ToolbarToggleBtn";
+import { SimpleFontFormatterButton } from "../MenuButtons/SimpleFontFormatterButton";
 
 
 interface Props {
@@ -71,118 +72,20 @@ export const SimpleRichTextToolbar = ({ editorRef, selectedNodeType, setSelected
                 }
                 justifyContent={"space-between"}
                 display={"flex"}
+                zIndex={2}
+
             >
-                {
-                    isSmall ?
-                        (
-                            <>
-                                <TimeButtons onClick={onClick} />
-                                <VerticalDivider />
-                                {
-                                    currentToolbarPage === 1 ?
-                                        <>
-                                            <ElementTypeButton onClick={onClick} isSmall
-                                                currentlyClickedNode={selectedNodeType}
-                                                setCurrentlyClickedNode={setSelectedNodeType}
-                                            />
-                                            <VerticalDivider />
 
-                                            <InsertButton />
-                                        </> :
-                                        currentToolbarPage === 2 ?
-                                            <>
+                <>
+                    <TimeButtons onClick={onClick} />
+                    <VerticalDivider />
+                    <BoldButton onClick={onClick} />
+                    <ItalicsButton onClick={onClick} />
+                    <UnderlineButton onClick={onClick} />
+                    <VerticalDivider />
+                    <SimpleFontFormatterButton />
+                </>
 
-                                                <BoldButton onClick={onClick} />
-                                                <ItalicsButton onClick={onClick} />
-                                                <UnderlineButton onClick={onClick} />
-                                                {/* <FontHighlighterButton /> */}
-
-                                            </>
-                                            :
-                                            <>
-                                                <FontFormatterButton />
-                                                <AlignButton isSmall onClick={onClick} />
-                                            </>
-                                }
-
-                                <Box>
-                                    <ToolbarToggleBtn
-                                        page={currentToolbarPage}
-                                        setPage={setCurrentToolbarPage}
-                                        maxPages={3}
-                                        isSmall
-                                    />
-                                </Box>
-                            </>
-                        ) :
-                        (
-                            shouldShowToolbarToggleBtnWhenNotSmall ?
-                                (
-                                    <>
-                                        <TimeButtons onClick={onClick} />
-                                        <VerticalDivider />
-                                        {
-                                            currentToolbarPageMd === 1 ?
-                                                <>
-                                                    <ElementTypeButton onClick={onClick}
-                                                        currentlyClickedNode={selectedNodeType}
-                                                        setCurrentlyClickedNode={setSelectedNodeType}
-                                                    />
-                                                    <VerticalDivider />
-
-                                                    <InsertButton />
-
-                                                    {/* <VerticalDivider /> */}
-
-
-                                                </> : currentToolbarPageMd === 2 ?
-                                                    <>
-                                                        {/* <FontStylingButtons /> */}
-
-                                                        <BoldButton onClick={onClick} />
-                                                        <ItalicsButton onClick={onClick} />
-                                                        <UnderlineButton onClick={onClick} />
-                                                    </> :
-                                                    <>
-                                                        <FontFormatterButton />
-                                                        <AlignButton onClick={onClick} />
-                                                    </>
-                                        }
-                                        <ToolbarToggleBtn
-                                            page={currentToolbarPageMd}
-                                            setPage={setCurrentToolbarPageMd}
-                                            maxPages={3}
-                                            isSmall
-                                        />
-                                    </>
-                                ) :
-                                (
-                                    <>
-                                        <TimeButtons onClick={onClick} />
-                                        <VerticalDivider />
-
-                                        <ElementTypeButton onClick={onClick} shouldFurtherConcat={true}
-
-                                            currentlyClickedNode={selectedNodeType}
-                                            setCurrentlyClickedNode={setSelectedNodeType}
-                                        />
-                                        <VerticalDivider />
-                                        <InsertButton />
-                                        <VerticalDivider />
-                                        <FontFormatterButton />
-
-                                        <VerticalDivider />
-                                        <BoldButton onClick={onClick} />
-                                        <ItalicsButton onClick={onClick} />
-                                        <UnderlineButton onClick={onClick} />
-                                        <VerticalDivider />
-
-                                        <AlignButton onClick={onClick} />
-
-                                    </>
-                                )
-                        )
-                }
             </Flex>
             <Divider />
         </>

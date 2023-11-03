@@ -11,7 +11,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
 import { $getRoot, $getSelection, ParagraphNode } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
-import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
+import { SimpleRichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin"

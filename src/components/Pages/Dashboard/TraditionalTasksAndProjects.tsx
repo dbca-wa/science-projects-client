@@ -12,6 +12,7 @@ import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext
 import { TraditionalTaskDisplay } from "./TraditionalTaskDisplay"
 import { AddIcon } from "@chakra-ui/icons"
 import { GoProjectRoadmap } from "react-icons/go"
+import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE"
 
 
 interface ITaskFromAPI {
@@ -277,7 +278,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                             >
                                                                 <GoProjectRoadmap />
                                                             </Center>
-                                                            <Text
+                                                            {/* <Text
                                                                 color={colorMode === "dark" ? "blue.200" : "blue.400"}
                                                                 fontWeight={"bold"}
                                                                 cursor={"pointer"}
@@ -288,7 +289,15 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                             >
 
                                                                 {`${project.title}`}
-                                                            </Text>
+                                                            </Text> */}
+
+                                                            <SimpleDisplaySRTE
+
+                                                                data={project.title}
+                                                                displayData={project.title}
+                                                                displayArea="traditionalProjectTitle"
+                                                            />
+
 
                                                         </Flex>
                                                     ))}
