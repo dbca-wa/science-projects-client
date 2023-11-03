@@ -32,27 +32,42 @@ export const ConceptPlanContents = ({ document, projectPk }: Props) => {
 
 
             <RichTextEditor
+                project_pk={projectPk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`background${editorKey}`} // Change the key to force a re-render
                 data={document?.background}
                 section={"background"}
             />
             <RichTextEditor
+                project_pk={projectPk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`aims${editorKey}`} // Change the key to force a re-render
                 data={document?.aims}
                 section={"aims"}
             />
 
             <RichTextEditor
+                project_pk={projectPk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`outcome${editorKey}`} // Change the key to force a re-render
                 data={document?.outcome}
                 section={"outcome"}
             />
             <RichTextEditor
+                project_pk={projectPk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`collaborations${editorKey}`} // Change the key to force a re-render
                 data={document?.collaborations}
                 section={"collaborations"}
             />
             <RichTextEditor
+                project_pk={projectPk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`strategic_context${editorKey}`} // Change the key to force a re-render
                 data={document?.strategic_context}
                 section={"strategic_context"}
@@ -60,12 +75,18 @@ export const ConceptPlanContents = ({ document, projectPk }: Props) => {
 
 
             <RichTextEditor
+                project_pk={projectPk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`staff_time_allocation${editorKey}`} // Change the key to force a re-render
                 data={document?.staff_time_allocation}
                 section={"staff_time_allocation"}
             />
 
             <RichTextEditor
+                project_pk={projectPk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`budget${editorKey}`} // Change the key to force a re-render
                 data={document?.budget}
                 section={"budget"}

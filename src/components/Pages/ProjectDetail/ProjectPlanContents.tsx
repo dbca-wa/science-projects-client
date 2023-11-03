@@ -25,38 +25,59 @@ export const ProjectPlanContents = ({ document }: Props) => {
             {/* <DocumentActions /> */}
 
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`background${editorKey}`} // Change the key to force a re-render
                 data={document?.background}
                 section={"background"}
             />
 
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`aims${editorKey}`} // Change the key to force a re-render
                 data={document?.aims}
                 section={"aims"}
             />
 
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`outcome${editorKey}`} // Change the key to force a re-render
                 data={document?.outcome}
                 section={"outcome"}
             />
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`knowledge_transfer${editorKey}`} // Change the key to force a re-render
                 data={document?.knowledge_transfer}
                 section={"knowledge_transfer"}
             />
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`project_tasks${editorKey}`} // Change the key to force a re-render
                 data={document?.project_tasks}
                 section={"project_tasks"}
             />
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`related_projects${editorKey}`} // Change the key to force a re-render
                 data={document?.related_projects}
                 section={"related_projects"}
             />
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`listed_references${editorKey}`} // Change the key to force a re-render
                 data={document?.listed_references}
                 section={"listed_references"}
@@ -64,12 +85,18 @@ export const ProjectPlanContents = ({ document }: Props) => {
 
 
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`data_management${editorKey}`} // Change the key to force a re-render
                 data={document?.endorsemeents?.data_management}
                 section={"data_management"}
             />
 
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`methodology${editorKey}`} // Change the key to force a re-render
                 data={document?.methodology}
                 section={"methodology"}
@@ -77,6 +104,9 @@ export const ProjectPlanContents = ({ document }: Props) => {
 
 
             <RichTextEditor
+                project_pk={document.document.project.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
                 key={`no_specimens${editorKey}`} // Change the key to force a re-render
                 data={document?.endorsemeents?.no_specimens}
                 section={"specimens"}

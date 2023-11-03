@@ -185,14 +185,14 @@ export const ModernProjectCard = ({
                     <Box
                         zIndex={3}
                     >
-                        {/* <Text
+                        <Text
                             fontWeight={"semibold"}
                             color={"white"}
                             noOfLines={2}
                             textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)" // Add text shadow
                         >
                             {title}
-                        </Text> */}
+                        </Text>
                         <SimpleDisplaySRTE
 
                             data={title}

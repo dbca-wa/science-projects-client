@@ -302,8 +302,17 @@ export const RichTextEditor = ({ data, titleTextSize, section, project_pk, docum
                         <DisplaySRTE
                             initialConfig={uneditableInitialCOnfig}
                             editorRef={editorRef}
+
+
                             data={data}
+                            section={section}
+                            project_pk={project_pk}
+                            document_pk={document_pk}
+                            editorType={editorType}
+                            isUpdate={isUpdate}
+
                             displayData={displayData}
+
                             editorText={editorText}
                             setEditorText={setEditorText}
                             shouldShowTree={shouldShowTree}
@@ -311,6 +320,7 @@ export const RichTextEditor = ({ data, titleTextSize, section, project_pk, docum
                             isEditorOpen={isEditorOpen}
                             setIsEditorOpen={setIsEditorOpen}
                             setDisplayData={setDisplayData}
+
                             textEditorName={section === "description" ? "Description" : undefined}
                         />
                     )

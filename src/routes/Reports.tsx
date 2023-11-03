@@ -3,7 +3,7 @@
 
 import { Box, Grid } from "@chakra-ui/react"
 import { Head } from "../components/Base/Head"
-import { SimpleRichTextEditor } from "../components/RichTextEditor/Editors/RichTextEditor"
+import { RichTextEditor } from "../components/RichTextEditor/Editors/RichTextEditor"
 
 export const Reports = () => {
 
@@ -29,7 +29,7 @@ export const Reports = () => {
             </Latex> */}
                     Not yet implemented.
                 </div>
-                {/* <SimpleRichTextEditor
+                {/* <RichTextEditor
                     data={
                         "<p>Test</p><ol><li>Hiii\nMy name is Jaridnbsp;Mark</li><li>Bye</li></ol><hr/><p>Did it work?</p>"
                     }

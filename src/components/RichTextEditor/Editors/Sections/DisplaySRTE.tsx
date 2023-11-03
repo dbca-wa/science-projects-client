@@ -11,17 +11,24 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
 import { $getRoot, $getSelection, ParagraphNode } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
-import { SimpleRichTextToolbar } from "../../Toolbar/RichTextToolbar";
+import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin"
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
 import { useEffect, useState } from "react";
+import { EditorSubsections, EditorType } from "../../../../types";
 
 interface Props {
     initialConfig: any;
     editorRef: any;
     data: string;
+    section: EditorSubsections;
+    project_pk: number;
+    document_pk: number;
+    editorType: EditorType;
+    isUpdate: boolean;
+
     editorText: string;
     setEditorText: React.Dispatch<React.SetStateAction<string>>;
     shouldShowTree: boolean;
@@ -33,7 +40,17 @@ interface Props {
     textEditorName?: string;
 }
 
-export const DisplaySRTE = ({ initialConfig, editorRef, data, editorText, setEditorText, isEditorOpen, setIsEditorOpen, displayData, setDisplayData, shouldShowTree, setShouldShowTree, textEditorName }: Props) => {
+export const DisplaySRTE = (
+    {
+        initialConfig, editorRef, data,
+        section, project_pk, document_pk, isUpdate,
+        editorType,
+        editorText, setEditorText,
+        isEditorOpen, setIsEditorOpen,
+        displayData, setDisplayData,
+        shouldShowTree, setShouldShowTree,
+        textEditorName
+    }: Props) => {
 
     const [selectedNodeType, setSelectedNodeType] = useState<string>();
     // useEffect(() => {
@@ -130,10 +147,17 @@ export const DisplaySRTE = ({ initialConfig, editorRef, data, editorText, setEdi
 
             <Box>
                 <OptionsBar
+                    editorType={editorType}
+                    displayData={displayData}
                     editorText={editorText}
                     shouldShowTree={shouldShowTree}
                     setShouldShowTree={setShouldShowTree}
-                    rawHTML={data}
+                    rawHTML={displayData}
+                    section={section}
+                    project_pk={project_pk}
+                    document_pk={document_pk}
+                    isUpdate={isUpdate}
+
                     editorIsOpen={isEditorOpen}
                     setIsEditorOpen={setIsEditorOpen}
                     setDisplayData={setDisplayData}
