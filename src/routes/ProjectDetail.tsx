@@ -14,6 +14,7 @@ import { ProjectClosureContents } from "../components/Pages/ProjectDetail/Projec
 import { StudentReportContents } from "../components/Pages/ProjectDetail/StudentReportContents";
 import { Head } from "../components/Base/Head";
 import { DocumentActions } from "../components/Pages/ProjectDetail/DocumentActions";
+import useDistilledProjectTitle from "../lib/hooks/useDistlledProjectTitle";
 // import { ProgressReportSelector } from "../components/Pages/ProjectDetail/ProgressReportSelector";
 
 export const ProjectDetail = () => {
@@ -44,9 +45,13 @@ export const ProjectDetail = () => {
     }, [tabIndex])
 
 
+    const distilledTitle = useDistilledProjectTitle(projectData?.project?.title);
+
+
+
     return (
         <>
-            <Head title={projectData?.project?.title} />
+            <Head title={distilledTitle} />
             <Tabs
                 isLazy
                 isFitted
