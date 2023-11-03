@@ -79,7 +79,8 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
 
     const defaultIndex = [
         (taskData?.inprogress.length + taskData?.todo.length) <= 5 && (taskData?.inprogress?.length + taskData?.todo?.length) >= 1 ? 0 : null,
-        projectData?.length <= 5 && projectData?.length >= 1 ? 1 : null,
+        1
+        // projectData?.length <= 5 && projectData?.length >= 1 ? 1 : null,
     ].map((index) => (index !== null ? index : -1));
 
 
