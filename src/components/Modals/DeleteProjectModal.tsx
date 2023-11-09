@@ -168,17 +168,9 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
                             </Button>
                             <Button
                                 colorScheme="red"
-                                // isDisabled={!changesMade}
                                 isLoading={deleteProjectMutation.isLoading}
                                 type="submit"
-                                // bgColor={colorMode === "light" ? `green.500` : `green.600`}
-                                // color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-                                // _hover={{
-                                //     bg: colorMode === "light" ? `green.600` : `green.400`,
-                                //     color: colorMode === "light" ? `white` : `white`
-                                // }}
                                 ml={3}
-
                             >
                                 Delete
                             </Button>

@@ -203,13 +203,14 @@ export const ProjectPlanActionModal = (
                                                 </Text>
                                                 <br />
                                                 <Text>
-                                                    {action === "approve" ?
-                                                        "This will send an email to members of the Directorate for approval and the document will be locked until the Directorate has reviewed the document."
-                                                        :
-                                                        action === "recall" ?
-                                                            "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
+                                                    {
+                                                        action === "approve" ?
+                                                            "This will send an email to members of the Directorate for approval and the document will be locked until the Directorate has reviewed the document."
                                                             :
-                                                            "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."
+                                                            action === "recall" ?
+                                                                "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
+                                                                :
+                                                                "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."
                                                     }
                                                 </Text>
 
