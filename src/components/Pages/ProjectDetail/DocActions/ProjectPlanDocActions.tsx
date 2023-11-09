@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { IDocGenerationProps, generateProjectDocument, downloadProjectDocument, spawnDocument, ISpawnDocument, setProjectStatus, ISetProjectProps } from "../../../../lib/api";
 import { AxiosError } from "axios";
 import { ProjectPlanActionModal } from "../../../Modals/DocumentActionModals/ProjectPlanActionModal";
+import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 
 interface IProjectPlanDocumentActions {
     projectPlanData: IProjectPlan;
@@ -56,6 +57,9 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
     const { isOpen: isS3SendbackModalOpen, onOpen: onS3SendbackModalOpen, onClose: onS3SendbackModalClose } = useDisclosure();
 
 
+    const { isOpen: isDeleteDocumentModalOpen, onOpen: onOpenDeleteDocumentModal, onClose: onCloseDeleteDcoumentModal } = useDisclosure();
+
+
     const { userData, userLoading } = useUser();
 
     const { baData, baLoading } = useBusinessArea(projectPlanData?.document?.project?.business_area?.pk)
@@ -90,11 +94,6 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
 
     const [actionsReady, setActionsReady] = useState(false);
     const [userIsLeader, setUserIsLeader] = useState(false);
-    // const [teamLeaderPk, setTeamLeaderPk] = useState(0);
-
-    // Find the team member with is_leader === true
-    // const leaderMember = teamData.find((member) => member.is_leader === true);
-
     const [leaderMember, setLeaderMemeber] = useState<IProjectMember>();
 
     useEffect(() => {
@@ -723,14 +722,26 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
                                                         {
                                                             all_documents?.progress_reports.length < 1
                                                             && (
-                                                                <Button
-                                                                    colorScheme="red"
-                                                                    size={"sm"}
-                                                                    onClick={onS1RecallModalOpen}
-                                                                    mr={2}
-                                                                >
-                                                                    Delete Document
-                                                                </Button>
+                                                                <>
+                                                                    <DeleteDocumentModal
+                                                                        projectPk={projectPlanData?.document?.project?.pk}
+                                                                        documentPk={projectPlanData?.document?.pk ? projectPlanData?.document?.pk : projectPlanData?.document?.id}
+                                                                        // deleting the main doc will also delete the projectplan
+                                                                        documentKind="projectplan"
+                                                                        onClose={onCloseDeleteDcoumentModal}
+                                                                        isOpen={isDeleteDocumentModalOpen}
+                                                                        refetchData={refetchData}
+                                                                    />
+                                                                    <Button
+                                                                        colorScheme="red"
+                                                                        size={"sm"}
+                                                                        onClick={onOpenDeleteDocumentModal}
+                                                                        mr={2}
+                                                                    >
+                                                                        Delete Document
+                                                                    </Button>
+
+                                                                </>
 
                                                             )
                                                         }

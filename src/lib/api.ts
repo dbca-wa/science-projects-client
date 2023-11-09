@@ -1208,6 +1208,7 @@ export const saveHtmlToDB = async (
 
 export interface ISpawnDocument {
     project_pk: number;
+    year?: number | string;
     kind: "concept" | "projectplan" | "progressreport" | "studentreport" | "studentreport" | "projectclosure" | string;
 }
 
@@ -1271,12 +1272,33 @@ export const deleteProjectCall = async ({ pk }: ISimplePkProp) => {
             url,
         ).then(res => res.data);
     }
-
-
 }
 
-export const spawnDocument = async ({ project_pk, kind }: ISpawnDocument) => {
-    console.log(project_pk, kind);
+export interface IDeleteDocument {
+    projectPk: number | string;
+    documentPk: number | string;
+    documentKind: "conceptplan" | "projectplan" | "progressreport" | "studentreport" | "projectclosure";
+}
+
+export const deleteDocumentCall = async ({ projectPk, documentPk, documentKind }: IDeleteDocument) => {
+    console.log(
+        {
+            projectPk,
+            documentPk,
+            documentKind,
+        }
+    );
+    if (documentPk !== undefined) {
+        const url = `documents/projectdocuments/${documentPk}`
+        return instance.delete(
+            url,
+        ).then(res => res.data);
+    }
+}
+
+
+export const spawnDocument = async ({ project_pk, kind, year }: ISpawnDocument) => {
+    console.log(project_pk, kind, year);
 
     const choices = ["concept", "projectplan", "progressreport", "studentreport", "projectclosure"]
     if (!choices.includes(kind)) {
@@ -1286,11 +1308,24 @@ export const spawnDocument = async ({ project_pk, kind }: ISpawnDocument) => {
 
     // Create the document first (as a document object)
     const url = `documents/projectdocuments`
-    const params = {
-        "old_id": 1,
-        "kind": kind,
-        "project": project_pk,
-        "details": {},
+
+    let params;
+    if (year) {
+        params = {
+            "old_id": 1,
+            "kind": kind,
+            "project": project_pk,
+            "details": {},
+            "year": year,
+        }
+    } else {
+        params = {
+            "old_id": 1,
+            "kind": kind,
+            "project": project_pk,
+            "details": {},
+        }
+
     }
 
     return instance.post(
