@@ -993,7 +993,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                                                                     onClick={
                                                                         () => spawnDocumentFunc(
                                                                             {
-                                                                                project_pk: conceptPlanData?.document?.project?.id ? conceptPlanData.document.project.id : conceptPlanData.document.project.pk,
+                                                                                projectPk: conceptPlanData?.document?.project?.id ? conceptPlanData.document.project.id : conceptPlanData.document.project.pk,
                                                                                 kind: "projectplan"
                                                                             }
                                                                         )
