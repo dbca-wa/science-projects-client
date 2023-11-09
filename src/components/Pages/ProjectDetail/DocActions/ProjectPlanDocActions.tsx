@@ -15,6 +15,7 @@ import { IDocGenerationProps, generateProjectDocument, downloadProjectDocument, 
 import { AxiosError } from "axios";
 import { ProjectPlanActionModal } from "../../../Modals/DocumentActionModals/ProjectPlanActionModal";
 import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
+import { CreateProgressReportModal } from "../../../Modals/CreateProgressReportModal";
 
 interface IProjectPlanDocumentActions {
     projectPlanData: IProjectPlan;
@@ -57,7 +58,8 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
     const { isOpen: isS3SendbackModalOpen, onOpen: onS3SendbackModalOpen, onClose: onS3SendbackModalClose } = useDisclosure();
 
 
-    const { isOpen: isDeleteDocumentModalOpen, onOpen: onOpenDeleteDocumentModal, onClose: onCloseDeleteDcoumentModal } = useDisclosure();
+    const { isOpen: isDeleteDocumentModalOpen, onOpen: onOpenDeleteDocumentModal, onClose: onCloseDeleteDocumentModal } = useDisclosure();
+    const { isOpen: isCreateProgressReportModalOpen, onOpen: onOpenCreateProgressReportModal, onClose: onCloseCreateProgressReportModal } = useDisclosure();
 
 
     const { userData, userLoading } = useUser();
@@ -273,7 +275,7 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
         projectDocPDFGenerationMutation.mutate(formData);
     }
 
-    const setReadyForProgressReport = (data: ISpawnDocument) => {
+    const spawnProgressReport = (data: ISpawnDocument) => {
         console.log(data);
         spawnMutation.mutate(data);
     }
@@ -728,7 +730,7 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
                                                                         documentPk={projectPlanData?.document?.pk ? projectPlanData?.document?.pk : projectPlanData?.document?.id}
                                                                         // deleting the main doc will also delete the projectplan
                                                                         documentKind="projectplan"
-                                                                        onClose={onCloseDeleteDcoumentModal}
+                                                                        onClose={onCloseDeleteDocumentModal}
                                                                         isOpen={isDeleteDocumentModalOpen}
                                                                         refetchData={refetchData}
                                                                     />
@@ -740,9 +742,7 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
                                                                     >
                                                                         Delete Document
                                                                     </Button>
-
                                                                 </>
-
                                                             )
                                                         }
 
@@ -1006,45 +1006,66 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
                                                         justifyContent={"flex-start"}
                                                         ml={3}
                                                     >
-                                                        <ProjectPlanActionModal
-                                                            action={"recall"}
-                                                            refetchData={refetchData}
+                                                        {
+                                                            all_documents?.progress_reports.length >= 1 ? null :
+                                                                (
+                                                                    <>
+                                                                        <ProjectPlanActionModal
+                                                                            action={"recall"}
+                                                                            refetchData={refetchData}
 
-                                                            baData={baData}
-                                                            isOpen={isS3RecallModalOpen}
-                                                            onClose={onS3RecallModalClose}
-                                                            projectPlanPk={projectPlanData?.pk}
-                                                            documentPk={projectPlanData?.document?.pk ? projectPlanData?.document?.pk : projectPlanData?.document?.id}
-                                                            stage={3}
-                                                            projectData={projectPlanData?.document?.project}
-                                                        />
-                                                        <Button
-                                                            colorScheme="blue"
-                                                            size={"sm"}
-                                                            onClick={onS3RecallModalOpen}
-                                                        >
-                                                            Recall Approval
-                                                        </Button>
+                                                                            baData={baData}
+                                                                            isOpen={isS3RecallModalOpen}
+                                                                            onClose={onS3RecallModalClose}
+                                                                            projectPlanPk={projectPlanData?.pk}
+                                                                            documentPk={projectPlanData?.document?.pk ? projectPlanData?.document?.pk : projectPlanData?.document?.id}
+                                                                            stage={3}
+                                                                            projectData={projectPlanData?.document?.project}
+                                                                        />
+                                                                        <Button
+                                                                            colorScheme="blue"
+                                                                            size={"sm"}
+                                                                            onClick={onS3RecallModalOpen}
+                                                                        >
+                                                                            Recall Approval
+                                                                        </Button>
+
+                                                                    </>
+
+                                                                )
+                                                        }
                                                         {(
                                                             projectPlanData?.document?.project?.status === "pending"
                                                             // all_documents?.progress_reports?.length < 1 || 
                                                         ) ?
                                                             (
-                                                                <Button
-                                                                    colorScheme="orange"
-                                                                    size={"sm"}
-                                                                    onClick={
-                                                                        () => setReadyForProgressReport(
-                                                                            {
-                                                                                project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
-                                                                                kind: "progressReport"
-                                                                            }
-                                                                        )
-                                                                    }
-                                                                    ml={2}
-                                                                >
-                                                                    Set Ready for Progress Report
-                                                                </Button>
+                                                                <>
+                                                                    <CreateProgressReportModal
+                                                                        projectPk={projectPlanData?.document?.project?.pk}
+                                                                        documentKind="progressreport"
+                                                                        onClose={onCloseCreateProgressReportModal}
+                                                                        isOpen={isCreateProgressReportModalOpen}
+                                                                        refetchData={refetchData}
+                                                                    />
+
+                                                                    <Button
+                                                                        colorScheme="orange"
+                                                                        size={"sm"}
+                                                                        onClick={
+                                                                            onOpenCreateProgressReportModal
+                                                                            // () => spawnProgressReport(
+                                                                            //     {
+                                                                            //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
+                                                                            //         kind: "progressreport"
+                                                                            //     }
+                                                                            // )
+                                                                        }
+                                                                        ml={2}
+                                                                    >
+                                                                        Create Progress Report
+                                                                    </Button>
+
+                                                                </>
 
                                                             )
                                                             :

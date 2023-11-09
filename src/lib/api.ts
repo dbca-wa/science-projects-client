@@ -1,6 +1,6 @@
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import { QueryFunctionContext } from "@tanstack/react-query";
+import { QueryFunction, QueryFunctionContext } from "@tanstack/react-query";
 import { EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
 
 // INSTANCE SETUP ==================================================================
@@ -1207,8 +1207,9 @@ export const saveHtmlToDB = async (
 
 
 export interface ISpawnDocument {
-    project_pk: number;
-    year?: number | string;
+    projectPk: number;
+    year?: number;
+    report_id?: number;
     kind: "concept" | "projectplan" | "progressreport" | "studentreport" | "studentreport" | "projectclosure" | string;
 }
 
@@ -1297,8 +1298,8 @@ export const deleteDocumentCall = async ({ projectPk, documentPk, documentKind }
 }
 
 
-export const spawnDocument = async ({ project_pk, kind, year }: ISpawnDocument) => {
-    console.log(project_pk, kind, year);
+export const spawnDocument = async ({ projectPk, kind, year, report_id }: ISpawnDocument) => {
+    console.log(projectPk, kind, year, report_id);
 
     const choices = ["concept", "projectplan", "progressreport", "studentreport", "projectclosure"]
     if (!choices.includes(kind)) {
@@ -1314,19 +1315,21 @@ export const spawnDocument = async ({ project_pk, kind, year }: ISpawnDocument) 
         params = {
             "old_id": 1,
             "kind": kind,
-            "project": project_pk,
+            "project": projectPk,
             "details": {},
+            "report": report_id,
             "year": year,
         }
     } else {
         params = {
             "old_id": 1,
             "kind": kind,
-            "project": project_pk,
+            "project": projectPk,
             "details": {},
         }
 
     }
+
 
     return instance.post(
         url,
@@ -1469,6 +1472,21 @@ export const deleteAddress = async (pk: number) => {
 
 
 // REPORTS ==========================================================================
+
+
+
+export const getAvailableReportYears = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+
+    try {
+        const response = await instance.get(`documents/reports/availableyears/${pk}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching years:", error);
+        throw error;
+    }
+}
 
 export const getLatestReportingYear = async () => {
     try {
