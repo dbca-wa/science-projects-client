@@ -172,6 +172,12 @@ export const ProjectDetail = () => {
                                 <ProgressReportContents
                                     documents={documents.progress_reports}
                                     refetch={refetch}
+
+                                    all_documents={documents}
+
+                                    userData={me?.userData}
+                                    members={members}
+
                                 />
                             </TabPanel>
                         )
