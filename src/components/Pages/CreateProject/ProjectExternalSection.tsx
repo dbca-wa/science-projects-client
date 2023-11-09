@@ -1,12 +1,14 @@
 // Tab data for Project External Project info on the creation page.
 
-import { Button, FormControl, FormHelperText, FormLabel, Grid, Input, InputGroup, InputLeftAddon, ModalBody, ModalFooter, Textarea } from "@chakra-ui/react";
+import { Button, Flex, FormControl, FormHelperText, FormLabel, Grid, Input, InputGroup, InputLeftAddon, ModalBody, ModalFooter, Textarea } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
 import { IoIosCreate } from "react-icons/io";
 import { ICreateProjectExternalDetails } from "../../../lib/api";
 import { MdCorporateFare, MdOutlineTitle } from "react-icons/md";
 import { AiFillDollarCircle } from "react-icons/ai";
+import { StateRichTextEditor } from "../../RichTextEditor/Editors/StateRichTextEditor";
+import { SimpleStateRichTextEditor } from "../../RichTextEditor/Editors/SimpleStateRichTextEditor";
 
 interface IProjectExternalProps {
     externalFilled: boolean;
@@ -108,10 +110,17 @@ export const ProjectExternalSection = (
                 <FormControl isRequired mb={6}>
                     <FormLabel>Description</FormLabel>
                     <InputGroup>
-                        <Textarea
+                        {/* <Textarea
                             placeholder={`Enter the description of the external project...`}
                             value={externalDescription}
                             onChange={(event) => setExternalDescription(event.target.value)}
+                        /> */}
+                        <SimpleStateRichTextEditor
+                            section="externalDescription"
+                            editorType="ProjectDetail"
+                            isUpdate={false}
+                            value={externalDescription}
+                            setValueFunction={setExternalDescription}
                         />
                     </InputGroup>
                     <FormHelperText>Description specific to this external project.</FormHelperText>
@@ -120,48 +129,58 @@ export const ProjectExternalSection = (
                 <FormControl isRequired mb={6}>
                     <FormLabel>Aims</FormLabel>
                     <InputGroup>
-                        <Textarea
+                        {/* <Textarea
                             placeholder={`Enter the aims of the project...`}
                             value={aims}
                             onChange={(event) => setAims(event.target.value)}
+                        /> */}
+                        <SimpleStateRichTextEditor
+                            section="externalAims"
+                            editorType="ProjectDetail"
+                            isUpdate={false}
+                            value={aims}
+                            setValueFunction={setAims}
                         />
                     </InputGroup>
                     <FormHelperText>List out the aims of your project.</FormHelperText>
                 </FormControl>
-
-            </ModalBody>
-            <ModalFooter
-            >
-                <Grid
-                    gridTemplateColumns={"repeat(2, 1fr)"}
-                    gridGap={4}
+                <Flex
+                    w={"100%"}
+                    justifyContent={"flex-end"}
+                    pb={4}
                 >
-                    <Button
-                        colorScheme="gray"
-
-                        onClick={backClick}
+                    <Grid
+                        gridTemplateColumns={"repeat(2, 1fr)"}
+                        gridGap={4}
                     >
-                        Cancel
-                    </Button>
+                        <Button
+                            colorScheme="gray"
 
-                    <Button
-                        ml={3}
-                        type="submit"
-                        colorScheme="blue"
-                        isDisabled={!externalFilled}
-                        onClick={() => {
-                            console.log('Here is the external data'
-                            )
-                            console.log(externalData)
-                            createClick()
+                            onClick={backClick}
+                        >
+                            Cancel
+                        </Button>
 
-                        }}
-                        rightIcon={<IoIosCreate />}
-                    >
-                        Create
-                    </Button>
-                </Grid>
-            </ModalFooter>
+                        <Button
+                            ml={3}
+                            type="submit"
+                            colorScheme="blue"
+                            isDisabled={!externalFilled}
+                            onClick={() => {
+                                console.log('Here is the external data'
+                                )
+                                console.log(externalData)
+                                createClick()
+
+                            }}
+                            rightIcon={<IoIosCreate />}
+                        >
+                            Create
+                        </Button>
+                    </Grid>
+                </Flex>
+            </ModalBody>
+
         </>
     )
 }

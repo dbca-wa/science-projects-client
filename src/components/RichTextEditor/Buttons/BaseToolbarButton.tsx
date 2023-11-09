@@ -19,6 +19,7 @@ export const BaseToolbarButton = ({ children, disabled, isActive, onClick }: IBa
             isDisabled={disabled}
             bg={isActive ? "gray.200" : undefined}
             onClick={onClick}
+            tabIndex={-1}
         >
             {children}
         </Button>

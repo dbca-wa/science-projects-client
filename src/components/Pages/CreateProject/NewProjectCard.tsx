@@ -28,7 +28,7 @@ export const NewProjectCard = ({ title, description, bulletPoints, colorScheme, 
     const cardVariants = {
         rest: { scale: 1, rotateX: 0 },
         hover: {
-            scale: 1.05,
+            scale: 1.035,
             rotateX: 7,
             transition: {
                 scale: { duration: 0.3 },

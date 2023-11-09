@@ -27,6 +27,7 @@ export const TraditionalLayout = () => {
         <Box
             minH={"100vh"}
             minW={"720px"}
+        // w={"100vw"}
         >
             <TraditionalPageWrapper>
                 <OldHeader />

@@ -208,7 +208,7 @@ export const DocumentActions = ({ tabType, document, projectPk }: IDocumentActio
                         Last updated by Jarid Prince on 05/05/2023
                     </Text>
                 </Box>
-  
+
                 <Flex
                     width={"100%"}
                     justifyContent={"center"}

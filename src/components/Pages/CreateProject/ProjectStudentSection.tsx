@@ -1,6 +1,6 @@
 // Tab data for Project External Project info on the creation page.
 
-import { Button, FormControl, FormHelperText, FormLabel, Grid, Icon, Input, InputGroup, InputLeftAddon, ModalBody, ModalFooter, Select, Textarea, useColorMode } from "@chakra-ui/react";
+import { Button, Flex, FormControl, FormHelperText, FormLabel, Grid, Icon, Input, InputGroup, InputLeftAddon, ModalBody, ModalFooter, Select, Textarea, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
 import { IoIosCreate } from "react-icons/io";
@@ -157,41 +157,43 @@ export const ProjectStudentSection = (
                     <FormHelperText>The level of the student and the project</FormHelperText>
 
                 </FormControl>
-
-            </ModalBody>
-            <ModalFooter
-            //  pos="absolute" bottom={0} right={0}
-            >
-                <Grid
-                    gridTemplateColumns={"repeat(2, 1fr)"}
-                    gridGap={4}
+                <Flex
+                    w={"100%"}
+                    justifyContent={"flex-end"}
+                    pb={4}
                 >
-                    <Button
-                        colorScheme="gray"
-
-                        onClick={backClick}
+                    <Grid
+                        gridTemplateColumns={"repeat(2, 1fr)"}
+                        gridGap={4}
                     >
-                        Cancel
-                    </Button>
+                        <Button
+                            colorScheme="gray"
 
-                    <Button
-                        ml={3}
-                        type="submit"
-                        colorScheme="blue"
-                        isDisabled={!studentFilled}
-                        onClick={() => {
-                            console.log('Here is the student data'
-                            )
-                            console.log(studentData)
-                            createClick()
+                            onClick={backClick}
+                        >
+                            Cancel
+                        </Button>
 
-                        }}
-                        rightIcon={<IoIosCreate />}
-                    >
-                        Create
-                    </Button>
-                </Grid>
-            </ModalFooter>
+                        <Button
+                            ml={3}
+                            type="submit"
+                            colorScheme="blue"
+                            isDisabled={!studentFilled}
+                            onClick={() => {
+                                console.log('Here is the student data'
+                                )
+                                console.log(studentData)
+                                createClick()
+
+                            }}
+                            rightIcon={<IoIosCreate />}
+                        >
+                            Create
+                        </Button>
+                    </Grid>
+                </Flex>
+            </ModalBody>
+
         </>
     )
 }

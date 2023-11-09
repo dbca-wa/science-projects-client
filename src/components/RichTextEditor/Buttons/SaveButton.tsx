@@ -16,7 +16,7 @@ import { IHTMLSave, saveHtmlToDB } from "../../../lib/api";
 import { EditorType } from "../../../types";
 
 
-export const SaveButton = ({ editorType, htmlData, project_pk, document_pk, section, isUpdate }: IHTMLSave) => {
+export const SaveButton = ({ editorType, htmlData, project_pk, document_pk, section, isUpdate, writeable_document_kind, writeable_document_pk }: IHTMLSave) => {
     const [isLocked, setIsLocked] = useState<boolean>(false);
     const [editor] = useLexicalComposerContext();
     // console.log(editor)
@@ -109,7 +109,11 @@ export const SaveButton = ({ editorType, htmlData, project_pk, document_pk, sect
         <BaseOptionsButton
             icon={FaSave}
             colorScheme="green"
-            onClick={() => saveToDB({ editorType, htmlData, project_pk, document_pk, section, isUpdate })}
+            onClick={() => saveToDB(
+                {
+                    editorType, htmlData, project_pk, document_pk, section, isUpdate,
+                    writeable_document_kind, writeable_document_pk
+                })}
             toolTipText="Save changes"
         // toolTip={"Save changes"}
         />

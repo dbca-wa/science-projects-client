@@ -42,8 +42,8 @@ export const BaseOptionsButton = ({ colorScheme, icon: buttonIcon, onClick, tool
                 }
                 onClick={onClick}
                 rounded={"full"}
-                w={"45px"}
-                h={"45px"}
+                w={"35px"}
+                h={"40px"}
                 data-tip="Click to Save"
             >
                 <Icon

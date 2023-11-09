@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 // Editor ============================================================================
 
-type ProjectSection = "title" | "description" | "tagline";
+type ProjectSection = "title" | "description" | "tagline" | "externalDescription" | "externalAims";
 type ConceptPlanSection = "background" | "aims" | "outcome" | "collaborations" | "strategic_context" | "staff_time_allocation" | "budget";
 type ProjectPlanSection = "background" | "aims" | "outcome" | "knowledge_transfer" | "project_tasks" | "listed_references" | "data_management" | "methodology" | "specimens" | "operating_budget" | "operating_budget_external" | "related_projects";
 type ProgressReportSection = "context" | "aims" | "progress" | "implications" | "future";
@@ -37,7 +37,8 @@ export interface IUserData {
 }
 
 export interface IUserMe {
-    pk: number;
+    id?: number;
+    pk?: number;
     about: string;
     agency: IAgency;
     branch: IBranch;
@@ -147,17 +148,7 @@ interface IFullProjectDetails {
 
 // PROJECT DOCUMENTS ============================================================================
 
-interface IConceptPlan {
-    pk: number;
-    document: number;
-    background: string | null;
-    aims: string | null;
-    outcome: string | null;
-    collaborations: string | null;
-    strategic_context: string | null;
-    staff_time_allocation: string | null;
-    budget: string | null;
-}
+
 
 
 interface IEndorsement {
@@ -181,7 +172,8 @@ interface ProjectPDFData {
 }
 
 interface MainDoc {
-    pk: number;
+    pk?: number;
+    id?: number;
     created_year: number;
     created_at: Date;
     creator: number;
@@ -195,6 +187,19 @@ interface MainDoc {
     directorate_approval_granted: boolean;
     pdf_generation_in_progress: boolean;
     pdf: string;
+}
+
+interface IConceptPlan {
+    pk?: number;
+    id?: number;
+    document: MainDoc;
+    background: string | null;
+    aims: string | null;
+    outcome: string | null;
+    collaborations: string | null;
+    strategic_context: string | null;
+    staff_time_allocation: string | null;
+    budget: string | null;
 }
 
 interface IProjectPlan {
@@ -263,8 +268,8 @@ interface IProjectDocuments {
 
 
 interface IProjectMember {
-    id: number;
-    pk: number;
+    id?: number;
+    pk?: number;
     project: number;
     is_leader: boolean;
     user: IMemberUserDetails;
@@ -339,12 +344,27 @@ export interface IQuickTask {
     description: string;
 }
 
-export interface IApproveProgressReport {
+export interface IApproveDocument {
     action: "approve" | "recall" | "send_back";
     stage: number; // 1-3
     documentPk: number;
-    progressReportPk: number;
 }
+
+// export interface IApproveProgressReport {
+//     action: "approve" | "recall" | "send_back";
+//     stage: number; // 1-3
+//     documentPk: number;
+//     // progressReportPk: number;
+// }
+
+
+// export interface IApproveConceptPlan {
+//     action: "approve" | "recall" | "send_back";
+//     stage: number; // 1-3
+//     documentPk: number;
+//     // conceptPlanPk: number;
+// }
+
 
 
 export interface ITaskDisplayCard {

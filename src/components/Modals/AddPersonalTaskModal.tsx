@@ -131,6 +131,7 @@ export const AddPersonalTaskModal = ({ user, isAnimating, setIsAnimating, isAddT
                             {/* <InputLeftAddon children={<MdOutlineTitle />} /> */}
                             <Input
                                 autoFocus
+                                autoComplete="off"
                                 placeholder="Enter the title of the task..."
                                 {...register("name", { required: true })}
                                 type="text"

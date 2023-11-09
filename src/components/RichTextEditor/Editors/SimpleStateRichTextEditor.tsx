@@ -115,7 +115,7 @@ export const SimpleStateRichTextEditor = ({
 
     return (
         <Box
-            pb={6}
+            pb={2}
             w={"100%"}
             zIndex={2}
         >

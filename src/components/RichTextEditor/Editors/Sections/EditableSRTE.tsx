@@ -18,7 +18,7 @@ import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin"
 import { useEffect, useState } from "react";
 import { DataDisplayPlugin } from "../../Plugins/DataDisplayPlugin";
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
-import { EditorSubsections, EditorType } from "../../../../types";
+import { EditorSections, EditorSubsections, EditorType } from "../../../../types";
 
 interface Props {
     initialConfig: any;
@@ -29,6 +29,8 @@ interface Props {
     document_pk: number;
     editorType: EditorType;
     isUpdate: boolean;
+    writeable_document_kind?: EditorSections | null;
+    writeable_document_pk?: number | null;
 
     editorText: string;
     setEditorText: React.Dispatch<React.SetStateAction<string>>;
@@ -44,6 +46,7 @@ interface Props {
 
 export const EditableSRTE = (
     { textEditorName, section, project_pk, document_pk, editorType, isUpdate,
+        writeable_document_kind, writeable_document_pk,
         initialConfig, editorRef,
         data, editorText, setEditorText,
         isEditorOpen, setIsEditorOpen,
@@ -133,6 +136,9 @@ export const EditableSRTE = (
                         project_pk={project_pk}
                         document_pk={document_pk}
                         isUpdate={isUpdate}
+                        writeable_document_kind={writeable_document_kind}
+                        writeable_document_pk={writeable_document_pk}
+
 
                         editorIsOpen={isEditorOpen}
                         setIsEditorOpen={setIsEditorOpen}

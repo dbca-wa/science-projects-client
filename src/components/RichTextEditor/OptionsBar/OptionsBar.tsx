@@ -7,11 +7,14 @@ import { SaveButton } from "../Buttons/SaveButton";
 import { TreeButton } from "../Buttons/TreeButton";
 import { LexicalEditor } from "lexical";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
-import { EditorSubsections, EditorType } from "../../../types";
+import { EditorSections, EditorSubsections, EditorType } from "../../../types";
 import { useEffect } from "react";
 
 interface IOptionsBarProps {
     // editor: LexicalEditor;
+    writeable_document_kind?: EditorSections | null;
+    writeable_document_pk?: number | null;
+
     isUpdate: boolean;
     editorText: string | null;
     editorType: EditorType;
@@ -30,7 +33,7 @@ interface IOptionsBarProps {
 export const OptionsBar = ({
     // editor,
     displayData, editorType, isUpdate,
-    editorText, shouldShowTree, setShouldShowTree, rawHTML, editorIsOpen, setIsEditorOpen, setDisplayData, section, project_pk, document_pk }: IOptionsBarProps) => {
+    editorText, shouldShowTree, setShouldShowTree, writeable_document_kind, writeable_document_pk, rawHTML, editorIsOpen, setIsEditorOpen, setDisplayData, section, project_pk, document_pk }: IOptionsBarProps) => {
     const { colorMode } = useColorMode();
 
     // useEffect(() => console.log(displayData), [displayData])
@@ -73,6 +76,8 @@ export const OptionsBar = ({
                         {/* <UploadButton /> */}
                         {/* <DownloadButton /> */}
                         <SaveButton
+                            writeable_document_pk={writeable_document_pk}
+                            writeable_document_kind={writeable_document_kind}
                             isUpdate={isUpdate}
                             editorType={editorType}
                             htmlData={displayData}

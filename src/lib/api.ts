@@ -1,7 +1,7 @@
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
 import { QueryFunctionContext } from "@tanstack/react-query";
-import { EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveProgressReport, IBranch, IBusinessArea, IDepartmentalService, IDivision, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
+import { EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
 
 // INSTANCE SETUP ==================================================================
 
@@ -211,6 +211,18 @@ export const getMe = async () => {
     })
     return res;
 }
+
+
+export const getTeamLead = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+
+    console.log(pk)
+    const res = instance.get(`projects/project_members/${pk}/leader`).then(res => {
+        return res.data
+    })
+    return res;
+}
+getTeamLead
 
 interface IFullUserProps {
     pk: string;
@@ -549,6 +561,26 @@ export const getFullProjectSimple = async (preselectedProjectPk: number) => {
     }
 };
 
+
+
+
+export interface ISetProjectProps {
+    status: 'new' | 'pending' | 'active' | 'updating' | 'terminated' | 'suspended' | 'closed';
+    projectId: number | string;
+}
+
+
+export const setProjectStatus = async ({ projectId, status }: ISetProjectProps) => {
+    const data = {
+        status: status
+    }
+    const res = instance.put(`projects/${projectId}`, data).then(res => {
+        return res.data
+    })
+    return res;
+
+
+}
 
 export interface INewMember {
     user: number;
@@ -997,23 +1029,25 @@ export const generateProjectDocument = async ({
 
 }
 
+// export const spawnDocument = async({})
 
-export const handleProgressReportAction = async ({ action, stage, documentPk, progressReportPk }: IApproveProgressReport) => {
+
+export const handleDocumentAction = async ({ action, stage, documentPk }: IApproveDocument) => {
 
     let url = ""
     if (action === "approve") {
-        url = `documents/progressreports/approve`
+        url = `documents/actions/approve`
     } else if (action === "recall") {
-        url = `documents/progressreports/recall`
+        url = `documents/actions/recall`
 
     } else if (action === "send_back") {
-        url = `documents/progressreports/send_back`
+        url = `documents/actions/send_back`
     }
     const params = {
         "action": action,
         "stage": stage,
         "documentPk": documentPk,
-        "progressReportPk": progressReportPk,
+        // "conceptPlanPk": conceptPlanPk,
     }
     console.log(params)
 
@@ -1027,6 +1061,38 @@ export const handleProgressReportAction = async ({ action, stage, documentPk, pr
         }
     ).then(res => res.data);
 }
+
+
+
+// export const handleProgressReportAction = async ({ action, stage, documentPk, progressReportPk }: IApproveProgressReport) => {
+
+//     let url = ""
+//     if (action === "approve") {
+//         url = `documents/progressreports/approve`
+//     } else if (action === "recall") {
+//         url = `documents/progressreports/recall`
+
+//     } else if (action === "send_back") {
+//         url = `documents/progressreports/send_back`
+//     }
+//     const params = {
+//         "action": action,
+//         "stage": stage,
+//         "documentPk": documentPk,
+//         "progressReportPk": progressReportPk,
+//     }
+//     console.log(params)
+
+//     return instance.post(
+//         url,
+//         params,
+//         {
+//             headers: {
+//                 'Content-Type': 'multipart/form-data',
+//             },
+//         }
+//     ).then(res => res.data);
+// }
 
 
 // export const recallProgressReport = async ({ stage, documentPk, progressReportPk }: IApproveProgressReport) => {
@@ -1057,12 +1123,14 @@ export interface IHTMLSave {
     isUpdate: boolean;
     project_pk: null | number;
     document_pk: null | number;
+    writeable_document_kind: null | EditorSections;
+    writeable_document_pk: null | number;
     section: null | EditorSubsections;
 }
 
 // Also have this handle directors message, research intro etc. (annual report)
 export const saveHtmlToDB = async (
-    { editorType, htmlData, project_pk, document_pk, section, isUpdate }: IHTMLSave) => {
+    { editorType, htmlData, project_pk, document_pk, writeable_document_kind, writeable_document_pk, section, isUpdate }: IHTMLSave) => {
 
     const urlType = isUpdate ? instance.put : instance.post;
 
@@ -1100,8 +1168,37 @@ export const saveHtmlToDB = async (
             "project": project_pk,
             "document": document_pk,
             "section": section,
+            "kind": writeable_document_kind,
+            "kind_pk": writeable_document_pk,
         }
         console.log(data)
+        const params = {
+            [section]: htmlData,
+        }
+        // if (section === "description") {
+        //     params = {
+        //         "description": htmlData,
+        //     }
+        // }
+        const formatDocumentKind = (writeable_document_kind) => {
+            // Remove spaces and convert the string to lowercase, then add 's' to the end
+            return writeable_document_kind.replace(/\s/g, '').toLowerCase() + 's';
+        }
+        const formattedKind = formatDocumentKind(writeable_document_kind)
+
+        console.log(`documents/${formattedKind}/${writeable_document_pk}`)
+        console.log(params)
+
+        return urlType(
+            `documents/${formattedKind}/${writeable_document_pk}`,
+            params,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        ).then(res => res.data);
+
 
     }
 
@@ -1109,9 +1206,73 @@ export const saveHtmlToDB = async (
 }
 
 
-interface ISpawnDocument {
+export interface ISpawnDocument {
     project_pk: number;
-    kind: string;
+    kind: "concept" | "projectplan" | "progressreport" | "studentreport" | "studentreport" | "projectclosure" | string;
+}
+
+
+export interface ICloseProjectProps {
+    projectPk: number;
+    reason: string;
+    outcome: 'forcecompleted' | "completed" | "terminated" | "suspended";
+}
+
+
+export const closeProjectCall = async ({ projectPk, reason, outcome }: ICloseProjectProps) => {
+    // console.log(projectPk, reason, outcome);
+    if (projectPk !== undefined) {
+
+        const url = `documents/projectdocuments`
+        const kind = 'projectclosure';
+
+        const params = {
+            project: projectPk,
+            kind: kind,
+            reason: reason,
+            outcome: outcome,
+        }
+
+        console.log(params)
+
+        return instance.post(
+            url, params
+        ).then(res => res.data);
+    }
+}
+
+export const openProjectCall = async ({ pk }: ISimplePkProp) => {
+    // console.log(projectPk, reason, outcome);
+    if (pk !== undefined) {
+
+        const url = `documents/projectclosures/reopen/${pk}`
+        const params = {
+            project: pk,
+        }
+
+        console.log(params)
+
+        return instance.post(
+            url, params
+        ).then(res => res.data);
+    }
+}
+
+export interface ISimplePkProp {
+    pk: number;
+}
+
+export const deleteProjectCall = async ({ pk }: ISimplePkProp) => {
+    console.log(pk)
+    if (pk !== undefined) {
+        const url = `projects/${pk}`
+
+        return instance.delete(
+            url,
+        ).then(res => res.data);
+    }
+
+
 }
 
 export const spawnDocument = async ({ project_pk, kind }: ISpawnDocument) => {
@@ -1119,34 +1280,18 @@ export const spawnDocument = async ({ project_pk, kind }: ISpawnDocument) => {
 
     const choices = ["concept", "projectplan", "progressreport", "studentreport", "projectclosure"]
     if (!choices.includes(kind)) {
+        console.log("returning")
         return;
     }
 
     // Create the document first (as a document object)
     const url = `documents/projectdocuments`
     const params = {
+        "old_id": 1,
         "kind": kind,
         "project": project_pk,
         "details": {},
     }
-
-
-    // Create the details for the document, depending on its type
-    // if (kind === "concept") {
-    // params["details"] = {}
-    // } 
-    // else if (kind === "projectplan") {
-
-    // } else if (kind === "progressreport") {
-
-    // } else if (kind === "studentreport") {
-
-    // } else if (kind === "projectclosure") {
-
-    // } 
-    // If both are successful, return the data of the details, which references the document
-
-    // If not, find where teh issue is and return the error for that
 
     return instance.post(
         url,
