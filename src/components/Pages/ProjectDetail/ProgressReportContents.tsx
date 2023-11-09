@@ -1,20 +1,27 @@
 // Maps out the document provided to the rich text editor components for progress report documents. 
 
-import { Box, Center, Flex, Select, Spinner, Text, useColorMode } from "@chakra-ui/react"
+import { Box, Button, Center, Flex, Select, Spinner, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
 import { DocumentActions } from "./DocumentActions"
-import { IProgressReport } from "../../../types";
+import { IProgressReport, IProjectDocuments, IProjectMember, IUserMe } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { useEffect, useState } from "react";
 // import { ProgressReportSelector } from "./ProgressReportSelector";
 import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions";
 import { motion } from "framer-motion";
+import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
+import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
 
 interface Props {
     documents: IProgressReport[];
+    all_documents: IProjectDocuments;
+    userData: IUserMe;
+    members: IProjectMember[];
     refetch: () => void;
 }
 
 export const ProgressReportContents = ({
+    userData, members,
+    all_documents,
     documents, refetch
 }: Props) => {
     // Handling years
@@ -43,6 +50,9 @@ export const ProgressReportContents = ({
     const documentType = "progressreport"
     const [editorKey, setEditorKey] = useState(selectedYear.toString() + colorMode + documentType);
 
+    const mePk = userData?.pk ? userData?.pk : userData?.id;
+    const userInTeam = useCheckUserInTeam(mePk, members);
+
 
     useEffect(() => {
         const dataForYear = documents.find((report) => report.year === selectedYear);
@@ -68,6 +78,7 @@ export const ProgressReportContents = ({
     //     // setSelectedYear(selectedYear);
     //     setIsLoading(false);
     // }
+    const { isOpen: isCreateProgressReportModalOpen, onOpen: onOpenCreateProgressReportModal, onClose: onCloseCreateProgressReportModal } = useDisclosure();
 
     return (
         <>
@@ -78,6 +89,15 @@ export const ProgressReportContents = ({
                 selectedProgressReportYear={selectedYear}
                 selectedProgressReport={selectedProgressReport}
             /> */}
+
+            <CreateProgressReportModal
+                projectPk={selectedProgressReport?.document?.project?.pk}
+                documentKind="progressreport"
+                onClose={onCloseCreateProgressReportModal}
+                isOpen={isCreateProgressReportModalOpen}
+                refetchData={refetch}
+            />
+
 
             {/* Selector */}
             <Box
@@ -101,7 +121,7 @@ export const ProgressReportContents = ({
                             fontSize={"lg"}
                             fontWeight={"bold"}
                         >
-                            Select a Year:
+                            Select a Report:
                         </Text>
 
                     </Flex>
@@ -123,7 +143,48 @@ export const ProgressReportContents = ({
                         </Select>
                     </Flex>
                 </Flex>
+                <Flex
+                    width={"100%"}
+                    mt={6}
+                >
 
+                    <Flex
+                        flex={1}
+                        justifyContent={"flex-start"}
+                        alignItems={"center"}
+                    >
+                        <Text
+                            fontSize={"lg"}
+                            fontWeight={"bold"}
+                        >
+
+                        </Text>
+
+                    </Flex>
+                    <Flex
+                        justifyContent={"flex-end"}
+                    >
+
+
+                        <Button
+                            colorScheme="orange"
+                            size={"sm"}
+                            onClick={
+                                onOpenCreateProgressReportModal
+                                // () => spawnProgressReport(
+                                //     {
+                                //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
+                                //         kind: "progressreport"
+                                //     }
+                                // )
+                            }
+                            ml={2}
+                        >
+                            Create Progress Report
+                        </Button>
+
+                    </Flex>
+                </Flex>
             </Box>
 
             {/* Actions */}
@@ -172,9 +233,16 @@ export const ProgressReportContents = ({
                     >
 
                         <RichTextEditor
+                            canEdit={userInTeam || userData?.is_superuser}
+                            writeable_document_kind={'Progress Report'}
+                            writeable_document_pk={selectedProgressReport?.pk}
+
+
                             project_pk={selectedProgressReport.document.project.pk}
                             document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
+
+
                             editorType="ProjectDocument"
                             key={`context${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.context}
@@ -182,9 +250,16 @@ export const ProgressReportContents = ({
                         />
 
                         <RichTextEditor
+                            canEdit={userInTeam || userData?.is_superuser}
+                            writeable_document_kind={'Progress Report'}
+                            writeable_document_pk={selectedProgressReport?.pk}
+
+
                             project_pk={selectedProgressReport.document.project.pk}
                             document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
+
+
                             editorType="ProjectDocument"
                             key={`aims${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.aims}
@@ -192,9 +267,16 @@ export const ProgressReportContents = ({
                         />
 
                         <RichTextEditor
+                            canEdit={userInTeam || userData?.is_superuser}
+                            writeable_document_kind={'Progress Report'}
+                            writeable_document_pk={selectedProgressReport?.pk}
+
+
                             project_pk={selectedProgressReport.document.project.pk}
                             document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
+
+
                             editorType="ProjectDocument"
                             key={`progress${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.progress}
@@ -202,9 +284,16 @@ export const ProgressReportContents = ({
                         />
 
                         <RichTextEditor
+                            canEdit={userInTeam || userData?.is_superuser}
+                            writeable_document_kind={'Progress Report'}
+                            writeable_document_pk={selectedProgressReport?.pk}
+
+
                             project_pk={selectedProgressReport.document.project.pk}
                             document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
+
+
                             editorType="ProjectDocument"
                             key={`implications${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.implications}
@@ -212,9 +301,17 @@ export const ProgressReportContents = ({
                         />
 
                         <RichTextEditor
+                            canEdit={userInTeam || userData?.is_superuser}
+                            writeable_document_kind={'Progress Report'}
+                            writeable_document_pk={selectedProgressReport?.pk}
+
                             project_pk={selectedProgressReport.document.project.pk}
                             document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
+
+
+
+
                             editorType="ProjectDocument"
                             key={`future${editorKey}`} // Change the key to force a re-render
                             data={selectedProgressReport?.future}
