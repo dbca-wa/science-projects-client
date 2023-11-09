@@ -15,6 +15,7 @@ import { StudentReportContents } from "../components/Pages/ProjectDetail/Student
 import { Head } from "../components/Base/Head";
 import { DocumentActions } from "../components/Pages/ProjectDetail/DocumentActions";
 import useDistilledProjectTitle from "../lib/hooks/useDistlledProjectTitle";
+import { useUser } from "../lib/hooks/useUser";
 // import { ProgressReportSelector } from "../components/Pages/ProjectDetail/ProgressReportSelector";
 
 export const ProjectDetail = () => {
@@ -28,6 +29,7 @@ export const ProjectDetail = () => {
     const [members, setMembers] = useState<IProjectMember[]>([]);
 
     useEffect(() => {
+        console.log(projectData)
         if (!isLoading && projectData) {
             setBaseInformation(projectData.project);
             setDetails(projectData.details);
@@ -47,7 +49,7 @@ export const ProjectDetail = () => {
 
     const distilledTitle = useDistilledProjectTitle(projectData?.project?.title);
 
-
+    const me = useUser();
 
     return (
         <>
@@ -106,6 +108,8 @@ export const ProjectDetail = () => {
                                             baseInformation={baseInformation}
                                             details={details}
                                             members={members}
+                                            documents={documents}
+                                            refetchData={refetch}
                                         />
 
                                         {/* <ManageTeam /> */}
@@ -132,8 +136,13 @@ export const ProjectDetail = () => {
                             <TabPanel
                             >
                                 <ConceptPlanContents
+                                    userData={me?.userData}
+                                    members={members}
                                     document={documents.concept_plan}
-                                    projectPk={Number(projectPk)}
+                                    all_documents={documents}
+                                    refetch={refetch}
+
+                                // projectPk={Number(projectPk)}
                                 />
                             </TabPanel>
                         )
@@ -143,7 +152,15 @@ export const ProjectDetail = () => {
                     {/* PROJECT PLAN */}
                     {documents?.project_plan && (
                         <TabPanel>
-                            <ProjectPlanContents document={documents.project_plan} />
+                            <ProjectPlanContents
+                                refetch={refetch}
+                                document={documents.project_plan}
+
+                                all_documents={documents}
+
+                                userData={me?.userData}
+                                members={members}
+                            />
                         </TabPanel>
                     )}
 

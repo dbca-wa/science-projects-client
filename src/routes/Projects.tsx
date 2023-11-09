@@ -1,13 +1,15 @@
 // Route for displaying paginated projects
 
 import { IUserData } from "../types"
-import { Checkbox, Flex, Grid, Stack, Text, useColorMode, Select, Box, Center } from "@chakra-ui/react"
+import { Checkbox, Flex, Grid, Stack, Text, useColorMode, Select, Box, Center, Button } from "@chakra-ui/react"
 import { DownloadProjectsCSVButton } from "../components/Pages/Projects/DownloadProjectsCSVButton";
 import { Head } from "../components/Base/Head";
 import { useProjectSearchContext } from "../lib/hooks/ProjectSearchContext";
 import { useEffect } from "react";
 import { PaginatorProject } from "../components/Pages/Projects/PaginatorProject";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { IoMdAdd } from "react-icons/io";
 
 
 export const Projects = () => {
@@ -70,6 +72,8 @@ export const Projects = () => {
     const user = queryClient.getQueryData<IUserData>(['me']);
 
 
+    const navigate = useNavigate();
+
     return (
         <>
             <Head title="Projects" />
@@ -88,7 +92,22 @@ export const Projects = () => {
                     </Text>
                 </Flex>
 
-                {user?.is_superuser && (
+                <Flex
+                    flex={1}
+                    w={"100%"}
+                    justifyContent={"flex-end"}
+                    alignItems={"center"}
+                >
+                    <Button
+                        variant={'solid'}
+                        colorScheme="green"
+                        onClick={() => navigate('/projects/add')}
+                        leftIcon={<IoMdAdd />}
+                    >
+                        New Project
+                    </Button>
+                </Flex>
+                {/* {user?.is_superuser && (
                     <Flex
                         flex={1}
                         w={"100%"}
@@ -98,7 +117,8 @@ export const Projects = () => {
                         <DownloadProjectsCSVButton />
                     </Flex>
 
-                )}
+
+                )} */}
             </Flex>
 
             <Box

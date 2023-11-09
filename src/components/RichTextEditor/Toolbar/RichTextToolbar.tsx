@@ -57,7 +57,7 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                 width={"100%"}
                 // mt={2}
                 p={2}
-                borderRadius={"20px 20px 0 0"}
+                // borderRadius={"20px 20px 0 0"}
                 backgroundColor={
                     colorMode === "light" ? "whiteAlpha.800"
                         : "blackAlpha.400"

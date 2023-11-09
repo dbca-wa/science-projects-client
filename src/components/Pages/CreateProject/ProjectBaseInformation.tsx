@@ -1,6 +1,6 @@
 // Section to provide base information on a project before proceeding to the details and location
 
-import { Box, Button, FormControl, FormHelperText, FormLabel, Input, InputGroup, ModalBody, ModalFooter, Grid, VisuallyHiddenInput, InputLeftElement, Icon, Textarea } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormHelperText, FormLabel, Input, InputGroup, ModalBody, ModalFooter, Grid, VisuallyHiddenInput, InputLeftElement, Icon, Textarea, Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
 import TagInput from "./TagInput";
@@ -200,46 +200,50 @@ export const ProjectBaseInformation = ({ projectKind, baseInformationFilled, set
 
 
                 </Grid>
-
-            </ModalBody>
-            <ModalFooter>
-                <Button onClick={onClose}>Cancel</Button>
-                <motion.div
-                    animate={{
-                        scale: showPulsate ? [1, 1.2, 1] : 1, // Keyframes for pulsating effect
-                    }}
-                    transition={{
-                        repeat: showPulsate ? Infinity : 0,
-                        duration: 1, // Animation duration in seconds
-                    }}
+                <Flex
+                    w={"100%"}
+                    justifyContent={"flex-end"}
+                    pb={4}
                 >
-                    <Button
-                        isDisabled={!baseInformationFilled}
-                        colorScheme="blue"
-                        ml={3}
-                        onClick={
-                            () => {
-                                if (baseInformationFilled) {
-                                    console.log("going next")
-                                    nextClick(
-                                        {
-                                            "kind": projectKind,
-                                            "year": currentYear,
-                                            "creator": meData?.pk,
-                                            "title": projectTitle,
-                                            "description": projectSummary,
-                                            "keywords": keywords,
-                                            "imageData": selectedFile
-                                        }
-                                    )
-                                } else return;
-                            }
-                        }
+                    <Button onClick={onClose}>Cancel</Button>
+                    <motion.div
+                        animate={{
+                            scale: showPulsate ? [1, 1.2, 1] : 1, // Keyframes for pulsating effect
+                        }}
+                        transition={{
+                            repeat: showPulsate ? Infinity : 0,
+                            duration: 1, // Animation duration in seconds
+                        }}
                     >
-                        Next &rarr;
-                    </Button>
-                </motion.div>
-            </ModalFooter>
+                        <Button
+                            isDisabled={!baseInformationFilled}
+                            colorScheme="blue"
+                            ml={3}
+                            onClick={
+                                () => {
+                                    if (baseInformationFilled) {
+                                        console.log("going next")
+                                        nextClick(
+                                            {
+                                                "kind": projectKind,
+                                                "year": currentYear,
+                                                "creator": meData?.pk,
+                                                "title": projectTitle,
+                                                "description": projectSummary,
+                                                "keywords": keywords,
+                                                "imageData": selectedFile
+                                            }
+                                        )
+                                    } else return;
+                                }
+                            }
+                        >
+                            Next &rarr;
+                        </Button>
+                    </motion.div>
+                </Flex>
+            </ModalBody>
+
         </>
     );
 };

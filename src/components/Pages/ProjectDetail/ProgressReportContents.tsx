@@ -173,6 +173,7 @@ export const ProgressReportContents = ({
 
                         <RichTextEditor
                             project_pk={selectedProgressReport.document.project.pk}
+                            document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
                             editorType="ProjectDocument"
                             key={`context${editorKey}`} // Change the key to force a re-render
@@ -182,6 +183,7 @@ export const ProgressReportContents = ({
 
                         <RichTextEditor
                             project_pk={selectedProgressReport.document.project.pk}
+                            document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
                             editorType="ProjectDocument"
                             key={`aims${editorKey}`} // Change the key to force a re-render
@@ -191,6 +193,7 @@ export const ProgressReportContents = ({
 
                         <RichTextEditor
                             project_pk={selectedProgressReport.document.project.pk}
+                            document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
                             editorType="ProjectDocument"
                             key={`progress${editorKey}`} // Change the key to force a re-render
@@ -200,6 +203,7 @@ export const ProgressReportContents = ({
 
                         <RichTextEditor
                             project_pk={selectedProgressReport.document.project.pk}
+                            document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
                             editorType="ProjectDocument"
                             key={`implications${editorKey}`} // Change the key to force a re-render
@@ -209,6 +213,7 @@ export const ProgressReportContents = ({
 
                         <RichTextEditor
                             project_pk={selectedProgressReport.document.project.pk}
+                            document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
                             editorType="ProjectDocument"
                             key={`future${editorKey}`} // Change the key to force a re-render

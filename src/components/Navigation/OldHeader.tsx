@@ -148,13 +148,14 @@ const ReportMenuContents = () => {
                 borderColor={dividerColor}
                 my={1}
             />
-            <MenuGroup
-                title="ARAR PDF" fontSize={"12px"}
-                color={"gray.500"} textAlign={"center"}
-            >
-                {!reportPdfsLoading && reportPdfsData && (
+            {!reportPdfsLoading && reportPdfsData && (
 
-                    reportPdfsData.map(publication => {
+                <MenuGroup
+                    title="ARAR PDF" fontSize={"12px"}
+                    color={"gray.500"} textAlign={"center"}
+                >
+
+                    {reportPdfsData.map(publication => {
                         return (
                             <MenuItem
                                 key={publication.report.year}
@@ -168,11 +169,12 @@ const ReportMenuContents = () => {
                                 </Text>
                             </MenuItem>
                         )
-                    })
+                    })}
 
-                )}
 
-            </MenuGroup>
+                </MenuGroup>
+            )}
+
         </>
     )
 }

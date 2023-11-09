@@ -508,7 +508,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData,
                                         >
                                             Document ID</Text>
                                         <Text>
-                                            {progressReportData?.document?.pk}
+                                            {progressReportData?.document?.pk ? progressReportData?.document?.pk : progressReportData?.document?.id}
                                         </Text>
                                     </Flex>
                                 </Grid>
@@ -1017,6 +1017,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData,
                                                     // onClick={beginProjectDocPDFGeneration}
                                                     type="submit"
                                                     form="pdf-download-form"
+                                                    isDisabled
                                                     isLoading={
                                                         // progressReportData?.document?.pdf_generation_in_progress
                                                         // ||
@@ -1038,6 +1039,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData,
                                                 // onClick={beginProjectDocPDFGeneration}
                                                 type="submit"
                                                 form="pdf-generation-form"
+                                                isDisabled
                                                 isLoading={
                                                     // progressReportData?.document?.pdf_generation_in_progress
                                                     // ||

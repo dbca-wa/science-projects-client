@@ -24,6 +24,7 @@ import { ICreateProjectBaseInfo, ICreateProjectDetails, ICreateProjectExternalDe
 import { useNavigate } from "react-router-dom"
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection"
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection"
+import { useUser } from "../../lib/hooks/useUser"
 
 interface INewProjectModalProps {
     projectType: string;
@@ -182,9 +183,12 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
     }, [projectType])
 
 
+    const { userLoading, userData } = useUser();
+
     return (
         <Modal isOpen={isOpen} onClose={controlledClose}
-            scrollBehavior="inside"
+            // scrollBehavior="outside"
+            // size={"6xl"}
             size={"full"}
         >
             <ModalOverlay />
@@ -255,7 +259,9 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                         h={"100%"}
                     >
                         <TabPanel
-                            h={"100%"}>
+                            h={"100%"}
+                            px={10}
+                        >
                             <ProjectBaseInformation
                                 projectKind={projectType === "Core Function" ? 'core_function' :
                                     projectType === "Student Project" ? 'student' :
@@ -272,8 +278,11 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                             />
                         </TabPanel>
                         <TabPanel
-                            h={"100%"}>
+                            h={"100%"}
+                            px={10}
+                        >
                             <ProjectDetailsSection
+                                thisUser={userData.pk}
                                 backClick={goBack}
                                 nextClick={goToLocationTab}
 
@@ -285,7 +294,9 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                             />
                         </TabPanel>
                         <TabPanel
-                            h={"100%"}>
+                            h={"100%"}
+                            px={10}
+                        >
                             {
                                 projectType.includes("External") || projectType.includes("Student") ?
                                     <ProjectLocationSection
@@ -320,7 +331,9 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                         </TabPanel>
                         {projectType.includes("External") && (
                             <TabPanel
-                                h={"100%"}>
+                                h={"100%"}
+                                px={10}
+                            >
                                 <ProjectExternalSection
                                     externalFilled={externalFilled}
                                     externalData={externalData}
@@ -336,7 +349,9 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
 
                         {projectType.includes("Student") && (
                             <TabPanel
-                                h={"100%"}>
+                                h={"100%"}
+                                px={10}
+                            >
 
                                 <ProjectStudentSection
                                     studentFilled={studentFilled}

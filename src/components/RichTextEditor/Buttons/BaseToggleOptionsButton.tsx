@@ -68,8 +68,8 @@ export const BaseToggleOptionsButton = ({
                 }
                 onClick={handleClick}
                 rounded={"full"}
-                w={"45px"}
-                h={"45px"}
+                w={"35px"}
+                h={"40px"}
             >
                 {currentState === false ?
                     <Icon as={IconOne} boxSize={6} />

@@ -1,33 +1,48 @@
 // Displayed when looking at the Project Details by selecting it on the projects page. Displays more data about the project and allows editing.
 
-import { Box, Button, Center, Flex, Grid, Image, Tag, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
+import { Box, Button, Center, Flex, Grid, Image, Menu, MenuButton, MenuItem, MenuList, Tag, Text, ToastId, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
 import { AiFillCalendar, AiFillEdit, AiFillTag } from "react-icons/ai"
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineExternalLink } from 'react-icons/hi'
 import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
-import { IFullProjectDetails, IProjectData, IProjectMember } from "../../../types";
-import { FaUserFriends } from "react-icons/fa";
+import { IFullProjectDetails, IProjectData, IProjectDocuments, IProjectMember } from "../../../types";
+import { FaEdit, FaEllipsisH, FaEllipsisV, FaLock, FaLockOpen, FaTrash, FaUserFriends } from "react-icons/fa";
 import { GiMaterialsScience } from "react-icons/gi";
-import { MdScience } from "react-icons/md";
+import { MdMoreVert, MdScience } from "react-icons/md";
 import { RiBook3Fill } from 'react-icons/ri'
 import { useNoImage } from "../../../lib/hooks/useNoImage";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE";
+import { useUser } from "../../../lib/hooks/useUser";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ISimplePkProp, deleteProjectCall } from "../../../lib/api";
+import { DeleteProjectModal } from "../../Modals/DeleteProjectModal";
+import { useTeamLead } from "../../../lib/hooks/useTeamLead";
+import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
+import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
+import { EditProjectModal } from "../../Modals/EditProjectModal";
+import { useCheckUserIsBaLeader } from "../../../lib/hooks/useCheckUserIsBaLeader";
+import { GrFormEdit, GrStatusInfo } from "react-icons/gr";
+import { ProjectClosureModal } from "../../Modals/ProjectClosureModal";
+import { ProjectReopenModal } from "../../Modals/ProjectReopenModal";
 
 interface IProjectOverviewCardProps {
     baseInformation: IProjectData;
     details: IFullProjectDetails | null | undefined;
     members: IProjectMember[];
+    documents: IProjectDocuments;
+    refetchData: () => void;
 }
 
 
 export const ProjectOverviewCard = (
-    { baseInformation, details, members }: IProjectOverviewCardProps
+    { baseInformation, details, members, refetchData, documents }: IProjectOverviewCardProps
 ) => {
+
 
     const baseApi = useApiEndpoint();
     const { isOpen: isEditProjectDetailModalOpen, onOpen: onEditProjectDetailModalOpen, onClose: onEditProjectDetailModalClose } = useDisclosure()
@@ -35,6 +50,13 @@ export const ProjectOverviewCard = (
     useEffect(() => {
         console.log(baseInformation)
     })
+
+
+    const { isOpen: isDeleteModalOpen, onOpen: onOpenDeleteModal, onClose: onCloseDeleteModal } = useDisclosure()
+    const { isOpen: isClosureModalOpen, onOpen: onOpenClosureModal, onClose: onCloseClosureModal } = useDisclosure()
+    const { isOpen: isReopenModalOpen, onOpen: onOpenReopenModal, onClose: onCloseReopenModal } = useDisclosure()
+    const { isOpen: isEditModalOpen, onOpen: onOpenEditModal, onClose: onCloseEditModal } = useDisclosure()
+
 
     const determineAuthors = (members: IProjectMember[]) => {
         // Filters members with non-null first and last names
@@ -138,23 +160,100 @@ export const ProjectOverviewCard = (
     // division
 
     const noImage = useNoImage();
-
-    useEffect(() => {
-        console.log(baseInformation)
-    }, [])
+    const me = useUser();
+    // const { leaderData, leaderLoading } = useTeamLead(baseInformation?.pk ? baseInformation.pk : baseInformation.id);
 
     const { layout } = useLayoutSwitcher();
 
 
     // const editorKey = selectedYear.toString() + colorMode;
 
+    const statusDictionary: { [key: string]: { label: string; color: string } }[] = [
+        { "new": { label: "New", color: "gray.500" } },
+        { "pending": { label: "Pending Project Plan", color: "yellow.500" } },
+        { "active": { label: "Active (Approved)", color: "green.500" } },
+        { "updating": { label: "Update Requested", color: "red.500" } },
+        { "closure requested": { label: "Closure Requested", color: "red.500" } },
+        { "closing": { label: "Closure Pending Final Update", color: "red.500" } },
+        { "final_update": { label: "Final Update Requested", color: "red.500" } },
+        { "completed": { label: "Completed and Closed", color: "blue.500" } },
+        { "terminated": { label: "Terminated and Closed", color: "gray.800" } },
+        { "suspended": { label: "Suspended", color: "gray.500" } },
+    ];
+
+
+    const getStatusValue = (status: string): { label: string; color: string } => {
+        const matchedStatus = statusDictionary.find((item) => status in item);
+        return matchedStatus ? matchedStatus[status] : { label: "Unknown Status", color: "gray.500" };
+    };
+
 
     const imageUrl = useServerImageUrl(baseInformation?.image?.file)
 
     const navigate = useNavigate();
 
+    // const checkIfUserInTeam = (userPk: number | string, team: IProjectMember[]): boolean => {
+    //     if (typeof userPk === 'string') {
+    //         userPk = parseInt(userPk, 10);
+    //     }
+
+    //     // Use the some() method to check if userPk is equal to the pk of any member in the team
+    //     return team.some(member => member.pk === userPk);
+    // };
+    // const [userInTeam, setUserInTeam] = useState(checkIfUserInTeam(me?.userData?.pk ? me?.userData?.pk : me?.userData?.id, members));
+
+
+    const mePk = me?.userData?.pk ? Number(me?.userData?.pk) : Number(me?.userData?.id);
+    const userInTeam = useCheckUserInTeam(mePk, members);
+    const userIsLeader = useCheckUserIsTeamLeader(mePk, members);
+    const userIsBaLead = mePk === baseInformation?.business_area?.pk;
+    // useCheckUserIsBaLeader(mePk, baseInformation?.business_area?.pk ? baseInformation?.business_area?.pk : baseInformation?.business_area?.id );
+    // useEffect(() => { console.log(mePk, userInTeam) })
+
+    const [statusValue, setStatusValue] = useState<string>();
+    const [statusColor, setStatusColor] = useState<string>();
+
+    useEffect(() => {
+        if (baseInformation) {
+            const { label, color } = getStatusValue(baseInformation?.status);
+            setStatusValue(label);
+            setStatusColor(color);
+        }
+    }, [baseInformation])
+
+    useEffect(() => console.log(documents), [documents])
+
     return (
         <>
+            {(me?.userData?.is_superuser || userIsLeader) &&
+                <>
+                    <EditProjectModal
+                        projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
+                        isOpen={isEditModalOpen}
+                        onClose={onCloseEditModal}
+                        refetchData={refetchData}
+                    />
+                    <ProjectClosureModal
+                        projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
+                        isOpen={isClosureModalOpen}
+                        onClose={onCloseClosureModal}
+                        refetchData={refetchData}
+                    />
+                    <ProjectReopenModal
+                        projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
+                        isOpen={isReopenModalOpen}
+                        onClose={onCloseReopenModal}
+                        refetchData={refetchData}
+                    />
+                    <DeleteProjectModal
+                        projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
+                        isOpen={isDeleteModalOpen}
+                        onClose={onCloseDeleteModal}
+                    />
+                </>
+
+            }
+
             <Box
                 minH={"100px"}
                 bg={colorMode === "light" ? "gray.100" : "gray.700"}
@@ -162,6 +261,144 @@ export const ProjectOverviewCard = (
                 rounded={"lg"}
                 overflow={"hidden"}
             >
+                {(me?.userData?.is_superuser || userIsLeader || userIsBaLead) && (
+                    <Flex
+                        // justifyContent={"flex-end"}
+                        mt={6}
+                        width={"100%"}
+                        // right={10}
+                        pr={14}
+                        pl={6}
+                        zIndex={1}
+                        pos={"absolute"}
+                        flexDir={"column"}
+                    >
+                        {/* <Flex
+                            // bg={"pink"}
+                            justifyContent={"flex-end"}
+                            right={0}
+                        >
+                            <Button
+                                colorScheme="blue"
+                                onClick={onOpenEditModal}
+                                justifySelf={'flex-end'}
+                            >
+                                Edit
+                            </Button>
+                        </Flex>
+                        <Flex
+                            // bg={"pink"}
+                            justifyContent={"flex-end"}
+                            right={0}
+                        >
+                            <Button
+                                colorScheme="red"
+                                onClick={onOpenDeleteModal}
+                            >
+                                Delete
+                            </Button>
+                        </Flex> */}
+
+                        <Flex
+                            justifyContent={"flex-end"}
+                            right={0}
+                            zIndex={-1}
+
+                        >
+                            <Menu
+                            >
+                                <MenuButton
+                                    px={2}
+                                    py={2}
+                                    transition='all 0.2s'
+                                    rounded={4}
+                                    borderRadius='md'
+                                    borderWidth='1px'
+                                    _hover={{ bg: 'green.400' }}
+                                    _expanded={{ bg: 'green.400' }}
+                                    _focus={{ boxShadow: 'outline' }}
+                                    mr={4}
+                                    bg={"green.500"}
+                                    color={"white"}
+                                >
+                                    <Flex alignItems={"center"} justifyContent={"center"}
+                                        zIndex={-1}
+                                    >
+
+                                        <MdMoreVert />
+                                    </Flex>
+
+                                </MenuButton>
+                                <MenuList>
+                                    <MenuItem onClick={onOpenEditModal}>
+                                        <Flex
+                                            alignItems={"center"}
+                                        // color={"red"}
+                                        >
+                                            <Box mr={2}>
+                                                <FaEdit />
+
+                                            </Box>
+                                            <Box>
+                                                <Text
+
+                                                >
+                                                    Edit
+
+                                                </Text>
+                                            </Box>
+                                        </Flex>
+                                    </MenuItem>
+                                    <MenuItem onClick={documents?.project_closure?.document ? onOpenReopenModal : onOpenClosureModal}>
+                                        <Flex
+                                            alignItems={"center"}
+                                        // color={"red"}
+                                        >
+                                            <Box mr={2}>
+                                                {documents?.project_closure?.document ? <FaLockOpen /> : <FaLock />}
+
+                                            </Box>
+                                            <Box>
+                                                <Text
+
+                                                >
+                                                    {documents?.project_closure?.document ? "Reopen Project" : "Close Project"}
+                                                    {/* Close Project */}
+
+                                                </Text>
+                                            </Box>
+                                        </Flex>
+                                    </MenuItem>
+                                    <MenuItem onClick={onOpenDeleteModal}
+                                    >
+                                        <Flex
+                                            alignItems={"center"}
+                                        // color={"red"}
+                                        >
+                                            <Box mr={2}>
+                                                <FaTrash />
+
+                                            </Box>
+                                            <Box>
+                                                <Text
+
+                                                >
+                                                    Delete
+
+                                                </Text>
+                                            </Box>
+                                        </Flex>
+
+                                    </MenuItem>
+                                </MenuList>
+                            </Menu>
+
+                        </Flex>
+
+
+
+                    </Flex>
+                )}
                 <Grid
                     p={4}
                     pt={6}
@@ -184,6 +421,7 @@ export const ProjectOverviewCard = (
                         }
                         rounded={"xl"}
                         overflow={"hidden"}
+                        position={"relative"}
                     >
                         <Image
                             src={
@@ -195,6 +433,13 @@ export const ProjectOverviewCard = (
                             w={"100%"}
                             h={"100%"}
                         />
+                        {/* <Box
+                            pos={"absolute"}
+                            right={0}
+                            top={0}
+                        >
+                            <p>{baseInformation.status}</p>
+                        </Box> */}
 
                     </Box>
 
@@ -231,6 +476,7 @@ export const ProjectOverviewCard = (
                                     displayArea="projectOverviewTitle"
                                 />
                             </Button>
+
                             <Text
                                 mt={2}
                                 color={colorMode === "light" ? "gray.600" : "gray.400"}
@@ -240,6 +486,39 @@ export const ProjectOverviewCard = (
                             </Text>
                         </Box>
 
+                        {/*  */}
+                        <Box
+                            pt={2}
+                            pb={5}
+                            display="flex"
+                            alignItems="center"
+                        >
+                            <GrStatusInfo size={"16px"} />
+                            <Grid
+                                ml={3}
+                                templateColumns={{
+                                    base: "repeat(1, 1fr)",
+                                    sm: "repeat(1, 1fr)",
+                                    md: "repeat(1, 1fr)",
+                                    lg: "repeat(1, 1fr)",
+                                    xl: "repeat(1, 1fr)",
+                                }}
+                                gridTemplateRows={"28px"}
+                                gap={4}
+                            >
+                                <Tag
+                                    size={"sm"}
+                                    textAlign={"center"}
+                                    justifyContent={"center"}
+                                    p={"10px"}
+                                    bgColor={statusColor}
+                                    color={"white"}
+                                >
+                                    {statusValue}
+                                </Tag>
+
+                            </Grid>
+                        </Box>
 
                         <Box
                             pt={2}
@@ -349,6 +628,7 @@ export const ProjectOverviewCard = (
                             : <Text><b>Description:</b> This project has no description</Text>} */}
 
                         <RichTextEditor
+                            canEdit={userInTeam || me?.userData?.is_superuser}
                             editorType="ProjectDetail"
                             data={baseInformation.description}
                             project_pk={baseInformation.id}
@@ -405,7 +685,10 @@ export const ProjectOverviewCard = (
                         >
                             <HiOutlineExternalLink />
                         </Box>
+
                     </Flex>
+
+
                     <Flex pt={6} justifyContent={"right"}>
                         <ProjectDetailEditModal
                             projectType={

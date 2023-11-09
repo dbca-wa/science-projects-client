@@ -1,6 +1,6 @@
 // Tab data for Project Location on the creation page. WIP need to update to take in pre-set locations for use in update project.
 
-import { Button, ModalBody, ModalFooter } from "@chakra-ui/react";
+import { Button, Flex, ModalBody, ModalFooter } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
 import { useGetLocations } from "../../../lib/hooks/useGetLocations";
@@ -132,40 +132,44 @@ export const ProjectLocationSection = (
                     </>
                 )}
 
-
-            </ModalBody>
-            <ModalFooter>
-                <Button onClick={backClick}>Cancel</Button>
-                <Button
-                    ml={3}
-                    type="submit"
-                    colorScheme="blue"
-                    isDisabled={!locationFilled}
-                    onClick={() => {
-                        console.log('Here is the location data'
-                        )
-                        console.log(locationData)
-                        if (projectType.includes("External") || projectType.includes("Student")) {
-                            if (locationFilled) {
-                                console.log("going next")
-                                console.log(locationData)
-                                setLocationFilled(true)
-                                nextClick(
-
-                                    locationData
-                                    // "locations": [...locationData]
-
-                                )
-                            } else return;
-                        } else {
-                            createClick()
-                        }
-                    }}
-                    rightIcon={(projectType.includes("External") || projectType.includes("Student")) ? undefined : <IoIosCreate />}
+                <Flex
+                    w={"100%"}
+                    justifyContent={"flex-end"}
+                    pb={4}
                 >
-                    {(projectType.includes("External") || projectType.includes("Student")) ? `Next` : `Create`}
-                </Button>
-            </ModalFooter>
+                    <Button onClick={backClick}>Cancel</Button>
+                    <Button
+                        ml={3}
+                        type="submit"
+                        colorScheme="blue"
+                        isDisabled={!locationFilled}
+                        onClick={() => {
+                            console.log('Here is the location data'
+                            )
+                            console.log(locationData)
+                            if (projectType.includes("External") || projectType.includes("Student")) {
+                                if (locationFilled) {
+                                    console.log("going next")
+                                    console.log(locationData)
+                                    setLocationFilled(true)
+                                    nextClick(
+
+                                        locationData
+                                        // "locations": [...locationData]
+
+                                    )
+                                } else return;
+                            } else {
+                                createClick()
+                            }
+                        }}
+                        rightIcon={(projectType.includes("External") || projectType.includes("Student")) ? undefined : <IoIosCreate />}
+                    >
+                        {(projectType.includes("External") || projectType.includes("Student")) ? `Next` : `Create`}
+                    </Button>
+                </Flex>
+            </ModalBody>
+
         </>
     )
 }

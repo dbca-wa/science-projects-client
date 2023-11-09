@@ -36,22 +36,27 @@ import { HeadingNode } from "@lexical/rich-text";
 
 import { EditableSRTE } from "./Sections/EditableSRTE";
 import { DisplaySRTE } from "./Sections/DisplaySRTE";
-import { EditorSubsections, EditorType } from "../../../types";
+import { EditorSections, EditorSubsections, EditorType } from "../../../types";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 
 
 
 interface IProps {
+    canEdit: boolean;
     data: string;
     titleTextSize?: string;
     section: EditorSubsections;
     project_pk: number;
     document_pk?: number;
+    writeable_document_kind?: EditorSections | null;
+    writeable_document_pk?: number | null;
     editorType: EditorType;
     isUpdate: boolean;
 }
 
-export const RichTextEditor = ({ data, titleTextSize, section, project_pk, document_pk, editorType, isUpdate }: IProps) => {
+export const RichTextEditor = ({
+    canEdit,
+    data, titleTextSize, section, project_pk, document_pk, editorType, isUpdate, writeable_document_kind, writeable_document_pk }: IProps) => {
 
     const [shouldShowTree, setShouldShowTree] = useState(false);
     const { colorMode } = useColorMode();
@@ -142,7 +147,7 @@ export const RichTextEditor = ({ data, titleTextSize, section, project_pk, docum
 
         >
             <Flex
-                bg={colorMode === "light" ? "gray.200" : section === "description" ? "gray.800" : "gray.700"}
+                bg={colorMode === "light" ? section === "description" ? "gray.200" : "gray.100" : section === "description" ? "gray.800" : "gray.700"}
                 // roundedTop={"8px"}
                 roundedTop={20}
 
@@ -152,11 +157,14 @@ export const RichTextEditor = ({ data, titleTextSize, section, project_pk, docum
                     alignItems={"center"}
                 >
                     <Text
-                        pt={5}
+                        // pt={1}
                         pl={8}
+                        // paddingBottom={"12px"}
+                        my={0}
+                        py={2}
+
                         fontWeight={"bold"}
-                        fontSize={titleTextSize ? titleTextSize : "2xl"}
-                        paddingBottom={"12px"}
+                        fontSize={titleTextSize ? titleTextSize : "xl"}
                     >
                         {
                             section === "description" ? "Description" :
@@ -204,19 +212,22 @@ export const RichTextEditor = ({ data, titleTextSize, section, project_pk, docum
                     <Grid
                         // px={10}
                         pr={8}
-                        py={4}
+                        py={2}
                         gridTemplateColumns={"repeat(1, 1fr)"}
                         // width={"100%"}
                         gridColumnGap={2}
                     >
+                        {/*  */}
+                        {canEdit && (
+                            <HideEditorButton
+                                setIsEditorOpen={setIsEditorOpen}
+                                editorIsOpen={isEditorOpen}
+                                // setDisplayData={setDisplayData}
+                                editorText={editorText}
+                            // rawHTML={rawHTML}
+                            />
+                        )}
 
-                        <HideEditorButton
-                            setIsEditorOpen={setIsEditorOpen}
-                            editorIsOpen={isEditorOpen}
-                            // setDisplayData={setDisplayData}
-                            editorText={editorText}
-                        // rawHTML={rawHTML}
-                        />
                     </Grid>
                 </Flex>
 
@@ -273,7 +284,6 @@ export const RichTextEditor = ({ data, titleTextSize, section, project_pk, docum
 
                 {isEditorOpen ? (
                     <EditableSRTE
-
                         initialConfig={initialConfig}
                         editorRef={editorRef}
 
@@ -284,6 +294,9 @@ export const RichTextEditor = ({ data, titleTextSize, section, project_pk, docum
                         document_pk={document_pk}
                         editorType={editorType}
                         isUpdate={isUpdate}
+                        writeable_document_kind={writeable_document_kind}
+                        writeable_document_pk={writeable_document_pk}
+
 
                         displayData={displayData}
 

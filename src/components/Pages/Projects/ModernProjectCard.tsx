@@ -90,7 +90,7 @@ export const ModernProjectCard = ({
                 overflow={"hidden"}
                 cursor={"pointer"}
                 style={{ transformStyle: "preserve-3d" }}
-                boxShadow="0px 20px 30px -10px rgba(0, 0, 0, 0.3), 0px 4px 5px -2px rgba(0, 0, 0, 0.06), -3px 0px 10px -2px rgba(0, 0, 0, 0.1), 3px 0px 10px -2px rgba(0, 0, 0, 0.1)"
+                boxShadow="0px 10px 15px -5px rgba(0, 0, 0, 0.3), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.06), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.1), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.1)"
                 onClick={() => { goToProject() }}
                 border={colorMode === "dark" ? "1px solid" : undefined}
                 borderColor={"gray.700"}

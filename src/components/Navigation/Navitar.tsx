@@ -1,6 +1,6 @@
 // Navitar - shown on both layouts. Uses useLayoutSwitcher to determine style
 
-import { Avatar, Menu, Text, MenuButton, MenuGroup, MenuItem, MenuList, Center, Box, useColorMode, useToast, ToastId, Image } from "@chakra-ui/react"
+import { Avatar, Menu, Text, MenuButton, MenuGroup, MenuItem, MenuList, Center, Box, useColorMode, useToast, ToastId, Image, Flex } from "@chakra-ui/react"
 import { FaBook, FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { SiReadthedocs } from "react-icons/si";
@@ -177,8 +177,13 @@ export const Navitar = (
                                 color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
                                 textAlign={"center"}
                             >
-                                <ToggleLayout />
-                                <ToggleDarkMode />
+                                <Flex
+                                // ml={1}
+                                >
+                                    <ToggleLayout />
+                                    <ToggleDarkMode />
+                                </Flex>
+
                                 <MenuItem
                                     onClick={() => {
                                         // layout === "modern" ?

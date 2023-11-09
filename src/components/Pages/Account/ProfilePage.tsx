@@ -523,9 +523,14 @@ export const ProfilePage = () => {
                                 alignItems="center"
                             >
                                 <Text mb='8px' fontWeight={"bold"}>Active?</Text>
-                                {me?.is_active ? <FcApproval /> : <Box color={colorMode === "light" ? "red.500" : "red.600"}>
-                                    <AiFillCloseCircle />
-                                </Box>}
+                                {me?.is_active ?
+                                    <Box color={colorMode === "light" ? "green.500" : "green.600"}>
+                                        <FcApproval />
+                                    </Box>
+                                    :
+                                    <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                                        <AiFillCloseCircle />
+                                    </Box>}
                             </Grid>
 
                             <Grid

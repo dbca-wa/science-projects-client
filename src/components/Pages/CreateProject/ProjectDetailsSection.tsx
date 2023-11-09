@@ -1,6 +1,6 @@
 // WIP project detail section for project creation
 
-import { Box, Button, FormControl, FormHelperText, FormLabel, Grid, Icon, InputGroup, ModalBody, ModalFooter, Select } from "@chakra-ui/react"
+import { Box, Button, Flex, FormControl, FormHelperText, FormLabel, Grid, Icon, InputGroup, ModalBody, ModalFooter, Select } from "@chakra-ui/react"
 import { useEffect, useState } from "react";
 import { BsFillCalendarEventFill } from "react-icons/bs";
 
@@ -15,6 +15,7 @@ import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 
 
 interface IProjectDetailSectionProps {
+    thisUser: number;
     projectDetailsFilled: boolean;
     setProjectDetailsFilled: (val: boolean) => void;
     nextClick: (data: any) => void;
@@ -25,7 +26,7 @@ interface IProjectDetailSectionProps {
 }
 
 export const ProjectDetailsSection = ({
-    backClick, nextClick, projectDetailsFilled, setProjectDetailsFilled, projectType, onClose, colorMode }: IProjectDetailSectionProps) => {
+    backClick, nextClick, projectDetailsFilled, setProjectDetailsFilled, projectType, thisUser, onClose, colorMode }: IProjectDetailSectionProps) => {
 
     const [selectedBusinessArea, setSelectedBusinessArea] = useState<number>(0);
     const [selectedDepartmentalService, setSelectedDepartmentalService] = useState<number>(0);
@@ -118,6 +119,7 @@ export const ProjectDetailsSection = ({
                     <UserSearchDropdown
                         isRequired={true}
                         setUserFunction={setSelectedSupervisingScientist}
+                        preselectedUserPk={thisUser}
                         label={projectType !== "Student Project" ? "Research Scientist" : "Supervising Scientist"}
                         placeholder={projectType === "Student Project" ? "Search for a Supervising Scientist" : "Search for a Research Scientist"}
                         helperText={
@@ -132,7 +134,8 @@ export const ProjectDetailsSection = ({
                     <UserSearchDropdown
                         isRequired={true}
                         setUserFunction={setSelectedDataCustodian}
-                        preselectedUserPk={selectedDataCustodian}
+                        // preselectedUserPk={selectedDataCustodian}
+                        preselectedUserPk={thisUser}
                         isEditable={true}
                         label="Data Custodian"
                         placeholder="Search for a data custodian"
@@ -259,38 +262,40 @@ export const ProjectDetailsSection = ({
                 > */}
 
                 {/* </Grid> */}
-            </ModalBody >
-            <ModalFooter
-                pos={"absolute"}
-                right={0}
-            >
-                <Button onClick={backClick}>Back</Button>
-                <Button
-                    ml={3}
-                    // type="submit"
-                    colorScheme="blue"
-                    isDisabled={!projectDetailsFilled}
-                    onClick={
-                        () => {
-                            if (projectDetailsFilled) {
-                                console.log("going next")
-                                nextClick(
-                                    {
-                                        "businessArea": selectedBusinessArea,
-                                        "researchFunction": selectedResearchFunction,
-                                        "departmentalService": selectedDepartmentalService,
-                                        "dataCustodian": selectedDataCustodian,
-                                        "supervisingScientist": selectedSupervisingScientist,
-                                        "dates": selectedDates,
-                                    }
-                                )
-                            } else return;
-                        }
-                    }
+                <Flex
+                    w={"100%"}
+                    justifyContent={"flex-end"}
+                    pb={4}
                 >
-                    Next &rarr;
-                </Button>
-            </ModalFooter>
+                    <Button onClick={backClick}>Back</Button>
+                    <Button
+                        ml={3}
+                        // type="submit"
+                        colorScheme="blue"
+                        isDisabled={!projectDetailsFilled}
+                        onClick={
+                            () => {
+                                if (projectDetailsFilled) {
+                                    console.log("going next")
+                                    nextClick(
+                                        {
+                                            "businessArea": selectedBusinessArea,
+                                            "researchFunction": selectedResearchFunction,
+                                            "departmentalService": selectedDepartmentalService,
+                                            "dataCustodian": selectedDataCustodian,
+                                            "supervisingScientist": selectedSupervisingScientist,
+                                            "dates": selectedDates,
+                                        }
+                                    )
+                                } else return;
+                            }
+                        }
+                    >
+                        Next &rarr;
+                    </Button>
+                </Flex>
+            </ModalBody >
+
         </>
     )
 }

@@ -58,6 +58,7 @@ export const BaseToolbarMenuButton = ({ title, menuIcon: MenuIcon, menuItems }: 
                 mx={1}
                 flex={1}
                 ref={buttonRef}
+                tabIndex={-1}
 
             >
                 {title ? title : null}
