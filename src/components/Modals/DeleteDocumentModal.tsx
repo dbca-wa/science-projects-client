@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { IUserMe } from "../../types";
 import { useForm } from "react-hook-form";
+import { useGetAvailableReportYears } from "../../lib/hooks/useGetAvailableReportYears";
 
 interface Props {
     projectPk: string | number;
@@ -13,11 +14,15 @@ interface Props {
     refetchData: () => void;
     isOpen: boolean;
     onClose: () => void;
+    onDeleteSuccess?: () => void;
 }
 
-export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refetchData, isOpen, onClose }: Props) => {
+export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refetchData, isOpen, onClose, onDeleteSuccess }: Props) => {
 
     const navigate = useNavigate();
+    const { availableReportYearsLoading, availableReportYearsData, refetchYears } = useGetAvailableReportYears(Number(projectPk));
+
+
 
     const toast = useToast();
     const toastIdRef = useRef<ToastId>();
@@ -48,6 +53,10 @@ export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refet
                         duration: 3000,
                         isClosable: true,
                     })
+                    refetchYears(() => {
+                        reset();
+                        onDeleteSuccess();
+                    });
                 }
                 // onClose();
 
