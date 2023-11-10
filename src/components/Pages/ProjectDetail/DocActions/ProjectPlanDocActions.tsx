@@ -1035,8 +1035,8 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
                                                                 )
                                                         }
                                                         {(
-                                                            projectPlanData?.document?.project?.status === "pending"
-                                                            // all_documents?.progress_reports?.length < 1 || 
+                                                            projectPlanData?.document?.project?.status === "pending" ||
+                                                            all_documents?.progress_reports?.length < 1
                                                         ) ?
                                                             (
                                                                 <>

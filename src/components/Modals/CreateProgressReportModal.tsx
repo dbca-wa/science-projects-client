@@ -1,4 +1,4 @@
-import { Text, Center, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, ToastId, useToast, useColorMode, UnorderedList, ListItem, FormControl, InputGroup, Input, ModalFooter, Grid, Button, Select, FormHelperText, Spinner } from "@chakra-ui/react";
+import { Text, Center, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, ToastId, useToast, useColorMode, UnorderedList, ListItem, FormControl, InputGroup, Input, ModalFooter, Grid, Button, Select, FormHelperText, Spinner, Box } from "@chakra-ui/react";
 import { ISpawnDocument, spawnDocument } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,7 +16,7 @@ interface Props {
 
 export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData, isOpen, onClose }: Props) => {
 
-    const { availableReportYearsLoading, availableReportYearsData } = useGetAvailableReportYears(Number(projectPk));
+    const { availableReportYearsLoading, availableReportYearsData, refetchYears } = useGetAvailableReportYears(Number(projectPk));
 
 
     const { register, handleSubmit, reset, watch } = useForm<ISpawnDocument>();
@@ -39,6 +39,9 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
     const navigate = useNavigate();
 
 
+    useEffect(() => {
+        refetchYears();
+    }, [selectedReportId])
 
     const toast = useToast();
     const toastIdRef = useRef<ToastId>();
@@ -69,6 +72,9 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
                         duration: 3000,
                         isClosable: true,
                     })
+                    refetchYears(() => {
+                        reset();
+                    });
                 }
                 // onClose();
 
@@ -134,71 +140,98 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
                         ?
                         (<>
                             <ModalBody>
-                                <Center
-                                    mt={8}
-                                >
-                                    <UnorderedList>
-                                        <ListItem>This will create a progress report for the selected year.</ListItem>
-                                        <ListItem>Years will only appear based on whether an annual report exists for that year</ListItem>
-                                        <ListItem>Years which already have progress reports for this project will not be selectable</ListItem>
-                                    </UnorderedList>
-                                </Center>
-                                <FormControl>
-                                    <InputGroup>
-                                        <Input type="hidden" {...register("projectPk", { required: true, value: Number(projectPk) })} readOnly />
-                                    </InputGroup>
-                                </FormControl>
 
-                                <FormControl
-                                    mt={6}
-                                >
-                                    <Select
-                                        placeholder={'Select a report year'}
-                                        {...register("year", { required: true })}
-                                    >
-                                        {availableReportYearsData?.map((freeReportYear, index: number) => {
-                                            // console.log(freeReportYear.year)
-                                            // console.log(yearValue)
-                                            return (
-                                                <option key={index} value={freeReportYear.year}
-                                                // selected={ba.pk === currentBaData?.pk || ba.pk === undefined}
-                                                >
-                                                    {freeReportYear.year}
-                                                </option>
-                                            )
-                                        })}
-                                    </Select>
-                                    <FormHelperText>Select an annual report for this progress report</FormHelperText>
-                                </FormControl>
+                                {availableReportYearsData.length < 1 ?
+                                    (
+                                        <Box
+                                            mt={6}
+                                        >
+                                            <Text>A progress report cannot be created for this project as it already has reports for each available year
+                                                {/* since its creation - potentially adjust hook and api to only get available reports since its creation*/}
+                                            </Text>
+
+                                        </Box>
+
+                                    )
+                                    :
+                                    (<>
+
+                                        <Center
+                                            mt={8}
+                                        >
+                                            <UnorderedList>
+                                                <ListItem>This will create a progress report for the selected year.</ListItem>
+                                                <ListItem>Years will only appear based on whether an annual report exists for that year</ListItem>
+                                                <ListItem>Years which already have progress reports for this project will not be selectable</ListItem>
+                                            </UnorderedList>
+                                        </Center>
+                                        <FormControl>
+                                            <InputGroup>
+                                                <Input type="hidden" {...register("projectPk", { required: true, value: Number(projectPk) })} readOnly />
+                                            </InputGroup>
+                                        </FormControl>
 
 
-                                <FormControl>
-                                    <InputGroup>
-                                        <Input type="hidden" {...register("kind", { required: true, value: documentKind })} readOnly />
-                                    </InputGroup>
-                                </FormControl>
+                                        <FormControl
+                                            mt={6}
+                                        >
+                                            <Select
+                                                placeholder={'Select a report year'}
+                                                {...register("year", { required: true })}
+                                            >
+                                                {availableReportYearsData?.map((freeReportYear, index: number) => {
+                                                    // console.log(freeReportYear.year)
+                                                    // console.log(yearValue)
+                                                    return (
+                                                        <option key={index} value={freeReportYear.year}
+                                                        // selected={ba.pk === currentBaData?.pk || ba.pk === undefined}
+                                                        >
+                                                            {freeReportYear.year}
+                                                        </option>
+                                                    )
+                                                })}
+                                            </Select>
+                                            <FormHelperText>Select an annual report for this progress report</FormHelperText>
+                                        </FormControl>
+
+
+
+
+                                        <FormControl>
+                                            <InputGroup>
+                                                <Input type="hidden" {...register("kind", { required: true, value: documentKind })} readOnly />
+                                            </InputGroup>
+                                        </FormControl>
+                                    </>)}
+
                             </ModalBody>
                             <ModalFooter>
-                                <Grid
-                                    gridTemplateColumns={"repeat(2, 1fr)"}
-                                    gridGap={4}
-                                >
-                                    <Button
-                                        colorScheme="gray"
-                                        onClick={onClose}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        colorScheme="green"
-                                        isLoading={createProgressReportMutation.isLoading}
-                                        isDisabled={!yearValue || !selectedReportId || !projPk}
-                                        type="submit"
-                                        ml={3}
-                                    >
-                                        Create
-                                    </Button>
-                                </Grid>
+
+                                {availableReportYearsData.length >= 1 &&
+                                    (
+                                        <Grid
+                                            gridTemplateColumns={"repeat(2, 1fr)"}
+                                            gridGap={4}
+                                        >
+                                            <Button
+                                                colorScheme="gray"
+                                                onClick={onClose}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                colorScheme="green"
+                                                isLoading={createProgressReportMutation.isLoading}
+                                                isDisabled={!yearValue || !selectedReportId || !projPk}
+                                                type="submit"
+                                                ml={3}
+                                            >
+                                                Create
+                                            </Button>
+                                        </Grid>
+
+                                    )}
+
                             </ModalFooter>
                         </>)
                         :

@@ -18,10 +18,14 @@ import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 interface IProgressDocumentActions {
     progressReportData: IProgressReport;
     refetchData: () => void;
+    documents: IProgressReport[];
+    setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
+    setSelectedProgressReport: React.Dispatch<React.SetStateAction<IProgressReport>>;
     // projectPk: number;
 }
 
-export const ProgressReportDocActions = ({ progressReportData, refetchData,
+export const ProgressReportDocActions = ({ progressReportData, refetchData, documents,
+    setSelectedProgressReport, setSelectedYear,
     // , projectPk 
 }: IProgressDocumentActions) => {
     const [showActions, setShowActions] = useState(false);
@@ -65,6 +69,38 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData,
 
     const { isOpen: isDeleteDocumentModalOpen, onOpen: onOpenDeleteDocumentModal, onClose: onCloseDeleteDocumentModal } = useDisclosure();
 
+
+    const [docPk, setDocPk] = useState(progressReportData?.document?.pk ? progressReportData.document.pk : progressReportData?.document?.id)
+
+    const keyForDeleteDocumentModal = progressReportData?.document?.pk
+        ? `document-${progressReportData?.document?.pk}`
+        : `document-${progressReportData?.document?.id}`;
+
+
+
+    useEffect(() => {
+        const highestYearDocument = documents.reduce((maxDocument, currentDocument) => {
+            if (!maxDocument || currentDocument.year > maxDocument.year) {
+                return currentDocument;
+            }
+            return maxDocument;
+        }, null)
+
+        setSelectedYear(highestYearDocument.year)
+        setSelectedProgressReport(highestYearDocument);
+        // console.log('DOC LENGTH: ', documents.length);
+        // refetchDataForYearFunction();
+    }, [documents])
+
+
+    useEffect(() => {
+        setDocPk(progressReportData.document.pk)
+    }, [progressReportData])
+
+    // useEffect(
+    //     () => {
+    //         setDocPk},
+    //     [documents])
 
 
     useEffect(() => {
@@ -651,9 +687,9 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData,
                                                             && ( */}
                                                         <>
                                                             <DeleteDocumentModal
-                                                                projectPk={progressReportData?.document?.project?.pk}
+                                                                key={keyForDeleteDocumentModal}
+                                                                projectPk={progressReportData?.document?.project?.pk ? progressReportData?.document?.project?.pk : progressReportData?.document?.project?.id}
                                                                 documentPk={progressReportData?.document?.pk ? progressReportData?.document?.pk : progressReportData?.document?.id}
-                                                                // deleting the main doc will also delete the projectplan
                                                                 documentKind="progressreport"
                                                                 onClose={onCloseDeleteDocumentModal}
                                                                 isOpen={isDeleteDocumentModalOpen}
@@ -662,7 +698,10 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData,
                                                             <Button
                                                                 colorScheme="red"
                                                                 size={"sm"}
-                                                                onClick={onOpenDeleteDocumentModal}
+                                                                onClick={() => {
+                                                                    console.log(docPk);
+                                                                    onOpenDeleteDocumentModal();
+                                                                }}
                                                                 mr={2}
                                                             >
                                                                 Delete Document

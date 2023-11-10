@@ -55,14 +55,38 @@ export const ProgressReportContents = ({
 
 
     useEffect(() => {
+        // const dataForYear = documents.find((report) => report.year === selectedYear);
+        refetchDataForYearFunction();
+    }, [selectedYear, colorMode, documentType, documents])
+
+
+
+    const refetchDataForYearFunction = () => {
+        console.log('SELECTED YEAR IS:', selectedYear)
         const dataForYear = documents.find((report) => report.year === selectedYear);
         if (dataForYear) {
             setIsLoading(true);
             setSelectedProgressReport(dataForYear);
             setEditorKey(selectedYear.toString() + colorMode + documentType)
         }
+        // else {
+        //     refetch();
+        // }
         console.log('set year and selected doc')
-    }, [selectedYear, colorMode, documentType, documents])
+    }
+
+    const refetchFunc = () => {
+        refetch();
+        setIsLoading(true);
+        const getHighestAvailable = () => {
+            const years = documents.map((progressReport) => progressReport.year);
+            const highestYear = Math.max(...years);
+            return highestYear;
+
+        }
+        const highestYear = getHighestAvailable();
+        setSelectedYear(highestYear)
+    }
 
     useEffect(() => {
         setIsLoading(false);
@@ -95,7 +119,7 @@ export const ProgressReportContents = ({
                 documentKind="progressreport"
                 onClose={onCloseCreateProgressReportModal}
                 isOpen={isCreateProgressReportModalOpen}
-                refetchData={refetch}
+                refetchData={refetchFunc}
             />
 
 
@@ -189,8 +213,11 @@ export const ProgressReportContents = ({
 
             {/* Actions */}
             <ProgressReportDocActions
-                refetchData={refetch}
+                refetchData={refetchFunc}
                 progressReportData={selectedProgressReport}
+                documents={documents}
+                setSelectedYear={setSelectedYear}
+                setSelectedProgressReport={setSelectedProgressReport}
             // projectPk={projectPk}
             />
             {/* Editors */}
