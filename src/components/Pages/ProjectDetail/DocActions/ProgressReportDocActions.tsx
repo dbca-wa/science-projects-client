@@ -13,6 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { IDocGenerationProps, generateProjectDocument, downloadProjectDocument } from "../../../../lib/api";
 import { AxiosError } from "axios";
+import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 
 interface IProgressDocumentActions {
     progressReportData: IProgressReport;
@@ -61,6 +62,9 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData,
     const { userData: creator, userLoading: creatorLoading } = useFullUserByPk(progressReportData?.document?.creator);
 
     const { teamData, isTeamLoading, refetchTeamData } = useProjectTeam(String(progressReportData?.document?.project?.pk));
+
+    const { isOpen: isDeleteDocumentModalOpen, onOpen: onOpenDeleteDocumentModal, onClose: onCloseDeleteDocumentModal } = useDisclosure();
+
 
 
     useEffect(() => {
@@ -641,6 +645,33 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData,
                                                             stage={1}
                                                             projectData={progressReportData?.document?.project}
                                                         />
+
+                                                        {/* {
+                                                            all_documents?.progress_reports.length < 1
+                                                            && ( */}
+                                                        <>
+                                                            <DeleteDocumentModal
+                                                                projectPk={progressReportData?.document?.project?.pk}
+                                                                documentPk={progressReportData?.document?.pk ? progressReportData?.document?.pk : progressReportData?.document?.id}
+                                                                // deleting the main doc will also delete the projectplan
+                                                                documentKind="progressreport"
+                                                                onClose={onCloseDeleteDocumentModal}
+                                                                isOpen={isDeleteDocumentModalOpen}
+                                                                refetchData={refetchData}
+                                                            />
+                                                            <Button
+                                                                colorScheme="red"
+                                                                size={"sm"}
+                                                                onClick={onOpenDeleteDocumentModal}
+                                                                mr={2}
+                                                            >
+                                                                Delete Document
+                                                            </Button>
+                                                        </>
+                                                        {/* )
+                                                        } */}
+
+
                                                         <Button
                                                             colorScheme="green"
                                                             size={"sm"}
