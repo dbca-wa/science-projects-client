@@ -1,4 +1,4 @@
-import { Box, Image, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormHelperText, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spinner, Text, Textarea, VStack, useDisclosure, useToast, FormErrorMessage } from "@chakra-ui/react"
+import { Box, Image, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormHelperText, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spinner, Text, Textarea, VStack, useDisclosure, useToast, FormErrorMessage, UnorderedList, ListItem } from "@chakra-ui/react"
 import { IReport, IResearchFunction } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -414,6 +414,15 @@ export const ReportItemDisplay = ({
                                 >
                                     "{year}"
                                 </Text>
+
+                                <Center
+                                    my={6}
+                                >
+                                    <UnorderedList>
+                                        <ListItem>This will delete all progress reports and their related document associated with the year</ListItem>
+                                        <ListItem>This will delete all images associated with the year</ListItem>
+                                    </UnorderedList>
+                                </Center>
 
                             </Box>
                         </ModalBody>

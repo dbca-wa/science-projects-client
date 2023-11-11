@@ -38,6 +38,9 @@ export const ProjectDetail = () => {
         }
     }, [isLoading, projectData])
 
+    useEffect(() => {
+        console.log(documents)
+    })
 
     // Refetch data on tab change
     const [tabIndex, setTabIndex] = useState(0)
@@ -188,7 +191,15 @@ export const ProjectDetail = () => {
                         documents?.student_reports && documents.student_reports.length !== 0 && (
                             <TabPanel>
                                 <StudentReportContents
+                                    project_pk={projectData?.pk}
                                     documents={documents.student_reports}
+                                    refetch={refetch}
+
+                                    all_documents={documents}
+
+                                    userData={me?.userData}
+                                    members={members}
+
                                 //  selectedYear={selectedStudentReportYear}
                                 />
                             </TabPanel>

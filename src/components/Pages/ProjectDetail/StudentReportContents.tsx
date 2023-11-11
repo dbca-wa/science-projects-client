@@ -1,45 +1,352 @@
-// Maps out the document provided to the rich text editor components for student report documents (based on year selected). 
 
-import { Box, Text } from "@chakra-ui/react"
-import { IStudentReport } from "../../../types"
+// Maps out the document provided to the rich text editor components for student report documents. 
+
+import { Box, Button, Center, Flex, Select, Spinner, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
 import { DocumentActions } from "./DocumentActions"
+import { IProgressReport, IProjectDocuments, IProjectMember, IUserMe, IStudentReport } from "../../../types";
+import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
+import { useEffect, useState } from "react";
+// import { ProgressReportSelector } from "./ProgressReportSelector";
+import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions";
+import { motion } from "framer-motion";
+import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
+import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
+import { useGetStudentReportAvailableReportYears } from "../../../lib/hooks/useGetStudentReportAvailableReportYears";
+import { getStudentReportForYear } from "../../../lib/api";
+import { StudentReportDocActions } from "./DocActions/StudentReportDocActions";
+import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
 
 interface Props {
     documents: IStudentReport[];
-    // selectedYear: number;
+    all_documents: IProjectDocuments;
+    project_pk: number;
+    userData: IUserMe;
+    members: IProjectMember[];
+    refetch: () => void;
 }
 
-export const StudentReportContents = ({ documents
-    // , selectedYear 
+export const StudentReportContents = ({
+    userData, members,
+    all_documents,
+    documents, refetch, project_pk
 }: Props) => {
+    // Handling years
+    const { availableStudentYearsLoading, availableStudentYearsData, refetchStudentYears } = useGetStudentReportAvailableReportYears(Number(documents[0].document?.project?.pk));
 
-    // const selectedReport = documents.find((report) => report.year === selectedYear);
 
+    const years = Array.from(new Set(documents.map(studentReport => studentReport.year))).sort((a, b) => b - a);
+    const [selectedYear, setSelectedYear] = useState(() => {
+        const years = documents.map((studentReport) => studentReport.year);
+        const highestYear = Math.max(...years);
+        return highestYear;
+    });
+
+    // Selected Report State
+    const [selectedStudentReport, setselectedStudentReport] = useState(() => {
+        const highestYearDocument = documents.reduce((maxDocument, currentDocument) => {
+            if (!maxDocument || currentDocument.year > maxDocument.year) {
+                return currentDocument;
+            }
+            return maxDocument;
+        }, null)
+        return highestYearDocument;
+    });
+
+    // Force a rerender when dark mode or year changed to update design and content
+    // const editorKey = selectedYear.toString() + colorMode;
+    const [isLoading, setIsLoading] = useState(false);
+    const { colorMode } = useColorMode();
+    const documentType = "studentreport"
+    const [editorKey, setEditorKey] = useState(selectedYear.toString() + colorMode + documentType);
+
+    const mePk = userData?.pk ? userData?.pk : userData?.id;
+    const userInTeam = useCheckUserInTeam(mePk, members);
+
+    // const projectPk = project_pk;
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+
+            try {
+                const data = {
+                    "project": selectedStudentReport?.document?.project?.pk,
+                    "year": selectedYear,
+                }
+                const newPRData = await getStudentReportForYear(data);
+                setselectedStudentReport(newPRData);
+            } catch (error) {
+                // Handle error
+                console.error('Error fetching student report data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        if (selectedStudentReport) {
+            console.log("project pk is:", selectedStudentReport?.document?.project?.pk)
+
+            fetchData();
+
+        }
+
+    }, [selectedYear, selectedStudentReport])
+
+
+    useEffect(() => {
+        if (selectedStudentReport)
+            setIsLoading(false);
+    }, [selectedStudentReport])
+
+
+    const refetchDataForYearFunction = () => {
+        console.log('SELECTED YEAR IS:', selectedYear)
+        const dataForYear = documents.find((report) => report.year === selectedYear);
+        if (dataForYear) {
+            setIsLoading(true);
+            setselectedStudentReport(dataForYear);
+            setEditorKey(selectedYear.toString() + colorMode + documentType)
+        }
+        console.log('set year and selected doc')
+    }
+
+    const refetchFunc = () => {
+        refetch();
+        setIsLoading(true);
+        const getHighestAvailable = () => {
+            const years = documents.map((studentReport) => studentReport.year);
+            const highestYear = Math.max(...years);
+            return highestYear;
+
+        }
+        const highestYear = getHighestAvailable();
+        // setSelectedYear(highestYear)
+    }
+
+    useEffect(() => {
+        setIsLoading(false);
+    }, [editorKey, documents])
+
+    const handleNewYearSelection = (event) => {
+        setIsLoading(true);
+        setSelectedYear(Number(event.target.value))
+
+    }
+
+    // const refetchData = () => {
+    //     setIsLoading(true);
+    //     // setSelectedYear(selectedYear);
+    //     setIsLoading(false);
+    // }
+    const { isOpen: isCreateProgressReportModalOpen, onOpen: onOpenCreateProgressReportModal, onClose: onCloseCreateProgressReportModal } = useDisclosure();
+    const { isOpen: isCreateStudentReportModalOpen, onOpen: onOpenCreateStudentReportModal, onClose: onCloseCreateStudentReportModal } = useDisclosure();
 
     return (
         <>
-            <p>none</p>
-            {/* <DocumentActions />
-            <Box>{selectedReport?.year}</Box>
+            {/* <ProgressReportSelector
+                projectPk={projectPk}
+                documents={documents}
+                onYearSelect={onYearSelect}
+                selectedStudentReportYear={selectedYear}
+                selectedStudentReport={selectedStudentReport}
+            /> */}
+
+            {/* <CreateProgressReportModal
+                projectPk={selectedStudentReport?.document?.project?.pk}
+                documentKind="progressreport"
+                onClose={onCloseCreateProgressReportModal}
+                isOpen={isCreateProgressReportModalOpen}
+                refetchData={refetchFunc}
+            /> */}
+
+            <CreateStudentReportModal
+                projectPk={selectedStudentReport?.document?.project?.pk}
+                documentKind="studentreport"
+                onClose={onCloseCreateStudentReportModal}
+                isOpen={isCreateStudentReportModalOpen}
+                refetchData={refetchFunc}
+            />
+
+
+
+            {/* Selector */}
             <Box
-                pb={6}
+                padding={4}
+                rounded={"xl"}
+                border={"1px solid"}
+                borderColor={"gray.300"}
+                mb={8}
+                width={"100%"}
             >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
+                <Flex
+                    width={"100%"}
                 >
-                    Report
-                </Text>
 
+                    <Flex
+                        flex={1}
+                        justifyContent={"flex-start"}
+                        alignItems={"center"}
+                    >
+                        <Text
+                            fontSize={"lg"}
+                            fontWeight={"bold"}
+                        >
+                            Select a Report:
+                        </Text>
+
+                    </Flex>
+                    <Flex
+                        justifyContent={"flex-end"}
+                    >
+                        <Select
+                            value={selectedYear}
+                            onChange={(event) =>
+                                handleNewYearSelection(event)
+                            }
+                            minW={"200px"}
+                        >
+                            {years.map(year => (
+                                <option key={year} value={year}>
+                                    {year}
+                                </option>
+                            ))}
+                        </Select>
+                    </Flex>
+                </Flex>
+                <Flex
+                    width={"100%"}
+                    mt={6}
+                >
+
+                    <Flex
+                        flex={1}
+                        justifyContent={"flex-start"}
+                        alignItems={"center"}
+                    >
+                        <Text
+                            fontSize={"lg"}
+                            fontWeight={"bold"}
+                        >
+
+                        </Text>
+
+                    </Flex>
+                    <Flex
+                        justifyContent={"flex-end"}
+                    >
+
+
+                        <Button
+                            colorScheme="orange"
+                            size={"sm"}
+                            onClick={
+                                // onOpenCreateProgressReportModal
+                                onOpenCreateStudentReportModal
+                                // () => spawnProgressReport(
+                                //     {
+                                //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
+                                //         kind: "progressreport"
+                                //     }
+                                // )
+                            }
+                            ml={2}
+                            isDisabled={availableStudentYearsData?.length < 1}
+                        >
+                            Create Student Report
+                        </Button>
+
+                    </Flex>
+                </Flex>
+            </Box>
+
+            {/* Actions */}
+            <StudentReportDocActions
+                refetchData={refetchFunc}
+                studentReportData={selectedStudentReport}
+                documents={documents}
+                setSelectedYear={setSelectedYear}
+                setselectedStudentReport={setselectedStudentReport}
+            // projectPk={projectPk}
+            />
+            {/* Editors */}
+
+            {isLoading ? (
                 <Box
-                    mt={4}
-                >
-                    {selectedReport?.progress_report}
-                </Box>
-            </Box> */}
+                    minH={"100vh"}
+                    display="flex"       // Use display: flex to enable flexbox layout
+                    justifyContent="center" // Center horizontally
+                    // alignItems="center"     // Center vertically
+                    // bg="red"
+                    pt={"50px"}
 
+                >
+                    <Spinner
+                        thickness='4px'
+                        speed='0.65s'
+                        emptyColor='gray.200'
+                        color='blue.500'
+                        size='xl'
+                    />
+
+                </Box>
+            ) :
+                (
+                    <motion.div
+                        initial={{ y: -10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 10, opacity: 0 }}
+                        transition={{
+                            duration: 0.7, delay: ((
+                                (1) / 7))
+                        }}
+                        style={{
+                            height: "100%",
+                            animation: "oscillate 8s ease-in-out infinite",
+                            // backgroundColor: "pink"
+                        }}
+
+                    >
+
+                        <RichTextEditor
+                            canEdit={userInTeam || userData?.is_superuser}
+                            writeable_document_kind={'Student Report'}
+                            writeable_document_pk={selectedStudentReport?.pk}
+
+
+                            project_pk={selectedStudentReport.document.project.pk}
+                            document_pk={selectedStudentReport?.document?.pk}
+                            isUpdate={true}
+
+
+                            editorType="ProjectDocument"
+                            key={`context${editorKey}`} // Change the key to force a re-render
+                            data={selectedStudentReport?.progress_report}
+                            section={"progress_report"}
+                        />
+
+                        {/* <RichTextEditor
+                            canEdit={userInTeam || userData?.is_superuser}
+                            writeable_document_kind={'Progress Report'}
+                            writeable_document_pk={selectedProgressReport?.pk}
+
+                            project_pk={selectedProgressReport.document.project.pk}
+                            document_pk={selectedProgressReport?.document?.pk}
+                            isUpdate={true}
+
+
+
+
+                            editorType="ProjectDocument"
+                            key={`future${editorKey}`} // Change the key to force a re-render
+                            data={selectedProgressReport?.future}
+                            section={"future"}
+                        /> */}
+
+
+
+                    </motion.div>
+                )}
 
         </>
-
     )
 }
