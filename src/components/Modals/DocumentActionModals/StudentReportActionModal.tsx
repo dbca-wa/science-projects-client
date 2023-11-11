@@ -12,17 +12,16 @@ interface Props {
     action: "approve" | "recall" | "send_back";
     stage: number;
     documentPk: number;
-    progressReportPk: number;
+    studentReportPk: number;
     projectData: IProjectData;
     baData: IBusinessArea;
     isOpen: boolean;
     refetchData: () => void;
-    callSameData: () => void;
     onClose: () => void;
 }
 
-export const ProgressReportActionModal = (
-    { stage, documentPk, progressReportPk, onClose, isOpen, projectData, baData, action, refetchData, callSameData }: Props
+export const StudentReportActionModal = (
+    { stage, documentPk, studentReportPk, onClose, isOpen, projectData, baData, action, refetchData }: Props
 ) => {
 
     const { colorMode } = useColorMode();
@@ -38,7 +37,7 @@ export const ProgressReportActionModal = (
     const watchedAction = watch("action");
     const watchedStage = watch("stage");
     const watchedDocumentPk = watch("documentPk");
-    // const watchedProgressReportPk = watch("progressReportPk");
+    // const watchedstudentReportPk = watch("studentReportPk");
 
 
     const [shouldSendEmail, setShouldSendEmail] = useState(true);
@@ -56,7 +55,7 @@ export const ProgressReportActionModal = (
         }
     }
 
-    const approveProgressReportMutation = useMutation(handleDocumentAction,
+    const approveStudentReportMutation = useMutation(handleDocumentAction,
         {
             onMutate: () => {
                 addToast({
@@ -77,10 +76,7 @@ export const ProgressReportActionModal = (
                     })
                 }
                 reset();
-                // await refetchData();
-                // refetchData();
-                callSameData();
-
+                await refetchData();
                 await sendEmail();
 
                 onClose();
@@ -97,7 +93,7 @@ export const ProgressReportActionModal = (
             onError: (error) => {
                 if (toastIdRef.current) {
                     toast.update(toastIdRef.current, {
-                        title: `Could Not ${action === "approve" ? "Approve" : action === "recall" ? "Recall" : "Send Back"} Progress Report`,
+                        title: `Could Not ${action === "approve" ? "Approve" : action === "recall" ? "Recall" : "Send Back"} student Report`,
                         description: `${error}`,
                         status: 'error',
                         position: "top-right",
@@ -111,12 +107,12 @@ export const ProgressReportActionModal = (
         })
 
     const onApprove = (formData: IApproveDocument) => {
-        approveProgressReportMutation.mutate(formData);
+        approveStudentReportMutation.mutate(formData);
     }
 
     useEffect(() => {
         console.log(
-            stage, documentPk, progressReportPk, projectData
+            stage, documentPk, studentReportPk, projectData
         )
         if (baData) {
             console.log(baData)
@@ -161,13 +157,13 @@ export const ProgressReportActionModal = (
                                 <Input type="hidden" {...register("stage", { required: true, value: stage })} readOnly />
                                 <Input type="hidden" {...register("action", { required: true, value: action })} readOnly />
                                 <Input type="hidden" {...register("documentPk", { required: true, value: documentPk })} readOnly />
-                                {/* <Input type="hidden" {...register("progressReportPk", { required: true, value: progressReportPk })} readOnly /> */}
+                                {/* <Input type="hidden" {...register("studentReportPk", { required: true, value: studentReportPk })} readOnly /> */}
                                 {stage === 1 ?
                                     (
                                         <Box>
                                             <Text fontWeight={"bold"}>Stage 1</Text>
                                             <br />
-                                            <Text>In your capacity as Project Lead, would you like to {action} this progress report?</Text>
+                                            <Text>In your capacity as Project Lead, would you like to {action} this student report?</Text>
                                             <br />
                                             <Text>
                                                 {action === "approve" ?
@@ -193,7 +189,7 @@ export const ProgressReportActionModal = (
                                                 <Text fontWeight={"bold"}>Stage 2</Text>
                                                 <br />
                                                 <Text>
-                                                    In your capacity as Business Area Lead, would you like to {action} this progress report?
+                                                    In your capacity as Business Area Lead, would you like to {action} this student report?
                                                 </Text>
                                                 <br />
                                                 <Text>
@@ -266,12 +262,12 @@ export const ProgressReportActionModal = (
                                             <Text fontWeight={"bold"}>Stage 3</Text>
                                             <br />
                                             <Text>
-                                                In your capacity as Directorate, would you like to {action} this progress report?
+                                                In your capacity as Directorate, would you like to {action} this student report?
                                             </Text>
                                             <br />
                                             <Text>
                                                 {action === "approve" ?
-                                                    "This will provide final approval for this progress report, adding it to the Annual Report."
+                                                    "This will provide final approval for this student report, adding it to the Annual Report."
                                                     :
                                                     action === "recall" ?
                                                         "This will return the approval status from 'Granted' to 'Required'."
@@ -333,7 +329,7 @@ export const ProgressReportActionModal = (
                         form="approval-form"
                         type="submit"
                         onClick={() => console.log(watchedDocumentPk, watchedStage, watchedAction)}
-                        isLoading={approveProgressReportMutation.isLoading}
+                        isLoading={approveStudentReportMutation.isLoading}
                         bg={colorMode === "dark" ? "green.500" : "green.400"}
                         color={"white"}
                         _hover={

@@ -10,6 +10,8 @@ import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions"
 import { motion } from "framer-motion";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
 import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
+import { useGetProgressReportAvailableReportYears } from "../../../lib/hooks/useGetProgressReportAvailableReportYears";
+import { getProgressReportForYear } from "../../../lib/api";
 
 interface Props {
     documents: IProgressReport[];
@@ -25,6 +27,9 @@ export const ProgressReportContents = ({
     documents, refetch
 }: Props) => {
     // Handling years
+    const { availableProgressReportYearsLoading, availableProgressReportYearsData, refetchProgressYears } = useGetProgressReportAvailableReportYears(Number(documents[0].document?.project?.pk));
+
+
     const years = Array.from(new Set(documents.map(progressReport => progressReport.year))).sort((a, b) => b - a);
     const [selectedYear, setSelectedYear] = useState(() => {
         const years = documents.map((progressReport) => progressReport.year);
@@ -53,12 +58,39 @@ export const ProgressReportContents = ({
     const mePk = userData?.pk ? userData?.pk : userData?.id;
     const userInTeam = useCheckUserInTeam(mePk, members);
 
+    const projectPk = all_documents?.concept_plan?.document?.project?.pk;
+
+    const [forceRefresh, setForceRefresh] = useState(false);
+
+    const handleSetSameYear = () => {
+        setForceRefresh((prevForceRefresh) => !prevForceRefresh);
+    };
+
 
     useEffect(() => {
-        // const dataForYear = documents.find((report) => report.year === selectedYear);
-        refetchDataForYearFunction();
-    }, [selectedYear, colorMode, documentType, documents])
+        const fetchData = async () => {
+            setIsLoading(true);
 
+            try {
+                const newPRData = await getProgressReportForYear(selectedYear, projectPk);
+                setSelectedProgressReport(newPRData);
+            } catch (error) {
+                // Handle error
+                console.error('Error fetching progress report data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+
+    }, [selectedYear, projectPk, forceRefresh])
+
+
+    useEffect(() => {
+        if (selectedProgressReport)
+            setIsLoading(false);
+    }, [selectedProgressReport])
 
 
     const refetchDataForYearFunction = () => {
@@ -69,24 +101,21 @@ export const ProgressReportContents = ({
             setSelectedProgressReport(dataForYear);
             setEditorKey(selectedYear.toString() + colorMode + documentType)
         }
-        // else {
-        //     refetch();
-        // }
         console.log('set year and selected doc')
     }
 
-    const refetchFunc = () => {
-        refetch();
-        setIsLoading(true);
-        const getHighestAvailable = () => {
-            const years = documents.map((progressReport) => progressReport.year);
-            const highestYear = Math.max(...years);
-            return highestYear;
+    // const refetchFunc = () => {
+    //     refetch();
+    //     setIsLoading(true);
+    //     const getHighestAvailable = () => {
+    //         const years = documents.map((progressReport) => progressReport.year);
+    //         const highestYear = Math.max(...years);
+    //         return highestYear;
 
-        }
-        const highestYear = getHighestAvailable();
-        setSelectedYear(highestYear)
-    }
+    //     }
+    //     const highestYear = getHighestAvailable();
+    //     // setSelectedYear(highestYear)
+    // }
 
     useEffect(() => {
         setIsLoading(false);
@@ -95,7 +124,13 @@ export const ProgressReportContents = ({
     const handleNewYearSelection = (event) => {
         setIsLoading(true);
         setSelectedYear(Number(event.target.value))
+
     }
+
+    // const handleSetSameYear = () => {
+    //     setIsLoading(true);
+    //     setSelectedYear(selectedYear);
+    // }
 
     // const refetchData = () => {
     //     setIsLoading(true);
@@ -103,6 +138,9 @@ export const ProgressReportContents = ({
     //     setIsLoading(false);
     // }
     const { isOpen: isCreateProgressReportModalOpen, onOpen: onOpenCreateProgressReportModal, onClose: onCloseCreateProgressReportModal } = useDisclosure();
+
+
+
 
     return (
         <>
@@ -119,7 +157,7 @@ export const ProgressReportContents = ({
                 documentKind="progressreport"
                 onClose={onCloseCreateProgressReportModal}
                 isOpen={isCreateProgressReportModalOpen}
-                refetchData={refetchFunc}
+                refetchData={refetch}
             />
 
 
@@ -203,6 +241,7 @@ export const ProgressReportContents = ({
                                 // )
                             }
                             ml={2}
+                            isDisabled={availableProgressReportYearsData?.length < 1}
                         >
                             Create Progress Report
                         </Button>
@@ -213,11 +252,12 @@ export const ProgressReportContents = ({
 
             {/* Actions */}
             <ProgressReportDocActions
-                refetchData={refetchFunc}
+                refetchData={refetch}
+                callSameData={handleSetSameYear}
                 progressReportData={selectedProgressReport}
                 documents={documents}
-                setSelectedYear={setSelectedYear}
-                setSelectedProgressReport={setSelectedProgressReport}
+            // setSelectedYear={setSelectedYear}
+            // setSelectedProgressReport={setSelectedProgressReport}
             // projectPk={projectPk}
             />
             {/* Editors */}

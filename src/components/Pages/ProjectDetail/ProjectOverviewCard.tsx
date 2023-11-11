@@ -29,6 +29,8 @@ import { useCheckUserIsBaLeader } from "../../../lib/hooks/useCheckUserIsBaLeade
 import { GrFormEdit, GrStatusInfo } from "react-icons/gr";
 import { ProjectClosureModal } from "../../Modals/ProjectClosureModal";
 import { ProjectReopenModal } from "../../Modals/ProjectReopenModal";
+import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
+import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
 
 interface IProjectOverviewCardProps {
     baseInformation: IProjectData;
@@ -55,6 +57,8 @@ export const ProjectOverviewCard = (
     const { isOpen: isDeleteModalOpen, onOpen: onOpenDeleteModal, onClose: onCloseDeleteModal } = useDisclosure()
     const { isOpen: isClosureModalOpen, onOpen: onOpenClosureModal, onClose: onCloseClosureModal } = useDisclosure()
     const { isOpen: isReopenModalOpen, onOpen: onOpenReopenModal, onClose: onCloseReopenModal } = useDisclosure()
+    const { isOpen: isCreateStudentReportModalOpen, onOpen: onOpenCreateStudentReportModal, onClose: onCloseCreateStudentReportModal } = useDisclosure()
+    const { isOpen: isCreateProgressReportModalOpen, onOpen: onOpenCreateProgressReportModal, onClose: onCloseCreateProgressReportModal } = useDisclosure()
     const { isOpen: isEditModalOpen, onOpen: onOpenEditModal, onClose: onCloseEditModal } = useDisclosure()
 
 
@@ -245,6 +249,26 @@ export const ProjectOverviewCard = (
                         onClose={onCloseReopenModal}
                         refetchData={refetchData}
                     />
+                    {baseInformation?.kind !== 'external' && baseInformation?.kind !== 'student' && (
+                        <CreateProgressReportModal
+                            projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
+                            documentKind={"progressreport"}
+                            refetchData={refetchData}
+                            isOpen={isCreateProgressReportModalOpen}
+                            onClose={onCloseCreateProgressReportModal}
+                        />
+
+                    )}
+                    {baseInformation?.kind === 'student' && (
+                        <CreateStudentReportModal
+                            projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
+                            documentKind={"studentreport"}
+                            refetchData={refetchData}
+                            isOpen={isCreateStudentReportModalOpen}
+                            onClose={onCloseCreateStudentReportModal}
+                        />
+
+                    )}
                     <DeleteProjectModal
                         projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
                         isOpen={isDeleteModalOpen}
@@ -349,6 +373,49 @@ export const ProjectOverviewCard = (
                                             </Box>
                                         </Flex>
                                     </MenuItem>
+                                    {baseInformation?.kind === 'student' && (
+                                        <MenuItem onClick={onOpenCreateStudentReportModal}>
+                                            <Flex
+                                                alignItems={"center"}
+                                            // color={"red"}
+                                            >
+                                                <Box mr={2}>
+                                                    <FaLockOpen />
+
+                                                </Box>
+                                                <Box>
+                                                    <Text
+
+                                                    >
+                                                        {"Create Student Report"}
+                                                    </Text>
+                                                </Box>
+                                            </Flex>
+                                        </MenuItem>
+
+                                    )}
+
+                                    {baseInformation?.kind !== 'student' && baseInformation?.kind !== 'external' && (
+                                        <MenuItem onClick={onOpenCreateProgressReportModal}>
+                                            <Flex
+                                                alignItems={"center"}
+                                            // color={"red"}
+                                            >
+                                                <Box mr={2}>
+                                                    <FaLockOpen />
+
+                                                </Box>
+                                                <Box>
+                                                    <Text
+
+                                                    >
+                                                        {"Create Progress Report"}
+                                                    </Text>
+                                                </Box>
+                                            </Flex>
+                                        </MenuItem>
+
+                                    )}
                                     <MenuItem onClick={documents?.project_closure?.document ? onOpenReopenModal : onOpenClosureModal}>
                                         <Flex
                                             alignItems={"center"}

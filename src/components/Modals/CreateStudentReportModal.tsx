@@ -4,19 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/useGetProgressReportAvailableReportYears";
+import { useGetStudentReportAvailableReportYears } from "../../lib/hooks/useGetStudentReportAvailableReportYears";
 
 interface Props {
     projectPk: string | number;
-    documentKind: "progressreport";
+    documentKind: "studentreport";
     refetchData: () => void;
     isOpen: boolean;
     onClose: () => void;
 }
 
-export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData, isOpen, onClose }: Props) => {
+export const CreateStudentReportModal = ({ projectPk, documentKind, refetchData, isOpen, onClose }: Props) => {
 
-    const { availableProgressReportYearsLoading, availableProgressReportYearsData, refetchProgressYears } = useGetProgressReportAvailableReportYears(Number(projectPk));
+    const { availableStudentYearsLoading, availableStudentYearsData, refetchStudentYears } = useGetStudentReportAvailableReportYears(Number(projectPk));
 
 
     const { register, handleSubmit, reset, watch } = useForm<ISpawnDocument>();
@@ -28,19 +28,19 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
     const reportValue = watch('report_id')
 
     useEffect(() => {
-        if (!availableProgressReportYearsLoading && availableProgressReportYearsData && yearValue) {
-            const obj = availableProgressReportYearsData.find(item => Number(item.year) === Number(yearValue));
+        if (!availableStudentYearsLoading && availableStudentYearsData && yearValue) {
+            const obj = availableStudentYearsData.find(item => Number(item.year) === Number(yearValue));
             // console.log(obj)
             setSelectedReportId(obj.pk);
 
         }
-    }, [yearValue, reportValue, availableProgressReportYearsData, availableProgressReportYearsLoading])
+    }, [yearValue, reportValue, availableStudentYearsData, availableStudentYearsLoading])
 
     const navigate = useNavigate();
 
 
     useEffect(() => {
-        refetchProgressYears();
+        refetchStudentYears();
     }, [selectedReportId])
 
     const toast = useToast();
@@ -53,12 +53,12 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
     // Mutation, query client, onsubmit, and api function 
     const queryClient = useQueryClient();
 
-    const createProgressReportMutation = useMutation(spawnDocument,
+    const createStudentReportMutation = useMutation(spawnDocument,
         {
             onMutate: () => {
                 addToast({
                     status: "loading",
-                    title: `Creating Progress Report`,
+                    title: `Creating Student Report`,
                     position: "top-right"
                 })
             },
@@ -66,13 +66,13 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
                 if (toastIdRef.current) {
                     toast.update(toastIdRef.current, {
                         title: 'Success',
-                        description: `Progress Report Created`,
+                        description: `Student Report Created`,
                         status: 'success',
                         position: "top-right",
                         duration: 3000,
                         isClosable: true,
                     })
-                    refetchProgressYears(() => {
+                    refetchStudentYears(() => {
                         reset();
                     });
                 }
@@ -90,7 +90,7 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
             onError: (error) => {
                 if (toastIdRef.current) {
                     toast.update(toastIdRef.current, {
-                        title: `Could not create progress report`,
+                        title: `Could not create Student report`,
                         description: `${error}`,
                         status: 'error',
                         position: "top-right",
@@ -104,7 +104,7 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
         })
 
 
-    const createProgressReportFunc = (formData: ISpawnDocument) => {
+    const createStudentReportFunc = (formData: ISpawnDocument) => {
 
         const newFormData = {
             "report_id": selectedReportId,
@@ -116,7 +116,7 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
         console.log(newFormData);
 
 
-        createProgressReportMutation.mutate(newFormData);
+        createStudentReportMutation.mutate(newFormData);
     }
 
     const { colorMode } = useColorMode();
@@ -132,21 +132,21 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
         >
             <ModalOverlay />
             <Flex as={"form"}
-                onSubmit={handleSubmit(createProgressReportFunc)}>
+                onSubmit={handleSubmit(createStudentReportFunc)}>
                 <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-                    <ModalHeader>Create Progress Report?</ModalHeader>
+                    <ModalHeader>Create Student Report?</ModalHeader>
                     <ModalCloseButton />
-                    {!availableProgressReportYearsLoading
+                    {!availableStudentYearsLoading
                         ?
                         (<>
                             <ModalBody>
 
-                                {availableProgressReportYearsData.length < 1 ?
+                                {availableStudentYearsData.length < 1 ?
                                     (
                                         <Box
                                             mt={6}
                                         >
-                                            <Text>A progress report cannot be created for this project as it already has reports for each available year
+                                            <Text>A student report cannot be created for this project as it already has reports for each available year
                                                 {/* since its creation - potentially adjust hook and api to only get available reports since its creation*/}
                                             </Text>
 
@@ -160,9 +160,9 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
                                             mt={8}
                                         >
                                             <UnorderedList>
-                                                <ListItem>This will create a progress report for the selected year.</ListItem>
+                                                <ListItem>This will create a student report for the selected year.</ListItem>
                                                 <ListItem>Years will only appear based on whether an annual report exists for that year</ListItem>
-                                                <ListItem>Years which already have progress reports for this project will not be selectable</ListItem>
+                                                <ListItem>Years which already have student reports for this project will not be selectable</ListItem>
                                             </UnorderedList>
                                         </Center>
                                         <FormControl>
@@ -179,7 +179,7 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
                                                 placeholder={'Select a report year'}
                                                 {...register("year", { required: true })}
                                             >
-                                                {availableProgressReportYearsData
+                                                {availableStudentYearsData
                                                     ?.sort((a, b) => b.year - a.year) // Sort years in descending order
                                                     .map((freeReportYear, index: number) => {
                                                         return (
@@ -189,7 +189,7 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
                                                         );
                                                     })}
                                             </Select>
-                                            <FormHelperText>Select an annual report for this progress report</FormHelperText>
+                                            <FormHelperText>Select an annual report for this student report</FormHelperText>
                                         </FormControl>
 
 
@@ -205,7 +205,7 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
                             </ModalBody>
                             <ModalFooter>
 
-                                {availableProgressReportYearsData.length >= 1 &&
+                                {availableStudentYearsData.length >= 1 &&
                                     (
                                         <Grid
                                             gridTemplateColumns={"repeat(2, 1fr)"}
@@ -219,7 +219,7 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
                                             </Button>
                                             <Button
                                                 colorScheme="green"
-                                                isLoading={createProgressReportMutation.isLoading}
+                                                isLoading={createStudentReportMutation.isLoading}
                                                 isDisabled={!yearValue || !selectedReportId || !projPk}
                                                 type="submit"
                                                 ml={3}

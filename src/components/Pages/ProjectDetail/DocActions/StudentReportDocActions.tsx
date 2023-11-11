@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { IProgressReport, IProjectMember } from "../../../../types";
+import { IStudentReport, IProjectMember } from "../../../../types";
 import { Box, Text, Flex, Tag, useColorMode, Grid, Button, Center, useDisclosure, Spinner, Drawer, DrawerOverlay, DrawerContent, DrawerBody, DrawerFooter, useToast, ToastId, Input } from "@chakra-ui/react";
-import { ProgressReportActionModal } from "../../../Modals/DocumentActionModals/ProgressReportActionModal";
 import { useUser } from "../../../../lib/hooks/useUser";
 import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
@@ -14,21 +13,21 @@ import { useForm } from "react-hook-form";
 import { IDocGenerationProps, generateProjectDocument, downloadProjectDocument, setProjectStatus, ISetProjectProps } from "../../../../lib/api";
 import { AxiosError } from "axios";
 import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
+import { StudentReportActionModal } from "../../../Modals/DocumentActionModals/StudentReportActionModal";
 
-interface IProgressDocumentActions {
-    progressReportData: IProgressReport;
+interface IStudentDocumentActions {
+    studentReportData: IStudentReport;
     refetchData: () => void;
-    callSameData: () => void;
-    documents: IProgressReport[];
-    // setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
-    // setSelectedProgressReport: React.Dispatch<React.SetStateAction<IProgressReport>>;
+    documents: IStudentReport[];
+    setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
+    setselectedStudentReport: React.Dispatch<React.SetStateAction<IStudentReport>>;
     // projectPk: number;
 }
 
-export const ProgressReportDocActions = ({ progressReportData, refetchData, documents, callSameData,
-    // setSelectedProgressReport, setSelectedYear,
+export const StudentReportDocActions = ({ studentReportData, refetchData, documents,
+    setselectedStudentReport, setSelectedYear,
     // , projectPk 
-}: IProgressDocumentActions) => {
+}: IStudentDocumentActions) => {
     const [showActions, setShowActions] = useState(false);
     const handleToggleActionsVisibility = () => {
         setShowActions(!showActions);
@@ -36,14 +35,14 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
     const { colorMode } = useColorMode();
 
     useEffect(() => {
-        console.log(progressReportData)
-        console.log(progressReportData?.document?.creator)
-        console.log(progressReportData?.document?.modifier)
-        // console.log(progressReportData?.document?.created_at);
-        // console.log(progressReportData?.document?.updated_at);
-        // setCreationDate(progressReportData?.document?.created_at);
-        // setModifyDate(progressReportData?.document?.updated_at);
-    }, [progressReportData])
+        console.log(studentReportData)
+        console.log(studentReportData?.document?.creator)
+        console.log(studentReportData?.document?.modifier)
+        // console.log(studentReportData?.document?.created_at);
+        // console.log(studentReportData?.document?.updated_at);
+        // setCreationDate(studentReportData?.document?.created_at);
+        // setModifyDate(studentReportData?.document?.updated_at);
+    }, [studentReportData])
 
     const { isOpen: isS1ApprovalModalOpen, onOpen: onS1ApprovalModalOpen, onClose: onS1ApprovalModalClose } = useDisclosure();
     const { isOpen: isS2ApprovalModalOpen, onOpen: onS2ApprovalModalOpen, onClose: onS2ApprovalModalClose } = useDisclosure();
@@ -61,42 +60,42 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
 
     const { userData, userLoading } = useUser();
 
-    const { baData, baLoading } = useBusinessArea(progressReportData?.document?.project?.business_area?.pk)
+    const { baData, baLoading } = useBusinessArea(studentReportData?.document?.project?.business_area?.pk)
     const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(baData?.leader)
-    const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(progressReportData?.document?.modifier);
-    const { userData: creator, userLoading: creatorLoading } = useFullUserByPk(progressReportData?.document?.creator);
+    const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(studentReportData?.document?.modifier);
+    const { userData: creator, userLoading: creatorLoading } = useFullUserByPk(studentReportData?.document?.creator);
 
-    const { teamData, isTeamLoading, refetchTeamData } = useProjectTeam(String(progressReportData?.document?.project?.pk));
+    const { teamData, isTeamLoading, refetchTeamData } = useProjectTeam(String(studentReportData?.document?.project?.pk));
 
     const { isOpen: isDeleteDocumentModalOpen, onOpen: onOpenDeleteDocumentModal, onClose: onCloseDeleteDocumentModal } = useDisclosure();
 
 
-    const [docPk, setDocPk] = useState(progressReportData?.document?.pk ? progressReportData.document.pk : progressReportData?.document?.id)
+    const [docPk, setDocPk] = useState(studentReportData?.document?.pk ? studentReportData.document.pk : studentReportData?.document?.id)
 
-    const keyForDeleteDocumentModal = progressReportData?.document?.pk
-        ? `document-${progressReportData?.document?.pk}`
-        : `document-${progressReportData?.document?.id}`;
+    const keyForDeleteDocumentModal = studentReportData?.document?.pk
+        ? `document-${studentReportData?.document?.pk}`
+        : `document-${studentReportData?.document?.id}`;
 
-
-
-    // useEffect(() => {
-    //     const highestYearDocument = documents.reduce((maxDocument, currentDocument) => {
-    //         if (!maxDocument || currentDocument.year > maxDocument.year) {
-    //             return currentDocument;
-    //         }
-    //         return maxDocument;
-    //     }, null)
-
-    //     setSelectedYear(highestYearDocument.year)
-    //     setSelectedProgressReport(highestYearDocument);
-    //     // console.log('DOC LENGTH: ', documents.length);
-    //     // refetchDataForYearFunction();
-    // }, [documents])
 
 
     useEffect(() => {
-        setDocPk(progressReportData.document.pk)
-    }, [progressReportData])
+        const highestYearDocument = documents.reduce((maxDocument, currentDocument) => {
+            if (!maxDocument || currentDocument.year > maxDocument.year) {
+                return currentDocument;
+            }
+            return maxDocument;
+        }, null)
+
+        setSelectedYear(highestYearDocument.year)
+        setselectedStudentReport(highestYearDocument);
+        // console.log('DOC LENGTH: ', documents.length);
+        // refetchDataForYearFunction();
+    }, [documents])
+
+
+    useEffect(() => {
+        setDocPk(studentReportData.document.pk)
+    }, [studentReportData])
 
     // useEffect(
     //     () => {
@@ -117,8 +116,8 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
 
     }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading])
 
-    const creationDate = useFormattedDate(progressReportData?.document?.created_at);
-    const modifyDate = useFormattedDate(progressReportData?.document?.updated_at);
+    const creationDate = useFormattedDate(studentReportData?.document?.created_at);
+    const modifyDate = useFormattedDate(studentReportData?.document?.updated_at);
 
     const [actionsReady, setActionsReady] = useState(false);
     const [userIsLeader, setUserIsLeader] = useState(false);
@@ -153,7 +152,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
         if (actionsReady) {
             setLeaderMemeber(teamData.find((member) => member.is_leader === true))
             console.log(userData);
-            console.log(progressReportData?.document)
+            console.log(studentReportData?.document)
         }
     }, [actionsReady, teamData, isTeamLoading])
 
@@ -170,7 +169,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
         toastIdRef.current = toast(data)
     }
 
-    const projectPk = progressReportData?.document?.project.pk;
+    const projectPk = studentReportData?.document?.project.pk;
 
     const setStatusIfRequired = () => {
         if (documents.length <= 1) {
@@ -257,14 +256,14 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
         })
 
     const beginProjectDocPDFDownload = (formData: IDocGenerationProps) => {
-        // const docPk = progressReportData?.document?.pk;
+        // const docPk = studentReportData?.document?.pk;
         projectPDFDownloadMutation.mutate(formData);
     }
 
 
 
     const beginProjectDocPDFGeneration = (formData: IDocGenerationProps) => {
-        // const docPk = progressReportData?.document?.pk;
+        // const docPk = studentReportData?.document?.pk;
         projectDocPDFGenerationMutation.mutate(formData);
     }
 
@@ -373,10 +372,10 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                         </Text>
                                         <Tag
                                             bg={
-                                                progressReportData.document.status === "approved" ? "green.500" :
-                                                    progressReportData.document.status === "inapproval" ? "blue.500" :
-                                                        progressReportData.document.status === "inreview" ? "orange.500" :
-                                                            progressReportData.document.status === "revising" ? "orange.500" :
+                                                studentReportData.document.status === "approved" ? "green.500" :
+                                                    studentReportData.document.status === "inapproval" ? "blue.500" :
+                                                        studentReportData.document.status === "inreview" ? "orange.500" :
+                                                            studentReportData.document.status === "revising" ? "orange.500" :
                                                                 // New
                                                                 "red.500"
                                             }
@@ -384,11 +383,11 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                             size={"md"}
                                         >
                                             {
-                                                progressReportData.document.status === "inapproval" ?
+                                                studentReportData.document.status === "inapproval" ?
                                                     "Approval Requested" :
-                                                    progressReportData.document.status === "approved" ? "Approved" :
-                                                        progressReportData.document.status === "inreview" ? "Review Requested" :
-                                                            progressReportData.document.status === "revising" ? "Revising" : "New Document"
+                                                    studentReportData.document.status === "approved" ? "Approved" :
+                                                        studentReportData.document.status === "inreview" ? "Review Requested" :
+                                                            studentReportData.document.status === "revising" ? "Revising" : "New Document"
                                             }
                                         </Tag>
                                     </Flex>
@@ -529,7 +528,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
 
                                         </Text>
                                         <Text>
-                                            {progressReportData?.document?.project?.pk}
+                                            {studentReportData?.document?.project?.pk}
                                         </Text>
                                     </Flex>
                                     <Flex
@@ -546,7 +545,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                         >
                                             Selected PR ID</Text>
                                         <Text>
-                                            {progressReportData?.pk}
+                                            {studentReportData?.pk}
                                         </Text>
                                     </Flex>
                                     <Flex
@@ -561,7 +560,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                         >
                                             Document ID</Text>
                                         <Text>
-                                            {progressReportData?.document?.pk ? progressReportData?.document?.pk : progressReportData?.document?.id}
+                                            {studentReportData?.document?.pk ? studentReportData?.document?.pk : studentReportData?.document?.id}
                                         </Text>
                                     </Flex>
                                 </Grid>
@@ -635,36 +634,35 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                 alignItems={"center"}
                                                 justifyContent={"center"}
                                                 display={"flex"}
-                                                bg={progressReportData?.document?.project_lead_approval_granted === true ? "green.500" : "red.500"}
+                                                bg={studentReportData?.document?.project_lead_approval_granted === true ? "green.500" : "red.500"}
                                                 color={"white"}
                                             >
-                                                {progressReportData?.document?.project_lead_approval_granted === true ? "Granted" : "Required"}
+                                                {studentReportData?.document?.project_lead_approval_granted === true ? "Granted" : "Required"}
                                             </Tag>
 
                                         </Flex>
                                         <Grid
                                             justifyContent={"flex-end"}
                                             w={"100%"}
-                                            mt={progressReportData?.document?.business_area_lead_approval_granted ? 0 : 3}
+                                            mt={studentReportData?.document?.business_area_lead_approval_granted ? 0 : 3}
                                             gridTemplateColumns={"repeat(1, 1fr)"}
                                         >
-                                            {progressReportData?.document?.business_area_lead_approval_granted === false
-                                                && progressReportData?.document?.project_lead_approval_granted === true
+                                            {studentReportData?.document?.business_area_lead_approval_granted === false
+                                                && studentReportData?.document?.project_lead_approval_granted === true
                                                 && (userData?.is_superuser || userData?.pk === leaderMember?.user?.pk) && (
                                                     <Center
                                                         justifyContent={"flex-end"}
                                                     >
-                                                        <ProgressReportActionModal
+                                                        <StudentReportActionModal
                                                             refetchData={refetchData}
-                                                            callSameData={callSameData}
                                                             baData={baData}
                                                             isOpen={isS1RecallModalOpen}
                                                             onClose={onS1RecallModalClose}
                                                             action={"recall"}
-                                                            progressReportPk={progressReportData?.pk}
-                                                            documentPk={progressReportData?.document?.pk}
+                                                            studentReportPk={studentReportData?.pk}
+                                                            documentPk={studentReportData?.document?.pk}
                                                             stage={1}
-                                                            projectData={progressReportData?.document?.project}
+                                                            projectData={studentReportData?.document?.project}
                                                         />
                                                         <Button
                                                             colorScheme="blue"
@@ -679,23 +677,21 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                 )
                                             }
 
-                                            {progressReportData?.document?.business_area_lead_approval_granted === false &&
-                                                progressReportData?.document?.project_lead_approval_granted === false
+                                            {studentReportData?.document?.business_area_lead_approval_granted === false &&
+                                                studentReportData?.document?.project_lead_approval_granted === false
                                                 && (userData?.is_superuser || userData?.pk === leaderMember?.user?.pk) && (
                                                     <Center
                                                         justifyContent={"flex-end"}>
-                                                        <ProgressReportActionModal
-                                                            callSameData={callSameData}
-
+                                                        <StudentReportActionModal
                                                             refetchData={refetchData}
                                                             baData={baData}
                                                             isOpen={isS1ApprovalModalOpen}
                                                             onClose={onS1ApprovalModalClose}
                                                             action={"approve"}
-                                                            progressReportPk={progressReportData?.pk}
-                                                            documentPk={progressReportData?.document?.pk}
+                                                            studentReportPk={studentReportData?.pk}
+                                                            documentPk={studentReportData?.document?.pk}
                                                             stage={1}
-                                                            projectData={progressReportData?.document?.project}
+                                                            projectData={studentReportData?.document?.project}
                                                         />
 
                                                         {/* {
@@ -704,8 +700,8 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                         <>
                                                             <DeleteDocumentModal
                                                                 key={keyForDeleteDocumentModal}
-                                                                projectPk={progressReportData?.document?.project?.pk ? progressReportData?.document?.project?.pk : progressReportData?.document?.project?.id}
-                                                                documentPk={progressReportData?.document?.pk ? progressReportData?.document?.pk : progressReportData?.document?.id}
+                                                                projectPk={studentReportData?.document?.project?.pk ? studentReportData?.document?.project?.pk : studentReportData?.document?.project?.id}
+                                                                documentPk={studentReportData?.document?.pk ? studentReportData?.document?.pk : studentReportData?.document?.id}
                                                                 documentKind="progressreport"
                                                                 onClose={onCloseDeleteDocumentModal}
                                                                 isOpen={isDeleteDocumentModalOpen}
@@ -779,21 +775,21 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                 alignItems={"center"}
                                                 justifyContent={"center"}
                                                 display={"flex"}
-                                                bg={progressReportData?.document?.business_area_lead_approval_granted === true ? "green.500" : "red.500"}
+                                                bg={studentReportData?.document?.business_area_lead_approval_granted === true ? "green.500" : "red.500"}
                                                 color={"white"}
                                             >
-                                                {progressReportData?.document?.business_area_lead_approval_granted === true ? "Granted" : "Required"}
+                                                {studentReportData?.document?.business_area_lead_approval_granted === true ? "Granted" : "Required"}
                                             </Tag>
 
                                         </Flex>
                                         <Flex
                                             justifyContent={"flex-end"}
                                             w={"100%"}
-                                            mt={progressReportData?.document?.project_lead_approval_granted && progressReportData?.document?.directorate_approval_granted === false ? 3 : 0}
+                                            mt={studentReportData?.document?.project_lead_approval_granted && studentReportData?.document?.directorate_approval_granted === false ? 3 : 0}
                                         // gridTemplateColumns={"repeat(2, 1fr)"}
                                         >
-                                            {progressReportData?.document?.project_lead_approval_granted
-                                                && progressReportData?.document?.business_area_lead_approval_granted === false
+                                            {studentReportData?.document?.project_lead_approval_granted
+                                                && studentReportData?.document?.business_area_lead_approval_granted === false
                                                 && (userData?.is_superuser || userData?.pk === baLead?.pk) &&
 
 
@@ -802,19 +798,17 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                     // justifyContent={"flex-start"}
                                                     // ml={4}
                                                     >
-                                                        <ProgressReportActionModal
-                                                            callSameData={callSameData}
-
+                                                        <StudentReportActionModal
                                                             refetchData={refetchData}
 
                                                             action={"send_back"}
                                                             baData={baData}
                                                             isOpen={isS2SendbackModalOpen}
                                                             onClose={onS2SendbackModalClose}
-                                                            progressReportPk={progressReportData?.pk}
-                                                            documentPk={progressReportData?.document?.pk}
+                                                            studentReportPk={studentReportData?.pk}
+                                                            documentPk={studentReportData?.document?.pk}
                                                             stage={2}
-                                                            projectData={progressReportData?.document?.project}
+                                                            projectData={studentReportData?.document?.project}
                                                         />
                                                         <Button
                                                             colorScheme="orange"
@@ -829,26 +823,24 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                 )
                                             }
 
-                                            {progressReportData?.document?.business_area_lead_approval_granted
-                                                && progressReportData?.document?.directorate_approval_granted === false
+                                            {studentReportData?.document?.business_area_lead_approval_granted
+                                                && studentReportData?.document?.directorate_approval_granted === false
                                                 && (userData?.is_superuser || userData?.business_area?.leader === baData?.leader) && (
                                                     <Center
                                                         // justifyContent={"flex-start"}
                                                         ml={3}
                                                     >
-                                                        <ProgressReportActionModal
-                                                            callSameData={callSameData}
-
+                                                        <StudentReportActionModal
                                                             refetchData={refetchData}
 
                                                             action={"recall"}
                                                             baData={baData}
                                                             isOpen={isS2RecallModalOpen}
                                                             onClose={onS2RecallModalClose}
-                                                            progressReportPk={progressReportData?.pk}
-                                                            documentPk={progressReportData?.document?.pk}
+                                                            studentReportPk={studentReportData?.pk}
+                                                            documentPk={studentReportData?.document?.pk}
                                                             stage={2}
-                                                            projectData={progressReportData?.document?.project}
+                                                            projectData={studentReportData?.document?.project}
                                                         />
 
                                                         <Button
@@ -865,27 +857,25 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                 )
                                             }
 
-                                            {progressReportData?.document?.project_lead_approval_granted
-                                                && progressReportData?.document?.business_area_lead_approval_granted === false
+                                            {studentReportData?.document?.project_lead_approval_granted
+                                                && studentReportData?.document?.business_area_lead_approval_granted === false
 
                                                 && (userData?.is_superuser || userData?.pk === baData?.leader) && (
                                                     <Center
                                                         // justifyContent={"flex-end"}
                                                         ml={3}
                                                     >
-                                                        <ProgressReportActionModal
-                                                            callSameData={callSameData}
-
+                                                        <StudentReportActionModal
                                                             refetchData={refetchData}
 
                                                             action={"approve"}
                                                             baData={baData}
                                                             isOpen={isS2ApprovalModalOpen}
                                                             onClose={onS2ApprovalModalClose}
-                                                            progressReportPk={progressReportData?.pk}
-                                                            documentPk={progressReportData?.document?.pk}
+                                                            studentReportPk={studentReportData?.pk}
+                                                            documentPk={studentReportData?.document?.pk}
                                                             stage={2}
-                                                            projectData={progressReportData?.document?.project}
+                                                            projectData={studentReportData?.document?.project}
                                                         />
                                                         <Button
                                                             colorScheme="green"
@@ -936,40 +926,38 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                 alignItems={"center"}
                                                 justifyContent={"center"}
                                                 display={"flex"}
-                                                bg={progressReportData?.document?.directorate_approval_granted === true ? "green.500" : "red.500"}
+                                                bg={studentReportData?.document?.directorate_approval_granted === true ? "green.500" : "red.500"}
                                                 color={"white"}
                                             >
-                                                {progressReportData?.document?.directorate_approval_granted === true ? "Granted" : "Required"}
+                                                {studentReportData?.document?.directorate_approval_granted === true ? "Granted" : "Required"}
                                             </Tag>
 
                                         </Flex>
                                         <Flex
                                             justifyContent={"flex-end"}
                                             w={"100%"}
-                                            mt={progressReportData?.document?.business_area_lead_approval_granted ? 3 : 0}
+                                            mt={studentReportData?.document?.business_area_lead_approval_granted ? 3 : 0}
                                         >
 
 
-                                            {progressReportData?.document?.business_area_lead_approval_granted && progressReportData?.document?.directorate_approval_granted === false
+                                            {studentReportData?.document?.business_area_lead_approval_granted && studentReportData?.document?.directorate_approval_granted === false
                                                 && (userData?.is_superuser || userData?.business_area?.name === "Directorate") &&
                                                 (
                                                     <Center
                                                         justifyContent={"flex-end"}
                                                         ml={3}
                                                     >
-                                                        <ProgressReportActionModal
-                                                            callSameData={callSameData}
-
+                                                        <StudentReportActionModal
                                                             action={"send_back"}
                                                             refetchData={refetchData}
 
                                                             baData={baData}
                                                             isOpen={isS3SendbackModalOpen}
                                                             onClose={onS3SendbackModalClose}
-                                                            progressReportPk={progressReportData?.pk}
-                                                            documentPk={progressReportData?.document?.pk}
+                                                            studentReportPk={studentReportData?.pk}
+                                                            documentPk={studentReportData?.document?.pk}
                                                             stage={3}
-                                                            projectData={progressReportData?.document?.project}
+                                                            projectData={studentReportData?.document?.project}
                                                         />
 
                                                         <Button
@@ -986,26 +974,24 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
 
 
 
-                                            {progressReportData?.document?.directorate_approval_granted
+                                            {studentReportData?.document?.directorate_approval_granted
                                                 && (userData?.is_superuser || userData?.business_area?.name === "Directorate") && (
                                                     <Center
 
                                                         justifyContent={"flex-start"}
                                                         ml={3}
                                                     >
-                                                        <ProgressReportActionModal
-                                                            callSameData={callSameData}
-
+                                                        <StudentReportActionModal
                                                             action={"recall"}
                                                             refetchData={refetchData}
 
                                                             baData={baData}
                                                             isOpen={isS3RecallModalOpen}
                                                             onClose={onS3RecallModalClose}
-                                                            progressReportPk={progressReportData?.pk}
-                                                            documentPk={progressReportData?.document?.pk}
+                                                            studentReportPk={studentReportData?.pk}
+                                                            documentPk={studentReportData?.document?.pk}
                                                             stage={3}
-                                                            projectData={progressReportData?.document?.project}
+                                                            projectData={studentReportData?.document?.project}
                                                         />
                                                         <Button
                                                             colorScheme="blue"
@@ -1020,28 +1006,26 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                 )
                                             }
 
-                                            {progressReportData?.document?.business_area_lead_approval_granted
+                                            {studentReportData?.document?.business_area_lead_approval_granted
                                                 && (userData?.is_superuser || userData?.business_area?.name === "Directorate") &&
-                                                !progressReportData?.document?.directorate_approval_granted &&
+                                                !studentReportData?.document?.directorate_approval_granted &&
                                                 (
                                                     <Center
                                                         ml={3}
 
                                                         justifyContent={"flex-end"}
                                                     >
-                                                        <ProgressReportActionModal
-                                                            callSameData={callSameData}
-
+                                                        <StudentReportActionModal
                                                             action={"approve"}
                                                             refetchData={refetchData}
 
                                                             baData={baData}
                                                             isOpen={isS3ApprovalModalOpen}
                                                             onClose={onS3ApprovalModalClose}
-                                                            progressReportPk={progressReportData?.pk}
-                                                            documentPk={progressReportData?.document?.pk}
+                                                            studentReportPk={studentReportData?.pk}
+                                                            documentPk={studentReportData?.document?.pk}
                                                             stage={3}
-                                                            projectData={progressReportData?.document?.project}
+                                                            projectData={studentReportData?.document?.project}
                                                         />
                                                         <Button
                                                             colorScheme="green"
@@ -1088,11 +1072,11 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                             >
                                                 <Input
                                                     type="hidden"
-                                                    {...register("docPk", { required: true, value: progressReportData?.document?.pk })}
+                                                    {...register("docPk", { required: true, value: studentReportData?.document?.pk })}
                                                 />
                                                 <Input
                                                     type="hidden"
-                                                    {...register("kind", { required: true, value: progressReportData?.document?.kind })}
+                                                    {...register("kind", { required: true, value: studentReportData?.document?.kind })}
                                                 />
                                             </Box>
                                             <Box
@@ -1102,11 +1086,11 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                             >
                                                 <Input
                                                     type="hidden"
-                                                    {...register("docPk", { required: true, value: progressReportData?.document?.pk })}
+                                                    {...register("docPk", { required: true, value: studentReportData?.document?.pk })}
                                                 />
                                             </Box>
                                             {
-                                                // progressReportData?.document?.pdf && (
+                                                // studentReportData?.document?.pdf && (
 
                                                 <Button
                                                     size={"sm"}
@@ -1118,7 +1102,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                     form="pdf-download-form"
                                                     isDisabled
                                                     isLoading={
-                                                        // progressReportData?.document?.pdf_generation_in_progress
+                                                        // studentReportData?.document?.pdf_generation_in_progress
                                                         // ||
                                                         projectPDFDownloadMutation.isLoading
                                                     }
@@ -1140,7 +1124,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                 form="pdf-generation-form"
                                                 isDisabled
                                                 isLoading={
-                                                    // progressReportData?.document?.pdf_generation_in_progress
+                                                    // studentReportData?.document?.pdf_generation_in_progress
                                                     // ||
                                                     projectDocPDFGenerationMutation.isLoading
                                                 }

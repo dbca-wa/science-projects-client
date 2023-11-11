@@ -54,7 +54,6 @@ export const ProjectReopenModal = ({ projectPk, isOpen, onClose, refetchData }: 
                         isClosable: true,
                     })
                 }
-                // onClose();
 
                 setTimeout(() => {
                     // if (setIsAnimating) {
@@ -62,6 +61,7 @@ export const ProjectReopenModal = ({ projectPk, isOpen, onClose, refetchData }: 
                     // }
                     queryClient.invalidateQueries(["projects", projectPk]);
                     refetchData();
+                    onClose();
 
                     // navigate('/projects');
 

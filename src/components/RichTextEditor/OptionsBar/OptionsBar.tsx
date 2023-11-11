@@ -78,6 +78,7 @@ export const OptionsBar = ({
                         <SaveButton
                             writeable_document_pk={writeable_document_pk}
                             writeable_document_kind={writeable_document_kind}
+                            setIsEditorOpen={setIsEditorOpen}
                             isUpdate={isUpdate}
                             editorType={editorType}
                             htmlData={displayData}

@@ -5,7 +5,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { IUserMe } from "../../types";
 import { useForm } from "react-hook-form";
-import { useGetAvailableReportYears } from "../../lib/hooks/useGetAvailableReportYears";
+import { useGetStudentReportAvailableReportYears } from "../../lib/hooks/useGetStudentReportAvailableReportYears";
+import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/useGetProgressReportAvailableReportYears";
+
 
 interface Props {
     projectPk: string | number;
@@ -20,7 +22,9 @@ interface Props {
 export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refetchData, isOpen, onClose, onDeleteSuccess }: Props) => {
 
     const navigate = useNavigate();
-    const { availableReportYearsLoading, availableReportYearsData, refetchYears } = useGetAvailableReportYears(Number(projectPk));
+    const { availableProgressReportYearsLoading, availableProgressReportYearsData, refetchProgressYears } = useGetProgressReportAvailableReportYears(Number(projectPk))
+    const { availableStudentYearsLoading, availableStudentYearsData, refetchStudentYears } = useGetStudentReportAvailableReportYears(Number(projectPk));
+
 
 
 
@@ -53,10 +57,14 @@ export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refet
                         duration: 3000,
                         isClosable: true,
                     })
-                    refetchYears(() => {
+                    refetchStudentYears(() => {
                         reset();
-                        onDeleteSuccess();
+                    })
+                    refetchProgressYears(() => {
+                        reset();
                     });
+                    onDeleteSuccess();
+
                 }
                 // onClose();
 

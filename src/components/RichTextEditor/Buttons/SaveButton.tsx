@@ -16,7 +16,7 @@ import { IHTMLSave, saveHtmlToDB } from "../../../lib/api";
 import { EditorType } from "../../../types";
 
 
-export const SaveButton = ({ editorType, htmlData, project_pk, document_pk, section, isUpdate, writeable_document_kind, writeable_document_pk }: IHTMLSave) => {
+export const SaveButton = ({ editorType, htmlData, project_pk, document_pk, section, isUpdate, writeable_document_kind, writeable_document_pk, softRefetch, setIsEditorOpen }: IHTMLSave) => {
     const [isLocked, setIsLocked] = useState<boolean>(false);
     const [editor] = useLexicalComposerContext();
     // console.log(editor)
@@ -39,6 +39,7 @@ export const SaveButton = ({ editorType, htmlData, project_pk, document_pk, sect
     const addToast = (data: any) => {
         toastIdRef.current = toast(data)
     }
+
 
     const htmlSaveProjectMutation = useMutation(saveHtmlToDB,
         {
@@ -67,7 +68,14 @@ export const SaveButton = ({ editorType, htmlData, project_pk, document_pk, sect
                     // if (setIsAnimating) {
                     //     setIsAnimating(false)
                     // }
-                    queryClient.invalidateQueries(["project",]);
+                    // queryClient.invalidateQueries(["project", project_pk]);
+                    // queryClient.invalidateQueries(["project"]);
+                    if (softRefetch) {
+                        softRefetch();
+
+                    }
+                    setIsEditorOpen(false);
+                    // refetchData();
 
                     // queryClient.refetchQueries([`mytasks`])
                 }, 350)

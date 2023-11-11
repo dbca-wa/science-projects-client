@@ -1115,6 +1115,15 @@ export const handleDocumentAction = async ({ action, stage, documentPk }: IAppro
 //     ).then(res => res.data);
 // }
 
+export const getProgressReportForYear = async (year: number, project: number) => {
+    const url = `documents/progressreports/${project}/${year}`
+    const progressReportData = await instance.get(url).then(res => res.data)
+    console.log(progressReportData);
+    return progressReportData;
+}
+
+
+
 
 
 export interface IHTMLSave {
@@ -1126,6 +1135,8 @@ export interface IHTMLSave {
     writeable_document_kind: null | EditorSections;
     writeable_document_pk: null | number;
     section: null | EditorSubsections;
+    softRefetch?: () => void;
+    setIsEditorOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Also have this handle directors message, research intro etc. (annual report)
@@ -1297,6 +1308,15 @@ export const deleteDocumentCall = async ({ projectPk, documentPk, documentKind }
     }
 }
 
+
+export const getStudentReportForYear = async (data: { project: number; year: number }) => {
+    const project = data.project;
+    const year = data.year;
+    const url = `documents/studentreports/${project}/${year}`
+    const studentReportData = await instance.get(url).then(res => res.data)
+    console.log(studentReportData);
+    return studentReportData;
+}
 
 export const spawnDocument = async ({ projectPk, kind, year, report_id }: ISpawnDocument) => {
     console.log(projectPk, kind, year, report_id);
@@ -1475,11 +1495,12 @@ export const deleteAddress = async (pk: number) => {
 
 
 
-export const getAvailableReportYears = async ({ queryKey }: QueryFunctionContext) => {
+export const getAvailableReportYearsForProgressReport = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
 
     try {
-        const response = await instance.get(`documents/reports/availableyears/${pk}`);
+        console.log(pk)
+        const response = await instance.get(`documents/reports/availableyears/${pk}/progressreport`);
         console.log(response.data);
         return response.data;
     } catch (error) {
@@ -1487,6 +1508,21 @@ export const getAvailableReportYears = async ({ queryKey }: QueryFunctionContext
         throw error;
     }
 }
+
+export const getAvailableReportYearsForStudentReport = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+
+    try {
+        const response = await instance.get(`documents/reports/availableyears/${pk}/studentreport`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching years:", error);
+        throw error;
+    }
+}
+
+
 
 export const getLatestReportingYear = async () => {
     try {
