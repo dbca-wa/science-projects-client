@@ -90,7 +90,7 @@ export const CreateStudentReportModal = ({ projectPk, documentKind, refetchData,
             onError: (error) => {
                 if (toastIdRef.current) {
                     toast.update(toastIdRef.current, {
-                        title: `Could not create Student report`,
+                        title: `Could not create student report`,
                         description: `${error}`,
                         status: 'error',
                         position: "top-right",
@@ -189,7 +189,7 @@ export const CreateStudentReportModal = ({ projectPk, documentKind, refetchData,
                                                         );
                                                     })}
                                             </Select>
-                                            <FormHelperText>Select an annual report for this student report</FormHelperText>
+                                            <FormHelperText>Select an annual report for this progress report</FormHelperText>
                                         </FormControl>
 
 

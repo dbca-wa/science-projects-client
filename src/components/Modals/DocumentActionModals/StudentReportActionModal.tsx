@@ -17,11 +17,12 @@ interface Props {
     baData: IBusinessArea;
     isOpen: boolean;
     refetchData: () => void;
+    callSameData: () => void;
     onClose: () => void;
 }
 
 export const StudentReportActionModal = (
-    { stage, documentPk, studentReportPk, onClose, isOpen, projectData, baData, action, refetchData }: Props
+    { stage, documentPk, studentReportPk, onClose, isOpen, projectData, baData, action, refetchData, callSameData }: Props
 ) => {
 
     const { colorMode } = useColorMode();
@@ -76,7 +77,8 @@ export const StudentReportActionModal = (
                     })
                 }
                 reset();
-                await refetchData();
+                // await refetchData();
+                callSameData();
                 await sendEmail();
 
                 onClose();

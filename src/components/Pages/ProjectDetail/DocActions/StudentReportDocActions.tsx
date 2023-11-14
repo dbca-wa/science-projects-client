@@ -19,13 +19,15 @@ interface IStudentDocumentActions {
     studentReportData: IStudentReport;
     refetchData: () => void;
     documents: IStudentReport[];
-    setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
-    setselectedStudentReport: React.Dispatch<React.SetStateAction<IStudentReport>>;
+    callSameData: () => void;
+    // setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
+    // setselectedStudentReport: React.Dispatch<React.SetStateAction<IStudentReport>>;
     // projectPk: number;
 }
 
 export const StudentReportDocActions = ({ studentReportData, refetchData, documents,
-    setselectedStudentReport, setSelectedYear,
+    callSameData,
+    // setselectedStudentReport, setSelectedYear,
     // , projectPk 
 }: IStudentDocumentActions) => {
     const [showActions, setShowActions] = useState(false);
@@ -78,19 +80,19 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
 
 
 
-    useEffect(() => {
-        const highestYearDocument = documents.reduce((maxDocument, currentDocument) => {
-            if (!maxDocument || currentDocument.year > maxDocument.year) {
-                return currentDocument;
-            }
-            return maxDocument;
-        }, null)
+    // useEffect(() => {
+    //     const highestYearDocument = documents.reduce((maxDocument, currentDocument) => {
+    //         if (!maxDocument || currentDocument.year > maxDocument.year) {
+    //             return currentDocument;
+    //         }
+    //         return maxDocument;
+    //     }, null)
 
-        setSelectedYear(highestYearDocument.year)
-        setselectedStudentReport(highestYearDocument);
-        // console.log('DOC LENGTH: ', documents.length);
-        // refetchDataForYearFunction();
-    }, [documents])
+    //     setSelectedYear(highestYearDocument.year)
+    //     setselectedStudentReport(highestYearDocument);
+    //     // console.log('DOC LENGTH: ', documents.length);
+    //     // refetchDataForYearFunction();
+    // }, [documents])
 
 
     useEffect(() => {
@@ -654,6 +656,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         justifyContent={"flex-end"}
                                                     >
                                                         <StudentReportActionModal
+                                                            callSameData={callSameData}
                                                             refetchData={refetchData}
                                                             baData={baData}
                                                             isOpen={isS1RecallModalOpen}
@@ -683,6 +686,8 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                     <Center
                                                         justifyContent={"flex-end"}>
                                                         <StudentReportActionModal
+                                                            callSameData={callSameData}
+
                                                             refetchData={refetchData}
                                                             baData={baData}
                                                             isOpen={isS1ApprovalModalOpen}
@@ -800,6 +805,8 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                     >
                                                         <StudentReportActionModal
                                                             refetchData={refetchData}
+                                                            callSameData={callSameData}
+
 
                                                             action={"send_back"}
                                                             baData={baData}
@@ -832,6 +839,8 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                     >
                                                         <StudentReportActionModal
                                                             refetchData={refetchData}
+                                                            callSameData={callSameData}
+
 
                                                             action={"recall"}
                                                             baData={baData}
@@ -867,6 +876,8 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                     >
                                                         <StudentReportActionModal
                                                             refetchData={refetchData}
+                                                            callSameData={callSameData}
+
 
                                                             action={"approve"}
                                                             baData={baData}
@@ -950,6 +961,8 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         <StudentReportActionModal
                                                             action={"send_back"}
                                                             refetchData={refetchData}
+                                                            callSameData={callSameData}
+
 
                                                             baData={baData}
                                                             isOpen={isS3SendbackModalOpen}
@@ -984,6 +997,8 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         <StudentReportActionModal
                                                             action={"recall"}
                                                             refetchData={refetchData}
+                                                            callSameData={callSameData}
+
 
                                                             baData={baData}
                                                             isOpen={isS3RecallModalOpen}
@@ -1018,6 +1033,8 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         <StudentReportActionModal
                                                             action={"approve"}
                                                             refetchData={refetchData}
+                                                            callSameData={callSameData}
+
 
                                                             baData={baData}
                                                             isOpen={isS3ApprovalModalOpen}

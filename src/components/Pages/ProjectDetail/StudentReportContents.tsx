@@ -65,6 +65,12 @@ export const StudentReportContents = ({
     // const projectPk = project_pk;
 
 
+    const [forceRefresh, setForceRefresh] = useState(false);
+
+    const handleSetSameYear = () => {
+        setForceRefresh((prevForceRefresh) => !prevForceRefresh);
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
@@ -90,7 +96,7 @@ export const StudentReportContents = ({
 
         }
 
-    }, [selectedYear, selectedStudentReport])
+    }, [selectedYear, selectedStudentReport, forceRefresh])
 
 
     useEffect(() => {
@@ -264,8 +270,10 @@ export const StudentReportContents = ({
                 refetchData={refetchFunc}
                 studentReportData={selectedStudentReport}
                 documents={documents}
-                setSelectedYear={setSelectedYear}
-                setselectedStudentReport={setselectedStudentReport}
+                callSameData={handleSetSameYear}
+
+            // setSelectedYear={setSelectedYear}
+            // setselectedStudentReport={setselectedStudentReport}
             // projectPk={projectPk}
             />
             {/* Editors */}

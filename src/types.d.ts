@@ -55,6 +55,9 @@ export interface IUserMe {
     is_superuser: boolean;
     is_staff: boolean;
     is_active: boolean;
+    is_biometrician: boolean;
+    is_aec: boolean;
+    is_herbarium_curator: boolean;
     image: IImageData;
     role: string | null;
     affiliation: string;
@@ -154,10 +157,18 @@ interface IFullProjectDetails {
 interface IEndorsement {
     pk: number;
     project_plan: number;
-    bm_endorsement: boolean;
-    hc_endorsement: boolean;
-    ae_endorsement: boolean;
-    data_manager_endorsement: boolean;
+    bm_endorsement_required: boolean;
+    bm_endorsement_provided: boolean;
+
+    hc_endorsement_required: boolean;
+    hc_endorsement_provided: boolean;
+
+    dm_endorsement_required: boolean;
+    dm_endorsement_provided: boolean;
+
+    ae_endorsement_required: boolean;
+    ae_endorsement_provided: boolean;
+
     data_management: string;
     no_specimens: string;
 
@@ -217,9 +228,8 @@ interface IProjectPlan {
     methodology: string | null;
     project_tasks: string | null;
     related_projects: string | null;
-    endorsemeents: IEndorsement;
+    endorsements: IEndorsement;
 }
-
 
 
 interface IProgressReport {
