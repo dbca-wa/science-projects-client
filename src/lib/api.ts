@@ -541,6 +541,9 @@ export const updateProfile = async ({ userPk, image, about, expertise }: IProfil
 // PROJECTS ==========================================================================
 
 
+
+
+
 export const getFullProject = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
     const res = instance.get(`projects/${pk}`).then(res => {
@@ -578,9 +581,70 @@ export const setProjectStatus = async ({ projectId, status }: ISetProjectProps) 
         return res.data
     })
     return res;
+}
 
+
+
+export interface ISpecialEndorsement {
+    projectPlanPk: number;
+    involvesAnimals: boolean;
+    aecEndorsementRequired?: boolean;
+    aecEndorsementProvided?: boolean;
+
+    involvesPlants: boolean;
+    herbariumEndorsementRequired?: boolean;
+    herbariumEndorsementProvided?: boolean;
+
+    dataManagerEndorsementRequired: boolean;
+    dataManagerEndorsementProvided: boolean;
+
+    bmEndorsementRequired: boolean;
+    bmEndorsementProvided: boolean;
 
 }
+
+
+export const seekEndorsement = async ({ pk }: ISimplePkProp) => {
+
+    const projectPlanPk = pk;
+    const res = instance.post(`documents/project_plan/${projectPlanPk}/seek_endorsement`).then(res => {
+        return res.data
+    })
+    return res;
+}
+
+
+export const setEndorsement = async (
+    { projectPlanPk,
+        involvesAnimals, aecEndorsementRequired, aecEndorsementProvided,
+        involvesPlants, herbariumEndorsementRequired, herbariumEndorsementProvided,
+        bmEndorsementRequired, bmEndorsementProvided,
+        dataManagerEndorsementRequired, dataManagerEndorsementProvided,
+    }: ISpecialEndorsement) => {
+    const data = {
+        project_plan: projectPlanPk,
+        // BM & DM Endorsement
+        bm_endorsement_required: bmEndorsementRequired,
+        bm_endorsement_provided: bmEndorsementRequired ? bmEndorsementProvided : false,
+        dm_endorsement_required: dataManagerEndorsementRequired,
+        dm_endorsement_provided: dataManagerEndorsementRequired ? dataManagerEndorsementProvided : false,
+
+        // Where animals involved
+        involves_animals: involvesAnimals,
+        ae_endorsement_required: involvesAnimals ? aecEndorsementRequired : false,
+        ae_endorsement_provided: aecEndorsementRequired ? aecEndorsementProvided : false,
+        // Where plants involved
+        involves_plants: involvesPlants,
+        hc_endorsement_required: involvesPlants ? herbariumEndorsementRequired : false,
+        hc_endorsement_provided: herbariumEndorsementRequired ? herbariumEndorsementProvided : false,
+    }
+    const res = instance.put(`documents/project_plan/${projectPlanPk}`, data).then(res => {
+        return res.data
+    })
+    return res;
+}
+
+
 
 export interface INewMember {
     user: number;

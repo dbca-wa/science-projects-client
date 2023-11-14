@@ -181,7 +181,7 @@ export const RichTextEditor = ({
                                                                     section === "related_projects" ? "Related Science Projects" :
                                                                         section === "listed_references" ? "References" :
                                                                             section === "data_management" ? "Data Management" :
-                                                                                section === "methodology" ? "Related Science Projects" :
+                                                                                section === "methodology" ? "Methodology" :
                                                                                     section === "specimens" ? "No. of Specimens" :
                                                                                         section === "operating_budget" ? "Operating Budget" :
                                                                                             section === "operating_budget_external" ? "External Budget" :
