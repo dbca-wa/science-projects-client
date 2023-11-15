@@ -11,7 +11,10 @@ import { UserProfile } from "../../Users/UserProfile";
 import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { IDocGenerationProps, generateProjectDocument, downloadProjectDocument, spawnDocument, ISpawnDocument, setProjectStatus, ISetProjectProps } from "../../../../lib/api";
+import {
+    IDocGenerationProps, generateProjectDocument, downloadProjectDocument, spawnNewEmptyDocument, ISpawnDocument,
+    setProjectStatus, ISetProjectProps
+} from "../../../../lib/api";
 import { AxiosError } from "axios";
 
 interface IConceptDocumentActions {
@@ -216,7 +219,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
             }
         })
 
-    const spawnMutation = useMutation(spawnDocument,
+    const spawnMutation = useMutation(spawnNewEmptyDocument,
         {
             onMutate: () => {
                 addToast({

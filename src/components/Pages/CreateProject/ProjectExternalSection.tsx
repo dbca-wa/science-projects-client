@@ -61,126 +61,120 @@ export const ProjectExternalSection = (
 
     return (
         <>
-            <ModalBody
-                overflowY={"auto"}
-            // maxHeight={"58vh"}
+            <FormControl
+                pb={6}
+                isRequired
             >
-                <FormControl
-                    pb={6}
-                    isRequired
-                >
-                    <FormLabel>Collaboration With</FormLabel>
-                    <InputGroup>
-                        <InputLeftAddon children={<MdCorporateFare />} />
-                        <Input
-                            placeholder="Enter collaborating entities..."
-                            value={collaborationWith}
-                            onChange={(e) => {
-                                setCollaborationWith(e.target.value);
-                            }}
-                            // {...register("name", { required: true })}
-                            type="text"
-                        />
-                    </InputGroup>
-                    <FormHelperText>The entity/s this project is in collaboration with</FormHelperText>
-                </FormControl>
+                <FormLabel>Collaboration With</FormLabel>
+                <InputGroup>
+                    <InputLeftAddon children={<MdCorporateFare />} />
+                    <Input
+                        placeholder="Enter collaborating entities..."
+                        value={collaborationWith}
+                        onChange={(e) => {
+                            setCollaborationWith(e.target.value);
+                        }}
+                        // {...register("name", { required: true })}
+                        type="text"
+                    />
+                </InputGroup>
+                <FormHelperText>The entity/s this project is in collaboration with</FormHelperText>
+            </FormControl>
 
 
-                <FormControl
-                    pb={6}
-                    isRequired
-                >
-                    <FormLabel>Budget</FormLabel>
-                    <InputGroup>
-                        <InputLeftAddon children={<AiFillDollarCircle />} />
-                        <Input
-                            placeholder="Enter the budget of the project..."
-                            value={budget}
-                            onChange={(e) => {
-                                setBudget(e.target.value);
-                            }}
-                            // {...register("name", { required: true })}
-                            type="number"
-                        />
-                    </InputGroup>
-                    <FormHelperText>The estimated operating budget in dollars</FormHelperText>
-                </FormControl>
+            <FormControl
+                pb={6}
+                isRequired
+            >
+                <FormLabel>Budget</FormLabel>
+                <InputGroup>
+                    <InputLeftAddon children={<AiFillDollarCircle />} />
+                    <Input
+                        placeholder="Enter the budget of the project..."
+                        value={budget}
+                        onChange={(e) => {
+                            setBudget(e.target.value);
+                        }}
+                        // {...register("name", { required: true })}
+                        type="number"
+                    />
+                </InputGroup>
+                <FormHelperText>The estimated operating budget in dollars</FormHelperText>
+            </FormControl>
 
 
-                <FormControl isRequired mb={6}>
-                    <FormLabel>Description</FormLabel>
-                    <InputGroup>
-                        {/* <Textarea
+            <FormControl isRequired mb={6}>
+                <FormLabel>Description</FormLabel>
+                <InputGroup>
+                    {/* <Textarea
                             placeholder={`Enter the description of the external project...`}
                             value={externalDescription}
                             onChange={(event) => setExternalDescription(event.target.value)}
                         /> */}
-                        <SimpleStateRichTextEditor
-                            section="externalDescription"
-                            editorType="ProjectDetail"
-                            isUpdate={false}
-                            value={externalDescription}
-                            setValueFunction={setExternalDescription}
-                        />
-                    </InputGroup>
-                    <FormHelperText>Description specific to this external project.</FormHelperText>
-                </FormControl>
+                    <SimpleStateRichTextEditor
+                        section="externalDescription"
+                        editorType="ProjectDetail"
+                        isUpdate={false}
+                        value={externalDescription}
+                        setValueFunction={setExternalDescription}
+                    />
+                </InputGroup>
+                <FormHelperText>Description specific to this external project.</FormHelperText>
+            </FormControl>
 
-                <FormControl isRequired mb={6}>
-                    <FormLabel>Aims</FormLabel>
-                    <InputGroup>
-                        {/* <Textarea
+            <FormControl isRequired mb={6}>
+                <FormLabel>Aims</FormLabel>
+                <InputGroup>
+                    {/* <Textarea
                             placeholder={`Enter the aims of the project...`}
                             value={aims}
                             onChange={(event) => setAims(event.target.value)}
                         /> */}
-                        <SimpleStateRichTextEditor
-                            section="externalAims"
-                            editorType="ProjectDetail"
-                            isUpdate={false}
-                            value={aims}
-                            setValueFunction={setAims}
-                        />
-                    </InputGroup>
-                    <FormHelperText>List out the aims of your project.</FormHelperText>
-                </FormControl>
-                <Flex
-                    w={"100%"}
-                    justifyContent={"flex-end"}
-                    pb={4}
+                    <SimpleStateRichTextEditor
+                        section="externalAims"
+                        editorType="ProjectDetail"
+                        isUpdate={false}
+                        value={aims}
+                        setValueFunction={setAims}
+                    />
+                </InputGroup>
+                <FormHelperText>List out the aims of your project.</FormHelperText>
+            </FormControl>
+            <Flex
+                w={"100%"}
+                justifyContent={"flex-end"}
+                pb={4}
+            >
+                <Grid
+                    gridTemplateColumns={"repeat(2, 1fr)"}
+                    gridGap={4}
                 >
-                    <Grid
-                        gridTemplateColumns={"repeat(2, 1fr)"}
-                        gridGap={4}
+                    <Button
+                        colorScheme="gray"
+
+                        onClick={backClick}
                     >
-                        <Button
-                            colorScheme="gray"
+                        Cancel
+                    </Button>
 
-                            onClick={backClick}
-                        >
-                            Cancel
-                        </Button>
+                    <Button
+                        ml={3}
+                        type="submit"
+                        colorScheme="blue"
+                        isDisabled={!externalFilled}
+                        onClick={() => {
+                            console.log('Here is the external data'
+                            )
+                            console.log(externalData)
+                            createClick()
 
-                        <Button
-                            ml={3}
-                            type="submit"
-                            colorScheme="blue"
-                            isDisabled={!externalFilled}
-                            onClick={() => {
-                                console.log('Here is the external data'
-                                )
-                                console.log(externalData)
-                                createClick()
-
-                            }}
-                            rightIcon={<IoIosCreate />}
-                        >
-                            Create
-                        </Button>
-                    </Grid>
-                </Flex>
-            </ModalBody>
-
+                        }}
+                        rightIcon={<IoIosCreate />}
+                    >
+                        Create
+                    </Button>
+                </Grid>
+            </Flex>
         </>
     )
 }

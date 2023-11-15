@@ -20,7 +20,12 @@ import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSe
 import { ProjectBaseInformation } from "../Pages/CreateProject/ProjectBaseInformation"
 import "../../styles/modalscrollbar.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { ICreateProjectBaseInfo, ICreateProjectDetails, ICreateProjectExternalDetails, ICreateProjectStudentDetails, IProjectCreationVariables, MutationError, MutationSuccess, ProjectCreationMutationSuccess, createProject, spawnDocument } from "../../lib/api"
+import {
+    ICreateProjectBaseInfo, ICreateProjectDetails,
+    ICreateProjectExternalDetails, ICreateProjectStudentDetails,
+    IProjectCreationVariables, MutationError,
+    MutationSuccess, ProjectCreationMutationSuccess, createProject, spawnNewEmptyDocument
+} from "../../lib/api"
 import { useNavigate } from "react-router-dom"
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection"
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection"
@@ -131,7 +136,7 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                 if (onClose) {
                     onClose();
                     if (!projectType.includes("Student") && !projectType.includes("External"))
-                        await spawnDocument({ project_pk: data.pk, kind: data.kind });
+                        await spawnNewEmptyDocument({ projectPk: data.pk, kind: data.kind });
                     else {
                         if (projectType.includes("Student")) {
                             console.log("Spawn document for Student here")
@@ -187,15 +192,13 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
 
     return (
         <Modal isOpen={isOpen} onClose={controlledClose}
-            // scrollBehavior="outside"
+            // scrollBehavior="inside"
             // size={"6xl"}
             size={"full"}
         >
             <ModalOverlay />
             <ModalContent
                 bg={colorMode === "light" ? "white" : "gray.800"}
-                height={"100%"}
-                w={"100%"}
             >
                 <ModalHeader
                     display={"inline-flex"}
@@ -256,7 +259,7 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                         )}
                     </TabList>
                     <TabPanels
-                        h={"100%"}
+                    // h={"100%"}
                     >
                         <TabPanel
                             h={"100%"}
@@ -278,8 +281,8 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                             />
                         </TabPanel>
                         <TabPanel
-                            h={"100%"}
-                            px={10}
+                        // h={"100%"}
+                        // px={10}
                         >
                             <ProjectDetailsSection
                                 thisUser={userData.pk}
@@ -294,8 +297,8 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                             />
                         </TabPanel>
                         <TabPanel
-                            h={"100%"}
-                            px={10}
+                        // h={"100%"}
+                        // px={10}
                         >
                             {
                                 projectType.includes("External") || projectType.includes("Student") ?
@@ -331,8 +334,8 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
                         </TabPanel>
                         {projectType.includes("External") && (
                             <TabPanel
-                                h={"100%"}
-                                px={10}
+                            // h={"100%"}
+                            // px={10}
                             >
                                 <ProjectExternalSection
                                     externalFilled={externalFilled}
@@ -349,8 +352,8 @@ export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewP
 
                         {projectType.includes("Student") && (
                             <TabPanel
-                                h={"100%"}
-                                px={10}
+                            // h={"100%"}
+                            // px={10}
                             >
 
                                 <ProjectStudentSection

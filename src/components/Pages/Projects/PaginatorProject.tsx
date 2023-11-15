@@ -1,6 +1,6 @@
 // A paginator for the projects page
 
-import { Box, Button, Center, Grid, Spinner } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Grid, Spinner } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ModernProjectCard } from "./ModernProjectCard";
 import { useEffect } from "react";
@@ -42,8 +42,18 @@ export const PaginatorProject = ({
     const { layout } = useLayoutSwitcher();
 
     return (
-        <Box>
-            <Box>
+        <Flex
+            minH={"69vh"}
+            // bg={"pink"}
+            pos={"relative"}
+            flexDir={"column"}
+        >
+            <Box
+                h={"100%"}
+                flex={1}
+
+            // bg={"blue"}
+            >
                 {/* Render the current page's data */}
                 {!loading ? (
 
@@ -117,7 +127,14 @@ export const PaginatorProject = ({
                     </Center>
                 )}
             </Box>
-            <Box mt={8} display="flex" justifyContent="center">
+            <Box
+                h={"100%"}
+                mt={8}
+                display="flex"
+                justifyContent="center"
+            // bottom={0}
+            // bg={"red"}
+            >
                 {/* Render the pagination buttons */}
                 <Button
                     disabled={currentProjectResultsPage === 1}
@@ -144,6 +161,6 @@ export const PaginatorProject = ({
                     Next
                 </Button>
             </Box>
-        </Box>
+        </Flex>
     );
 };

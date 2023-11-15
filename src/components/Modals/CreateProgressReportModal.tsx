@@ -1,5 +1,5 @@
 import { Text, Center, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, ToastId, useToast, useColorMode, UnorderedList, ListItem, FormControl, InputGroup, Input, ModalFooter, Grid, Button, Select, FormHelperText, Spinner, Box } from "@chakra-ui/react";
-import { ISpawnDocument, spawnDocument } from "../../lib/api";
+import { ISpawnDocument, spawnNewEmptyDocument } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -53,7 +53,7 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
     // Mutation, query client, onsubmit, and api function 
     const queryClient = useQueryClient();
 
-    const createProgressReportMutation = useMutation(spawnDocument,
+    const createProgressReportMutation = useMutation(spawnNewEmptyDocument,
         {
             onMutate: () => {
                 addToast({

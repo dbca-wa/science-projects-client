@@ -104,197 +104,193 @@ export const ProjectDetailsSection = ({
 
     return (
         <>
-            <ModalBody
-                overflowY={"auto"}
-            // maxHeight={"59vh"}
+
+            <Grid
+                gridTemplateColumns={"repeat(2, 1fr)"}
+                gridGap={8}
+                my={4}
+            // justifyContent={"center"}
+            // alignItems={"center"}
             >
-                <Grid
-                    gridTemplateColumns={"repeat(2, 1fr)"}
-                    gridGap={8}
-                    my={4}
-                // justifyContent={"center"}
-                // alignItems={"center"}
-                >
 
-                    <UserSearchDropdown
-                        isRequired={true}
-                        setUserFunction={setSelectedSupervisingScientist}
-                        preselectedUserPk={thisUser}
-                        label={projectType !== "Student Project" ? "Research Scientist" : "Supervising Scientist"}
-                        placeholder={projectType === "Student Project" ? "Search for a Supervising Scientist" : "Search for a Research Scientist"}
-                        helperText={
-                            <Box
-                                mt={2}
+                <UserSearchDropdown
+                    isRequired={true}
+                    setUserFunction={setSelectedSupervisingScientist}
+                    preselectedUserPk={thisUser}
+                    label={projectType !== "Student Project" ? "Research Scientist" : "Supervising Scientist"}
+                    placeholder={projectType === "Student Project" ? "Search for a Supervising Scientist" : "Search for a Research Scientist"}
+                    helperText={
+                        <Box
+                            mt={2}
+                        >
+                            {projectType === "Student Project" ? "The supervising scientist." : "Research Scientist (Project Leader)"}
+                        </Box>
+                    }
+                />
+
+                <UserSearchDropdown
+                    isRequired={true}
+                    setUserFunction={setSelectedDataCustodian}
+                    // preselectedUserPk={selectedDataCustodian}
+                    preselectedUserPk={thisUser}
+                    isEditable={true}
+                    label="Data Custodian"
+                    placeholder="Search for a data custodian"
+                    helperText={
+                        <Box
+                        >
+                            The data custodian (SPP E25) responsible for data management, publishing, and metadata documentation on the&nbsp;
+                            <Button onClick={() => {
+                                window.open("http://data.dbca.wa.gov.au/", "_blank");
+                            }}
+                                variant={"link"}
+                                colorScheme="blue"
                             >
-                                {projectType === "Student Project" ? "The supervising scientist." : "Research Scientist (Project Leader)"}
-                            </Box>
-                        }
-                    />
+                                data catalogue.
+                            </Button>
+                        </Box>
+                    }
+                />
 
-                    <UserSearchDropdown
-                        isRequired={true}
-                        setUserFunction={setSelectedDataCustodian}
-                        // preselectedUserPk={selectedDataCustodian}
-                        preselectedUserPk={thisUser}
-                        isEditable={true}
-                        label="Data Custodian"
-                        placeholder="Search for a data custodian"
-                        helperText={
+
+            </Grid>
+
+            <Grid
+                gridTemplateColumns={"repeat(2, 1fr)"}
+                gridGap={8}
+            >
+                <Box w={"100%"} h={"100%"} display="flex" alignItems="center" justifyContent="center">
+                    <FormControl isRequired>
+
+                        <FormLabel>
                             <Box
+                                display={"inline-flex"}
+                                justifyContent={"center"}
+                                alignItems={"center"}
                             >
-                                The data custodian (SPP E25) responsible for data management, publishing, and metadata documentation on the&nbsp;
-                                <Button onClick={() => {
-                                    window.open("http://data.dbca.wa.gov.au/", "_blank");
-                                }}
-                                    variant={"link"}
-                                    colorScheme="blue"
-                                >
-                                    data catalogue.
-                                </Button>
+                                <Icon as={BsFillCalendarEventFill} mr={2} />
+                                Start and End Dates
                             </Box>
-                        }
-                    />
+
+                        </FormLabel>
+
+                        <CalendarWithCSS onChange={setSelectedDates} />
+
+                        <FormHelperText>
+                            Select a start and end date by clicking on the calendar. The first clicked date is the start date, the second is the end date.
+                        </FormHelperText>
+                    </FormControl>
+                </Box>
+                <Box>
+                    <FormControl isRequired mb={4}>
+                        <FormLabel>Departmental Service</FormLabel>
+                        <InputGroup>
+                            <Select
+                                variant='filled' placeholder='Select a Deparmental Service'
+                                onChange={(event) => setSelectedDepartmentalService(parseInt(event.target.value))}
+                                value={selectedDepartmentalService}
+                            >
+                                {servicesList.map((service, index) => {
+                                    return (
+                                        <option key={index} value={service.pk}>
+                                            {service.name}
+                                        </option>
+                                    )
+                                })}
+                            </Select>
+                        </InputGroup>
+                        <FormHelperText>The DBCA service that this project delivers outputs to.</FormHelperText>
+                    </FormControl>
 
 
-                </Grid>
+                    <FormControl isRequired>
+                        <FormLabel>Business Area</FormLabel>
 
-                <Grid
-                    gridTemplateColumns={"repeat(2, 1fr)"}
-                    gridGap={8}
-                >
-                    <Box w={"100%"} h={"100%"} display="flex" alignItems="center" justifyContent="center">
-                        <FormControl isRequired>
+                        <InputGroup>
+                            <Select
+                                variant='filled' placeholder='Select a Business Area'
+                                onChange={(event) => setSelectedBusinessArea(parseInt(event.target.value))}
+                                value={selectedBusinessArea}
+                            >
+                                {businessAreaList.map((ba, index) => {
+                                    return (
+                                        <option key={index} value={ba.pk}>
+                                            {ba.name}
+                                        </option>
+                                    )
+                                })}
+                            </Select>
+                        </InputGroup>
+                        <FormHelperText>The Business Area / Program that this project belongs to.</FormHelperText>
+                    </FormControl>
+                    <FormControl isRequired mb={4}>
+                        <FormLabel>Research Function</FormLabel>
+                        <InputGroup>
+                            <Select
+                                variant='filled' placeholder='Select a Research Function'
+                                onChange={(event) => setSelectedResearchFunction(parseInt(event.target.value))}
+                                value={selectedResearchFunction}
+                            >
+                                {researchFunctionsList?.map((rf, index) => {
+                                    return (
+                                        <option
+                                            key={index}
+                                            value={rf?.pk}
+                                        >
+                                            {rf?.name}
+                                        </option>
+                                    )
+                                })}
+                            </Select>
+                        </InputGroup>
+                        <FormHelperText>The Research Function this project mainly contributes to.</FormHelperText>
+                    </FormControl>
 
-                            <FormLabel>
-                                <Box
-                                    display={"inline-flex"}
-                                    justifyContent={"center"}
-                                    alignItems={"center"}
-                                >
-                                    <Icon as={BsFillCalendarEventFill} mr={2} />
-                                    Start and End Dates
-                                </Box>
+                </Box>
 
-                            </FormLabel>
-
-                            <CalendarWithCSS onChange={setSelectedDates} />
-
-                            <FormHelperText>
-                                Select a start and end date by clicking on the calendar. The first clicked date is the start date, the second is the end date.
-                            </FormHelperText>
-                        </FormControl>
-                    </Box>
-                    <Box>
-                        <FormControl isRequired mb={4}>
-                            <FormLabel>Departmental Service</FormLabel>
-                            <InputGroup>
-                                <Select
-                                    variant='filled' placeholder='Select a Deparmental Service'
-                                    onChange={(event) => setSelectedDepartmentalService(parseInt(event.target.value))}
-                                    value={selectedDepartmentalService}
-                                >
-                                    {servicesList.map((service, index) => {
-                                        return (
-                                            <option key={index} value={service.pk}>
-                                                {service.name}
-                                            </option>
-                                        )
-                                    })}
-                                </Select>
-                            </InputGroup>
-                            <FormHelperText>The DBCA service that this project delivers outputs to.</FormHelperText>
-                        </FormControl>
+            </Grid>
 
 
-                        <FormControl isRequired>
-                            <FormLabel>Business Area</FormLabel>
-
-                            <InputGroup>
-                                <Select
-                                    variant='filled' placeholder='Select a Business Area'
-                                    onChange={(event) => setSelectedBusinessArea(parseInt(event.target.value))}
-                                    value={selectedBusinessArea}
-                                >
-                                    {businessAreaList.map((ba, index) => {
-                                        return (
-                                            <option key={index} value={ba.pk}>
-                                                {ba.name}
-                                            </option>
-                                        )
-                                    })}
-                                </Select>
-                            </InputGroup>
-                            <FormHelperText>The Business Area / Program that this project belongs to.</FormHelperText>
-                        </FormControl>
-                        <FormControl isRequired mb={4}>
-                            <FormLabel>Research Function</FormLabel>
-                            <InputGroup>
-                                <Select
-                                    variant='filled' placeholder='Select a Research Function'
-                                    onChange={(event) => setSelectedResearchFunction(parseInt(event.target.value))}
-                                    value={selectedResearchFunction}
-                                >
-                                    {researchFunctionsList?.map((rf, index) => {
-                                        return (
-                                            <option
-                                                key={index}
-                                                value={rf?.pk}
-                                            >
-                                                {rf?.name}
-                                            </option>
-                                        )
-                                    })}
-                                </Select>
-                            </InputGroup>
-                            <FormHelperText>The Research Function this project mainly contributes to.</FormHelperText>
-                        </FormControl>
-
-                    </Box>
-
-                </Grid>
-
-
-                {/* <Grid
+            {/* <Grid
                     gridTemplateColumns={"repeat(2, 1fr)"}
                     gridColumnGap={8}
                     my={4}
                     bg={"red"}
                 > */}
 
-                {/* </Grid> */}
-                <Flex
-                    w={"100%"}
-                    justifyContent={"flex-end"}
-                    pb={4}
-                >
-                    <Button onClick={backClick}>Back</Button>
-                    <Button
-                        ml={3}
-                        // type="submit"
-                        colorScheme="blue"
-                        isDisabled={!projectDetailsFilled}
-                        onClick={
-                            () => {
-                                if (projectDetailsFilled) {
-                                    console.log("going next")
-                                    nextClick(
-                                        {
-                                            "businessArea": selectedBusinessArea,
-                                            "researchFunction": selectedResearchFunction,
-                                            "departmentalService": selectedDepartmentalService,
-                                            "dataCustodian": selectedDataCustodian,
-                                            "supervisingScientist": selectedSupervisingScientist,
-                                            "dates": selectedDates,
-                                        }
-                                    )
-                                } else return;
-                            }
+            {/* </Grid> */}
+            <Flex
+                w={"100%"}
+                justifyContent={"flex-end"}
+                pb={4}
+            >
+                <Button onClick={backClick}>Back</Button>
+                <Button
+                    ml={3}
+                    // type="submit"
+                    colorScheme="blue"
+                    isDisabled={!projectDetailsFilled}
+                    onClick={
+                        () => {
+                            if (projectDetailsFilled) {
+                                console.log("going next")
+                                nextClick(
+                                    {
+                                        "businessArea": selectedBusinessArea,
+                                        "researchFunction": selectedResearchFunction,
+                                        "departmentalService": selectedDepartmentalService,
+                                        "dataCustodian": selectedDataCustodian,
+                                        "supervisingScientist": selectedSupervisingScientist,
+                                        "dates": selectedDates,
+                                    }
+                                )
+                            } else return;
                         }
-                    >
-                        Next &rarr;
-                    </Button>
-                </Flex>
-            </ModalBody >
+                    }
+                >
+                    Next &rarr;
+                </Button>
+            </Flex>
 
         </>
     )
