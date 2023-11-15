@@ -146,8 +146,17 @@ export const CreateProgressReportModal = ({ projectPk, documentKind, refetchData
                                         <Box
                                             mt={6}
                                         >
-                                            <Text>A progress report cannot be created for this project as it already has reports for each available year
+                                            <Text>
+                                                A progress report cannot be created for this project as it already has reports for each available year.
+                                                Please either create a new annual report for the year you wish to create a progress report or delete the
+                                                current one occupying the year you wish to create for.
                                                 {/* since its creation - potentially adjust hook and api to only get available reports since its creation*/}
+                                            </Text>
+                                            <Text
+                                                mt={8}
+                                                color={"red.500"}
+                                            >
+                                                Note: Creating a new progress report will send out updates and spawn progress/student reports for the year automatically.
                                             </Text>
 
                                         </Box>

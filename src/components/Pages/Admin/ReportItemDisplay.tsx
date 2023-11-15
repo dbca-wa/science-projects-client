@@ -1,4 +1,4 @@
-import { Box, Image, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormHelperText, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spinner, Text, Textarea, VStack, useDisclosure, useToast, FormErrorMessage, UnorderedList, ListItem } from "@chakra-ui/react"
+import { Box, Image, Button, Center, Checkbox, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormHelperText, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Spinner, Text, Textarea, VStack, useDisclosure, useToast, FormErrorMessage, UnorderedList, ListItem, useColorMode } from "@chakra-ui/react"
 import { IReport, IResearchFunction } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -17,6 +17,9 @@ import { useGetFullReport } from "../../../lib/hooks/useGetFullReport";
 import { useNoImage } from "../../../lib/hooks/useNoImage";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import { useGetReportMedia } from "../../../lib/hooks/useGetReportMedia";
+import { StateRichTextEditor } from "../../RichTextEditor/Editors/StateRichTextEditor";
+import { useUser } from "../../../lib/hooks/useUser";
+import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 
 export const ReportItemDisplay = ({
     pk, year, created_at, updated_at, date_closed, date_open, creator,
@@ -83,10 +86,14 @@ export const ReportItemDisplay = ({
 
 
     const { reportData, reportLoading } = useGetFullReport(pk);
+
+    const [dmValue, setDmValue] = useState(reportData?.dm);
+
     useEffect(() => {
         if (!reportLoading)
 
             console.log(reportData);
+        setDmValue(reportData?.dm);
     }, [reportData, reportLoading])
 
 
@@ -102,6 +109,9 @@ export const ReportItemDisplay = ({
     // const [selectedCreator, setSelectedCreator] = useState<number>(creator);
     // const [selectedModifier, setSelectedModifier] = useState<number>(modifier);
     const [selectedDates, setSelectedDates] = useState([date_open, date_closed]);
+
+
+
     const dmData = watch("dm");
     const serviceDeliveryData = watch("service_delivery_intro");
     const researchIntroData = watch("research_intro");
@@ -239,6 +249,16 @@ export const ReportItemDisplay = ({
         console.log(`${modifierData?.first_name} clicked`);
         onModifierOpen();
     }
+
+    const { colorMode } = useColorMode();
+
+    const documentType = "annualreport"
+    const editorKey = colorMode + documentType;
+
+    // useEffect(() => { console.log(document) }, [document])
+    const { userData, userLoading } = useUser();
+    const mePk = userData?.pk ? userData?.pk : userData?.id;
+
 
     return (
         !creatorLoading && creatorData ? (
@@ -393,9 +413,8 @@ export const ReportItemDisplay = ({
                         </Menu>
                         {/* </Button> */}
                     </Flex>
-
-
                 </Grid>
+
                 <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
                     <ModalOverlay />
                     <ModalContent bg="white">
@@ -1199,27 +1218,20 @@ export const ReportItemDisplay = ({
 
                 <Modal isOpen={isUpdateModalOpen} onClose={onUpdateModalClose}
                     // size={"full"}
-                    size={"6xl"}
+                    // scrollBehavior="inside"
+                    size={"full"}
                 >
                     <ModalOverlay />
-                    <ModalBody
-                        h={"100%"}
-                    // bg={"red"}
-                    >
+                    <ModalBody>
 
-                        <ModalContent bg="white" p={4}>
+                        <ModalContent bg="white"
+                            p={4}
+                        >
                             <ModalHeader>Update Report</ModalHeader>
 
                             <ModalCloseButton />
 
-                            <FormControl>
-                                {/* Hidden input to capture the pk */}
-                                <input
-                                    type="hidden"
-                                    {...register("pk")}
-                                    defaultValue={pk} // Prefill with the 'pk' prop
-                                />
-                            </FormControl>
+
 
                             {reportLoading ?
                                 (<Spinner />
@@ -1227,13 +1239,21 @@ export const ReportItemDisplay = ({
                                 :
                                 (
                                     <>
-                                        <VStack spacing={6}
+                                        <VStack
                                             // as="form" id="update-form" onSubmit={handleSubmit(onUpdateSubmit)}
 
                                             // bg={"red"}
-                                            h={"100%"}
+                                            // h={"100%"}
                                             p={6}
+                                            spacing={6}
+
                                         >
+
+                                            <input
+                                                type="hidden"
+                                                {...register("pk")}
+                                                defaultValue={pk} // Prefill with the 'pk' prop
+                                            />
                                             <FormControl>
                                                 <FormLabel>Year</FormLabel>
                                                 <InputGroup>
@@ -1248,54 +1268,114 @@ export const ReportItemDisplay = ({
                                                 </InputGroup>
                                             </FormControl>
 
-                                            <FormControl
+                                            {/* <FormControl
                                                 isRequired
                                             >
                                                 <FormLabel>Start and End Dates</FormLabel>
                                                 <CalendarWithCSS onChange={setSelectedDates} preselectedDates={[date_open, date_closed]} />
                                                 <FormHelperText>Select the period in which entries for this annual report are allowed. First day clicked is the open date, second is the close date.</FormHelperText>
-                                            </FormControl>
+                                            </FormControl> */}
 
                                             <FormControl>
-                                                <FormLabel>Director's Message</FormLabel>
-                                                <Textarea
+                                                {/* <FormLabel>Director's Message</FormLabel> */}
+                                                {/* <Textarea
                                                     {...register("dm", { required: false })}
                                                     defaultValue={reportData.dm}
+                                                /> */}
+                                                {/* <StateRichTextEditor
+                                                    section="dm"
+                                                    editorType="AnnualReport"
+                                                    isUpdate={false}
+                                                    value={dmValue}
+                                                    setValueFunction={setDmValue}
+                                                /> */}
+
+                                                <RichTextEditor
+                                                    canEdit={userData?.is_superuser}
+                                                    isUpdate={true}
+                                                    editorType="AnnualReport"
+                                                    key={`dm${editorKey}`} // Change the key to force a re-render
+                                                    data={reportData?.dm}
+                                                    section={"dm"}
+                                                    writeable_document_kind={'Annual Report'}
+                                                    writeable_document_pk={reportData?.pk}
                                                 />
                                             </FormControl>
 
                                             <FormControl>
-                                                <FormLabel>Service Delivery Intro</FormLabel>
+                                                {/* <FormLabel>Service Delivery Intro</FormLabel>
                                                 <Textarea
                                                     {...register("service_delivery_intro", { required: false })}
                                                     defaultValue={reportData.service_delivery_intro}
 
+                                                /> */}
+                                                <RichTextEditor
+                                                    canEdit={userData?.is_superuser}
+                                                    isUpdate={true}
+                                                    editorType="AnnualReport"
+                                                    key={`service_delivery_intro${editorKey}`} // Change the key to force a re-render
+                                                    data={reportData?.service_delivery_intro}
+                                                    section={"service_delivery_intro"}
+                                                    writeable_document_kind={'Annual Report'}
+                                                    writeable_document_pk={reportData?.pk}
                                                 />
                                             </FormControl>
                                             <FormControl>
-                                                <FormLabel>Research Intro</FormLabel>
+                                                {/* <FormLabel>Research Intro</FormLabel>
                                                 <Textarea
                                                     {...register("research_intro", { required: false })}
                                                     defaultValue={reportData.research_intro}
 
+                                                    
+                                                /> */}
+                                                <RichTextEditor
+                                                    canEdit={userData?.is_superuser}
+                                                    isUpdate={true}
+                                                    editorType="AnnualReport"
+                                                    key={`research_intro${editorKey}`} // Change the key to force a re-render
+                                                    data={reportData?.research_intro}
+                                                    section={"research_intro"}
+                                                    writeable_document_kind={'Annual Report'}
+                                                    writeable_document_pk={reportData?.pk}
                                                 />
                                             </FormControl>
 
                                             <FormControl>
-                                                <FormLabel>Student Intro</FormLabel>
+                                                {/* <FormLabel>Student Intro</FormLabel>
                                                 <Textarea
                                                     {...register("student_intro", { required: false })}
                                                     defaultValue={reportData.student_intro}
 
                                                 />
+                                                 */}
+                                                <RichTextEditor
+                                                    canEdit={userData?.is_superuser}
+                                                    isUpdate={true}
+                                                    editorType="AnnualReport"
+                                                    key={`student_intro${editorKey}`} // Change the key to force a re-render
+                                                    data={reportData?.student_intro}
+                                                    section={"student_intro"}
+                                                    writeable_document_kind={'Annual Report'}
+                                                    writeable_document_pk={reportData?.pk}
+                                                />
                                             </FormControl>
 
                                             <FormControl>
-                                                <FormLabel>Publications</FormLabel>
+                                                {/* <FormLabel>Publications</FormLabel>
                                                 <Textarea
                                                     {...register("publications", { required: false })}
                                                     defaultValue={reportData.publications}
 
+                                                /> */}
+                                                <RichTextEditor
+                                                    canEdit={userData?.is_superuser}
+                                                    isUpdate={true}
+                                                    editorType="AnnualReport"
+                                                    key={`publications${editorKey}`} // Change the key to force a re-render
+                                                    data={reportData?.publications}
+                                                    section={"publications"}
+                                                    writeable_document_kind={'Annual Report'}
+                                                    writeable_document_pk={reportData?.pk}
                                                 />
                                             </FormControl>
 

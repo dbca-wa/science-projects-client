@@ -1,4 +1,4 @@
-import { Text, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, Flex, FormControl, Input, InputGroup, InputLeftAddon, VStack, useDisclosure, Center, Spinner, Grid, DrawerOverlay, DrawerCloseButton, DrawerHeader, FormLabel, Textarea, Checkbox, useToast, Select, FormHelperText } from "@chakra-ui/react";
+import { Text, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, Flex, FormControl, Input, InputGroup, InputLeftAddon, VStack, useDisclosure, Center, Spinner, Grid, DrawerOverlay, DrawerCloseButton, DrawerHeader, FormLabel, Textarea, Checkbox, useToast, Select, FormHelperText, Switch } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -6,17 +6,17 @@ import { createReport, getAllReports } from "../../../lib/api";
 import _ from 'lodash';
 import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
-import { IReport } from "../../../types";
+import { IReport, IReportCreation } from "../../../types";
 import { ReportItemDisplay } from "./ReportItemDisplay";
 import { CalendarWithCSS } from "../CreateProject/CalendarWithCSS";
 import { AxiosError } from "axios";
 
 export const ReportsCRUD = () => {
-    const { register, handleSubmit, watch } = useForm<IReport>();
+    const { register, handleSubmit, watch } = useForm<IReportCreation>();
 
     const yearData = watch('year');
     const [selectedDates, setSelectedDates] = useState([null, null]);
-
+    const seekUpdateValue = watch('seek_update');
     useEffect(() => {
         console.log(selectedDates)
     }, [selectedDates])
@@ -51,7 +51,7 @@ export const ReportsCRUD = () => {
 
             }
         });
-    const onSubmit = (formData: IReport) => {
+    const onSubmit = (formData: IReportCreation) => {
         console.log(formData);
         mutation.mutate(formData);
     }
@@ -235,6 +235,23 @@ export const ReportsCRUD = () => {
                                         <FormHelperText>Select the period in which entries for this annual report are allowed. First day clicked is the open date, second is the close date.</FormHelperText>
                                     </FormControl>
 
+                                    <FormControl>
+                                        <FormLabel>Do you want to seek updates on projects now?</FormLabel>
+
+                                        <Switch
+                                            defaultChecked={false}
+                                            {...register('seek_update')}
+                                        />
+                                        <FormHelperText
+                                            color={"red.700"}
+                                        >
+                                            This will set eligible projects to updating, create a progress/student report for this report, and send an email to users letting them know that an update is required.
+                                            Note: This is not recommended on creation. Instead, it is suggested that a report is created without this on, and the 'Seek Update' button (available on edit) is pressed when the report is ready for submissions.
+                                        </FormHelperText>
+
+                                    </FormControl>
+
+
                                     {/* <FormControl>
                                         <FormLabel>Service Delivery Intro</FormLabel>
                                         <Textarea
@@ -283,6 +300,9 @@ export const ReportsCRUD = () => {
                                     // type="submit"
                                     isLoading={mutation.isLoading}
                                     colorScheme="blue" size="lg" width={"100%"}
+                                    isDisabled={
+                                        selectedDates[0] === (undefined || null) || selectedDates[1] === (undefined || null)
+                                    }
                                     onClick={() => {
                                         console.log("clicked")
                                         onSubmit(
@@ -291,11 +311,12 @@ export const ReportsCRUD = () => {
                                                 "year": yearData,
                                                 "date_open": selectedDates[0],
                                                 "date_closed": selectedDates[1],
-                                                dm: "",
-                                                publications: "",
-                                                research_intro: "",
-                                                service_delivery_intro: "",
-                                                student_intro: ""
+                                                dm: "<p></p>",
+                                                publications: "<p></p>",
+                                                research_intro: "<p></p>",
+                                                service_delivery_intro: "<p></p>",
+                                                student_intro: "<p></p>",
+                                                seek_update: seekUpdateValue,
                                             }
                                         )
 

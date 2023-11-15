@@ -265,18 +265,6 @@ export const StudentReportContents = ({
                 </Flex>
             </Box>
 
-            {/* Actions */}
-            <StudentReportDocActions
-                refetchData={refetchFunc}
-                studentReportData={selectedStudentReport}
-                documents={documents}
-                callSameData={handleSetSameYear}
-
-            // setSelectedYear={setSelectedYear}
-            // setselectedStudentReport={setselectedStudentReport}
-            // projectPk={projectPk}
-            />
-            {/* Editors */}
 
             {isLoading ? (
                 <Box
@@ -314,6 +302,18 @@ export const StudentReportContents = ({
                         }}
 
                     >
+                        {/* Actions */}
+                        <StudentReportDocActions
+                            refetchData={refetchFunc}
+                            studentReportData={selectedStudentReport}
+                            documents={documents}
+                            callSameData={handleSetSameYear}
+
+                        // setSelectedYear={setSelectedYear}
+                        // setselectedStudentReport={setselectedStudentReport}
+                        // projectPk={projectPk}
+                        />
+                        {/* Editors */}
 
                         <RichTextEditor
                             canEdit={userInTeam || userData?.is_superuser}
