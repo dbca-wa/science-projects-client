@@ -1,6 +1,6 @@
 // Paginator for displaying data for users on Users page
 
-import { Box, Button, Center, Grid, Spinner, Stack } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Grid, Spinner, Stack } from "@chakra-ui/react";
 import { UserGridItem } from "./UserGridItem";
 import { AnimatePresence, motion } from "framer-motion";
 import { useBranches } from "../../../lib/hooks/useBranches";
@@ -44,8 +44,14 @@ export const PaginatorUser = ({
     }, [data, loading])
 
     return (
-        <Box>
-            <Box>
+        <Flex
+            flexDir={"column"}
+            minH={"64vh"}
+        >
+            <Box
+                h={"100%"}
+                flex={1}
+            >
                 {/* Render the current page's data */}
                 {!loading ? (
 
@@ -92,7 +98,12 @@ export const PaginatorUser = ({
                     </Center>
                 )}
             </Box>
-            <Box mt={8} display="flex" justifyContent="center">
+            <Box
+                h={"100%"}
+                mt={8}
+                display="flex"
+                justifyContent="center"
+            >
                 {/* Render the pagination buttons */}
                 <Button
                     disabled={currentUserResultsPage === 1}
@@ -119,7 +130,7 @@ export const PaginatorUser = ({
                     Next
                 </Button>
             </Box>
-        </Box>
+        </Flex>
     );
 };
 

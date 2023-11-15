@@ -65,135 +65,129 @@ export const ProjectStudentSection = (
 
     return (
         <>
-            <ModalBody
-                overflowY={"auto"}
-            // maxHeight={"58vh"}
+            <FormControl
+                pb={6}
+                isRequired
             >
-                <FormControl
-                    pb={6}
-                    isRequired
-                >
-                    <FormLabel>Organisation</FormLabel>
-                    <InputGroup>
-                        <InputLeftAddon children={<FaUniversity />} />
-                        <Input
-                            placeholder="Enter the corresponding organisation..."
-                            value={organisation}
-                            onChange={(e) => {
-                                setOrganisation(e.target.value);
-                            }}
-                            // {...register("name", { required: true })}
-                            type="text"
-                        />
-                    </InputGroup>
-                    <FormHelperText>The academic organisation of the student</FormHelperText>
-                </FormControl>
+                <FormLabel>Organisation</FormLabel>
+                <InputGroup>
+                    <InputLeftAddon children={<FaUniversity />} />
+                    <Input
+                        placeholder="Enter the corresponding organisation..."
+                        value={organisation}
+                        onChange={(e) => {
+                            setOrganisation(e.target.value);
+                        }}
+                        // {...register("name", { required: true })}
+                        type="text"
+                    />
+                </InputGroup>
+                <FormHelperText>The academic organisation of the student</FormHelperText>
+            </FormControl>
 
 
-                <FormControl
-                    pb={6}
-                    isRequired
-                    userSelect={"none"}
+            <FormControl
+                pb={6}
+                isRequired
+                userSelect={"none"}
+            >
+                <FormLabel
+                    onMouseEnter={() => setHoveredTitle(true)}
+                    onMouseLeave={() => setHoveredTitle(false)}
                 >
-                    <FormLabel
+                    Level</FormLabel>
+                <InputGroup>
+                    <InputLeftAddon
+                        left={0}
+                        bg={colorMode === "light" ? "gray.100" : "whiteAlpha.300"}
+                        px={4}
+                        zIndex={1}
+                        borderColor={titleBorderColor}
+                        borderTopRightRadius={"none"}
+                        borderBottomRightRadius={"none"}
+                        borderRight={"none"}
+                    // boxSize={10}
+                    >
+                        <Icon as={HiAcademicCap} boxSize={5} />
+                    </InputLeftAddon>
+
+                    <Select placeholder={'Select a level'}
+                        borderLeft={"none"}
+                        borderTopLeftRadius={"none"}
+                        borderBottomLeftRadius={"none"}
+                        pl={"2px"}
+                        borderLeftColor={"transparent"}
                         onMouseEnter={() => setHoveredTitle(true)}
                         onMouseLeave={() => setHoveredTitle(false)}
+                        // {...register("title", {
+                        //     value: data?.title,
+                        // })}
+                        onChange={(e) => {
+                            setLevel(e.target.value);
+                        }}
+                        value={level}
                     >
-                        Level</FormLabel>
-                    <InputGroup>
-                        <InputLeftAddon
-                            left={0}
-                            bg={colorMode === "light" ? "gray.100" : "whiteAlpha.300"}
-                            px={4}
-                            zIndex={1}
-                            borderColor={titleBorderColor}
-                            borderTopRightRadius={"none"}
-                            borderBottomRightRadius={"none"}
-                            borderRight={"none"}
-                        // boxSize={10}
-                        >
-                            <Icon as={HiAcademicCap} boxSize={5} />
-                        </InputLeftAddon>
+                        <option value='phd'>
+                            PhD
+                        </option>
+                        <option value='msc'>
+                            MSc
+                        </option>
+                        <option value='honours'>
+                            BSc Honours
+                        </option>
+                        <option value='fourth_year'>
+                            Fourth Year
+                        </option>
+                        <option value='third_year'>
+                            Third Year
+                        </option>
+                        <option value='undergrad'>
+                            Undergradate
+                        </option>
 
-                        <Select placeholder={'Select a level'}
-                            borderLeft={"none"}
-                            borderTopLeftRadius={"none"}
-                            borderBottomLeftRadius={"none"}
-                            pl={"2px"}
-                            borderLeftColor={"transparent"}
-                            onMouseEnter={() => setHoveredTitle(true)}
-                            onMouseLeave={() => setHoveredTitle(false)}
-                            // {...register("title", {
-                            //     value: data?.title,
-                            // })}
-                            onChange={(e) => {
-                                setLevel(e.target.value);
-                            }}
-                            value={level}
-                        >
-                            <option value='phd'>
-                                PhD
-                            </option>
-                            <option value='msc'>
-                                MSc
-                            </option>
-                            <option value='honours'>
-                                BSc Honours
-                            </option>
-                            <option value='fourth_year'>
-                                Fourth Year
-                            </option>
-                            <option value='third_year'>
-                                Third Year
-                            </option>
-                            <option value='undergrad'>
-                                Undergradate
-                            </option>
+                    </Select>
 
-                        </Select>
+                </InputGroup>
 
-                    </InputGroup>
+                <FormHelperText>The level of the student and the project</FormHelperText>
 
-                    <FormHelperText>The level of the student and the project</FormHelperText>
-
-                </FormControl>
-                <Flex
-                    w={"100%"}
-                    justifyContent={"flex-end"}
-                    pb={4}
+            </FormControl>
+            <Flex
+                w={"100%"}
+                justifyContent={"flex-end"}
+                pb={4}
+            >
+                <Grid
+                    gridTemplateColumns={"repeat(2, 1fr)"}
+                    gridGap={4}
                 >
-                    <Grid
-                        gridTemplateColumns={"repeat(2, 1fr)"}
-                        gridGap={4}
+                    <Button
+                        colorScheme="gray"
+
+                        onClick={backClick}
                     >
-                        <Button
-                            colorScheme="gray"
+                        Cancel
+                    </Button>
 
-                            onClick={backClick}
-                        >
-                            Cancel
-                        </Button>
+                    <Button
+                        ml={3}
+                        type="submit"
+                        colorScheme="blue"
+                        isDisabled={!studentFilled}
+                        onClick={() => {
+                            console.log('Here is the student data'
+                            )
+                            console.log(studentData)
+                            createClick()
 
-                        <Button
-                            ml={3}
-                            type="submit"
-                            colorScheme="blue"
-                            isDisabled={!studentFilled}
-                            onClick={() => {
-                                console.log('Here is the student data'
-                                )
-                                console.log(studentData)
-                                createClick()
-
-                            }}
-                            rightIcon={<IoIosCreate />}
-                        >
-                            Create
-                        </Button>
-                    </Grid>
-                </Flex>
-            </ModalBody>
-
+                        }}
+                        rightIcon={<IoIosCreate />}
+                    >
+                        Create
+                    </Button>
+                </Grid>
+            </Flex>
         </>
     )
 }

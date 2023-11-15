@@ -92,7 +92,7 @@ export const StudentReportContents = ({
         if (selectedStudentReport) {
             console.log("project pk is:", selectedStudentReport?.document?.project?.pk)
 
-            fetchData();
+            // fetchData();
 
         }
 

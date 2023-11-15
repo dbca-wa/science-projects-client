@@ -72,104 +72,98 @@ export const ProjectLocationSection = (
 
     return (
         <>
-            <ModalBody
-                overflowY={"auto"}
-            // maxHeight={"58vh"}
+            {!locationsLoading && (
+                <>
+                    {dbcaRegions && (
+                        <AreaCheckAndMaps
+                            title="DBCA Regions"
+                            areas={dbcaRegions}
+                            required
+                            selectedAreas={selectedRegions}
+                            setSelectedAreas={setSelectedRegions}
+                        />
+
+                    )}
+                    {dbcaDistricts && (
+                        <AreaCheckAndMaps
+                            title="DBCA Districts"
+                            areas={dbcaDistricts}
+                            required
+                            selectedAreas={selectedDistricts}
+                            setSelectedAreas={setSelectedDistricts}
+                        />
+
+                    )}
+                    {ibra && (
+                        <AreaCheckAndMaps
+                            title="IBRAs"
+                            areas={ibra}
+                            required
+                            selectedAreas={selectedIbras}
+                            setSelectedAreas={setSelectedIbras}
+                        />
+
+                    )}
+                    {imcra && (
+                        <AreaCheckAndMaps
+                            title="IMCRAs"
+                            areas={imcra}
+                            required
+                            selectedAreas={selectedImcras}
+                            setSelectedAreas={setSelectedImcras}
+                        />
+
+                    )}
+                    {nrm && (
+                        <AreaCheckAndMaps
+                            title="Natural Resource Management Regions"
+                            areas={nrm}
+                            required
+                            selectedAreas={selectedNrms}
+                            setSelectedAreas={setSelectedNrms}
+                        />
+
+                    )}
+
+                </>
+            )}
+
+            <Flex
+                w={"100%"}
+                justifyContent={"flex-end"}
+                pb={4}
             >
-                {!locationsLoading && (
-                    <>
-                        {dbcaRegions && (
-                            <AreaCheckAndMaps
-                                title="DBCA Regions"
-                                areas={dbcaRegions}
-                                required
-                                selectedAreas={selectedRegions}
-                                setSelectedAreas={setSelectedRegions}
-                            />
+                <Button onClick={backClick}>Cancel</Button>
+                <Button
+                    ml={3}
+                    type="submit"
+                    colorScheme="blue"
+                    isDisabled={!locationFilled}
+                    onClick={() => {
+                        console.log('Here is the location data'
+                        )
+                        console.log(locationData)
+                        if (projectType.includes("External") || projectType.includes("Student")) {
+                            if (locationFilled) {
+                                console.log("going next")
+                                console.log(locationData)
+                                setLocationFilled(true)
+                                nextClick(
 
-                        )}
-                        {dbcaDistricts && (
-                            <AreaCheckAndMaps
-                                title="DBCA Districts"
-                                areas={dbcaDistricts}
-                                required
-                                selectedAreas={selectedDistricts}
-                                setSelectedAreas={setSelectedDistricts}
-                            />
+                                    locationData
+                                    // "locations": [...locationData]
 
-                        )}
-                        {ibra && (
-                            <AreaCheckAndMaps
-                                title="IBRAs"
-                                areas={ibra}
-                                required
-                                selectedAreas={selectedIbras}
-                                setSelectedAreas={setSelectedIbras}
-                            />
-
-                        )}
-                        {imcra && (
-                            <AreaCheckAndMaps
-                                title="IMCRAs"
-                                areas={imcra}
-                                required
-                                selectedAreas={selectedImcras}
-                                setSelectedAreas={setSelectedImcras}
-                            />
-
-                        )}
-                        {nrm && (
-                            <AreaCheckAndMaps
-                                title="Natural Resource Management Regions"
-                                areas={nrm}
-                                required
-                                selectedAreas={selectedNrms}
-                                setSelectedAreas={setSelectedNrms}
-                            />
-
-                        )}
-
-                    </>
-                )}
-
-                <Flex
-                    w={"100%"}
-                    justifyContent={"flex-end"}
-                    pb={4}
+                                )
+                            } else return;
+                        } else {
+                            createClick()
+                        }
+                    }}
+                    rightIcon={(projectType.includes("External") || projectType.includes("Student")) ? undefined : <IoIosCreate />}
                 >
-                    <Button onClick={backClick}>Cancel</Button>
-                    <Button
-                        ml={3}
-                        type="submit"
-                        colorScheme="blue"
-                        isDisabled={!locationFilled}
-                        onClick={() => {
-                            console.log('Here is the location data'
-                            )
-                            console.log(locationData)
-                            if (projectType.includes("External") || projectType.includes("Student")) {
-                                if (locationFilled) {
-                                    console.log("going next")
-                                    console.log(locationData)
-                                    setLocationFilled(true)
-                                    nextClick(
-
-                                        locationData
-                                        // "locations": [...locationData]
-
-                                    )
-                                } else return;
-                            } else {
-                                createClick()
-                            }
-                        }}
-                        rightIcon={(projectType.includes("External") || projectType.includes("Student")) ? undefined : <IoIosCreate />}
-                    >
-                        {(projectType.includes("External") || projectType.includes("Student")) ? `Next` : `Create`}
-                    </Button>
-                </Flex>
-            </ModalBody>
-
+                    {(projectType.includes("External") || projectType.includes("Student")) ? `Next` : `Create`}
+                </Button>
+            </Flex>
         </>
     )
 }

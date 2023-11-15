@@ -11,7 +11,7 @@ import { UserProfile } from "../../Users/UserProfile";
 import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { IDocGenerationProps, generateProjectDocument, downloadProjectDocument, spawnDocument, ISpawnDocument, setProjectStatus, ISetProjectProps } from "../../../../lib/api";
+import { IDocGenerationProps, generateProjectDocument, downloadProjectDocument, spawnNewEmptyDocument, ISpawnDocument, setProjectStatus, ISetProjectProps } from "../../../../lib/api";
 import { AxiosError } from "axios";
 import { ProjectPlanActionModal } from "../../../Modals/DocumentActionModals/ProjectPlanActionModal";
 import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
@@ -218,7 +218,7 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
             }
         })
 
-    const spawnMutation = useMutation(spawnDocument,
+    const spawnMutation = useMutation(spawnNewEmptyDocument,
         {
             onMutate: () => {
                 addToast({

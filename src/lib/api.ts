@@ -1382,36 +1382,86 @@ export const getStudentReportForYear = async (data: { project: number; year: num
     return studentReportData;
 }
 
-export const spawnDocument = async ({ projectPk, kind, year, report_id }: ISpawnDocument) => {
+export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }: ISpawnDocument) => {
     console.log(projectPk, kind, year, report_id);
 
     const choices = ["concept", "projectplan", "progressreport", "studentreport", "projectclosure"]
     if (!choices.includes(kind)) {
         console.log("returning")
         return;
+    } else {
+        console.log(
+            "valid choice"
+        )
     }
 
     // Create the document first (as a document object)
     const url = `documents/projectdocuments`
 
     let params;
-    if (year) {
+
+    if (kind === "concept") {
         params = {
-            "old_id": 1,
-            "kind": kind,
+            "kind": "concept",
             "project": projectPk,
-            "details": {},
-            "report": report_id,
-            "year": year,
+            "aims": "<p></p>",
+            "outcome": "<p></p>",
+            "collaborations": "<p></p>",
+            "strategic_context": "<p></p>",
+            "staff_time_allocation": "<p></p>",
+            "budget": "<p></p>",
         }
-    } else {
+    } else if (kind === "projectplan") {
         params = {
-            "old_id": 1,
-            "kind": kind,
+            "kind": "projectplan",
             "project": projectPk,
-            "details": {},
+            "background": "<p></p>",
+            "aims": false,
+            "outcome": "<p></p>",
+            "knowledge_transfer": "<p></p>",
+            "project_tasks": "<p></p>",
+            "listed_references": "<p></p>",
+            "methodology": "<p></p>",
+            "involves_plants": false,
+            "involves_animals": false,
+            "operating_budget": "<p></p>",
+            "operating_budget_external": "<p></p>",
+            "related_projects": "<p></p>",
+        }
+    } else if (kind === "studentreport") {
+        params = {
+            "kind": "studentreport",
+            "report": report_id,
+            "project": projectPk,
+            "year": year,
+            "progress_report": "<p></p>",
         }
 
+    } else if (kind === "progressreport") {
+        params = {
+            "kind": "progressreport",
+            "report": report_id,
+            "project": projectPk,
+            "year": year,
+            "is_final_report": false,
+            "context": "<p></p>",
+            "aims": "<p></p>",
+            "progress": "<p></p>",
+            "implications": "<p></p>",
+            "future": "<p></p>",
+        }
+    } else if (kind === "projectclosure") {
+        params = {
+            "kind": "projectclosure",
+            "project": projectPk,
+            "intended_outcome": "<p></p>",
+            "reason": "<p></p>",
+            "scientific_outputs": "<p></p>",
+            "knowledge_transfer": "<p></p>",
+            "data_location": "<p></p>",
+            "hardcopy_location": "<p></p>",
+            "backup_location": "<p></p>",
+        }
     }
 
 
