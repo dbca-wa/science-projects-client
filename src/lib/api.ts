@@ -1397,13 +1397,13 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
 
     // Create the document first (as a document object)
     const url = `documents/projectdocuments`
-
+    const project_id = Number(projectPk)
     let params;
 
     if (kind === "concept") {
         params = {
             "kind": "concept",
-            "project": projectPk,
+            "project": project_id,
             "aims": "<p></p>",
             "outcome": "<p></p>",
             "collaborations": "<p></p>",
@@ -1414,9 +1414,9 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
     } else if (kind === "projectplan") {
         params = {
             "kind": "projectplan",
-            "project": projectPk,
+            "project": project_id,
             "background": "<p></p>",
-            "aims": false,
+            "aims": "<p></p>",
             "outcome": "<p></p>",
             "knowledge_transfer": "<p></p>",
             "project_tasks": "<p></p>",
@@ -1432,7 +1432,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
         params = {
             "kind": "studentreport",
             "report": report_id,
-            "project": projectPk,
+            "project": project_id,
             "year": year,
             "progress_report": "<p></p>",
         }
@@ -1441,7 +1441,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
         params = {
             "kind": "progressreport",
             "report": report_id,
-            "project": projectPk,
+            "project": project_id,
             "year": year,
             "is_final_report": false,
             "context": "<p></p>",
@@ -1453,7 +1453,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
     } else if (kind === "projectclosure") {
         params = {
             "kind": "projectclosure",
-            "project": projectPk,
+            "project": project_id,
             "intended_outcome": "<p></p>",
             "reason": "<p></p>",
             "scientific_outputs": "<p></p>",

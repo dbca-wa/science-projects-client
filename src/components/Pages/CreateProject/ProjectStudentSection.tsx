@@ -73,6 +73,7 @@ export const ProjectStudentSection = (
                 <InputGroup>
                     <InputLeftAddon children={<FaUniversity />} />
                     <Input
+                        autoFocus
                         placeholder="Enter the corresponding organisation..."
                         value={organisation}
                         onChange={(e) => {

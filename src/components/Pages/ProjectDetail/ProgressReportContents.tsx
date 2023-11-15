@@ -250,17 +250,7 @@ export const ProgressReportContents = ({
                 </Flex>
             </Box>
 
-            {/* Actions */}
-            <ProgressReportDocActions
-                refetchData={refetch}
-                callSameData={handleSetSameYear}
-                progressReportData={selectedProgressReport}
-                documents={documents}
-            // setSelectedYear={setSelectedYear}
-            // setSelectedProgressReport={setSelectedProgressReport}
-            // projectPk={projectPk}
-            />
-            {/* Editors */}
+
 
             {isLoading ? (
                 <Box
@@ -298,6 +288,17 @@ export const ProgressReportContents = ({
                         }}
 
                     >
+                        {/* Actions */}
+                        <ProgressReportDocActions
+                            refetchData={refetch}
+                            callSameData={handleSetSameYear}
+                            progressReportData={selectedProgressReport}
+                            documents={documents}
+                        // setSelectedYear={setSelectedYear}
+                        // setSelectedProgressReport={setSelectedProgressReport}
+                        // projectPk={projectPk}
+                        />
+                        {/* Editors */}
 
                         <RichTextEditor
                             canEdit={userInTeam || userData?.is_superuser}

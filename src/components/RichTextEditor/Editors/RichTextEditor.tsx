@@ -46,7 +46,7 @@ interface IProps {
     data: string;
     titleTextSize?: string;
     section: EditorSubsections;
-    project_pk: number;
+    project_pk?: number;
     document_pk?: number;
     writeable_document_kind?: EditorSections | null;
     writeable_document_pk?: number | null;
@@ -194,11 +194,17 @@ export const RichTextEditor = ({
                                                                                                                 section === "progress_report" ? "Progress Report" :
                                                                                                                     section === "reason" ? "Reason" :
                                                                                                                         section === "intended_outcome" ? "Intended Outcome" :
-                                                                                                                            section === "data_location" ? "Intended Outcome" :
-                                                                                                                                section === "hardcopy_location" ? "Intended Outcome" :
-                                                                                                                                    section === "backup_location" ? "Intended Outcome" :
-                                                                                                                                        // scientific_outputs
-                                                                                                                                        "Scientific Outputs"
+                                                                                                                            section === "data_location" ? "Data Location" :
+                                                                                                                                section === "hardcopy_location" ? "Hardcopy Location" :
+                                                                                                                                    section === "backup_location" ? "Backup Location" :
+                                                                                                                                        section === "dm" ? "Director's Message" :
+                                                                                                                                            section === "service_delivery_intro" ? "Service Delivery Intro" :
+                                                                                                                                                section === "research_intro" ? "Research Intro" :
+                                                                                                                                                    section === "student_intro" ? "Student Intro" :
+                                                                                                                                                        section === "publications" ? "Publications" :
+
+                                                                                                                                                            // scientific_outputs
+                                                                                                                                                            "Scientific Outputs"
                         }
                     </Text>
                 </Flex>

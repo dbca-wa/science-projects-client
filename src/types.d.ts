@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 
 // Editor ============================================================================
 
+type AnnualReportSection = "dm" | "service_delivery_intro" | "research_intro" | "student_intro" | "publications";
 type ProjectSection = "title" | "description" | "tagline" | "externalDescription" | "externalAims";
 type ConceptPlanSection = "background" | "aims" | "outcome" | "collaborations" | "strategic_context" | "staff_time_allocation" | "budget";
 type ProjectPlanSection = "background" | "aims" | "outcome" | "knowledge_transfer" | "project_tasks" | "listed_references" | "data_management" | "methodology" | "specimens" | "operating_budget" | "operating_budget_external" | "related_projects";
@@ -10,9 +11,12 @@ type StudentReportSection = "progress_report";
 type ProjectClosureSection = "reason" | "intended_outcome" | "knowledge_transfer" | "data_location" | "hardcopy_location" | "backup_location" | "scientific_outputs";
 
 
-export type EditorType = "ProjectDetail" | "ProjectDocument";
-export type EditorSections = "Description" | "Concept Plan" | "Project Plan" | "Progress Report" | "Student Report" | "Project Closure";
-type EditorSubsections = ProjectSection | ConceptPlanSection | ProjectPlanSection | ProgressReportSection | StudentReportSection | ProjectClosureSection;
+export type EditorType = "ProjectDetail" | "ProjectDocument" | "AnnualReport";
+export type EditorSections =
+    "Annual Report" |
+    "Description" |
+    "Concept Plan" | "Project Plan" | "Progress Report" | "Student Report" | "Project Closure";
+type EditorSubsections = ProjectSection | ConceptPlanSection | ProjectPlanSection | ProgressReportSection | StudentReportSection | ProjectClosureSection | AnnualReportSection;
 
 
 
@@ -579,6 +583,26 @@ export interface IReport {
     research_intro: string | null;
     service_delivery_intro: string | null;
     student_intro: string | null;
+}
+
+export interface IReportCreation {
+    old_id?: number;
+    pk?: number;
+    created_at?: Date;
+    updated_at?: Date | null;
+    date_open: Date | null;
+    date_closed: Date | null;
+    year: number;
+
+    creator?: number;
+    modifier?: number;
+
+    dm: string | null;
+    publications: string | null;
+    research_intro: string | null;
+    service_delivery_intro: string | null;
+    student_intro: string | null;
+    seek_update: boolean;
 }
 
 // QUOTE ====================================================================
