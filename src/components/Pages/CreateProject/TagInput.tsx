@@ -43,7 +43,9 @@ const TagInput = ({ setTagFunction }: Props) => {
         const newTags = inputValue
 
             .split(', ')
-            .map((tag) => tag.trim())
+            // .map((tag) => tag.trim())
+            .map((tag) => tag.trim().replace(/,$/, ''))
+
             .filter((tag) => tag !== '')
             .filter((tag) => !tags.some((existingTag) => existingTag.toLowerCase() === tag.toLowerCase()));
 
