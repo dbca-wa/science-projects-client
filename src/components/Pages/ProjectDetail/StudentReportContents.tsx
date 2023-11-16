@@ -1,39 +1,32 @@
-
 // Maps out the document provided to the rich text editor components for student report documents. 
 
-import { Box, Button, Center, Flex, Select, Spinner, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
-import { DocumentActions } from "./DocumentActions"
-import { IProgressReport, IProjectDocuments, IProjectMember, IUserMe, IStudentReport } from "../../../types";
+import { Box, Button, Flex, Select, Spinner, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
+import { IProjectDocuments, IProjectMember, IUserMe, IStudentReport } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { useEffect, useState } from "react";
-// import { ProgressReportSelector } from "./ProgressReportSelector";
-import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions";
+import { StudentReportDocActions } from "./DocActions/StudentReportDocActions";
 import { motion } from "framer-motion";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
-import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
+import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
 import { useGetStudentReportAvailableReportYears } from "../../../lib/hooks/useGetStudentReportAvailableReportYears";
 import { getStudentReportForYear } from "../../../lib/api";
-import { StudentReportDocActions } from "./DocActions/StudentReportDocActions";
-import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
 
 interface Props {
     documents: IStudentReport[];
     all_documents: IProjectDocuments;
-    project_pk: number;
     userData: IUserMe;
     members: IProjectMember[];
     refetch: () => void;
+    projectPk: number | string;
 }
 
 export const StudentReportContents = ({
     userData, members,
     all_documents,
-    documents, refetch, project_pk
+    documents, refetch, projectPk
 }: Props) => {
     // Handling years
     const { availableStudentYearsLoading, availableStudentYearsData, refetchStudentYears } = useGetStudentReportAvailableReportYears(Number(documents[0].document?.project?.pk));
-
-
     const years = Array.from(new Set(documents.map(studentReport => studentReport.year))).sort((a, b) => b - a);
     const [selectedYear, setSelectedYear] = useState(() => {
         const years = documents.map((studentReport) => studentReport.year);
@@ -62,8 +55,6 @@ export const StudentReportContents = ({
     const mePk = userData?.pk ? userData?.pk : userData?.id;
     const userInTeam = useCheckUserInTeam(mePk, members);
 
-    // const projectPk = project_pk;
-
 
     const [forceRefresh, setForceRefresh] = useState(false);
 
@@ -76,11 +67,7 @@ export const StudentReportContents = ({
             setIsLoading(true);
 
             try {
-                const data = {
-                    "project": selectedStudentReport?.document?.project?.pk,
-                    "year": selectedYear,
-                }
-                const newPRData = await getStudentReportForYear(data);
+                const newPRData = await getStudentReportForYear(selectedYear, Number(projectPk));
                 setselectedStudentReport(newPRData);
             } catch (error) {
                 // Handle error
@@ -89,14 +76,13 @@ export const StudentReportContents = ({
                 setIsLoading(false);
             }
         };
-        if (selectedStudentReport) {
-            console.log("project pk is:", selectedStudentReport?.document?.project?.pk)
 
-            // fetchData();
+        fetchData();
 
-        }
 
-    }, [selectedYear, selectedStudentReport, forceRefresh])
+    }, [selectedYear, forceRefresh, projectPk])
+
+    useEffect(() => console.log(selectedStudentReport), [selectedStudentReport])
 
 
     useEffect(() => {
@@ -116,18 +102,18 @@ export const StudentReportContents = ({
         console.log('set year and selected doc')
     }
 
-    const refetchFunc = () => {
-        refetch();
-        setIsLoading(true);
-        const getHighestAvailable = () => {
-            const years = documents.map((studentReport) => studentReport.year);
-            const highestYear = Math.max(...years);
-            return highestYear;
+    // const refetchFunc = () => {
+    //     refetch();
+    //     setIsLoading(true);
+    //     const getHighestAvailable = () => {
+    //         const years = documents.map((studentReport) => studentReport.year);
+    //         const highestYear = Math.max(...years);
+    //         return highestYear;
 
-        }
-        const highestYear = getHighestAvailable();
-        // setSelectedYear(highestYear)
-    }
+    //     }
+    //     const highestYear = getHighestAvailable();
+    //     // setSelectedYear(highestYear)
+    // }
 
     useEffect(() => {
         setIsLoading(false);
@@ -144,7 +130,11 @@ export const StudentReportContents = ({
     //     // setSelectedYear(selectedYear);
     //     setIsLoading(false);
     // }
-    const { isOpen: isCreateProgressReportModalOpen, onOpen: onOpenCreateProgressReportModal, onClose: onCloseCreateProgressReportModal } = useDisclosure();
+
+
+
+
+
     const { isOpen: isCreateStudentReportModalOpen, onOpen: onOpenCreateStudentReportModal, onClose: onCloseCreateStudentReportModal } = useDisclosure();
 
     return (
@@ -170,7 +160,7 @@ export const StudentReportContents = ({
                 documentKind="studentreport"
                 onClose={onCloseCreateStudentReportModal}
                 isOpen={isCreateStudentReportModalOpen}
-                refetchData={refetchFunc}
+                refetchData={refetch}
             />
 
 
@@ -304,14 +294,10 @@ export const StudentReportContents = ({
                     >
                         {/* Actions */}
                         <StudentReportDocActions
-                            refetchData={refetchFunc}
+                            refetchData={refetch}
+                            callSameData={handleSetSameYear}
                             studentReportData={selectedStudentReport}
                             documents={documents}
-                            callSameData={handleSetSameYear}
-
-                        // setSelectedYear={setSelectedYear}
-                        // setselectedStudentReport={setselectedStudentReport}
-                        // projectPk={projectPk}
                         />
                         {/* Editors */}
 
@@ -321,37 +307,16 @@ export const StudentReportContents = ({
                             writeable_document_pk={selectedStudentReport?.pk}
 
 
-                            project_pk={selectedStudentReport.document.project.pk}
+                            project_pk={selectedStudentReport?.document?.project?.pk}
                             document_pk={selectedStudentReport?.document?.pk}
                             isUpdate={true}
 
 
                             editorType="ProjectDocument"
-                            key={`context${editorKey}`} // Change the key to force a re-render
+                            key={`progress${editorKey}`} // Change the key to force a re-render
                             data={selectedStudentReport?.progress_report}
                             section={"progress_report"}
                         />
-
-                        {/* <RichTextEditor
-                            canEdit={userInTeam || userData?.is_superuser}
-                            writeable_document_kind={'Progress Report'}
-                            writeable_document_pk={selectedProgressReport?.pk}
-
-                            project_pk={selectedProgressReport.document.project.pk}
-                            document_pk={selectedProgressReport?.document?.pk}
-                            isUpdate={true}
-
-
-
-
-                            editorType="ProjectDocument"
-                            key={`future${editorKey}`} // Change the key to force a re-render
-                            data={selectedProgressReport?.future}
-                            section={"future"}
-                        /> */}
-
-
-
                     </motion.div>
                 )}
 

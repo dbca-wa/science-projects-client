@@ -188,10 +188,10 @@ export const ProjectDetail = () => {
 
                     {/* STUDENT REPORT */}
                     {
-                        documents?.student_reports && documents.student_reports.length !== 0 && (
+                        documents?.student_reports && documents.student_reports.length !== 0 && projectPk && (
                             <TabPanel>
                                 <StudentReportContents
-                                    project_pk={projectData?.pk}
+                                    projectPk={projectPk}
                                     documents={documents.student_reports}
                                     refetch={refetch}
 

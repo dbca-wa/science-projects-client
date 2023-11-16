@@ -1,11 +1,9 @@
 // Maps out the document provided to the rich text editor components for progress report documents. 
 
-import { Box, Button, Center, Flex, Select, Spinner, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
-import { DocumentActions } from "./DocumentActions"
+import { Box, Button, Flex, Select, Spinner, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
 import { IProgressReport, IProjectDocuments, IProjectMember, IUserMe } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { useEffect, useState } from "react";
-// import { ProgressReportSelector } from "./ProgressReportSelector";
 import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions";
 import { motion } from "framer-motion";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
@@ -28,8 +26,6 @@ export const ProgressReportContents = ({
 }: Props) => {
     // Handling years
     const { availableProgressReportYearsLoading, availableProgressReportYearsData, refetchProgressYears } = useGetProgressReportAvailableReportYears(Number(documents[0].document?.project?.pk));
-
-
     const years = Array.from(new Set(documents.map(progressReport => progressReport.year))).sort((a, b) => b - a);
     const [selectedYear, setSelectedYear] = useState(() => {
         const years = documents.map((progressReport) => progressReport.year);
@@ -294,9 +290,6 @@ export const ProgressReportContents = ({
                             callSameData={handleSetSameYear}
                             progressReportData={selectedProgressReport}
                             documents={documents}
-                        // setSelectedYear={setSelectedYear}
-                        // setSelectedProgressReport={setSelectedProgressReport}
-                        // projectPk={projectPk}
                         />
                         {/* Editors */}
 
@@ -306,7 +299,7 @@ export const ProgressReportContents = ({
                             writeable_document_pk={selectedProgressReport?.pk}
 
 
-                            project_pk={selectedProgressReport.document.project.pk}
+                            project_pk={selectedProgressReport?.document?.project?.pk}
                             document_pk={selectedProgressReport?.document?.pk}
                             isUpdate={true}
 
