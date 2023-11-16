@@ -22,6 +22,9 @@ export const CreateStudentReportModal = ({ projectPk, documentKind, refetchData,
     const { register, handleSubmit, reset, watch } = useForm<ISpawnDocument>();
 
     const yearValue = watch('year')
+
+    useEffect(() => console.log(yearValue), [yearValue])
+
     const projPk = watch('projectPk');
 
     const [selectedReportId, setSelectedReportId] = useState<number>();

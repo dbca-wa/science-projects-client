@@ -1373,9 +1373,7 @@ export const deleteDocumentCall = async ({ projectPk, documentPk, documentKind }
 }
 
 
-export const getStudentReportForYear = async (data: { project: number; year: number }) => {
-    const project = data.project;
-    const year = data.year;
+export const getStudentReportForYear = async (year: number, project: number) => {
     const url = `documents/studentreports/${project}/${year}`
     const studentReportData = await instance.get(url).then(res => res.data)
     console.log(studentReportData);
@@ -1394,6 +1392,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
             "valid choice"
         )
     }
+    const yearAsNumber = Number(year);
 
     // Create the document first (as a document object)
     const url = `documents/projectdocuments`
@@ -1433,7 +1432,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
             "kind": "studentreport",
             "report": report_id,
             "project": project_id,
-            "year": year,
+            "year": yearAsNumber,
             "progress_report": "<p></p>",
         }
 
@@ -1442,7 +1441,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
             "kind": "progressreport",
             "report": report_id,
             "project": project_id,
-            "year": year,
+            "year": yearAsNumber,
             "is_final_report": false,
             "context": "<p></p>",
             "aims": "<p></p>",
