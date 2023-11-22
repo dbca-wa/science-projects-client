@@ -111,7 +111,7 @@ export const EditableSRTE = (
                             style={{
                                 position: "absolute",
                                 left: "32px",
-                                top: "89px",
+                                top: "76px",
                                 userSelect: "none",
                                 pointerEvents: "none",
 
@@ -158,7 +158,7 @@ export const EditableSRTE = (
 
                         console.log(e)
                         console.log('paragaph node clicked')
-                        setSelectedNodeType('paragraph')
+                        // setSelectedNodeType('paragraph')
                     }}
                 />
                 <NodeEventPlugin
@@ -168,7 +168,7 @@ export const EditableSRTE = (
 
                         console.log(e)
                         console.log('li node clicked')
-                        setSelectedNodeType('li')
+                        // setSelectedNodeType('li')
                     }}
                 />
 

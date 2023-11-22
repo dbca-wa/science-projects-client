@@ -6,7 +6,7 @@ import { ProjectOverviewCard } from "../components/Pages/ProjectDetail/ProjectOv
 import { ConceptPlanContents } from "../components/Pages/ProjectDetail/ConceptPlanContents";
 import { ProjectPlanContents } from "../components/Pages/ProjectDetail/ProjectPlanContents";
 import { ProgressReportContents } from "../components/Pages/ProjectDetail/ProgressReportContents";
-import { IFullProjectDetails, IProgressReport, IProjectData, IProjectDocuments, IProjectMember, IStudentReport } from "../types";
+import { IFullProjectDetails, IProgressReport, IProjectAreas, IProjectData, IProjectDocuments, IProjectMember, IStudentReport } from "../types";
 import { ManageTeam } from "../components/Pages/ProjectDetail/ManageTeam";
 import { useProject } from "../lib/hooks/useProject";
 import { useEffect, useState } from "react";
@@ -18,11 +18,12 @@ import useDistilledProjectTitle from "../lib/hooks/useDistlledProjectTitle";
 import { useUser } from "../lib/hooks/useUser";
 // import { ProgressReportSelector } from "../components/Pages/ProjectDetail/ProgressReportSelector";
 
-export const ProjectDetail = () => {
+export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.ReactNode => {
 
     const { projectPk } = useParams();
     const { isLoading, projectData, refetch } = useProject(projectPk);
 
+    const [location, setLocation] = useState<IProjectAreas | null>();
     const [baseInformation, setBaseInformation] = useState<IProjectData | null>();
     const [details, setDetails] = useState<IFullProjectDetails | null>();
     const [documents, setDocuments] = useState<IProjectDocuments | null>();
@@ -31,6 +32,7 @@ export const ProjectDetail = () => {
     useEffect(() => {
         console.log(projectData)
         if (!isLoading && projectData) {
+            setLocation(projectData.location);
             setBaseInformation(projectData.project);
             setDetails(projectData.details);
             setDocuments(projectData.documents);
@@ -38,187 +40,222 @@ export const ProjectDetail = () => {
         }
     }, [isLoading, projectData])
 
-    useEffect(() => {
-        console.log(documents)
-    })
-
-    // Refetch data on tab change
-    const [tabIndex, setTabIndex] = useState(0)
-
-    useEffect(() => {
-        refetch();
-    }, [tabIndex])
 
 
     const distilledTitle = useDistilledProjectTitle(projectData?.project?.title);
 
     const me = useUser();
 
-    return (
-        <>
-            <Head title={distilledTitle} />
-            <Tabs
-                isLazy
-                isFitted
-                variant={'enclosed'}
-                onChange={(index) => setTabIndex(index)}
-            >
-                <TabList mb='1em'>
-                    <Tab
-                        fontSize="sm"
-                    >Overview</Tab>
-                    {documents?.concept_plan && (
-                        <Tab fontSize="sm"
-                        >Concept Plan</Tab>
-                    )}
-                    {documents?.project_plan && (
-                        <Tab fontSize="sm"
-                        >Project Plan</Tab>
 
-                    )}
-                    {documents?.progress_reports && documents.progress_reports.length !== 0 && (
-                        <Tab fontSize="sm"
-                        >
-                            Progress Reports
-                        </Tab>
 
-                    )}
-                    {documents?.student_reports && documents.student_reports.length !== 0 && (
-                        <Tab fontSize="sm"
-                        >
-                            Student Reports
-                        </Tab>
+    // Refetch data on tab change and ensures falsey items remvoed from array
+    const tabs = [
+        'overview',
+        documents?.concept_plan && 'concept',
+        documents?.project_plan && 'project',
+        documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
+        documents?.student_reports && documents.student_reports.length > 0 && 'student',
+        documents?.project_closure && 'closure'
+    ].filter(Boolean);
 
-                    )}
-                    {documents?.project_closure && (
-                        <Tab fontSize="sm"
-                        >Project Closure</Tab>
+    const defaultTab = selectedTab || "overview";
+    const initialTabIndex = defaultTab ? tabs.indexOf(defaultTab) : 0;
 
-                    )}
-                </TabList>
-                <TabPanels>
-
-                    {/* OVERVIEW */}
-                    <TabPanel>
-                        {
-                            baseInformation ?
-                                (
-                                    <>
+    useEffect(() => {
+        console.log(documents);
+        console.log(defaultTab);
+        console.log(selectedTab);
+        console.log(tabs.indexOf(defaultTab))
+    })
 
 
 
-                                        <ProjectOverviewCard
-                                            baseInformation={baseInformation}
-                                            details={details}
-                                            members={members}
-                                            documents={documents}
-                                            refetchData={refetch}
-                                        />
 
-                                        {/* <ManageTeam /> */}
-                                        <ManageTeam
-                                            // team={members}
-                                            project_id={projectPk !== undefined ? Number(projectPk) : 0}
-                                        />
+    if (isLoading || !documents) {
+        return <Spinner />;
+    } else
+        return (
+            documents && (
+                <>
+                    <Head title={distilledTitle} />
+                    <Tabs
+                        isLazy
+                        isFitted
+                        variant={'enclosed'}
+                        // onChange={(index) => setTabIndex(index)}
+                        onChange={(index) => refetch()}
+                        defaultIndex={initialTabIndex}
+                    >
+                        <TabList mb='1em'>
+                            <Tab
+                                fontSize="sm"
+                                value="overview"
+                            >
+                                Overview
+                            </Tab>
+                            {documents?.concept_plan && (
+                                <Tab fontSize="sm"
+                                    value="concept"
+                                >
+                                    Concept Plan
+                                </Tab>
+                            )}
+                            {documents?.project_plan && (
+                                <Tab fontSize="sm"
+                                    value="project"
+                                >
+                                    Project Plan</Tab>
 
-                                        {/* <DocumentActions
+                            )}
+                            {documents?.progress_reports && documents.progress_reports.length !== 0 && (
+                                <Tab fontSize="sm"
+                                    value="progress"
+                                >
+                                    Progress Reports
+                                </Tab>
+
+                            )}
+                            {documents?.student_reports && documents.student_reports.length !== 0 && (
+                                <Tab fontSize="sm"
+                                    value="student"
+                                >
+                                    Student Reports
+                                </Tab>
+
+                            )}
+                            {documents?.project_closure && (
+                                <Tab fontSize="sm"
+                                    value="closure"
+                                >Project Closure</Tab>
+
+                            )}
+                        </TabList>
+                        <TabPanels>
+
+                            {/* OVERVIEW */}
+                            <TabPanel>
+                                {
+                                    baseInformation ?
+                                        (
+                                            <>
+
+
+
+                                                <ProjectOverviewCard
+                                                    location={location}
+                                                    baseInformation={baseInformation}
+                                                    details={details}
+                                                    members={members}
+                                                    documents={documents}
+                                                    refetchData={refetch}
+                                                />
+
+                                                {/* <ManageTeam /> */}
+                                                <ManageTeam
+                                                    // team={members}
+                                                    project_id={projectPk !== undefined ? Number(projectPk) : 0}
+                                                />
+
+                                                {/* <DocumentActions
                                             tabType="overview"
                                             documents={documents}
                                             projectData={projectData}
                                         /> */}
-                                    </>
-                                ) :
-                                <Spinner />
-                        }
-                    </TabPanel>
-
-
-                    {/* CONCEPT PLAN */}
-                    {
-                        documents?.concept_plan && (
-                            <TabPanel
-                            >
-                                <ConceptPlanContents
-                                    userData={me?.userData}
-                                    members={members}
-                                    document={documents.concept_plan}
-                                    all_documents={documents}
-                                    refetch={refetch}
-
-                                // projectPk={Number(projectPk)}
-                                />
+                                            </>
+                                        ) :
+                                        <Spinner />
+                                }
                             </TabPanel>
-                        )
-                    }
 
 
-                    {/* PROJECT PLAN */}
-                    {documents?.project_plan && (
-                        <TabPanel>
-                            <ProjectPlanContents
-                                refetch={refetch}
-                                document={documents.project_plan}
+                            {/* CONCEPT PLAN */}
+                            {
+                                documents?.concept_plan && (
+                                    <TabPanel
+                                    >
+                                        <ConceptPlanContents
+                                            userData={me?.userData}
+                                            members={members}
+                                            document={documents.concept_plan}
+                                            all_documents={documents}
+                                            refetch={refetch}
 
-                                all_documents={documents}
-
-                                userData={me?.userData}
-                                members={members}
-                            />
-                        </TabPanel>
-                    )}
-
-
-                    {/* PROGRESS REPORT */}
-                    {
-                        documents?.progress_reports && documents.progress_reports.length !== 0 && (
-                            <TabPanel>
-                                <ProgressReportContents
-                                    documents={documents.progress_reports}
-                                    refetch={refetch}
-
-                                    all_documents={documents}
-
-                                    userData={me?.userData}
-                                    members={members}
-
-                                />
-                            </TabPanel>
-                        )
-                    }
-
-                    {/* STUDENT REPORT */}
-                    {
-                        documents?.student_reports && documents.student_reports.length !== 0 && projectPk && (
-                            <TabPanel>
-                                <StudentReportContents
-                                    projectPk={projectPk}
-                                    documents={documents.student_reports}
-                                    refetch={refetch}
-
-                                    all_documents={documents}
-
-                                    userData={me?.userData}
-                                    members={members}
-
-                                //  selectedYear={selectedStudentReportYear}
-                                />
-                            </TabPanel>
-                        )
-                    }
+                                        // projectPk={Number(projectPk)}
+                                        />
+                                    </TabPanel>
+                                )
+                            }
 
 
-                    {/* PROJECT CLOSURE */}
-                    {
-                        documents?.project_closure && (
-                            <TabPanel>
-                                <ProjectClosureContents document={documents.project_closure} />
-                            </TabPanel>
-                        )
-                    }
-                </TabPanels>
-            </Tabs>
-        </>
-    )
+                            {/* PROJECT PLAN */}
+                            {documents?.project_plan && (
+                                <TabPanel>
+                                    <ProjectPlanContents
+                                        refetch={refetch}
+                                        document={documents.project_plan}
+
+                                        all_documents={documents}
+
+                                        userData={me?.userData}
+                                        members={members}
+                                    />
+                                </TabPanel>
+                            )}
+
+
+                            {/* PROGRESS REPORT */}
+                            {
+                                documents?.progress_reports && documents.progress_reports.length !== 0 && (
+                                    <TabPanel>
+                                        <ProgressReportContents
+                                            documents={documents.progress_reports}
+                                            refetch={refetch}
+
+                                            all_documents={documents}
+
+                                            userData={me?.userData}
+                                            members={members}
+
+                                        />
+                                    </TabPanel>
+                                )
+                            }
+
+                            {/* STUDENT REPORT */}
+                            {
+                                documents?.student_reports && documents.student_reports.length !== 0 && projectPk && (
+                                    <TabPanel>
+                                        <StudentReportContents
+                                            projectPk={projectPk}
+                                            documents={documents.student_reports}
+                                            refetch={refetch}
+
+                                            all_documents={documents}
+
+                                            userData={me?.userData}
+                                            members={members}
+
+                                        //  selectedYear={selectedStudentReportYear}
+                                        />
+                                    </TabPanel>
+                                )
+                            }
+
+
+                            {/* PROJECT CLOSURE */}
+                            {
+                                documents?.project_closure && (
+                                    <TabPanel>
+                                        <ProjectClosureContents document={documents.project_closure} />
+                                    </TabPanel>
+                                )
+                            }
+                        </TabPanels>
+                    </Tabs>
+                </>
+            )
+
+        )
 }
 
 

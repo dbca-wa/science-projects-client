@@ -10,6 +10,7 @@ import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
 import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
 import { useGetProgressReportAvailableReportYears } from "../../../lib/hooks/useGetProgressReportAvailableReportYears";
 import { getProgressReportForYear } from "../../../lib/api";
+import WordToHtmlConverter from "../../RichTextEditor/WordToHTML";
 
 interface Props {
     documents: IProgressReport[];
@@ -147,6 +148,8 @@ export const ProgressReportContents = ({
                 selectedProgressReportYear={selectedYear}
                 selectedProgressReport={selectedProgressReport}
             /> */}
+
+            {/* <WordToHtmlConverter /> */}
 
             <CreateProgressReportModal
                 projectPk={selectedProgressReport?.document?.project?.pk}

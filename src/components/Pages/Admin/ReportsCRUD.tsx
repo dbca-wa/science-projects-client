@@ -38,11 +38,27 @@ export const ReportsCRUD = () => {
                 onAddClose();
                 queryClient.invalidateQueries(["reports"]);
             },
-            onError: () => {
+            onError: (e: AxiosError) => {
+                // console.log(Array.isArray(e.response.data))
+                let errorDescription = "";
+
+                // Check if e.response.data is an object
+                if (typeof e.response.data === "object" && e.response.data !== null) {
+                    // Iterate over the properties of the object
+                    Object.keys(e.response.data).forEach(key => {
+                        // Assert the type of e.response.data[key] as string
+                        errorDescription += `${key}: ${String(e.response.data[key])}\n`;
+                    });
+                } else {
+                    // If not an object, use the original data
+                    errorDescription = String(e.response.data);
+                }
+
                 console.log("error")
                 toast({
                     status: "error",
                     title: "Failed",
+                    description: `${errorDescription}`,
                     position: "top-right"
                 })
             },

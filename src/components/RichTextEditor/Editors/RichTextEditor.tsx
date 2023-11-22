@@ -27,7 +27,7 @@ import { OptionsBar } from "../OptionsBar/OptionsBar";
 
 import '../../../styles/texteditor.css'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getRoot, $getSelection, ParagraphNode } from "lexical";
+import { $getRoot, $getSelection, ParagraphNode, TextNode } from "lexical";
 
 
 
@@ -125,7 +125,6 @@ export const RichTextEditor = ({
         nodes: [
             ListNode,
             ListItemNode,
-            HeadingNode,
         ],
     };
 

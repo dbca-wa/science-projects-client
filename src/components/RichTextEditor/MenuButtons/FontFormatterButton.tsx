@@ -2,7 +2,6 @@
 
 import { RxLetterCaseCapitalize } from "react-icons/rx"
 import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton"
-import { AiOutlineStrikethrough } from "react-icons/ai"
 import { MdSubscript, MdSuperscript } from "react-icons/md"
 import { BsTrash3 } from "react-icons/bs"
 import { useState } from "react"
@@ -12,9 +11,6 @@ export const FontFormatterButton = () => {
 
     const [currentTitle, setCurrentTitle] = useState<string>('Format')
 
-    const StrikeThroughFunc = () => {
-        setCurrentTitle("Strike")
-    }
     const SubscriptFunc = () => {
         setCurrentTitle("Sub")
     }
@@ -30,17 +26,11 @@ export const FontFormatterButton = () => {
         <BaseToolbarMenuButton
             title={currentTitle}
             menuIcon={
-                currentTitle === "Strike" || currentTitle === "Strikethrough" ? AiOutlineStrikethrough :
-                    currentTitle === "Sub" || currentTitle === "Subscript" ? MdSubscript :
-                        currentTitle === "Super" || currentTitle === "Superscript" ? MdSuperscript :
-                            currentTitle === "Clear" || currentTitle === "Clear Formatting" ? BsTrash3 :
-                                RxLetterCaseCapitalize}
+                currentTitle === "Sub" || currentTitle === "Subscript" ? MdSubscript :
+                    currentTitle === "Super" || currentTitle === "Superscript" ? MdSuperscript :
+                        currentTitle === "Clear" || currentTitle === "Clear Formatting" ? BsTrash3 :
+                            RxLetterCaseCapitalize}
             menuItems={[
-                {
-                    leftIcon: AiOutlineStrikethrough,
-                    text: "Strikethrough",
-                    onClick: StrikeThroughFunc,
-                },
                 {
                     leftIcon: MdSubscript,
                     text: "Subscript",
@@ -58,10 +48,5 @@ export const FontFormatterButton = () => {
                 },
             ]}
         />
-        // <Button
-        //     leftIcon={<RxLetterCaseCapitalize />}
-        //     rightIcon={<FaCaretDown />}
-        // >
-        // </Button>
     )
 }

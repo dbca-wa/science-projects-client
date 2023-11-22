@@ -1,11 +1,21 @@
 // Route for reviewing all reports.
 // NOTE: Currently used as a Lexical text editor page, until implemented.
 
-import { Box, Grid } from "@chakra-ui/react"
+import { Box, Text, Button, Flex, Grid, useDisclosure, Image, Center, Divider, AbsoluteCenter, useColorMode, Spinner } from "@chakra-ui/react"
 import { Head } from "../components/Base/Head"
-import { RichTextEditor } from "../components/RichTextEditor/Editors/RichTextEditor"
+import { AddReportPDFModal } from "../components/Modals/AddReportPDFModal"
+import { useGetARARsWithPDF } from "../lib/hooks/useGetARARsWithPDF";
+import { FaEdit, FaFileDownload } from "react-icons/fa";
+import { MdDownload } from "react-icons/md";
+import { ChangeReportPDFModal } from "../components/Modals/ChangeReportPDFModal";
+import { motion } from "framer-motion";
+import { AnnualReportPDFGridItem } from "../components/Pages/Reports/AnnualReportPDFGridItem";
+
+
 
 export const Reports = () => {
+    const { isOpen: isAddPDFOpen, onOpen: onAddPDFOpen, onClose: onAddPDFClose } = useDisclosure();
+    const { reportsWithPDFData, reportsWithPDFLoading, refetchReportsWithPDFs } = useGetARARsWithPDF()
 
     return (
         <>
@@ -13,27 +23,67 @@ export const Reports = () => {
                 mt={5}
             >
                 <Head title={"Reports"} />
-
-                <Grid
-                    gridTemplateColumns={"repeat(3, 1fr)"}
+                <AddReportPDFModal
+                    isAddPDFOpen={isAddPDFOpen}
+                    onAddPDFClose={onAddPDFClose}
+                    refetchPDFs={refetchReportsWithPDFs}
+                />
+                <Flex
+                    justifyContent={"flex-end"}
+                    w={"100%"}
                 >
-                    <Box>
-
+                    <Box
+                        justifySelf={
+                            "flex-end"
+                        }
+                    >
+                        <Button
+                            colorScheme="green"
+                            onClick={onAddPDFOpen}
+                        >
+                            Add PDF
+                        </Button>
                     </Box>
 
-                </Grid>
+                </Flex>
 
-                <div style={{ fontSize: 20 }}>
-                    {/* <Latex>
+                {(!reportsWithPDFLoading && reportsWithPDFData) ?
+                    <Grid
+                        gridTemplateColumns={{
+                            base: "repeat(1, 1fr)",
+                            lg: "repeat(2, 1fr)",
+                            'xl': "repeat(4, 1fr)",
+                        }}
+                        mt={6}
+                        gridGap={4}
+                    >
+                        {reportsWithPDFData
+                            .sort((a, b) => b.year - a.year)
+                            .map((report, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ y: -10, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    exit={{ y: 10, opacity: 0 }}
+                                    transition={{ duration: 0.7, delay: (((index + 1) / 7)) }}
+                                    style={{
+                                        height: "100%",
+                                        animation: "oscillate 8s ease-in-out infinite",
+                                    }}
 
-            </Latex> */}
-                    Not yet implemented.
-                </div>
-                {/* <RichTextEditor
-                    data={
-                        "<p>Test</p><ol><li>Hiii\nMy name is Jaridnbsp;Mark</li><li>Bye</li></ol><hr/><p>Did it work?</p>"
-                    }
-                /> */}
+                                >
+                                    <AnnualReportPDFGridItem
+                                        report={report}
+                                        refetchFunction={refetchReportsWithPDFs}
+                                    />
+                                </motion.div>
+                            ))}
+
+
+                    </Grid>
+                    : <Spinner />
+                }
+
             </Box>
         </>
     )

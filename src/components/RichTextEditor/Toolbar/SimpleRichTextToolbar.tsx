@@ -1,18 +1,13 @@
 // Toolbar for the simple rich text editor
 
-import { Box, Divider, Flex, useBreakpointValue, useColorMode } from "@chakra-ui/react"
-import { AlignButton } from "../MenuButtons/AlignButton"
+import { Divider, Flex, useBreakpointValue, useColorMode } from "@chakra-ui/react"
 import { RefObject, SetStateAction, useEffect, useState } from "react"
 import { useToolbarClickListener } from "../../../lib/hooks/useToolbarClickListener"
 import { TimeButtons } from "./TimeButtons";
-import { ElementTypeButton } from "../MenuButtons/ElementTypeButton";
 import { BoldButton } from "../Buttons/BoldButton";
 import { VerticalDivider } from "./VerticalDivider";
-import { InsertButton } from "../MenuButtons/InsertButton";
 import { ItalicsButton } from "../Buttons/ItalicsButton";
 import { UnderlineButton } from "../Buttons/UnderlineButton";
-import { FontFormatterButton } from "../MenuButtons/FontFormatterButton";
-import { ToolbarToggleBtn } from "../Buttons/ToolbarToggleBtn";
 import { SimpleFontFormatterButton } from "../MenuButtons/SimpleFontFormatterButton";
 
 

@@ -77,6 +77,7 @@ export const ProjectPlanEndorsements = (
     const [dmEndRequired, setDmEndRequired] = useState(document?.endorsements?.dm_endorsement_required);
 
 
+
     const [bmEndProvided, setBmEndProvided] = useState(document?.endorsements?.bm_endorsement_provided);
     const [bmEndRequired, setBmEndRequired] = useState(document?.endorsements?.bm_endorsement_required);
 
@@ -266,7 +267,7 @@ export const ProjectPlanEndorsements = (
                             </Text>
                         </Box>
                         {/* Data Collection */}
-                        <Grid
+                        {/* <Grid
                             gridTemplateColumns={"repeat(1, 1fr)"}
                             gridRowGap={4}
                             alignItems={"center"}
@@ -293,6 +294,8 @@ export const ProjectPlanEndorsements = (
                                         dmEndRequired
                                     }
                                     {...register('dataManagerEndorsementRequired', { value: dmEndRequired })}
+                                    {...register('dataManagerEndorsementRequired', { value: true })}
+
                                     mr={3}
                                 />
 
@@ -348,7 +351,7 @@ export const ProjectPlanEndorsements = (
 
                             </Flex>
 
-                        </Grid>
+                        </Grid> */}
 
                         {/* Biometrician */}
                         <Grid
@@ -360,8 +363,8 @@ export const ProjectPlanEndorsements = (
                             borderColor={"gray.300"}
                             p={4}
                             rounded={"xl"}
-                            roundedTop={0}
-                            borderTop={0}
+                            roundedTop={'xl'}
+                            // borderTop={0}
                             roundedBottom={0}
                         >
 
@@ -376,7 +379,7 @@ export const ProjectPlanEndorsements = (
                                     <Text
                                         fontWeight={"semibold"}
                                     >
-                                        Biometrician Required?
+                                        Biometrician Endorsement Required?
                                     </Text>
                                 </Box>
                                 <Checkbox
@@ -451,7 +454,7 @@ export const ProjectPlanEndorsements = (
                             borderTop={0}
                             roundedBottom={0}
                         >
-                            <Flex
+                            {/* <Flex
                                 alignItems={"center"}
                                 userSelect={"none"}
                             >
@@ -475,7 +478,7 @@ export const ProjectPlanEndorsements = (
 
                                 />
 
-                            </Flex>
+                            </Flex> */}
 
 
                             {/* {
@@ -487,9 +490,10 @@ export const ProjectPlanEndorsements = (
                                     flex={1}
                                 >
                                     <Text
-                                        color={involvesPlantsValue ? "black" : "gray.500"}
+                                        // color={involvesPlantsValue ? "black" : "gray.500"}
+                                        fontWeight={"semibold"}
                                     >
-                                        HC Endorsement Required?</Text>
+                                        Herbarium Curator's Endorsement Required?</Text>
                                 </Box>
                                 <Checkbox
                                     defaultChecked={
@@ -564,7 +568,7 @@ export const ProjectPlanEndorsements = (
                             borderTop={0}
                         // roundedBottom={0}
                         >
-                            <Flex
+                            {/* <Flex
                                 alignItems={"center"}
                                 userSelect={"none"}
                             >
@@ -588,7 +592,7 @@ export const ProjectPlanEndorsements = (
                                 />
 
 
-                            </Flex>
+                            </Flex> */}
 
                             {/* {involvesAnimalsValue === true &&
                             ( */}
@@ -601,9 +605,11 @@ export const ProjectPlanEndorsements = (
                                     flex={1}
                                 >
                                     <Text
-                                        color={involvesAnimalsValue ? "black" : "gray.500"}
+                                        fontWeight={"semibold"}
+
+                                    // color={involvesAnimalsValue ? "black" : "gray.500"}
                                     >
-                                        AEC Endorsement Required?
+                                        Animal Ethics Committee Endorsement Required?
                                     </Text>
                                 </Box>
                                 <Box
@@ -701,7 +707,7 @@ export const ProjectPlanEndorsements = (
                                 }
                                 onClick={onOpen}
                             >
-                                Seek Endorsements
+                                Send Emails
                             </Button>
                             <Button
                                 mx={1}
@@ -724,7 +730,7 @@ export const ProjectPlanEndorsements = (
                         </Flex>
                     </Grid>
                 </Flex>
-            </Box>
+            </Box >
         </>
 
 

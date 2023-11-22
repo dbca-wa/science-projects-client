@@ -5,7 +5,7 @@ import { AiFillCalendar, AiFillEdit, AiFillTag } from "react-icons/ai"
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineExternalLink } from 'react-icons/hi'
 import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
-import { IFullProjectDetails, IProjectData, IProjectDocuments, IProjectMember } from "../../../types";
+import { IFullProjectDetails, IProjectAreas, IProjectData, IProjectDocuments, IProjectMember, ISimpleLocationData } from "../../../types";
 import { FaEdit, FaEllipsisH, FaEllipsisV, FaLock, FaLockOpen, FaTrash, FaUserFriends } from "react-icons/fa";
 import { GiMaterialsScience } from "react-icons/gi";
 import { MdMoreVert, MdScience } from "react-icons/md";
@@ -33,6 +33,7 @@ import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModa
 import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
 
 interface IProjectOverviewCardProps {
+    location: IProjectAreas;
     baseInformation: IProjectData;
     details: IFullProjectDetails | null | undefined;
     members: IProjectMember[];
@@ -42,7 +43,7 @@ interface IProjectOverviewCardProps {
 
 
 export const ProjectOverviewCard = (
-    { baseInformation, details, members, refetchData, documents }: IProjectOverviewCardProps
+    { location, baseInformation, details, members, refetchData, documents }: IProjectOverviewCardProps
 ) => {
 
 
@@ -51,6 +52,7 @@ export const ProjectOverviewCard = (
     const { colorMode } = useColorMode();
     useEffect(() => {
         console.log(baseInformation)
+        console.log(details)
     })
 
 
@@ -233,6 +235,15 @@ export const ProjectOverviewCard = (
                 <>
                     <EditProjectModal
                         projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
+                        currentImage={baseInformation?.image}
+                        currentBa={baseInformation?.business_area}
+                        currentResearchFunction={details?.base?.research_function}
+                        currentService={details?.base?.service}
+                        currentDates={[baseInformation?.start_date, baseInformation?.end_date]}
+                        currentKeywords={[baseInformation?.keywords]}
+                        currentTitle={baseInformation?.title}
+                        currentAreas={location?.areas}
+                        currentDataCustodian={details?.base?.data_custodian?.id}
                         isOpen={isEditModalOpen}
                         onClose={onCloseEditModal}
                         refetchData={refetchData}

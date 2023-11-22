@@ -1,11 +1,11 @@
 // Used to display the tasks and projects of a user in the traditional layout
 
-import { AccordionPanel, Box, AccordionButton, Accordion, AccordionIcon, AccordionItem, Flex, Text, Center, Button, Grid, useColorMode, Spinner } from "@chakra-ui/react"
+import { AccordionPanel, Box, AccordionButton, Accordion, AccordionIcon, AccordionItem, Flex, Text, Center, Button, Grid, useColorMode, Spinner, Divider } from "@chakra-ui/react"
 import { FcHighPriority, FcOk } from "react-icons/fc"
 import { AiFillProject } from "react-icons/ai"
 import { useGetMyTasks } from "../../../lib/hooks/useGetMyTasks"
 import { useGetMyProjects } from "../../../lib/hooks/useGetMyProjects"
-import { IProjectData, ITaskDisplayCard } from "../../../types"
+import { IProjectData, IMainDoc, ITaskDisplayCard } from "../../../types"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext"
@@ -13,6 +13,8 @@ import { TraditionalTaskDisplay } from "./TraditionalTaskDisplay"
 import { AddIcon } from "@chakra-ui/icons"
 import { GoProjectRoadmap } from "react-icons/go"
 import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE"
+import { useGetDocumentsPendingApproval } from "../../../lib/hooks/useGetDocumentsPendingApproval"
+import { HiDocumentCheck } from "react-icons/hi2";
 
 
 interface ITaskFromAPI {
@@ -43,9 +45,31 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
     }, [tasksLoading, taskData])
 
 
-    const { projectData, projectsLoading } = useGetMyProjects()
+    const { projectData, projectsLoading } = useGetMyProjects();
+
+    const { pendingProjectDocumentData, projectDocumentDataLoading } = useGetDocumentsPendingApproval();
 
     const { colorMode } = useColorMode();
+
+    const formattedKind = (kind: string) => {
+        // "conceptplan" | "projectplan" | "progressreport" | "studentreport" | "projectclosure"
+        if (kind === "conceptplan") {
+            return "Concept Plan"
+        } else if (kind === "projectplan") {
+            return "Project Plan"
+        } else if (kind === "progressreport") {
+            return "Progress Report"
+        } else if (kind === "projectclosure") {
+            return "Project Closure"
+        } else if (kind === "studentreport") {
+            return "Student Report"
+        }
+        else {
+            // catchall 
+
+            return kind
+        }
+    }
 
     // Once the component receives new data, update the state accordingly
     useEffect(() => {
@@ -77,8 +101,15 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
         }
     }, [taskDataState, tasksLoading]);
 
+
+    // useEffect(() => {
+    //     setCombinedData((prev) => ...prev + )
+
+    // }, [pendingProjectDocumentData, projectDocumentDataLoading])
+
     const defaultIndex = [
-        (taskData?.inprogress.length + taskData?.todo.length) <= 5 && (taskData?.inprogress?.length + taskData?.todo?.length) >= 1 ? 0 : null,
+        (taskData?.inprogress.length + taskData?.todo.length) <= 5
+            && (taskData?.inprogress?.length + taskData?.todo?.length) >= 1 ? 0 : null,
         1
         // projectData?.length <= 5 && projectData?.length >= 1 ? 1 : null,
     ].map((index) => (index !== null ? index : -1));
@@ -96,6 +127,33 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
         }
         else {
             navigate(`projects/${pk}`)
+
+        }
+    }
+
+    const goToProjectDocument = (pk: number | undefined, document: IMainDoc) => {
+
+        let urlkind = '';
+        if (document?.kind === "progressreport") {
+            urlkind = 'progress'
+        } else if (document?.kind === "projectclosure") {
+            urlkind = 'closure'
+        } else if (document?.kind === "studentreport") {
+            urlkind = 'student'
+        } else if (document?.kind === "concept") {
+            urlkind = 'concept'
+        } else if (document?.kind === "projectplan") {
+            urlkind = 'project'
+        }
+
+        if (pk === undefined) {
+            console.log("The Pk is undefined. Potentially use 'id' instead.")
+        }
+        else if (isOnProjectsPage) {
+            navigate(`${pk}/${urlkind}`)
+        }
+        else {
+            navigate(`projects/${pk}/${urlkind}`)
 
         }
     }
@@ -131,14 +189,14 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                         My Tasks
                                     </Box>
                                     {
-                                        combinedData?.length >= 1 ?
+                                        (combinedData?.length >= 1 || pendingProjectDocumentData?.length > 1) ?
                                             <Box
                                                 display={"inline-flex"}
                                                 justifyContent={"center"}
                                                 alignItems={"center"}
                                             >
                                                 <Box mr={2}>
-                                                    {combinedData?.length}
+                                                    {combinedData?.length + pendingProjectDocumentData?.length}
                                                 </Box>
                                                 <FcHighPriority />
                                             </Box>
@@ -167,6 +225,69 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                     />
                                                 )
                                             })}
+
+                                            {
+
+                                                !(projectDocumentDataLoading && pendingProjectDocumentData?.length >= 1) ?
+                                                    (
+                                                        pendingProjectDocumentData?.map((document: IMainDoc, index: number) => (
+                                                            <Flex
+                                                                key={index}
+                                                                alignItems={"center"}
+                                                                border={"1px solid"}
+                                                                borderTopWidth={0}
+                                                                borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
+                                                                w={"100%"}
+                                                                p={2}
+                                                                onClick={() => goToProjectDocument(document?.project?.pk ? document?.project?.pk : document?.project?.id, document)}
+                                                                _hover={{
+                                                                    color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                                                    textDecoration: "underline",
+                                                                    cursor: "pointer"
+                                                                }}
+                                                            >
+                                                                <Center
+                                                                    color={colorMode === "light" ? "red.600" : "red.200"}
+                                                                    mr={3}
+                                                                    alignItems={"center"}
+                                                                    alignContent={"center"}
+                                                                    boxSize={5}
+                                                                    w={"20px"}
+
+                                                                >
+                                                                    <HiDocumentCheck />
+                                                                </Center>
+
+                                                                <Box
+                                                                    mx={0}
+                                                                    maxW={"125px"}
+                                                                    w={"100%"}
+                                                                >
+
+                                                                    <Text>{formattedKind(document?.kind)}</Text>
+
+                                                                </Box>
+                                                                <Divider
+                                                                    orientation='vertical'
+                                                                    // ml={-6}
+                                                                    mr={5}
+                                                                />
+                                                                <SimpleDisplaySRTE
+
+                                                                    data={document?.project.title}
+                                                                    displayData={document?.project.title}
+                                                                    displayArea="traditionalProjectTitle"
+                                                                />
+
+
+                                                            </Flex>
+                                                        ))
+
+
+                                                    ) : null
+                                            }
+
+
                                         </Grid>
                                     )
                                         : <Center>
@@ -275,7 +396,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                 mr={3}
                                                                 alignItems={"center"}
                                                                 alignContent={"center"}
-                                                                boxSize={3}
+                                                                boxSize={5}
                                                             >
                                                                 <GoProjectRoadmap />
                                                             </Center>
@@ -315,6 +436,119 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                 </AccordionPanel>
 
                             </AccordionItem>
+
+                            {/* 
+
+                            {!projectDocumentDataLoading &&
+                                (
+                                    <AccordionItem
+                                        borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
+                                        borderBottom={"none"}
+                                    >
+                                        <AccordionButton
+                                            bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                                            color={colorMode === "light" ? "black" : "white"}
+                                            _hover={colorMode === "light" ? { bg: 'gray.300', color: "black" } : { bg: 'gray.500', color: 'white' }}
+                                            userSelect={"none"}
+                                        >
+                                            <Box as="span" flex='1' textAlign='left'>
+                                                Project Documents Pending Approval
+                                            </Box>
+                                            {pendingProjectDocumentData?.length >= 1 ?
+                                                <Box
+                                                    display={"inline-flex"}
+                                                    justifyContent={"center"}
+                                                    alignItems={"center"}
+                                                >
+                                                    <Box mr={2}>
+                                                        {pendingProjectDocumentData?.length}
+                                                    </Box>
+                                                    <HiDocumentCheck />
+
+                                                </Box>
+                                                : null
+                                            }
+                                            <AccordionIcon />
+                                        </AccordionButton>
+
+                                        <AccordionPanel
+                                            pb={4}
+                                            userSelect={"none"}
+                                            px={0}
+                                            pt={0}
+                                        >
+                                            {
+
+                                                pendingProjectDocumentData?.length >= 1 ?
+                                                    (
+                                                        <Grid
+                                                            justifyItems={"start"}
+                                                            w={"100%"}
+                                                        >
+                                                            {pendingProjectDocumentData?.map((document: IMainDoc, index: number) => (
+                                                                <Flex
+                                                                    key={index}
+                                                                    alignItems={"center"}
+                                                                    border={"1px solid"}
+                                                                    borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
+                                                                    w={"100%"}
+                                                                    p={2}
+                                                                    onClick={() => goToProjectDocument(document?.project?.pk ? document?.project?.pk : document?.project?.id, document)}
+                                                                    _hover={{
+                                                                        color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                                                        textDecoration: "underline",
+                                                                        cursor: "pointer"
+                                                                    }}
+                                                                >
+                                                                    <Center
+                                                                        color={colorMode === "light" ? "red.600" : "red.200"}
+                                                                        mr={3}
+                                                                        alignItems={"center"}
+                                                                        alignContent={"center"}
+                                                                        boxSize={5}
+                                                                    >
+                                                                        <HiDocumentCheck />
+                                                                    </Center>
+                                                                    <Box
+                                                                        mx={0}
+                                                                        w={"100px"}
+                                                                    >
+
+                                                                        <Text>{formattedKind(document?.kind)}</Text>
+
+                                                                    </Box>
+                                                                    <Divider
+                                                                        orientation='vertical'
+                                                                        // ml={-6}
+                                                                        mr={5}
+                                                                    />
+                                                                    <SimpleDisplaySRTE
+
+                                                                        data={document?.project.title}
+                                                                        displayData={document?.project.title}
+                                                                        displayArea="traditionalProjectTitle"
+                                                                    />
+
+
+                                                                </Flex>
+                                                            ))}
+                                                        </Grid>
+                                                    ) :
+                                                    <Text
+                                                        mt={4}
+                                                        mx={2}
+                                                    >
+                                                        There are no project documents pending approval
+
+                                                    </Text>
+                                            }
+                                        </AccordionPanel>
+
+                                    </AccordionItem>
+                                )
+
+                            } */}
+
 
                         </Accordion>
 

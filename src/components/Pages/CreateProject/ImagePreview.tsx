@@ -7,6 +7,9 @@ export const ImagePreview: React.FC<{ selectedFile: File | null }> = ({ selected
     const width = 600;
     const height = width * aspectRatio;
 
+    // console.log(URL.createObjectURL(selectedFile))
+    const imageUrl = selectedFile ? URL.createObjectURL(selectedFile) : "";
+
     return (
         <>
             {selectedFile && (
@@ -21,7 +24,7 @@ export const ImagePreview: React.FC<{ selectedFile: File | null }> = ({ selected
                     boxShadow="0px 20px 30px -10px rgba(0, 0, 0, 0.3), 0px 4px 5px -2px rgba(0, 0, 0, 0.06), -3px 0px 10px -2px rgba(0, 0, 0, 0.1), 3px 0px 10px -2px rgba(0, 0, 0, 0.1)"
                 >
                     <Image
-                        src={URL.createObjectURL(selectedFile)}
+                        src={imageUrl}
                         alt="Preview"
                         objectFit="cover"
                         h="100%"

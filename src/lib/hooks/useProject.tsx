@@ -5,7 +5,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { getFullProject } from "../api";
 
-export const useProject = (projectPk: undefined | string) => {
+export const useProject = (projectPk: undefined | string | number) => {
     const { isLoading, data, refetch } = useQuery(["project", projectPk], getFullProject, {
         retry: false,
     });

@@ -33,9 +33,9 @@ import { useUser } from "../../lib/hooks/useUser"
 
 interface INewProjectModalProps {
     projectType: string;
+    icon: IconType;
     isOpen: boolean;
     onClose: () => void;
-    icon: IconType;
 }
 
 export const CreateProjectModal = ({ projectType, isOpen, onClose, icon }: INewProjectModalProps) => {

@@ -1,4 +1,4 @@
-import { Box, Button, Center, Flex, Grid, Tag, Text, ToastId, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Divider, Flex, Grid, Tag, Text, ToastId, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
 import { ITaskDisplayCard } from "../../../types";
 import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
@@ -8,6 +8,9 @@ import { CloseIcon, CheckIcon } from "@chakra-ui/icons";
 import { MutationError, MutationSuccess, completeTask, deletePersonalTask } from "../../../lib/api";
 import { BsFlagFill } from 'react-icons/bs'
 import { TaskDetailsModal } from "../../Modals/TaskDetailsModal";
+import { HiDocumentCheck } from "react-icons/hi2";
+import { FaUser } from "react-icons/fa";
+import { MdPriorityHigh } from "react-icons/md";
 interface Props {
     task: ITaskDisplayCard;
 }
@@ -186,105 +189,132 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
                 task={task}
             />
             <Flex
-                minH={"40px"}
-                // py={2}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                alignItems={"center"}
+                border={"1px solid"}
+                borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
+                w={"100%"}
+                p={2}
+                _hover={{
+                    color: colorMode === "dark" ? "blue.100" : "blue.300",
+                    textDecoration: "underline",
+                    cursor: "pointer"
+                }}
             >
-                <Flex
+                <Center
+                    color={colorMode === "light" ? "red.600" : "red.200"}
+                    mr={2}
                     alignItems={"center"}
-                    border={"1px solid"}
-                    borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-                    w={"100%"}
-                    p={2}
+                    alignContent={"center"}
+                    boxSize={5}
+                    w={"20px"}
                 >
-                    <Center
-                        color={"red.600 "}
-                        mr={3}
-                        alignItems={"center"}
-                        alignContent={"center"}
-                        boxSize={3}
-                    >
-                        <BsFlagFill />
-                    </Center>
-                    <Flex
-                    >
-                        <Text
-                            color={
-                                colorMode === "dark" ? "blue.200" : "blue.400"
-                            }
-                            fontWeight={"bold"}
-                            cursor={"pointer"}
-                            _hover={
-                                {
-                                    color: colorMode === "dark" ? "blue.100" : "blue.300",
-                                    textDecoration: "underline",
-                                }
-                            }
-                            onClick={() => {
-                                if (task?.project?.pk) {
-                                    goToProject(task.project.pk);
-                                }
-                                else {
-                                    onOpen();
-                                }
-                            }}
-                        >
-                            {`${task.name}`}
-                        </Text>
-                    </Flex>
+                    {task.task_type === "personal" ?
+                        <FaUser /> : <MdPriorityHigh />
+                    }
+                </Center>
+                <Box
+                    mx={0}
+                    maxW={"125px"}
+                    w={"100%"}
 
-                    <Flex
-                        alignItems="center"
-                        justifyContent={'flex-end'}
-                        right={0}
-                        flex={1}
-                        pl={4}
+                >
+                    {task.task_type === "personal" ?
+                        <Text>Personal</Text>
+                        : <Text>Assigned</Text>
 
-                    >
-                        {task.task_type === "personal"
-                            &&
-                            // isHovered &&
-                            (
-                                <>
-                                    <Button
-                                        size="xs"
-                                        isDisabled={isDeleting}
-                                        onClick={() => handleDeleteClick(task.pk)}
-                                    >
-                                        <CloseIcon boxSize={2} />
-                                    </Button>
-                                    <Button
-                                        isDisabled={isCompleting}
-                                        ml={2}
-                                        size={"xs"}
-                                        bg={"green.500"}
-                                        color={"white"}
-                                        _hover={{
-                                            bg: "green.400"
-                                        }}
-                                        onClick={() => handleCompletion(task.pk)}
-                                    >
-                                        <CheckIcon boxSize={2} />
-                                    </Button>
+                    }
 
-                                </>
-                            )
+
+                </Box>
+                <Divider
+                    orientation='vertical'
+                    // ml={-6}
+                    mr={5}
+                />
+                {/* <SimpleDisplaySRTE
+
+                                                                        data={document?.project.title}
+                                                                        displayData={document?.project.title}
+                                                                        displayArea="traditionalProjectTitle"
+                                                                    /> */}
+
+                <Text
+
+                    color={
+                        colorMode === "dark" ? "blue.200" : "blue.400"
+                    }
+                    fontWeight={"bold"}
+                    cursor={"pointer"}
+                    _hover={
+                        {
+                            color: colorMode === "dark" ? "blue.100" : "blue.300",
+                            textDecoration: "underline",
                         }
-                        {task.task_type === "assigned" && (
+                    }
+                    onClick={() => {
+                        if (task?.project?.pk) {
+                            goToProject(task.project.pk);
+                        }
+                        else {
+                            onOpen();
+                        }
+                    }}
+                >
+                    {`${task.name}`}
+                </Text>
+                <Flex
+                    alignItems="center"
+                    justifyContent={'flex-end'}
+                    right={0}
+                    flex={1}
+                    pl={4}
 
-                            <Tag
-                                size={"sm"}
-                                bg="red.600" color="white">
-                                {`ASSIGNED`}
-                            </Tag>
+                >
+                    {task.task_type === "personal"
+                        &&
+                        // isHovered &&
+                        (
+                            <>
+                                <Button
+                                    size="xs"
+                                    isDisabled={isDeleting}
+                                    onClick={() => handleDeleteClick(task.pk)}
+                                >
+                                    <CloseIcon boxSize={2} />
+                                </Button>
+                                <Button
+                                    isDisabled={isCompleting}
+                                    ml={2}
+                                    size={"xs"}
+                                    bg={"green.500"}
+                                    color={"white"}
+                                    _hover={{
+                                        bg: "green.400"
+                                    }}
+                                    onClick={() => handleCompletion(task.pk)}
+                                >
+                                    <CheckIcon boxSize={2} />
+                                </Button>
 
-                        )}
-                    </Flex>
+                            </>
+                        )
+                    }
+                    {task.task_type === "assigned" && (
 
+                        <Tag
+                            size={"sm"}
+                            bg="red.600" color="white">
+                            {`ASSIGNED`}
+                        </Tag>
+
+                    )}
                 </Flex>
 
             </Flex>
+
+
+            {/* </Flex> */}
+
         </>
     )
 }
