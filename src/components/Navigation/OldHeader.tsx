@@ -38,7 +38,7 @@ import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { useUser } from "../../lib/hooks/useUser";
 import { RiAdminFill, RiOrganizationChart } from "react-icons/ri";
-import { MdManageHistory, MdOutlineSettingsSuggest } from "react-icons/md";
+import { MdManageHistory, MdOutlineAccessTimeFilled, MdOutlineSettingsSuggest } from "react-icons/md";
 import { GoOrganization } from "react-icons/go";
 import { FcApproval, FcDataBackup } from "react-icons/fc";
 import { useGetReportPDFs } from "../../lib/hooks/useGetReportPDFs";
@@ -124,27 +124,30 @@ const ReportMenuContents = () => {
 
                 <MenuItem
                     onClick={() => {
+                        navigate('/reports/current')
+                    }}
+                >
+                    <MdOutlineAccessTimeFilled />
+
+                    {/* {<AiFillPrinter />} */}
+                    <Text ml={2}>
+                        Latest Report
+                    </Text>
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
                         navigate('/reports')
                     }}
                 >
                     {<CgViewList />}
                     <Text ml={2}
                     >
-                        Overview
+                        Prior Reports
                     </Text>
                 </MenuItem>
-                <MenuItem
-                    onClick={() => {
-                        navigate('/reports/current')
-                    }}
-                >
-                    {<AiFillPrinter />}
-                    <Text ml={2}>
-                        Print Preview
-                    </Text>
-                </MenuItem>
+
             </MenuGroup>
-            <Divider
+            {/* <Divider
                 borderColor={dividerColor}
                 my={1}
             />
@@ -155,7 +158,28 @@ const ReportMenuContents = () => {
                     color={"gray.500"} textAlign={"center"}
                 >
 
-                    {reportPdfsData.map(publication => {
+
+                    <MenuItem
+                                key={publication.report.year}
+                                onClick={() => {
+                                    window.open(publication.file, "_blank");
+                                }}
+                            >
+                                {<ImBook />}
+                                <Text ml={2}>
+                                    ARAR {publication.report.year}
+                                </Text>
+                            </MenuItem>
+
+
+                </MenuGroup>
+            )} */}
+
+        </>
+    )
+}
+
+{/* {reportPdfsData.map(publication => {
                         return (
                             <MenuItem
                                 key={publication.report.year}
@@ -169,15 +193,8 @@ const ReportMenuContents = () => {
                                 </Text>
                             </MenuItem>
                         )
-                    })}
+                    })} */}
 
-
-                </MenuGroup>
-            )}
-
-        </>
-    )
-}
 
 const UserMenuContents = () => {
     const navigate = useNavigate();

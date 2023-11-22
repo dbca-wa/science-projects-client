@@ -1,14 +1,14 @@
 // Toolbar for the simple rich text editor
 
 import { Box, Divider, Flex, useBreakpointValue, useColorMode } from "@chakra-ui/react"
-import { AlignButton } from "../MenuButtons/AlignButton"
+// import { AlignButton } from "../MenuButtons/AlignButton"
 import { RefObject, SetStateAction, useEffect, useState } from "react"
 import { useToolbarClickListener } from "../../../lib/hooks/useToolbarClickListener"
 import { TimeButtons } from "./TimeButtons";
 import { ElementTypeButton } from "../MenuButtons/ElementTypeButton";
 import { BoldButton } from "../Buttons/BoldButton";
 import { VerticalDivider } from "./VerticalDivider";
-import { InsertButton } from "../MenuButtons/InsertButton";
+import { InsertTableButton } from "../MenuButtons/InsertTableButton";
 import { ItalicsButton } from "../Buttons/ItalicsButton";
 import { UnderlineButton } from "../Buttons/UnderlineButton";
 import { FontFormatterButton } from "../MenuButtons/FontFormatterButton";
@@ -55,19 +55,14 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
             {/* <AutoFocusPlugin clickFunction={onClick} /> */}
             <Flex
                 width={"100%"}
-                // mt={2}
-                p={2}
-                // borderRadius={"20px 20px 0 0"}
+                my={1}
+                px={1}
                 backgroundColor={
                     colorMode === "light" ? "whiteAlpha.800"
                         : "blackAlpha.400"
                 }
-                // backgroundColor={"gray.200"}
                 overflowX={
                     'hidden'
-                    // shouldShowEllipsis ? 
-                    // 'auto'
-                    // : 'hidden'
                 }
                 justifyContent={"space-between"}
                 display={"flex"}
@@ -80,29 +75,32 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                 <VerticalDivider />
                                 {
                                     currentToolbarPage === 1 ?
-                                        <>
-                                            <ElementTypeButton onClick={onClick} isSmall
-                                                currentlyClickedNode={selectedNodeType}
-                                                setCurrentlyClickedNode={setSelectedNodeType}
-                                            />
-                                            <VerticalDivider />
 
-                                            <InsertButton />
-                                        </> :
+                                        <>
+
+                                            <BoldButton onClick={onClick} />
+                                            <ItalicsButton onClick={onClick} />
+                                            <UnderlineButton onClick={onClick} />
+                                            {/* <FontHighlighterButton /> */}
+
+                                        </>
+                                        :
                                         currentToolbarPage === 2 ?
                                             <>
-
-                                                <BoldButton onClick={onClick} />
-                                                <ItalicsButton onClick={onClick} />
-                                                <UnderlineButton onClick={onClick} />
-                                                {/* <FontHighlighterButton /> */}
-
+                                                <ElementTypeButton onClick={onClick} isSmall
+                                                    currentlyClickedNode={selectedNodeType}
+                                                    setCurrentlyClickedNode={setSelectedNodeType}
+                                                />
+                                                <VerticalDivider />
+                                                <>
+                                                    <FontFormatterButton />
+                                                    {/* <AlignButton isSmall onClick={onClick} /> */}
+                                                </>
                                             </>
                                             :
-                                            <>
-                                                <FontFormatterButton />
-                                                <AlignButton isSmall onClick={onClick} />
-                                            </>
+
+                                            <InsertTableButton />
+
                                 }
 
                                 <Box>
@@ -124,29 +122,33 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                         {
                                             currentToolbarPageMd === 1 ?
                                                 <>
-                                                    <ElementTypeButton onClick={onClick}
-                                                        currentlyClickedNode={selectedNodeType}
-                                                        setCurrentlyClickedNode={setSelectedNodeType}
-                                                    />
-                                                    <VerticalDivider />
+                                                    {/* <FontStylingButtons /> */}
 
-                                                    <InsertButton />
+                                                    <BoldButton onClick={onClick} />
+                                                    <ItalicsButton onClick={onClick} />
+                                                    <UnderlineButton onClick={onClick} />
+                                                </>
 
-                                                    {/* <VerticalDivider /> */}
-
-
-                                                </> : currentToolbarPageMd === 2 ?
+                                                : currentToolbarPageMd === 2 ?
                                                     <>
-                                                        {/* <FontStylingButtons /> */}
+                                                        <ElementTypeButton onClick={onClick}
+                                                            currentlyClickedNode={selectedNodeType}
+                                                            setCurrentlyClickedNode={setSelectedNodeType}
+                                                        />
+                                                        <VerticalDivider />
 
-                                                        <BoldButton onClick={onClick} />
-                                                        <ItalicsButton onClick={onClick} />
-                                                        <UnderlineButton onClick={onClick} />
-                                                    </> :
-                                                    <>
-                                                        <FontFormatterButton />
-                                                        <AlignButton onClick={onClick} />
+
+                                                        {/* <VerticalDivider /> */}
+
+                                                        <>
+                                                            <FontFormatterButton />
+                                                            {/* <AlignButton onClick={onClick} /> */}
+                                                        </>
                                                     </>
+                                                    :
+                                                    <InsertTableButton />
+
+
                                         }
                                         <ToolbarToggleBtn
                                             page={currentToolbarPageMd}
@@ -160,6 +162,10 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                     <>
                                         <TimeButtons onClick={onClick} />
                                         <VerticalDivider />
+                                        <BoldButton onClick={onClick} />
+                                        <ItalicsButton onClick={onClick} />
+                                        <UnderlineButton onClick={onClick} />
+                                        <VerticalDivider />
 
                                         <ElementTypeButton onClick={onClick} shouldFurtherConcat={true}
 
@@ -167,17 +173,10 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                             setCurrentlyClickedNode={setSelectedNodeType}
                                         />
                                         <VerticalDivider />
-                                        <InsertButton />
-                                        <VerticalDivider />
                                         <FontFormatterButton />
 
                                         <VerticalDivider />
-                                        <BoldButton onClick={onClick} />
-                                        <ItalicsButton onClick={onClick} />
-                                        <UnderlineButton onClick={onClick} />
-                                        <VerticalDivider />
-
-                                        <AlignButton onClick={onClick} />
+                                        <InsertTableButton />
 
                                     </>
                                 )

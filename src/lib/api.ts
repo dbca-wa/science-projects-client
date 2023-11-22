@@ -169,6 +169,14 @@ export const getQuote = async () => {
 }
 
 
+export const getDocumentsPendingApproval = () => {
+    const res = instance.get(`documents/projectdocuments/pendingapproval`).then(res => {
+        return res.data
+    })
+    return res;
+}
+
+
 export const getMyProjects = async () => {
     const res = instance.get(`projects/mine`).then(res => {
         return res.data
@@ -784,7 +792,7 @@ export const getDirectorateMembers = async ({ queryKey }: QueryFunctionContext) 
 // }
 
 
-// PROJECT CREATION ==========================================================================
+// PROJECT CRUD ==========================================================================
 
 export interface ICreateProjectBaseInfo {
     creator: number;
@@ -891,18 +899,57 @@ export const createProject = async ({ baseInformationData, detailsData, location
 
 }
 
-export interface IUpdateProjectDetails {
-    // departmentalService: number;
-    // researchFunction: number;
-    // businessArea: number;
+export interface IEditProject {
+    projectPk: string | number;
+    title: string;
     description: string;
-    // dates: Date[];
+    keywords: string[];
+    image: File | null;
+
+    dates: Date[];
+    status: 'new' | 'pending' | 'active' | 'updating' | 'terminated' | 'suspended' | 'closed';
+    dataCustodian: number;
+    departmentalService: number;
+    researchFunction: number;
+    businessArea: number;
 }
 
 export const updateProjectDetails = async ({
-    description
-}: IUpdateProjectDetails) => {
-    return instance.get('google.com')
+    projectPk,
+    title,
+    description,
+    keywords,
+    image,
+
+    dates,
+    status,
+    dataCustodian,
+    departmentalService,
+    researchFunction,
+    businessArea,
+}: IEditProject) => {
+    console.log('editing')
+
+    const data = {
+        'pk': projectPk,
+        'image': image,
+        'title': title,
+        'description': description,
+        'keywords': keywords,
+        'dates': dates,
+        'status': status,
+        'service': departmentalService,
+        'research_function': researchFunction,
+        'business_area': businessArea,
+        'data_custodian:': dataCustodian,
+    }
+    console.log(data)
+    return {
+        'data': data,
+        'status': 200,
+    }
+
+    // return instance.get('google.com')
 }
 
 // export const getInternalUsersBasedOnSearchTerm = async (searchTerm: string, onlyInternal: boolean) => {
@@ -1188,7 +1235,138 @@ export const getProgressReportForYear = async (year: number, project: number) =>
 
 
 
+export interface IAddPDF {
+    reportId: number;
+    userId: number;
+    pdfFile: File;
+}
 
+export interface IUpdatePDF {
+    reportMediaId: number;
+    // userId: number;
+    pdfFile: File;
+}
+
+export const updateReportPDF = async ({
+    reportMediaId,
+    // userId,
+    pdfFile
+}: IUpdatePDF) => {
+    console.log({
+        // userId,
+        reportMediaId,
+        pdfFile
+    })
+
+    const formData = new FormData();
+    function isFileArray(obj: any): obj is File[] {
+        return Array.isArray(obj) && obj.length > 0 && obj[0] instanceof File;
+    }
+
+    if (pdfFile instanceof File) {
+        formData.append('file', pdfFile);
+    } else if (isFileArray(pdfFile)) {
+        const firstFile = pdfFile[0];
+        formData.append('file', firstFile);
+    } else {
+        console.error('pdfFile is not a valid File object or array. Type:', typeof pdfFile);
+        // Handle the error or log additional information as needed
+    }
+
+    // formData.append('file', pdfFile, pdfFile.name); // Make sure pdfFile is a File object
+    // formData.append('user', userId.toString());
+    // formData.append('report', reportMediaId.toString());
+
+    console.log(';formdata is')
+    console.log(formData)
+
+    const res = await instance.put(`medias/report_pdfs/${reportMediaId}`, formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    console.log(res);
+    return res.data;
+
+}
+
+export const addPDFToReport = async ({
+    reportId,
+    userId,
+    pdfFile
+}: IAddPDF) => {
+    console.log({
+        userId,
+        reportId,
+        pdfFile
+    })
+
+    const formData = new FormData();
+    function isFileArray(obj: any): obj is File[] {
+        return Array.isArray(obj) && obj.length > 0 && obj[0] instanceof File;
+    }
+
+    if (pdfFile instanceof File) {
+        formData.append('file', pdfFile);
+    } else if (isFileArray(pdfFile)) {
+        const firstFile = pdfFile[0];
+        formData.append('file', firstFile);
+    } else {
+        console.error('pdfFile is not a valid File object or array. Type:', typeof pdfFile);
+        // Handle the error or log additional information as needed
+    }
+
+    // formData.append('file', pdfFile, pdfFile.name); // Make sure pdfFile is a File object
+    formData.append('user', userId.toString());
+    formData.append('report', reportId.toString());
+
+    console.log(';formdata is')
+    console.log(formData)
+
+    const res = await instance.post('medias/report_pdfs', formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    console.log(res);
+    return res.data;
+}
+
+export interface IUploadFile {
+    pk: number;
+    file: File;
+}
+
+// export const startFinalAnnualReportPDFUpload = async ({ pk, file }: IUploadFile) => {
+//     console.log(file, pk);
+//     return true;
+// }
+
+export const getArarsWithPDFs = async () => {
+    try {
+        const response = await instance.get(`documents/reports/withPDF`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching reports with pdfs:", error);
+        throw error;
+    }
+}
+
+
+export const getArarsWithoutPDFs = async () => {
+
+    try {
+        const response = await instance.get(`documents/reports/withoutPDF`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching reports without pdfs:", error);
+        throw error;
+    }
+}
 
 export interface IHTMLSave {
     editorType: EditorType;

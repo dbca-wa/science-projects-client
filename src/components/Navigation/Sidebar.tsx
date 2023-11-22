@@ -15,6 +15,7 @@ import { AnimatedToggleButton } from "./AnimatedToggleButton";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { useLocation } from "react-router-dom";
+import { MdOutlineAccessTimeFilled } from "react-icons/md";
 
 const buttonWidthVariants = {
     open: {
@@ -31,7 +32,8 @@ const textVariants = {
     open: {
         opacity: 1,
         width: "auto",
-        marginLeft: "3rem",
+        marginLeft: "2.75rem",
+        // alignSelf: "center",
         transition: {
             duration: 0.3,
             delay: 0.2
@@ -88,7 +90,7 @@ export const Sidebar = () => {
         { title: "Users", img: ImUsers, route: "/users", section: "Users" },
         { title: "Add user", img: FiUserPlus, route: "/users/add" },
 
-        { title: `${currentYear} Report`, img: IoMdDocument, route: "/reports/current", section: "ARAR" },
+        { title: `Latest Report`, img: MdOutlineAccessTimeFilled, route: "/reports/current", section: "ARAR" },
         { title: "Reports", img: HiDocumentDuplicate, route: "/reports" },
 
 

@@ -110,7 +110,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                         base: "repeat(1, 1fr)",
                         md: "repeat(2, 1fr)",
                         lg: "repeat(2, 1fr)",
-                        xl: "repeat(3, 1fr)",
+                        // xl: "repeat(3, 1fr)",
                     }}
                     gap={10}
                 >
@@ -156,7 +156,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                                 "Scientific Site Register"
                         }
                     </Button>
-                    <Button
+                    {/* <Button
                         bgColor={
                             colorMode === "light" ? `red.500` : `red.600 `
                         }
@@ -180,7 +180,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                                 "Projects Pending Approval"
                         }
 
-                    </Button>
+                    </Button> */}
 
                 </Grid>
                 <TraditionalTasksAndProjects onAddTaskOpen={onAddTaskOpen} />

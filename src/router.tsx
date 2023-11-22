@@ -245,9 +245,49 @@ export const router = createBrowserRouter([
                 path: "projects/:projectPk",
                 element:
                     <ContentWrapper>
-                        <ProjectDetail />
+                        <ProjectDetail selectedTab="overview" />
                     </ContentWrapper>
 
+            },
+            {
+                path: "projects/:projectPk/concept",
+                element: (
+                    <ContentWrapper>
+                        <ProjectDetail selectedTab="concept" />
+                    </ContentWrapper>
+                )
+            },
+            {
+                path: "projects/:projectPk/project",
+                element: (
+                    <ContentWrapper>
+                        <ProjectDetail selectedTab="project" />
+                    </ContentWrapper>
+                )
+            },
+            {
+                path: "projects/:projectPk/progress",
+                element: (
+                    <ContentWrapper>
+                        <ProjectDetail selectedTab="progress" />
+                    </ContentWrapper>
+                )
+            },
+            {
+                path: "projects/:projectPk/student",
+                element: (
+                    <ContentWrapper>
+                        <ProjectDetail selectedTab="student" />
+                    </ContentWrapper>
+                )
+            },
+            {
+                path: "projects/:projectPk/closure",
+                element: (
+                    <ContentWrapper>
+                        <ProjectDetail selectedTab="closure" />
+                    </ContentWrapper>
+                )
             },
             // Users
             {

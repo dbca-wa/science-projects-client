@@ -19,10 +19,18 @@ const capitalizeFirstLetter = (text: string) => {
 
 interface Props {
     setTagFunction: React.Dispatch<React.SetStateAction<string[]>>;
+    preExistingTags?: string[];
 }
-const TagInput = ({ setTagFunction }: Props) => {
+const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
     const [inputValue, setInputValue] = useState<string>('');
     const [tags, setTags] = useState<string[]>([]);
+    useEffect(() => {
+        if (preExistingTags?.length >= 1) {
+            console.log(preExistingTags.length, preExistingTags)
+            // if preExistingTags.length === 1
+            setTags([...preExistingTags]);
+        }
+    }, [])
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
@@ -41,11 +49,9 @@ const TagInput = ({ setTagFunction }: Props) => {
 
     const addTags = () => {
         const newTags = inputValue
-
             .split(', ')
             // .map((tag) => tag.trim())
             .map((tag) => tag.trim().replace(/,$/, ''))
-
             .filter((tag) => tag !== '')
             .filter((tag) => !tags.some((existingTag) => existingTag.toLowerCase() === tag.toLowerCase()));
 
@@ -88,7 +94,7 @@ const TagInput = ({ setTagFunction }: Props) => {
             </InputGroup>
             <FormHelperText>Add some keywords as a comma-separated list. Press space after a comma to add the tag.</FormHelperText>
             <Flex flexWrap="wrap" gap={2} pt={3} userSelect={"none"}>
-                {tags.map((tag, index) => (
+                {tags?.map((tag, index) => (
                     <Tag key={index} size="md" borderRadius="full" variant="solid" colorScheme="blue" userSelect={"none"}>
                         <TagLabel pl={1} userSelect={"none"}>{tag}</TagLabel>
                         <TagCloseButton

@@ -1,4 +1,4 @@
-// Simple hook for getting the tasks of the user, for the dashboard
+// Simple hook for getting the arars where a progress report can be created for a given project
 
 import { useQuery } from "@tanstack/react-query"
 import { ISimplePkProp, getAvailableReportYearsForProgressReport } from "../api";

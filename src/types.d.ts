@@ -112,7 +112,13 @@ interface ISmallProject {
 }
 
 interface ISmallResearchFunction {
-    id: number;
+    id?: number;
+    pk?: numer;
+    name: string;
+}
+interface ISmallService {
+    id?: number;
+    pk?: numer;
     name: string;
 }
 
@@ -127,6 +133,7 @@ interface IBaseProjectDetails {
     owner: ISmallUser;
     project: ISmallProject;
     research_function: ISmallResearchFunction | null;
+    service: ISmallService | null;
 }
 
 interface IStudentProjectDetails {
@@ -182,11 +189,11 @@ interface ProjectPDFData {
     pk: number;
     old_file: string | null;
     file: string | null;
-    document: MainDoc;
+    document: IMainDoc;
     project: IProjectData;
 }
 
-interface MainDoc {
+export interface IMainDoc {
     pk?: number;
     id?: number;
     created_year: number;
@@ -207,7 +214,7 @@ interface MainDoc {
 interface IConceptPlan {
     pk?: number;
     id?: number;
-    document: MainDoc;
+    document: IMainDoc;
     background: string | null;
     aims: string | null;
     outcome: string | null;
@@ -219,7 +226,7 @@ interface IConceptPlan {
 
 interface IProjectPlan {
     pk: number;
-    document: MainDoc;
+    document: IMainDoc;
     background: string | null;
     aims: string | null;
     outcome: string | null;
@@ -240,7 +247,7 @@ interface IProgressReport {
     pk: number;
     created_at: Date;
     updated_at: Date;
-    document: MainDoc;
+    document: IMainDoc;
     year: number;
     is_final_report: boolean;
     context: string | null;
@@ -252,14 +259,14 @@ interface IProgressReport {
 
 interface IStudentReport {
     pk: number;
-    document: MainDoc;
+    document: IMainDoc;
     progress_report: string;
     year: number;
 }
 
 interface IProjectClosure {
     pk: number;
-    document: MainDoc;
+    document: IMainDoc;
     intended_outcome: string | null;
     reason: string | null;
     scientific_outputs: string | null;
@@ -416,6 +423,14 @@ interface ISimpleLocationData {
     area_type: string;
 }
 
+interface IProjectAreas {
+    created_at: Date;
+    updated_at: Date;
+    project: number;
+    id: number;
+    areas: ISimpleLocationData[];
+}
+
 interface IAddLocationForm {
     old_id?: number;
     pk?: string;
@@ -563,8 +578,15 @@ export interface ISmallReport {
     year: number | null;
     creator: number;
     media: ITinyReportMedia;
+    pdf?: IReportPDF;
+
 }
 
+export interface IReportPDF {
+    pk: number;
+    file: string | null;
+    old_file: string | null;
+}
 
 export interface IReport {
     old_id?: number;

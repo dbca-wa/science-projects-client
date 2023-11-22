@@ -7,7 +7,9 @@ interface IPageWrapperProps {
     children: React.ReactNode;
 }
 
-export const ContentWrapper = ({ children }: IPageWrapperProps) => {
+export const ContentWrapper: React.FC<IPageWrapperProps> = ({ children }) => {
+    // Your ContentWrapper component implementation
+
 
     const { layout } = useLayoutSwitcher();
 
