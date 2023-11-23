@@ -16,6 +16,7 @@ import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleD
 import { useGetDocumentsPendingApproval } from "../../../lib/hooks/useGetDocumentsPendingApproval"
 import { HiDocumentCheck } from "react-icons/hi2";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle"
+import { FaArrowRight } from "react-icons/fa"
 
 
 interface ITaskFromAPI {
@@ -240,7 +241,6 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                 borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
                                                                 w={"100%"}
                                                                 p={2}
-                                                                onClick={() => goToProjectDocument(document?.project?.pk ? document?.project?.pk : document?.project?.id, document)}
                                                                 _hover={{
                                                                     color: colorMode === "dark" ? "blue.100" : "blue.300",
                                                                     textDecoration: "underline",
@@ -270,7 +270,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                 </Box>
                                                                 <Divider
                                                                     orientation='vertical'
-                                                                    // ml={-6}
+                                                                    ml={-1}
                                                                     mr={5}
                                                                 />
                                                                 {/* <SimpleDisplaySRTE
@@ -292,15 +292,31 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                             textDecoration: "underline",
                                                                         }
                                                                     }
-                                                                // onClick={() => {
-                                                                //     if (task?.project?.pk) {
-                                                                //         goToProject(task.project.pk);
-                                                                //     }
-                                                                //     else {
-                                                                //         onOpen();
-                                                                //     }
-                                                                // }}
                                                                 />
+                                                                <Flex
+                                                                    alignItems="center"
+                                                                    justifyContent={'flex-end'}
+                                                                    right={0}
+                                                                    flex={1}
+                                                                    pl={4}
+
+                                                                >
+                                                                    <Button
+                                                                        size={"xs"}
+                                                                        bg={"blue.500"}
+                                                                        color={"white"}
+                                                                        _hover={{
+                                                                            bg: "blue.400"
+                                                                        }}
+                                                                        rightIcon={<FaArrowRight />}
+                                                                        onClick={() => goToProjectDocument(document?.project?.pk ? document?.project?.pk : document?.project?.id, document)}
+
+                                                                    >
+                                                                        Visit
+                                                                    </Button>
+
+                                                                </Flex>
+
                                                             </Flex>
                                                         ))
 
@@ -434,11 +450,26 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                 {`${project.title}`}
                                                             </Text> */}
 
-                                                            <SimpleDisplaySRTE
+                                                            {/* <SimpleDisplaySRTE
 
                                                                 data={project.title}
                                                                 displayData={project.title}
                                                                 displayArea="traditionalProjectTitle"
+                                                            /> */}
+
+                                                            <ExtractedHTMLTitle
+                                                                htmlContent={`${project.title}`}
+                                                                color={
+                                                                    colorMode === "dark" ? "blue.200" : "blue.400"
+                                                                }
+                                                                fontWeight={"bold"}
+                                                                cursor={"pointer"}
+                                                                _hover={
+                                                                    {
+                                                                        color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                                                        textDecoration: "underline",
+                                                                    }
+                                                                }
                                                             />
 
 
