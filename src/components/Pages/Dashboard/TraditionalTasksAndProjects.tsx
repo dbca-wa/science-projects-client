@@ -15,6 +15,7 @@ import { GoProjectRoadmap } from "react-icons/go"
 import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE"
 import { useGetDocumentsPendingApproval } from "../../../lib/hooks/useGetDocumentsPendingApproval"
 import { HiDocumentCheck } from "react-icons/hi2";
+import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle"
 
 
 interface ITaskFromAPI {
@@ -272,14 +273,34 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                     // ml={-6}
                                                                     mr={5}
                                                                 />
-                                                                <SimpleDisplaySRTE
+                                                                {/* <SimpleDisplaySRTE
 
                                                                     data={document?.project.title}
                                                                     displayData={document?.project.title}
                                                                     displayArea="traditionalProjectTitle"
+                                                                /> */}
+                                                                <ExtractedHTMLTitle
+                                                                    htmlContent={`${document?.project.title}`}
+                                                                    color={
+                                                                        colorMode === "dark" ? "blue.200" : "blue.400"
+                                                                    }
+                                                                    fontWeight={"bold"}
+                                                                    cursor={"pointer"}
+                                                                    _hover={
+                                                                        {
+                                                                            color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                                                            textDecoration: "underline",
+                                                                        }
+                                                                    }
+                                                                // onClick={() => {
+                                                                //     if (task?.project?.pk) {
+                                                                //         goToProject(task.project.pk);
+                                                                //     }
+                                                                //     else {
+                                                                //         onOpen();
+                                                                //     }
+                                                                // }}
                                                                 />
-
-
                                                             </Flex>
                                                         ))
 
