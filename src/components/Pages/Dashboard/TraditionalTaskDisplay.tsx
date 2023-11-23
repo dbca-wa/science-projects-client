@@ -218,7 +218,8 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
                     w={"100%"}
 
                 >
-                    {task.task_type === "personal" ?
+                    {
+                        task.task_type === "personal" ?
                         <Text>Personal</Text>
                         : <Text>Assigned</Text>
 
