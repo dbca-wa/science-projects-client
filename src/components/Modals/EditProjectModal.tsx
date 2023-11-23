@@ -235,9 +235,9 @@ export const EditProjectModal = ({
                 }
 
                 setTimeout(() => {
-                    // queryClient.invalidateQueries(["projects", projectPk]);
-                    // refetchData();
-                    // onClose();
+                    queryClient.invalidateQueries(["projects", projectPk]);
+                    refetchData();
+                    onClose();
 
                 }, 350)
             },

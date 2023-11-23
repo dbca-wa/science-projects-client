@@ -568,92 +568,20 @@ export const ProjectOverviewCard = (
                     </Box>
                 </Grid>
 
-                {/* Description and Edit Project Details */}
-                <Box p={6} pt={0}>
-                    {/* <Box
-                        pb={2}
-                    >
-                        {baseInformation?.tagline
-                            ? <Text><b>Tagline:</b> {baseInformation.tagline}</Text>
-                            : <Text><b>Tagline:</b> This project has no tagline</Text>
-                        }
-                    </Box> */}
-                    <Box
-                        mt={4}
-                    >
-                        {/* {baseInformation?.description
-                            ? <Text><b>Description:</b> {baseInformation.description}</Text>
-                            : <Text><b>Description:</b> This project has no description</Text>} */}
 
-                        <RichTextEditor
-                            canEdit={userInTeam || me?.userData?.is_superuser}
-                            editorType="ProjectDetail"
-                            data={baseInformation.description}
-                            project_pk={baseInformation.id}
-                            section={"description"}
-                            isUpdate={true}
-                            titleTextSize={"20px"}
-                            key={`description${colorMode}`} // Change the key to force a re-render
-                        />
-                    </Box>
+
+                <Flex
+                    // justifyContent={"flex-end"}
+                    right={0}
+                    zIndex={-1}
+                    px={6}
+                >
 
                     <Flex
-                        // py={4} 
-                        pb={0}
-                        w={"100%"}
-                        justifyContent={"flex-end"}
+                    // justifyContent={"flex-end"}
+                    // flex={1}
                     >
-                        {/* <Button
-                                variant={"link"}
-                                colorScheme="blue"
-                                leftIcon={<HiOutlineExternalLink />}
-                                onClick={() => {
-                                    window.open('https://data.dbca.wa.gov.au/', "_blank")
-                                }}
-                            >
-                                Review datasets tagged with {projectLabel}
-                            </Button> */}
 
-                        <Text
-                            color={
-                                colorMode === "dark" ? "blue.200" : "blue.400"
-                            }
-                            fontWeight={"bold"}
-                            cursor={"pointer"}
-                            _hover={
-                                {
-                                    color: colorMode === "dark" ? "blue.100" : "blue.300",
-                                    textDecoration: "underline",
-                                }
-                            }
-                            onClick={() => {
-                                window.open('https://data.dbca.wa.gov.au/', "_blank")
-                            }}
-                        >
-                            Review datasets tagged with {projectLabel}
-                        </Text>
-                        <Box
-                            mt={1}
-                            ml={2}
-                            // mr={2}
-                            color={colorMode === "dark" ? "blue.200" : "blue.400"}
-                            // mr={3}
-                            alignItems={"center"}
-                            alignContent={"center"}
-                        // boxSize={3}
-                        // bg={"red"}
-                        >
-                            <HiOutlineExternalLink />
-                        </Box>
-
-                    </Flex>
-
-                    <Flex
-                        justifyContent={"flex-end"}
-                        right={0}
-                        zIndex={-1}
-
-                    >
                         <Menu
                         >
                             <MenuButton
@@ -667,7 +595,6 @@ export const ProjectOverviewCard = (
                                 _expanded={{ bg: 'blue.400' }}
                                 _focus={{ boxShadow: 'outline' }}
                                 // mr={4}
-                                mt={3}
                                 bg={"blue.500"}
                                 color={"white"}
                                 fontSize={"medium"}
@@ -803,6 +730,76 @@ export const ProjectOverviewCard = (
                         </Menu>
 
                     </Flex>
+
+                    <Flex
+                        pb={0}
+                        alignItems={"center"}
+                        justifyContent={"flex-end"}
+                        flex={1}
+
+                    >
+                        <Text
+                            color={
+                                colorMode === "dark" ? "blue.200" : "blue.400"
+                            }
+                            fontWeight={"bold"}
+                            cursor={"pointer"}
+                            _hover={
+                                {
+                                    color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                    textDecoration: "underline",
+                                }
+                            }
+                            onClick={() => {
+                                window.open('https://data.dbca.wa.gov.au/', "_blank")
+                            }}
+                        >
+                            Review datasets tagged with {projectLabel}
+                        </Text>
+                        <Box
+                            mt={1}
+                            ml={2}
+                            color={colorMode === "dark" ? "blue.200" : "blue.400"}
+                            alignItems={"center"}
+                            alignContent={"center"}
+                        >
+                            <HiOutlineExternalLink />
+                        </Box>
+
+                    </Flex>
+
+                </Flex>
+
+
+                {/* Description and Edit Project Details */}
+                <Box p={6} pt={0}>
+                    {/* <Box
+                        pb={2}
+                    >
+                        {baseInformation?.tagline
+                            ? <Text><b>Tagline:</b> {baseInformation.tagline}</Text>
+                            : <Text><b>Tagline:</b> This project has no tagline</Text>
+                        }
+                    </Box> */}
+                    <Box
+                        mt={4}
+                    >
+                        {/* {baseInformation?.description
+                            ? <Text><b>Description:</b> {baseInformation.description}</Text>
+                            : <Text><b>Description:</b> This project has no description</Text>} */}
+
+                        <RichTextEditor
+                            canEdit={userInTeam || me?.userData?.is_superuser}
+                            editorType="ProjectDetail"
+                            data={baseInformation.description}
+                            project_pk={baseInformation.id}
+                            section={"description"}
+                            isUpdate={true}
+                            titleTextSize={"20px"}
+                            key={`description${colorMode}`} // Change the key to force a re-render
+                        />
+                    </Box>
+
 
                     <Flex pt={6} justifyContent={"right"}>
                         <ProjectDetailEditModal
