@@ -168,6 +168,12 @@ export const getQuote = async () => {
     return instance.get(`quotes/random/`).then(res => res.data)
 }
 
+export const getDocumentsPendingMyAction = () => {
+    const res = instance.get(`documents/projectdocuments/pendingmyaction`).then(res => {
+        return res.data
+    })
+    return res;
+}
 
 export const getDocumentsPendingApproval = () => {
     const res = instance.get(`documents/projectdocuments/pendingapproval`).then(res => {

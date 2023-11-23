@@ -202,7 +202,7 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
             >
                 <Center
                     color={colorMode === "light" ? "red.600" : "red.200"}
-                    mr={2}
+                    mr={3}
                     alignItems={"center"}
                     alignContent={"center"}
                     boxSize={5}
@@ -220,8 +220,8 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
                 >
                     {
                         task.task_type === "personal" ?
-                        <Text>Personal</Text>
-                        : <Text>Assigned</Text>
+                            <Text>Personal</Text>
+                            : <Text>Assigned</Text>
 
                     }
 

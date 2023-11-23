@@ -1,7 +1,14 @@
-import { Text } from "@chakra-ui/react";
+import { Text, TextProps } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-export const ExtractedHTMLTitle = ({ htmlContent, ...textProps }) => {
+interface Props extends TextProps {
+    htmlContent: string;
+    onClick?: () => void;
+    extraText?: string;
+}
+
+export const ExtractedHTMLTitle: React.FC<Props> = ({ htmlContent, onClick, extraText, ...textProps }) => {
+
     const [text, setText] = useState('');
 
     useEffect(() => {
@@ -15,9 +22,13 @@ export const ExtractedHTMLTitle = ({ htmlContent, ...textProps }) => {
         }
     }, [htmlContent]);
 
+    console.log(extraText)
+
     return (
-        <Text {...textProps}>
-            {text}
+        <Text {...textProps}
+            onClick={onClick}
+        >
+            {text} {(extraText && extraText !== undefined) ? extraText : null}
         </Text>
     );
 };
