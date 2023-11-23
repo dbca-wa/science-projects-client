@@ -9,6 +9,7 @@ import { useFullUserByPk } from "../../lib/hooks/useFullUserByPk";
 import { useUser } from "../../lib/hooks/useUser";
 import { useProject } from "../../lib/hooks/useProject";
 import { useNoImage } from "../../lib/hooks/useNoImage";
+import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";
 
 interface IProjectSearchDropdown {
     allProjects: boolean;
@@ -265,11 +266,10 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
                     ml={3}
                     h="100%"
                 >
-                    <Text ml={2}
+                    <ExtractedHTMLTitle
+                        htmlContent={`${project.title}`}
                         color={"green.500"}
-                    >
-                        {`${project.title}`}
-                    </Text>
+                    />
                 </Box>
             </Flex>
             : null
@@ -320,9 +320,11 @@ const SelectedProjectInput = ({ project, onClear, isPreselected
                 size="sm"
                 src={project?.image?.file ? project.image?.file : project.image?.old_file ? project.image.old_file : noImage}
             />
-            <Text ml={2}
+            <ExtractedHTMLTitle
+                ml={2}
+                htmlContent={`${project.title}`}
                 color={"green.500"}
-            >{`${project?.title}`}</Text>
+            />
             <input
                 // {...register("project", { required: true })}
                 value={projectPk}
