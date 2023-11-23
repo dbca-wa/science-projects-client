@@ -18,6 +18,8 @@ import { useBusinessAreas } from "../../lib/hooks/useBusinessAreas";
 import { useGetLocations } from "../../lib/hooks/useGetLocations";
 import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
+import { useNoImage } from "../../lib/hooks/useNoImage";
+import { NewImagePreview } from "../Pages/CreateProject/NewImagePreview";
 
 interface Props {
     // thisUser: IUserMe;
@@ -68,7 +70,7 @@ export const EditProjectModal = ({
         // console.log(selectedIbras);
         // console.log(selectedImcras);
         // console.log(selectedNrms);
-    }, [locationData, currentAreas])
+    }, [])
 
     const [businessAreaList, setBusinessAreaList] = useState<IBusinessArea[]>([]);
     const { baData: businessAreaDataFromAPI, baLoading } = useBusinessAreas();
@@ -127,10 +129,71 @@ export const EditProjectModal = ({
     const [researchFunction, setResearchFunction] = useState<IResearchFunction | ISmallResearchFunction>(currentResearchFunction);
     const [dataCustodian, setDataCustodian] = useState(currentDataCustodian)
 
+    const [imageLoadFailed, setImageLoadFailed] = useState(false);
+    const noImageLink = useNoImage();
+    // const imageUrl = useServerImageUrl(noImageLink);
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>();
+
+    const baseAPI = useApiEndpoint();
+
+    const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            setSelectedFile(files[0]);
+        }
+    };
 
     // const [status, setStatus] = useState(projectData?.project?.status);
-
     const [canUpdate, setCanUpdate] = useState(false);
+
+    const getPlainTextFromHTML = (htmlString) => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = htmlString;
+
+        // Find the first 'p' or 'span' tag and get its text content
+        const tag = wrapper.querySelector('p, span');
+        return tag ? tag.textContent : '';
+    };
+
+
+    useEffect(() => {
+        console.log({
+            projectTitle,
+            keywords,
+            dates,
+            businessArea,
+            service,
+            researchFunction,
+            dataCustodian
+        })
+        const plainTitle = getPlainTextFromHTML(projectTitle)
+        if (
+            (plainTitle === '' || plainTitle.length === 0) ||
+            (dates === null || dates.length < 2) ||
+            (service === null || service === undefined) ||
+            (researchFunction === null || researchFunction === undefined) ||
+            (businessArea === null || businessArea === undefined) ||
+            (dataCustodian === null || dataCustodian === 0 || dataCustodian === undefined) ||
+            (locationData.length < 1) ||
+            (keywords.length === 0)
+        ) {
+            setCanUpdate(false)
+        } else {
+            setCanUpdate(true)
+        }
+        console.log(selectedFile);
+        console.log(currentImage);
+    }, [
+        projectTitle, keywords, dates, businessArea, service, researchFunction, dataCustodian,
+        locationData,
+        selectedFile, currentImage,
+    ])
+
+
+
+
 
 
 
@@ -144,10 +207,10 @@ export const EditProjectModal = ({
     }
     const { colorMode } = useColorMode();
 
-    const updateProject = (formData: IEditProject) => {
+    const updateProject = async (formData: IEditProject) => {
         console.log('updating project')
         console.log(formData)
-
+        await updateProjectMutation.mutate(formData);
     }
 
     const updateProjectMutation = useMutation(updateProjectDetails,
@@ -172,8 +235,9 @@ export const EditProjectModal = ({
                 }
 
                 setTimeout(() => {
-                    queryClient.invalidateQueries(["projects", projectPk]);
-                    onClose();
+                    // queryClient.invalidateQueries(["projects", projectPk]);
+                    // refetchData();
+                    // onClose();
 
                 }, 350)
             },
@@ -194,7 +258,6 @@ export const EditProjectModal = ({
         })
 
 
-
     return (
         <>
             <Modal
@@ -203,8 +266,10 @@ export const EditProjectModal = ({
                 size={"full"}
             >
                 <ModalOverlay />
-                <Flex as={"form"}
-                    onSubmit={handleSubmit(updateProject)}>
+                <Flex
+                // as={"form"}
+                //     onSubmit={handleSubmit(updateProject)}
+                >
                     <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
                         <ModalHeader>Edit Project?</ModalHeader>
                         <ModalCloseButton />
@@ -217,21 +282,7 @@ export const EditProjectModal = ({
                                 readOnly
                             />
                             <FormControl>
-                                <UserSearchDropdown
-                                    {...register("dataCustodian", { required: true })}
 
-                                    onlyInternal={false}
-                                    isRequired={true}
-                                    setUserFunction={setDataCustodian}
-                                    preselectedUserPk={currentDataCustodian}
-                                    label="Data Custodian"
-                                    placeholder="Search for a user"
-                                    helperText={
-                                        <>
-                                            The user you would like to handle data.
-                                        </>
-                                    }
-                                />
                                 <FormLabel>Project Title</FormLabel>
                                 <StateRichTextEditor
                                     section={"title"}
@@ -276,221 +327,238 @@ export const EditProjectModal = ({
                                 </FormControl>
                             </Box>
 
+                            <Grid
+                                gridTemplateColumns={"repeat(1, 1fr)"}
+                                gridGap={4}
+                                // flexDir={"column"}
+                                mt={4}
+                            >
+                                <UserSearchDropdown
+                                    {...register("dataCustodian", { required: true })}
+
+                                    onlyInternal={false}
+                                    isRequired={true}
+                                    setUserFunction={setDataCustodian}
+                                    isEditable
+                                    preselectedUserPk={currentDataCustodian}
+                                    label="Data Custodian"
+                                    placeholder="Search for a user"
+                                    helperText={
+                                        <>
+                                            The user you would like to handle data.
+                                        </>
+                                    }
+                                />
+
+                                {!baLoading && baSet && (
+                                    <>
 
 
-                            {!baLoading && baSet && (
-                                <Box>
+                                        <FormControl isRequired>
+                                            <FormLabel>Business Area</FormLabel>
 
+                                            <InputGroup>
+                                                <Select
+                                                    variant='filled'
+                                                    placeholder='Select a Business Area'
+                                                    onChange={(event) => {
+                                                        const pkVal = event.target.value;
+                                                        const relatedBa = businessAreaList.find((ba) => Number(ba.pk) === Number(pkVal));
 
-                                    <FormControl isRequired>
-                                        <FormLabel>Business Area</FormLabel>
-
-                                        <InputGroup>
-                                            <Select
-                                                variant='filled'
-                                                placeholder='Select a Business Area'
-                                                onChange={(event) => {
-                                                    const pkVal = event.target.value;
-                                                    const relatedBa = businessAreaList.find((ba) => Number(ba.pk) === Number(pkVal));
-
-                                                    console.log(event.target.value)
-                                                    console.log(relatedBa);
-                                                    if (relatedBa !== undefined) {
-                                                        setBusinessArea(relatedBa)
+                                                        console.log(event.target.value)
+                                                        console.log(relatedBa);
+                                                        if (relatedBa !== undefined) {
+                                                            setBusinessArea(relatedBa)
+                                                        }
                                                     }
-                                                }
-                                                }
-                                                value={businessArea?.pk}
+                                                    }
+                                                    value={businessArea?.pk}
+                                                >
+                                                    {businessAreaList.map((ba, index) => {
+                                                        return (
+                                                            <option key={index} value={ba.pk}>
+                                                                {ba.name}
+                                                            </option>
+                                                        )
+                                                    })}
+                                                </Select>
+                                            </InputGroup>
+                                            <FormHelperText>The Business Area / Program that this project belongs to.</FormHelperText>
+                                        </FormControl>
+
+
+                                        <FormControl isRequired mb={4}>
+                                            <FormLabel>Research Function</FormLabel>
+                                            <InputGroup>
+                                                <Select
+                                                    variant='filled' placeholder='Select a Research Function'
+                                                    onChange={(event) => {
+                                                        const pkVal = event.target.value;
+                                                        const relatedRF = researchFunctionsList.find((rf) => Number(rf.pk) === Number(pkVal));
+
+                                                        console.log(event.target.value)
+                                                        console.log(relatedRF);
+                                                        if (relatedRF !== undefined) {
+                                                            setResearchFunction(relatedRF)
+                                                        }
+                                                    }
+                                                    }
+                                                    value={researchFunction?.pk}
+                                                >
+                                                    {researchFunctionsList?.map((rf, index) => {
+                                                        return (
+                                                            <option
+                                                                key={index}
+                                                                value={rf.pk}
+                                                            >
+                                                                {rf.name}
+                                                            </option>
+                                                        )
+                                                    })}
+                                                </Select>
+                                            </InputGroup>
+                                            <FormHelperText>The Research Function this project mainly contributes to.</FormHelperText>
+                                        </FormControl>
+
+                                        <FormControl isRequired mb={4}>
+                                            <FormLabel>Departmental Service</FormLabel>
+                                            <InputGroup>
+                                                <Select
+                                                    variant='filled' placeholder='Select a Deparmental Service'
+                                                    onChange={(event) => {
+                                                        const pkVal = event.target.value;
+                                                        const depService = servicesList.find((serv) => Number(serv.pk) === Number(pkVal));
+
+                                                        console.log(event.target.value)
+                                                        console.log(depService);
+                                                        if (depService !== undefined) {
+                                                            setService(depService)
+                                                        }
+                                                    }
+                                                    }
+                                                    value={service?.pk}                                            >
+                                                    {servicesList.map((service, index) => {
+                                                        return (
+                                                            <option key={index} value={service.pk}>
+                                                                {service.name}
+                                                            </option>
+                                                        )
+                                                    })}
+                                                </Select>
+                                            </InputGroup>
+                                            <FormHelperText>The DBCA service that this project delivers outputs to.</FormHelperText>
+                                        </FormControl>
+
+                                    </>
+                                )}
+
+                                {!locationsLoading && (
+                                    <>
+                                        {dbcaRegions && dbcaRegions.length > 0 && (
+                                            <AreaCheckAndMaps
+                                                title="DBCA Regions"
+                                                areas={dbcaRegions}
+                                                required
+                                                selectedAreas={locationData}
+                                                setSelectedAreas={setLocationData}
+                                            />
+
+                                        )}
+                                        {dbcaDistricts && dbcaDistricts.length > 0 && (
+                                            <AreaCheckAndMaps
+                                                title="DBCA Districts"
+                                                areas={dbcaDistricts}
+                                                required
+                                                selectedAreas={locationData}
+                                                setSelectedAreas={setLocationData}
+                                            />
+
+                                        )}
+                                        {ibra && ibra.length > 0 && (
+                                            <AreaCheckAndMaps
+                                                title="IBRAs"
+                                                areas={ibra}
+                                                required
+                                                selectedAreas={locationData}
+                                                setSelectedAreas={setLocationData}
+                                            />
+
+                                        )}
+                                        {imcra && imcra.length > 0 && (
+                                            <AreaCheckAndMaps
+                                                title="IMCRAs"
+                                                areas={imcra}
+                                                required
+                                                selectedAreas={locationData}
+                                                setSelectedAreas={setLocationData}
+                                            />
+
+                                        )}
+                                        {nrm && nrm.length > 0 && (
+                                            <AreaCheckAndMaps
+                                                title="Natural Resource Management Regions"
+                                                areas={nrm}
+                                                required
+                                                selectedAreas={locationData}
+                                                setSelectedAreas={setLocationData}
+                                            />
+
+                                        )}
+
+                                    </>
+                                )}
+                            </Grid>
+
+
+
+
+                            <FormControl my={4}>
+
+                                <FormLabel>Image</FormLabel>
+                                <Grid
+                                    gridTemplateColumns={"repeat(2, 1fr)"}
+                                    gridGap={4}
+                                >
+
+                                    <NewImagePreview
+                                        selectedFile={selectedFile}
+                                        currentString={`${baseAPI}${currentImage.file}`}
+                                    />
+
+                                    <Box>
+                                        <InputGroup>
+                                            <Button
+                                                as="label"
+                                                htmlFor="fileInput"
+                                                pt={1}
+                                                display="inline-flex"
+                                                justifyContent="center"
+                                                alignItems="center"
+                                                bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                                                color={colorMode === "light" ? "black" : "white"}
+                                                cursor={"pointer"}
                                             >
-                                                {businessAreaList.map((ba, index) => {
-                                                    return (
-                                                        <option key={index} value={ba.pk}>
-                                                            {ba.name}
-                                                        </option>
-                                                    )
-                                                })}
-                                            </Select>
+                                                Choose File
+                                            </Button>
+                                            <Input
+                                                id="fileInput"
+                                                type="file"
+                                                onChange={handleFileInputChange}
+                                                opacity={0}
+                                                position="absolute"
+                                                width="0.1px"
+                                                height="0.1px"
+                                                zIndex="-1"
+                                            />
                                         </InputGroup>
-                                        <FormHelperText>The Business Area / Program that this project belongs to.</FormHelperText>
-                                    </FormControl>
+                                        <FormHelperText>
+                                            Upload an image that represents the project.
+                                        </FormHelperText>
 
+                                    </Box>
+                                </Grid>
+                            </FormControl>
 
-                                    <FormControl isRequired mb={4}>
-                                        <FormLabel>Research Function</FormLabel>
-                                        <InputGroup>
-                                            <Select
-                                                variant='filled' placeholder='Select a Research Function'
-                                                onChange={(event) => {
-                                                    const pkVal = event.target.value;
-                                                    const relatedRF = researchFunctionsList.find((rf) => Number(rf.pk) === Number(pkVal));
-
-                                                    console.log(event.target.value)
-                                                    console.log(relatedRF);
-                                                    if (relatedRF !== undefined) {
-                                                        setResearchFunction(relatedRF)
-                                                    }
-                                                }
-                                                }
-                                                value={researchFunction?.pk}
-                                            >
-                                                {researchFunctionsList?.map((rf, index) => {
-                                                    return (
-                                                        <option
-                                                            key={index}
-                                                            value={rf.pk}
-                                                        >
-                                                            {rf.name}
-                                                        </option>
-                                                    )
-                                                })}
-                                            </Select>
-                                        </InputGroup>
-                                        <FormHelperText>The Research Function this project mainly contributes to.</FormHelperText>
-                                    </FormControl>
-
-                                    <FormControl isRequired mb={4}>
-                                        <FormLabel>Departmental Service</FormLabel>
-                                        <InputGroup>
-                                            <Select
-                                                variant='filled' placeholder='Select a Deparmental Service'
-                                                onChange={(event) => {
-                                                    const pkVal = event.target.value;
-                                                    const depService = servicesList.find((serv) => Number(serv.pk) === Number(pkVal));
-
-                                                    console.log(event.target.value)
-                                                    console.log(depService);
-                                                    if (depService !== undefined) {
-                                                        setService(depService)
-                                                    }
-                                                }
-                                                }
-                                                value={service?.pk}                                            >
-                                                {servicesList.map((service, index) => {
-                                                    return (
-                                                        <option key={index} value={service.pk}>
-                                                            {service.name}
-                                                        </option>
-                                                    )
-                                                })}
-                                            </Select>
-                                        </InputGroup>
-                                        <FormHelperText>The DBCA service that this project delivers outputs to.</FormHelperText>
-                                    </FormControl>
-
-                                </Box>
-                            )}
-
-                            {!locationsLoading && (
-                                <>
-                                    {dbcaRegions && (
-                                        <AreaCheckAndMaps
-                                            title="DBCA Regions"
-                                            areas={dbcaRegions}
-                                            required
-                                            selectedAreas={locationData}
-                                            setSelectedAreas={setLocationData}
-                                        />
-
-                                    )}
-                                    {dbcaDistricts && (
-                                        <AreaCheckAndMaps
-                                            title="DBCA Districts"
-                                            areas={dbcaDistricts}
-                                            required
-                                            selectedAreas={locationData}
-                                            setSelectedAreas={setLocationData}
-                                        />
-
-                                    )}
-                                    {ibra && (
-                                        <AreaCheckAndMaps
-                                            title="IBRAs"
-                                            areas={ibra}
-                                            required
-                                            selectedAreas={locationData}
-                                            setSelectedAreas={setLocationData}
-                                        />
-
-                                    )}
-                                    {imcra && (
-                                        <AreaCheckAndMaps
-                                            title="IMCRAs"
-                                            areas={imcra}
-                                            required
-                                            selectedAreas={locationData}
-                                            setSelectedAreas={setLocationData}
-                                        />
-
-                                    )}
-                                    {nrm && (
-                                        <AreaCheckAndMaps
-                                            title="Natural Resource Management Regions"
-                                            areas={nrm}
-                                            required
-                                            selectedAreas={locationData}
-                                            setSelectedAreas={setLocationData}
-                                        />
-
-                                    )}
-
-                                </>
-                            )}
-
-
-                            {/* <FormControl my={4}>
-                                    <Center
-                                        width={"100%"}
-                                        maxH={"300px"}
-                                        bg={"gray.50"}
-
-                                        mt={1}
-                                        rounded={"lg"}
-                                        overflow={"hidden"}
-                                    >
-                                        <Image
-                                            objectFit={"cover"}
-                                            src={
-                                                imageUrl
-                                                // me?.image ? `${baseAPI}${me.image.file}` : "/sad-face.png"
-                                            }
-
-                                            top={0}
-                                            left={0}
-                                            userSelect={"none"}
-                                        />
-                                    </Center>
-                                    <FormLabel>Image</FormLabel>
-                                    <InputGroup>
-                                        <Button
-                                            as="label"
-                                            htmlFor="fileInput"
-                                            pt={1}
-                                            display="inline-flex"
-                                            justifyContent="center"
-                                            alignItems="center"
-                                            bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                                            color={colorMode === "light" ? "black" : "white"}
-                                            cursor={"pointer"}
-                                        >
-                                            Choose File
-                                        </Button>
-                                        <Input
-                                            id="fileInput"
-                                            type="file"
-                                            onChange={handleFileInputChange}
-                                            opacity={0}
-                                            position="absolute"
-                                            width="0.1px"
-                                            height="0.1px"
-                                            zIndex="-1"
-                                        />
-                                    </InputGroup>
-                                    <FormHelperText>
-                                        Upload an image that represents the project.
-                                    </FormHelperText>
-                                </FormControl>
-
-                                <ImagePreview selectedFile={selectedFile} /> */}
 
 
                         </ModalBody>
@@ -513,6 +581,22 @@ export const EditProjectModal = ({
                                     type="submit"
                                     ml={3}
                                     isDisabled={!canUpdate}
+                                    onClick={(async () => {
+                                        updateProject({
+                                            projectPk: projectPk,
+                                            title: projectTitle,
+                                            // description: ,
+                                            image: selectedFile,
+                                            // status: ,
+                                            dataCustodian: dataCustodian,
+                                            keywords: keywords,
+                                            dates: dates,
+                                            departmentalService: service?.pk,
+                                            researchFunction: researchFunction?.pk,
+                                            businessArea: businessArea?.pk,
+                                            locations: locationData,
+                                        })
+                                    })}
                                 >
                                     Update
                                 </Button>

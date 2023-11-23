@@ -902,12 +902,13 @@ export const createProject = async ({ baseInformationData, detailsData, location
 export interface IEditProject {
     projectPk: string | number;
     title: string;
-    description: string;
+    description?: string;
+    status?: 'new' | 'pending' | 'active' | 'updating' | 'terminated' | 'suspended' | 'closed';
+    image?: File | null;
+    locations: number[];
     keywords: string[];
-    image: File | null;
 
     dates: Date[];
-    status: 'new' | 'pending' | 'active' | 'updating' | 'terminated' | 'suspended' | 'closed';
     dataCustodian: number;
     departmentalService: number;
     researchFunction: number;
@@ -920,6 +921,7 @@ export const updateProjectDetails = async ({
     description,
     keywords,
     image,
+    locations,
 
     dates,
     status,
@@ -929,25 +931,98 @@ export const updateProjectDetails = async ({
     businessArea,
 }: IEditProject) => {
     console.log('editing')
+    console.log('keywords:', keywords)
 
-    const data = {
-        'pk': projectPk,
-        'image': image,
-        'title': title,
-        'description': description,
-        'keywords': keywords,
-        'dates': dates,
-        'status': status,
-        'service': departmentalService,
-        'research_function': researchFunction,
-        'business_area': businessArea,
-        'data_custodian:': dataCustodian,
+    // const data = {
+    //     'pk': projectPk,
+    //     'title': title,
+
+    //     ...(description !== undefined && { 'description': description }),
+    //     ...(image !== undefined && { 'image': image }),
+    //     ...(status !== undefined && { 'status': status }),
+    //     ...(dataCustodian !== undefined && { 'data_custodian': dataCustodian }),
+
+    //     'keywords': keywords,
+    //     'dates': dates,
+    //     'service': departmentalService,
+    //     'research_function': researchFunction,
+    //     'business_area': businessArea,
+    // }
+
+
+
+    const newFormData = new FormData();
+
+    if (projectPk !== undefined) {
+        newFormData.append('pk', projectPk.toString());
     }
-    console.log(data)
-    return {
-        'data': data,
-        'status': 200,
+    if (title !== undefined) {
+        newFormData.append('title', title);
     }
+
+    if (description !== undefined) {
+        newFormData.append('description', description);
+    }
+    if (image !== null && image !== undefined) {
+        if (image instanceof File) {
+            newFormData.append('image', image);
+        } else if (typeof image === 'string') {
+            newFormData.append('image', image);
+        }
+    }
+    if (status !== undefined) {
+        newFormData.append('status', status);
+    }
+    if (dataCustodian !== undefined) {
+        newFormData.append('data_custodian', dataCustodian.toString());
+    }
+    if (keywords !== undefined) {
+        // const keywordString = JSON.stringify(keywords)
+        newFormData.append('keywords', keywords.join(', '));
+
+    }
+
+    if (locations !== undefined && locations.length > 0) {
+        const locationsString = JSON.stringify(locations);
+        newFormData.append('locations', locationsString);
+    }
+
+    if (dates !== undefined && dates.length > 0) {
+        console.log(dates)
+        dates.forEach((date, index) => {
+            const dateFormatted = new Date(date);
+            newFormData.append('dates', dateFormatted.toISOString());
+        });
+        // toISOString()
+    }
+
+    if (departmentalService !== undefined) {
+        newFormData.append('service', departmentalService.toString());
+    }
+
+    if (researchFunction !== undefined) {
+        newFormData.append('research_function', researchFunction.toString());
+    }
+
+    if (businessArea !== undefined) {
+        newFormData.append('business_area', businessArea.toString());
+    }
+
+
+    console.log(newFormData);
+    // console.log(data)
+
+    const res = instance.put(`projects/${projectPk}`, newFormData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    ).then(res => res.data);
+    // return {
+    //     'data': data,
+    //     'status': 200,
+    // }
 
     // return instance.get('google.com')
 }
