@@ -16,7 +16,10 @@ import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleD
 import { useGetDocumentsPendingApproval } from "../../../lib/hooks/useGetDocumentsPendingApproval"
 import { HiDocumentCheck } from "react-icons/hi2";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle"
-import { FaArrowRight } from "react-icons/fa"
+import { FaArrowRight, FaUserFriends } from "react-icons/fa"
+import { MdScience } from "react-icons/md"
+import { GiMaterialsScience } from "react-icons/gi"
+import { RiBook3Fill } from "react-icons/ri"
 
 
 interface ITaskFromAPI {
@@ -429,13 +432,23 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                             }}
                                                         >
                                                             <Center
-                                                                color={colorMode === "light" ? "blue.600" : "gray.200"}
+                                                                // color={colorMode === "light" ? "blue.600" : "gray.200"}
+                                                                color={
+                                                                    project?.kind === "core_function" ? "red.600" :
+                                                                        project?.kind === "science" ? "green.600" :
+                                                                            project?.kind === "student" ? "blue.600" :
+                                                                                "gray.600"
+                                                                }
                                                                 mr={3}
                                                                 alignItems={"center"}
                                                                 alignContent={"center"}
                                                                 boxSize={5}
                                                             >
-                                                                <GoProjectRoadmap />
+                                                                {project?.kind === "core_function" ? <GiMaterialsScience /> :
+                                                                    project?.kind === "science" ? <MdScience /> :
+                                                                        project?.kind === "student" ? <RiBook3Fill /> :
+                                                                            <FaUserFriends />}
+                                                                {/* <GoProjectRoadmap /> */}
                                                             </Center>
                                                             {/* <Text
                                                                 color={colorMode === "dark" ? "blue.200" : "blue.400"}

@@ -54,7 +54,14 @@ export const ProjectExternalSection = (
             setExternalFilled(true)
         }
         else {
+            console.log(
+                externalDescription.length,
+                aims.length,
+                collaborationWith.length
+
+            )
             setExternalFilled(false);
+
         }
     }, [externalData, aims, budget, collaborationWith, externalDescription, setExternalFilled])
 
