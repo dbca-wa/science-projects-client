@@ -164,16 +164,14 @@ export const TeamMember = ({
                     // isCurrentlyDragging ? "blue.500" : colorMode === "light" ? "white" : "gray.800"
                 }
                 justifyContent={"space-between"}
-                _hover={
-                    {
-                        boxShadow: colorMode === "light" ?
-                            "0px 20px 30px -10px rgba(0, 0, 0, 0.3), 0px 4px 5px -2px rgba(0, 0, 0, 0.06), -3px 0px 10px -2px rgba(0, 0, 0, 0.1), 3px 0px 10px -2px rgba(0, 0, 0, 0.1)"
-                            :
-                            "0px 4px 6px -1px rgba(255, 255, 255, 0.1), 0px 2px 4px -1px rgba(255, 255, 255, 0.06)",
-                        zIndex: 999,
+                _hover={{
+                    boxShadow: colorMode === "light" ?
+                        "0px 10px 15px -5px rgba(0, 0, 0, 0.15), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.03), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.05), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.05)"
+                        :
+                        "0px 2px 3px -0.5px rgba(255, 255, 255, 0.05), 0px 1px 2px -0.5px rgba(255, 255, 255, 0.03)",
+                    zIndex: 999,
+                }}
 
-                    }
-                }
                 border={"1px solid"}
                 borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
 
