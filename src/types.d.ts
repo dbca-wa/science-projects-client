@@ -196,6 +196,7 @@ interface ProjectPDFData {
 export interface IMainDoc {
     pk?: number;
     id?: number;
+    // report?: ISmallReport;
     created_year: number;
     created_at: Date;
     creator: number;

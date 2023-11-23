@@ -20,6 +20,7 @@ import { FaArrowRight, FaUserFriends } from "react-icons/fa"
 import { MdScience } from "react-icons/md"
 import { GiMaterialsScience } from "react-icons/gi"
 import { RiBook3Fill } from "react-icons/ri"
+import { useGetDocumentsPendingMyAction } from "../../../lib/hooks/useGetDocumentsPendingMyAction"
 
 
 interface ITaskFromAPI {
@@ -52,13 +53,13 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
 
     const { projectData, projectsLoading } = useGetMyProjects();
 
-    const { pendingProjectDocumentData, projectDocumentDataLoading } = useGetDocumentsPendingApproval();
+    const { pendingProjectDocumentData, projectDocumentDataLoading } = useGetDocumentsPendingMyAction();
 
     const { colorMode } = useColorMode();
 
     const formattedKind = (kind: string) => {
         // "conceptplan" | "projectplan" | "progressreport" | "studentreport" | "projectclosure"
-        if (kind === "conceptplan") {
+        if (kind === "concept" || kind === "conceptplan") {
             return "Concept Plan"
         } else if (kind === "projectplan") {
             return "Project Plan"
@@ -267,13 +268,11 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                     maxW={"125px"}
                                                                     w={"100%"}
                                                                 >
-
                                                                     <Text>{formattedKind(document?.kind)}</Text>
-
                                                                 </Box>
                                                                 <Divider
                                                                     orientation='vertical'
-                                                                    ml={-1}
+                                                                    // ml={-1}
                                                                     mr={5}
                                                                 />
                                                                 {/* <SimpleDisplaySRTE
@@ -284,6 +283,8 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                 /> */}
                                                                 <ExtractedHTMLTitle
                                                                     htmlContent={`${document?.project.title}`}
+                                                                    onClick={() => goToProjectDocument(document?.project?.pk ? document?.project?.pk : document?.project?.id, document)}
+
                                                                     color={
                                                                         colorMode === "dark" ? "blue.200" : "blue.400"
                                                                     }
@@ -416,41 +417,65 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                     justifyItems={"start"}
                                                     w={"100%"}
                                                 >
-                                                    {projectData?.map((project: IProjectData, index: number) => (
-                                                        <Flex
-                                                            key={index}
-                                                            alignItems={"center"}
-                                                            border={"1px solid"}
-                                                            borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-                                                            w={"100%"}
-                                                            p={2}
-                                                            onClick={() => goToProject(project?.pk ? project.pk : project.id)}
-                                                            _hover={{
-                                                                color: colorMode === "dark" ? "blue.100" : "blue.300",
-                                                                textDecoration: "underline",
-                                                                cursor: "pointer"
-                                                            }}
-                                                        >
-                                                            <Center
-                                                                // color={colorMode === "light" ? "blue.600" : "gray.200"}
-                                                                color={
-                                                                    project?.kind === "core_function" ? "red.600" :
-                                                                        project?.kind === "science" ? "green.600" :
-                                                                            project?.kind === "student" ? "blue.600" :
-                                                                                "gray.600"
-                                                                }
-                                                                mr={3}
+                                                    {projectData
+                                                        ?.sort((a, b) => {
+                                                            const order = ['science', 'student', 'core_function', 'external'];
+
+                                                            const indexA = order.indexOf(a.kind);
+                                                            const indexB = order.indexOf(b.kind);
+
+                                                            // If both kinds are in the order array, compare their positions
+                                                            if (indexA !== -1 && indexB !== -1) {
+                                                                return indexA - indexB;
+                                                            }
+
+                                                            // If only one kind is in the order array, prioritize it
+                                                            if (indexA !== -1) {
+                                                                return -1;
+                                                            }
+
+                                                            if (indexB !== -1) {
+                                                                return 1;
+                                                            }
+
+                                                            // If neither kind is in the order array, maintain the original order
+                                                            return 0;
+                                                        })
+                                                        .map((project: IProjectData, index: number) => (
+                                                            <Flex
+                                                                key={index}
                                                                 alignItems={"center"}
-                                                                alignContent={"center"}
-                                                                boxSize={5}
+                                                                border={"1px solid"}
+                                                                borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
+                                                                w={"100%"}
+                                                                p={2}
+                                                                onClick={() => goToProject(project?.pk ? project.pk : project.id)}
+                                                                _hover={{
+                                                                    color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                                                    textDecoration: "underline",
+                                                                    cursor: "pointer"
+                                                                }}
                                                             >
-                                                                {project?.kind === "core_function" ? <GiMaterialsScience /> :
-                                                                    project?.kind === "science" ? <MdScience /> :
-                                                                        project?.kind === "student" ? <RiBook3Fill /> :
-                                                                            <FaUserFriends />}
-                                                                {/* <GoProjectRoadmap /> */}
-                                                            </Center>
-                                                            {/* <Text
+                                                                <Center
+                                                                    // color={colorMode === "light" ? "blue.600" : "gray.200"}
+                                                                    color={
+                                                                        project?.kind === "core_function" ? "red.600" :
+                                                                            project?.kind === "science" ? "green.600" :
+                                                                                project?.kind === "student" ? "blue.600" :
+                                                                                    "gray.600"
+                                                                    }
+                                                                    mr={3}
+                                                                    alignItems={"center"}
+                                                                    alignContent={"center"}
+                                                                    boxSize={5}
+                                                                >
+                                                                    {project?.kind === "core_function" ? <GiMaterialsScience /> :
+                                                                        project?.kind === "science" ? <MdScience /> :
+                                                                            project?.kind === "student" ? <RiBook3Fill /> :
+                                                                                <FaUserFriends />}
+                                                                    {/* <GoProjectRoadmap /> */}
+                                                                </Center>
+                                                                {/* <Text
                                                                 color={colorMode === "dark" ? "blue.200" : "blue.400"}
                                                                 fontWeight={"bold"}
                                                                 cursor={"pointer"}
@@ -463,31 +488,31 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                 {`${project.title}`}
                                                             </Text> */}
 
-                                                            {/* <SimpleDisplaySRTE
+                                                                {/* <SimpleDisplaySRTE
 
                                                                 data={project.title}
                                                                 displayData={project.title}
                                                                 displayArea="traditionalProjectTitle"
                                                             /> */}
 
-                                                            <ExtractedHTMLTitle
-                                                                htmlContent={`${project.title}`}
-                                                                color={
-                                                                    colorMode === "dark" ? "blue.200" : "blue.400"
-                                                                }
-                                                                fontWeight={"bold"}
-                                                                cursor={"pointer"}
-                                                                _hover={
-                                                                    {
-                                                                        color: colorMode === "dark" ? "blue.100" : "blue.300",
-                                                                        textDecoration: "underline",
+                                                                <ExtractedHTMLTitle
+                                                                    htmlContent={`${project.title}`}
+                                                                    color={
+                                                                        colorMode === "dark" ? "blue.200" : "blue.400"
                                                                     }
-                                                                }
-                                                            />
+                                                                    fontWeight={"bold"}
+                                                                    cursor={"pointer"}
+                                                                    _hover={
+                                                                        {
+                                                                            color: colorMode === "dark" ? "blue.100" : "blue.300",
+                                                                            textDecoration: "underline",
+                                                                        }
+                                                                    }
+                                                                />
 
 
-                                                        </Flex>
-                                                    ))}
+                                                            </Flex>
+                                                        ))}
                                                 </Grid>
                                             ) :
                                             <Text
