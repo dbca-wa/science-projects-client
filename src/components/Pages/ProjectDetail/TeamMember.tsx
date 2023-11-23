@@ -4,7 +4,7 @@ import { Avatar, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, D
 import { BsGripVertical } from "react-icons/bs";
 import { ProjectUserDetails } from "./ProjectUserDetails";
 import { useEffect, useState } from "react";
-import { IImageData, IUserData } from "../../../types";
+import { IImageData, IUserData, IUserMe } from "../../../types";
 import { FaCrown } from "react-icons/fa";
 import { DraggableProvided } from "react-beautiful-dnd"; // Import DraggableProvided
 
@@ -25,7 +25,7 @@ interface ITeamMember {
     draggableProps: DraggableProvided['draggableProps'];
     dragHandleProps: DraggableProvided['dragHandleProps'];
     isCurrentlyDragging: boolean;
-    draggingUser: IUserData;
+    draggingUser: IUserData | IUserMe;
     backgroundColor: string | undefined; // Add backgroundColor prop
     refetchTeamData: () => void;
 }

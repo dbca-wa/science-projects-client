@@ -11,11 +11,14 @@ import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSe
 import { ProjectBaseInformation } from "../Pages/CreateProject/ProjectBaseInformation"
 import "../../styles/modalscrollbar.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { ICreateProjectBaseInfo, ICreateProjectDetails, ICreateProjectExternalDetails, ICreateProjectStudentDetails, IProjectCreationVariables, IUpdateProjectDetails, MutationError, MutationSuccess, ProjectCreationMutationSuccess, createProject, spawnDocument, updateProjectDetails } from "../../lib/api"
+import {
+    ICreateProjectBaseInfo, ICreateProjectDetails, ICreateProjectExternalDetails, ICreateProjectStudentDetails
+} from "../../lib/api"
 import { useNavigate } from "react-router-dom"
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection"
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection"
 import { IFullProjectDetails, IProjectData } from "../../types"
+import { useUser } from "../../lib/hooks/useUser"
 
 
 interface IEditProjectDetailsProps {
@@ -95,83 +98,7 @@ export const ProjectDetailEditModal = ({ projectType, isOpen, onClose, icon, bas
 
     const navigate = useNavigate();
 
-    // const mutation = useMutation<
-    //     MutationSuccess, MutationError, IUpdateProjectDetails
-    // >(
-    //     updateProjectDetails,
-    //     {
-    //         // Start of mutation handling
-    //         onMutate: () => {
-    //             addToast({
-    //                 title: 'Creating project...',
-    //                 description: "One moment!",
-    //                 status: 'loading',
-    //                 position: "top-right",
-    //                 // duration: 3000
-    //             })
-    //         },
-    //         // Success handling based on API-file-declared interface
-    //         onSuccess: async (data) => {
-    //             console.log(data)
-    //             if (toastIdRef.current) {
-    //                 toast.update(toastIdRef.current, {
-    //                     title: 'Success',
-    //                     description: `Project Created`,
-    //                     status: 'success',
-    //                     position: "top-right",
-    //                     duration: 3000,
-    //                     isClosable: true,
-    //                 })
-    //             }
-    //             // Close the modal
-    //             if (onClose) {
-    //                 onClose();
-    //                 if (!projectType.includes("Student") && !projectType.includes("External"))
-    //                     await spawnDocument({ project_pk: data.pk, kind: data.kind });
-    //                 else {
-    //                     if (projectType.includes("Student")) {
-    //                         console.log("Spawn document for Student here")
-    //                     }
-    //                     else {
-    //                         console.log("Spawn document for External here")
-    //                     }
-    //                 }
-
-    //                 queryClient.refetchQueries([`projects`])
-    //                 navigate(`/projects/${data.pk}`);
-    //             }
-    //         },
-    //         // Error handling based on API-file-declared interface
-    //         onError: (error) => {
-    //             let errorMessage = "";
-    //             console.log(error)
-    //             if (error.response?.data) {
-    //                 const errorKeys = Object.keys(error.response.data);
-    //                 if (errorKeys.length > 0) {
-    //                     errorMessage = error.response.data[errorKeys[0]][0];
-    //                 } else {
-    //                     errorMessage = 'Unknown error occurred.';
-    //                 }
-    //             } else {
-    //                 errorMessage = 'Unknown error occurred.';
-    //             }
-
-    //             const capitalizedErrorMessage = errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1);
-
-
-    //             if (toastIdRef.current) {
-    //                 toast.update(toastIdRef.current, {
-    //                     title: 'Could not create project',
-    //                     description: capitalizedErrorMessage,
-    //                     status: 'error',
-    //                     position: "top-right",
-    //                     duration: 3000,
-    //                     isClosable: true,
-    //                 })
-    //             }
-    //         }
-    //     }
-    // )
+    const { userData: me, userLoading } = useUser();
 
 
     useEffect(() => {
@@ -264,6 +191,7 @@ export const ProjectDetailEditModal = ({ projectType, isOpen, onClose, icon, bas
                                 <ProjectDetailsSection
                                     backClick={goBack}
                                     nextClick={goToLocationTab}
+                                    thisUser={me?.pk}
 
                                     onClose={onClose}
                                     projectType={projectType}
