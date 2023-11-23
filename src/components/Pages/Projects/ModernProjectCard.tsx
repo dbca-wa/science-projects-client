@@ -10,6 +10,7 @@ import { useNoImage } from "../../../lib/hooks/useNoImage";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE";
+import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 
 export const ModernProjectCard = ({
     pk,
@@ -193,11 +194,18 @@ export const ModernProjectCard = ({
                         >
                             {title}
                         </Text> */}
-                        <SimpleDisplaySRTE
+                        {/* <SimpleDisplaySRTE
 
                             data={title}
                             displayData={title}
                             displayArea="projectCardTitle"
+                        /> */}
+
+                        <ExtractedHTMLTitle
+                            htmlContent={title}
+                            color={"white"}
+                            fontWeight={"semibold"}
+                            fontSize={"17px"}
                         />
                     </Box>
                 </Flex>
