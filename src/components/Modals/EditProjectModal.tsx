@@ -522,7 +522,7 @@ export const EditProjectModal = ({
 
                                     <NewImagePreview
                                         selectedFile={selectedFile}
-                                        currentString={`${baseAPI}${currentImage.file}`}
+                                        currentString={currentImage?.file ? `${baseAPI}${currentImage?.file}` : undefined}
                                     />
 
                                     <Box>

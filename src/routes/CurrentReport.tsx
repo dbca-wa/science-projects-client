@@ -56,6 +56,7 @@ export const CurrentReport = () => {
                 <>
                     <Box>
                         <Head title={financialYearString} />
+                        <Text>WORK IN PROGRESS</Text>
 
                         <Flex >
                             <Text flex={1} fontSize={"2xl"} fontWeight={"bold"}>Annual Report ({financialYearString}) </Text>

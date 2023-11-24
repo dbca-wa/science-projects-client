@@ -113,6 +113,8 @@ const ReportMenuContents = () => {
         }
     }, [reportPdfsData, reportPdfsLoading])
 
+    const { userData, userLoading } = useUser();
+
     return (
         <>
             <MenuGroup
@@ -121,19 +123,21 @@ const ReportMenuContents = () => {
 
 
             >
+                {userData?.is_superuser ? (
+                    <MenuItem
+                        onClick={() => {
+                            navigate('/reports/current')
+                        }}
+                    >
+                        <MdOutlineAccessTimeFilled />
 
-                <MenuItem
-                    onClick={() => {
-                        navigate('/reports/current')
-                    }}
-                >
-                    <MdOutlineAccessTimeFilled />
+                        {/* {<AiFillPrinter />} */}
+                        <Text ml={2}>
+                            Latest Report
+                        </Text>
+                    </MenuItem>
+                ) : null}
 
-                    {/* {<AiFillPrinter />} */}
-                    <Text ml={2}>
-                        Latest Report
-                    </Text>
-                </MenuItem>
                 <MenuItem
                     onClick={() => {
                         navigate('/reports')

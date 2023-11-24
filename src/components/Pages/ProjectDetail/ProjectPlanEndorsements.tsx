@@ -19,9 +19,6 @@ export const ProjectPlanEndorsements = (
     const { register, handleSubmit, reset, watch, setValue } = useForm<ISpecialEndorsement>();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const involvesPlantsValue = watch('involvesPlants');
-    const involvesAnimalsValue = watch('involvesAnimals');
-
     const dmEndReqValue = watch('dataManagerEndorsementRequired');
     const hcEndReqValue = watch('herbariumEndorsementRequired');
     const aecEndReqValue = watch('aecEndorsementRequired');
@@ -38,25 +35,19 @@ export const ProjectPlanEndorsements = (
         dmEndProvidedValue: dmEndProvidedValue,
         bmEndRequiredValue: bmEndRequiredValue,
         bmEndProvidedValue: bmEndProvidedValue,
-        involvesPlantsValue: involvesPlantsValue,
         hcEndReqValue: hcEndReqValue,
         hcEndProvidedValue: hcEndProvidedValue,
-        involvesAnimalsValue: involvesAnimalsValue,
         aecEndReqValue: aecEndReqValue,
         aecEndProvidedValue: aecEndProvidedValue,
 
     }), [
         dmEndReqValue, dmEndProvidedValue,
-        involvesPlantsValue, involvesAnimalsValue,
         bmEndRequiredValue, bmEndProvidedValue,
         aecEndReqValue, aecEndProvidedValue,
         hcEndReqValue, hcEndProvidedValue,
     ]);
 
     // const [involvesDataCollection, setInvolvesDataCollection] = useState(true);
-
-    const [involvesPlants, setInvolvesPlants] = useState(document?.involves_plants);
-    const [involvesAnimals, setInvolvesAnimals] = useState(document?.involves_animals);
 
     // useEffect(() => {
     //     console.log(involvesAnimals)
@@ -73,30 +64,19 @@ export const ProjectPlanEndorsements = (
     const [aecEndProvided, setAecEndProvided] = useState(document?.endorsements?.ae_endorsement_provided);
 
 
-    const [dmEndProvided, setDmEndProvided] = useState(document?.endorsements?.dm_endorsement_provided);
-    const [dmEndRequired, setDmEndRequired] = useState(document?.endorsements?.dm_endorsement_required);
-
-
-
     const [bmEndProvided, setBmEndProvided] = useState(document?.endorsements?.bm_endorsement_provided);
     const [bmEndRequired, setBmEndRequired] = useState(document?.endorsements?.bm_endorsement_required);
 
-    const [herbCuratorInteractable, setHerbCuratorInteractable] = useState(false);
-    const [aecInteractable, setAecInteractable] = useState(false);
 
 
-    const [userCanEditDMEndorsement, setUserCanEditDMEndorsement] = useState(false);
     const [userCanEditHCEndorsement, setUserCanEditHCEndorsement] = useState(false);
     const [userCanEditBMEndorsement, setUserCanEditBMEndorsement] = useState(false);
     const [userCanEditAECEndorsement, setUserCanEditAECEndorsement] = useState(false);
 
-    useEffect(() => {
-        if (userData?.is_superuser || userIsLeader) {
-            setUserCanEditDMEndorsement(true);
-        } else {
-            setUserCanEditDMEndorsement(false);
-        }
-    }, [userData, userIsLeader]);
+    const [herbCuratorInteractable, setHerbCuratorInteractable] = useState(false);
+    const [aecInteractable, setAecInteractable] = useState(false);
+    const [bmInteractable, setBmInteractable] = useState(false);
+
 
     useEffect(() => {
         if (userData?.is_superuser || userData?.is_herbarium_curator) {
@@ -133,22 +113,32 @@ export const ProjectPlanEndorsements = (
 
 
     useEffect(() => {
-        if (involvesAnimals === true && aecEndRequired === true) {
+        if (aecEndRequired === true) {
             setAecInteractable(true)
         }
         else {
             setAecInteractable(false)
         }
-    }, [involvesAnimals, aecEndRequired])
+    }, [aecEndRequired])
 
     useEffect(() => {
-        if (involvesPlants === true && hcEndRequired === true) {
+        if (hcEndRequired === true) {
             setHerbCuratorInteractable(true);
         }
         else {
             setHerbCuratorInteractable(false);
         }
-    }, [involvesPlants, hcEndRequired])
+    }, [hcEndRequired])
+
+
+    useEffect(() => {
+        if (bmEndRequired === true) {
+            setBmInteractable(true);
+        }
+        else {
+            setBmInteractable(false);
+        }
+    }, [hcEndRequired])
 
 
     const queryClient = useQueryClient();
@@ -216,17 +206,12 @@ export const ProjectPlanEndorsements = (
             <SeekEndorsementModal
                 projectPlanPk={document?.pk}
 
-                dataManagerEndorsementRequired={dmEndReqValue}
-                dataManagerEndorsementProvided={dmEndProvidedValue}
-
                 biometricianEndorsementRequired={bmEndRequiredValue}
                 biometricianEndorsementProvided={bmEndProvidedValue}
 
-                involvesPlants={involvesPlantsValue}
                 herbariumEndorsementRequired={hcEndReqValue}
                 herbariumEndorsementProvided={hcEndProvidedValue}
 
-                involvesAnimals={involvesAnimalsValue}
                 aecEndorsementRequired={aecEndReqValue}
                 aecEndorsementProvided={aecEndProvidedValue}
 
@@ -266,92 +251,7 @@ export const ProjectPlanEndorsements = (
                                 Involvement & Endorsements
                             </Text>
                         </Box>
-                        {/* Data Collection */}
-                        {/* <Grid
-                            gridTemplateColumns={"repeat(1, 1fr)"}
-                            gridRowGap={4}
-                            alignItems={"center"}
-                            userSelect={"none"}
-                            border={"1px solid"}
-                            borderColor={"gray.300"}
-                            p={4}
-                            rounded={"xl"}
-                            roundedBottom={0}
-                        >
-                            <Flex>
 
-                                <Box
-                                    flex={1}
-                                >
-                                    <Text
-                                        fontWeight={"semibold"}
-                                    >
-                                        Data Collection Required?
-                                    </Text>
-                                </Box>
-                                <Checkbox
-                                    defaultChecked={
-                                        dmEndRequired
-                                    }
-                                    {...register('dataManagerEndorsementRequired', { value: dmEndRequired })}
-                                    {...register('dataManagerEndorsementRequired', { value: true })}
-
-                                    mr={3}
-                                />
-
-                            </Flex>
-
-
-                            <Flex
-                                // alignItems={"center"}
-                                w={"100%"}
-                                alignItems={"center"}
-                                mb={3}
-                            >
-
-
-                                <Box
-                                    flex={1}
-                                >
-                                    <Text
-                                        color={dmEndReqValue ? "black" : "gray.500"}
-                                    >
-                                        Data Manager's Endorsement
-                                    </Text>
-                                </Box>
-
-                                <Flex
-                                >
-                                    {!userCanEditDMEndorsement
-                                        ?
-                                        (
-                                            <Tag
-                                                alignItems={"center"}
-                                                justifyContent={"center"}
-                                                display={"flex"}
-                                                bg={document?.endorsements?.dm_endorsement_provided === true ? "green.500" : "red.500"}
-                                                color={"white"}
-                                            >
-                                                {document?.endorsements?.dm_endorsement_provided === true ? "Granted" : "Required"}
-                                            </Tag>
-                                        )
-                                        :
-                                        (
-                                            <Switch
-                                                defaultChecked={
-                                                    document.endorsements.hc_endorsement_provided === true
-                                                }
-                                                {...register('dataManagerEndorsementProvided', { value: dmEndProvided })}
-                                                isDisabled={!dmEndReqValue}
-                                            />
-                                        )
-                                    }
-
-                                </Flex>
-
-                            </Flex>
-
-                        </Grid> */}
 
                         {/* Biometrician */}
                         <Grid
@@ -388,8 +288,6 @@ export const ProjectPlanEndorsements = (
                                     }
                                     mr={3}
                                     {...register("bmEndorsementRequired", { value: bmEndRequired })}
-
-                                // isDisabled
                                 />
 
 
@@ -481,16 +379,13 @@ export const ProjectPlanEndorsements = (
                             </Flex> */}
 
 
-                            {/* {
-                            involvesPlantsValue &&
-                            ( */}
+
                             <Flex
                             >
                                 <Box
                                     flex={1}
                                 >
                                     <Text
-                                        // color={involvesPlantsValue ? "black" : "gray.500"}
                                         fontWeight={"semibold"}
                                     >
                                         Herbarium Curator's Endorsement Required?</Text>
@@ -502,7 +397,6 @@ export const ProjectPlanEndorsements = (
                                     mr={3}
                                     // onChange={handleTogglePlantsInvolved}
                                     {...register('herbariumEndorsementRequired', { value: hcEndRequired })}
-                                    isDisabled={!involvesPlantsValue}
                                 />
 
 
@@ -518,7 +412,7 @@ export const ProjectPlanEndorsements = (
                             >
                                 <Box>
                                     <Text
-                                        color={hcEndRequired ? "black" : "gray.500"}
+                                        color={hcEndReqValue ? "black" : "gray.500"}
                                     >
                                         Herbarium Curator's Endorsement</Text>
                                 </Box>
@@ -568,31 +462,7 @@ export const ProjectPlanEndorsements = (
                             borderTop={0}
                         // roundedBottom={0}
                         >
-                            {/* <Flex
-                                alignItems={"center"}
-                                userSelect={"none"}
-                            >
-                                <Box
-                                    flex={1}
-                                >
-                                    <Text
-                                        fontWeight={"semibold"}
-                                    >
-                                        Interaction with Vertebrate Animals
-                                    </Text>
-                                </Box>
 
-                                <Checkbox
-                                    defaultChecked={
-                                        involvesAnimals
-                                    }
-                                    mr={3}
-                                    // onChange={handleToggleAnimalsInvolved}
-                                    {...register('involvesAnimals', { value: involvesAnimals })}
-                                />
-
-
-                            </Flex> */}
 
                             {/* {involvesAnimalsValue === true &&
                             ( */}
@@ -624,7 +494,6 @@ export const ProjectPlanEndorsements = (
                                         mr={3}
                                         // onChange={handleTogglePlantsInvolved}
                                         {...register('aecEndorsementRequired', { value: aecEndRequired })}
-                                        isDisabled={!involvesAnimalsValue}
                                     />
 
                                 </Box>
@@ -679,8 +548,6 @@ export const ProjectPlanEndorsements = (
                             </Flex>
                             {/* )
                         } */}
-
-
                         </Grid>
 
                         <Flex
@@ -688,34 +555,10 @@ export const ProjectPlanEndorsements = (
                             justifyContent={"flex-end"}
                         >
                             <Button
-                                // form="submitEndorsement"
-                                colorScheme="blue"
-                                // type="submit"
                                 mx={1}
-                                isDisabled={
-                                    dmEndReqValue === undefined ||
-                                    dmEndProvidedValue === undefined ||
-                                    bmEndRequiredValue === undefined ||
-                                    bmEndProvidedValue === undefined
-
-                                    ||
-
-                                    hcEndReqValue === undefined ||
-                                    hcEndProvidedValue === undefined ||
-                                    aecEndReqValue === undefined ||
-                                    aecEndProvidedValue === undefined
-                                }
-                                onClick={onOpen}
-                            >
-                                Send Emails
-                            </Button>
-                            <Button
-                                mx={1}
-
                                 colorScheme="green"
+                                onClick={onOpen}
                                 isDisabled={
-                                    dmEndReqValue === undefined ||
-                                    dmEndProvidedValue === undefined ||
                                     bmEndRequiredValue === undefined ||
                                     bmEndProvidedValue === undefined
                                     ||

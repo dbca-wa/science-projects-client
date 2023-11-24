@@ -12,16 +12,12 @@ import { useForm } from "react-hook-form";
 
 interface Props {
     projectPlanPk: number;
-    involvesAnimals: boolean;
-    involvesPlants: boolean;
     biometricianEndorsementRequired: boolean;
     biometricianEndorsementProvided: boolean;
     aecEndorsementRequired: boolean;
     herbariumEndorsementRequired: boolean;
     aecEndorsementProvided: boolean;
     herbariumEndorsementProvided: boolean;
-    dataManagerEndorsementRequired: boolean;
-    dataManagerEndorsementProvided: boolean;
     isOpen: boolean;
     onClose: () => void;
 }
@@ -30,9 +26,8 @@ export const SeekEndorsementModal = (
     {
         projectPlanPk,
         biometricianEndorsementRequired, biometricianEndorsementProvided,
-        involvesPlants, herbariumEndorsementRequired, herbariumEndorsementProvided,
-        involvesAnimals, aecEndorsementRequired, aecEndorsementProvided,
-        dataManagerEndorsementRequired, dataManagerEndorsementProvided,
+        herbariumEndorsementRequired, herbariumEndorsementProvided,
+        aecEndorsementRequired, aecEndorsementProvided,
         isOpen, onClose
     }: Props
 ) => {
@@ -131,12 +126,13 @@ export const SeekEndorsementModal = (
                                 fontSize={"xl"}
                             >
                                 {
-                                    !involvesAnimals || (involvesAnimals && !aecEndorsementRequired) || (involvesAnimals && aecEndorsementRequired && aecEndorsementProvided) ||
-                                        !involvesPlants || (involvesPlants && !herbariumEndorsementRequired) || (involvesPlants && herbariumEndorsementRequired && herbariumEndorsementProvided) ||
-                                        !biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided) ||
-                                        !dataManagerEndorsementRequired || (dataManagerEndorsementRequired && dataManagerEndorsementProvided)
+                                    ((!aecEndorsementRequired) || (aecEndorsementRequired && aecEndorsementProvided)) &&
+                                        ((!herbariumEndorsementRequired) || (herbariumEndorsementRequired && herbariumEndorsementProvided)) &&
+                                        (!biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided))
                                         ?
-                                        ("Endorsement emails are not necessary") : "Are you sure you want to seek endorsement for this project?"
+                                        ("Endorsement emails are not necessary")
+                                        :
+                                        "Are you sure you want to seek endorsement for this project?"
                                 }
 
                             </Text>
@@ -145,29 +141,7 @@ export const SeekEndorsementModal = (
                             mt={8}
                         >
                             <UnorderedList>
-                                {/* IF DM endorsement required and not provided */}
-                                {
-                                    dataManagerEndorsementRequired === true &&
-                                    dataManagerEndorsementProvided === false &&
-                                    (
-                                        <ListItem
-                                            color={"red.700"}
-                                        >
-                                            As the data manager has not signed off on this, but DM endorsement is marked as required but it has yet to be provided, an email will be sent to the listed data manager
-                                        </ListItem>
-                                    )
-                                }
-                                {/* ELSE where DME not required */}
-                                {
-                                    dataManagerEndorsementRequired === false &&
-                                    (
-                                        <ListItem
-                                            color={"blue.500"}
-                                        >
-                                            As DM endorsement is marked as not required, no email will be sent to the listed DM
-                                        </ListItem>
-                                    )
-                                }
+
                                 {/* IF BM endorsement required and not provided */}
                                 {
                                     biometricianEndorsementRequired === true &&
@@ -195,8 +169,7 @@ export const SeekEndorsementModal = (
                                 {/* IF involves animals */}
                                 {/* AND AEC endorsement required and not provided */}
                                 {
-                                    involvesAnimals === true
-                                    && aecEndorsementRequired === true
+                                    aecEndorsementRequired === true
                                     && aecEndorsementProvided === false
                                     &&
                                     (
@@ -208,7 +181,6 @@ export const SeekEndorsementModal = (
                                     )}
                                 {/* ELSE where AEC endorsement not required */}
                                 {
-                                    involvesAnimals === true &&
                                     aecEndorsementRequired === false
                                     &&
                                     (
@@ -222,7 +194,6 @@ export const SeekEndorsementModal = (
                                 {/* IF involves plants */}
                                 {/* AND HC endorsement required */}
                                 {
-                                    involvesPlants === true &&
                                     herbariumEndorsementRequired === true &&
                                     herbariumEndorsementProvided === false &&
                                     (
@@ -237,7 +208,6 @@ export const SeekEndorsementModal = (
 
                                 {/* ELSE where HC endorsement not required */}
                                 {
-                                    involvesPlants === true &&
                                     herbariumEndorsementRequired === false &&
                                     (
                                         <ListItem
@@ -278,11 +248,9 @@ export const SeekEndorsementModal = (
                                 type="submit"
                                 ml={3}
                                 isDisabled={
-                                    !involvesAnimals || (involvesAnimals && !aecEndorsementRequired) || (involvesAnimals && aecEndorsementRequired && aecEndorsementProvided) ||
-                                    !involvesPlants || (involvesPlants && !herbariumEndorsementRequired) || (involvesPlants && herbariumEndorsementRequired && herbariumEndorsementProvided) ||
-                                    !biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided) ||
-                                    !dataManagerEndorsementRequired || (dataManagerEndorsementRequired && dataManagerEndorsementProvided)
-
+                                    ((!aecEndorsementRequired) || (aecEndorsementRequired && aecEndorsementProvided)) &&
+                                    ((!herbariumEndorsementRequired) || (herbariumEndorsementRequired && herbariumEndorsementProvided)) &&
+                                    (!biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided))
                                 }
                             >
                                 Send Emails
