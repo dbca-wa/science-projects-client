@@ -656,6 +656,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         justifyContent={"flex-end"}
                                                     >
                                                         <StudentReportActionModal
+                                                            userData={userData}
                                                             callSameData={callSameData}
                                                             refetchData={refetchData}
                                                             baData={baData}
@@ -686,6 +687,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                     <Center
                                                         justifyContent={"flex-end"}>
                                                         <StudentReportActionModal
+                                                            userData={userData}
                                                             callSameData={callSameData}
 
                                                             refetchData={refetchData}
@@ -804,6 +806,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                     // ml={4}
                                                     >
                                                         <StudentReportActionModal
+                                                            userData={userData}
                                                             refetchData={refetchData}
                                                             callSameData={callSameData}
 
@@ -838,6 +841,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         ml={3}
                                                     >
                                                         <StudentReportActionModal
+                                                            userData={userData}
                                                             refetchData={refetchData}
                                                             callSameData={callSameData}
 
@@ -875,6 +879,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         ml={3}
                                                     >
                                                         <StudentReportActionModal
+                                                            userData={userData}
                                                             refetchData={refetchData}
                                                             callSameData={callSameData}
 
@@ -959,6 +964,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         ml={3}
                                                     >
                                                         <StudentReportActionModal
+                                                            userData={userData}
                                                             action={"send_back"}
                                                             refetchData={refetchData}
                                                             callSameData={callSameData}
@@ -995,6 +1001,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         ml={3}
                                                     >
                                                         <StudentReportActionModal
+                                                            userData={userData}
                                                             action={"recall"}
                                                             refetchData={refetchData}
                                                             callSameData={callSameData}
@@ -1031,6 +1038,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                         justifyContent={"flex-end"}
                                                     >
                                                         <StudentReportActionModal
+                                                            userData={userData}
                                                             action={"approve"}
                                                             refetchData={refetchData}
                                                             callSameData={callSameData}

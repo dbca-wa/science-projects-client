@@ -2,13 +2,14 @@ import { Button, Text, FormControl, Input, InputGroup, Modal, ModalBody, ModalCl
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { IApproveDocument, IBusinessArea, IProjectData } from "../../../types";
+import { IApproveDocument, IBusinessArea, IProjectData, IUserMe } from "../../../types";
 import { handleDocumentAction } from "../../../lib/api";
 import { useBusinessArea } from "../../../lib/hooks/useBusinessArea";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers";
 
 interface Props {
+    userData: IUserMe;
     action: "approve" | "recall" | "send_back";
     stage: number;
     documentPk: number;
@@ -21,9 +22,13 @@ interface Props {
 }
 
 export const ProjectPlanActionModal = (
-    { stage, documentPk, projectPlanPk, action,
+    {
+        userData,
+        stage, documentPk, projectPlanPk, action,
         onClose, isOpen, projectData, baData, refetchData }: Props
 ) => {
+
+
 
     useEffect(() => {
         console.log(
@@ -136,6 +141,7 @@ export const ProjectPlanActionModal = (
             console.log(directorateData)
     }, [directorateData])
 
+
     return (
         <Modal
             isOpen={isOpen}
@@ -184,6 +190,7 @@ export const ProjectPlanActionModal = (
                                             </Text>
 
                                             <Checkbox
+                                                isDisabled={!userData?.is_superuser}
                                                 mt={8}
                                                 isChecked={shouldSendEmail}
                                                 onChange={() => setShouldSendEmail(!shouldSendEmail)}
@@ -259,6 +266,7 @@ export const ProjectPlanActionModal = (
 
                                                 </Box>
                                                 <Checkbox
+                                                    isDisabled={!userData?.is_superuser}
                                                     mt={8}
                                                     isChecked={shouldSendEmail}
                                                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
@@ -273,12 +281,12 @@ export const ProjectPlanActionModal = (
                                             <Text fontWeight={"bold"}>Stage 3</Text>
                                             <br />
                                             <Text>
-                                                In your capacity as Directorate, would you like to {action} this project plan?
+                                                In your capacity as Directorate, would you like to {action === 'send_back' ? "send back" : action} this project plan?
                                             </Text>
                                             <br />
                                             <Text>
                                                 {action === "approve" ?
-                                                    "This will provide final approval for this concept plan, enabling creation of a project plan."
+                                                    "This will provide final approval for this project plan, enabling creation of progress reports."
                                                     :
                                                     action === "recall" ?
                                                         "This will return the approval status from 'Granted' to 'Required'."
@@ -312,6 +320,7 @@ export const ProjectPlanActionModal = (
 
                                                         </Box>
                                                         <Checkbox
+                                                            isDisabled={!userData?.is_superuser}
                                                             mt={8}
                                                             isChecked={shouldSendEmail}
                                                             onChange={() => setShouldSendEmail(!shouldSendEmail)}

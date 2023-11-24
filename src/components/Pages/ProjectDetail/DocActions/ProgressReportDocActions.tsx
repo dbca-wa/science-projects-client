@@ -655,6 +655,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                         justifyContent={"flex-end"}
                                                     >
                                                         <ProgressReportActionModal
+                                                            userData={userData}
                                                             refetchData={refetchData}
                                                             callSameData={callSameData}
                                                             baData={baData}
@@ -685,6 +686,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                     <Center
                                                         justifyContent={"flex-end"}>
                                                         <ProgressReportActionModal
+                                                            userData={userData}
                                                             callSameData={callSameData}
 
                                                             refetchData={refetchData}
@@ -803,6 +805,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                     // ml={4}
                                                     >
                                                         <ProgressReportActionModal
+                                                            userData={userData}
                                                             callSameData={callSameData}
 
                                                             refetchData={refetchData}
@@ -837,6 +840,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                         ml={3}
                                                     >
                                                         <ProgressReportActionModal
+                                                            userData={userData}
                                                             callSameData={callSameData}
 
                                                             refetchData={refetchData}
@@ -874,6 +878,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                         ml={3}
                                                     >
                                                         <ProgressReportActionModal
+                                                            userData={userData}
                                                             callSameData={callSameData}
 
                                                             refetchData={refetchData}
@@ -958,6 +963,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                         ml={3}
                                                     >
                                                         <ProgressReportActionModal
+                                                            userData={userData}
                                                             callSameData={callSameData}
 
                                                             action={"send_back"}
@@ -994,6 +1000,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                         ml={3}
                                                     >
                                                         <ProgressReportActionModal
+                                                            userData={userData}
                                                             callSameData={callSameData}
 
                                                             action={"recall"}
@@ -1030,6 +1037,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                         justifyContent={"flex-end"}
                                                     >
                                                         <ProgressReportActionModal
+                                                            userData={userData}
                                                             callSameData={callSameData}
 
                                                             action={"approve"}

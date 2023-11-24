@@ -2,13 +2,14 @@ import { Button, Text, FormControl, Input, InputGroup, Modal, ModalBody, ModalCl
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { IApproveDocument, IBusinessArea, IProjectData } from "../../../types";
+import { IApproveDocument, IBusinessArea, IProjectData, IUserMe } from "../../../types";
 import { handleDocumentAction } from "../../../lib/api";
 import { useBusinessArea } from "../../../lib/hooks/useBusinessArea";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers";
 
 interface Props {
+    userData: IUserMe;
     action: "approve" | "recall" | "send_back";
     stage: number;
     documentPk: number;
@@ -22,7 +23,7 @@ interface Props {
 }
 
 export const ProgressReportActionModal = (
-    { stage, documentPk, progressReportPk, onClose, isOpen, projectData, baData, action, refetchData, callSameData }: Props
+    { userData, stage, documentPk, progressReportPk, onClose, isOpen, projectData, baData, action, refetchData, callSameData }: Props
 ) => {
 
     const { colorMode } = useColorMode();
@@ -178,6 +179,8 @@ export const ProgressReportActionModal = (
                                             </Text>
 
                                             <Checkbox
+                                                isDisabled={!userData?.is_superuser}
+
                                                 mt={8}
                                                 isChecked={shouldSendEmail}
                                                 onChange={() => setShouldSendEmail(!shouldSendEmail)}
@@ -252,6 +255,8 @@ export const ProgressReportActionModal = (
 
                                                 </Box>
                                                 <Checkbox
+                                                    isDisabled={!userData?.is_superuser}
+
                                                     mt={8}
                                                     isChecked={shouldSendEmail}
                                                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
@@ -305,6 +310,8 @@ export const ProgressReportActionModal = (
 
                                                         </Box>
                                                         <Checkbox
+                                                            isDisabled={!userData?.is_superuser}
+
                                                             mt={8}
                                                             isChecked={shouldSendEmail}
                                                             onChange={() => setShouldSendEmail(!shouldSendEmail)}
