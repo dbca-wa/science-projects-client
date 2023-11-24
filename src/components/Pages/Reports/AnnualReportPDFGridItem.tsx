@@ -18,6 +18,7 @@ export const AnnualReportPDFGridItem = ({ report, refetchFunction }: Props) => {
         console.log(report.pdf.file);
         if (report.pdf.file) {
             console.log('downloading file')
+            window.open(report.pdf.file, "_blank")
         }
     }
     return (
