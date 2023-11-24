@@ -670,6 +670,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                                                         justifyContent={"flex-end"}
                                                     >
                                                         <ConceptPlanActionModal
+                                                            userData={userData}
                                                             refetchData={refetchData}
                                                             baData={baData}
                                                             isOpen={isS1RecallModalOpen}
@@ -700,6 +701,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                                                     <Center
                                                         justifyContent={"flex-end"}>
                                                         <ConceptPlanActionModal
+                                                            userData={userData}
                                                             refetchData={refetchData}
                                                             baData={baData}
                                                             isOpen={isS1ApprovalModalOpen}
@@ -785,6 +787,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                                                     // ml={4}
                                                     >
                                                         <ConceptPlanActionModal
+                                                            userData={userData}
                                                             refetchData={refetchData}
 
                                                             action={"send_back"}
@@ -817,6 +820,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                                                         ml={3}
                                                     >
                                                         <ConceptPlanActionModal
+                                                            userData={userData}
                                                             refetchData={refetchData}
 
                                                             action={"recall"}
@@ -852,6 +856,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                                                         ml={3}
                                                     >
                                                         <ConceptPlanActionModal
+                                                            userData={userData}
                                                             refetchData={refetchData}
 
                                                             action={"approve"}
@@ -934,6 +939,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                                                         ml={3}
                                                     >
                                                         <ConceptPlanActionModal
+                                                            userData={userData}
                                                             action={"send_back"}
                                                             refetchData={refetchData}
 
@@ -970,6 +976,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                                                         ml={3}
                                                     >
                                                         <ConceptPlanActionModal
+                                                            userData={userData}
                                                             action={"recall"}
                                                             refetchData={refetchData}
 
@@ -1023,6 +1030,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                                                         justifyContent={"flex-end"}
                                                     >
                                                         <ConceptPlanActionModal
+                                                            userData={userData}
                                                             action={"approve"}
                                                             refetchData={refetchData}
 

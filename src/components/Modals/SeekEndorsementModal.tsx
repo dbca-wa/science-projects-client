@@ -1,9 +1,9 @@
 // Modal designed to send out emails seeking endorsement on the project plan where required
 // Will send an email out to users marked as is_biometrician, is_herb_curator, or is_aec
 
-import { Text, Button, Center, Flex, FormControl, Grid, Input, InputGroup, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, UnorderedList, useToast, ToastId, useColorMode } from "@chakra-ui/react"
-import { ISimplePkProp, ISpecialEndorsement, deleteProjectCall, seekEndorsement } from "../../lib/api";
-import { useEffect, useRef } from "react";
+import { Text, Button, Center, Flex, FormControl, Grid, Input, InputGroup, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, UnorderedList, useToast, ToastId, useColorMode, Checkbox, Box } from "@chakra-ui/react"
+import { ISimplePkProp, ISpecialEndorsement, deleteProjectCall, seekEndorsementAndSave } from "../../lib/api";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { IUserMe } from "../../types";
@@ -40,11 +40,11 @@ export const SeekEndorsementModal = (
         toastIdRef.current = toast(data)
     }
 
-
+    const [shouldSendEmail, setShouldSendEmail] = useState(false);
     // Mutation, query client, onsubmit, and api function 
     const queryClient = useQueryClient();
 
-    const seekEndorsementMutation = useMutation(seekEndorsement,
+    const seekEndorsementAndSaveMutation = useMutation(seekEndorsementAndSave,
         {
             onMutate: () => {
                 addToast({
@@ -93,15 +93,15 @@ export const SeekEndorsementModal = (
         })
 
 
-    const seekEndorsementFunc = (formData: ISimplePkProp) => {
+    const seekEndorsementAndSaveFunc = (formData: ISpecialEndorsement) => {
         console.log(formData)
-        seekEndorsementMutation.mutate(formData);
+        seekEndorsementAndSaveMutation.mutate(formData);
     }
 
     const { colorMode } = useColorMode();
-    const { register, handleSubmit, reset, watch } = useForm<ISimplePkProp>();
+    const { register, handleSubmit, reset, watch } = useForm<ISpecialEndorsement>();
 
-    const projPlanPk = watch('pk');
+    const projPlanPk = watch('projectPlanPk');
 
 
 
@@ -112,119 +112,164 @@ export const SeekEndorsementModal = (
             size={"2xl"}
         >
             <ModalOverlay />
-            <Flex as={"form"}
-                onSubmit={handleSubmit(seekEndorsementFunc)}>
+            <Flex
+                as={"form"}
+                onSubmit={handleSubmit(seekEndorsementAndSaveFunc)}
+            >
                 <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-                    <ModalHeader>Seek Endorsement?</ModalHeader>
+                    <ModalHeader>Save Endorsements</ModalHeader>
                     <ModalCloseButton />
 
                     <ModalBody>
 
-                        <Center>
+                        <Box
+                            mt={2}
+                        >
                             <Text
                                 fontWeight={"semibold"}
-                                fontSize={"xl"}
+                                fontSize={"lg"}
                             >
                                 {
                                     ((!aecEndorsementRequired) || (aecEndorsementRequired && aecEndorsementProvided)) &&
                                         ((!herbariumEndorsementRequired) || (herbariumEndorsementRequired && herbariumEndorsementProvided)) &&
                                         (!biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided))
                                         ?
-                                        ("Endorsement emails are not necessary")
+                                        ("As no endorsement is marked as required, endorsement emails are not necessary. You may still save.")
                                         :
-                                        "Are you sure you want to seek endorsement for this project?"
+                                        "Also send notifications?"
                                 }
 
                             </Text>
-                        </Center>
-                        <Center
-                            mt={8}
-                        >
-                            <UnorderedList>
+                            <Flex>
+                                <Checkbox
+                                    mt={4}
+                                    isChecked={shouldSendEmail}
+                                    onChange={() => setShouldSendEmail(!shouldSendEmail)}
+                                    isDisabled={
+                                        ((!aecEndorsementRequired) || (aecEndorsementRequired && aecEndorsementProvided)) &&
+                                        ((!herbariumEndorsementRequired) || (herbariumEndorsementRequired && herbariumEndorsementProvided)) &&
+                                        (!biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided))
+                                    }
+                                >
+                                    Send Notifications
+                                </Checkbox>
+                            </Flex>
 
-                                {/* IF BM endorsement required and not provided */}
-                                {
-                                    biometricianEndorsementRequired === true &&
-                                    biometricianEndorsementProvided === false &&
-                                    (
-                                        <ListItem
-                                            color={"red.700"}
-                                        >
-                                            As the biometrician has not signed off on this, and BM endorsement is marked as required but it has yet to be provided, an email will be sent to the listed biometrician
-                                        </ListItem>
-                                    )
-                                }
-                                {/* ELSE where DME not required */}
-                                {
-                                    biometricianEndorsementRequired === false &&
-                                    (
-                                        <ListItem
-                                            color={"blue.500"}
-                                        >
-                                            As BM endorsement is marked as not required, no email will be sent to the listed BM
-                                        </ListItem>
-                                    )
-                                }
+                        </Box>
+                        {
+                            shouldSendEmail ?
+                                (
+                                    <Center
+                                        mt={8}
+                                    >
+                                        <UnorderedList>
 
-                                {/* IF involves animals */}
-                                {/* AND AEC endorsement required and not provided */}
-                                {
-                                    aecEndorsementRequired === true
-                                    && aecEndorsementProvided === false
-                                    &&
-                                    (
-                                        <ListItem
-                                            color={"red.700"}
-                                        >
-                                            As this project involves animals, and you have marked that AEC endorsement as required but it has yet to be provided, an email will be sent to aec members to approve or reject this plan
-                                        </ListItem>
-                                    )}
-                                {/* ELSE where AEC endorsement not required */}
-                                {
-                                    aecEndorsementRequired === false
-                                    &&
-                                    (
-                                        <ListItem
-                                            color={"blue.500"}
-                                        >
-                                            As this project involves animals, but you have marked that AEC endorsement as NOT required, no email will be sent
-                                        </ListItem>
-                                    )
-                                }
-                                {/* IF involves plants */}
-                                {/* AND HC endorsement required */}
-                                {
-                                    herbariumEndorsementRequired === true &&
-                                    herbariumEndorsementProvided === false &&
-                                    (
-                                        <ListItem
-                                            color={"red.700"}
-                                        >
-                                            As this project involves plants, and you have marked that Herbarium endorsement as required but it has yet to be provided, an email will be sent to the herbarium curator to approve or reject this plan
-                                        </ListItem>
+                                            {/* IF BM endorsement required and not provided */}
+                                            {
+                                                biometricianEndorsementRequired === true &&
+                                                biometricianEndorsementProvided === false &&
+                                                (
+                                                    <ListItem
+                                                        color={"blue.400"}
+                                                    >
+                                                        As Biometrician endorsement is marked as required but it has yet to be provided, an email will be sent to Biometricians to approve or reject this plan
+                                                    </ListItem>
+                                                )
+                                            }
+                                            {/* ELSE where DME not required */}
+                                            {
+                                                biometricianEndorsementRequired === false &&
+                                                (
+                                                    <ListItem
+                                                        color={"gray.400"}
 
-                                    )
-                                }
-
-                                {/* ELSE where HC endorsement not required */}
-                                {
-                                    herbariumEndorsementRequired === false &&
-                                    (
-                                        <ListItem
-                                            color={"blue.500"}
-                                        >
-                                            As this project involves plants, but you have marked that HC endorsement as NOT required, no email will be sent
-                                        </ListItem>
-                                    )
-                                }
+                                                    >
+                                                        As Biometrician endorsement is marked as not required, no email will be sent to Biometricians.
+                                                    </ListItem>
+                                                )
+                                            }
 
 
+                                            {/* IF involves plants */}
+                                            {/* AND HC endorsement required */}
+                                            {
+                                                herbariumEndorsementRequired === true &&
+                                                herbariumEndorsementProvided === false &&
+                                                (
+                                                    <ListItem
+                                                        color={"blue.400"}
+                                                    >
+                                                        As Herbarium Curator endorsement is required but it has yet to be provided, an email will be sent to Herbarium Curators to approve or reject this plan
+                                                    </ListItem>
 
-                            </UnorderedList>
-                        </Center>
+                                                )
+                                            }
+
+                                            {/* ELSE where HC endorsement not required */}
+                                            {
+                                                herbariumEndorsementRequired === false &&
+                                                (
+                                                    <ListItem
+                                                        color={"gray.400"}
+                                                    >
+                                                        As Herbarium Curator endorsement is marked as not required, no email will be sent to Herbarium Curators
+                                                    </ListItem>
+                                                )
+                                            }
+
+                                            {/* IF involves animals */}
+                                            {/* AND AEC endorsement required and not provided */}
+                                            {
+                                                aecEndorsementRequired === true
+                                                && aecEndorsementProvided === false
+                                                &&
+                                                (
+                                                    <ListItem
+                                                        color={"blue.400"}
+                                                    >
+                                                        As Animal Ethics Committee endorsement is marked as required but it has yet to be provided, an email will be sent to Animal Ethics Committee approvers to approve or reject this plan
+                                                    </ListItem>
+                                                )}
+                                            {/* ELSE where AEC endorsement not required */}
+                                            {
+                                                aecEndorsementRequired === false
+                                                &&
+                                                (
+                                                    <ListItem
+                                                        color={"gray.400"}
+                                                    >
+                                                        As Animal Ethics Committee endorsement is marked as not required, no email will be sent to Animal Ethics Committee approvers
+                                                    </ListItem>
+                                                )
+                                            }
+
+                                        </UnorderedList>
+                                    </Center>
+                                ) :
+                                null
+                        }
+
                         <FormControl>
                             <InputGroup>
-                                <Input type="hidden" {...register("pk", { required: true, value: Number(projectPlanPk) })} readOnly />
+                                <Input type="hidden" {...register("projectPlanPk", { required: true, value: Number(projectPlanPk) })} readOnly />
+                            </InputGroup>
+                            <InputGroup>
+                                <Input type="hidden" {...register("aecEndorsementRequired", { required: true, value: aecEndorsementRequired })} readOnly />
+                            </InputGroup>
+                            <InputGroup>
+                                <Input type="hidden" {...register("aecEndorsementProvided", { required: true, value: aecEndorsementProvided })} readOnly />
+                            </InputGroup>
+                            <InputGroup>
+                                <Input type="hidden" {...register("herbariumEndorsementRequired", { required: true, value: herbariumEndorsementRequired })} readOnly />
+                            </InputGroup>
+                            <InputGroup>
+                                <Input type="hidden" {...register("herbariumEndorsementProvided", { required: true, value: herbariumEndorsementProvided })} readOnly />
+                            </InputGroup>
+                            <InputGroup>
+                                <Input type="hidden" {...register("bmEndorsementRequired", { required: true, value: biometricianEndorsementRequired })} readOnly />
+                            </InputGroup>
+                            <InputGroup>
+                                <Input type="hidden" {...register("bmEndorsementProvided", { required: true, value: biometricianEndorsementProvided })} readOnly />
                             </InputGroup>
                         </FormControl>
 
@@ -242,19 +287,23 @@ export const SeekEndorsementModal = (
                             >
                                 Cancel
                             </Button>
+
                             <Button
-                                colorScheme="red"
-                                isLoading={seekEndorsementMutation.isLoading}
+                                colorScheme="blue"
+                                isLoading={seekEndorsementAndSaveMutation.isLoading}
                                 type="submit"
                                 ml={3}
                                 isDisabled={
-                                    ((!aecEndorsementRequired) || (aecEndorsementRequired && aecEndorsementProvided)) &&
-                                    ((!herbariumEndorsementRequired) || (herbariumEndorsementRequired && herbariumEndorsementProvided)) &&
-                                    (!biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided))
+                                    (shouldSendEmail &&
+                                        ((!aecEndorsementRequired) || (aecEndorsementRequired && aecEndorsementProvided)) &&
+                                        ((!herbariumEndorsementRequired) || (herbariumEndorsementRequired && herbariumEndorsementProvided)) &&
+                                        (!biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided)))
                                 }
                             >
-                                Send Emails
+
+                                {shouldSendEmail ? `Save and Send Emails` : `Save`}
                             </Button>
+
                         </Grid>
                     </ModalFooter>
                 </ModalContent>

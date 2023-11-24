@@ -3,7 +3,7 @@ import { IProjectPlan, IUserData, IUserMe } from "../../../types"
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { ISpecialEndorsement, setEndorsement } from "../../../lib/api";
+import { ISpecialEndorsement } from "../../../lib/api";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
 
 
@@ -19,20 +19,16 @@ export const ProjectPlanEndorsements = (
     const { register, handleSubmit, reset, watch, setValue } = useForm<ISpecialEndorsement>();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const dmEndReqValue = watch('dataManagerEndorsementRequired');
     const hcEndReqValue = watch('herbariumEndorsementRequired');
     const aecEndReqValue = watch('aecEndorsementRequired');
     const bmEndRequiredValue = watch('bmEndorsementRequired');
 
-    const dmEndProvidedValue = watch('dataManagerEndorsementProvided')
     const hcEndProvidedValue = watch('herbariumEndorsementProvided');
     const aecEndProvidedValue = watch('aecEndorsementProvided');
     const bmEndProvidedValue = watch('bmEndorsementProvided');
 
 
     useEffect(() => console.log({
-        dmEndReqValue: dmEndReqValue,
-        dmEndProvidedValue: dmEndProvidedValue,
         bmEndRequiredValue: bmEndRequiredValue,
         bmEndProvidedValue: bmEndProvidedValue,
         hcEndReqValue: hcEndReqValue,
@@ -41,7 +37,6 @@ export const ProjectPlanEndorsements = (
         aecEndProvidedValue: aecEndProvidedValue,
 
     }), [
-        dmEndReqValue, dmEndProvidedValue,
         bmEndRequiredValue, bmEndProvidedValue,
         aecEndReqValue, aecEndProvidedValue,
         hcEndReqValue, hcEndProvidedValue,
@@ -148,55 +143,55 @@ export const ProjectPlanEndorsements = (
         toastIdRef.current = toast(data)
     }
 
-    const endorsementMutation = useMutation(setEndorsement,
-        {
-            onMutate: () => {
-                addToast({
-                    status: "loading",
-                    title: "Creating Task",
-                    position: "top-right"
-                })
-            },
-            onSuccess: (data) => {
+    // const endorsementMutation = useMutation(setEndorsement,
+    //     {
+    //         onMutate: () => {
+    //             addToast({
+    //                 status: "loading",
+    //                 title: "Creating Task",
+    //                 position: "top-right"
+    //             })
+    //         },
+    //         onSuccess: (data) => {
 
-                if (toastIdRef.current) {
-                    toast.update(toastIdRef.current, {
-                        title: 'Success',
-                        description: `Task Created`,
-                        status: 'success',
-                        position: "top-right",
-                        duration: 3000,
-                        isClosable: true,
-                    })
-                }
-                reset()
-                // onClose()
+    //             if (toastIdRef.current) {
+    //                 toast.update(toastIdRef.current, {
+    //                     title: 'Success',
+    //                     description: `Task Created`,
+    //                     status: 'success',
+    //                     position: "top-right",
+    //                     duration: 3000,
+    //                     isClosable: true,
+    //                 })
+    //             }
+    //             reset()
+    //             // onClose()
 
-                setTimeout(() => {
+    //             setTimeout(() => {
 
-                    queryClient.invalidateQueries(["projects"]);
+    //                 queryClient.invalidateQueries(["projects"]);
 
-                }, 350)
-            },
-            onError: (error) => {
-                if (toastIdRef.current) {
-                    toast.update(toastIdRef.current, {
-                        title: 'Could Not Create Task',
-                        description: `${error}`,
-                        status: 'error',
-                        position: "top-right",
-                        duration: 3000,
-                        isClosable: true,
-                    })
-                }
-            }
+    //             }, 350)
+    //         },
+    //         onError: (error) => {
+    //             if (toastIdRef.current) {
+    //                 toast.update(toastIdRef.current, {
+    //                     title: 'Could Not Create Task',
+    //                     description: `${error}`,
+    //                     status: 'error',
+    //                     position: "top-right",
+    //                     duration: 3000,
+    //                     isClosable: true,
+    //                 })
+    //             }
+    //         }
 
 
-        })
+    //     })
 
-    const onSubmitUpdateEndorsement = (formData: ISpecialEndorsement) => {
-        endorsementMutation.mutate(formData);
-    }
+    // const onSubmitUpdateEndorsement = (formData: ISpecialEndorsement) => {
+    //     endorsementMutation.mutate(formData);
+    // }
 
 
 

@@ -601,16 +601,13 @@ export const setProjectStatus = async ({ projectId, status }: ISetProjectProps) 
 
 export interface ISpecialEndorsement {
     projectPlanPk: number;
-    involvesAnimals: boolean;
+    shouldSendEmails?: boolean;
+
     aecEndorsementRequired?: boolean;
     aecEndorsementProvided?: boolean;
 
-    involvesPlants: boolean;
     herbariumEndorsementRequired?: boolean;
     herbariumEndorsementProvided?: boolean;
-
-    dataManagerEndorsementRequired: boolean;
-    dataManagerEndorsementProvided: boolean;
 
     bmEndorsementRequired: boolean;
     bmEndorsementProvided: boolean;
@@ -618,45 +615,53 @@ export interface ISpecialEndorsement {
 }
 
 
-export const seekEndorsement = async ({ pk }: ISimplePkProp) => {
+export const seekEndorsementAndSave = async ({
+    projectPlanPk,
+    aecEndorsementRequired, aecEndorsementProvided,
+    herbariumEndorsementRequired, herbariumEndorsementProvided,
+    bmEndorsementRequired, bmEndorsementProvided
+}: ISpecialEndorsement) => {
 
-    const projectPlanPk = pk;
-    const res = instance.post(`documents/project_plan/${projectPlanPk}/seek_endorsement`).then(res => {
-        return res.data
-    })
-    return res;
-}
-
-
-export const setEndorsement = async (
-    { projectPlanPk,
-        involvesAnimals, aecEndorsementRequired, aecEndorsementProvided,
-        involvesPlants, herbariumEndorsementRequired, herbariumEndorsementProvided,
-        bmEndorsementRequired, bmEndorsementProvided,
-        dataManagerEndorsementRequired, dataManagerEndorsementProvided,
-    }: ISpecialEndorsement) => {
     const data = {
-        project_plan: projectPlanPk,
-        // BM & DM Endorsement
         bm_endorsement_required: bmEndorsementRequired,
-        bm_endorsement_provided: bmEndorsementRequired ? bmEndorsementProvided : false,
-        dm_endorsement_required: dataManagerEndorsementRequired,
-        dm_endorsement_provided: dataManagerEndorsementRequired ? dataManagerEndorsementProvided : false,
-
-        // Where animals involved
-        involves_animals: involvesAnimals,
-        ae_endorsement_required: involvesAnimals ? aecEndorsementRequired : false,
-        ae_endorsement_provided: aecEndorsementRequired ? aecEndorsementProvided : false,
-        // Where plants involved
-        involves_plants: involvesPlants,
-        hc_endorsement_required: involvesPlants ? herbariumEndorsementRequired : false,
-        hc_endorsement_provided: herbariumEndorsementRequired ? herbariumEndorsementProvided : false,
+        bm_endorsement_provided: bmEndorsementProvided,
+        hc_endorsement_required: herbariumEndorsementRequired,
+        hc_endorsement_provided: herbariumEndorsementProvided,
+        ae_endorsement_required: aecEndorsementRequired,
+        ae_endorsement_provided: aecEndorsementProvided,
     }
-    const res = instance.put(`documents/project_plan/${projectPlanPk}`, data).then(res => {
+
+    const res = instance.post(`documents/project_plan/${projectPlanPk}/seek_endorsement`, data).then(res => {
         return res.data
     })
     return res;
 }
+
+
+// export const setEndorsement = async (
+//     { projectPlanPk,
+//         aecEndorsementRequired, aecEndorsementProvided,
+//         herbariumEndorsementRequired, herbariumEndorsementProvided,
+//         bmEndorsementRequired, bmEndorsementProvided,
+
+//     }: ISpecialEndorsement) => {
+//     const data = {
+//         project_plan: projectPlanPk,
+
+//         bm_endorsement_required: bmEndorsementRequired,
+//         bm_endorsement_provided: bmEndorsementRequired ? bmEndorsementProvided : false,
+
+//         ae_endorsement_required: aecEndorsementRequired,
+//         ae_endorsement_provided: aecEndorsementRequired ? aecEndorsementProvided : false,
+
+//         hc_endorsement_required: herbariumEndorsementRequired,
+//         hc_endorsement_provided: herbariumEndorsementRequired ? herbariumEndorsementProvided : false,
+//     }
+//     const res = instance.put(`documents/project_plan/${projectPlanPk}`, data).then(res => {
+//         return res.data
+//     })
+//     return res;
+// }
 
 
 
@@ -1680,8 +1685,6 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
             "project_tasks": "<p></p>",
             "listed_references": "<p></p>",
             "methodology": "<p></p>",
-            "involves_plants": false,
-            "involves_animals": false,
             "operating_budget": "<p></p>",
             "operating_budget_external": "<p></p>",
             "related_projects": "<p></p>",

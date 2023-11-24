@@ -63,7 +63,7 @@ export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refet
                     refetchProgressYears(() => {
                         reset();
                     });
-                    onDeleteSuccess();
+                    onDeleteSuccess && onDeleteSuccess();
 
                 }
                 // onClose();
