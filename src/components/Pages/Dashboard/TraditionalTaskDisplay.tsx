@@ -201,7 +201,13 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
                 }}
             >
                 <Center
-                    color={colorMode === "light" ? "red.600" : "red.200"}
+                    color={
+                        task.task_type === "assigned"
+                            ? colorMode === "light"
+                                ? "red.600" : "red.200"
+                            : colorMode === "light"
+                                ? "blue.600" : "blue.200"
+                    }
                     mr={3}
                     alignItems={"center"}
                     alignContent={"center"}

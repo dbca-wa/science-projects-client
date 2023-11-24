@@ -195,14 +195,14 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                         My Tasks
                                     </Box>
                                     {
-                                        (combinedData?.length >= 1 || pendingProjectDocumentData?.length > 1) ?
+                                        (combinedData?.length >= 1 || pendingProjectDocumentData?.all?.length > 1) ?
                                             <Box
                                                 display={"inline-flex"}
                                                 justifyContent={"center"}
                                                 alignItems={"center"}
                                             >
                                                 <Box mr={2}>
-                                                    {combinedData?.length + pendingProjectDocumentData?.length}
+                                                    {combinedData?.length + pendingProjectDocumentData?.all?.length}
                                                 </Box>
                                                 <FcHighPriority />
                                             </Box>
@@ -234,9 +234,9 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
 
                                             {
 
-                                                !(projectDocumentDataLoading && pendingProjectDocumentData?.length >= 1) ?
+                                                !(projectDocumentDataLoading && pendingProjectDocumentData?.all?.length >= 1) ?
                                                     (
-                                                        pendingProjectDocumentData?.map((document: IMainDoc, index: number) => (
+                                                        pendingProjectDocumentData?.all?.map((document: IMainDoc, index: number) => (
                                                             <Flex
                                                                 key={index}
                                                                 alignItems={"center"}
@@ -468,6 +468,8 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                     alignItems={"center"}
                                                                     alignContent={"center"}
                                                                     boxSize={5}
+                                                                    w={"20px"}
+
                                                                 >
                                                                     {project?.kind === "core_function" ? <GiMaterialsScience /> :
                                                                         project?.kind === "science" ? <MdScience /> :
@@ -475,25 +477,29 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                                 <FaUserFriends />}
                                                                     {/* <GoProjectRoadmap /> */}
                                                                 </Center>
-                                                                {/* <Text
-                                                                color={colorMode === "dark" ? "blue.200" : "blue.400"}
-                                                                fontWeight={"bold"}
-                                                                cursor={"pointer"}
-                                                                _hover={{
-                                                                    color: colorMode === "dark" ? "blue.100" : "blue.300",
-                                                                    textDecoration: "underline",
-                                                                }}
-                                                            >
 
-                                                                {`${project.title}`}
-                                                            </Text> */}
-
+                                                                <Box
+                                                                    mx={0}
+                                                                    maxW={"125px"}
+                                                                    w={"100%"}
+                                                                >
+                                                                    <Text>{project?.kind === "core_function" ? `Core Function` :
+                                                                        project?.kind === "science" ? `Science` :
+                                                                            project?.kind === "student" ? `Student` :
+                                                                                `External`}</Text>
+                                                                </Box>
+                                                                <Divider
+                                                                    orientation='vertical'
+                                                                    // ml={-1}
+                                                                    mr={5}
+                                                                />
                                                                 {/* <SimpleDisplaySRTE
 
-                                                                data={project.title}
-                                                                displayData={project.title}
-                                                                displayArea="traditionalProjectTitle"
-                                                            /> */}
+                                                                    data={document?.project.title}
+                                                                    displayData={document?.project.title}
+                                                                    displayArea="traditionalProjectTitle"
+                                                                /> */}
+
 
                                                                 <ExtractedHTMLTitle
                                                                     htmlContent={`${project.title}`}
