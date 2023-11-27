@@ -146,7 +146,7 @@ export const ChangeReportPDFModal = ({ isChangePDFOpen, onChangePDFClose, refetc
 
     const deleteFile = () => {
         console.log('delete btn clicked');
-        deletePDFMutation.mutate(report?.pk);
+        deletePDFMutation.mutate(report?.pdf?.pk);
     }
 
     const onSubmitPDFUpdate = () => {

@@ -172,6 +172,15 @@ interface IFullProjectDetails {
 // PROJECT DOCUMENTS ============================================================================
 
 
+interface IAECPDF {
+    created_at: Date;
+    updated_at: Date;
+    creator: number;
+    endorsement: number;
+    id?: number;
+    pk?: number;
+    file: string;
+}
 
 
 interface IEndorsement {
@@ -191,6 +200,7 @@ interface IEndorsement {
 
     data_management: string;
     no_specimens: string;
+    aec_pdf: IAECPDF;
 
 }
 

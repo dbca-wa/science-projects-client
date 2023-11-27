@@ -616,12 +616,6 @@ export interface ISpecialEndorsement {
 }
 
 
-export const deleteFinalAnnualReportPDF = async (
-    annualReportPk: number
-) => {
-    console.log(annualReportPk);
-}
-
 
 export const seekEndorsementAndSave = async ({
     projectPlanPk,
@@ -1361,6 +1355,18 @@ export interface IUpdatePDF {
     pdfFile: File;
 }
 
+
+export const deleteFinalAnnualReportPDF = async (
+    annualReportPDFPk: number
+) => {
+    console.log(annualReportPDFPk);
+
+    const res = await instance.delete(`medias/report_pdfs/${annualReportPDFPk}`);
+    console.log(res);
+    return res.data;
+}
+
+
 export const updateReportPDF = async ({
     reportMediaId,
     // userId,
@@ -1457,6 +1463,9 @@ export interface IUploadFile {
 //     console.log(file, pk);
 //     return true;
 // }
+
+
+
 
 export const getArarsWithPDFs = async () => {
     try {
