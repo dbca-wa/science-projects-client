@@ -616,6 +616,13 @@ export interface ISpecialEndorsement {
 }
 
 
+export const deleteFinalAnnualReportPDF = async (
+    annualReportPk: number
+) => {
+    console.log(annualReportPk);
+}
+
+
 export const seekEndorsementAndSave = async ({
     projectPlanPk,
     shouldSendEmails,
@@ -625,6 +632,7 @@ export const seekEndorsementAndSave = async ({
     bmEndorsementRequired, bmEndorsementProvided
 }: ISpecialEndorsement) => {
 
+    console.log(aecPDFFile?.name)
     const formData = new FormData();
     formData.append('bm_endorsement_required', bmEndorsementRequired.toString());
     formData.append('bm_endorsement_provided', bmEndorsementProvided.toString());
@@ -634,20 +642,8 @@ export const seekEndorsementAndSave = async ({
     formData.append('ae_endorsement_provided', aecEndorsementRequired === false ? aecEndorsementRequired.toString() : aecEndorsementProvided.toString());
 
     if (aecPDFFile !== undefined && aecPDFFile !== null) {
-        // if (aecPDFFile instanceof File) {
         formData.append('aec_pdf_file', aecPDFFile);
-        // }
     }
-    // const data = {
-    //     bm_endorsement_required: bmEndorsementRequired,
-    //     bm_endorsement_provided: bmEndorsementProvided,
-    //     hc_endorsement_required: herbariumEndorsementRequired,
-    //     hc_endorsement_provided: herbariumEndorsementProvided,
-    //     ae_endorsement_required: aecEndorsementRequired,
-    //     ae_endorsement_provided: aecEndorsementProvided,
-    //     aec_pdf_file: aecPDFFile
-    // }
-
     console.log(
         formData
     )

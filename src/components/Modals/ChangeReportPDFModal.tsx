@@ -1,10 +1,10 @@
-import { Button, Text, FormControl, FormLabel, Input, InputGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Textarea, ToastId, useColorMode, useDisclosure, useToast, FormHelperText, Box } from "@chakra-ui/react"
+import { Button, Text, FormControl, FormLabel, Input, InputGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Textarea, ToastId, useColorMode, useDisclosure, useToast, FormHelperText, Box, Flex, Divider, AbsoluteCenter } from "@chakra-ui/react"
 import { MdOutlineTitle } from "react-icons/md"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../lib/hooks/useUser";
-import { IAddPDF, addPDFToReport, updateReportPDF } from "../../lib/api";
+import { IAddPDF, addPDFToReport, deleteFinalAnnualReportPDF, updateReportPDF } from "../../lib/api";
 import { useGetARARsWithoputPDF } from "../../lib/hooks/useGetARARsWithoputPDF";
 import { SingleFileUpload } from "../SingleFileStateUpload";
 import { report } from "process";
@@ -97,6 +97,58 @@ export const ChangeReportPDFModal = ({ isChangePDFOpen, onChangePDFClose, refetc
         }
     )
 
+    const deletePDFMutation = useMutation(deleteFinalAnnualReportPDF,
+        {
+            onMutate: () => {
+                addToast({
+                    status: "loading",
+                    title: "Deleting PDF",
+                    position: "top-right"
+                })
+            },
+            onSuccess: (data) => {
+
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Success',
+                        description: `PDF Deleted`,
+                        status: 'success',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+                // reset()
+                onChangePDFClose()
+
+                setTimeout(() => {
+                    queryClient.invalidateQueries(["ararsWithoutPDFs"]);
+                    queryClient.invalidateQueries(["ararsWithPDFs"]);
+                    refetchPDFs();
+                    // refetchReportsWithoutPDFs();
+                }, 350)
+            },
+            onError: (error) => {
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Could Not Delete PDF',
+                        description: `${error}`,
+                        status: 'error',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+            }
+        }
+    )
+
+
+    const deleteFile = () => {
+        console.log('delete btn clicked');
+        deletePDFMutation.mutate(report?.pk);
+    }
+
     const onSubmitPDFUpdate = () => {
         console.log(reportMediaId);
         console.log(uploadedPDF);
@@ -113,7 +165,7 @@ export const ChangeReportPDFModal = ({ isChangePDFOpen, onChangePDFClose, refetc
         <Modal
             isOpen={isChangePDFOpen}
             onClose={onChangePDFClose}
-            size={"sm"}
+            size={"lg"}
         // scrollBehavior="inside"
         // isCentered={true}
         >
@@ -154,11 +206,31 @@ export const ChangeReportPDFModal = ({ isChangePDFOpen, onChangePDFClose, refetc
                                 </Select>
                             </FormControl>
 
+
                         </>
                     ) : null}
-
                     <FormControl>
-                        <FormLabel>PDF File</FormLabel>
+
+                        {/* <FormLabel>Delete Current PDF File</FormLabel> */}
+                        <Flex
+                            justifyContent={"flex-end"}
+                        >
+                            <Button
+                                colorScheme={"red"}
+                                onClick={deleteFile}
+                            >
+                                Remove Current PDF
+                            </Button>
+                        </Flex>
+                    </FormControl>
+                    <Box position='relative' padding='10'>
+                        <Divider />
+                        <AbsoluteCenter bg='white' px='4'>
+                            OR
+                        </AbsoluteCenter>
+                    </Box>
+                    <FormControl>
+                        <FormLabel>Replace PDF File</FormLabel>
                         <SingleFileUpload
                             fileType={"pdf"}
                             uploadedFile={uploadedPDF}
@@ -168,6 +240,7 @@ export const ChangeReportPDFModal = ({ isChangePDFOpen, onChangePDFClose, refetc
                         />
 
                     </FormControl>
+
                 </ModalBody>
 
                 <ModalFooter>

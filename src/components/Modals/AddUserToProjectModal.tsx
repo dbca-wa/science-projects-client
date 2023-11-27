@@ -15,6 +15,7 @@ import { INewMember, createTeamMember } from "../../lib/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../lib/hooks/ProjectSearchContext";
 import { AxiosError } from "axios";
+import { CustomAxiosError } from "../../types";
 
 
 interface IAddUserToProjectModalProps {
@@ -135,12 +136,26 @@ export const AddUserToProjectModal = ({ isOpen, onClose, preselectedUser, presel
                     }, 350)
 
             },
-            onError: (error: AxiosError) => {
+            onError: (error: CustomAxiosError) => {
                 console.log(error);
                 if (toastIdRef.current) {
+                    const nonFieldErrors = error?.response?.data?.non_field_errors;
+                    const errorMessage =
+                        nonFieldErrors &&
+                            nonFieldErrors.includes(
+                                'The fields project, user must make a unique set.'
+                            )
+                            ? 'Cannot add a user to a project they are already in.'
+                            : nonFieldErrors?.join(', ') || 'An error occurred';
+
                     toast.update(toastIdRef.current, {
                         title: 'Could Not Create Project Membership',
-                        description: `${error?.response?.data}`,
+                        description: errorMessage,
+                        //  `${error?.response?.data?.non_field_errors ?
+                        //     error.response.data.non_field_errors[0] === "The fields project, user must make a unique set." ? "Cannot add a user to a project they are already in."
+                        //         : error?.response?.data?.non_field_errors : error?.response?.data
+                        //     }`
+                        // ,
                         // .non_field_errors && error.response.data.non_field_errors == "The fields project, user must make a unique set." ? "Cannot add a user to a project they are already in." : error}`,
                         status: 'error',
                         position: "top-right",
