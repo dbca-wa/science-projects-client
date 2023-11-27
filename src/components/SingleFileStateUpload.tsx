@@ -101,9 +101,9 @@ export const FileDropzone = ({ fileType, setUploadedFile, uploadedFile, isError,
 
                             </Box>
                             {extraText === undefined ?
-                                <Text>{`Drag and drop a ${fileType} file.`}</Text>
+                                <Text px={8} textAlign={"center"}>{`Drag and drop a ${fileType} file.`}</Text>
                                 :
-                                <Text>{`Drag and drop a ${fileType} file${extraText}.`}</Text>
+                                <Text px={8} textAlign={"center"}>{`Drag and drop a ${fileType} file${extraText}.`}</Text>
 
                             }
                             {!isError && acceptedFiles && acceptedFiles[0] ? (

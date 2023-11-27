@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, Flex, Grid, Input, Switch, Tag, Text, ToastId, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Checkbox, Flex, Grid, Input, Switch, Tag, Text, ToastId, useDisclosure, useToast } from "@chakra-ui/react"
 import { IProjectPlan, IUserData, IUserMe } from "../../../types"
 import { SetStateAction, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -6,7 +6,9 @@ import { useForm } from "react-hook-form";
 import { ISpecialEndorsement } from "../../../lib/api";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
 import { SingleFileUpload } from "../../SingleFileStateUpload";
+import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 
+import { BsFilePdfFill } from "react-icons/bs";
 
 interface IEndorsementProps {
     document: IProjectPlan
@@ -29,6 +31,7 @@ export const ProjectPlanEndorsements = (
     const aecEndProvidedValue = watch('aecEndorsementProvided');
     const bmEndProvidedValue = watch('bmEndorsementProvided');
 
+    const baseApi = useApiEndpoint();
 
     useEffect(() => console.log({
         bmEndRequiredValue: bmEndRequiredValue,
@@ -532,7 +535,7 @@ export const ProjectPlanEndorsements = (
                             aecEndReqValue === true && ( */}
                             <Flex
                                 alignItems={"center"}
-                                mb={3}
+                            // mb={3}
                             // w={"100%"}
                             // ml={8}
                             // mt={2}
@@ -600,6 +603,66 @@ export const ProjectPlanEndorsements = (
                                         )}
                                 </Flex>
                             </Flex>
+                            {document?.endorsements?.aec_pdf?.file ?
+                                <Flex
+                                    mb={3}
+                                >
+                                    <Box
+                                        flex={1}
+
+                                    >
+                                        <Text
+                                            color={aecEndReqValue ? "black" : "gray.500"}
+                                        >
+                                            Current Approval PDF
+                                        </Text>
+                                    </Box>
+                                    <Flex
+                                    >
+                                        {document?.endorsements?.aec_pdf?.file ?
+                                            <Flex
+                                                justifyContent={"flex-end"}
+                                                onClick={() => {
+                                                    window.open(`${baseApi}${document?.endorsements?.aec_pdf?.file}`, "_blank")
+                                                }}
+                                                _hover={{
+                                                    cursor: "pointer",
+                                                    textDecoration: "underline"
+                                                }}
+                                            >
+                                                <Center
+                                                    color={"red.500"}
+                                                    // bg={"blue"}
+                                                    mr={1}
+                                                >
+                                                    <BsFilePdfFill />
+
+                                                </Center>
+                                                <Center>
+                                                    <Text
+                                                        // variant={"link"}
+                                                        color={"blue.700"}
+
+                                                    >
+                                                        {document?.endorsements?.aec_pdf?.file
+                                                            ? (
+                                                                `${document.endorsements.aec_pdf.file.split('/').pop().split('.')[0]}.pdf`)
+                                                            : "No File"}
+                                                        {/* {baseApi}{document?.endorsements?.aec_pdf?.file} */}
+                                                    </Text>
+                                                </Center>
+
+
+                                            </Flex>
+
+                                            : null}
+
+                                    </Flex>
+
+
+                                </Flex>
+                                : null}
+
                             {userCanEditAECEndorsement && aecEndReqValue ?
                                 (
                                     <SingleFileUpload
@@ -608,7 +671,7 @@ export const ProjectPlanEndorsements = (
                                         setUploadedFile={setUploadedPDF}
                                         isError={isError}
                                         setIsError={setIsError}
-                                        extraText={" to provide your endorsement"}
+                                        extraText={" to provide your endorsement or update the file"}
                                     />
                                 ) : null
                             }
