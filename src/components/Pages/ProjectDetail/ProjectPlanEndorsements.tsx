@@ -1,20 +1,22 @@
-import { Box, Button, Checkbox, Flex, Grid, Switch, Tag, Text, ToastId, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Checkbox, Flex, Grid, Input, Switch, Tag, Text, ToastId, useDisclosure, useToast } from "@chakra-ui/react"
 import { IProjectPlan, IUserData, IUserMe } from "../../../types"
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { ISpecialEndorsement } from "../../../lib/api";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
+import { SingleFileUpload } from "../../SingleFileStateUpload";
 
 
 interface IEndorsementProps {
     document: IProjectPlan
     userData: IUserMe;
     userIsLeader: boolean;
+    refetchDocument: () => void;
 }
 
 export const ProjectPlanEndorsements = (
-    { document, userData, userIsLeader, }: IEndorsementProps
+    { document, userData, userIsLeader, refetchDocument, }: IEndorsementProps
 ) => {
     const { register, handleSubmit, reset, watch, setValue } = useForm<ISpecialEndorsement>();
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -35,11 +37,12 @@ export const ProjectPlanEndorsements = (
         hcEndProvidedValue: hcEndProvidedValue,
         aecEndReqValue: aecEndReqValue,
         aecEndProvidedValue: aecEndProvidedValue,
-
+        document
     }), [
         bmEndRequiredValue, bmEndProvidedValue,
         aecEndReqValue, aecEndProvidedValue,
         hcEndReqValue, hcEndProvidedValue,
+        document
     ]);
 
     // const [involvesDataCollection, setInvolvesDataCollection] = useState(true);
@@ -52,26 +55,21 @@ export const ProjectPlanEndorsements = (
     //     }
     // }, [involvesAnimals])
 
-    const [aecEndRequired, setAecEndRequired] = useState(document?.endorsements?.ae_endorsement_required);
-    const [hcEndRequired, setHcEndRequired] = useState(document?.endorsements?.hc_endorsement_required);
+    const [aecEndRequired, setAecEndRequired] = useState<boolean>(document?.endorsements?.ae_endorsement_required);
+    const [hcEndRequired, setHcEndRequired] = useState<boolean>(document?.endorsements?.hc_endorsement_required);
 
-    const [hcEndProvided, setHcEndProvided] = useState(document?.endorsements?.hc_endorsement_provided);
-    const [aecEndProvided, setAecEndProvided] = useState(document?.endorsements?.ae_endorsement_provided);
+    const [hcEndProvided, setHcEndProvided] = useState<boolean>(document?.endorsements?.hc_endorsement_provided);
+    const [aecEndProvided, setAecEndProvided] = useState<boolean>(document?.endorsements?.ae_endorsement_provided);
 
 
-    const [bmEndProvided, setBmEndProvided] = useState(document?.endorsements?.bm_endorsement_provided);
-    const [bmEndRequired, setBmEndRequired] = useState(document?.endorsements?.bm_endorsement_required);
+    const [bmEndProvided, setBmEndProvided] = useState<boolean>(document?.endorsements?.bm_endorsement_provided);
+    const [bmEndRequired, setBmEndRequired] = useState<boolean>(document?.endorsements?.bm_endorsement_required);
 
 
 
     const [userCanEditHCEndorsement, setUserCanEditHCEndorsement] = useState(false);
     const [userCanEditBMEndorsement, setUserCanEditBMEndorsement] = useState(false);
     const [userCanEditAECEndorsement, setUserCanEditAECEndorsement] = useState(false);
-
-    const [herbCuratorInteractable, setHerbCuratorInteractable] = useState(false);
-    const [aecInteractable, setAecInteractable] = useState(false);
-    const [bmInteractable, setBmInteractable] = useState(false);
-
 
     useEffect(() => {
         if (userData?.is_superuser || userData?.is_herbarium_curator) {
@@ -98,6 +96,14 @@ export const ProjectPlanEndorsements = (
         }
     }, [userData]);
 
+
+    // const [herbCuratorInteractable, setHerbCuratorInteractable] = useState(false);
+    // const [aecInteractable, setAecInteractable] = useState(false);
+    // const [bmInteractable, setBmInteractable] = useState(false);
+
+
+
+
     // const handleTogglePlantsInvolved = () => {
     //     setInvolvesPlants((prev) => !prev);
     // }
@@ -107,33 +113,33 @@ export const ProjectPlanEndorsements = (
     // }
 
 
-    useEffect(() => {
-        if (aecEndRequired === true) {
-            setAecInteractable(true)
-        }
-        else {
-            setAecInteractable(false)
-        }
-    }, [aecEndRequired])
+    // useEffect(() => {
+    //     if (aecEndRequired === true) {
+    //         setAecInteractable(true)
+    //     }
+    //     else {
+    //         setAecInteractable(false)
+    //     }
+    // }, [aecEndRequired])
 
-    useEffect(() => {
-        if (hcEndRequired === true) {
-            setHerbCuratorInteractable(true);
-        }
-        else {
-            setHerbCuratorInteractable(false);
-        }
-    }, [hcEndRequired])
+    // useEffect(() => {
+    //     if (hcEndRequired === true) {
+    //         setHerbCuratorInteractable(true);
+    //     }
+    //     else {
+    //         setHerbCuratorInteractable(false);
+    //     }
+    // }, [hcEndRequired])
 
 
-    useEffect(() => {
-        if (bmEndRequired === true) {
-            setBmInteractable(true);
-        }
-        else {
-            setBmInteractable(false);
-        }
-    }, [hcEndRequired])
+    // useEffect(() => {
+    //     if (bmEndRequired === true) {
+    //         setBmInteractable(true);
+    //     }
+    //     else {
+    //         setBmInteractable(false);
+    //     }
+    // }, [bmEndRequired])
 
 
     const queryClient = useQueryClient();
@@ -195,23 +201,48 @@ export const ProjectPlanEndorsements = (
 
 
 
+    const [uploadedPDF, setUploadedPDF] = useState<File>();
+    const [isError, setIsError] = useState(false);
+
+
+    const [shouldSwitchBeChecked, setShouldSwitchBeChecked] = useState<boolean>(
+
+        (
+            (uploadedPDF && uploadedPDF.type === "application/pdf")
+            ||
+            (document?.endorsements?.ae_endorsement_provided === true)
+        ) ? true : false
+    )
+
+        ;
+
+
+    useEffect(() => {
+        console.log(uploadedPDF)
+        if (uploadedPDF && uploadedPDF[0].type === "application/pdf") {
+            setShouldSwitchBeChecked(true);
+        }
+    }, [uploadedPDF])
+
 
     return (
         <>
             <SeekEndorsementModal
                 projectPlanPk={document?.pk}
 
-                biometricianEndorsementRequired={bmEndRequiredValue}
-                biometricianEndorsementProvided={bmEndProvidedValue}
+                bmEndorsementRequired={bmEndRequiredValue}
+                bmEndorsementProvided={bmEndProvidedValue}
 
                 herbariumEndorsementRequired={hcEndReqValue}
                 herbariumEndorsementProvided={hcEndProvidedValue}
 
                 aecEndorsementRequired={aecEndReqValue}
-                aecEndorsementProvided={aecEndProvidedValue}
+                aecEndorsementProvided={shouldSwitchBeChecked}
+                aecPDFFile={uploadedPDF}
 
                 isOpen={isOpen}
                 onClose={onClose}
+                refetchEndorsements={refetchDocument}
             />
             <Box
                 background={"gray.50"}
@@ -532,15 +563,56 @@ export const ProjectPlanEndorsements = (
                                             </Tag>
                                         ) :
                                         (
-                                            <Switch
-                                                defaultChecked={document?.endorsements?.ae_endorsement_provided === true}
-                                                {...register('aecEndorsementProvided', { value: aecEndProvided })}
-                                                isDisabled={!aecEndReqValue}
-                                            />
+                                            // null
+                                            // <Switch
+                                            //     isDisabled={!aecEndReqValue}
+                                            //     defaultChecked={
+                                            //         (document?.endorsements?.ae_endorsement_provided === true || (uploadedPDF)) ? true : false
+                                            //     }
+                                            //     // defaultChecked={document?.endorsements?.ae_endorsement_provided === true || aecEndProvided}
+                                            //     {...register('aecEndorsementProvided', { value: aecEndProvided })}
+                                            // />
+                                            // <Input
+                                            //     {...register('aecEndorsementProvided', { value: shouldSwitchBeChecked })}
+                                            //     type="hidden"
+                                            // />
+
+                                            (<Switch
+                                                isDisabled={true} // Disable direct toggling
+                                                defaultChecked={shouldSwitchBeChecked}
+                                                isChecked={shouldSwitchBeChecked}
+                                                {...register('aecEndorsementProvided', { value: shouldSwitchBeChecked })}
+                                            />)
+                                            // shouldSwitchBeChecked === true ?
+                                            //     (<Switch
+                                            //         // isDisabled={true} // Disable direct toggling
+                                            //         defaultChecked={true}
+                                            //         {...register('aecEndorsementProvided', { value: true })}
+                                            //     />) :
+                                            //     (<Switch
+                                            //         // isDisabled={true} // Disable direct toggling
+                                            //         defaultChecked={false}
+                                            //         {...register('aecEndorsementProvided', { value: false })}
+                                            //     />)
+
+
 
                                         )}
                                 </Flex>
                             </Flex>
+                            {userCanEditAECEndorsement && aecEndReqValue ?
+                                (
+                                    <SingleFileUpload
+                                        fileType={"pdf"}
+                                        uploadedFile={uploadedPDF}
+                                        setUploadedFile={setUploadedPDF}
+                                        isError={isError}
+                                        setIsError={setIsError}
+                                        extraText={" to provide your endorsement"}
+                                    />
+                                ) : null
+                            }
+
                             {/* )
                         } */}
                         </Grid>
@@ -560,7 +632,7 @@ export const ProjectPlanEndorsements = (
                                     hcEndReqValue === undefined ||
                                     hcEndProvidedValue === undefined ||
                                     aecEndReqValue === undefined ||
-                                    aecEndProvidedValue === undefined
+                                    (aecEndProvided !== true && aecEndProvidedValue === undefined)
                                 }
                             >
                                 Save

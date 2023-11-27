@@ -602,39 +602,71 @@ export const setProjectStatus = async ({ projectId, status }: ISetProjectProps) 
 export interface ISpecialEndorsement {
     projectPlanPk: number;
     shouldSendEmails?: boolean;
+    aecPDFFile?: File;
 
-    aecEndorsementRequired?: boolean;
-    aecEndorsementProvided?: boolean;
+    aecEndorsementRequired: boolean;
+    aecEndorsementProvided: boolean;
 
-    herbariumEndorsementRequired?: boolean;
-    herbariumEndorsementProvided?: boolean;
+
+    herbariumEndorsementRequired: boolean;
+    herbariumEndorsementProvided: boolean;
 
     bmEndorsementRequired: boolean;
     bmEndorsementProvided: boolean;
-
 }
 
 
 export const seekEndorsementAndSave = async ({
     projectPlanPk,
-    aecEndorsementRequired, aecEndorsementProvided,
+    shouldSendEmails,
+
+    aecEndorsementRequired, aecEndorsementProvided, aecPDFFile,
     herbariumEndorsementRequired, herbariumEndorsementProvided,
     bmEndorsementRequired, bmEndorsementProvided
 }: ISpecialEndorsement) => {
 
-    const data = {
-        bm_endorsement_required: bmEndorsementRequired,
-        bm_endorsement_provided: bmEndorsementProvided,
-        hc_endorsement_required: herbariumEndorsementRequired,
-        hc_endorsement_provided: herbariumEndorsementProvided,
-        ae_endorsement_required: aecEndorsementRequired,
-        ae_endorsement_provided: aecEndorsementProvided,
+    const formData = new FormData();
+    formData.append('bm_endorsement_required', bmEndorsementRequired.toString());
+    formData.append('bm_endorsement_provided', bmEndorsementProvided.toString());
+    formData.append('hc_endorsement_required', herbariumEndorsementRequired.toString());
+    formData.append('hc_endorsement_provided', herbariumEndorsementProvided.toString());
+    formData.append('ae_endorsement_required', aecEndorsementRequired.toString());
+    formData.append('ae_endorsement_provided', aecEndorsementRequired === false ? aecEndorsementRequired.toString() : aecEndorsementProvided.toString());
+
+    if (aecPDFFile !== undefined && aecPDFFile !== null) {
+        // if (aecPDFFile instanceof File) {
+        formData.append('aec_pdf_file', aecPDFFile);
+        // }
+    }
+    // const data = {
+    //     bm_endorsement_required: bmEndorsementRequired,
+    //     bm_endorsement_provided: bmEndorsementProvided,
+    //     hc_endorsement_required: herbariumEndorsementRequired,
+    //     hc_endorsement_provided: herbariumEndorsementProvided,
+    //     ae_endorsement_required: aecEndorsementRequired,
+    //     ae_endorsement_provided: aecEndorsementProvided,
+    //     aec_pdf_file: aecPDFFile
+    // }
+
+    console.log(
+        formData
+    )
+    for (const pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
     }
 
-    const res = instance.post(`documents/project_plan/${projectPlanPk}/seek_endorsement`, data).then(res => {
-        return res.data
-    })
-    return res;
+    // const res = instance.post(`documents/project_plan/${projectPlanPk}/seek_endorsement`, data).then(res => {
+    //     return res.data
+    // })
+    // return res;
+    return instance.post(
+        `documents/project_plans/${projectPlanPk}/seek_endorsement`, formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    ).then(res => res.data);
 }
 
 
