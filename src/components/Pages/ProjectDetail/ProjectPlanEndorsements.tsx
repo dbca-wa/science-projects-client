@@ -219,7 +219,7 @@ export const ProjectPlanEndorsements = (
 
     useEffect(() => {
         console.log(uploadedPDF)
-        if (uploadedPDF && uploadedPDF[0].type === "application/pdf") {
+        if (uploadedPDF && uploadedPDF.type === "application/pdf") {
             setShouldSwitchBeChecked(true);
         }
     }, [uploadedPDF])
@@ -238,11 +238,11 @@ export const ProjectPlanEndorsements = (
 
                 aecEndorsementRequired={aecEndReqValue}
                 aecEndorsementProvided={shouldSwitchBeChecked}
-                aecPDFFile={uploadedPDF}
 
                 isOpen={isOpen}
                 onClose={onClose}
                 refetchEndorsements={refetchDocument}
+                aecPDFFile={uploadedPDF}
             />
             <Box
                 background={"gray.50"}

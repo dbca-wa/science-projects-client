@@ -37,7 +37,7 @@ export const FileDropzone = ({ fileType, setUploadedFile, uploadedFile, isError,
         const res = await new Promise((resolve) => setTimeout(resolve, 1500));
         clearInterval(progressInterval);
         setUploadProgress(100);
-        setUploadedFile(acceptedFile);
+        setUploadedFile(acceptedFile[0]);
     }
 
     const startSimulatedProgress = () => {

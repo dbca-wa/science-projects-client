@@ -19,6 +19,15 @@ export type EditorSections =
 type EditorSubsections = ProjectSection | ConceptPlanSection | ProjectPlanSection | ProgressReportSection | StudentReportSection | ProjectClosureSection | AnnualReportSection;
 
 
+export interface CustomAxiosError extends AxiosError {
+    response?: {
+        data?: {
+            non_field_errors?: string[];
+        };
+    };
+}
+
+
 
 // USER ============================================================================
 

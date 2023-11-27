@@ -320,7 +320,7 @@ export const SeekEndorsementModal = (
                                         <Text
                                             color={colorMode === "light" ? "gray.800" : "gray.300"}
                                         >
-                                            {aecPDFFile[0].name}
+                                            {aecPDFFile.name}
                                         </Text>
                                     </Box>
                                 </Flex>
