@@ -272,7 +272,6 @@ export const ProjectPlanActionModal = (
                                                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                                                 >
                                                     Send emails to members of the Directorate alerting them that you have approved this document?
-
                                                 </Checkbox>
                                             </Box>
 

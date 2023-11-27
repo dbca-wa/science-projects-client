@@ -182,6 +182,7 @@ export const ProjectPlanContents = ({
                 document={document}
                 userIsLeader={userIsLeader}
                 userData={userData}
+                refetchDocument={refetch}
             // isProjectLeader={}
             />
 

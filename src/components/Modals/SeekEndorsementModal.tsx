@@ -1,7 +1,7 @@
 // Modal designed to send out emails seeking endorsement on the project plan where required
 // Will send an email out to users marked as is_biometrician, is_herb_curator, or is_aec
 
-import { Text, Button, Center, Flex, FormControl, Grid, Input, InputGroup, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, UnorderedList, useToast, ToastId, useColorMode, Checkbox, Box } from "@chakra-ui/react"
+import { Text, Image, Button, Center, Flex, FormControl, Grid, Input, InputGroup, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, UnorderedList, useToast, ToastId, useColorMode, Checkbox, Box, FormErrorMessage } from "@chakra-ui/react"
 import { ISimplePkProp, ISpecialEndorsement, deleteProjectCall, seekEndorsementAndSave } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,23 +12,25 @@ import { useForm } from "react-hook-form";
 
 interface Props {
     projectPlanPk: number;
-    biometricianEndorsementRequired: boolean;
-    biometricianEndorsementProvided: boolean;
+    bmEndorsementRequired: boolean;
+    bmEndorsementProvided: boolean;
     aecEndorsementRequired: boolean;
     herbariumEndorsementRequired: boolean;
     aecEndorsementProvided: boolean;
     herbariumEndorsementProvided: boolean;
+    aecPDFFile: File;
     isOpen: boolean;
     onClose: () => void;
+    refetchEndorsements: () => void;
 }
 
 export const SeekEndorsementModal = (
     {
         projectPlanPk,
-        biometricianEndorsementRequired, biometricianEndorsementProvided,
+        bmEndorsementRequired, bmEndorsementProvided,
         herbariumEndorsementRequired, herbariumEndorsementProvided,
-        aecEndorsementRequired, aecEndorsementProvided,
-        isOpen, onClose
+        aecEndorsementRequired, aecEndorsementProvided, aecPDFFile,
+        isOpen, onClose, refetchEndorsements,
     }: Props
 ) => {
 
@@ -40,7 +42,7 @@ export const SeekEndorsementModal = (
         toastIdRef.current = toast(data)
     }
 
-    const [shouldSendEmail, setShouldSendEmail] = useState(false);
+    const [shouldSendEmails, setShouldSendEmails] = useState(false);
     // Mutation, query client, onsubmit, and api function 
     const queryClient = useQueryClient();
 
@@ -49,7 +51,7 @@ export const SeekEndorsementModal = (
             onMutate: () => {
                 addToast({
                     status: "loading",
-                    title: `Sending Emails`,
+                    title: shouldSendEmails ? `Sending Emails` : `Updating Endorsements`,
                     position: "top-right"
                 })
             },
@@ -57,29 +59,24 @@ export const SeekEndorsementModal = (
                 if (toastIdRef.current) {
                     toast.update(toastIdRef.current, {
                         title: 'Success',
-                        description: `Emails Sent`,
+                        description: shouldSendEmails ? `Emails Sent` : `Updated Endorsements`,
                         status: 'success',
                         position: "top-right",
                         duration: 3000,
                         isClosable: true,
                     })
                 }
-                // onClose();
 
                 setTimeout(() => {
-                    // if (setIsAnimating) {
-                    //     setIsAnimating(false)
-                    // }
-                    queryClient.invalidateQueries(["projects"]);
-                    navigate('/projects');
 
-                    // queryClient.refetchQueries([`mytasks`])
+                    refetchEndorsements();
+                    onClose();
                 }, 350)
             },
             onError: (error) => {
                 if (toastIdRef.current) {
                     toast.update(toastIdRef.current, {
-                        title: `Could Not Send Emails`,
+                        title: shouldSendEmails ? `Could Not Send Emails` : `Could Not Update Endorsements`,
                         description: `${error}`,
                         status: 'error',
                         position: "top-right",
@@ -92,6 +89,7 @@ export const SeekEndorsementModal = (
 
         })
 
+    useEffect(() => console.log(errors))
 
     const seekEndorsementAndSaveFunc = (formData: ISpecialEndorsement) => {
         console.log(formData)
@@ -99,9 +97,19 @@ export const SeekEndorsementModal = (
     }
 
     const { colorMode } = useColorMode();
-    const { register, handleSubmit, reset, watch } = useForm<ISpecialEndorsement>();
+    const { register, handleSubmit, reset, watch, formState: { errors }, } = useForm<ISpecialEndorsement>();
 
-    const projPlanPk = watch('projectPlanPk');
+    // const projPlanPk = watch('projectPlanPk');
+    // const aecPDFFile = watch('aecPDFFile');
+
+    // useEffect(() => {
+    //     console.log({
+    //         projPlanPk,
+    //         bmEndorsementRequired, bmEndorsementProvided,
+    //         herbariumEndorsementRequired, herbariumEndorsementProvided,
+    //         aecEndorsementRequired, aecEndorsementProvided, aecPDFFile,
+    //     });
+    // })
 
 
 
@@ -113,8 +121,8 @@ export const SeekEndorsementModal = (
         >
             <ModalOverlay />
             <Flex
-                as={"form"}
-                onSubmit={handleSubmit(seekEndorsementAndSaveFunc)}
+            // as={"form"}
+            // onSubmit={handleSubmit(seekEndorsementAndSaveFunc)}
             >
                 <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
                     <ModalHeader>Save Endorsements</ModalHeader>
@@ -130,11 +138,15 @@ export const SeekEndorsementModal = (
                                 fontSize={"lg"}
                             >
                                 {
-                                    ((!aecEndorsementRequired) || (aecEndorsementRequired && aecEndorsementProvided)) &&
-                                        ((!herbariumEndorsementRequired) || (herbariumEndorsementRequired && herbariumEndorsementProvided)) &&
-                                        (!biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided))
+                                    (
+                                        // AEC not required or AEC required and given
+                                        (aecEndorsementRequired === false) || (aecEndorsementRequired === true && aecEndorsementProvided === true)) &&
+                                        // Herb not required or herb required and given 
+                                        ((herbariumEndorsementRequired === false) || (herbariumEndorsementRequired === true && herbariumEndorsementProvided === true)) &&
+                                        // Bio not required or bio required and given
+                                        (bmEndorsementRequired === false || (bmEndorsementRequired === true && bmEndorsementProvided === true))
                                         ?
-                                        ("As no endorsement is marked as required, endorsement emails are not necessary. You may still save.")
+                                        ("As all required endorsements have been provided, no emails are necessary. You may still save.")
                                         :
                                         "Also send notifications?"
                                 }
@@ -143,12 +155,12 @@ export const SeekEndorsementModal = (
                             <Flex>
                                 <Checkbox
                                     mt={4}
-                                    isChecked={shouldSendEmail}
-                                    onChange={() => setShouldSendEmail(!shouldSendEmail)}
+                                    isChecked={shouldSendEmails}
+                                    onChange={() => setShouldSendEmails(!shouldSendEmails)}
                                     isDisabled={
                                         ((!aecEndorsementRequired) || (aecEndorsementRequired && aecEndorsementProvided)) &&
                                         ((!herbariumEndorsementRequired) || (herbariumEndorsementRequired && herbariumEndorsementProvided)) &&
-                                        (!biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided))
+                                        (!bmEndorsementRequired || (bmEndorsementRequired && bmEndorsementProvided))
                                     }
                                 >
                                     Send Notifications
@@ -157,7 +169,7 @@ export const SeekEndorsementModal = (
 
                         </Box>
                         {
-                            shouldSendEmail ?
+                            shouldSendEmails ?
                                 (
                                     <Center
                                         mt={8}
@@ -166,8 +178,8 @@ export const SeekEndorsementModal = (
 
                                             {/* IF BM endorsement required and not provided */}
                                             {
-                                                biometricianEndorsementRequired === true &&
-                                                biometricianEndorsementProvided === false &&
+                                                bmEndorsementRequired === true &&
+                                                bmEndorsementProvided === false &&
                                                 (
                                                     <ListItem
                                                         color={"blue.400"}
@@ -178,7 +190,7 @@ export const SeekEndorsementModal = (
                                             }
                                             {/* ELSE where DME not required */}
                                             {
-                                                biometricianEndorsementRequired === false &&
+                                                bmEndorsementRequired === false &&
                                                 (
                                                     <ListItem
                                                         color={"gray.400"}
@@ -249,7 +261,7 @@ export const SeekEndorsementModal = (
                                 null
                         }
 
-                        <FormControl>
+                        {/* <FormControl>
                             <InputGroup>
                                 <Input type="hidden" {...register("projectPlanPk", { required: true, value: Number(projectPlanPk) })} readOnly />
                             </InputGroup>
@@ -266,12 +278,104 @@ export const SeekEndorsementModal = (
                                 <Input type="hidden" {...register("herbariumEndorsementProvided", { required: true, value: herbariumEndorsementProvided })} readOnly />
                             </InputGroup>
                             <InputGroup>
-                                <Input type="hidden" {...register("bmEndorsementRequired", { required: true, value: biometricianEndorsementRequired })} readOnly />
+                                <Input type="hidden" {...register("bmEndorsementRequired", { required: true, value: bmEndorsementRequired })} readOnly />
                             </InputGroup>
                             <InputGroup>
-                                <Input type="hidden" {...register("bmEndorsementProvided", { required: true, value: biometricianEndorsementProvided })} readOnly />
+                                <Input type="hidden" {...register("bmEndorsementProvided", { required: true, value: bmEndorsementProvided })} readOnly />
                             </InputGroup>
-                        </FormControl>
+                            <InputGroup>
+                                <Input type="hidden" {...register("aecPDFFile", { required: false, value: uploadedPDF })} readOnly />
+                            </InputGroup>
+                        </FormControl> */}
+
+                        {aecPDFFile ? (
+                            <Box
+                                mt={8}
+                            >
+                                <Text
+                                    color={"green.500"}
+
+                                >
+                                    You are uploading the following file to provide AEC approval:
+                                </Text>
+                                <Flex
+                                    mt={6}
+                                    minH={'40px'}
+                                    alignItems="center"
+                                >
+                                    <Box>
+                                        <Image
+                                            maxH={'40px'}
+                                            src={'/pdf2.png'}
+                                        />
+                                    </Box>
+                                    <Box
+                                        ml={4}
+                                        display="flex"
+                                        flex={1}
+                                        minH={'40px'}
+                                        // bg={"blue"}  
+                                        alignItems="center">
+
+                                        <Text
+                                            color={colorMode === "light" ? "gray.800" : "gray.300"}
+                                        >
+                                            {aecPDFFile[0].name}
+                                        </Text>
+                                    </Box>
+                                </Flex>
+
+                            </Box>
+
+                        ) : null}
+                        {/* {errors ?
+                            <Box
+                                mt={8}
+                            >
+                                <Text>Errors:</Text>
+                                {Object.keys(errors).length > 0 && (
+                                    <div>
+                                        <p>Errors:</p>
+                                        <ul>
+                                            {Object.entries(errors).map(([fieldName, error]) => (
+                                                <li key={fieldName}>
+                                                    <strong>{fieldName}:</strong> {error?.message}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                {errors.bmEndorsementRequired && (
+                                    <FormErrorMessage>{errors.bmEndorsementRequired.message}</FormErrorMessage>
+                                )}
+                                {errors.bmEndorsementProvided && (
+                                    <FormErrorMessage>{errors.bmEndorsementProvided.message}</FormErrorMessage>
+                                )}
+                                {errors.herbariumEndorsementRequired && (
+                                    <FormErrorMessage>{errors.herbariumEndorsementRequired.message}</FormErrorMessage>
+                                )}
+                                {errors.herbariumEndorsementProvided && (
+                                    <FormErrorMessage>{errors.herbariumEndorsementProvided.message}</FormErrorMessage>
+                                )}
+                                {errors.aecEndorsementRequired && (
+                                    <FormErrorMessage>{errors.aecEndorsementRequired.message}</FormErrorMessage>
+                                )}
+                                {errors.aecEndorsementProvided && (
+                                    <FormErrorMessage>{errors.aecEndorsementProvided.message}</FormErrorMessage>
+                                )}
+                                {errors.aecPDFFile && (
+                                    <FormErrorMessage>{errors.aecPDFFile.message}</FormErrorMessage>
+                                )}
+                                {errors.projectPlanPk && (
+                                    <FormErrorMessage>{errors.projectPlanPk.message}</FormErrorMessage>
+                                )}
+                                {errors.shouldSendEmails && (
+                                    <FormErrorMessage>{errors.shouldSendEmails.message}</FormErrorMessage>
+                                )}
+                            </Box>
+                            : null} */}
+
+
 
 
                     </ModalBody>
@@ -291,20 +395,47 @@ export const SeekEndorsementModal = (
                             <Button
                                 colorScheme="blue"
                                 isLoading={seekEndorsementAndSaveMutation.isLoading}
-                                type="submit"
+                                // type="submit"
                                 ml={3}
                                 isDisabled={
-                                    (shouldSendEmail &&
-                                        ((!aecEndorsementRequired) || (aecEndorsementRequired && aecEndorsementProvided)) &&
-                                        ((!herbariumEndorsementRequired) || (herbariumEndorsementRequired && herbariumEndorsementProvided)) &&
-                                        (!biometricianEndorsementRequired || (biometricianEndorsementRequired && biometricianEndorsementProvided)))
+                                    (shouldSendEmails &&
+                                        ((aecEndorsementRequired === false) || (aecEndorsementRequired === true && aecEndorsementProvided === true)) &&
+                                        ((herbariumEndorsementRequired === false) || (herbariumEndorsementRequired === true && herbariumEndorsementProvided === true)) &&
+                                        (bmEndorsementRequired === false || (bmEndorsementRequired === true && bmEndorsementProvided === true)))
                                 }
+                                onClick={() => {
+                                    aecPDFFile !== undefined ?
+                                        seekEndorsementAndSaveFunc({
+                                            aecEndorsementRequired,
+                                            aecEndorsementProvided,
+                                            aecPDFFile,
+                                            herbariumEndorsementRequired,
+                                            herbariumEndorsementProvided,
+                                            bmEndorsementRequired,
+                                            bmEndorsementProvided,
+                                            shouldSendEmails,
+                                            projectPlanPk
+                                        })
+                                        :
+                                        seekEndorsementAndSaveFunc({
+                                            aecEndorsementRequired,
+                                            aecEndorsementProvided,
+                                            herbariumEndorsementRequired,
+                                            herbariumEndorsementProvided,
+                                            bmEndorsementRequired,
+                                            bmEndorsementProvided,
+                                            shouldSendEmails,
+                                            projectPlanPk
+                                        })
+                                }}
                             >
 
-                                {shouldSendEmail ? `Save and Send Emails` : `Save`}
+                                {shouldSendEmails ? `Save and Send Emails` : `Save`}
                             </Button>
 
+
                         </Grid>
+                        { }
                     </ModalFooter>
                 </ModalContent>
             </Flex>

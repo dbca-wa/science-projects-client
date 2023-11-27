@@ -12,8 +12,8 @@ export interface IFileType {
     fileType: "pdf" | "image";
 }
 
-export const FileDropzone = ({ fileType, setUploadedFile, uploadedFile, isError, setIsError }:
-    { fileType: "pdf" | "image", setUploadedFile: React.Dispatch<React.SetStateAction<File>>, uploadedFile: File, isError: boolean, setIsError: React.Dispatch<React.SetStateAction<boolean>> }) => {
+export const FileDropzone = ({ fileType, setUploadedFile, uploadedFile, isError, setIsError, extraText }:
+    { fileType: "pdf" | "image", setUploadedFile: React.Dispatch<React.SetStateAction<File>>, uploadedFile: File, isError: boolean, setIsError: React.Dispatch<React.SetStateAction<boolean>>, extraText: string }) => {
 
     const [isUploading, setIsUploading] = useState<boolean>(true);
     const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -100,7 +100,12 @@ export const FileDropzone = ({ fileType, setUploadedFile, uploadedFile, isError,
                                 />
 
                             </Box>
-                            <FormHelperText>{`Drag and drop a ${fileType} file.`}</FormHelperText>
+                            {extraText === undefined ?
+                                <Text>{`Drag and drop a ${fileType} file.`}</Text>
+                                :
+                                <Text>{`Drag and drop a ${fileType} file${extraText}.`}</Text>
+
+                            }
                             {!isError && acceptedFiles && acceptedFiles[0] ? (
                                 <Flex
                                     mt={4}
@@ -215,16 +220,18 @@ interface Props {
     setUploadedFile: React.Dispatch<React.SetStateAction<File>>;
     isError: boolean;
     setIsError: React.Dispatch<React.SetStateAction<boolean>>;
+    extraText?: string;
 }
 
 
-export const SingleFileUpload = ({ fileType, uploadedFile, setUploadedFile, isError, setIsError }: Props) => {
+export const SingleFileUpload = ({ fileType, uploadedFile, setUploadedFile, isError, setIsError, extraText }: Props) => {
     return (
         <Box>
             <FileDropzone
                 fileType={fileType}
                 setUploadedFile={setUploadedFile} uploadedFile={uploadedFile}
                 setIsError={setIsError} isError={isError}
+                extraText={extraText}
             />
         </Box>
     );
