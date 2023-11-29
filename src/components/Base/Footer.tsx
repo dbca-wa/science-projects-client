@@ -9,7 +9,7 @@ export const Footer = () => {
     const currentYear = useCurrentYear();
     const { layout } = useLayoutSwitcher();
     // const FooterText = layout === "traditional" ? "SPMS v6.0.0" : "Cycle v1.0.0"
-    const FooterText = "SPMS v0.1.0"
+    const FooterText = "SPMS2 v0.1.0"
 
 
     return (

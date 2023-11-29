@@ -146,58 +146,15 @@ const ReportMenuContents = () => {
                     {<CgViewList />}
                     <Text ml={2}
                     >
-                        Prior Reports
+                        Finalised Reports
                     </Text>
                 </MenuItem>
 
             </MenuGroup>
-            {/* <Divider
-                borderColor={dividerColor}
-                my={1}
-            />
-            {!reportPdfsLoading && reportPdfsData && (
-
-                <MenuGroup
-                    title="ARAR PDF" fontSize={"12px"}
-                    color={"gray.500"} textAlign={"center"}
-                >
-
-
-                    <MenuItem
-                                key={publication.report.year}
-                                onClick={() => {
-                                    window.open(publication.file, "_blank");
-                                }}
-                            >
-                                {<ImBook />}
-                                <Text ml={2}>
-                                    ARAR {publication.report.year}
-                                </Text>
-                            </MenuItem>
-
-
-                </MenuGroup>
-            )} */}
 
         </>
     )
 }
-
-{/* {reportPdfsData.map(publication => {
-                        return (
-                            <MenuItem
-                                key={publication.report.year}
-                                onClick={() => {
-                                    window.open(publication.file, "_blank");
-                                }}
-                            >
-                                {<ImBook />}
-                                <Text ml={2}>
-                                    ARAR {publication.report.year}
-                                </Text>
-                            </MenuItem>
-                        )
-                    })} */}
 
 
 const UserMenuContents = () => {
