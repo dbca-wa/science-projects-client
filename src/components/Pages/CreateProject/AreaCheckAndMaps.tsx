@@ -25,7 +25,7 @@ export const AreaCheckAndMaps = ({
         // Check if the "All " checkbox is checked
         console.log(selectedAreas)
         const isAllAreaChecked = areas.some((area) => {
-            return area.name.toLowerCase().startsWith("all ") && selectedAreas.includes(area.pk);
+            return area.name.toLowerCase().startsWith("all ") && selectedAreas?.includes(area.pk);
         });
         setAllAreaChecked(isAllAreaChecked);
     }, [areas, selectedAreas]);
@@ -41,7 +41,7 @@ export const AreaCheckAndMaps = ({
             }
         } else {
             setAllAreaChecked(false);
-            const newSelectedAreas = selectedAreas.filter((value) => value !== areaId);
+            const newSelectedAreas = selectedAreas?.filter((value) => value !== areaId);
             setSelectedAreas(newSelectedAreas);
         }
     };
@@ -52,7 +52,7 @@ export const AreaCheckAndMaps = ({
             <InputGroup>
                 <Grid gridTemplateColumns={"repeat(3, 1fr)"} gridGap={3} py={4}>
                     {areas?.map((area, index) => {
-                        const isChecked = selectedAreas.includes(area.pk);
+                        const isChecked = selectedAreas?.includes(area.pk);
                         const isDisabled =
                             allAreaChecked && !area.name.toLowerCase().startsWith("all ");
                         if (isDisabled && isChecked) {
@@ -62,7 +62,7 @@ export const AreaCheckAndMaps = ({
                             <Flex key={index}>
                                 <Checkbox
                                     onChange={(e) => {
-                                        if (e.target.name.includes("All ")) {
+                                        if (e.target.name?.includes("All ")) {
                                             disableAndUncheckAllOtherRegionsExceptAll(
                                                 area.pk,
                                                 e.target.checked

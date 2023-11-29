@@ -175,7 +175,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                 mt={6}
             >
                 {
-                    !tasksLoading && !projectsLoading ? (
+                    !tasksLoading && !projectsLoading && !projectDocumentDataLoading ? (
                         <Accordion
                             defaultIndex={defaultIndex}
                             allowMultiple

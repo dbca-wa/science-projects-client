@@ -22,7 +22,7 @@ export const ExtractedHTMLTitle: React.FC<Props> = ({ htmlContent, onClick, extr
         }
     }, [htmlContent]);
 
-    console.log(extraText)
+    // console.log(extraText)
 
     return (
         <Text {...textProps}
