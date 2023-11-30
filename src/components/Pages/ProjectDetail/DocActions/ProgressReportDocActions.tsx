@@ -995,7 +995,7 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                             {progressReportData?.document?.directorate_approval_granted
                                                 && (userData?.is_superuser || userData?.business_area?.name === "Directorate") && (
                                                     <Center
-
+                                                        mt={3}
                                                         justifyContent={"flex-start"}
                                                         ml={3}
                                                     >

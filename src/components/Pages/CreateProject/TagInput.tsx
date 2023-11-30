@@ -96,10 +96,10 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
                 />
             </InputGroup>
             <FormHelperText>Add some keywords as a comma-separated list. Press space after a comma to add the tag.</FormHelperText>
-            <Flex flexWrap="wrap" gap={2} pt={3} userSelect={"none"}>
+            <Flex flexWrap="wrap" gap={2} pt={3} >
                 {tags?.map((tag, index) => (
-                    <Tag key={index} size="md" borderRadius="full" variant="solid" colorScheme="blue" userSelect={"none"}>
-                        <TagLabel pl={1} userSelect={"none"}>{tag}</TagLabel>
+                    <Tag key={index} size="md" borderRadius="full" variant="solid" colorScheme="blue" >
+                        <TagLabel pl={1} >{tag}</TagLabel>
                         <TagCloseButton
                             onClick={() => removeTag(tag)}
                             userSelect={"none"}

@@ -10,7 +10,7 @@ const useDistilledProjectTitle = (rawHTML) => {
 
         // Find the <p> and <span> elements
         const pElement = doc.querySelector('p');
-        const spanElement = pElement ? pElement.querySelector('span') : null;
+        const spanElement = pElement.querySelector('span') ? pElement.querySelector('span') : pElement;
 
         // Extract the text content of the <span> element
         const title = spanElement ? spanElement.textContent : '';

@@ -1,7 +1,7 @@
 // Route for displaying the Project Details of a given project.
 
 import { useParams } from "react-router-dom"
-import { Tab, TabList, TabPanel, TabPanels, Tabs, useColorMode, Spinner, Select, FormControl, FormHelperText, FormLabel, Box, Text, Flex } from "@chakra-ui/react";
+import { Tab, TabList, TabPanel, TabPanels, Tabs, useColorMode, Spinner, Select, FormControl, FormHelperText, FormLabel, Box, Text, Flex, Center } from "@chakra-ui/react";
 import { ProjectOverviewCard } from "../components/Pages/ProjectDetail/ProjectOverviewCard";
 import { ConceptPlanContents } from "../components/Pages/ProjectDetail/ConceptPlanContents";
 import { ProjectPlanContents } from "../components/Pages/ProjectDetail/ProjectPlanContents";
@@ -28,6 +28,7 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
     const [details, setDetails] = useState<IFullProjectDetails | null>();
     const [documents, setDocuments] = useState<IProjectDocuments | null>();
     const [members, setMembers] = useState<IProjectMember[]>([]);
+    const [distilledTitle, setDistilledTitle] = useState<string>();
 
     useEffect(() => {
         console.log(projectData)
@@ -37,12 +38,34 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
             setDetails(projectData.details);
             setDocuments(projectData.documents);
             setMembers(projectData.members);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(projectData?.project?.title, 'text/html');
+            const pElement = doc.querySelector('p');
+            const spanElement = pElement.querySelector('span') ? pElement.querySelector('span') : pElement;
+            const title = spanElement ? spanElement.textContent : '';
+            setDistilledTitle(title);
         }
     }, [isLoading, projectData])
 
+    // useEffect(() => {
+    //     if (projectData) {
+    //         const parser = new DOMParser();
+    //         const doc = parser.parseFromString(projectData?.project?.title, 'text/html');
+    //         const pElement = doc.querySelector('p');
+    //         const spanElement = pElement.querySelector('span') ? pElement.querySelector('span') : pElement;
+    //         const title = spanElement ? spanElement.textContent : '';
+    //         setDistilledTitle(title);
+    //     }
+    // }, [projectData])
+
+    useEffect(() => {
+        console.log(distilledTitle)
+
+    }, [distilledTitle])
 
 
-    const distilledTitle = useDistilledProjectTitle(projectData?.project?.title);
+
+    // const distilledTitle = useDistilledProjectTitle(projectData?.project?.title);
 
     const me = useUser();
 
@@ -69,13 +92,13 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
     })
 
 
+    return (
 
-
-    if (isLoading || !documents) {
-        return <Spinner />;
-    } else
-        return (
-            documents && (
+        (isLoading || !documents || !distilledTitle) ? <Center>
+            {/* <Head title={distilledTitle} /> */}
+            <Spinner />
+        </Center> :
+            documents && distilledTitle && (
                 <>
                     <Head title={distilledTitle} />
                     <Tabs
@@ -255,7 +278,7 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
                 </>
             )
 
-        )
+    )
 }
 
 
