@@ -46,7 +46,7 @@ export const ConceptPlanContents = ({
                 all_documents={all_documents}
                 conceptPlanData={document}
                 refetchData={refetch}
-                setToLastTab={setToLastTab}
+            // setToLastTab={setToLastTab}
 
             // projectPk={projectPk}
             />
