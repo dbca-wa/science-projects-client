@@ -219,7 +219,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                     pt={0}
                                 >
 
-                                    {combinedData.length >= 1 ? (
+                                    {(combinedData.length + pendingProjectDocumentData?.all?.length) >= 1 ? (
                                         <Grid
                                             gridTemplateColumns={"repeat(1, 1fr)"}
                                         >
