@@ -14,10 +14,10 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
     refetchData: () => void;
-
+    setToLastTab: () => void;
 }
 
-export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData }: Props) => {
+export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData, setToLastTab }: Props) => {
 
     const { register, handleSubmit, reset, watch } = useForm<ICloseProjectProps>();
     const [closureReason, setClosureReason] = useState('');
@@ -61,12 +61,14 @@ export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData }:
                     })
                 }
 
-                setTimeout(() => {
+                setTimeout(async () => {
                     // if (setIsAnimating) {
                     //     setIsAnimating(false)
                     // }
                     queryClient.invalidateQueries(["projects", projectPk]);
-                    refetchData();
+                    await refetchData();
+                    console.log("cheese")
+                    setToLastTab();
                     onClose();
 
                     // navigate('/projects');

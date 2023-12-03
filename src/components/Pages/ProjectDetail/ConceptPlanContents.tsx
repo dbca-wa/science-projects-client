@@ -15,12 +15,15 @@ interface Props {
     document: IConceptPlan | null;
 
     refetch: () => void;
+    setToLastTab: () => void;
+
 }
 
 export const ConceptPlanContents = ({
     userData, members,
     all_documents,
-    document, refetch
+    document, refetch,
+    setToLastTab,
 }: Props) => {
 
 
@@ -43,6 +46,8 @@ export const ConceptPlanContents = ({
                 all_documents={all_documents}
                 conceptPlanData={document}
                 refetchData={refetch}
+                setToLastTab={setToLastTab}
+
             // projectPk={projectPk}
             />
 

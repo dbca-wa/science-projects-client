@@ -17,9 +17,10 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
     onDeleteSuccess?: () => void;
+    setToLastTab: () => void;
 }
 
-export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refetchData, isOpen, onClose, onDeleteSuccess }: Props) => {
+export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refetchData, isOpen, onClose, onDeleteSuccess, setToLastTab }: Props) => {
 
     const navigate = useNavigate();
     const { availableProgressReportYearsLoading, availableProgressReportYearsData, refetchProgressYears } = useGetProgressReportAvailableReportYears(Number(projectPk))
@@ -68,13 +69,16 @@ export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refet
                 }
                 // onClose();
 
-                setTimeout(() => {
+                setTimeout(async () => {
                     // if (setIsAnimating) {
                     //     setIsAnimating(false)
                     // }
                     queryClient.invalidateQueries(["projects", projectPk]);
-                    refetchData();
+                    await refetchData();
                     onClose();
+                    console.log('deletging')
+                    setToLastTab();
+
                 }, 350)
             },
             onError: (error) => {

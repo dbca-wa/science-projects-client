@@ -18,12 +18,15 @@ interface Props {
     userData: IUserMe;
     members: IProjectMember[];
     refetch: () => void;
+    setToLastTab: () => void;
+
 }
 
 export const ProgressReportContents = ({
     userData, members,
     all_documents,
-    documents, refetch
+    documents, refetch,
+    setToLastTab,
 }: Props) => {
     // Handling years
     const { availableProgressReportYearsLoading, availableProgressReportYearsData, refetchProgressYears } = useGetProgressReportAvailableReportYears(Number(documents[0].document?.project?.pk));
@@ -293,6 +296,7 @@ export const ProgressReportContents = ({
                             callSameData={handleSetSameYear}
                             progressReportData={selectedProgressReport}
                             documents={documents}
+                            setToLastTab={setToLastTab}
                         />
                         {/* Editors */}
 
