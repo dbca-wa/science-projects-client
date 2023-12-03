@@ -1,14 +1,18 @@
 // Maps out the document provided to the rich text editor components for project closure documents. 
 
 
-import { Box, Flex, Grid, Select, Text, useColorMode } from "@chakra-ui/react"
+import { Box, Flex, Grid, Select, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react"
 import { IProjectClosure, IProjectDocuments, IProjectMember, IUserMe } from "../../../types"
 import { DocumentActions } from "./DocumentActions"
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
 import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
 import { ProjectClosureDocActions } from "./DocActions/ProjectClosureDocActions";
+import { IClosureOutcomeProps, setClosureOutcome } from "../../../lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { AxiosError } from "axios";
 
 interface Props {
     document: IProjectClosure | null;
@@ -45,14 +49,75 @@ export const ProjectClosureContents = ({
     const [selectedOutcome, setSelectedOutcome] = useState<string>(document?.intended_outcome);
     const potentialOutcomes = ["completed", "terminated", "suspended", "forcecompleted"]
 
-    const handleNewOutcomeSelection = (event) => {
-        // setIsLoading(true);
-        setSelectedOutcome(event.target.value)
+
+    const queryClient = useQueryClient();
+    const { register, handleSubmit, reset } = useForm<IClosureOutcomeProps>();
+    const toast = useToast();
+    const toastIdRef = useRef<ToastId>();
+    const addToast = (data: any) => {
+        toastIdRef.current = toast(data)
     }
 
-    useEffect(() => {
-        console.log(selectedOutcome)
-    }, [selectedOutcome])
+    const setClosureMutation = useMutation(setClosureOutcome,
+        {
+            onMutate: () => {
+                addToast({
+                    status: "loading",
+                    title: "Setting Closure Outcome",
+                    position: "top-right"
+                })
+            },
+            onSuccess: async (data) => {
+
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Success',
+                        description: `Closure Outcome Set`,
+                        status: 'success',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+                queryClient.invalidateQueries(["projects", document?.document?.project?.id]);
+                refetch();
+            },
+            onError: (error: AxiosError) => {
+                if (toastIdRef.current) {
+                    toast.update(toastIdRef.current, {
+                        title: 'Could Not Set Closure Outcome',
+                        description: error?.response?.data
+                            ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
+                            : 'Error',
+                        status: 'error',
+                        position: "top-right",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
+            }
+        })
+
+
+    const handleNewOutcomeSelection = (event) => {
+        // setIsLoading(true);
+        // setSelectedOutcome(event.target.value)
+        const outcome = event.target.value;
+        const closurePk = document?.pk
+        const formData = {
+            outcome: outcome,
+            closurePk: closurePk,
+        }
+        setSelectedOutcome(outcome)
+        setClosureMutation.mutate(formData)
+    }
+
+
+    // useEffect(() => {
+    //     console.log(selectedOutcome)
+    //     // api call to set the outcome
+
+    // }, [selectedOutcome])
 
     return (
         <>

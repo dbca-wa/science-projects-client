@@ -33,6 +33,7 @@ import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModa
 import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
 import { IoMdSettings } from "react-icons/io";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
+import { BsCaretDownFill } from "react-icons/bs";
 
 interface IProjectOverviewCardProps {
     location: IProjectAreas;
@@ -181,7 +182,7 @@ export const ProjectOverviewCard = (
         { "pending": { label: "Pending Project Plan", color: "yellow.500" } },
         { "active": { label: "Active (Approved)", color: "green.500" } },
         { "updating": { label: "Update Requested", color: "red.500" } },
-        { "closure requested": { label: "Closure Requested", color: "red.500" } },
+        { "closure_requested": { label: "Closure Requested", color: "red.500" } },
         { "closing": { label: "Closure Pending Final Update", color: "red.500" } },
         { "final_update": { label: "Final Update Requested", color: "red.500" } },
         { "completed": { label: "Completed and Closed", color: "blue.500" } },
@@ -612,7 +613,7 @@ export const ProjectOverviewCard = (
                                         > */}
                                         <Center>
                                             <Box
-                                                mr={1}
+                                                mr={2}
                                             >
                                                 <IoMdSettings />
 
@@ -621,6 +622,9 @@ export const ProjectOverviewCard = (
                                                 Project Settings
 
                                             </Text>
+                                            <Box ml={2}>
+                                                <BsCaretDownFill />
+                                            </Box>
 
                                         </Center>
 

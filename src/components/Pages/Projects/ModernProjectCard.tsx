@@ -44,7 +44,7 @@ export const ModernProjectCard = ({
         { "pending": { label: "Pending Project Plan", color: "yellow.500" } },
         { "active": { label: "Active (Approved)", color: "green.500" } },
         { "updating": { label: "Update Requested", color: "red.500" } },
-        { "closure requested": { label: "Closure Requested", color: "red.500" } },
+        { "closure_requested": { label: "Closure Requested", color: "red.500" } },
         { "closing": { label: "Closure Pending Final Update", color: "red.500" } },
         { "final_update": { label: "Final Update Requested", color: "red.500" } },
         { "completed": { label: "Completed and Closed", color: "blue.500" } },

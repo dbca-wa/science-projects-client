@@ -1,6 +1,6 @@
 // The traditional version of the dashboard
 
-import { Box, Button, Center, Grid, Heading, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
+import { Box, Button, Center, Flex, Grid, Heading, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
 import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects"
 import { Head } from "../../Base/Head"
 import { useCallback, useEffect, useState } from "react";
@@ -86,7 +86,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                     {/* <br /> */}
                     {!shouldConcat && (
                         <Text
-                            py={4}
+                            pt={4}
                             fontSize={"19px"}
                             fontWeight={"normal"}
                         >
@@ -96,13 +96,38 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                         </Text>
 
                     )}
+
+                    <Flex
+                        flexDir={"column"}
+                    >
+                        <Text
+                            fontSize={"16px"}
+                            mt={5}
+                            fontWeight={"normal"}
+                        >
+                            Currently under development,
+                            this version serves to identify and address bugs and areas for improvement.
+                            Please feel free to explore and test the site.
+                            Rest assured, all data will be restored to a database snapshot when the site is production-ready.
+                            For feedback or feature requests, kindly submit them here: <Button
+                                variant={"link"}
+                                color={"red.500"}
+                            >
+                                Submit Feedback
+                            </Button>
+                        </Text>
+                        <Text>
+                            Don't be shy, we can only make things better with your help!
+                        </Text>
+                    </Flex>
+
                     {/* <br /> */}
-                    <Text
+                    {/* <Text
                         fontWeight={"thin"}
 
                     >
                         Welcome to the test instance of the new SPMS. This version is still under development and is live on the test network to find any bugs and areas for improvement.
-                    </Text>
+                    </Text> */}
                 </Box>
                 <Grid
                     my={5}

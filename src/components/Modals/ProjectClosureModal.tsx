@@ -196,7 +196,7 @@ export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData }:
                                     <UnorderedList px={10} pt={4}>
                                         <ListItem>Spawns a project closure document</ListItem>
                                         <ListItem>Prevents any further reports</ListItem>
-                                        <ListItem>Sets the status of the project to an inactive one, based on the selected outcome</ListItem>
+                                        <ListItem>Sets the status of the project to closure requested, until the closure document is approved</ListItem>
                                     </UnorderedList>
                                 </Box>
 

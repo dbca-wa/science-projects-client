@@ -11,7 +11,7 @@ import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers"
 interface Props {
     userData: IUserMe;
 
-    action: "approve" | "recall" | "send_back";
+    action: "approve" | "recall" | "send_back" | "reopen";
     stage: number;
     documentPk: number;
     projectClosurePk: number;
@@ -283,10 +283,10 @@ export const ProjectClosureActionModal = (
                                             <br />
                                             <Text>
                                                 {action === "approve" ?
-                                                    "This will provide final approval for this project closure, enabling creation of a project plan."
+                                                    "This will provide final approval for this project closure, closing the project."
                                                     :
                                                     action === "recall" ?
-                                                        "This will return the approval status from 'Granted' to 'Required'."
+                                                        "This will return the directorate approval status from 'Granted' to 'Required'. The project will also be reopened."
                                                         :
                                                         "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been sent back for revision."
                                                 }

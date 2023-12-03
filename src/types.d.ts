@@ -386,7 +386,7 @@ export interface IQuickTask {
 }
 
 export interface IApproveDocument {
-    action: "approve" | "recall" | "send_back";
+    action: "approve" | "recall" | "send_back" | "reopen";
     stage: number; // 1-3
     documentPk: number;
 }
