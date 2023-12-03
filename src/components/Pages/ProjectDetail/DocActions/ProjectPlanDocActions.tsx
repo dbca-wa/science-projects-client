@@ -21,12 +21,13 @@ interface IProjectPlanDocumentActions {
     projectPlanData: IProjectPlan;
     refetchData: () => void;
     all_documents: IProjectDocuments;
-
+    setToLastTab: () => void;
     // projectPk: number;
 }
 
 export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchData,
     // , projectPk 
+    setToLastTab
 }: IProjectPlanDocumentActions) => {
     const [showActions, setShowActions] = useState(false);
     const handleToggleActionsVisibility = () => {
@@ -735,6 +736,7 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
                                                                         onClose={onCloseDeleteDocumentModal}
                                                                         isOpen={isDeleteDocumentModalOpen}
                                                                         refetchData={refetchData}
+                                                                        setToLastTab={setToLastTab}
                                                                     />
                                                                     <Button
                                                                         colorScheme="red"

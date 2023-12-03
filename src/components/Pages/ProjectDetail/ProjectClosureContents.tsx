@@ -20,12 +20,15 @@ interface Props {
     userData: IUserMe;
     members: IProjectMember[];
     refetch: () => void;
+    setToLastTab: () => void;
+
 }
 
 export const ProjectClosureContents = ({
     userData, members,
     all_documents,
     document, refetch,
+    setToLastTab,
 }: Props) => {
 
     const { colorMode } = useColorMode();
@@ -126,6 +129,7 @@ export const ProjectClosureContents = ({
                 all_documents={all_documents}
                 projectClosureData={document}
                 refetchData={refetch}
+                setToLastTab={setToLastTab}
             // projectPk={projectPk}
             />
 

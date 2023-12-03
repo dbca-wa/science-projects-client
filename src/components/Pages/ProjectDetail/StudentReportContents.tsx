@@ -18,12 +18,15 @@ interface Props {
     members: IProjectMember[];
     refetch: () => void;
     projectPk: number | string;
+    setToLastTab: () => void;
+
 }
 
 export const StudentReportContents = ({
     userData, members,
     all_documents,
-    documents, refetch, projectPk
+    documents, refetch, projectPk,
+    setToLastTab,
 }: Props) => {
     // Handling years
     const { availableStudentYearsLoading, availableStudentYearsData, refetchStudentYears } = useGetStudentReportAvailableReportYears(Number(documents[0].document?.project?.pk));
@@ -298,6 +301,7 @@ export const StudentReportContents = ({
                             callSameData={handleSetSameYear}
                             studentReportData={selectedStudentReport}
                             documents={documents}
+                            setToLastTab={setToLastTab}
                         />
                         {/* Editors */}
 

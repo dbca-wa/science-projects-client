@@ -20,12 +20,13 @@ interface IProgressDocumentActions {
     refetchData: () => void;
     callSameData: () => void;
     documents: IProgressReport[];
+    setToLastTab: () => void;
     // setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
     // setSelectedProgressReport: React.Dispatch<React.SetStateAction<IProgressReport>>;
     // projectPk: number;
 }
 
-export const ProgressReportDocActions = ({ progressReportData, refetchData, documents, callSameData,
+export const ProgressReportDocActions = ({ progressReportData, refetchData, documents, callSameData, setToLastTab,
     // setSelectedProgressReport, setSelectedYear,
     // , projectPk 
 }: IProgressDocumentActions) => {
@@ -713,6 +714,8 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                                                 isOpen={isDeleteDocumentModalOpen}
                                                                 onDeleteSuccess={setStatusIfRequired}
                                                                 refetchData={refetchData}
+                                                                setToLastTab={setToLastTab}
+
                                                             />
                                                             <Button
                                                                 colorScheme="red"

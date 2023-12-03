@@ -20,13 +20,14 @@ interface IStudentDocumentActions {
     refetchData: () => void;
     documents: IStudentReport[];
     callSameData: () => void;
+    setToLastTab: () => void;
     // setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
     // setselectedStudentReport: React.Dispatch<React.SetStateAction<IStudentReport>>;
     // projectPk: number;
 }
 
 export const StudentReportDocActions = ({ studentReportData, refetchData, documents,
-    callSameData,
+    callSameData, setToLastTab,
     // setselectedStudentReport, setSelectedYear,
     // , projectPk 
 }: IStudentDocumentActions) => {
@@ -714,6 +715,7 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                                                                 isOpen={isDeleteDocumentModalOpen}
                                                                 onDeleteSuccess={setStatusIfRequired}
                                                                 refetchData={refetchData}
+                                                                setToLastTab={setToLastTab}
                                                             />
                                                             <Button
                                                                 colorScheme="red"

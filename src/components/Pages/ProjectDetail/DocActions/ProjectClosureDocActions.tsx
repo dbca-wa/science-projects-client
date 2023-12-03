@@ -22,11 +22,11 @@ interface IConceptDocumentActions {
     projectClosureData: IProjectClosure;
     refetchData: () => void;
     all_documents: IProjectDocuments;
-
+    setToLastTab: () => void;
     // projectPk: number;
 }
 
-export const ProjectClosureDocActions = ({ all_documents, projectClosureData, refetchData,
+export const ProjectClosureDocActions = ({ all_documents, projectClosureData, refetchData, setToLastTab,
     // , projectPk 
 }: IConceptDocumentActions) => {
     const [showActions, setShowActions] = useState(false);
@@ -785,6 +785,7 @@ export const ProjectClosureDocActions = ({ all_documents, projectClosureData, re
                                                                 isOpen={isDeleteDocumentModalOpen}
                                                                 onDeleteSuccess={() => { setStatusIfRequired(projectClosureData?.document?.project?.pk ? projectClosureData?.document?.project?.pk : projectClosureData?.document?.project?.id, "updating") }}
                                                                 refetchData={refetchData}
+                                                                setToLastTab={setToLastTab}
                                                             />
                                                             <Button
                                                                 colorScheme="red"

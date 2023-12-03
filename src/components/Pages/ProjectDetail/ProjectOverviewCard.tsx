@@ -42,11 +42,12 @@ interface IProjectOverviewCardProps {
     members: IProjectMember[];
     documents: IProjectDocuments;
     refetchData: () => void;
+    setToLastTab: () => void;
 }
 
 
 export const ProjectOverviewCard = (
-    { location, baseInformation, details, members, refetchData, documents }: IProjectOverviewCardProps
+    { location, baseInformation, details, members, refetchData, documents, setToLastTab }: IProjectOverviewCardProps
 ) => {
 
 
@@ -258,6 +259,8 @@ export const ProjectOverviewCard = (
                         isOpen={isClosureModalOpen}
                         onClose={onCloseClosureModal}
                         refetchData={refetchData}
+                        setToLastTab={setToLastTab}
+
                     />
                     <ProjectReopenModal
                         projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
