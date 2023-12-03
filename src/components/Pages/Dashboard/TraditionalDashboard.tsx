@@ -37,7 +37,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                 setSpmsText("Science Project <br/> Management System");
             }
             else {
-                setSpmsText("Science Project Management System");
+                setSpmsText("Science Project Management System (TEST)");
             }
         }
     }, [theme.breakpoints.lg, user?.userData?.first_name]);
@@ -101,7 +101,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                         fontWeight={"thin"}
 
                     >
-                        Please note that this web application is under reconstruction and not all features may work. Please update and submit (when ready) all documents awaiting your attention in the "My Tasks" section below. From the same section, you may manually add a simple todo to ensure you are on top of things. You can view and update project details of projects you belong to in the "My Projects" section below.
+                        Welcome to the test instance of the new SPMS. This version is still under development and is live on the test network to find any bugs and areas for improvement.
                     </Text>
                 </Box>
                 <Grid

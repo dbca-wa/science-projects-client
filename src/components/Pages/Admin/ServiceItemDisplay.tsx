@@ -10,6 +10,7 @@ import { FcOk, FcCancel } from "react-icons/fc";
 import { deleteDepartmentalService, updateDepartmentalService } from "../../../lib/api";
 import { useState } from "react";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { TextButtonFlex } from "../../TextButtonFlex";
 
 export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService) => {
 
@@ -114,23 +115,40 @@ export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService)
                     </Drawer>
 
                     <Grid
-                        gridTemplateColumns="4fr 5fr 1fr"
+                        gridTemplateColumns="5fr 4fr 1fr"
                         width="100%"
                         p={3}
                         borderWidth={1}
+                    // gridColumnGap={8}
                     >
-                        <Flex justifyContent="flex-start"
-                            ml={4}
-                            alignItems={"center"}
+                        <TextButtonFlex
+                            name={name}
+                            onClick={onUpdateModalOpen}
+                        />
+                        {/* <Flex justifyContent="flex-start"
+
+                            overflow="auto"
+                            textOverflow="ellipsis"
+                            maxW="100%"
+                            pr={8}
                         >
-                            <Button
+                            <Text
                                 variant={"link"}
-                                colorScheme="blue"
+                                color="blue.500"
+                                fontWeight={"semibold"}
                                 onClick={onUpdateModalOpen}
+                                whiteSpace="normal"
+                                textOverflow="ellipsis"
+                                cursor={"pointer"}
+                                _hover={
+                                    {
+                                        textDecoration: "underline",
+                                    }
+                                }
                             >
                                 {name ?? ""}
-                            </Button>
-                        </Flex>
+                            </Text>
+                        </Flex> */}
 
                         <Flex
                         >
@@ -214,7 +232,8 @@ export const ServiceItemDisplay = ({ pk, name, director }: IDepartmentalService)
                         <ModalOverlay />
                         <ModalHeader>Update Research Function</ModalHeader>
                         <ModalBody>
-                            <ModalContent bg="white" p={4}>
+                            <ModalContent bg="white" p={4} px={6}
+                            >
                                 <FormControl>
                                     {/* Hidden input to capture the pk */}
                                     <input

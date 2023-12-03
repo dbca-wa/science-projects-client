@@ -96,7 +96,7 @@ export const SearchProjects = () => {
                 <option value={"All"}
                     color={"black"}
 
-                >All Businesss Areas</option>
+                >All Business Areas</option>
                 {businessAreas &&
                     businessAreas
                         .sort((a, b) => a.name.localeCompare(b.name)) // Sort the array alphabetically

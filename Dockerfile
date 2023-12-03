@@ -26,8 +26,3 @@ COPY vite.config.ts .
 RUN npm cache clean --force && npm install typescript
 EXPOSE 3000
 CMD ["npm", "run", "preview"]
-
-# Commands:
-# docker build --tag dockertest .
-# docker run --publish 3000:3000 dockertest NOT # docker run dockertest 
-# docker-compose run app

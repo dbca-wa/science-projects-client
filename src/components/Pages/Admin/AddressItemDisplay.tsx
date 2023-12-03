@@ -7,6 +7,7 @@ import { FaSign } from "react-icons/fa";
 import { deleteAddress, updateAddress } from "../../../lib/api";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
 import { useState } from "react";
+import { TextButtonFlex } from "../../TextButtonFlex";
 
 export const AddressItemDisplay = ({ pk, street, city, zipcode, state, country, agency, branch, pobox }: IAddress) => {
 
@@ -98,7 +99,10 @@ export const AddressItemDisplay = ({ pk, street, city, zipcode, state, country, 
                 borderWidth={1}
             // bg={"red"}
             >
-                <Flex justifyContent="flex-start"
+                <TextButtonFlex
+                    name={branchObj?.name ?? ""}
+                />
+                {/* <Flex justifyContent="flex-start"
                     alignItems={"center"}
 
                 >
@@ -110,7 +114,7 @@ export const AddressItemDisplay = ({ pk, street, city, zipcode, state, country, 
                         {branchObj?.name ?? ""}
                     </Button>
 
-                </Flex>
+                </Flex> */}
                 <Flex
                     alignItems={"center"}
                 >
@@ -173,7 +177,8 @@ export const AddressItemDisplay = ({ pk, street, city, zipcode, state, country, 
                     </Menu>
                 </Flex>
             </Grid>
-            <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
+            <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}
+            >
                 <ModalOverlay />
                 <ModalContent bg="white">
                     <ModalHeader>Delete Address</ModalHeader>
@@ -208,11 +213,16 @@ export const AddressItemDisplay = ({ pk, street, city, zipcode, state, country, 
                 </ModalContent>
             </Modal>
 
-            <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
+            <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}
+                size={"xl"}
+            >
                 <ModalOverlay />
                 <ModalHeader>Update Address</ModalHeader>
-                <ModalBody>
-                    <ModalContent bg={colorMode === "light" ? "white" : "gray.800"} p={4}>
+                <ModalBody
+                >
+                    <ModalContent bg={colorMode === "light" ? "white" : "gray.800"} p={4}
+                        px={6}
+                    >
                         <FormControl>
                             {/* Hidden input to capture the pk */}
                             <input

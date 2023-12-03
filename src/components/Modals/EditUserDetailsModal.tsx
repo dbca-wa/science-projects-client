@@ -694,6 +694,7 @@ export const EditUserDetailsModal = ({ isOpen, onClose, user, branches, business
                     >
                         <Button
                             colorScheme="gray"
+                            onClick={onClose}
                         >
                             Cancel
                         </Button>

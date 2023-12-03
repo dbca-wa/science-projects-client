@@ -7,9 +7,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
 import { useNoImage } from "../../../lib/hooks/useNoImage";
-import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
-import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 
 export const ModernProjectCard = ({
@@ -21,6 +19,7 @@ export const ModernProjectCard = ({
     year,
     number,
 }: IProjectData) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     const { isOnProjectsPage } = useProjectSearchContext();
 
@@ -81,143 +80,163 @@ export const ModernProjectCard = ({
             initial="rest"
             style={{ perspective: 1000 }}
         >
-
-            <Box
-                onMouseOver={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
+            <Skeleton
+                isLoaded={imageLoaded}
                 rounded={"2xl"}
                 h={"325px"}
                 pos={"relative"}
                 overflow={"hidden"}
                 cursor={"pointer"}
                 style={{ transformStyle: "preserve-3d" }}
-                boxShadow="0px 10px 15px -5px rgba(0, 0, 0, 0.3), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.06), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.1), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.1)"
-                onClick={() => { goToProject() }}
-                border={colorMode === "dark" ? "1px solid" : undefined}
+                boxShadow="0px 10px 15px -5px rgba(0, 0, 0, 0.3), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.06), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.1), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.1)" border={colorMode === "dark" ? "1px solid" : undefined}
                 borderColor={"gray.700"}
+
             >
-                <Image
-                    rounded={"2xl"}
-
-                    src={
-                        image ?
-                            imageurl
-
-                            : noImage
-                    }
-                    objectFit={"cover"}
-                    h={"100%"}
-                    w={"100%"}
-                />
                 <Box
-                    pos={"absolute"}
-                    left={0}
-                    top={0}
-                    p={2}
+                    onMouseOver={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
+                    rounded={"2xl"}
+                    h={"325px"}
+                    pos={"relative"}
+                    overflow={"hidden"}
+                    cursor={"pointer"}
+                    style={{ transformStyle: "preserve-3d" }}
+                    boxShadow="0px 10px 15px -5px rgba(0, 0, 0, 0.3), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.06), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.1), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.1)"
+                    onClick={() => { goToProject() }}
+                    border={colorMode === "dark" ? "1px solid" : undefined}
+                    borderColor={"gray.700"}
                 >
-                    <Tag
-                        fontWeight={"semibold"}
-                        color={"white"}
-                        px={2}
-                        py={1}
-                        fontSize={"xs"}
+                    <Image
+                        rounded={"2xl"}
 
-                        bgColor={
-                            kind === "core_function" ?
-                                "red.600" :
-                                kind === "science" ?
-                                    "green.500" :
-                                    kind === "student" ?
-                                        "blue.400" :
-                                        "gray.400"
+                        src={
+                            image ?
+                                imageurl
+
+                                : noImage
                         }
+                        objectFit={"cover"}
+                        onLoad={() => setImageLoaded(true)}
+
+                        h={"100%"}
+                        w={"100%"}
+                    />
+
+                    <Box
+                        pos={"absolute"}
+                        left={0}
+                        top={0}
+                        p={2}
                     >
-                        {
-                            kind === "core_function"
-                                ? "CF"
-                                : kind === "external"
-                                    ? "EXT"
-                                    : kind === "science"
-                                        ? "SP"
-                                        : "STP" //Student
-                        }
-                        -{year}-{number}
-                    </Tag>
-                </Box>
-                {hovered && (
+                        <Tag
+                            fontWeight={"semibold"}
+                            color={"white"}
+                            px={2}
+                            py={1}
+                            fontSize={"xs"}
+
+                            bgColor={
+                                kind === "core_function" ?
+                                    "red.600" :
+                                    kind === "science" ?
+                                        "green.500" :
+                                        kind === "student" ?
+                                            "blue.400" :
+                                            "gray.400"
+                            }
+                        >
+                            {
+                                kind === "core_function"
+                                    ? "CF"
+                                    : kind === "external"
+                                        ? "EXT"
+                                        : kind === "science"
+                                            ? "SP"
+                                            : "STP" //Student
+                            }
+                            -{year}-{number}
+                        </Tag>
+                    </Box>
+                    {hovered && (
+                        <Box
+                            pos="absolute"
+                            top={2}
+                            right={0}
+                            w="max-content"
+                            style={{ perspective: 500 }}
+                        >
+                            <motion.div
+                                initial={{ opacity: 0, x: "100%" }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: "100%" }}
+                                transition={{ duration: 0.4 }}
+                                style={{ transformStyle: "preserve-3d" }}
+                            >
+                                <Text
+                                    roundedStart="2xl"
+                                    fontWeight="normal"
+                                    color="white"
+                                    bg={getStatusValue(status).color}
+                                    px={5}
+                                    py={1}
+                                    fontSize="xs"
+                                >
+                                    {getStatusValue(status).label === "Unknown Status"
+                                        ? status
+                                        : getStatusValue(status).label}
+                                </Text>
+                            </motion.div>
+                        </Box>
+                    )}
+
+                    <Flex
+                        pos={"absolute"}
+                        left={0}
+                        bottom={0}
+                        p={4}
+                        flexDir={"column"}
+                    >
+                        <Box
+                            zIndex={3}
+                        >
+                            {/* <Text
+                 fontWeight={"semibold"}
+                 color={"white"}
+                 noOfLines={2}
+                 textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)" // Add text shadow
+             >
+                 {title}
+             </Text> */}
+                            {/* <SimpleDisplaySRTE
+
+                 data={title}
+                 displayData={title}
+                 displayArea="projectCardTitle"
+             /> */}
+
+                            <ExtractedHTMLTitle
+                                htmlContent={title}
+                                color={"white"}
+                                fontWeight={"semibold"}
+                                fontSize={"17px"}
+                                noOfLines={3}
+                            // isTruncated
+                            />
+                        </Box>
+                    </Flex>
                     <Box
                         pos="absolute"
-                        top={2}
-                        right={0}
-                        w="max-content"
-                        style={{ perspective: 500 }}
-                    >
-                        <motion.div
-                            initial={{ opacity: 0, x: "100%" }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: "100%" }}
-                            transition={{ duration: 0.4 }}
-                            style={{ transformStyle: "preserve-3d" }}
-                        >
-                            <Text
-                                roundedStart="2xl"
-                                fontWeight="normal"
-                                color="white"
-                                bg={getStatusValue(status).color}
-                                px={5}
-                                py={1}
-                                fontSize="xs"
-                            >
-                                {getStatusValue(status).label === "Unknown Status"
-                                    ? status
-                                    : getStatusValue(status).label}
-                            </Text>
-                        </motion.div>
-                    </Box>
-                )}
+                        left={0}
+                        bottom={0}
+                        w="100%"
+                        h="30%"
+                        bgGradient="linear(to-t, rgba(0,0,0,0.55), transparent)" // Add gradient overlay
+                    />
+                </Box>
 
-                <Flex
-                    pos={"absolute"}
-                    left={0}
-                    bottom={0}
-                    p={4}
-                    flexDir={"column"}
-                >
-                    <Box
-                        zIndex={3}
-                    >
-                        {/* <Text
-                            fontWeight={"semibold"}
-                            color={"white"}
-                            noOfLines={2}
-                            textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)" // Add text shadow
-                        >
-                            {title}
-                        </Text> */}
-                        {/* <SimpleDisplaySRTE
+            </Skeleton>
 
-                            data={title}
-                            displayData={title}
-                            displayArea="projectCardTitle"
-                        /> */}
 
-                        <ExtractedHTMLTitle
-                            htmlContent={title}
-                            color={"white"}
-                            fontWeight={"semibold"}
-                            fontSize={"17px"}
-                        />
-                    </Box>
-                </Flex>
-                <Box
-                    pos="absolute"
-                    left={0}
-                    bottom={0}
-                    w="100%"
-                    h="30%"
-                    bgGradient="linear(to-t, rgba(0,0,0,0.55), transparent)" // Add gradient overlay
-                />
-            </Box>
 
         </motion.div >
     );

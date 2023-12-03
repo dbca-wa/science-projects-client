@@ -14,7 +14,7 @@ interface Props {
     action: "approve" | "recall" | "send_back";
     stage: number;
     documentPk: number;
-    conceptPlanPk: number;
+    projectClosurePk: number;
     projectData: IProjectData;
     baData: IBusinessArea;
     isOpen: boolean;
@@ -22,17 +22,17 @@ interface Props {
     onClose: () => void;
 }
 
-export const ConceptPlanActionModal = (
-    { userData, stage, documentPk, conceptPlanPk, action,
+export const ProjectClosureActionModal = (
+    { userData, stage, documentPk, projectClosurePk, action,
         onClose, isOpen, projectData, baData, refetchData }: Props
 ) => {
 
     useEffect(() => {
         console.log(
-            { stage: stage, documentPk: documentPk, conceptPlanPk: conceptPlanPk }
+            { stage: stage, documentPk: documentPk, projectClosurePk: projectClosurePk }
         )
     }
-        , [stage, documentPk, conceptPlanPk])
+        , [stage, documentPk, projectClosurePk])
 
     const { colorMode } = useColorMode();
     const queryClient = useQueryClient();
@@ -48,7 +48,7 @@ export const ConceptPlanActionModal = (
     const watchedAction = watch("action");
     const watchedStage = watch("stage");
     const watchedDocumentPk = watch("documentPk");
-    // const watchedConceptPlanPk = watch("conceptPlanPk");
+    // const watchedprojectClosurePk = watch("projectClosurePk");
 
 
     const [shouldSendEmail, setShouldSendEmail] = useState(true);
@@ -66,7 +66,7 @@ export const ConceptPlanActionModal = (
         }
     }
 
-    const approveConceptPlanMutation = useMutation(handleDocumentAction,
+    const approveProjectClosureMutation = useMutation(handleDocumentAction,
         {
             onMutate: () => {
                 addToast({
@@ -104,7 +104,7 @@ export const ConceptPlanActionModal = (
             onError: (error) => {
                 if (toastIdRef.current) {
                     toast.update(toastIdRef.current, {
-                        title: `Could Not ${action === "approve" ? "Approve" : action === "recall" ? "Recall" : "Send Back"} Concept Plan`,
+                        title: `Could Not ${action === "approve" ? "Approve" : action === "recall" ? "Recall" : "Send Back"} project closure`,
                         description: `${error}`,
                         status: 'error',
                         position: "top-right",
@@ -119,12 +119,12 @@ export const ConceptPlanActionModal = (
 
     const onApprove = (formData: IApproveDocument) => {
         console.log(formData)
-        approveConceptPlanMutation.mutate(formData);
+        approveProjectClosureMutation.mutate(formData);
     }
 
     useEffect(() => {
         console.log(
-            stage, documentPk, conceptPlanPk, projectData
+            stage, documentPk, projectClosurePk, projectData
         )
         if (baData) {
             console.log(baData)
@@ -169,13 +169,13 @@ export const ConceptPlanActionModal = (
                                 <Input type="hidden" {...register("stage", { required: true, value: stage })} readOnly />
                                 <Input type="hidden" {...register("action", { required: true, value: action })} readOnly />
                                 <Input type="hidden" {...register("documentPk", { required: true, value: documentPk })} readOnly />
-                                {/* <Input type="hidden" {...register("conceptPlanPk", { required: true, value: conceptPlanPk })} readOnly /> */}
+                                {/* <Input type="hidden" {...register("projectClosurePk", { required: true, value: projectClosurePk })} readOnly /> */}
                                 {stage === 1 ?
                                     (
                                         <Box>
                                             <Text fontWeight={"bold"}>Stage 1</Text>
                                             <br />
-                                            <Text>In your capacity as Project Lead, would you like to {action} this concept plan?</Text>
+                                            <Text>In your capacity as Project Lead, would you like to {action} this project closure?</Text>
                                             <br />
                                             <Text>
                                                 {action === "approve" ?
@@ -203,7 +203,7 @@ export const ConceptPlanActionModal = (
                                                 <Text fontWeight={"bold"}>Stage 2</Text>
                                                 <br />
                                                 <Text>
-                                                    In your capacity as Business Area Lead, would you like to {action} this concept plan?
+                                                    In your capacity as Business Area Lead, would you like to {action} this project closure?
                                                 </Text>
                                                 <br />
                                                 <Text>
@@ -278,12 +278,12 @@ export const ConceptPlanActionModal = (
                                             <Text fontWeight={"bold"}>Stage 3</Text>
                                             <br />
                                             <Text>
-                                                In your capacity as Directorate, would you like to {action} this concept plan?
+                                                In your capacity as Directorate, would you like to {action} this project closure?
                                             </Text>
                                             <br />
                                             <Text>
                                                 {action === "approve" ?
-                                                    "This will provide final approval for this concept plan, enabling creation of a project plan."
+                                                    "This will provide final approval for this project closure, enabling creation of a project plan."
                                                     :
                                                     action === "recall" ?
                                                         "This will return the approval status from 'Granted' to 'Required'."
@@ -347,7 +347,7 @@ export const ConceptPlanActionModal = (
                         form="approval-form"
                         type="submit"
                         onClick={() => console.log(watchedDocumentPk, watchedStage, watchedAction)}
-                        isLoading={approveConceptPlanMutation.isLoading}
+                        isLoading={approveProjectClosureMutation.isLoading}
                         bg={colorMode === "dark" ? "green.500" : "green.400"}
                         color={"white"}
                         _hover={
