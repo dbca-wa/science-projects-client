@@ -18,7 +18,7 @@
     "@dnd-kit/utilities": "^3.2.1",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@lexical/react": "^0.12.2",
+    "@lexical/react": "0.12.2",
     "@tanstack/react-query": "^4.29.12",
     "@types/react-katex": "^3.0.0",
     "@types/react-latex": "^2.0.0",
