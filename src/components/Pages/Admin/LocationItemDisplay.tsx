@@ -193,7 +193,8 @@ export const LocationItemDisplay = ({ pk, name, area_type }: ISimpleLocationData
                 <ModalOverlay />
                 <ModalHeader>Update Location</ModalHeader>
                 <ModalBody>
-                    <ModalContent bg="white" p={4}>
+                    <ModalContent bg="white" p={4} px={6}
+                    >
                         <FormControl>
                             {/* Hidden input to capture the pk */}
                             <input

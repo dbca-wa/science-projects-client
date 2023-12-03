@@ -233,7 +233,9 @@ export const ProjectOverviewCard = (
 
     return (
         <>
-            {(me?.userData?.is_superuser || userIsLeader) &&
+            {(me?.userData?.is_superuser || userIsLeader || userIsBaLead || me?.userData?.business_area?.name === "Directorate")
+
+                &&
                 <>
                     <EditProjectModal
                         projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
@@ -298,19 +300,21 @@ export const ProjectOverviewCard = (
                 rounded={"lg"}
                 overflow={"hidden"}
             >
-                {(me?.userData?.is_superuser || userIsLeader || userIsBaLead) && (
-                    <Flex
-                        // justifyContent={"flex-end"}
-                        mt={6}
-                        width={"100%"}
-                        // right={10}
-                        pr={14}
-                        pl={6}
-                        zIndex={1}
-                        pos={"absolute"}
-                        flexDir={"column"}
-                    >
-                        {/* <Flex
+                {(me?.userData?.is_superuser || userIsLeader || userIsBaLead || me?.userData?.business_area?.name === "Directorate")
+
+                    && (
+                        <Flex
+                            // justifyContent={"flex-end"}
+                            mt={6}
+                            width={"100%"}
+                            // right={10}
+                            pr={14}
+                            pl={6}
+                            zIndex={1}
+                            pos={"absolute"}
+                            flexDir={"column"}
+                        >
+                            {/* <Flex
                             // bg={"pink"}
                             justifyContent={"flex-end"}
                             right={0}
@@ -338,8 +342,8 @@ export const ProjectOverviewCard = (
 
 
 
-                    </Flex>
-                )}
+                        </Flex>
+                    )}
                 <Grid
                     p={4}
                     pt={6}
@@ -357,7 +361,7 @@ export const ProjectOverviewCard = (
                                 // base: "250px",
                                 base: "380px",
                                 xl: "400px",
-                                '2xl': "4800px",
+                                '2xl': "600px",
                             }
                         }
                         rounded={"xl"}
@@ -576,160 +580,166 @@ export const ProjectOverviewCard = (
                     zIndex={-1}
                     px={6}
                 >
-
-                    <Flex
-                    // justifyContent={"flex-end"}
-                    // flex={1}
-                    >
-
-                        <Menu
-                        >
-                            <MenuButton
-                                px={2}
-                                py={2}
-                                transition='all 0.2s'
-                                rounded={4}
-                                borderRadius='md'
-                                borderWidth='1px'
-                                _hover={{ bg: 'blue.400' }}
-                                _expanded={{ bg: 'blue.400' }}
-                                _focus={{ boxShadow: 'outline' }}
-                                // mr={4}
-                                bg={"blue.500"}
-                                color={"white"}
-                                fontSize={"medium"}
-
+                    {(me?.userData?.is_superuser || userIsLeader || userIsBaLead || me?.userData?.business_area?.name === "Directorate")
+                        ?
+                        (
+                            <Flex
+                            // justifyContent={"flex-end"}
+                            // flex={1}
                             >
-                                {/* <Flex alignItems={"center"} justifyContent={"center"}
-                                        zIndex={
-                                            -1}
-                                    > */}
-                                <Center>
-                                    <Box
-                                        mr={1}
-                                    >
-                                        <IoMdSettings />
 
-                                    </Box>
-                                    <Text>
-                                        Project Settings
-
-                                    </Text>
-
-                                </Center>
-
-                                {/* <MdMoreVert /> */}
-                                {/* </Flex> */}
-
-                            </MenuButton>
-                            <MenuList>
-                                <MenuItem onClick={onOpenEditModal}>
-                                    <Flex
-                                        alignItems={"center"}
-                                    // color={"red"}
-                                    >
-                                        <Box mr={2}>
-                                            <FaEdit />
-
-                                        </Box>
-                                        <Box>
-                                            <Text
-
-                                            >
-                                                Edit
-
-                                            </Text>
-                                        </Box>
-                                    </Flex>
-                                </MenuItem>
-                                {baseInformation?.kind === 'student' && (
-                                    <MenuItem onClick={onOpenCreateStudentReportModal}>
-                                        <Flex
-                                            alignItems={"center"}
-                                        // color={"red"}
-                                        >
-                                            <Box mr={2}>
-                                                <FaLockOpen />
-
-                                            </Box>
-                                            <Box>
-                                                <Text
-
-                                                >
-                                                    {"Create Student Report"}
-                                                </Text>
-                                            </Box>
-                                        </Flex>
-                                    </MenuItem>
-
-                                )}
-
-                                {baseInformation?.kind !== 'student' && baseInformation?.kind !== 'external' && (
-                                    <MenuItem onClick={onOpenCreateProgressReportModal}>
-                                        <Flex
-                                            alignItems={"center"}
-                                        // color={"red"}
-                                        >
-                                            <Box mr={2}>
-                                                <FaLockOpen />
-
-                                            </Box>
-                                            <Box>
-                                                <Text
-
-                                                >
-                                                    {"Create Progress Report"}
-                                                </Text>
-                                            </Box>
-                                        </Flex>
-                                    </MenuItem>
-
-                                )}
-                                <MenuItem onClick={documents?.project_closure?.document ? onOpenReopenModal : onOpenClosureModal}>
-                                    <Flex
-                                        alignItems={"center"}
-                                    // color={"red"}
-                                    >
-                                        <Box mr={2}>
-                                            {documents?.project_closure?.document ? <FaLockOpen /> : <FaLock />}
-
-                                        </Box>
-                                        <Box>
-                                            <Text
-
-                                            >
-                                                {documents?.project_closure?.document ? "Reopen Project" : "Close Project"}
-                                                {/* Close Project */}
-
-                                            </Text>
-                                        </Box>
-                                    </Flex>
-                                </MenuItem>
-                                <MenuItem onClick={onOpenDeleteModal}
+                                <Menu
                                 >
-                                    <Flex
-                                        alignItems={"center"}
-                                    // color={"red"}
+                                    <MenuButton
+                                        px={2}
+                                        py={2}
+                                        transition='all 0.2s'
+                                        rounded={4}
+                                        borderRadius='md'
+                                        borderWidth='1px'
+                                        _hover={{ bg: 'blue.400' }}
+                                        _expanded={{ bg: 'blue.400' }}
+                                        _focus={{ boxShadow: 'outline' }}
+                                        // mr={4}
+                                        bg={"blue.500"}
+                                        color={"white"}
+                                        fontSize={"medium"}
+
                                     >
-                                        <Box mr={2}>
-                                            <FaTrash />
-
-                                        </Box>
-                                        <Box>
-                                            <Text
-
+                                        {/* <Flex alignItems={"center"} justifyContent={"center"}
+                                            zIndex={
+                                                -1}
+                                        > */}
+                                        <Center>
+                                            <Box
+                                                mr={1}
                                             >
-                                                Delete
+                                                <IoMdSettings />
+
+                                            </Box>
+                                            <Text>
+                                                Project Settings
 
                                             </Text>
-                                        </Box>
-                                    </Flex>
 
-                                </MenuItem>
-                            </MenuList>
-                        </Menu>
+                                        </Center>
 
-                    </Flex>
+                                        {/* <MdMoreVert /> */}
+                                        {/* </Flex> */}
+
+                                    </MenuButton>
+                                    <MenuList>
+                                        <MenuItem onClick={onOpenEditModal}>
+                                            <Flex
+                                                alignItems={"center"}
+                                            // color={"red"}
+                                            >
+                                                <Box mr={2}>
+                                                    <FaEdit />
+
+                                                </Box>
+                                                <Box>
+                                                    <Text
+
+                                                    >
+                                                        Edit
+
+                                                    </Text>
+                                                </Box>
+                                            </Flex>
+                                        </MenuItem>
+                                        {baseInformation?.kind === 'student' && (
+                                            <MenuItem onClick={onOpenCreateStudentReportModal}>
+                                                <Flex
+                                                    alignItems={"center"}
+                                                // color={"red"}
+                                                >
+                                                    <Box mr={2}>
+                                                        <FaLockOpen />
+
+                                                    </Box>
+                                                    <Box>
+                                                        <Text
+
+                                                        >
+                                                            {"Create Student Report"}
+                                                        </Text>
+                                                    </Box>
+                                                </Flex>
+                                            </MenuItem>
+
+                                        )}
+
+                                        {baseInformation?.kind !== 'student' && baseInformation?.kind !== 'external' && (
+                                            <MenuItem onClick={onOpenCreateProgressReportModal}>
+                                                <Flex
+                                                    alignItems={"center"}
+                                                // color={"red"}
+                                                >
+                                                    <Box mr={2}>
+                                                        <FaLockOpen />
+
+                                                    </Box>
+                                                    <Box>
+                                                        <Text
+
+                                                        >
+                                                            {"Create Progress Report"}
+                                                        </Text>
+                                                    </Box>
+                                                </Flex>
+                                            </MenuItem>
+
+                                        )}
+                                        <MenuItem onClick={documents?.project_closure?.document ? onOpenReopenModal : onOpenClosureModal}>
+                                            <Flex
+                                                alignItems={"center"}
+                                            // color={"red"}
+                                            >
+                                                <Box mr={2}>
+                                                    {documents?.project_closure?.document ? <FaLockOpen /> : <FaLock />}
+
+                                                </Box>
+                                                <Box>
+                                                    <Text
+
+                                                    >
+                                                        {documents?.project_closure?.document ? "Reopen Project" : "Close Project"}
+                                                        {/* Close Project */}
+
+                                                    </Text>
+                                                </Box>
+                                            </Flex>
+                                        </MenuItem>
+                                        <MenuItem onClick={onOpenDeleteModal}
+                                        >
+                                            <Flex
+                                                alignItems={"center"}
+                                            // color={"red"}
+                                            >
+                                                <Box mr={2}>
+                                                    <FaTrash />
+
+                                                </Box>
+                                                <Box>
+                                                    <Text
+
+                                                    >
+                                                        Delete
+
+                                                    </Text>
+                                                </Box>
+                                            </Flex>
+
+                                        </MenuItem>
+                                    </MenuList>
+                                </Menu>
+
+                            </Flex>
+                        )
+                        : null
+                    }
+
 
                     <Flex
                         pb={0}

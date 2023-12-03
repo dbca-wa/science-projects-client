@@ -186,7 +186,7 @@ export const DivisionsCRUD = () => {
                                 :
                                 <>
                                     <Grid
-                                        gridTemplateColumns="2fr 2fr 3fr 3fr 1fr"
+                                        gridTemplateColumns="4fr 2fr 2fr 2fr 1fr"
                                         mt={4}
                                         width="100%"
                                         p={3}

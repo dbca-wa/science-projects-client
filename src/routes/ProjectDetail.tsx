@@ -269,7 +269,13 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
                             {
                                 documents?.project_closure && (
                                     <TabPanel>
-                                        <ProjectClosureContents document={documents.project_closure} />
+                                        <ProjectClosureContents
+                                            document={documents.project_closure}
+                                            userData={me?.userData}
+                                            members={members}
+                                            all_documents={documents}
+                                            refetch={refetch}
+                                        />
                                     </TabPanel>
                                 )
                             }

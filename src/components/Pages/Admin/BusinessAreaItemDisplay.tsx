@@ -12,6 +12,7 @@ import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useState } from "react";
+import { TextButtonFlex } from "../../TextButtonFlex";
 // import { useEffect } from "react";
 // import NoImageFile from '/sad-face.gif'
 
@@ -266,30 +267,25 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                             />
                         </Box>
                     </Flex>
-                    <Flex
-                        alignItems={"center"}
-                    >
-                        <Button
-                            variant={"link"}
-                            colorScheme="blue"
-                            onClick={onUpdateModalOpen}
-                        >
-                            {name ?? ""}
-                        </Button>
+                    <TextButtonFlex
+                        name={name}
+                        onClick={onUpdateModalOpen}
+                    />
+                    <TextButtonFlex
+                        name={`${leaderData.first_name} ${leaderData.last_name}`}
+                        onClick={leaderDrawerFunction}
+                    />
 
-                    </Flex>
-                    <Flex
-                        alignItems={"center"}
+                    {
+                        (!financeAdminLoading && financeAdminData) ?
+                            <TextButtonFlex
+                                name={`${financeAdminData.first_name} ${financeAdminData.last_name}`}
+                                onClick={financeAdminDrawerFunction}
+                            /> :
+                            <TextButtonFlex />
+                    }
 
-                    >
-                        <Button
-                            variant={"link"}
-                            colorScheme="blue"
-                            onClick={leaderDrawerFunction}
-                        >
-                            {leaderData.first_name} {leaderData.last_name}
-                        </Button>
-                    </Flex>
+                    {/* 
                     <Flex
                         alignItems={"center"}
 
@@ -309,8 +305,16 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                             )
                         }
 
-                    </Flex>
-                    <Flex
+                    </Flex> */}
+                    {
+                        (!dataCustodianLoading && dataCustodianData) ?
+                            <TextButtonFlex
+                                name={`${dataCustodianData.first_name} ${dataCustodianData.last_name}`}
+                                onClick={dataCustodianDrawerFunction}
+                            /> :
+                            <TextButtonFlex />
+                    }
+                    {/* <Flex
                         alignItems={"center"}
                     >
                         {
@@ -328,7 +332,7 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                             )
                         }
 
-                    </Flex>
+                    </Flex> */}
 
 
                     <Flex
@@ -412,7 +416,7 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                     <ModalOverlay />
                     <ModalHeader>Update Business Area</ModalHeader>
                     <ModalBody>
-                        <ModalContent bg="white" p={4}>
+                        <ModalContent bg="white" p={4} px={6}>
                             <FormControl>
                                 {/* Hidden input to capture the pk */}
                                 <input

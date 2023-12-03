@@ -178,7 +178,7 @@ export const ResearchFunctionsCRUD = () => {
                             </Flex>
                         </Flex>
                         <Grid
-                            gridTemplateColumns="3fr 2fr 6fr 1fr"
+                            gridTemplateColumns="5fr 2fr 4fr 1fr"
                             mt={4}
                             width="100%"
                             p={3}

@@ -9,6 +9,7 @@ import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useState } from "react";
+import { TextButtonFlex } from "../../TextButtonFlex";
 
 
 export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
@@ -129,7 +130,11 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                     borderWidth={1}
                 // bg={"red"}
                 >
-                    <Flex justifyContent="flex-start" alignItems={"center"}>
+                    <TextButtonFlex
+                        name={name}
+                        onClick={onUpdateModalOpen}
+                    />
+                    {/* <Flex justifyContent="flex-start" alignItems={"center"}>
                         <Button
                             variant={"link"}
                             colorScheme="blue"
@@ -138,9 +143,13 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                             {name ?? ""}
                         </Button>
 
-                    </Flex>
+                    </Flex> */}
 
-                    <Flex>
+                    <TextButtonFlex
+                        name={managerData?.first_name ? `${managerData?.first_name} ${managerData?.last_name}` : `${managerData?.username}`}
+                        onClick={managerDrawerFunction}
+                    />
+                    {/* <Flex>
                         <Button
                             variant={"link"}
                             colorScheme="blue"
@@ -149,7 +158,7 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                             {managerData?.first_name ? `${managerData?.first_name} ${managerData?.last_name}` : `${managerData?.username}`}
                         </Button>
 
-                    </Flex>
+                    </Flex> */}
 
 
                     <Flex
@@ -226,11 +235,14 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                         </ModalFooter>
                     </ModalContent>
                 </Modal>
-                <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
+                <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}
+
+                >
                     <ModalOverlay />
                     <ModalHeader>Update Branch</ModalHeader>
                     <ModalBody>
-                        <ModalContent bg="white" p={4}>
+                        <ModalContent bg="white" p={4} px={6}
+                        >
                             <FormControl>
                                 {/* Hidden input to capture the pk */}
                                 <input

@@ -9,6 +9,7 @@ import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useState } from "react";
+import { TextButtonFlex } from "../../TextButtonFlex";
 
 export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id }: IDivision) => {
 
@@ -143,13 +144,17 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
 
 
                 <Grid
-                    gridTemplateColumns="2fr 2fr 3fr 3fr 1fr"
+                    gridTemplateColumns="4fr 2fr 2fr 2fr 1fr"
                     width="100%"
                     p={3}
                     borderWidth={1}
                 // bg={"red"}
                 >
-                    <Flex justifyContent="flex-start"
+                    <TextButtonFlex
+                        name={name}
+                        onClick={onUpdateModalOpen}
+                    />
+                    {/* <Flex justifyContent="flex-start"
                         alignItems={"center"}
                     >
                         <Text
@@ -164,7 +169,7 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
                             </Button>
                         </Text>
 
-                    </Flex>
+                    </Flex> */}
                     <Flex
                         alignItems={"center"}
                     >
@@ -172,6 +177,15 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
 
 
                     </Flex>
+                    <TextButtonFlex
+                        name={`${directorData.first_name} ${directorData.last_name}`}
+                        onClick={directorDrawerFunction}
+                    />
+                    <TextButtonFlex
+                        name={`${approverData.first_name} ${approverData.last_name}`}
+                        onClick={approverDrawerFunction}
+                    />
+                    {/*               
                     <Flex>
                         <Button
                             variant={"link"}
@@ -181,8 +195,8 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
                             {directorData.first_name} {directorData.last_name}
                         </Button>
 
-                    </Flex>
-                    <Flex>
+                    </Flex> */}
+                    {/* <Flex>
                         <Button
                             variant={"link"}
                             colorScheme="blue"
@@ -190,7 +204,7 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
                         >
                             {approverData.first_name} {approverData.last_name}
                         </Button>
-                    </Flex>
+                    </Flex> */}
 
 
 
@@ -271,7 +285,8 @@ export const DivisionItemDisplay = ({ pk, slug, name, director, approver, old_id
                     <ModalOverlay />
                     <ModalHeader>Update Division</ModalHeader>
                     <ModalBody>
-                        <ModalContent bg="white" p={4}>
+                        <ModalContent bg="white" p={4} px={6}
+                        >
                             <FormControl>
                                 {/* Hidden input to capture the pk */}
                                 <input

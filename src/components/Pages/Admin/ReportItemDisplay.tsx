@@ -20,6 +20,7 @@ import { useGetReportMedia } from "../../../lib/hooks/useGetReportMedia";
 import { StateRichTextEditor } from "../../RichTextEditor/Editors/StateRichTextEditor";
 import { useUser } from "../../../lib/hooks/useUser";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
+import { TextButtonFlex } from "../../TextButtonFlex";
 
 export const ReportItemDisplay = ({
     pk, year, created_at, updated_at, date_closed, date_open, creator,
@@ -344,7 +345,11 @@ export const ReportItemDisplay = ({
 
                         </Box>
                     </Grid>
-                    <Flex
+                    <TextButtonFlex
+                        name={`${creatorData.first_name} ${creatorData.last_name}`}
+                        onClick={creatorDrawerFunction}
+                    />
+                    {/* <Flex
                         alignItems={"center"}
 
                     >
@@ -355,8 +360,19 @@ export const ReportItemDisplay = ({
                         >
                             {creatorData.first_name} {creatorData.last_name}
                         </Button>
-                    </Flex>
-                    <Flex
+                    </Flex> */}
+                    {
+                        (!modifierLoading &&
+                            modifierData) ?
+
+                            (<TextButtonFlex
+                                name={`${modifierData.first_name} ${modifierData.last_name}`}
+                                onClick={modifierDrawerFunction}
+                            />)
+                            :
+                            (<TextButtonFlex />)
+                    }
+                    {/* <Flex
                         alignItems={"center"}
 
                     >
@@ -374,7 +390,7 @@ export const ReportItemDisplay = ({
 
                             )
                         }
-                    </Flex>
+                    </Flex> */}
 
 
                     <Flex
@@ -470,7 +486,7 @@ export const ReportItemDisplay = ({
                     >
 
                         <ModalContent bg="white" p={4}>
-                            <ModalHeader>Update Report Media</ModalHeader>
+                            <ModalHeader>Update {reportData?.year} Report Media</ModalHeader>
 
                             <ModalCloseButton />
 
@@ -1227,7 +1243,7 @@ export const ReportItemDisplay = ({
                         <ModalContent bg="white"
                             p={4}
                         >
-                            <ModalHeader>Update Report</ModalHeader>
+                            <ModalHeader>Update {reportData?.year} Report</ModalHeader>
 
                             <ModalCloseButton />
 
@@ -1254,19 +1270,13 @@ export const ReportItemDisplay = ({
                                                 {...register("pk")}
                                                 defaultValue={pk} // Prefill with the 'pk' prop
                                             />
-                                            <FormControl>
-                                                <FormLabel>Year</FormLabel>
-                                                <InputGroup>
-                                                    {/* <InputLeftAddon children={<FaSign />} /> */}
-                                                    <Input
-                                                        {...register("year", { required: true })}
-                                                        disabled
-                                                        required
-                                                        type="text"
-                                                        defaultValue={reportData.year} // Prefill with the 'name' prop
-                                                    />
-                                                </InputGroup>
-                                            </FormControl>
+                                            <Input
+                                                {...register("year", { required: true })}
+                                                disabled
+                                                required
+                                                type="hidden"
+                                                defaultValue={reportData.year} // Prefill with the 'name' prop
+                                            />
 
                                             {/* <FormControl
                                                 isRequired

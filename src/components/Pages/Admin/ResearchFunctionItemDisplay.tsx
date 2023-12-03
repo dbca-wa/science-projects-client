@@ -11,6 +11,7 @@ import { FcOk, FcCancel } from "react-icons/fc";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useState } from "react";
 import { AxiosError } from "axios";
+import { TextButtonFlex } from "../../TextButtonFlex";
 
 export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, description, leader }: IResearchFunction) => {
 
@@ -121,12 +122,16 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
                     </Drawer>
 
                     <Grid
-                        gridTemplateColumns="3fr 2fr 6fr 1fr"
+                        gridTemplateColumns="5fr 2fr 4fr 1fr"
                         width="100%"
                         p={3}
                         borderWidth={1}
                     >
-                        <Flex justifyContent="flex-start"
+                        <TextButtonFlex
+                            name={name}
+                            onClick={onUpdateModalOpen}
+                        />
+                        {/* <Flex justifyContent="flex-start"
                             ml={4}
                             alignItems={"center"}
                         >
@@ -138,7 +143,7 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
                                 {name ?? ""}
                             </Button>
 
-                        </Flex>
+                        </Flex> */}
                         <Flex
                             alignItems={"center"}
                         // bg={"red"}
@@ -236,7 +241,8 @@ export const ResearchFunctionItemDisplay = ({ pk, name, is_active, association, 
                         <ModalOverlay />
                         <ModalHeader>Update Research Function</ModalHeader>
                         <ModalBody>
-                            <ModalContent bg="white" p={4}>
+                            <ModalContent bg="white" p={4} px={6}
+                            >
                                 <FormControl>
                                     {/* Hidden input to capture the pk */}
                                     <input

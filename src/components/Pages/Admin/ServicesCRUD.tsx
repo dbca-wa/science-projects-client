@@ -131,7 +131,7 @@ export const ServicesCRUD = () => {
                             </Flex>
                         </Flex>
                         <Grid
-                            gridTemplateColumns="4fr 5fr 1fr"
+                            gridTemplateColumns="5fr 4fr 1fr"
                             mt={4}
                             width="100%"
                             p={3}

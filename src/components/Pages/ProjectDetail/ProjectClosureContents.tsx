@@ -1,164 +1,204 @@
 // Maps out the document provided to the rich text editor components for project closure documents. 
 
 
-import { Box, Text } from "@chakra-ui/react"
-import { IProjectClosure } from "../../../types"
+import { Box, Flex, Grid, Select, Text, useColorMode } from "@chakra-ui/react"
+import { IProjectClosure, IProjectDocuments, IProjectMember, IUserMe } from "../../../types"
 import { DocumentActions } from "./DocumentActions"
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
+import { useEffect, useState } from "react";
+import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
+import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
+import { ProjectClosureDocActions } from "./DocActions/ProjectClosureDocActions";
 
 interface Props {
     document: IProjectClosure | null;
+    all_documents: IProjectDocuments;
+    userData: IUserMe;
+    members: IProjectMember[];
+    refetch: () => void;
 }
 
-export const ProjectClosureContents = ({ document }: Props) => {
+export const ProjectClosureContents = ({
+    userData, members,
+    all_documents,
+    document, refetch,
+}: Props) => {
+
+    const { colorMode } = useColorMode();
+    const documentType = "closure"
+    const editorKey = colorMode + documentType;
+    useEffect(() => {
+        console.log(document)
+    }, [document])
+
+
+    const mePk = userData?.pk ? userData?.pk : userData?.id;
+    const userInTeam = useCheckUserInTeam(mePk, members);
+    const userIsLeader = useCheckUserIsTeamLeader(mePk, members);
+
+    useEffect(() => {
+        console.log(userData)
+        console.log(userInTeam)
+    }, [userData, userInTeam])
+
+    // const [isLoading, setIsLoading] = useState(false);
+    const [selectedOutcome, setSelectedOutcome] = useState<string>(document?.intended_outcome);
+    const potentialOutcomes = ["completed", "terminated", "suspended", "forcecompleted"]
+
+    const handleNewOutcomeSelection = (event) => {
+        // setIsLoading(true);
+        setSelectedOutcome(event.target.value)
+    }
+
+    useEffect(() => {
+        console.log(selectedOutcome)
+    }, [selectedOutcome])
+
     return (
         <>
             {/* <DocumentActions /> */}
-            <Box
-                pb={6}
+            <ProjectClosureDocActions
+                all_documents={all_documents}
+                projectClosureData={document}
+                refetchData={refetch}
+            // projectPk={projectPk}
+            />
+
+            <Flex
+                width={"100%"}
+                mb={8}
+                p={2}
+                px={4}
+                border={'1px solid'}
+                borderColor={"gray.200"}
+                rounded={"2xl"}
             >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
+
+                <Flex
+                    flex={1}
+                    justifyContent={"flex-start"}
+                    alignItems={"center"}
                 >
-                    Reason
-                </Text>
+                    <Text
+                        fontSize={"lg"}
+                        fontWeight={"bold"}
+                    >
+                        Select an Intended Outcome:
+                    </Text>
 
-                {/* <Box
-                    mt={4}
+                </Flex>
+                <Flex
+                    justifyContent={"flex-end"}
                 >
-                    {document?.reason}
-                </Box> */}
-                {/* <SimpleRichTextEditor
-                    data={document?.reason}
-
-                /> */}
-            </Box>
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Intended Outcome
-                </Text>
-
-                {/* <Box
-                    mt={4}
-                >
-                    {document?.intended_outcome}
-                </Box> */}
-                {/* <SimpleRichTextEditor
-                    data={document?.intended_outcome}
-
-                /> */}
-            </Box>
+                    <Select
+                        value={
+                            selectedOutcome}
+                        onChange={(event) =>
+                            handleNewOutcomeSelection(event)
+                        }
+                        minW={"200px"}
+                    >
+                        {potentialOutcomes.map(outcome => (
+                            <option key={outcome} value={outcome}>
+                                {outcome === "forcecompleted" ? "Force Completed" : (outcome.charAt(0).toUpperCase() + outcome.slice(1))}
+                            </option>
+                        ))}
+                    </Select>
+                </Flex>
+            </Flex>
 
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Knowledge Transfer
-                </Text>
-                {/* <Box
-                    my={4}
-                >
-                    {document?.knowledge_transfer}
-                </Box> */}
-                {/* <SimpleRichTextEditor
-                    data={document?.knowledge_transfer}
+            {/* <RichTextEditor
+                canEdit={userInTeam || userData?.is_superuser}
+                document_pk={document?.document?.pk}
+                project_pk={document?.document?.project?.pk}
+                writeable_document_kind={'Project Closure'}
+                writeable_document_pk={document?.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
+                key={`intended_outcome${editorKey}`} // Change the key to force a re-render
+                data={document?.intended_outcome}
+                section={"intended_outcome"}
+            /> */}
 
-                /> */}
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Data Location
-                </Text>
-                {/* <Box
-                    my={4}
-                >
-                    {document?.data_location}
-                </Box> */}
-                {/* <SimpleRichTextEditor
-                    data={document?.data_location}
-
-                /> */}
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Hardcopy Location
-                </Text>
-                {/* <Box
-                    my={4}
-                >
-                    {document?.hardcopy_location}
-                </Box> */}
-                {/* <SimpleRichTextEditor
-                    data={document?.hardcopy_location}
-
-                /> */}
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Backup Location
-                </Text>
-                {/* <Box
-                    my={4}
-                >
-                    {document?.backup_location}
-                </Box> */}
-                {/* <SimpleRichTextEditor
-                    data={document?.backup_location}
-
-                /> */}
-            </Box>
+            <RichTextEditor
+                canEdit={userInTeam || userData?.is_superuser}
+                document_pk={document?.document?.pk}
+                project_pk={document?.document?.project?.pk}
+                writeable_document_kind={'Project Closure'}
+                writeable_document_pk={document?.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
+                key={`reason${editorKey}`} // Change the key to force a re-render
+                data={document?.reason}
+                section={"reason"}
+            />
 
 
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Scientific Outputs
-                </Text>
-                {/* <Box
-                    my={4}
-                >
-                    {document?.scientific_outputs}
 
-                </Box> */}
-                {/* <SimpleRichTextEditor
-                    data={document?.scientific_outputs}
+            <RichTextEditor
+                canEdit={userInTeam || userData?.is_superuser}
+                document_pk={document?.document?.pk}
+                project_pk={document?.document?.project?.pk}
+                writeable_document_kind={'Project Closure'}
+                writeable_document_pk={document?.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
+                key={`knowledge_transfer${editorKey}`} // Change the key to force a re-render
+                data={document?.knowledge_transfer}
+                section={"knowledge_transfer"}
+            />
 
-                /> */}
-            </Box>
+            <RichTextEditor
+                canEdit={userInTeam || userData?.is_superuser}
+                document_pk={document?.document?.pk}
+                project_pk={document?.document?.project?.pk}
+                writeable_document_kind={'Project Closure'}
+                writeable_document_pk={document?.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
+                key={`data_location${editorKey}`} // Change the key to force a re-render
+                data={document?.data_location}
+                section={"data_location"}
+            />
+            <RichTextEditor
+                canEdit={userInTeam || userData?.is_superuser}
+                document_pk={document?.document?.pk}
+                project_pk={document?.document?.project?.pk}
+                writeable_document_kind={'Project Closure'}
+                writeable_document_pk={document?.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
+                key={`hardcopy_location${editorKey}`} // Change the key to force a re-render
+                data={document?.hardcopy_location}
+                section={"hardcopy_location"}
+            />
+            <RichTextEditor
+                canEdit={userInTeam || userData?.is_superuser}
+                document_pk={document?.document?.pk}
+                project_pk={document?.document?.project?.pk}
+                writeable_document_kind={'Project Closure'}
+                writeable_document_pk={document?.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
+                key={`backup_location${editorKey}`} // Change the key to force a re-render
+                data={document?.backup_location}
+                section={"backup_location"}
+            />
+            <RichTextEditor
+                canEdit={userInTeam || userData?.is_superuser}
+                document_pk={document?.document?.pk}
+                project_pk={document?.document?.project?.pk}
+                writeable_document_kind={'Project Closure'}
+                writeable_document_pk={document?.pk}
+                isUpdate={true}
+                editorType="ProjectDocument"
+                key={`scientific_outputs${editorKey}`} // Change the key to force a re-render
+                data={document?.scientific_outputs}
+                section={"scientific_outputs"}
+            />
 
         </>
-
     )
 }
+
