@@ -12,7 +12,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import {
     IDocGenerationProps, generateProjectDocument, downloadProjectDocument, spawnNewEmptyDocument, ISpawnDocument,
-    setProjectStatus, ISetProjectProps, closeProjectCall, ICloseProjectProps, openProjectCall
+    setProjectStatus, ISetProjectProps, closeProjectCall, ICloseProjectProps, openProjectCall, ISimplePkProp
 } from "../../../../lib/api";
 import { AxiosError } from "axios";
 import { ProjectClosureActionModal } from "../../../Modals/DocumentActionModals/ProjectClosureActionModal";
@@ -52,6 +52,8 @@ export const ProjectClosureDocActions = ({ all_documents, projectClosureData, re
     const { isOpen: isS1SendbackModalOpen, onOpen: onS1SendbackModalOpen, onClose: onS1SendbackModalClose } = useDisclosure();
     const { isOpen: isS2SendbackModalOpen, onOpen: onS2SendbackModalOpen, onClose: onS2SendbackModalClose } = useDisclosure();
     const { isOpen: isS3SendbackModalOpen, onOpen: onS3SendbackModalOpen, onClose: onS3SendbackModalClose } = useDisclosure();
+
+    const { isOpen: isS3ReopenModalOpen, onOpen: onS3ReopenModalOpen, onClose: onS3ReopenModalClose } = useDisclosure();
 
 
     const { userData, userLoading } = useUser();
@@ -233,50 +235,50 @@ export const ProjectClosureDocActions = ({ all_documents, projectClosureData, re
         console.log(leaderMember)
     }, [leaderMember])
 
-    const closeProjectMutation = useMutation(closeProjectCall,
-        {
-            onMutate: () => {
-                addToast({
-                    status: "loading",
-                    title: "Closing Project",
-                    position: "top-right"
-                })
-            },
-            onSuccess: async (data) => {
+    // const closeProjectMutation = useMutation(closeProjectCall,
+    //     {
+    //         onMutate: () => {
+    //             addToast({
+    //                 status: "loading",
+    //                 title: "Closing Project",
+    //                 position: "top-right"
+    //             })
+    //         },
+    //         onSuccess: async (data) => {
 
-                if (toastIdRef.current) {
-                    toast.update(toastIdRef.current, {
-                        title: 'Success',
-                        description: `Project Closed`,
-                        status: 'success',
-                        position: "top-right",
-                        duration: 3000,
-                        isClosable: true,
-                    })
-                }
-                const updateData: ISetProjectProps = {
-                    projectId: projectClosureData?.document?.project.pk ? projectClosureData.document.project.pk : projectClosureData?.document?.project?.id,
-                    status: 'closed',
-                }
-                await setProjectStatus(updateData)
-                queryClient.invalidateQueries(["projects", updateData.projectId]);
-                refetchData();
-            },
-            onError: (error: AxiosError) => {
-                if (toastIdRef.current) {
-                    toast.update(toastIdRef.current, {
-                        title: 'Could Not Close Project',
-                        description: error?.response?.data
-                            ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
-                            : 'Error',
-                        status: 'error',
-                        position: "top-right",
-                        duration: 3000,
-                        isClosable: true,
-                    })
-                }
-            }
-        })
+    //             if (toastIdRef.current) {
+    //                 toast.update(toastIdRef.current, {
+    //                     title: 'Success',
+    //                     description: `Project Closed`,
+    //                     status: 'success',
+    //                     position: "top-right",
+    //                     duration: 3000,
+    //                     isClosable: true,
+    //                 })
+    //             }
+    //             const updateData: ISetProjectProps = {
+    //                 projectId: projectClosureData?.document?.project.pk ? projectClosureData.document.project.pk : projectClosureData?.document?.project?.id,
+    //                 status: 'closed',
+    //             }
+    //             await setProjectStatus(updateData)
+    //             queryClient.invalidateQueries(["projects", updateData.projectId]);
+    //             refetchData();
+    //         },
+    //         onError: (error: AxiosError) => {
+    //             if (toastIdRef.current) {
+    //                 toast.update(toastIdRef.current, {
+    //                     title: 'Could Not Close Project',
+    //                     description: error?.response?.data
+    //                         ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
+    //                         : 'Error',
+    //                     status: 'error',
+    //                     position: "top-right",
+    //                     duration: 3000,
+    //                     isClosable: true,
+    //                 })
+    //             }
+    //         }
+    //     })
 
     const openProjectMutation = useMutation(openProjectCall,
         {
@@ -331,10 +333,10 @@ export const ProjectClosureDocActions = ({ all_documents, projectClosureData, re
     //     closeProjectMutation.mutate(data);
     // }
 
-    // const openProjectFunc = (data: ICloseProjectProps) => {
-    //     console.log(data);
-    //     openProjectMutation.mutate(data);
-    // }
+    const openProjectFunc = (data: ISimplePkProp) => {
+        console.log(data);
+        openProjectMutation.mutate(data);
+    }
 
     const { isOpen: isDeleteDocumentModalOpen, onOpen: onOpenDeleteDocumentModal, onClose: onCloseDeleteDocumentModal } = useDisclosure();
 
@@ -1070,9 +1072,7 @@ export const ProjectClosureDocActions = ({ all_documents, projectClosureData, re
 
 
                                             {projectClosureData?.document?.directorate_approval_granted
-                                                && (userData?.is_superuser || userData?.business_area?.name === "Directorate") &&
-                                                !all_documents?.project_plan
-                                                && (
+                                                && (userData?.is_superuser || userData?.business_area?.name === "Directorate") && (
                                                     <Center
 
                                                         justifyContent={"flex-start"}
@@ -1099,40 +1099,36 @@ export const ProjectClosureDocActions = ({ all_documents, projectClosureData, re
                                                             Recall Approval
                                                         </Button>
 
-                                                        {/* 
-                                                        {projectClosureData?.document?.project?.status !== "closed" ?
+                                                        <ProjectClosureActionModal
+                                                            userData={userData}
+                                                            action={"reopen"}
+                                                            refetchData={refetchData}
 
-                                                            <Button
-                                                                colorScheme="orange"
-                                                                size={"sm"}
-                                                                onClick={
-                                                                    () => closeProjectFunc(
-                                                                        {
-                                                                            projectPk: projectClosureData?.document?.project?.id ? projectClosureData.document.project.id : projectClosureData.document.project.pk,
-                                                                        }
-                                                                    )
-                                                                }
-                                                                ml={2}
-                                                            >
-                                                                Close Project
-                                                            </Button>
-                                                            :
-                                                            <Button
-                                                                colorScheme="orange"
-                                                                size={"sm"}
-                                                                onClick={
-                                                                    () => openProjectFunc(
-                                                                        {
-                                                                            projectPk: projectClosureData?.document?.project?.id ? projectClosureData.document.project.id : projectClosureData.document.project.pk,
-                                                                        }
-                                                                    )
-                                                                }
-                                                                ml={2}
-                                                            >
-                                                                Reopen Project
-                                                            </Button>
-                                                        } */}
+                                                            baData={baData}
+                                                            isOpen={isS3ReopenModalOpen}
+                                                            onClose={onS3ReopenModalClose}
+                                                            projectClosurePk={projectClosureData?.pk}
+                                                            documentPk={projectClosureData?.document?.pk ? projectClosureData?.document?.pk : projectClosureData?.document?.id}
+                                                            stage={3}
+                                                            projectData={projectClosureData?.document?.project}
+                                                        />
 
+                                                        <Button
+                                                            colorScheme="orange"
+                                                            size={"sm"}
+                                                            onClick={onS3ReopenModalOpen}
+
+                                                            // onClick={
+                                                            //     () => openProjectFunc(
+                                                            //         {
+                                                            //             pk: projectClosureData?.document?.project?.id ? projectClosureData.document.project.id : projectClosureData.document.project.pk,
+                                                            //         }
+                                                            //     )
+                                                            // }
+                                                            ml={2}
+                                                        >
+                                                            Reopen Project
+                                                        </Button>
                                                     </Center>
 
                                                 )

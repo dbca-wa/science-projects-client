@@ -104,14 +104,14 @@ const ReportMenuContents = () => {
         },
     ]
 
-    const { reportPdfsData, reportPdfsLoading } = useGetReportPDFs();
+    // const { reportPdfsData, reportPdfsLoading } = useGetReportPDFs();
 
-    useEffect(() => {
-        if (!reportPdfsLoading) {
-            console.log(reportPdfsData);
+    // useEffect(() => {
+    //     if (!reportPdfsLoading) {
+    //         console.log(reportPdfsData);
 
-        }
-    }, [reportPdfsData, reportPdfsLoading])
+    //     }
+    // }, [reportPdfsData, reportPdfsLoading])
 
     const { userData, userLoading } = useUser();
 

@@ -1261,6 +1261,8 @@ export const handleDocumentAction = async ({ action, stage, documentPk }: IAppro
 
     } else if (action === "send_back") {
         url = `documents/actions/send_back`
+    } else if (action === "reopen") {
+        url = `documents/actions/reopen`
     }
     const params = {
         "action": action,
@@ -1596,6 +1598,18 @@ export interface ICloseProjectProps {
     outcome: 'forcecompleted' | "completed" | "terminated" | "suspended";
 }
 
+export interface IClosureOutcomeProps {
+    outcome: string;
+    closurePk: number;
+}
+export const setClosureOutcome = async ({ outcome, closurePk }: IClosureOutcomeProps) => {
+    const url = `documents/projectclosures/${closurePk}`
+    const params = {
+        intended_outcome: outcome,
+    }
+
+    instance.put(url, params).then(res => res.data)
+}
 
 export const closeProjectCall = async ({ projectPk, reason, outcome }: ICloseProjectProps) => {
     // console.log(projectPk, reason, outcome);
