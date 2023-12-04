@@ -1,4 +1,4 @@
-import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormErrorMessage, FormHelperText, FormLabel, Grid, HStack, Image, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormErrorMessage, FormHelperText, FormLabel, Grid, HStack, Image, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Skeleton, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react"
 import { IBusinessArea } from "../../../types"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
@@ -251,21 +251,26 @@ export const BusinessAreaItemDisplay = ({ pk, slug, name, leader, finance_admin,
                         alignItems={"center"}
 
                     >
-                        <Box rounded="lg" overflow="hidden" w="80px" h="69px">
-                            <Image
-                                src={
-                                    image instanceof File
-                                        ? `${apiEndpoint}${image.name}` // Use the image directly for File
-                                        : image?.file
-                                            ? `${apiEndpoint}${image.file}`
-                                            : NoImageFile
-                                }
-                                width={"100%"}
-                                height={"100%"}
-                                objectFit={"cover"}
+                        {name ?
+                            <Box rounded="lg" overflow="hidden" w="80px" h="69px">
+                                <Image
+                                    src={
+                                        image instanceof File
+                                            ? `${apiEndpoint}${image.name}` // Use the image directly for File
+                                            : image?.file
+                                                ? `${apiEndpoint}${image.file}`
+                                                : NoImageFile
+                                    }
+                                    width={"100%"}
+                                    height={"100%"}
+                                    objectFit={"cover"}
 
-                            />
-                        </Box>
+                                />
+                            </Box>
+
+                            : <Skeleton
+                                rounded="lg" overflow="hidden" w="80px" h="69px"
+                            />}
                     </Flex>
                     <TextButtonFlex
                         name={name}
