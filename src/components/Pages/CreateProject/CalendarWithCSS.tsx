@@ -3,6 +3,8 @@
 import { Box, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
+// import { Calendar } from "@/components/ui/calendar"
+import React from "react";
 
 interface IProps {
   onChange: (val: any) => void;
@@ -12,6 +14,8 @@ interface IProps {
 export const CalendarWithCSS = ({ onChange, preselectedDates }: IProps) => {
   const { colorMode } = useColorMode();
   const [calendarStyles, setCalendarStyles] = useState("");
+
+  // const [date, setDate] = React.useState<Date | undefined>(new Date())
 
   const handleDateChange = (value: any) => {
     console.log("Dates changed placeholder")
@@ -43,7 +47,7 @@ export const CalendarWithCSS = ({ onChange, preselectedDates }: IProps) => {
               color: ${colorMode === "light" ? "#B718A4" : "#A7F3D0"};
               // Color of weekend numbers
             }
-            
+
             // .react-calendar__month-view__weekdays {
             //   background: ${colorMode === "light" ? "#E2E8F0" : "#2D3748"};
             // //   Color of days of the week background
@@ -55,7 +59,7 @@ export const CalendarWithCSS = ({ onChange, preselectedDates }: IProps) => {
                 color: ${colorMode === "light" ? "#000000" : "#FFFFFF"};
               //   Hover color
               }
-      
+
 
             .react-calendar__tile--disabled,
             .react-calendar__navigation button:disabled,
@@ -63,7 +67,7 @@ export const CalendarWithCSS = ({ onChange, preselectedDates }: IProps) => {
               background: ${colorMode === "light" ? "#E2E8F0" : "#2D3748"};
               color: ${disabledColor};
             }
-            
+
           `;
       return styles;
 
@@ -75,32 +79,40 @@ export const CalendarWithCSS = ({ onChange, preselectedDates }: IProps) => {
 
   return (
     preselectedDates ?
-      (<Box w="100%" h="100%" textAlign="center">
+
+      <Box w="100%" h="100%" textAlign="center">
+        {/* <p>calendar</p> */}
         <style>{calendarStyles}</style>
         <Calendar
           minDate={new Date()}
           selectRange
           minDetail="month"
           maxDate={new Date(Date.now() + 60 * 60 * 24 * 7 * 52 * 1000)} // One year from today max
-          prev2Label={null}
-          next2Label={null}
+          // prev2Label={null}
+          // next2Label={null}
           onChange={handleDateChange}
           defaultValue={[preselectedDates[0], preselectedDates[1]]}
         />
-      </Box>)
+      </Box>
+
       :
-      (<Box w="100%" h="100%" textAlign="center">
+
+      <Box w="100%" h="100%" textAlign="center">
+        {/* <p>calendar</p> */}
         <style>{calendarStyles}</style>
         <Calendar
-          minDate={new Date()}
+          minDate={new Date(Date.now() - 60 * 60 * 24 * 7 * 52 * 5 * 1000)}
           selectRange
           minDetail="month"
-          maxDate={new Date(Date.now() + 60 * 60 * 24 * 7 * 52 * 1000)} // One year from today max
-          prev2Label={null}
-          next2Label={null}
+          maxDate={new Date(Date.now() + 60 * 60 * 24 * 7 * 52 * 5 * 1000)} // One year from today max
+          // prev2Label={null}
+          // next2Label={null}
           onChange={handleDateChange}
         />
-      </Box>)
+      </Box>
+
 
   );
 };
+
+
