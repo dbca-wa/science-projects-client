@@ -9,6 +9,7 @@ import { useUser } from "../../../lib/hooks/useUser";
 import { IDashProps } from "../../../types";
 import { AddIcon } from "@chakra-ui/icons";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
+import { UserFeedbackModal } from "@/components/Modals/UserFeedbackModal";
 
 
 export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
@@ -49,6 +50,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
     }, [handleResize]);
 
     const { isOpen: isAddTaskOpen, onOpen: onAddTaskOpen, onClose: onAddTaskClose } = useDisclosure();
+    const { isOpen: isFeedbackModalOpen, onOpen: onOpenFeedbackModal, onClose: onCloseFeedbackModal } = useDisclosure();
 
 
     return (
@@ -58,6 +60,11 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                     user={user}
                     isAddTaskOpen={isAddTaskOpen}
                     onAddTaskClose={onAddTaskClose}
+                />
+                <UserFeedbackModal
+                    user={user}
+                    isFeedbackModalOpen={isFeedbackModalOpen}
+                    onCloseFeedbackModal={onCloseFeedbackModal}
                 />
 
                 <Box
@@ -112,6 +119,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                             For feedback or feature requests, kindly submit them here: <Button
                                 variant={"link"}
                                 color={"red.500"}
+                                onClick={onOpenFeedbackModal}
                             >
                                 Submit Feedback
                             </Button>

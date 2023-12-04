@@ -385,6 +385,13 @@ export interface IQuickTask {
     description: string;
 }
 
+interface IFeedback {
+    user: number;
+    kind: "feedback" | "request";
+    status: "new" | "logged" | "inprogress" | "fixed";
+    text: string;
+}
+
 export interface IApproveDocument {
     action: "approve" | "recall" | "send_back" | "reopen";
     stage: number; // 1-3
