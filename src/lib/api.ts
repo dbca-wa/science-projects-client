@@ -1,7 +1,7 @@
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
 import { QueryFunction, QueryFunctionContext } from "@tanstack/react-query";
-import { EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
+import { EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
 
 // INSTANCE SETUP ==================================================================
 
@@ -1819,6 +1819,24 @@ export const createPersonalTask = async ({ user, name, description }: IQuickTask
         description: description,
         status: 'todo',
         task_type: 'personal'
+    }).then(res => {
+        return res.data
+    })
+    return res;
+}
+
+
+
+export const createFeedbackItem = async ({ user, text, kind, status }: IFeedback) => {
+    console.log({
+        user, text, kind, status
+    })
+    const res = instance.post(
+        "tasks/feedback", {
+        user: user,
+        text: text,
+        kind: kind,
+        status: status,
     }).then(res => {
         return res.data
     })
