@@ -293,6 +293,10 @@ export const getUsersBasedOnSearchTerm = async (searchTerm: string, page: number
             url += "&only_superuser=true";
         }
 
+        if (filters.businessArea) {
+            url += `&businessArea=${filters.businessArea}`
+        }
+
         const response = await instance.get(url);
 
         const { users, total_results, total_pages } = response.data;
@@ -1111,6 +1115,12 @@ export const getMyProjectsBasedOnSearchTerm = async (
 
 }
 
+export const getAllProjectsYears = async () => {
+    const url = 'projects/listofyears';
+    const response = await instance.get(url);
+    return response.data;
+
+}
 
 export const getProjectsBasedOnSearchTerm = async (
     searchTerm: string,
@@ -1121,6 +1131,7 @@ export const getProjectsBasedOnSearchTerm = async (
         filterBA: string;
         filterProjectKind: string;
         filterProjectStatus: string;
+        filterYear: number;
     }
 ) => {
     try {
@@ -1159,6 +1170,13 @@ export const getProjectsBasedOnSearchTerm = async (
                 // skip to get all 
             } else {
                 url += `&projectkind=${filters.filterProjectKind}`;
+            }
+        }
+        if (filters.filterYear) {
+            if (filters.filterYear === 0) {
+                // skip to get all 
+            } else {
+                url += `&year=${filters.filterYear}`;
             }
         }
 

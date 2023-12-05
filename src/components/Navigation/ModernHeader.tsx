@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import theme from "../../theme";
 import { ModernBreadcrumb } from "./ModernBreadcrumb";
-import { SearchProjects } from "./SearchProjects";
-import { SearchUsers } from "./SearchUsers";
+// import { SearchProjects } from "./SearchProjects";
+// import { SearchUsers } from "./SearchUsers";
 
 export const ModernHeader = () => {
     const location = useLocation();
@@ -92,17 +92,17 @@ export const ModernHeader = () => {
             >
 
 
-                {
+                {/* {
                     shouldRenderUserSearch === true && (
                         <SearchUsers />
                     )
-                }
+                } */}
 
-                {
+                {/* {
                     shouldRenderProjectSearch === true && (
                         <SearchProjects />
                     )
-                }
+                } */}
                 <HStack
                     pl={6}
                     pr={3}

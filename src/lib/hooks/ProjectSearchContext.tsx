@@ -26,12 +26,14 @@ interface IProjectSearchContext {
     filterBA: string;
     filterProjectKind: string;
     filterProjectStatus: string;
+    filterYear: number;
     setSearchFilters: (filters: {
         onlyActive: boolean;
         onlyInactive: boolean;
         filterBA: string;
         filterProjectKind: string;
         filterProjectStatus: string;
+        filterYear: number;
     }) => void;
 
 }
@@ -58,6 +60,7 @@ const ProjectSearchContext = createContext<IProjectSearchContext>({
     filterBA: '',
     filterProjectKind: '',
     filterProjectStatus: '',
+    filterYear: 0,
     setSearchFilters: () => {
         throw new Error('setSearchFilters function must be implemented');
     },
@@ -83,6 +86,7 @@ export const ProjectSearchProvider = ({ children }: IProjectSearchProviderProps)
     const [filterBA, setFilterBA] = useState('');
     const [filterProjectKind, setFilterProjectKind] = useState('');
     const [filterProjectStatus, setFilterProjectStatus] = useState('');
+    const [filterYear, setFilterYear] = useState(0);
 
     const setSearchFilters = (filters: {
         onlyActive: boolean;
@@ -90,12 +94,14 @@ export const ProjectSearchProvider = ({ children }: IProjectSearchProviderProps)
         filterBA: string;
         filterProjectKind: string;
         filterProjectStatus: string;
+        filterYear: number;
     }) => {
         setOnlyActive(filters.onlyActive);
         setOnlyInactive(filters.onlyInactive);
         setFilterBA(filters.filterBA);
         setFilterProjectStatus(filters.filterProjectStatus);
         setFilterProjectKind(filters.filterProjectKind);
+        setFilterYear(filters.filterYear);
         setCurrentProjectResultsPage(1); // Set the current page to 1 when filters change
     };
 
@@ -109,6 +115,7 @@ export const ProjectSearchProvider = ({ children }: IProjectSearchProviderProps)
                 filterBA,
                 filterProjectKind,
                 filterProjectStatus,
+                filterYear,
             })
                 .then((data) => {
                     setFilteredItems(data.projects);
@@ -126,7 +133,7 @@ export const ProjectSearchProvider = ({ children }: IProjectSearchProviderProps)
             setFilterProjectKind("All")
 
         }
-    }, [searchTerm, currentProjectResultsPage, isOnProjectsPage, onlyActive, onlyInactive, filterBA, filterProjectStatus, filterProjectKind]);
+    }, [searchTerm, currentProjectResultsPage, isOnProjectsPage, onlyActive, onlyInactive, filterBA, filterYear, filterProjectStatus, filterProjectKind]);
 
 
     const contextValue: IProjectSearchContext = {
@@ -145,6 +152,7 @@ export const ProjectSearchProvider = ({ children }: IProjectSearchProviderProps)
         filterBA,
         filterProjectKind,
         filterProjectStatus,
+        filterYear,
         setSearchFilters,
     };
 

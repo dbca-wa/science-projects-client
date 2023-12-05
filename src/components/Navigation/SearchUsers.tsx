@@ -1,12 +1,22 @@
 // User Search component - works/appears on the Users page with UserSearchContext
 
-import { Box, Input, InputGroup, InputRightElement, useColorMode } from "@chakra-ui/react";
+import { Box, Flex, Input, InputGroup, InputRightElement, Select, useColorMode } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
 import { useUserSearchContext } from "../../lib/hooks/UserSearchContext";
 import { useEffect, useState } from "react";
+import { getAllBusinessAreas } from "@/lib/api";
 
 export const SearchUsers = () => {
-    const { setSearchTerm, setIsOnUserPage, searchTerm, setCurrentUserResultsPage } = useUserSearchContext();
+    const {
+        setSearchTerm,
+        setIsOnUserPage,
+        searchTerm,
+        onlySuperuser,
+        onlyStaff,
+        onlyExternal,
+
+        setCurrentUserResultsPage,
+        setSearchFilters } = useUserSearchContext();
     const { colorMode } = useColorMode();
     const [inputValue, setInputValue] = useState('');
 
@@ -36,8 +46,71 @@ export const SearchUsers = () => {
         setInputValue(value);
     };
 
+
+    const [businessAreas, setBusinessAreas] = useState<any[]>([]);
+
+    const handleOnlySelectedBusinessAreaChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
+        const businessAreaValue = event.target.value;
+        console.log(businessAreaValue);
+        setSearchFilters({
+            onlySuperuser: onlySuperuser,
+            onlyExternal: onlyExternal,
+            onlyStaff: onlyStaff,
+            businessArea: businessAreaValue
+        });
+    };
+
+    useEffect(() => {
+        const fetchBusinessAreas = async () => {
+            try {
+                const data = await getAllBusinessAreas();
+                setBusinessAreas(data);
+            } catch (error) {
+                console.error("Error fetching business areas:", error);
+            }
+        };
+
+        fetchBusinessAreas();
+    }, []);
+
+    console.log(businessAreas)
+
     return (
-        <Box>
+        <Flex>
+            <Select onChange={handleOnlySelectedBusinessAreaChange}
+                size={"sm"}
+                mx={4}
+                rounded={"5px"}
+                style={
+                    colorMode === "light" ? {
+                        color: 'black',
+                        backgroundColor: 'white',
+                        borderColor: 'gray.200',
+                        caretColor: 'black !important',
+                    } :
+                        {
+                            color: 'white',
+                            borderColor: 'white',
+                            caretColor: 'black !important',
+                        }
+
+                }
+            >
+                <option value={"All"}
+                    color={"black"}
+
+                >All Business Areas</option>
+                {businessAreas &&
+                    businessAreas
+                        .sort((a, b) => a.name.localeCompare(b.name)) // Sort the array alphabetically
+                        .map((ba, index) => (
+                            <option key={index} value={ba.name}>
+                                {ba.name}
+                            </option>
+                        ))
+                }
+            </Select>
+
             <InputGroup borderColor="gray.200" size="sm">
                 <InputRightElement pointerEvents="none" children={<FiSearch color={"#9CA3AF"} />} />
                 <Input
@@ -53,6 +126,6 @@ export const SearchUsers = () => {
                     onChange={handleChange}
                 />
             </InputGroup>
-        </Box>
+        </Flex>
     );
 };
