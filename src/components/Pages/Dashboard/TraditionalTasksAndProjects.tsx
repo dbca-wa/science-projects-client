@@ -9,7 +9,7 @@ import { IProjectData, IMainDoc, ITaskDisplayCard } from "../../../types"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext"
-import { TraditionalTaskDisplay } from "./TraditionalTaskDisplay"
+import { TraditionalPersonalTaskDisplay } from "./TraditionalPersonalTaskDisplay"
 import { AddIcon } from "@chakra-ui/icons"
 import { GoProjectRoadmap } from "react-icons/go"
 import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE"
@@ -21,6 +21,10 @@ import { MdScience } from "react-icons/md"
 import { GiMaterialsScience } from "react-icons/gi"
 import { RiBook3Fill } from "react-icons/ri"
 import { useGetDocumentsPendingMyAction } from "../../../lib/hooks/useGetDocumentsPendingMyAction"
+import { TraditionalEndorsementTaskDisplay } from "./TraditionalEndorsementTaskDisplay"
+import { TraditionalDocumentTaskDisplay } from "./TraditionalDocumentTaskDisplay"
+import { useBoxShadow } from "@/lib/hooks/useBoxShadow"
+import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/useGetEndorsementsPendingMyAction"
 
 
 interface ITaskFromAPI {
@@ -53,7 +57,17 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
 
     const { projectData, projectsLoading } = useGetMyProjects();
 
-    const { pendingProjectDocumentData, projectDocumentDataLoading } = useGetDocumentsPendingMyAction();
+    const { pendingProjectDocumentData, pendingProjectDocumentDataLoading } = useGetDocumentsPendingMyAction();
+
+    const { pendingEndorsementsData, pendingEndorsementsDataLoading } = useGetEndorsementsPendingMyAction();
+
+    useEffect(() => {
+        console.log(pendingProjectDocumentData)
+    }, [pendingProjectDocumentData])
+
+    useEffect(() => {
+        console.log(pendingEndorsementsData)
+    }, [pendingEndorsementsData])
 
     const { colorMode } = useColorMode();
 
@@ -113,12 +127,12 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
 
     // }, [pendingProjectDocumentData, projectDocumentDataLoading])
 
-    const defaultIndex = [
-        (taskData?.inprogress.length + taskData?.todo.length) <= 5
-            && (taskData?.inprogress?.length + taskData?.todo?.length) >= 1 ? 0 : null,
-        1
-        // projectData?.length <= 5 && projectData?.length >= 1 ? 1 : null,
-    ].map((index) => (index !== null ? index : -1));
+    // const defaultIndex = [
+    //     (taskData?.inprogress.length + taskData?.todo.length) <= 5
+    //         && (taskData?.inprogress?.length + taskData?.todo?.length) >= 1 ? 0 : null,
+    //     1
+    //     // projectData?.length <= 5 && projectData?.length >= 1 ? 1 : null,
+    // ].map((index) => (index !== null ? index : -1));
 
 
     const { isOnProjectsPage } = useProjectSearchContext();
@@ -169,169 +183,141 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
         onAddTaskOpen();
     }
 
+    const boxShadow = useBoxShadow();
+
+
     return (
+
+        // {
+        //     !tasksLoading && !projectsLoading && !pendingProjectDocumentDataLoading ? (
+        //         )
+        //         : <Center>
+        //             <Spinner />
+        //         </Center>
+        // }
         <>
             <Box
                 mt={6}
             >
-                {
-                    !tasksLoading && !projectsLoading && !projectDocumentDataLoading ? (
-                        <Accordion
-                            defaultIndex={defaultIndex}
-                            allowMultiple
+
+                <Accordion
+                    // defaultIndex={defaultIndex}
+                    defaultIndex={[0]}
+                // allowMultiple
+                >
+                    {pendingProjectDocumentDataLoading ?
+                        (
+                            null
+                            // <Center>
+                            //     <Spinner />
+                            // </Center>
+                        )
+                        :
+                        <AccordionItem
+                            borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
+                            borderBottom={"none"}
+                            borderTop={"none"}
                         >
-                            <AccordionItem
-                                borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
-                                borderBottom={"none"}
-                                borderTop={"none"}
+                            <AccordionButton
+                                bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                                color={colorMode === "light" ? "black" : "white"}
+                                _hover={colorMode === "light" ? { bg: 'gray.300', color: "black" } : { bg: 'gray.500', color: 'white' }}
+                                userSelect={"none"}
                             >
-                                <AccordionButton
-                                    bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                                    color={colorMode === "light" ? "black" : "white"}
-                                    _hover={colorMode === "light" ? { bg: 'gray.300', color: "black" } : { bg: 'gray.500', color: 'white' }}
-                                    userSelect={"none"}
-                                >
-                                    <Box as="span" flex='1' textAlign='left'>
-                                        My Tasks
-                                    </Box>
-                                    {
-                                        (combinedData?.length >= 1 || pendingProjectDocumentData?.all?.length > 1) ?
-                                            <Box
-                                                display={"inline-flex"}
-                                                justifyContent={"center"}
-                                                alignItems={"center"}
-                                            >
-                                                <Box mr={2}>
-                                                    {combinedData?.length + pendingProjectDocumentData?.all?.length}
-                                                </Box>
-                                                <FcHighPriority />
-                                            </Box>
-                                            :
-                                            <FcOk />
-                                    }
-                                    <AccordionIcon />
-                                </AccordionButton>
-
-
-                                <AccordionPanel pb={4}
-                                    userSelect={"none"}
-                                    px={0}
-                                    pt={0}
-                                >
-
-                                    {(combinedData.length + pendingProjectDocumentData?.all?.length) >= 1 ? (
-                                        <Grid
-                                            gridTemplateColumns={"repeat(1, 1fr)"}
+                                <Box as="span" flex='1' textAlign='left'>
+                                    My Tasks
+                                </Box>
+                                {
+                                    (
+                                        combinedData?.length +
+                                        pendingProjectDocumentData?.all?.length
+                                        >= 1
+                                        // pendingProjectDocumentData?.team?.length +
+                                        // pendingProjectDocumentData?.ba?.length +
+                                        // pendingProjectDocumentData?.directorate?.length 
+                                    ) ?
+                                        <Box
+                                            display={"inline-flex"}
+                                            justifyContent={"center"}
+                                            alignItems={"center"}
                                         >
-                                            {combinedData.map((task: ITaskDisplayCard, index: number) => {
-                                                return (
-                                                    <TraditionalTaskDisplay
-                                                        key={index}
-                                                        task={task}
-                                                    />
-                                                )
-                                            })}
+                                            <Box mr={2}>
+                                                {
+                                                    combinedData?.length +
+                                                    pendingProjectDocumentData?.all?.length
 
-                                            {
+                                                    // pendingProjectDocumentData?.team?.length +
+                                                    // pendingProjectDocumentData?.ba?.length +
+                                                    // pendingProjectDocumentData?.directorate?.length 
+                                                }
+                                            </Box>
+                                            <FcHighPriority />
+                                        </Box>
+                                        :
+                                        <FcOk />
+                                }
+                                <AccordionIcon />
+                            </AccordionButton>
 
-                                                !(projectDocumentDataLoading && pendingProjectDocumentData?.all?.length >= 1) ?
-                                                    (
-                                                        pendingProjectDocumentData?.all?.map((document: IMainDoc, index: number) => (
-                                                            <Flex
-                                                                key={index}
-                                                                alignItems={"center"}
-                                                                border={"1px solid"}
-                                                                borderTopWidth={0}
-                                                                borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-                                                                w={"100%"}
-                                                                p={2}
-                                                                _hover={{
-                                                                    color: colorMode === "dark" ? "blue.100" : "blue.300",
-                                                                    textDecoration: "underline",
-                                                                    cursor: "pointer"
-                                                                }}
-                                                            >
-                                                                <Center
-                                                                    color={colorMode === "light" ? "red.600" : "red.200"}
-                                                                    mr={3}
-                                                                    alignItems={"center"}
-                                                                    alignContent={"center"}
-                                                                    boxSize={5}
-                                                                    w={"20px"}
 
-                                                                >
-                                                                    <HiDocumentCheck />
-                                                                </Center>
+                            <AccordionPanel pb={4}
+                                userSelect={"none"}
+                                px={0}
+                                pt={0}
+                            >
+                                {
 
-                                                                <Box
-                                                                    mx={0}
-                                                                    maxW={"125px"}
-                                                                    w={"100%"}
-                                                                >
-                                                                    <Text>{formattedKind(document?.kind)}</Text>
-                                                                </Box>
-                                                                <Divider
-                                                                    orientation='vertical'
-                                                                    // ml={-1}
-                                                                    mr={5}
+                                    (
+                                        combinedData?.length +
+                                        pendingProjectDocumentData?.all?.length
+
+                                        // pendingProjectDocumentData?.team?.length +
+                                        // pendingProjectDocumentData?.ba?.length +
+                                        // pendingProjectDocumentData?.directorate?.length 
+                                    ) >= 1 ?
+                                        (
+                                            <Grid
+                                                gridTemplateColumns={"repeat(1, 1fr)"}
+                                            >
+                                                {combinedData.map((task: ITaskDisplayCard, index: number) => {
+                                                    return (
+                                                        <TraditionalPersonalTaskDisplay
+                                                            key={index}
+                                                            task={task}
+                                                        />
+                                                    )
+                                                })}
+
+                                                {
+                                                    !(pendingProjectDocumentDataLoading && (
+                                                        pendingProjectDocumentData?.team?.length +
+                                                        pendingProjectDocumentData?.ba?.length +
+                                                        pendingProjectDocumentData?.directorate?.length
+                                                    ) >= 1) ?
+                                                        (
+                                                            (
+                                                                [
+                                                                    ...pendingProjectDocumentData.team.map((document) => ({ document, inputKind: 'team_member' })),
+                                                                    ...pendingProjectDocumentData.ba.map((document) => ({ document, inputKind: 'business_area_lead' })),
+                                                                    ...pendingProjectDocumentData.directorate.map((document) => ({ document, inputKind: 'directorate' })),
+                                                                ]
+                                                            )?.map(({ document, inputKind }, index: number) => (
+                                                                <TraditionalDocumentTaskDisplay
+                                                                    key={index}
+                                                                    document={document}
+                                                                    inputKind={inputKind}
                                                                 />
-                                                                {/* <SimpleDisplaySRTE
-
-                                                                    data={document?.project.title}
-                                                                    displayData={document?.project.title}
-                                                                    displayArea="traditionalProjectTitle"
-                                                                /> */}
-                                                                <ExtractedHTMLTitle
-                                                                    htmlContent={`${document?.project.title}`}
-                                                                    onClick={() => goToProjectDocument(document?.project?.pk ? document?.project?.pk : document?.project?.id, document)}
-
-                                                                    color={
-                                                                        colorMode === "dark" ? "blue.200" : "blue.400"
-                                                                    }
-                                                                    fontWeight={"bold"}
-                                                                    cursor={"pointer"}
-                                                                    _hover={
-                                                                        {
-                                                                            color: colorMode === "dark" ? "blue.100" : "blue.300",
-                                                                            textDecoration: "underline",
-                                                                        }
-                                                                    }
-                                                                />
-                                                                <Flex
-                                                                    alignItems="center"
-                                                                    justifyContent={'flex-end'}
-                                                                    right={0}
-                                                                    flex={1}
-                                                                    pl={4}
-
-                                                                >
-                                                                    <Button
-                                                                        size={"xs"}
-                                                                        bg={"blue.500"}
-                                                                        color={"white"}
-                                                                        _hover={{
-                                                                            bg: "blue.400"
-                                                                        }}
-                                                                        rightIcon={<FaArrowRight />}
-                                                                        onClick={() => goToProjectDocument(document?.project?.pk ? document?.project?.pk : document?.project?.id, document)}
-
-                                                                    >
-                                                                        Visit
-                                                                    </Button>
-
-                                                                </Flex>
-
-                                                            </Flex>
-                                                        ))
+                                                            ))
 
 
-                                                    ) : null
-                                            }
+                                                        ) : null
+                                                }
 
 
-                                        </Grid>
-                                    )
-                                        : <Center>
+                                            </Grid>
+                                        )
+                                        :
+                                        (<Center>
                                             <Flex>
                                                 <Center
                                                     pt={10}
@@ -341,36 +327,168 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                     <Text>All done!</Text>
                                                 </Center>
                                             </Flex>
-                                        </Center>
-                                    }
-                                    <Box
-                                        display="flex"
-                                        justifyContent={"flex-end"}
-                                        alignItems="center"
-                                        minWidth="100%" py={4}
-                                    >
-                                        <Button
-                                            bg={colorMode === "dark" ? "green.500" : "green.400"}
-                                            _hover={
-                                                {
-                                                    bg: colorMode === "dark" ? "green.400" : "green.300",
-                                                }
+                                        </Center>)
+                                    // }
+
+
+                                    // )
+
+                                }
+
+                                <Box
+                                    display="flex"
+                                    justifyContent={"flex-end"}
+                                    alignItems="center"
+                                    minWidth="100%" py={4}
+                                >
+                                    <Button
+                                        bg={colorMode === "dark" ? "green.500" : "green.400"}
+                                        _hover={
+                                            {
+                                                bg: colorMode === "dark" ? "green.400" : "green.300",
                                             }
-                                            variant="solid"
-                                            px={3} // Adjust the padding to your preference
-                                            mr={0}
-                                            display="flex"
-                                            alignItems="center"
-                                            onClick={handleAddTaskClick}
-                                            color="white"
-                                            size={"sm"}
+                                        }
+                                        variant="solid"
+                                        px={3} // Adjust the padding to your preference
+                                        mr={0}
+                                        display="flex"
+                                        alignItems="center"
+                                        onClick={handleAddTaskClick}
+                                        color="white"
+                                        size={"sm"}
+                                    >
+                                        Add Quick Task
+                                        {/* <AddIcon ml={2} color="white" /> */}
+                                    </Button>
+                                </Box>
+                            </AccordionPanel>
+                        </AccordionItem>
+                    }
+
+
+                    {pendingEndorsementsDataLoading ?
+                        (null) :
+                        <AccordionItem
+                            borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
+                            borderBottom={"none"}
+                        // borderTop={"none"}
+                        >
+                            <AccordionButton
+                                bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                                color={colorMode === "light" ? "black" : "white"}
+                                _hover={colorMode === "light" ? { bg: 'gray.300', color: "black" } : { bg: 'gray.500', color: 'white' }}
+                                userSelect={"none"}
+                            >
+                                <Box as="span" flex='1' textAlign='left'>
+                                    Endorsement Tasks
+                                </Box>
+                                {
+                                    ((
+                                        pendingEndorsementsData?.aec?.length +
+                                        pendingEndorsementsData?.bm?.length +
+                                        pendingEndorsementsData?.hc?.length
+                                    ) > 1) ?
+                                        <Box
+                                            display={"inline-flex"}
+                                            justifyContent={"center"}
+                                            alignItems={"center"}
                                         >
-                                            Add Task
-                                            {/* <AddIcon ml={2} color="white" /> */}
-                                        </Button>
-                                    </Box>
-                                </AccordionPanel>
-                            </AccordionItem>
+                                            <Box mr={2}>
+                                                {(
+                                                    pendingEndorsementsData?.aec?.length +
+                                                    pendingEndorsementsData?.bm?.length +
+                                                    pendingEndorsementsData?.hc?.length
+                                                )}
+                                            </Box>
+                                            <FcHighPriority />
+                                        </Box>
+                                        :
+                                        <FcOk />
+                                }
+                                <AccordionIcon />
+                            </AccordionButton>
+
+
+                            <AccordionPanel pb={4}
+                                userSelect={"none"}
+                                px={0}
+                                pt={0}
+                            >
+
+                                {((
+                                    pendingEndorsementsData?.aec?.length +
+                                    pendingEndorsementsData?.bm?.length +
+                                    pendingEndorsementsData?.hc?.length
+                                )) >= 1 ? (
+                                    <Grid
+                                        gridTemplateColumns={"repeat(1, 1fr)"}
+                                    >
+                                        {
+                                            (
+                                                !pendingEndorsementsDataLoading &&
+                                                pendingEndorsementsData?.aec?.length >= 1
+                                            ) ?
+                                                (
+                                                    pendingEndorsementsData?.aec?.map((document: IMainDoc, index: number) => (
+                                                        <TraditionalEndorsementTaskDisplay
+                                                            key={index}
+                                                            document={document}
+                                                            endorsementKind={"animalEthics"}
+                                                        />
+                                                    ))
+                                                ) : null
+                                        }
+                                        {
+                                            (
+                                                !pendingEndorsementsDataLoading &&
+                                                pendingEndorsementsData?.hc?.length >= 1
+                                            ) ?
+                                                (
+                                                    pendingEndorsementsData?.hc?.map((document: IMainDoc, index: number) => (
+                                                        <TraditionalEndorsementTaskDisplay
+                                                            key={index}
+                                                            document={document}
+                                                            endorsementKind={"herbarium"}
+                                                        />
+                                                    ))
+                                                ) : null
+                                        }
+                                        {
+                                            (
+                                                !pendingEndorsementsDataLoading &&
+                                                pendingEndorsementsData?.bm?.length >= 1
+                                            ) ?
+                                                (
+                                                    pendingEndorsementsData?.bm?.map((document: IMainDoc, index: number) => (
+                                                        <TraditionalEndorsementTaskDisplay
+                                                            key={index}
+                                                            document={document}
+                                                            endorsementKind={"biometrician"}
+                                                        />
+                                                    ))
+                                                ) : null
+                                        }
+
+                                    </Grid>
+                                )
+                                    : <Center>
+                                        <Flex>
+                                            <Center
+                                                pt={10}
+                                            >
+                                                <FcOk />
+                                                &nbsp;
+                                                <Text>No Endorsements Required From You!</Text>
+                                            </Center>
+                                        </Flex>
+                                    </Center>
+                                }
+                            </AccordionPanel>
+                        </AccordionItem>
+                    }
+                    {
+                        projectsLoading ?
+                            (null) :
                             <AccordionItem
                                 borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
                                 borderBottom={"none"}
@@ -453,7 +571,8 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                                                 _hover={{
                                                                     color: colorMode === "dark" ? "blue.100" : "blue.300",
                                                                     textDecoration: "underline",
-                                                                    cursor: "pointer"
+                                                                    cursor: "pointer",
+                                                                    boxShadow: boxShadow,
                                                                 }}
                                                             >
                                                                 <Center
@@ -532,127 +651,10 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                                 </AccordionPanel>
 
                             </AccordionItem>
-
-                            {/* 
-
-                            {!projectDocumentDataLoading &&
-                                (
-                                    <AccordionItem
-                                        borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
-                                        borderBottom={"none"}
-                                    >
-                                        <AccordionButton
-                                            bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                                            color={colorMode === "light" ? "black" : "white"}
-                                            _hover={colorMode === "light" ? { bg: 'gray.300', color: "black" } : { bg: 'gray.500', color: 'white' }}
-                                            userSelect={"none"}
-                                        >
-                                            <Box as="span" flex='1' textAlign='left'>
-                                                Project Documents Pending Approval
-                                            </Box>
-                                            {pendingProjectDocumentData?.length >= 1 ?
-                                                <Box
-                                                    display={"inline-flex"}
-                                                    justifyContent={"center"}
-                                                    alignItems={"center"}
-                                                >
-                                                    <Box mr={2}>
-                                                        {pendingProjectDocumentData?.length}
-                                                    </Box>
-                                                    <HiDocumentCheck />
-
-                                                </Box>
-                                                : null
-                                            }
-                                            <AccordionIcon />
-                                        </AccordionButton>
-
-                                        <AccordionPanel
-                                            pb={4}
-                                            userSelect={"none"}
-                                            px={0}
-                                            pt={0}
-                                        >
-                                            {
-
-                                                pendingProjectDocumentData?.length >= 1 ?
-                                                    (
-                                                        <Grid
-                                                            justifyItems={"start"}
-                                                            w={"100%"}
-                                                        >
-                                                            {pendingProjectDocumentData?.map((document: IMainDoc, index: number) => (
-                                                                <Flex
-                                                                    key={index}
-                                                                    alignItems={"center"}
-                                                                    border={"1px solid"}
-                                                                    borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-                                                                    w={"100%"}
-                                                                    p={2}
-                                                                    onClick={() => goToProjectDocument(document?.project?.pk ? document?.project?.pk : document?.project?.id, document)}
-                                                                    _hover={{
-                                                                        color: colorMode === "dark" ? "blue.100" : "blue.300",
-                                                                        textDecoration: "underline",
-                                                                        cursor: "pointer"
-                                                                    }}
-                                                                >
-                                                                    <Center
-                                                                        color={colorMode === "light" ? "red.600" : "red.200"}
-                                                                        mr={3}
-                                                                        alignItems={"center"}
-                                                                        alignContent={"center"}
-                                                                        boxSize={5}
-                                                                    >
-                                                                        <HiDocumentCheck />
-                                                                    </Center>
-                                                                    <Box
-                                                                        mx={0}
-                                                                        w={"100px"}
-                                                                    >
-
-                                                                        <Text>{formattedKind(document?.kind)}</Text>
-
-                                                                    </Box>
-                                                                    <Divider
-                                                                        orientation='vertical'
-                                                                        // ml={-6}
-                                                                        mr={5}
-                                                                    />
-                                                                    <SimpleDisplaySRTE
-
-                                                                        data={document?.project.title}
-                                                                        displayData={document?.project.title}
-                                                                        displayArea="traditionalProjectTitle"
-                                                                    />
+                    }
+                </Accordion>
 
 
-                                                                </Flex>
-                                                            ))}
-                                                        </Grid>
-                                                    ) :
-                                                    <Text
-                                                        mt={4}
-                                                        mx={2}
-                                                    >
-                                                        There are no project documents pending approval
-
-                                                    </Text>
-                                            }
-                                        </AccordionPanel>
-
-                                    </AccordionItem>
-                                )
-
-                            } */}
-
-
-                        </Accordion>
-
-                    )
-                        : <Center>
-                            <Spinner />
-                        </Center>
-                }
 
             </Box>
         </>

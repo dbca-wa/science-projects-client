@@ -35,7 +35,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
             setShouldConcat(false);
             setAnnualReportText("Annual Report");
             if (window.innerWidth < 1350) {
-                setSpmsText("Science Project <br/> Management System");
+                setSpmsText("Science Project <br/> Management System (TEST)");
             }
             else {
                 setSpmsText("Science Project Management System (TEST)");
@@ -131,7 +131,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                             mt={3}
                             fontWeight={'semibold'}
                         >
-                            Note: The following is set to be implemented on production release
+                            Note: The following is not yet implemented, and will be integrated on production release
                         </Text>
                         <UnorderedList pl={8}
                             pt={4}>

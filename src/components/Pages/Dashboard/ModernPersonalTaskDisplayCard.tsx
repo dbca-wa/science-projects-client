@@ -2,7 +2,7 @@
 
 import { Box, Button, Flex, Image, Tag, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
 import { ITaskDisplayCard } from "../../../types";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import NoImageFile from '/sad-face.gif'
 import { useNavigate } from "react-router-dom";
@@ -10,8 +10,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MutationError, MutationSuccess, completeTask, deletePersonalTask } from "../../../lib/api";
 import { motion } from "framer-motion";
 import { CloseIcon } from "@chakra-ui/icons";
+import { unset } from "lodash";
 
-export const TaskDisplayCard = (
+export const ModernPersonalTaskDisplayCard = (
     {
         pk,
         creator,
@@ -39,6 +40,21 @@ export const TaskDisplayCard = (
     const formattedDate = `${day}${getDaySuffix(day)} ${month}`;
 
     const [isHovered, setIsHovered] = useState(false);
+    const [isHoverAnimating, setIsHoverAnimating] = useState(false);
+
+    useEffect(() => {
+        if (isHovered) {
+            console.log("Hoverstate: ", isHovered)
+            setIsHoverAnimating(true)
+
+        } else {
+            console.log("Hoverstate: ", isHovered)
+            setIsHoverAnimating(false)
+
+        }
+    }
+        , [isHovered]
+    )
 
     function getDaySuffix(day: number) {
         if (day >= 11 && day <= 13) {
@@ -203,7 +219,14 @@ export const TaskDisplayCard = (
     return (
         <motion.div
             initial={{ scale: 1, opacity: 1 }} // Initial scale (no animation)
-            animate={{ scale: isAnimating ? 0 : 1, opacity: isAnimating ? 0 : 1 }} // Scale to 0 when isAnimating is true
+            animate={{
+                scale:
+                    isAnimating ? 0 :
+                        isHoverAnimating ? 1.05
+                            : 1,
+                opacity: isAnimating ? 0 : 1
+
+            }} // Scale to 0 when isAnimating is true
             transition={{ duration: 0.3 }} // Animation duration in seconds
         >
             <Flex
@@ -225,7 +248,7 @@ export const TaskDisplayCard = (
                 pos={"relative"}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                cursor={task_type === "assigned" ? "pointer" : "unset"}
+                cursor={isHoverAnimating ? "pointer" : 'unset'}
                 onClick={handleProjectTaskCardClick}
             >
                 {isHovered && task_type !== "assigned" && (

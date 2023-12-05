@@ -8,7 +8,7 @@ export const useGetDocumentsPendingMyAction = () => {
         retry: false,
     });
     return {
-        projectDocumentDataLoading: isLoading,
+        pendingProjectDocumentDataLoading: isLoading,
         pendingProjectDocumentData: data,
     }
 }

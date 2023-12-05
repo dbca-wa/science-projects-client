@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 interface Props extends TextProps {
     htmlContent: string;
     onClick?: () => void;
+    textBefore?: string;
     extraText?: string;
 }
 
-export const ExtractedHTMLTitle: React.FC<Props> = ({ htmlContent, onClick, extraText, ...textProps }) => {
+export const ExtractedHTMLTitle: React.FC<Props> = ({ htmlContent, onClick, textBefore, extraText, ...textProps }) => {
 
     const [text, setText] = useState('');
 
@@ -28,7 +29,7 @@ export const ExtractedHTMLTitle: React.FC<Props> = ({ htmlContent, onClick, extr
         <Text {...textProps}
             onClick={onClick}
         >
-            {text} {(extraText && extraText !== undefined) ? extraText : null}
+            {(textBefore && textBefore !== undefined) ? textBefore : null} {text} {(extraText && extraText !== undefined) ? extraText : null}
         </Text>
     );
 };

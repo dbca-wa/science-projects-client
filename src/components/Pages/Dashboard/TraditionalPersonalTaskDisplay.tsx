@@ -11,12 +11,13 @@ import { TaskDetailsModal } from "../../Modals/TaskDetailsModal";
 import { HiDocumentCheck } from "react-icons/hi2";
 import { FaUser } from "react-icons/fa";
 import { MdPriorityHigh } from "react-icons/md";
+import { useBoxShadow } from "@/lib/hooks/useBoxShadow";
 interface Props {
     task: ITaskDisplayCard;
 }
 
 
-export const TraditionalTaskDisplay = ({ task }: Props) => {
+export const TraditionalPersonalTaskDisplay = ({ task }: Props) => {
 
     const [isHovered, setIsHovered] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -180,6 +181,8 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
+    const boxShadow = useBoxShadow();
+
 
     return (
         <>
@@ -196,8 +199,10 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
                 p={2}
                 _hover={{
                     color: colorMode === "dark" ? "blue.100" : "blue.300",
-                    textDecoration: "underline",
-                    cursor: "pointer"
+                    cursor: "pointer",
+                    boxShadow: boxShadow,
+                    zIndex: 999,
+
                 }}
             >
                 <Center
@@ -226,7 +231,7 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
                 >
                     {
                         task.task_type === "personal" ?
-                            <Text>Personal</Text>
+                            <Text>Quick Task</Text>
                             : <Text>Assigned</Text>
 
                     }
@@ -245,30 +250,41 @@ export const TraditionalTaskDisplay = ({ task }: Props) => {
                                                                         displayArea="traditionalProjectTitle"
                                                                     /> */}
 
-                <Text
+                <Grid>
+                    <Text
 
-                    color={
-                        colorMode === "dark" ? "blue.200" : "blue.400"
-                    }
-                    fontWeight={"bold"}
-                    cursor={"pointer"}
-                    _hover={
-                        {
-                            color: colorMode === "dark" ? "blue.100" : "blue.300",
-                            textDecoration: "underline",
+                        color={
+                            colorMode === "dark" ? "blue.200" : "blue.400"
                         }
-                    }
-                    onClick={() => {
-                        if (task?.project?.pk) {
-                            goToProject(task.project.pk);
-                        }
-                        else {
-                            onOpen();
-                        }
-                    }}
-                >
-                    {`${task.name}`}
-                </Text>
+                        fontWeight={"bold"}
+                        cursor={"pointer"}
+                        // _hover={
+                        //     {
+                        //         color: colorMode === "dark" ? "blue.100" : "blue.300",
+                        //         textDecoration: "underline",
+                        //     }
+                        // }
+                        onClick={() => {
+                            if (task?.project?.pk) {
+                                goToProject(task.project.pk);
+                            }
+                            else {
+                                // onOpen();
+                            }
+                        }}
+                    >
+                        {`${task.name}`}
+                    </Text>
+                    <Text
+                        color={"gray.500"}
+                        fontWeight={"semibold"}
+                        fontSize={"small"}
+                    >
+                        {task.description}
+                    </Text>
+
+                </Grid>
+
                 <Flex
                     alignItems="center"
                     justifyContent={'flex-end'}
