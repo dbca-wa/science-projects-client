@@ -4,6 +4,8 @@ import {
     Box,
     Button,
     Center,
+    Flex,
+    Spinner,
     Tab, TabList, TabPanel, TabPanels, Tabs,
     ToastId,
     useColorMode,
@@ -27,6 +29,8 @@ import { useToast } from '@chakra-ui/react';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPersonalTask } from "../../../lib/api";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
+import { useGetDocumentsPendingMyAction } from "@/lib/hooks/useGetDocumentsPendingMyAction";
+import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/useGetEndorsementsPendingMyAction";
 
 
 export const ModernDashboard = ({ activeTab }: IDashProps) => {
@@ -51,6 +55,18 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
     }, [location.state]);
 
     const { taskData, tasksLoading } = useGetMyTasks()
+    const { pendingProjectDocumentData, pendingProjectDocumentDataLoading } = useGetDocumentsPendingMyAction();
+    const { pendingEndorsementsData, pendingEndorsementsDataLoading } = useGetEndorsementsPendingMyAction();
+
+    useEffect(() => {
+        console.log(pendingProjectDocumentData)
+    }, [pendingProjectDocumentData])
+
+    useEffect(() => {
+        console.log(pendingEndorsementsData)
+    }, [pendingEndorsementsData])
+
+
     const { projectData, projectsLoading } = useGetMyProjects()
 
     const [shouldConcat, setShouldConcat] = useState(false);
@@ -264,9 +280,30 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
                             navigate('/', { replace: true, state: { activeTab: 0 } });
                         }}>
                         Dash
-                        {taskData && (
+                        {(
                             <Center ml={2}>
-                                <Box sx={countCircleStyling}>{taskData.inprogress.length + taskData.todo.length}</Box>
+                                <Box sx={countCircleStyling}>
+
+                                    {
+                                        tasksLoading === false ? (
+                                            (
+                                                pendingEndorsementsDataLoading === false ? (
+                                                    pendingEndorsementsData.aec.length +
+                                                    pendingEndorsementsData.bm.length +
+                                                    pendingEndorsementsData.hc.length
+                                                ) : 0
+                                            ) +
+                                            (
+                                                pendingProjectDocumentDataLoading === false ? (
+                                                    pendingProjectDocumentData.all.length
+                                                ) : 0
+                                            ) +
+                                            (taskData.inprogress.length +
+                                                taskData.todo.length)
+                                        )
+                                            : 0
+                                    }
+                                </Box>
                             </Center>
                         )}
                     </Tab>
@@ -323,8 +360,41 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
                         <Quote />
                         <Box
                             mt={8}
-                        >
-                            <MyTasksSection data={taskData} loading={tasksLoading} />
+                        >{
+                                tasksLoading === false &&
+                                    pendingEndorsementsDataLoading === false &&
+                                    pendingProjectDocumentDataLoading === false ?
+                                    (
+                                        <MyTasksSection
+                                            personalTaskData={taskData}
+                                            personalTaskDataLoading={tasksLoading}
+                                            endorsementTaskData={pendingEndorsementsData}
+                                            endorsementTaskDataLoading={pendingEndorsementsDataLoading}
+                                            documentTaskData={pendingProjectDocumentData}
+                                            documentTaskDataLoading={pendingProjectDocumentDataLoading}
+                                        />
+                                    )
+                                    :
+                                    (
+                                        <>
+                                            <Flex
+                                                w={"100%"}
+                                                h={"100%"}
+                                            >
+                                                <Center
+                                                    w={"100%"}
+                                                    h={"100%"}
+                                                    py={20}
+                                                >
+                                                    <Spinner
+                                                        size={"xl"}
+                                                    />
+                                                </Center>
+                                            </Flex>
+                                        </>
+                                    )
+                            }
+
                         </Box>
 
                     </TabPanel>
