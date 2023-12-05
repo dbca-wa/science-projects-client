@@ -1,6 +1,6 @@
 // The traditional version of the dashboard
 
-import { Box, Button, Center, Flex, Grid, Heading, Text, useColorMode, useDisclosure } from "@chakra-ui/react"
+import { Box, Button, Center, Flex, Grid, Heading, ListItem, Text, UnorderedList, useColorMode, useDisclosure } from "@chakra-ui/react"
 import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects"
 import { Head } from "../../Base/Head"
 import { useCallback, useEffect, useState } from "react";
@@ -127,6 +127,18 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                         <Text>
                             Don't be shy, we can only make things better with your help!
                         </Text>
+                        <Text
+                            mt={3}
+                            fontWeight={'semibold'}
+                        >
+                            Note: The following is set to be implemented on production release
+                        </Text>
+                        <UnorderedList pl={8}
+                            pt={4}>
+                            <ListItem>'latest report' page</ListItem>
+                            <ListItem>PDF generation</ListItem>
+                            <ListItem>SPMS emails</ListItem>
+                        </UnorderedList>
                     </Flex>
 
                     {/* <br /> */}

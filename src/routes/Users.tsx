@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { CreateUserModal } from "../components/Modals/CreateUserModal";
 import { PaginatorUser } from "../components/Pages/Users/PaginatorUser";
 import { useLayoutSwitcher } from "../lib/hooks/LayoutSwitcherContext";
+import { SearchUsers } from "@/components/Navigation/SearchUsers";
 
 export const Users = () => {
     const {
@@ -19,6 +20,7 @@ export const Users = () => {
         setCurrentUserResultsPage,
         onlyExternal,
         onlySuperuser,
+        businessArea,
         onlyStaff,
         setSearchFilters,
         totalResults,
@@ -56,25 +58,25 @@ export const Users = () => {
 
     const handleOnlyExternalChange = () => {
         if (!onlyExternal) {
-            setSearchFilters({ onlyExternal: true, onlySuperuser: false, onlyStaff: false });
+            setSearchFilters({ onlyExternal: true, onlySuperuser: false, onlyStaff: false, businessArea: businessArea });
         } else {
-            setSearchFilters({ onlyExternal: false, onlySuperuser, onlyStaff });
+            setSearchFilters({ onlyExternal: false, onlySuperuser, onlyStaff, businessArea: businessArea });
         }
     };
 
     const handleOnlyStaffChange = () => {
         if (!onlyStaff) {
-            setSearchFilters({ onlyExternal: false, onlySuperuser: false, onlyStaff: true });
+            setSearchFilters({ onlyExternal: false, onlySuperuser: false, onlyStaff: true, businessArea: businessArea });
         } else {
-            setSearchFilters({ onlyExternal, onlySuperuser, onlyStaff: false });
+            setSearchFilters({ onlyExternal, onlySuperuser, onlyStaff: false, businessArea: businessArea });
         }
     };
 
     const handleOnlySuperChange = () => {
         if (!onlySuperuser) {
-            setSearchFilters({ onlyExternal: false, onlySuperuser: true, onlyStaff: false });
+            setSearchFilters({ onlyExternal: false, onlySuperuser: true, onlyStaff: false, businessArea: businessArea });
         } else {
-            setSearchFilters({ onlyExternal, onlySuperuser: false, onlyStaff });
+            setSearchFilters({ onlyExternal, onlySuperuser: false, onlyStaff, businessArea: businessArea });
         }
     };
 
@@ -147,10 +149,11 @@ export const Users = () => {
                                 base: "100%",
                             }}
                             gridTemplateColumns={{
-                                base: "repeat(1, 1fr)",
+                                base: "repeat(2, 1fr)",
                             }}
                             gridColumnGap={4}
                         >
+
                             <Flex flex={1} w={"100%"}>
 
                                 <Stack
@@ -190,6 +193,9 @@ export const Users = () => {
                                 </Stack>
 
                             </Flex>
+                            <Stack>
+                                <SearchUsers />
+                            </Stack>
                         </Grid>
                     </Box>
 

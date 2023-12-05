@@ -24,10 +24,12 @@ interface IUserSearchContext {
     onlySuperuser: boolean;
     onlyExternal: boolean;
     onlyStaff: boolean;
+    businessArea: string;
     setSearchFilters: (filters: {
         onlySuperuser: boolean;
         onlyExternal: boolean;
         onlyStaff: boolean;
+        businessArea: string;
     }) => void;
     reFetch: () => void;
 
@@ -53,6 +55,7 @@ const UserSearchContext = createContext<IUserSearchContext>({
     onlySuperuser: false,
     onlyExternal: false,
     onlyStaff: false,
+    businessArea: "All",
     setSearchFilters: () => {
         throw new Error('setSearchFilters function must be implemented');
     },
@@ -79,15 +82,18 @@ export const UserSearchProvider = ({ children }: IUserSearchProviderProps) => {
     const [onlySuperuser, setOnlySuperuser] = useState(false);
     const [onlyExternal, setOnlyExternal] = useState(false);
     const [onlyStaff, setOnlyStaff] = useState(false);
+    const [businessArea, setBusinessArea] = useState("All");
 
     const setSearchFilters = (filters: {
         onlySuperuser: boolean;
         onlyExternal: boolean;
         onlyStaff: boolean;
+        businessArea: string;
     }) => {
         setOnlySuperuser(filters.onlySuperuser);
         setOnlyExternal(filters.onlyExternal);
         setOnlyStaff(filters.onlyStaff);
+        setBusinessArea(filters.businessArea);
         setCurrentUserResultsPage(1);
     };
 
@@ -98,6 +104,7 @@ export const UserSearchProvider = ({ children }: IUserSearchProviderProps) => {
             onlySuperuser,
             onlyExternal,
             onlyStaff,
+            businessArea
         })
             .then((data) => {
                 setFilteredItems(data.users);
@@ -118,6 +125,7 @@ export const UserSearchProvider = ({ children }: IUserSearchProviderProps) => {
                 onlySuperuser,
                 onlyExternal,
                 onlyStaff,
+                businessArea,
             })
                 .then((data) => {
                     setFilteredItems(data.users);
@@ -133,9 +141,10 @@ export const UserSearchProvider = ({ children }: IUserSearchProviderProps) => {
             setOnlyExternal(false);
             setOnlyStaff(false);
             setOnlySuperuser(false);
+            setBusinessArea("All");
             setSearchTerm('');
         }
-    }, [searchTerm, currentUserResultsPage, isOnUserPage, onlySuperuser, onlyExternal, onlyStaff]);
+    }, [searchTerm, currentUserResultsPage, isOnUserPage, onlySuperuser, onlyExternal, onlyStaff, businessArea]);
 
 
     const contextValue: IUserSearchContext = {
@@ -151,6 +160,7 @@ export const UserSearchProvider = ({ children }: IUserSearchProviderProps) => {
         onlySuperuser,
         onlyExternal,
         onlyStaff,
+        businessArea,
         setSearchFilters,
         reFetch,
     };

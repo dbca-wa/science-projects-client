@@ -32,8 +32,8 @@ import { FaAddressCard, FaLocationArrow, FaUserPlus, FaUsers } from "react-icons
 import { Navitar } from "./Navitar";
 import { SidebarNavMenu } from "./SidebarNavMenu";
 import { CreateUserModal } from "../Modals/CreateUserModal";
-import { SearchUsers } from "./SearchUsers";
-import { SearchProjects } from "./SearchProjects";
+// import { SearchUsers } from "./SearchUsers";
+// import { SearchProjects } from "./SearchProjects";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { useUser } from "../../lib/hooks/useUser";
@@ -554,7 +554,7 @@ const OldHeader = () => {
                                                             alignItems={"center"}
                                                         >
                                                             <Center mr={4}>
-                                                                {
+                                                                {/* {
                                                                     shouldRenderUserSearch === true && (
                                                                         <SearchUsers />
                                                                     )
@@ -564,7 +564,7 @@ const OldHeader = () => {
                                                                     shouldRenderProjectSearch === true && (
                                                                         <SearchProjects />
                                                                     )
-                                                                }
+                                                                } */}
                                                                 <ToggleLayout />
                                                                 <ToggleDarkMode />
                                                             </Center>
@@ -666,17 +666,17 @@ const OldHeader = () => {
                                 <HStack
                                     px={3}
                                 >
-                                    {
+                                    {/* {
                                         shouldRenderUserSearch === true && (
                                             <SearchUsers />
                                         )
-                                    }
+                                    } */}
 
-                                    {
+                                    {/* {
                                         shouldRenderProjectSearch === true && (
                                             <SearchProjects />
                                         )
-                                    }
+                                    } */}
 
                                     <Navitar shouldShowName
                                         windowSize={windowSizeValue} isModern={false} />
