@@ -28,7 +28,7 @@ export const BoxContainer: React.FC<BoxContainerProps> = ({ children, ...props }
 
 
 export const UserGridItem = ({
-    pk, username, email, first_name, last_name, is_staff, is_superuser,
+    pk, username, email, first_name, last_name, is_staff, is_superuser, is_active,
     business_area, role, branch, image, affiliation, branches, businessAreas
 }: IUserData) => {
 
@@ -50,9 +50,8 @@ export const UserGridItem = ({
     }
 
     useEffect(() => {
-        console.log(business_area?.name)
-        console.log(image)
-    }, [business_area, image])
+        console.log(is_active)
+    }, [is_active])
 
     return (
         <>
@@ -165,6 +164,7 @@ export const UserGridItem = ({
                                             is_staff ? "Staff" :
                                                 "External User"
                                     }
+                                    {is_active === false && (` (Inactive)`)}
                                 </Text>
                                 {
                                     (is_staff) ?

@@ -236,28 +236,15 @@ export const ConceptPlanActionModal = (
                                                         gridTemplateColumns={"repeat(2, 1fr)"}
                                                     >
 
-                                                        {directorateData?.map((member, index) => {
-                                                            return (
-                                                                <Center
-                                                                    key={index}
-                                                                // bg={"red"}
-                                                                >
-                                                                    <Box
-                                                                        px={2}
-                                                                        // bg={"red"}
-                                                                        w={"100%"}
-                                                                    >
-
-                                                                        <Text
-                                                                        >
-                                                                            {member.first_name} {member.last_name}
-                                                                        </Text>
+                                                        {directorateData
+                                                            ?.filter((member) => member.is_active) // Filter only active members
+                                                            .map((member, index) => (
+                                                                <Center key={index}>
+                                                                    <Box px={2} w={"100%"}>
+                                                                        <Text>{`${member.first_name} ${member.last_name}`}</Text>
                                                                     </Box>
-
-
                                                                 </Center>
-                                                            )
-                                                        })}
+                                                            ))}
                                                     </Grid>
 
                                                 </Box>

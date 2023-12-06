@@ -47,104 +47,92 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
         }
     }, [isLoading, projectData])
 
-    // useEffect(() => {
-    //     if (projectData) {
-    //         const parser = new DOMParser();
-    //         const doc = parser.parseFromString(projectData?.project?.title, 'text/html');
-    //         const pElement = doc.querySelector('p');
-    //         const spanElement = pElement.querySelector('span') ? pElement.querySelector('span') : pElement;
-    //         const title = spanElement ? spanElement.textContent : '';
-    //         setDistilledTitle(title);
-    //     }
-    // }, [projectData])
-
     useEffect(() => {
         console.log(distilledTitle)
 
     }, [distilledTitle])
 
-
-
-    // const distilledTitle = useDistilledProjectTitle(projectData?.project?.title);
-
     const me = useUser();
 
+    // Refetch data on tab change and ensure falsy items are removed from the array
+    const [tabs, setTabs] = useState([]);
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+    const [isInitialRender, setIsInitialRender] = useState(true);
+    const [selectedTabSet, setSelectedTabSet] = useState(false);
+    // const [tabCount, setTabCount] = useState<number>(tabs.length);
 
+    const setToSelectedTab = () => {
+        if (tabs.includes(selectedTab)) {
+            setActiveTabIndex(tabs.indexOf(selectedTab))
+        }
+    }
 
-    // Refetch data on tab change and ensures falsey items remvoed from array
-    const [tabs, setTabs] = useState([
-        'overview',
-        documents?.concept_plan && 'concept',
-        documents?.project_plan && 'project',
-        documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
-        documents?.student_reports && documents.student_reports.length > 0 && 'student',
-        documents?.project_closure && 'closure'
-    ].filter(Boolean));
-
-    const [tabCount, setTabCount] = useState<number>();
-    useEffect(() => {
-        setTabCount(tabs.length)
-    }, [projectData, tabs])
-
-    useEffect(() => {
-        setTabs(
-            [
-                'overview',
-                documents?.concept_plan && 'concept',
-                documents?.project_plan && 'project',
-                documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
-                documents?.student_reports && documents.student_reports.length > 0 && 'student',
-                documents?.project_closure && 'closure'
-            ].filter(Boolean)
-        )
-    }, [documents?.project_closure, documents?.concept_plan, documents?.progress_reports, documents?.project_plan, documents?.student_reports])
-
-    const defaultTab = selectedTab || "overview";
-    const initialTabIndex = defaultTab ? tabs.indexOf(defaultTab) : 0;
-
-    useEffect(() => {
-        console.log(documents);
-        console.log(defaultTab);
-        console.log(selectedTab);
-        console.log(tabs.indexOf(defaultTab))
-    })
-
-
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(tabs.indexOf(defaultTab));
-
-    const setToLastTab = () => {
-        // refetch()
-        console.log("Setting index")
-        // console.log(lastTabIndex, lastTab, tabs.indexOf(lastTab))
-        // setActiveTabIndex(tabs.indexOf(lastTab));
-
-        setActiveTabIndex(
-            tabs.includes('closure') ?
-                tabs.indexOf('closure') :
-                tabs.includes('student') ?
-                    tabs.indexOf('student') :
-                    tabs.includes('progress') ?
-                        tabs.indexOf('progress') :
-                        tabs.includes('project') ?
-                            tabs.indexOf('project') :
-                            tabs.includes('concept') ?
-                                tabs.indexOf('concept') :
-                                tabs.indexOf('overview')
-
-        )
+    const setToLastTab = (tabs: string[]) => {
+        if (tabs.includes('closure')) {
+            setActiveTabIndex(tabs.indexOf('closure'))
+        }
+        else if (tabs.includes('progress')) {
+            setActiveTabIndex(tabs.indexOf('progress'))
+        }
+        else if (tabs.includes('student')) {
+            setActiveTabIndex(tabs.indexOf('student'))
+        }
+        else if (tabs.includes('project')) {
+            setActiveTabIndex(tabs.indexOf('project'))
+        }
+        else if (tabs.includes('concept')) {
+            setActiveTabIndex(tabs.indexOf('concept'))
+        }
+        else if (tabs.includes('overview')) {
+            setActiveTabIndex(tabs.indexOf('overview'))
+        }
     };
 
     useEffect(() => {
-        setToLastTab();
-    }, [tabCount])
 
-    useEffect(() => console.log('tab:', activeTabIndex), [activeTabIndex])
+        if (isInitialRender) {
+            if (documents) {
+                const tabData = [
+                    'overview',
+                    documents?.concept_plan && 'concept',
+                    documents?.project_plan && 'project',
+                    documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
+                    documents?.student_reports && documents.student_reports.length > 0 && 'student',
+                    documents?.project_closure && 'closure'
+                ].filter(Boolean)
+                setTabs(tabData)
+                setIsInitialRender(false);
 
-    // useEffect(() => {
-    //     console.log("activeIndex:", activeTabIndex)
-    // })
+            }
+            // if (tabs.length >= 1) {
+            // }
+        } else {
+            if (selectedTab) {
+                console.log('there is a selected tab')
+                if (selectedTabSet === false) {
+                    console.log('and it hasnt been set')
+                    setToSelectedTab();
+                    setSelectedTabSet(true);
+                }
+            } else {
+                // if the tab has been set already
+                const tabData = [
+                    'overview',
+                    documents?.concept_plan && 'concept',
+                    documents?.project_plan && 'project',
+                    documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
+                    documents?.student_reports && documents.student_reports.length > 0 && 'student',
+                    documents?.project_closure && 'closure'
+                ].filter(Boolean)
+                if (tabData.length !== tabs.length) {
+                    console.log("Len:", tabs.length, tabs)
 
+                    setTabs(tabData)
+                }
+            }
 
+        }
+    }, [documents, tabs, isInitialRender, selectedTab, selectedTabSet])
 
     return (
 
@@ -164,7 +152,7 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
                             refetch()
                             setActiveTabIndex(index)
                         }}
-                        defaultIndex={initialTabIndex}
+                        defaultIndex={activeTabIndex}
                         index={activeTabIndex}
 
                     >
@@ -239,7 +227,9 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
                                                     members={members}
                                                     documents={documents}
                                                     refetchData={refetch}
-                                                    setToLastTab={setToLastTab}
+                                                    setToLastTab={() => {
+                                                        setToLastTab(tabs)
+                                                    }}
                                                 />
 
                                                 {/* <ManageTeam /> */}
@@ -271,8 +261,9 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
                                             document={documents.concept_plan}
                                             all_documents={documents}
                                             refetch={refetch}
-                                            setToLastTab={setToLastTab}
-
+                                            setToLastTab={() => {
+                                                setToLastTab(tabs)
+                                            }}
                                         // projectPk={Number(projectPk)}
                                         />
                                     </TabPanel>
@@ -291,8 +282,9 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
 
                                         userData={me?.userData}
                                         members={members}
-                                        setToLastTab={setToLastTab}
-
+                                        setToLastTab={() => {
+                                            setToLastTab(tabs)
+                                        }}
                                     />
                                 </TabPanel>
                             )}
@@ -310,8 +302,9 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
 
                                             userData={me?.userData}
                                             members={members}
-                                            setToLastTab={setToLastTab}
-
+                                            setToLastTab={() => {
+                                                setToLastTab(tabs)
+                                            }}
                                         />
                                     </TabPanel>
                                 )
@@ -330,8 +323,9 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
 
                                             userData={me?.userData}
                                             members={members}
-                                            setToLastTab={setToLastTab}
-
+                                            setToLastTab={() => {
+                                                setToLastTab(tabs)
+                                            }}
                                         //  selectedYear={selectedStudentReportYear}
                                         />
                                     </TabPanel>
@@ -349,8 +343,9 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
                                             members={members}
                                             all_documents={documents}
                                             refetch={refetch}
-                                            setToLastTab={setToLastTab}
-
+                                            setToLastTab={() => {
+                                                setToLastTab(tabs)
+                                            }}
                                         />
                                     </TabPanel>
                                 )
@@ -362,5 +357,3 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
 
     )
 }
-
-

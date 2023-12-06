@@ -359,7 +359,7 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
 
                         <Quote />
                         <Box
-                            mt={8}
+                            mt={1}
                         >{
                                 tasksLoading === false &&
                                     pendingEndorsementsDataLoading === false &&
