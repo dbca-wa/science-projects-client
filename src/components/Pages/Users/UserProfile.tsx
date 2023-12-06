@@ -18,6 +18,7 @@ import { useUpdatePage } from "../../../lib/hooks/useUpdatePage";
 import { useBranches } from "../../../lib/hooks/useBranches";
 import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
 import { IBranch, IBusinessArea } from "../../../types";
+import { DeactivateUserModal } from "@/components/Modals/DeactivateUserModal";
 
 interface Props {
     pk: number;
@@ -43,6 +44,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     }
 
     const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
+    const { isOpen: isDeactivateModalOpen, onOpen: onDeactivateModalOpen, onClose: onDeactivateModalClose } = useDisclosure();
     const { isOpen: isPromoteModalOpen, onOpen: onPromoteModalOpen, onClose: onPromoteModalClose } = useDisclosure();
     const { isOpen: isAddToProjectModalOpen, onOpen: onAddToProjectModalOpen, onClose: onAddToProjectModalClose } = useDisclosure();
     const { isOpen: isEditUserDetailsModalOpen, onOpen: onEditUserDetailsModalOpen, onClose: onEditUserDetailsModalClose } = useDisclosure();
@@ -74,6 +76,12 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 <DeleteUserModal
                     isOpen={isDeleteModalOpen}
                     onClose={onDeleteModalClose}
+                    userIsSuper={userInQuestionIsSuperuser}
+                    userIsMe={userInQuestionIsMe} userPk={user.pk}
+                />
+                <DeactivateUserModal
+                    isOpen={isDeactivateModalOpen}
+                    onClose={onDeactivateModalClose}
                     userIsSuper={userInQuestionIsSuperuser}
                     userIsMe={userInQuestionIsMe} userPk={user.pk}
                 />
@@ -456,6 +464,21 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
                                         >
                                             {user.is_superuser ? "Demote" : "Promote"}
+                                        </Button>
+                                        <Button
+                                            onClick={onDeactivateModalOpen}
+                                            bg={colorMode === "light" ? "orange.600" : "orange.700"}
+                                            color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
+
+                                            _hover={{
+                                                bg: colorMode === "light" ?
+                                                    "orange.500"
+                                                    :
+                                                    "orange.600",
+                                            }}
+                                            isDisabled={user.is_superuser || user.email === me.userData.email}
+                                        >
+                                            Deactivate
                                         </Button>
                                         <Button
                                             onClick={onDeleteModalOpen}

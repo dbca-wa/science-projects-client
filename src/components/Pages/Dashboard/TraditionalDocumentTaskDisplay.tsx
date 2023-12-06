@@ -77,7 +77,7 @@ export const TraditionalDocumentTaskDisplay = ({ inputKind, document }: IProps) 
         } else if (actionKind === "project_lead") {
             return "Project Lead"
         } else if (actionKind === "business_area_lead") {
-            return "Area Lead"
+            return "Business Area Lead"
         }
         else {
             // catchall 
@@ -176,7 +176,7 @@ export const TraditionalDocumentTaskDisplay = ({ inputKind, document }: IProps) 
                 <Flex>
 
                     <ExtractedHTMLTitle
-                        htmlContent={`${document?.project.title}`}
+                        htmlContent={`${document?.project?.title}`}
                         // onClick={() => goToProjectDocument(document?.project?.pk ? document?.project?.pk : document?.project?.id, document)}
 
                         color={

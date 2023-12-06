@@ -13,7 +13,7 @@ import { TraditionalPersonalTaskDisplay } from "./TraditionalPersonalTaskDisplay
 import { AddIcon } from "@chakra-ui/icons"
 import { GoProjectRoadmap } from "react-icons/go"
 import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE"
-import { useGetDocumentsPendingApproval } from "../../../lib/hooks/useGetDocumentsPendingApproval"
+// import { useGetDocumentsPendingApproval } from "../../../lib/hooks/useGetDocumentsPendingApproval"
 import { HiDocumentCheck } from "react-icons/hi2";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle"
 import { FaArrowRight, FaUserFriends } from "react-icons/fa"
@@ -25,6 +25,8 @@ import { TraditionalEndorsementTaskDisplay } from "./TraditionalEndorsementTaskD
 import { TraditionalDocumentTaskDisplay } from "./TraditionalDocumentTaskDisplay"
 import { useBoxShadow } from "@/lib/hooks/useBoxShadow"
 import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/useGetEndorsementsPendingMyAction"
+import { useUser } from "@/lib/hooks/useUser"
+import { motion } from "framer-motion"
 
 
 interface ITaskFromAPI {
@@ -90,6 +92,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
             return kind
         }
     }
+    const me = useUser();
 
     // Once the component receives new data, update the state accordingly
     useEffect(() => {
@@ -207,285 +210,307 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                 >
                     {pendingProjectDocumentDataLoading ?
                         (
-                            null
-                            // <Center>
-                            //     <Spinner />
-                            // </Center>
+                            // null
+                            <Center my={4}>
+                                <Spinner />
+                            </Center>
                         )
                         :
-                        <AccordionItem
-                            borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
-                            borderBottom={"none"}
-                            borderTop={"none"}
+                        <motion.div
+                            initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
+                            animate={{ opacity: pendingProjectDocumentDataLoading ? 0 : 1 }}
+                            transition={{ duration: 0.4 }} // Animation duration in seconds
                         >
-                            <AccordionButton
-                                bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                                color={colorMode === "light" ? "black" : "white"}
-                                _hover={colorMode === "light" ? { bg: 'gray.300', color: "black" } : { bg: 'gray.500', color: 'white' }}
-                                userSelect={"none"}
+                            <AccordionItem
+                                borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
+                                borderBottom={"none"}
+                                borderTop={"none"}
                             >
-                                <Box as="span" flex='1' textAlign='left'>
-                                    My Tasks
-                                </Box>
-                                {
-                                    (
-                                        combinedData?.length +
-                                        pendingProjectDocumentData?.all?.length
-                                        >= 1
-                                        // pendingProjectDocumentData?.team?.length +
-                                        // pendingProjectDocumentData?.ba?.length +
-                                        // pendingProjectDocumentData?.directorate?.length 
-                                    ) ?
-                                        <Box
-                                            display={"inline-flex"}
-                                            justifyContent={"center"}
-                                            alignItems={"center"}
-                                        >
-                                            <Box mr={2}>
-                                                {
-                                                    combinedData?.length +
-                                                    pendingProjectDocumentData?.all?.length
-
-                                                    // pendingProjectDocumentData?.team?.length +
-                                                    // pendingProjectDocumentData?.ba?.length +
-                                                    // pendingProjectDocumentData?.directorate?.length 
-                                                }
-                                            </Box>
-                                            <FcHighPriority />
-                                        </Box>
-                                        :
-                                        <FcOk />
-                                }
-                                <AccordionIcon />
-                            </AccordionButton>
-
-
-                            <AccordionPanel pb={4}
-                                userSelect={"none"}
-                                px={0}
-                                pt={0}
-                            >
-                                {
-
-                                    (
-                                        combinedData?.length +
-                                        pendingProjectDocumentData?.all?.length
-
-                                        // pendingProjectDocumentData?.team?.length +
-                                        // pendingProjectDocumentData?.ba?.length +
-                                        // pendingProjectDocumentData?.directorate?.length 
-                                    ) >= 1 ?
+                                <AccordionButton
+                                    bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                                    color={colorMode === "light" ? "black" : "white"}
+                                    _hover={colorMode === "light" ? { bg: 'gray.300', color: "black" } : { bg: 'gray.500', color: 'white' }}
+                                    userSelect={"none"}
+                                >
+                                    <Box as="span" flex='1' textAlign='left'>
+                                        My Tasks
+                                    </Box>
+                                    {
                                         (
+                                            combinedData?.length +
+                                            pendingProjectDocumentData?.all?.length
+                                            >= 1
+                                            // pendingProjectDocumentData?.team?.length +
+                                            // pendingProjectDocumentData?.ba?.length +
+                                            // pendingProjectDocumentData?.directorate?.length 
+                                        ) ?
+                                            <Box
+                                                display={"inline-flex"}
+                                                justifyContent={"center"}
+                                                alignItems={"center"}
+                                            >
+                                                <Box mr={2}>
+                                                    {
+                                                        combinedData?.length +
+                                                        pendingProjectDocumentData?.all?.length
+
+                                                        // pendingProjectDocumentData?.team?.length +
+                                                        // pendingProjectDocumentData?.ba?.length +
+                                                        // pendingProjectDocumentData?.directorate?.length 
+                                                    }
+                                                </Box>
+                                                <FcHighPriority />
+                                            </Box>
+                                            :
+                                            <FcOk />
+                                    }
+                                    <AccordionIcon />
+                                </AccordionButton>
+
+
+                                <AccordionPanel pb={4}
+                                    userSelect={"none"}
+                                    px={0}
+                                    pt={0}
+                                >
+                                    {
+
+                                        (
+                                            combinedData?.length +
+                                            pendingProjectDocumentData?.all?.length
+
+                                            // pendingProjectDocumentData?.team?.length +
+                                            // pendingProjectDocumentData?.ba?.length +
+                                            // pendingProjectDocumentData?.directorate?.length 
+                                        ) >= 1 ?
+                                            (
+                                                <Grid
+                                                    gridTemplateColumns={"repeat(1, 1fr)"}
+                                                >
+                                                    {combinedData.map((task: ITaskDisplayCard, index: number) => {
+                                                        return (
+                                                            <TraditionalPersonalTaskDisplay
+                                                                key={index}
+                                                                task={task}
+                                                            />
+                                                        )
+                                                    })}
+
+                                                    {
+                                                        !(pendingProjectDocumentDataLoading && (
+                                                            pendingProjectDocumentData?.team?.length +
+                                                            pendingProjectDocumentData?.lead?.length +
+                                                            pendingProjectDocumentData?.ba?.length +
+                                                            pendingProjectDocumentData?.directorate?.length
+                                                        ) >= 1) ?
+                                                            (
+                                                                (
+                                                                    [
+                                                                        ...pendingProjectDocumentData.team.map((document) => ({ document, inputKind: 'team_member' })),
+                                                                        ...pendingProjectDocumentData.lead.map((document) => ({ document, inputKind: 'project_lead' })),
+                                                                        ...pendingProjectDocumentData.ba.map((document) => ({ document, inputKind: 'business_area_lead' })),
+                                                                        ...pendingProjectDocumentData.directorate.map((document) => ({ document, inputKind: 'directorate' })),
+                                                                    ]
+                                                                )?.map(({ document, inputKind }, index: number) => (
+                                                                    <TraditionalDocumentTaskDisplay
+                                                                        key={index}
+                                                                        document={document}
+                                                                        inputKind={inputKind}
+                                                                    />
+                                                                ))
+
+
+                                                            ) : null
+                                                    }
+
+
+                                                </Grid>
+                                            )
+                                            :
+                                            (<Center>
+                                                <Flex>
+                                                    <Center
+                                                        pt={10}
+                                                    >
+                                                        <FcOk />
+                                                        &nbsp;
+                                                        <Text>All done!</Text>
+                                                    </Center>
+                                                </Flex>
+                                            </Center>)
+                                        // }
+
+
+                                        // )
+
+                                    }
+
+                                    <Box
+                                        display="flex"
+                                        justifyContent={"flex-end"}
+                                        alignItems="center"
+                                        minWidth="100%" py={4}
+                                    >
+                                        <Button
+                                            bg={colorMode === "dark" ? "green.500" : "green.400"}
+                                            _hover={
+                                                {
+                                                    bg: colorMode === "dark" ? "green.400" : "green.300",
+                                                }
+                                            }
+                                            variant="solid"
+                                            px={3} // Adjust the padding to your preference
+                                            mr={0}
+                                            display="flex"
+                                            alignItems="center"
+                                            onClick={handleAddTaskClick}
+                                            color="white"
+                                            size={"sm"}
+                                        >
+                                            Add Quick Task
+                                            {/* <AddIcon ml={2} color="white" /> */}
+                                        </Button>
+                                    </Box>
+                                </AccordionPanel>
+                            </AccordionItem>
+                        </motion.div>
+
+                    }
+
+                    {(me?.userData?.is_aec || me?.userData?.is_biometrician || me?.userData?.is_herbarium_curator || me?.userData?.is_superuser) === false ? null :
+
+                        pendingEndorsementsDataLoading ?
+                            (<Center my={4}>
+                                <Spinner />
+                            </Center>) :
+                            <motion.div
+                                initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
+                                animate={{ opacity: pendingEndorsementsDataLoading ? 0 : 1 }}
+                                transition={{ duration: 0.4 }} // Animation duration in seconds
+                            >
+                                <AccordionItem
+                                    borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
+                                    borderBottom={"none"}
+                                // borderTop={"none"}
+                                >
+                                    <AccordionButton
+                                        bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                                        color={colorMode === "light" ? "black" : "white"}
+                                        _hover={colorMode === "light" ? { bg: 'gray.300', color: "black" } : { bg: 'gray.500', color: 'white' }}
+                                        userSelect={"none"}
+                                    >
+                                        <Box as="span" flex='1' textAlign='left'>
+                                            Endorsement Tasks
+                                        </Box>
+                                        {
+                                            ((
+                                                pendingEndorsementsData?.aec?.length +
+                                                pendingEndorsementsData?.bm?.length +
+                                                pendingEndorsementsData?.hc?.length
+                                            ) > 1) ?
+                                                <Box
+                                                    display={"inline-flex"}
+                                                    justifyContent={"center"}
+                                                    alignItems={"center"}
+                                                >
+                                                    <Box mr={2}>
+                                                        {(
+                                                            pendingEndorsementsData?.aec?.length +
+                                                            pendingEndorsementsData?.bm?.length +
+                                                            pendingEndorsementsData?.hc?.length
+                                                        )}
+                                                    </Box>
+                                                    <FcHighPriority />
+                                                </Box>
+                                                :
+                                                <FcOk />
+                                        }
+                                        <AccordionIcon />
+                                    </AccordionButton>
+
+
+                                    <AccordionPanel pb={4}
+                                        userSelect={"none"}
+                                        px={0}
+                                        pt={0}
+                                    >
+
+                                        {((
+                                            pendingEndorsementsData?.aec?.length +
+                                            pendingEndorsementsData?.bm?.length +
+                                            pendingEndorsementsData?.hc?.length
+                                        )) >= 1 ? (
                                             <Grid
                                                 gridTemplateColumns={"repeat(1, 1fr)"}
                                             >
-                                                {combinedData.map((task: ITaskDisplayCard, index: number) => {
-                                                    return (
-                                                        <TraditionalPersonalTaskDisplay
-                                                            key={index}
-                                                            task={task}
-                                                        />
-                                                    )
-                                                })}
-
                                                 {
-                                                    !(pendingProjectDocumentDataLoading && (
-                                                        pendingProjectDocumentData?.team?.length +
-                                                        pendingProjectDocumentData?.ba?.length +
-                                                        pendingProjectDocumentData?.directorate?.length
-                                                    ) >= 1) ?
+                                                    (
+                                                        !pendingEndorsementsDataLoading &&
+                                                        pendingEndorsementsData?.aec?.length >= 1
+                                                    ) ?
                                                         (
-                                                            (
-                                                                [
-                                                                    ...pendingProjectDocumentData.team.map((document) => ({ document, inputKind: 'team_member' })),
-                                                                    ...pendingProjectDocumentData.ba.map((document) => ({ document, inputKind: 'business_area_lead' })),
-                                                                    ...pendingProjectDocumentData.directorate.map((document) => ({ document, inputKind: 'directorate' })),
-                                                                ]
-                                                            )?.map(({ document, inputKind }, index: number) => (
-                                                                <TraditionalDocumentTaskDisplay
+                                                            pendingEndorsementsData?.aec?.map((document: IMainDoc, index: number) => (
+                                                                <TraditionalEndorsementTaskDisplay
                                                                     key={index}
                                                                     document={document}
-                                                                    inputKind={inputKind}
+                                                                    endorsementKind={"animalEthics"}
                                                                 />
                                                             ))
-
-
+                                                        ) : null
+                                                }
+                                                {
+                                                    (
+                                                        !pendingEndorsementsDataLoading &&
+                                                        pendingEndorsementsData?.hc?.length >= 1
+                                                    ) ?
+                                                        (
+                                                            pendingEndorsementsData?.hc?.map((document: IMainDoc, index: number) => (
+                                                                <TraditionalEndorsementTaskDisplay
+                                                                    key={index}
+                                                                    document={document}
+                                                                    endorsementKind={"herbarium"}
+                                                                />
+                                                            ))
+                                                        ) : null
+                                                }
+                                                {
+                                                    (
+                                                        !pendingEndorsementsDataLoading &&
+                                                        pendingEndorsementsData?.bm?.length >= 1
+                                                    ) ?
+                                                        (
+                                                            pendingEndorsementsData?.bm?.map((document: IMainDoc, index: number) => (
+                                                                <TraditionalEndorsementTaskDisplay
+                                                                    key={index}
+                                                                    document={document}
+                                                                    endorsementKind={"biometrician"}
+                                                                />
+                                                            ))
                                                         ) : null
                                                 }
 
-
                                             </Grid>
                                         )
-                                        :
-                                        (<Center>
-                                            <Flex>
-                                                <Center
-                                                    pt={10}
-                                                >
-                                                    <FcOk />
-                                                    &nbsp;
-                                                    <Text>All done!</Text>
-                                                </Center>
-                                            </Flex>
-                                        </Center>)
-                                    // }
-
-
-                                    // )
-
-                                }
-
-                                <Box
-                                    display="flex"
-                                    justifyContent={"flex-end"}
-                                    alignItems="center"
-                                    minWidth="100%" py={4}
-                                >
-                                    <Button
-                                        bg={colorMode === "dark" ? "green.500" : "green.400"}
-                                        _hover={
-                                            {
-                                                bg: colorMode === "dark" ? "green.400" : "green.300",
-                                            }
-                                        }
-                                        variant="solid"
-                                        px={3} // Adjust the padding to your preference
-                                        mr={0}
-                                        display="flex"
-                                        alignItems="center"
-                                        onClick={handleAddTaskClick}
-                                        color="white"
-                                        size={"sm"}
-                                    >
-                                        Add Quick Task
-                                        {/* <AddIcon ml={2} color="white" /> */}
-                                    </Button>
-                                </Box>
-                            </AccordionPanel>
-                        </AccordionItem>
-                    }
-
-
-                    {pendingEndorsementsDataLoading ?
-                        (null) :
-                        <AccordionItem
-                            borderColor={colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"}
-                            borderBottom={"none"}
-                        // borderTop={"none"}
-                        >
-                            <AccordionButton
-                                bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                                color={colorMode === "light" ? "black" : "white"}
-                                _hover={colorMode === "light" ? { bg: 'gray.300', color: "black" } : { bg: 'gray.500', color: 'white' }}
-                                userSelect={"none"}
-                            >
-                                <Box as="span" flex='1' textAlign='left'>
-                                    Endorsement Tasks
-                                </Box>
-                                {
-                                    ((
-                                        pendingEndorsementsData?.aec?.length +
-                                        pendingEndorsementsData?.bm?.length +
-                                        pendingEndorsementsData?.hc?.length
-                                    ) > 1) ?
-                                        <Box
-                                            display={"inline-flex"}
-                                            justifyContent={"center"}
-                                            alignItems={"center"}
-                                        >
-                                            <Box mr={2}>
-                                                {(
-                                                    pendingEndorsementsData?.aec?.length +
-                                                    pendingEndorsementsData?.bm?.length +
-                                                    pendingEndorsementsData?.hc?.length
-                                                )}
-                                            </Box>
-                                            <FcHighPriority />
-                                        </Box>
-                                        :
-                                        <FcOk />
-                                }
-                                <AccordionIcon />
-                            </AccordionButton>
-
-
-                            <AccordionPanel pb={4}
-                                userSelect={"none"}
-                                px={0}
-                                pt={0}
-                            >
-
-                                {((
-                                    pendingEndorsementsData?.aec?.length +
-                                    pendingEndorsementsData?.bm?.length +
-                                    pendingEndorsementsData?.hc?.length
-                                )) >= 1 ? (
-                                    <Grid
-                                        gridTemplateColumns={"repeat(1, 1fr)"}
-                                    >
-                                        {
-                                            (
-                                                !pendingEndorsementsDataLoading &&
-                                                pendingEndorsementsData?.aec?.length >= 1
-                                            ) ?
-                                                (
-                                                    pendingEndorsementsData?.aec?.map((document: IMainDoc, index: number) => (
-                                                        <TraditionalEndorsementTaskDisplay
-                                                            key={index}
-                                                            document={document}
-                                                            endorsementKind={"animalEthics"}
-                                                        />
-                                                    ))
-                                                ) : null
-                                        }
-                                        {
-                                            (
-                                                !pendingEndorsementsDataLoading &&
-                                                pendingEndorsementsData?.hc?.length >= 1
-                                            ) ?
-                                                (
-                                                    pendingEndorsementsData?.hc?.map((document: IMainDoc, index: number) => (
-                                                        <TraditionalEndorsementTaskDisplay
-                                                            key={index}
-                                                            document={document}
-                                                            endorsementKind={"herbarium"}
-                                                        />
-                                                    ))
-                                                ) : null
-                                        }
-                                        {
-                                            (
-                                                !pendingEndorsementsDataLoading &&
-                                                pendingEndorsementsData?.bm?.length >= 1
-                                            ) ?
-                                                (
-                                                    pendingEndorsementsData?.bm?.map((document: IMainDoc, index: number) => (
-                                                        <TraditionalEndorsementTaskDisplay
-                                                            key={index}
-                                                            document={document}
-                                                            endorsementKind={"biometrician"}
-                                                        />
-                                                    ))
-                                                ) : null
-                                        }
-
-                                    </Grid>
-                                )
-                                    : <Center>
-                                        <Flex>
-                                            <Center
-                                                pt={10}
-                                            >
-                                                <FcOk />
-                                                &nbsp;
-                                                <Text>No Endorsements Required From You!</Text>
+                                            : <Center>
+                                                <Flex>
+                                                    <Center
+                                                        pt={10}
+                                                    >
+                                                        <FcOk />
+                                                        &nbsp;
+                                                        <Text>No Endorsements Required From You!</Text>
+                                                    </Center>
+                                                </Flex>
                                             </Center>
-                                        </Flex>
-                                    </Center>
-                                }
-                            </AccordionPanel>
-                        </AccordionItem>
+                                        }
+                                    </AccordionPanel>
+                                </AccordionItem>
+
+                            </motion.div>
+
+
                     }
+
                     {
                         projectsLoading ?
                             (null) :

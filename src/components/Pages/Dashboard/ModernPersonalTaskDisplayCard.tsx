@@ -1,6 +1,6 @@
 // Component for rendering the actual task to the dashboard; this is the design and how the data is mapped for a single task
 
-import { Box, Button, Flex, Image, Tag, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Image, Tag, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
 import { ITaskDisplayCard } from "../../../types";
 import { useEffect, useRef, useState } from "react";
 
@@ -11,6 +11,9 @@ import { MutationError, MutationSuccess, completeTask, deletePersonalTask } from
 import { motion } from "framer-motion";
 import { CloseIcon } from "@chakra-ui/icons";
 import { unset } from "lodash";
+import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
+import { HiDocumentCheck } from "react-icons/hi2";
+import { FaUser } from "react-icons/fa";
 
 export const ModernPersonalTaskDisplayCard = (
     {
@@ -44,17 +47,13 @@ export const ModernPersonalTaskDisplayCard = (
 
     useEffect(() => {
         if (isHovered) {
-            console.log("Hoverstate: ", isHovered)
+            // console.log("Hoverstate: ", isHovered)
             setIsHoverAnimating(true)
-
         } else {
-            console.log("Hoverstate: ", isHovered)
+            // console.log("Hoverstate: ", isHovered)
             setIsHoverAnimating(false)
-
         }
-    }
-        , [isHovered]
-    )
+    }, [isHovered])
 
     function getDaySuffix(day: number) {
         if (day >= 11 && day <= 13) {
@@ -227,7 +226,7 @@ export const ModernPersonalTaskDisplayCard = (
                 opacity: isAnimating ? 0 : 1
 
             }} // Scale to 0 when isAnimating is true
-            transition={{ duration: 0.3 }} // Animation duration in seconds
+            transition={{ duration: 0.2 }} // Animation duration in seconds
         >
             <Flex
                 userSelect={"none"}
@@ -299,19 +298,23 @@ export const ModernPersonalTaskDisplayCard = (
                     pt={task_type === "assigned" ? 6 : 0}
                     p={4}
                 >
-                    <Text
+                    {/* <Text
                         fontSize="sm" fontWeight="bold"
                         color={colorMode === "light" ? "gray.600" : "gray.300"}
                     >
                         {name}
-                    </Text>
-
+                    </Text> */}
+                    <ExtractedHTMLTitle
+                        htmlContent={`<p>${name}</p>`}
+                        color={"blue.500"}
+                        fontWeight={'semibold'}
+                    />
                     <Box>
                         <Text
-                            fontSize="xs"
-                            fontWeight="normal"
+                            color={"gray.500"}
+                            fontWeight={"semibold"}
+                            fontSize={"small"}
                             mt={2}
-                            color={colorMode === "light" ? "gray.700" : "gray.300"}
                         >
                             {description}
                         </Text>
@@ -329,29 +332,84 @@ export const ModernPersonalTaskDisplayCard = (
                     // px={10}
                     px={4}
                 >
-                    <Tag
+                    {/* <Tag
                         size={"md"}
                         py={2}
                     >
                         {status.toUpperCase()}
-                    </Tag>
+                    </Tag> */}
                     {isHovered && task_type === "personal" &&
 
-                        (<Button
-                            size={"sm"}
-                            // fontSize={"xs"}
-                            bg={"green.500"}
-                            color={"white"}
-                            _hover={
-                                { bg: "green.400" }
-                            }
-                            onClick={() => handleCompletion(pk)}
-                        >
-                            Complete
-                        </Button>
+                        (
+                            <Flex justifyContent={'flex-end'} width={"100%"}>
+                                <Button
+                                    size={"sm"}
+                                    // fontSize={"xs"}
+                                    bg={"green.500"}
+                                    color={"white"}
+                                    _hover={
+                                        { bg: "green.400" }
+                                    }
+                                    onClick={() => handleCompletion(pk)}
+                                >
+                                    Complete
+                                </Button>
+                            </Flex>
+
                         )
                     }
-                    {task_type === "assigned" &&
+                    {!isHovered && task_type === "personal" &&
+
+                        (
+                            <Flex justifyContent={'flex-end'} width={"100%"}>
+                                <Box
+                                    pos={"absolute"}
+                                    bottom={0}
+                                    right={1.5}
+                                    px={1}
+                                // bg={"red"}
+                                // justifyContent={"center"}
+                                >
+                                    <Flex>
+                                        <Center
+                                            textAlign={"center"}
+                                            color={
+                                                colorMode === "light" ? "blue.600" : "blue.200"
+                                            }
+                                            mr={2}
+                                            mt={0.5}
+                                            boxSize={5}
+                                            w={"20px"}
+
+                                        // w={"100%"}
+                                        // bg={"orange"}
+
+                                        >
+                                            <FaUser />
+                                        </Center>
+                                        <Box
+                                            // mx={0}
+                                            w={"100%"}
+                                        >
+                                            <Text
+                                                as={'span'}
+                                                color={`blue.600`}
+                                                fontWeight={"semibold"}
+                                                fontSize={"small"}
+                                                mr={1}
+                                            >
+                                                Quick Task
+                                            </Text>
+
+                                        </Box>
+
+                                    </Flex>
+                                </Box>
+
+                            </Flex>
+
+                        )
+                    }                    {task_type === "assigned" &&
                         (
                             <Tag bg="red.600" color="white">
                                 {`ASSIGNED`}

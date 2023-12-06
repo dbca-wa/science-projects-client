@@ -1,9 +1,10 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import { useProjectSearchContext } from "@/lib/hooks/ProjectSearchContext";
 import { IMainDoc } from "@/types"
-import { Box, Text, Flex, useColorMode } from "@chakra-ui/react";
+import { Box, Text, Flex, useColorMode, Center } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { HiDocumentCheck } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 
 interface IProps {
@@ -104,7 +105,7 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
         <motion.div
             initial={{ scale: 1, opacity: 1 }} // Initial scale (no animation)
             animate={{ scale: isAnimating ? 1.05 : 1, opacity: isAnimating ? 1 : 1 }} // Scale to 0 when isAnimating is true
-            transition={{ duration: 0.3 }} // Animation duration in seconds
+            transition={{ duration: 0.2 }} // Animation duration in seconds
         >
             <Flex
                 p={4}
@@ -121,7 +122,7 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
                 }
                 display="flex"
                 flexDirection="column"
-                justifyContent="space-between"
+                // justifyContent="space-between"
                 alignItems="stretch"
                 pos={"relative"}
                 onMouseEnter={() => setIsHovered(true)}
@@ -129,12 +130,26 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
                 cursor={"pointer"}
                 onClick={handleProjectTaskCardClick}
             >
-                <ExtractedHTMLTitle
-                    htmlContent={document?.project?.title}
-                />
-                | {kind}
-                <Flex>
+                <Box
+                    w={"100%"}
+                >
+
+
+                    <ExtractedHTMLTitle
+                        htmlContent={document?.project?.title}
+                        color={"blue.500"}
+                        fontWeight={'semibold'}
+                    />
+                </Box>
+
+
+                <Box
+                // pos={"absolute"}
+                // bottom={2}
+                // px={1}
+                >
                     <Text
+                        as={'span'}
                         color={`${kind === "directorate" ? "red" : kind === "ba_lead" ? "orange" : "green"}.600`}
                         fontWeight={"semibold"}
                         fontSize={"small"}
@@ -143,21 +158,62 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
                         {`${formattedInputKind(kind)}:`}
                     </Text>
                     <Text
+                        as={'span'}
                         color={"gray.500"}
                         fontWeight={"semibold"}
                         fontSize={"small"}
                     >
                         {
                             kind === "team"
-                                ?
-                                "Input required"
-                                :
-                                `Determine if the ${formattedDocumentKind(document?.kind)} for this project is satisfactory`
+                                ? "Input required"
+                                : `Determine if the ${formattedDocumentKind(document?.kind)} for this project is satisfactory`
                         }
-
-                        {/* {inputKind === "team_member" ? "Input" : "Action"} required as {formattedInputKind(inputKind)} */}
                     </Text>
-                </Flex>
+                </Box>
+
+                <Box
+                    pos={"absolute"}
+                    bottom={2}
+                    right={1.5}
+                    px={1}
+                // bg={"red"}
+                // justifyContent={"center"}
+                >
+                    <Flex>
+                        <Center
+                            textAlign={"center"}
+                            color={
+                                colorMode === "light" ? "red.600" : "red.200"
+                            }
+                            mr={2}
+                            mt={0.5}
+                            boxSize={5}
+                            w={"20px"}
+
+                        // w={"100%"}
+                        // bg={"orange"}
+
+                        >
+                            <HiDocumentCheck />
+                        </Center>
+                        <Box
+                            // mx={0}
+                            w={"100%"}
+                        >
+                            <Text
+                                as={'span'}
+                                color={`red.600`}
+                                fontWeight={"semibold"}
+                                fontSize={"small"}
+                                mr={1}
+                            >
+                                {formattedDocumentKind(document?.kind)}
+                            </Text>
+
+                        </Box>
+
+                    </Flex>
+                </Box>
 
             </Flex>
         </motion.div>

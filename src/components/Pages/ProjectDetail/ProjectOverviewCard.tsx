@@ -34,6 +34,7 @@ import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal"
 import { IoMdSettings } from "react-icons/io";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 import { BsCaretDownFill } from "react-icons/bs";
+import { IoCreate } from "react-icons/io5";
 
 interface IProjectOverviewCardProps {
     location: IProjectAreas;
@@ -678,13 +679,18 @@ export const ProjectOverviewCard = (
                                         )}
 
                                         {baseInformation?.kind !== 'student' && baseInformation?.kind !== 'external' && (
-                                            <MenuItem onClick={onOpenCreateProgressReportModal}>
+                                            <MenuItem onClick={onOpenCreateProgressReportModal}
+                                                isDisabled={
+                                                    !documents?.concept_plan?.document?.directorate_approval_granted ||
+                                                    !documents?.project_plan?.document?.directorate_approval_granted
+                                                }
+                                            >
                                                 <Flex
                                                     alignItems={"center"}
                                                 // color={"red"}
                                                 >
                                                     <Box mr={2}>
-                                                        <FaLockOpen />
+                                                        <IoCreate />
 
                                                     </Box>
                                                     <Box>

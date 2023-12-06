@@ -1,6 +1,6 @@
 // Component for displaying the tasks the user has on the dashboard (modern)
 
-import { AbsoluteCenter, Box, Center, Divider, Flex, Grid, Heading, Spinner, Text } from "@chakra-ui/react"
+import { AbsoluteCenter, Box, Center, Divider, Flex, Grid, Heading, Spinner, Text, useColorMode } from "@chakra-ui/react"
 // import { TaskDisplayCard } from "./TaskDisplayCard"
 import { useEffect, useLayoutEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -29,6 +29,7 @@ interface ITaskSection {
         all: IMainDoc[];
         ba: IMainDoc[];
         directorate: IMainDoc[];
+        lead: IMainDoc[];
         team: IMainDoc[];
     };
     documentTaskDataLoading: boolean;
@@ -43,6 +44,7 @@ export const MyTasksSection = ({
     documentTaskData,
     documentTaskDataLoading,
 }: ITaskSection) => {
+    const { colorMode } = useColorMode();
     const [inprogress, setInprogress] = useState<ITaskDisplayCard[]>([]);
     const [todo, setTodo] = useState<ITaskDisplayCard[]>([]);
 
@@ -122,6 +124,49 @@ export const MyTasksSection = ({
     useEffect(() => {
         console.log(total)
     }, [total])
+
+    const renderEndorsementTaskCards = (documents, kind) => {
+        if (!documents) return null;
+
+        return documents.map((doc, index) => (
+            <motion.div
+                key={`endorsementtask${kind}${index}`}
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 10, opacity: 0 }}
+                transition={{ duration: 0.4, delay: (index / 8) }}
+                style={{
+                    position: "relative",
+                    height: "100%",
+                    animation: "oscillate 8s ease-in-out infinite",
+                }}
+            >
+                <ModernEndorsementTaskDisplayCard document={doc} kind={kind} />
+            </motion.div>
+        ));
+    };
+
+    const renderDocumentTaskCards = (documents, kind) => {
+        if (!documents) return null;
+
+        return documents.map((doc, index) => (
+            <motion.div
+                key={`documenttask${kind}${index}`}
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 10, opacity: 0 }}
+                transition={{ duration: 0.4, delay: (index / 8) }}
+                style={{
+                    position: "relative",
+                    height: "100%",
+                    animation: "oscillate 8s ease-in-out infinite",
+                }}
+            >
+                <ModernDocumentTaskDisplayCard document={doc} kind={kind} />
+            </motion.div>
+        ));
+    };
+
     return (
 
         total < 1 ?
@@ -148,7 +193,7 @@ export const MyTasksSection = ({
                                 <>
                                     <Box position='relative' padding='10'>
                                         <Divider />
-                                        <AbsoluteCenter bg='white' px='4'>
+                                        <AbsoluteCenter bg={colorMode === "light" ? "white" : "gray.800"} px='4'>
                                             <Heading
                                                 size={"md"}
                                             >
@@ -156,90 +201,52 @@ export const MyTasksSection = ({
                                             </Heading>
                                         </AbsoluteCenter>
                                     </Box>
+
                                     <Grid
                                         gridTemplateColumns={{
                                             base: "repeat(1, 1fr)",
                                             md: "repeat(1, 1fr)",
-                                            "mdlg": "repeat(2, 1fr)",
+                                            mdlg: "repeat(2, 1fr)",
                                             "1080px": "repeat(3, 1fr)",
-                                            'xl': "repeat(4, 1fr)",
+                                            xl: "repeat(4, 1fr)",
                                         }}
                                         gridGap={4}
                                         gridRowGap={8}
+                                        mb={6}
                                     >
-                                        {
-                                            personalTaskData?.inprogress?.map((task, index) => {
-                                                return (
-                                                    <motion.div
-                                                        key={index}
-                                                        initial={{ y: -10, opacity: 0 }}
-                                                        animate={{ y: 0, opacity: 1 }}
-                                                        exit={{ y: 10, opacity: 0 }}
-                                                        transition={{ duration: 0.4, delay: (((index) / 8)) }}
-                                                        layout
-                                                        layoutId={task.pk.toString()}
-                                                        style={{
-                                                            position: "relative",
-                                                            height: "100%",
-                                                            animation: "oscillate 8s ease-in-out infinite",
-                                                        }}
-                                                    >
-                                                        <ModernPersonalTaskDisplayCard
-                                                            pk={task.pk}
-                                                            name={task.name}
-                                                            description={task.description}
-                                                            notes={task.notes}
-                                                            task_type={task.task_type}
-                                                            status={task.status}
-                                                            document={task.document}
-                                                            user={task.user}
-                                                            project={task.project}
-                                                            date_assigned={task.date_assigned}
-                                                            creator={task.creator}
-                                                        />
-
-                                                    </motion.div>
-                                                )
-                                            })
-                                        }
-                                        {
-                                            personalTaskData?.todo?.map((task, index) => {
-                                                return (
-                                                    <motion.div
-                                                        key={index}
-                                                        initial={{ y: -10, opacity: 0 }}
-                                                        animate={{ y: 0, opacity: 1 }}
-                                                        exit={{ y: 10, opacity: 0 }}
-                                                        transition={{ duration: 0.4, delay: (((index) / 8)) }}
-                                                        layout
-                                                        layoutId={task.pk.toString()}
-                                                        style={{
-                                                            position: "relative",
-                                                            height: "100%",
-                                                            animation: "oscillate 8s ease-in-out infinite",
-                                                        }}
-                                                    >
-                                                        <ModernPersonalTaskDisplayCard
-                                                            pk={task.pk}
-                                                            name={task.name}
-                                                            description={task.description}
-                                                            notes={task.notes}
-                                                            task_type={task.task_type}
-                                                            status={task.status}
-                                                            document={task.document}
-                                                            user={task.user}
-                                                            project={task.project}
-                                                            date_assigned={task.date_assigned}
-                                                            creator={task.creator}
-                                                        />
-
-                                                    </motion.div>
-                                                )
-                                            })
-                                        }
-
+                                        {(personalTaskData?.inprogress || []).concat(personalTaskData?.todo || []).map((task, index) => (
+                                            <motion.div
+                                                key={`quicktask${task.pk}_${task.status}_${index}`}
+                                                initial={{ y: -10, opacity: 0 }}
+                                                animate={{ y: 0, opacity: 1 }}
+                                                exit={{ y: 10, opacity: 0 }}
+                                                transition={{ duration: 0.4, delay: (((index) / 8)) }}
+                                                layout
+                                                layoutId={task.pk.toString()}
+                                                style={{
+                                                    position: "relative",
+                                                    minHeight: "200px",
+                                                    height: "100%",
+                                                    maxHeight: "250px",
+                                                    animation: "oscillate 8s ease-in-out infinite",
+                                                }}
+                                            >
+                                                <ModernPersonalTaskDisplayCard
+                                                    pk={task.pk}
+                                                    name={task.name}
+                                                    description={task.description}
+                                                    notes={task.notes}
+                                                    task_type={task.task_type}
+                                                    status={task.status}
+                                                    document={task.document}
+                                                    user={task.user}
+                                                    project={task.project}
+                                                    date_assigned={task.date_assigned}
+                                                    creator={task.creator}
+                                                />
+                                            </motion.div>
+                                        ))}
                                     </Grid>
-
                                 </>
 
                             ) :
@@ -253,20 +260,18 @@ export const MyTasksSection = ({
                         documentTaskData?.team &&
                             documentTaskData?.directorate &&
                             documentTaskData?.ba &&
+                            documentTaskData?.lead &&
                             ([
                                 ...documentTaskData.team,
+                                ...documentTaskData.lead,
                                 ...documentTaskData.directorate,
                                 ...documentTaskData.ba
                             ].length) >= 1 ? (
                             <>
                                 <Box position='relative' padding='10'>
                                     <Divider />
-                                    <AbsoluteCenter bg='white' px='4'>
-                                        <Heading
-                                            size={"md"}
-                                        >
-                                            Document Tasks
-                                        </Heading>
+                                    <AbsoluteCenter bg={colorMode === "light" ? "white" : "gray.800"} px='4'>
+                                        <Heading size={"md"}>Document Tasks</Heading>
                                     </AbsoluteCenter>
                                 </Box>
                                 <Grid
@@ -279,92 +284,17 @@ export const MyTasksSection = ({
                                     }}
                                     gridGap={4}
                                     gridRowGap={8}
+                                    mb={6}
                                 >
-                                    {
-                                        documentTaskData?.team?.map((teamDoc, index) => {
-                                            return (
-                                                <motion.div
-                                                    key={index}
-                                                    initial={{ y: -10, opacity: 0 }}
-                                                    animate={{ y: 0, opacity: 1 }}
-                                                    exit={{ y: 10, opacity: 0 }}
-                                                    transition={{ duration: 0.4, delay: (((index) / 8)) }}
-                                                    layout
-                                                    layoutId={teamDoc.pk.toString()}
-                                                    style={{
-                                                        position: "relative",
-                                                        height: "100%",
-                                                        animation: "oscillate 8s ease-in-out infinite",
-                                                    }}
-                                                >
-                                                    <ModernDocumentTaskDisplayCard
-                                                        document={teamDoc}
-                                                        kind={"project_lead"}
-                                                    />
-                                                </motion.div>
-                                            )
-                                        })
-                                    }
-                                    {
-                                        documentTaskData?.ba?.map((baDoc, index) => {
-                                            return (
-                                                <motion.div
-                                                    key={index}
-                                                    initial={{ y: -10, opacity: 0 }}
-                                                    animate={{ y: 0, opacity: 1 }}
-                                                    exit={{ y: 10, opacity: 0 }}
-                                                    transition={{ duration: 0.4, delay: (((index) / 8)) }}
-                                                    layout
-                                                    layoutId={baDoc.pk.toString()}
-                                                    style={{
-                                                        position: "relative",
-                                                        height: "100%",
-                                                        animation: "oscillate 8s ease-in-out infinite",
-                                                    }}
-                                                >
-                                                    <ModernDocumentTaskDisplayCard
-                                                        document={baDoc}
-                                                        kind={"ba_lead"}
-                                                    />
-                                                </motion.div>
-
-                                            )
-                                        })
-                                    }
-
-                                    {
-                                        documentTaskData?.directorate?.map((directorateDoc, index) => {
-                                            return (
-                                                <motion.div
-                                                    key={index}
-                                                    initial={{ y: -10, opacity: 0 }}
-                                                    animate={{ y: 0, opacity: 1 }}
-                                                    exit={{ y: 10, opacity: 0 }}
-                                                    transition={{ duration: 0.4, delay: (((index) / 8)) }}
-                                                    layout
-                                                    layoutId={directorateDoc.pk.toString()}
-                                                    style={{
-                                                        position: "relative",
-                                                        height: "100%",
-                                                        animation: "oscillate 8s ease-in-out infinite",
-                                                    }}
-                                                >
-                                                    <ModernDocumentTaskDisplayCard
-                                                        document={directorateDoc}
-                                                        kind={"directorate"}
-                                                    />
-                                                </motion.div>
-
-                                            )
-                                        })
-                                    }
-
+                                    {renderDocumentTaskCards(documentTaskData?.team, "team")}
+                                    {renderDocumentTaskCards(documentTaskData?.lead, "project_lead")}
+                                    {renderDocumentTaskCards(documentTaskData?.ba, "ba_lead")}
+                                    {renderDocumentTaskCards(documentTaskData?.directorate, "directorate")}
                                 </Grid>
-
                             </>
                         ) : null
-
                     }
+
                     {
                         endorsementTaskData?.aec &&
                             endorsementTaskData?.bm &&
@@ -379,7 +309,7 @@ export const MyTasksSection = ({
 
                                     <Box position='relative' padding='10'>
                                         <Divider />
-                                        <AbsoluteCenter bg='white' px='4'>
+                                        <AbsoluteCenter bg={colorMode === "light" ? "white" : "gray.800"} px='4'>
                                             <Heading
                                                 size={"md"}
                                             >
@@ -397,13 +327,30 @@ export const MyTasksSection = ({
                                         }}
                                         gridGap={4}
                                         gridRowGap={8}
+                                        mb={6}
+
+                                    >
+                                        {renderEndorsementTaskCards(endorsementTaskData?.aec, "aec")}
+                                        {renderEndorsementTaskCards(endorsementTaskData?.bm, "bm")}
+                                        {renderEndorsementTaskCards(endorsementTaskData?.hc, "hc")}
+                                    </Grid>
+                                    {/* <Grid
+                                        gridTemplateColumns={{
+                                            base: "repeat(1, 1fr)",
+                                            md: "repeat(1, 1fr)",
+                                            "mdlg": "repeat(2, 1fr)",
+                                            "1080px": "repeat(3, 1fr)",
+                                            'xl': "repeat(4, 1fr)",
+                                        }}
+                                        gridGap={4}
+                                        gridRowGap={8}
                                     >
 
                                         {
                                             endorsementTaskData?.aec?.map((aecDoc, index) => {
                                                 return (
                                                     <motion.div
-                                                        key={index}
+                                                        key={`endorsementaec${index}`}
                                                         initial={{ y: -10, opacity: 0 }}
                                                         animate={{ y: 0, opacity: 1 }}
                                                         exit={{ y: 10, opacity: 0 }}
@@ -430,7 +377,7 @@ export const MyTasksSection = ({
                                             endorsementTaskData?.bm?.map((bmDoc, index) => {
                                                 return (
                                                     <motion.div
-                                                        key={index}
+                                                        key={`endorsementbm${index}`}
                                                         initial={{ y: -10, opacity: 0 }}
                                                         animate={{ y: 0, opacity: 1 }}
                                                         exit={{ y: 10, opacity: 0 }}
@@ -457,7 +404,7 @@ export const MyTasksSection = ({
                                             endorsementTaskData?.hc?.map((hcDoc, index) => {
                                                 return (
                                                     <motion.div
-                                                        key={index}
+                                                        key={`endorsementhc${index}`}
                                                         initial={{ y: -10, opacity: 0 }}
                                                         animate={{ y: 0, opacity: 1 }}
                                                         exit={{ y: 10, opacity: 0 }}
@@ -480,7 +427,7 @@ export const MyTasksSection = ({
                                             })
                                         }
 
-                                    </Grid>
+                                    </Grid> */}
                                 </>
                             ) : null
 

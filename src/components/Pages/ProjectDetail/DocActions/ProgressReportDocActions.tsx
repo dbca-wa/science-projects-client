@@ -794,7 +794,9 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                                         <Flex
                                             justifyContent={"flex-end"}
                                             w={"100%"}
-                                            mt={progressReportData?.document?.project_lead_approval_granted && progressReportData?.document?.directorate_approval_granted === false ? 3 : 0}
+                                            mt={
+                                                // progressReportData?.document?.project_lead_approval_granted === true && 
+                                                progressReportData?.document?.directorate_approval_granted === false ? 3 : 0}
                                         // gridTemplateColumns={"repeat(2, 1fr)"}
                                         >
                                             {progressReportData?.document?.project_lead_approval_granted
