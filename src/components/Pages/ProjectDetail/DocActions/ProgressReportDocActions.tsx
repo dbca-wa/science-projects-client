@@ -20,7 +20,7 @@ interface IProgressDocumentActions {
     refetchData: () => void;
     callSameData: () => void;
     documents: IProgressReport[];
-    setToLastTab: () => void;
+    setToLastTab: (tabToGoTo?: number) => void;
     // setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
     // setSelectedProgressReport: React.Dispatch<React.SetStateAction<IProgressReport>>;
     // projectPk: number;
@@ -1176,8 +1176,31 @@ export const ProgressReportDocActions = ({ progressReportData, refetchData, docu
                     </>
 
                 ) :
-                <Spinner
-                />
+                baLoading === false && baData === undefined
+                    ? <Grid
+                        my={4}
+                        gridTemplateColumns={"repeat(1, 1fr)"}
+                        justifyContent={"center"}
+                    >
+                        <Text
+                            textAlign={"center"}
+                            fontWeight={'semibold'}
+                        >
+                            Document Actions cannot be displayed as this project has no business area.
+                        </Text>
+                        <Text
+                            textAlign={"center"}
+                            fontWeight={'semibold'}
+                        >
+                            Please set a business area for this project from the project settings.
+                        </Text>
+                    </Grid> :
+
+                    <Center>
+                        <Spinner
+                        />
+                    </Center>
+
             }
         </>
     )

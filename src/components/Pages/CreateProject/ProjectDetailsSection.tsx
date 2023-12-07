@@ -43,8 +43,8 @@ export const ProjectDetailsSection = ({
         // }
         if (
             selectedBusinessArea
-            && selectedDepartmentalService
-            && selectedResearchFunction
+            // && selectedDepartmentalService
+            // && selectedResearchFunction
             && selectedSupervisingScientist
             && selectedDataCustodian
             && selectedDates) {
@@ -182,27 +182,6 @@ export const ProjectDetailsSection = ({
                     </FormControl>
                 </Box>
                 <Box>
-                    <FormControl isRequired mb={4}>
-                        <FormLabel>Departmental Service</FormLabel>
-                        <InputGroup>
-                            <Select
-                                variant='filled' placeholder='Select a Deparmental Service'
-                                onChange={(event) => setSelectedDepartmentalService(parseInt(event.target.value))}
-                                value={selectedDepartmentalService}
-                            >
-                                {servicesList.map((service, index) => {
-                                    return (
-                                        <option key={index} value={service.pk}>
-                                            {service.name}
-                                        </option>
-                                    )
-                                })}
-                            </Select>
-                        </InputGroup>
-                        <FormHelperText>The DBCA service that this project delivers outputs to.</FormHelperText>
-                    </FormControl>
-
-
                     <FormControl isRequired>
                         <FormLabel>Business Area</FormLabel>
 
@@ -223,7 +202,34 @@ export const ProjectDetailsSection = ({
                         </InputGroup>
                         <FormHelperText>The Business Area / Program that this project belongs to.</FormHelperText>
                     </FormControl>
-                    <FormControl isRequired mb={4}>
+
+                    <FormControl
+                        // isRequired 
+                        mb={4}>
+                        <FormLabel>Departmental Service</FormLabel>
+                        <InputGroup>
+                            <Select
+                                variant='filled' placeholder='Select a Deparmental Service'
+                                onChange={(event) => setSelectedDepartmentalService(parseInt(event.target.value))}
+                                value={selectedDepartmentalService}
+                            >
+                                {servicesList.map((service, index) => {
+                                    return (
+                                        <option key={index} value={service.pk}>
+                                            {service.name}
+                                        </option>
+                                    )
+                                })}
+                            </Select>
+                        </InputGroup>
+                        <FormHelperText>The DBCA service that this project delivers outputs to.</FormHelperText>
+                    </FormControl>
+
+
+
+                    <FormControl
+                        // isRequired 
+                        mb={4}>
                         <FormLabel>Research Function</FormLabel>
                         <InputGroup>
                             <Select

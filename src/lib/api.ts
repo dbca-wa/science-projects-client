@@ -923,8 +923,12 @@ export const createProject = async ({ baseInformationData, detailsData, location
     }
 
     formData.append('businessArea', detailsData.businessArea.toString());
-    formData.append('researchFunction', detailsData.researchFunction.toString());
-    formData.append('departmentalService', detailsData.departmentalService.toString());
+    if (detailsData.researchFunction) {
+        formData.append('researchFunction', detailsData.researchFunction.toString());
+    }
+    if (detailsData.departmentalService) {
+        formData.append('departmentalService', detailsData.departmentalService.toString());
+    }
     formData.append('dataCustodian', detailsData.dataCustodian.toString());
     formData.append('supervisingScientist', detailsData.supervisingScientist.toString());
 
@@ -1707,6 +1711,24 @@ export const deleteProjectCall = async ({ pk }: ISimplePkProp) => {
             url,
         ).then(res => res.data);
     }
+}
+
+export interface ISetProjectAreas {
+    projectPk: number;
+    areas: number[];
+}
+
+export const setProjectAreas = async ({ areas, projectPk }: ISetProjectAreas) => {
+    console.log({ areas, projectPk })
+    const url = `projects/${projectPk}/areas`
+    const params = {
+        'areas': areas,
+    }
+    return instance.put(
+        url,
+        params,
+    ).then(res => res.data)
+
 }
 
 export interface IDeleteDocument {

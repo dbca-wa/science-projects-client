@@ -20,7 +20,7 @@ interface Props {
     userData: IUserMe;
     members: IProjectMember[];
     refetch: () => void;
-    setToLastTab: () => void;
+    setToLastTab: (tabToGoTo?: number) => void;
 
 }
 

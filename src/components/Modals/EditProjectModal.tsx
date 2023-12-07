@@ -172,8 +172,8 @@ export const EditProjectModal = ({
         if (
             (plainTitle === '' || plainTitle.length === 0) ||
             (dates === null || dates.length < 2) ||
-            (service === null || service === undefined) ||
-            (researchFunction === null || researchFunction === undefined) ||
+            // (service === null || service === undefined) ||
+            // (researchFunction === null || researchFunction === undefined) ||
             (businessArea === null || businessArea === undefined) ||
             (dataCustodian === null || dataCustodian === 0 || dataCustodian === undefined) ||
             (locationData.length < 1) ||
@@ -387,7 +387,9 @@ export const EditProjectModal = ({
                                         </FormControl>
 
 
-                                        <FormControl isRequired mb={4}>
+                                        <FormControl
+                                            // isRequired 
+                                            mb={4}>
                                             <FormLabel>Research Function</FormLabel>
                                             <InputGroup>
                                                 <Select
@@ -420,7 +422,9 @@ export const EditProjectModal = ({
                                             <FormHelperText>The Research Function this project mainly contributes to.</FormHelperText>
                                         </FormControl>
 
-                                        <FormControl isRequired mb={4}>
+                                        <FormControl
+                                            // isRequired 
+                                            mb={4}>
                                             <FormLabel>Departmental Service</FormLabel>
                                             <InputGroup>
                                                 <Select
@@ -454,59 +458,118 @@ export const EditProjectModal = ({
 
                                 {!locationsLoading && (
                                     <>
-                                        {dbcaRegions && dbcaRegions.length > 0 && (
-                                            <AreaCheckAndMaps
-                                                title="DBCA Regions"
-                                                areas={dbcaRegions}
-                                                required
-                                                selectedAreas={locationData}
-                                                setSelectedAreas={setLocationData}
-                                            />
 
-                                        )}
-                                        {dbcaDistricts && dbcaDistricts.length > 0 && (
-                                            <AreaCheckAndMaps
-                                                title="DBCA Districts"
-                                                areas={dbcaDistricts}
-                                                required
-                                                selectedAreas={locationData}
-                                                setSelectedAreas={setLocationData}
-                                            />
+                                        <Grid
+                                            gridTemplateColumns={"repeat(2, 1fr)"}
+                                            gridColumnGap={4}
+                                            px={4}
+                                        >
+                                            <Flex
+                                                flexDir={"column"}
+                                            >
+                                                {dbcaRegions && dbcaRegions.length > 0 && (
+                                                    <AreaCheckAndMaps
+                                                        title="DBCA Regions"
+                                                        areas={dbcaRegions}
+                                                        required={false}
+                                                        selectedAreas={locationData}
+                                                        setSelectedAreas={setLocationData}
+                                                    />
 
-                                        )}
-                                        {ibra && ibra.length > 0 && (
-                                            <AreaCheckAndMaps
-                                                title="IBRAs"
-                                                areas={ibra}
-                                                required
-                                                selectedAreas={locationData}
-                                                setSelectedAreas={setLocationData}
-                                            />
+                                                )}
+                                                {dbcaDistricts && dbcaDistricts.length > 0 && (
+                                                    <AreaCheckAndMaps
+                                                        title="DBCA Districts"
+                                                        areas={dbcaDistricts}
+                                                        required={false}
+                                                        selectedAreas={locationData}
+                                                        setSelectedAreas={setLocationData}
+                                                    />
 
-                                        )}
-                                        {imcra && imcra.length > 0 && (
-                                            <AreaCheckAndMaps
-                                                title="IMCRAs"
-                                                areas={imcra}
-                                                required
-                                                selectedAreas={locationData}
-                                                setSelectedAreas={setLocationData}
-                                            />
+                                                )}
+                                                {ibra && ibra.length > 0 && (
+                                                    <AreaCheckAndMaps
+                                                        title="IBRAs"
+                                                        areas={ibra}
+                                                        required={false}
+                                                        selectedAreas={locationData}
+                                                        setSelectedAreas={setLocationData}
+                                                    />
 
-                                        )}
-                                        {nrm && nrm.length > 0 && (
-                                            <AreaCheckAndMaps
-                                                title="Natural Resource Management Regions"
-                                                areas={nrm}
-                                                required
-                                                selectedAreas={locationData}
-                                                setSelectedAreas={setLocationData}
-                                            />
+                                                )}
+                                                {imcra && imcra.length > 0 && (
+                                                    <AreaCheckAndMaps
+                                                        title="IMCRAs"
+                                                        areas={imcra}
+                                                        required={false}
+                                                        selectedAreas={locationData}
+                                                        setSelectedAreas={setLocationData}
+                                                    />
 
-                                        )}
+                                                )}
+                                                {nrm && nrm.length > 0 && (
+                                                    <AreaCheckAndMaps
+                                                        title="Natural Resource Management Regions"
+                                                        areas={nrm}
+                                                        required={false}
+                                                        selectedAreas={locationData}
+                                                        setSelectedAreas={setLocationData}
+                                                    />
+
+                                                )}
+                                            </Flex>
+
+                                            <Box
+                                                position="sticky"
+                                                top={"120px"} // Adjust the top value if needed
+                                                overflow={'hidden'}
+                                                h={'700px'} // Set the height of the image container
+                                                // bg={"red"}
+                                                rounded={"2xl"}
+                                            >
+                                                <Text
+                                                    // color={"white"}
+                                                    // zIndex={999}
+                                                    fontWeight={'bold'}
+                                                    my={2}
+                                                    // ml={2}
+                                                    textAlign={'center'}
+                                                >
+                                                    Map in development
+                                                </Text>
+                                                {/* <Skeleton
+                            // position="sticky"
+                            // top={"125px"} // Adjust the top value if needed
+                            // overflow={'hidden'}
+                            // h={'500px'} // Set the height of the image container
+                            // bg={"red"}
+                            rounded={"2xl"}
+                        > */}
+                                                <Box
+                                                    position="sticky"
+                                                    // top={"105px"} // Adjust the top value if needed
+                                                    overflow={'hidden'}
+                                                    // h={'500px'} // Set the height of the image container
+                                                    bg={"gray.200"}
+                                                    w={"100%"}
+                                                    h={"500px"}
+                                                    // h={"100%"}
+                                                    rounded={"2xl"}
+                                                >
+                                                    {/* <Image
+                                src="/soon.jpg"
+                                objectFit={'cover'}
+                                w={"100%"}
+                                h={"100%"}
+                            /> */}
+                                                </Box>
+                                                {/* </Skeleton> */}
+                                            </Box>
+                                        </Grid>
 
                                     </>
                                 )}
+
                             </Grid>
 
 

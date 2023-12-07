@@ -108,37 +108,78 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                         flexDir={"column"}
                     >
                         <Text
-                            fontSize={"16px"}
                             mt={5}
+                            fontSize={"16px"}
                             fontWeight={"normal"}
                         >
                             Currently under development,
                             this version serves to identify and address bugs and areas for improvement.
                             Please feel free to explore and test the site.
+
+                        </Text>
+                        <Text
+
+                            fontSize={"16px"}
+                            fontWeight={"normal"}
+                        >
                             Rest assured, all data will be restored to a database snapshot when the site is production-ready.
-                            For feedback or feature requests, kindly submit them here: <Button
+                        </Text>
+                        <Flex
+                            mt={4}
+                            flexDir={"column"}
+                        >
+                            <Box
+                                mt={2}
+
+                            >
+                                <Text
+                                    as={'span'}
+                                    fontWeight={'bold'}
+                                >
+                                    Note:
+                                </Text>
+                                <Text
+                                    ml={1}
+                                    as={'span'}
+                                // fontWeight={'semibold'}
+                                >
+                                    We are trialing dark mode and another layout. These are accessible by hovering over your name/image on the top right.
+                                </Text>
+                            </Box>
+
+                            <Text >
+                                Further note that the following is not yet implemented, and will be integrated on production release:
+                            </Text>
+                            <UnorderedList pl={8}
+                                pt={4}>
+                                <ListItem>'latest report' page</ListItem>
+                                <ListItem>PDF generation</ListItem>
+                                <ListItem>SPMS emails</ListItem>
+                            </UnorderedList>
+
+                        </Flex>
+                        <Flex
+                            mt={4}
+                        >
+                            <Text
+                                as={'span'}
+                                fontSize={"16px"}
+                                fontWeight={"normal"}
+                            >
+                                For feedback or feature requests, kindly submit them here:
+                            </Text>
+
+                            <Button
+                                ml={2}
                                 variant={"link"}
                                 color={"red.500"}
                                 onClick={onOpenFeedbackModal}
                             >
                                 Submit Feedback
-                            </Button>
-                        </Text>
+                            </Button></Flex>
                         <Text>
                             Don't be shy, we can only make things better with your help!
                         </Text>
-                        <Text
-                            mt={3}
-                            fontWeight={'semibold'}
-                        >
-                            Note: The following is not yet implemented, and will be integrated on production release
-                        </Text>
-                        <UnorderedList pl={8}
-                            pt={4}>
-                            <ListItem>'latest report' page</ListItem>
-                            <ListItem>PDF generation</ListItem>
-                            <ListItem>SPMS emails</ListItem>
-                        </UnorderedList>
                     </Flex>
 
                     {/* <br /> */}

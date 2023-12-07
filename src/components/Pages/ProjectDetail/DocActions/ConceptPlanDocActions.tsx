@@ -63,7 +63,8 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
     const { baData, baLoading } = useBusinessArea(conceptPlanData?.document?.project?.business_area?.pk)
     useEffect(() => {
         if (!baLoading)
-            console.log(conceptPlanData?.document)
+            console.log(conceptPlanData)
+        console.log(conceptPlanData?.document)
         console.log(baData)
 
     }, [baData, baLoading, conceptPlanData])
@@ -1162,8 +1163,32 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                     </>
 
                 ) :
-                <Spinner
-                />
+                // <Spinner/> 
+                baLoading === false && baData === undefined
+                    ? <Grid
+                        my={4}
+                        gridTemplateColumns={"repeat(1, 1fr)"}
+                        justifyContent={"center"}
+                    >
+                        <Text
+                            textAlign={"center"}
+                            fontWeight={'semibold'}
+                        >
+                            Document Actions cannot be displayed as this project has no business area.
+                        </Text>
+                        <Text
+                            textAlign={"center"}
+                            fontWeight={'semibold'}
+                        >
+                            Please set a business area for this project from the project settings.
+                        </Text>
+                    </Grid> :
+
+                    <Center>
+                        <Spinner
+                        />
+                    </Center>
+
             }
         </>
     )

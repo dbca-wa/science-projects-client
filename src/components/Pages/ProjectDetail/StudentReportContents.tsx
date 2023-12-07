@@ -18,7 +18,7 @@ interface Props {
     members: IProjectMember[];
     refetch: () => void;
     projectPk: number | string;
-    setToLastTab: () => void;
+    setToLastTab: (tabToGoTo?: number) => void;
 
 }
 

@@ -20,7 +20,7 @@ interface IStudentDocumentActions {
     refetchData: () => void;
     documents: IStudentReport[];
     callSameData: () => void;
-    setToLastTab: () => void;
+    setToLastTab: (tabToGoTo?: number) => void;
     // setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
     // setselectedStudentReport: React.Dispatch<React.SetStateAction<IStudentReport>>;
     // projectPk: number;
@@ -1174,8 +1174,30 @@ export const StudentReportDocActions = ({ studentReportData, refetchData, docume
                     </>
 
                 ) :
-                <Spinner
-                />
+                baLoading === false && baData === undefined
+                    ? <Grid
+                        my={4}
+                        gridTemplateColumns={"repeat(1, 1fr)"}
+                        justifyContent={"center"}
+                    >
+                        <Text
+                            textAlign={"center"}
+                            fontWeight={'semibold'}
+                        >
+                            Document Actions cannot be displayed as this project has no business area.
+                        </Text>
+                        <Text
+                            textAlign={"center"}
+                            fontWeight={'semibold'}
+                        >
+                            Please set a business area for this project from the project settings.
+                        </Text>
+                    </Grid> :
+
+                    <Center>
+                        <Spinner
+                        />
+                    </Center>
             }
         </>
     )

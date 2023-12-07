@@ -47,7 +47,9 @@ export const AreaCheckAndMaps = ({
     };
 
     return (
-        <FormControl isRequired={required} mb={4}>
+        <FormControl
+            // isRequired={required} 
+            mb={4}>
             <FormLabel>{title}</FormLabel>
             <InputGroup>
                 <Grid gridTemplateColumns={"repeat(3, 1fr)"} gridGap={3} py={4}>

@@ -17,7 +17,7 @@ import {
 import { useNavigate } from "react-router-dom"
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection"
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection"
-import { IFullProjectDetails, IProjectData } from "../../types"
+import { IExtendedProjectDetails, IFullProjectDetails, IProjectData } from "../../types"
 import { useUser } from "../../lib/hooks/useUser"
 
 
@@ -27,7 +27,7 @@ interface IEditProjectDetailsProps {
     onClose: () => void;
     icon: IconType;
     baseInformation: IProjectData;
-    details: IFullProjectDetails | null | undefined;
+    details: IExtendedProjectDetails | null | undefined;
 }
 
 

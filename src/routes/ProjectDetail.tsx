@@ -6,7 +6,7 @@ import { ProjectOverviewCard } from "../components/Pages/ProjectDetail/ProjectOv
 import { ConceptPlanContents } from "../components/Pages/ProjectDetail/ConceptPlanContents";
 import { ProjectPlanContents } from "../components/Pages/ProjectDetail/ProjectPlanContents";
 import { ProgressReportContents } from "../components/Pages/ProjectDetail/ProgressReportContents";
-import { IFullProjectDetails, IProgressReport, IProjectAreas, IProjectData, IProjectDocuments, IProjectMember, IStudentReport } from "../types";
+import { IExtendedProjectDetails, IFullProjectDetails, IProgressReport, IProjectAreas, IProjectData, IProjectDocuments, IProjectMember, IStudentReport } from "../types";
 import { ManageTeam } from "../components/Pages/ProjectDetail/ManageTeam";
 import { useProject } from "../lib/hooks/useProject";
 import { useEffect, useState } from "react";
@@ -25,7 +25,7 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
 
     const [location, setLocation] = useState<IProjectAreas | null>();
     const [baseInformation, setBaseInformation] = useState<IProjectData | null>();
-    const [details, setDetails] = useState<IFullProjectDetails | null>();
+    const [details, setDetails] = useState<IExtendedProjectDetails | null>();
     const [documents, setDocuments] = useState<IProjectDocuments | null>();
     const [members, setMembers] = useState<IProjectMember[]>([]);
     const [distilledTitle, setDistilledTitle] = useState<string>();
@@ -67,293 +67,374 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
         }
     }
 
-    const setToLastTab = (tabs: string[]) => {
-        if (tabs.includes('closure')) {
-            setActiveTabIndex(tabs.indexOf('closure'))
+    const setToLastTab = (tabToGoTo?: number) => {
+        if (tabToGoTo) {
+            if (tabToGoTo === -1) {
+                console.log("HEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+                setActiveTabIndex(tabs.length)
+            } else if (tabToGoTo === 0) {
+                console.log("Theses are the tabs mate", tabs)
+                console.log("This is the index of the previous tab, mate", tabs.length - 1)
+                setActiveTabIndex(tabs.length - 1)
+            }
         }
-        else if (tabs.includes('progress')) {
-            setActiveTabIndex(tabs.indexOf('progress'))
-        }
-        else if (tabs.includes('student')) {
-            setActiveTabIndex(tabs.indexOf('student'))
-        }
-        else if (tabs.includes('project')) {
-            setActiveTabIndex(tabs.indexOf('project'))
-        }
-        else if (tabs.includes('concept')) {
-            setActiveTabIndex(tabs.indexOf('concept'))
-        }
-        else if (tabs.includes('overview')) {
-            setActiveTabIndex(tabs.indexOf('overview'))
+        else {
+            if (tabs.includes('closure')) {
+                setActiveTabIndex(tabs.indexOf('closure'))
+            }
+            else if (tabs.includes('progress')) {
+                setActiveTabIndex(tabs.indexOf('progress'))
+            }
+            else if (tabs.includes('student')) {
+                setActiveTabIndex(tabs.indexOf('student'))
+            }
+            else if (tabs.includes('project')) {
+                setActiveTabIndex(tabs.indexOf('project'))
+            }
+            else if (tabs.includes('concept')) {
+                setActiveTabIndex(tabs.indexOf('concept'))
+            }
+            else if (tabs.includes('overview')) {
+                setActiveTabIndex(tabs.indexOf('overview'))
+            }
+
         }
     };
 
     useEffect(() => {
+        const count = (
+            documents?.student_reports?.length >= 1 ? 1 : 0) +
+            (documents?.progress_reports?.length >= 1 ? 1 : 0) +
+            (documents?.concept_plan ? 1 : 0) +
+            (documents?.project_closure ? 1 : 0) +
+            (documents?.project_plan ? 1 : 0) + 1 // plus overview
+        console.log('count: ', count)
 
+        const tabData = [
+            'overview',
+            documents?.concept_plan && 'concept',
+            documents?.project_plan && 'project',
+            documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
+            documents?.student_reports && documents.student_reports.length > 0 && 'student',
+            documents?.project_closure && 'closure'
+        ].filter(Boolean)
+        const tabDataLength = tabData.length;
+        console.log('len of tabdata: ', tabDataLength)
+
+        if (tabs.length !== count) {
+            console.log("Length different, updating")
+            setTabs(tabData)
+        }
+        else {
+            console.log('Tabs: ', tabs)
+        }
+    }, [documents?.concept_plan, documents?.progress_reports, documents?.student_reports, documents?.progress_reports?.length, documents?.student_reports?.length, documents?.project_plan, documents?.project_closure, tabs])
+
+
+    // useEffect(() => {
+    //     console.log('Tabs:', tabs);
+    // }, [tabs])
+
+    useEffect(() => {
         if (isInitialRender) {
-            if (documents) {
-                const tabData = [
-                    'overview',
-                    documents?.concept_plan && 'concept',
-                    documents?.project_plan && 'project',
-                    documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
-                    documents?.student_reports && documents.student_reports.length > 0 && 'student',
-                    documents?.project_closure && 'closure'
-                ].filter(Boolean)
-                setTabs(tabData)
-                setIsInitialRender(false);
-
-            }
-            // if (tabs.length >= 1) {
+            // if (documents) {
+            setIsInitialRender(false);
             // }
         } else {
-            if (selectedTab) {
-                console.log('there is a selected tab')
+            if (selectedTab && selectedTab !== "overview") {
+                console.log('there is a selected tab: ', selectedTab)
                 if (selectedTabSet === false) {
                     console.log('and it hasnt been set')
                     setToSelectedTab();
                     setSelectedTabSet(true);
                 }
             } else {
-                // if the tab has been set already
-                const tabData = [
-                    'overview',
-                    documents?.concept_plan && 'concept',
-                    documents?.project_plan && 'project',
-                    documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
-                    documents?.student_reports && documents.student_reports.length > 0 && 'student',
-                    documents?.project_closure && 'closure'
-                ].filter(Boolean)
-                if (tabData.length !== tabs.length) {
-                    console.log("Len:", tabs.length, tabs)
-
-                    setTabs(tabData)
-                }
+                // const tabData = [
+                //     'overview',
+                //     documents?.concept_plan && 'concept',
+                //     documents?.project_plan && 'project',
+                //     documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
+                //     documents?.student_reports && documents.student_reports.length > 0 && 'student',
+                //     documents?.project_closure && 'closure'
+                // ].filter(Boolean)
+                // if (tabData.length !== tabs.length) {
+                //     console.log("Len:", tabs.length, tabs)
+                //     setTabs(tabData)
+                // }
             }
-
         }
-    }, [documents, tabs, isInitialRender, selectedTab, selectedTabSet])
+    }, [tabs, isInitialRender, selectedTab, selectedTabSet]);
+
+    // useEffect(() => {
+
+    //     if (isInitialRender) {
+    //         if (documents) {
+    //             const tabData = [
+    //                 'overview',
+    //                 documents?.concept_plan && 'concept',
+    //                 documents?.project_plan && 'project',
+    //                 documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
+    //                 documents?.student_reports && documents.student_reports.length > 0 && 'student',
+    //                 documents?.project_closure && 'closure'
+    //             ].filter(Boolean)
+    //             setTabs(tabData)
+    //             setIsInitialRender(false);
+
+    //         }
+    //         // if (tabs.length >= 1) {
+    //         // }
+    //     } else {
+    //         if (selectedTab) {
+    //             console.log('there is a selected tab')
+    //             if (selectedTabSet === false) {
+    //                 console.log('and it hasnt been set')
+    //                 setToSelectedTab();
+    //                 setSelectedTabSet(true);
+    //             }
+    //         } else {
+    //             // if the tab has been set already
+    //             const tabData = [
+    //                 'overview',
+    //                 documents?.concept_plan && 'concept',
+    //                 documents?.project_plan && 'project',
+    //                 documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
+    //                 documents?.student_reports && documents.student_reports.length > 0 && 'student',
+    //                 documents?.project_closure && 'closure'
+    //             ].filter(Boolean)
+    //             if (tabData.length !== tabs.length) {
+    //                 console.log("Len:", tabs.length, tabs)
+
+    //                 setTabs(tabData)
+    //             }
+    //         }
+
+    //     }
+    // }, [documents, tabs, isInitialRender, selectedTab, selectedTabSet])
 
     return (
+        <div key={
+            (documents?.progress_reports?.length || 0) +
+            (documents?.student_reports?.length || 0) +
+            (documents?.concept_plan ? 1 : 0) +
+            (documents?.project_plan ? 1 : 0) +
+            (documents?.progress_reports?.length || 0)
+        }
+        >
+            {(isLoading || !documents || !distilledTitle) ? <Center>
+                {/* <Head title={distilledTitle} /> */}
+                <Spinner />
+            </Center> :
+                documents && distilledTitle && (
+                    <>
+                        <Head title={distilledTitle} />
+                        <Tabs
+                            isLazy
+                            isFitted
+                            variant={'enclosed'}
+                            // onChange={(index) => setTabIndex(index)}
+                            onChange={(index) => {
+                                refetch()
+                                setActiveTabIndex(index)
+                            }}
+                            defaultIndex={activeTabIndex}
+                            index={activeTabIndex}
 
-        (isLoading || !documents || !distilledTitle) ? <Center>
-            {/* <Head title={distilledTitle} /> */}
-            <Spinner />
-        </Center> :
-            documents && distilledTitle && (
-                <>
-                    <Head title={distilledTitle} />
-                    <Tabs
-                        isLazy
-                        isFitted
-                        variant={'enclosed'}
-                        // onChange={(index) => setTabIndex(index)}
-                        onChange={(index) => {
-                            refetch()
-                            setActiveTabIndex(index)
-                        }}
-                        defaultIndex={activeTabIndex}
-                        index={activeTabIndex}
-
-                    >
-                        <TabList mb='1em'>
-                            <Tab
-                                fontSize="sm"
-                                value="overview"
-                                onClick={() => setActiveTabIndex(tabs.indexOf("overview"))}
-                            >
-                                Overview
-                            </Tab>
-                            {documents?.concept_plan && (
-                                <Tab fontSize="sm"
-                                    value="concept"
-                                    onClick={() => setActiveTabIndex(tabs.indexOf("concept"))}
+                        >
+                            <TabList mb='1em'>
+                                <Tab
+                                    fontSize="sm"
+                                    value="overview"
+                                    onClick={() => setActiveTabIndex(tabs.indexOf("overview"))}
                                 >
-                                    Concept Plan
+                                    Overview
                                 </Tab>
-                            )}
-                            {documents?.project_plan && (
-                                <Tab fontSize="sm"
-                                    value="project"
-                                    onClick={() => setActiveTabIndex(tabs.indexOf("project"))}
-                                >
-                                    Project Plan</Tab>
+                                {documents?.concept_plan && (
+                                    <Tab fontSize="sm"
+                                        value="concept"
+                                        onClick={() => setActiveTabIndex(tabs.indexOf("concept"))}
+                                    >
+                                        Concept Plan
+                                    </Tab>
+                                )}
+                                {documents?.project_plan && (
+                                    <Tab fontSize="sm"
+                                        value="project"
+                                        onClick={() => setActiveTabIndex(tabs.indexOf("project"))}
+                                    >
+                                        Project Plan</Tab>
 
-                            )}
-                            {documents?.progress_reports && documents.progress_reports.length !== 0 && (
-                                <Tab fontSize="sm"
-                                    value="progress"
-                                    onClick={() => setActiveTabIndex(tabs.indexOf("progress"))}
+                                )}
+                                {documents?.progress_reports && documents.progress_reports.length !== 0 && (
+                                    <Tab fontSize="sm"
+                                        value="progress"
+                                        onClick={() => setActiveTabIndex(tabs.indexOf("progress"))}
 
-                                >
-                                    Progress Reports
-                                </Tab>
+                                    >
+                                        Progress Reports
+                                    </Tab>
 
-                            )}
-                            {documents?.student_reports && documents.student_reports.length !== 0 && (
-                                <Tab fontSize="sm"
-                                    value="student"
-                                    onClick={() => setActiveTabIndex(tabs.indexOf("student"))}
+                                )}
+                                {documents?.student_reports && documents.student_reports.length !== 0 && (
+                                    <Tab fontSize="sm"
+                                        value="student"
+                                        onClick={() => setActiveTabIndex(tabs.indexOf("student"))}
 
-                                >
-                                    Student Reports
-                                </Tab>
+                                    >
+                                        Student Reports
+                                    </Tab>
 
-                            )}
-                            {documents?.project_closure && (
-                                <Tab fontSize="sm"
-                                    value="closure"
-                                    onClick={() => setActiveTabIndex(tabs.indexOf("closure"))}
+                                )}
+                                {documents?.project_closure && (
+                                    <Tab fontSize="sm"
+                                        value="closure"
+                                        onClick={() => setActiveTabIndex(tabs.indexOf("closure"))}
 
-                                >Project Closure</Tab>
+                                    >Project Closure</Tab>
 
-                            )}
-                        </TabList>
-                        <TabPanels>
+                                )}
+                            </TabList>
+                            <TabPanels>
 
-                            {/* OVERVIEW */}
-                            <TabPanel>
-                                {
-                                    baseInformation ?
-                                        (
-                                            <>
+                                {/* OVERVIEW */}
+                                <TabPanel>
+                                    {
+                                        baseInformation ?
+                                            (
+                                                <>
 
 
 
-                                                <ProjectOverviewCard
-                                                    location={location}
-                                                    baseInformation={baseInformation}
-                                                    details={details}
-                                                    members={members}
-                                                    documents={documents}
-                                                    refetchData={refetch}
-                                                    setToLastTab={() => {
-                                                        setToLastTab(tabs)
-                                                    }}
-                                                />
+                                                    <ProjectOverviewCard
+                                                        location={location}
+                                                        baseInformation={baseInformation}
+                                                        details={details}
+                                                        members={members}
+                                                        documents={documents}
+                                                        refetchData={refetch}
+                                                        setToLastTab={setToLastTab}
+                                                    />
 
-                                                {/* <ManageTeam /> */}
-                                                <ManageTeam
-                                                    // team={members}
-                                                    project_id={projectPk !== undefined ? Number(projectPk) : 0}
-                                                />
+                                                    {/* <ManageTeam /> */}
+                                                    <ManageTeam
+                                                        // team={members}
+                                                        project_id={projectPk !== undefined ? Number(projectPk) : 0}
+                                                    />
 
-                                                {/* <DocumentActions
+                                                    {/* <DocumentActions
                                             tabType="overview"
                                             documents={documents}
                                             projectData={projectData}
                                         /> */}
-                                            </>
-                                        ) :
-                                        <Spinner />
-                                }
-                            </TabPanel>
-
-
-                            {/* CONCEPT PLAN */}
-                            {
-                                documents?.concept_plan && (
-                                    <TabPanel
-                                    >
-                                        <ConceptPlanContents
-                                            userData={me?.userData}
-                                            members={members}
-                                            document={documents.concept_plan}
-                                            all_documents={documents}
-                                            refetch={refetch}
-                                            setToLastTab={() => {
-                                                setToLastTab(tabs)
-                                            }}
-                                        // projectPk={Number(projectPk)}
-                                        />
-                                    </TabPanel>
-                                )
-                            }
-
-
-                            {/* PROJECT PLAN */}
-                            {documents?.project_plan && (
-                                <TabPanel>
-                                    <ProjectPlanContents
-                                        refetch={refetch}
-                                        document={documents.project_plan}
-
-                                        all_documents={documents}
-
-                                        userData={me?.userData}
-                                        members={members}
-                                        setToLastTab={() => {
-                                            setToLastTab(tabs)
-                                        }}
-                                    />
+                                                </>
+                                            ) :
+                                            <Spinner />
+                                    }
                                 </TabPanel>
-                            )}
 
 
-                            {/* PROGRESS REPORT */}
-                            {
-                                documents?.progress_reports && documents.progress_reports.length !== 0 && (
+                                {/* CONCEPT PLAN */}
+                                {
+                                    documents?.concept_plan && (
+                                        <TabPanel
+                                        >
+                                            <ConceptPlanContents
+                                                userData={me?.userData}
+                                                members={members}
+                                                document={documents.concept_plan}
+                                                all_documents={documents}
+                                                refetch={refetch}
+                                                setToLastTab={setToLastTab}
+
+                                            // projectPk={Number(projectPk)}
+                                            />
+                                        </TabPanel>
+                                    )
+                                }
+
+
+                                {/* PROJECT PLAN */}
+                                {documents?.project_plan && (
                                     <TabPanel>
-                                        <ProgressReportContents
-                                            documents={documents.progress_reports}
+                                        <ProjectPlanContents
                                             refetch={refetch}
+                                            document={documents.project_plan}
 
                                             all_documents={documents}
 
                                             userData={me?.userData}
                                             members={members}
-                                            setToLastTab={() => {
-                                                setToLastTab(tabs)
-                                            }}
+                                            setToLastTab={setToLastTab}
+                                            projectAreas={location}
+
                                         />
                                     </TabPanel>
-                                )
-                            }
-
-                            {/* STUDENT REPORT */}
-                            {
-                                documents?.student_reports && documents.student_reports.length !== 0 && projectPk && (
-                                    <TabPanel>
-                                        <StudentReportContents
-                                            projectPk={projectPk}
-                                            documents={documents.student_reports}
-                                            refetch={refetch}
-
-                                            all_documents={documents}
-
-                                            userData={me?.userData}
-                                            members={members}
-                                            setToLastTab={() => {
-                                                setToLastTab(tabs)
-                                            }}
-                                        //  selectedYear={selectedStudentReportYear}
-                                        />
-                                    </TabPanel>
-                                )
-                            }
+                                )}
 
 
-                            {/* PROJECT CLOSURE */}
-                            {
-                                documents?.project_closure && (
-                                    <TabPanel>
-                                        <ProjectClosureContents
-                                            document={documents.project_closure}
-                                            userData={me?.userData}
-                                            members={members}
-                                            all_documents={documents}
-                                            refetch={refetch}
-                                            setToLastTab={() => {
-                                                setToLastTab(tabs)
-                                            }}
-                                        />
-                                    </TabPanel>
-                                )
-                            }
-                        </TabPanels>
-                    </Tabs>
-                </>
-            )
+                                {/* PROGRESS REPORT */}
+                                {
+                                    documents?.progress_reports && documents.progress_reports.length !== 0 && (
+                                        <TabPanel>
+                                            <ProgressReportContents
+                                                documents={documents.progress_reports}
+                                                refetch={refetch}
+
+                                                all_documents={documents}
+
+                                                userData={me?.userData}
+                                                members={members}
+                                                setToLastTab={setToLastTab}
+
+                                            />
+                                        </TabPanel>
+                                    )
+                                }
+
+                                {/* STUDENT REPORT */}
+                                {
+                                    documents?.student_reports && documents.student_reports.length !== 0 && projectPk && (
+                                        <TabPanel>
+                                            <StudentReportContents
+                                                projectPk={projectPk}
+                                                documents={documents.student_reports}
+                                                refetch={refetch}
+
+                                                all_documents={documents}
+
+                                                userData={me?.userData}
+                                                members={members}
+                                                setToLastTab={setToLastTab}
+
+                                            //  selectedYear={selectedStudentReportYear}
+                                            />
+                                        </TabPanel>
+                                    )
+                                }
+
+
+                                {/* PROJECT CLOSURE */}
+                                {
+                                    documents?.project_closure && (
+                                        <TabPanel>
+                                            <ProjectClosureContents
+                                                document={documents.project_closure}
+                                                userData={me?.userData}
+                                                members={members}
+                                                all_documents={documents}
+                                                refetch={refetch}
+                                                setToLastTab={setToLastTab}
+
+                                            />
+                                        </TabPanel>
+                                    )
+                                }
+                            </TabPanels>
+                        </Tabs>
+                    </>
+                )}
+        </div>
+
+
 
     )
 }
