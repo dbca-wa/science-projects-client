@@ -15,7 +15,7 @@ interface Props {
     document: IConceptPlan | null;
 
     refetch: () => void;
-    setToLastTab: () => void;
+    setToLastTab: (tabToGoTo?: number) => void;
 
 }
 

@@ -163,7 +163,7 @@ interface IExternalProjectDetails {
     description: string | null;
 }
 
-interface IFullProjectDetails {
+interface IExtendedProjectDetails {
     base: IBaseProjectDetails;
     external: IExternalProjectDetails | [];
     student: IStudentProjectDetails | [];
@@ -348,7 +348,7 @@ interface IProjectData {
 
 interface IFullProjectDetails {
     project: IProjectData;
-    details: IFullProjectDetails;
+    details: IExtendedProjectDetails;
     documents: IProjectDocuments;
     members: IProjectMember[] | null;
 }

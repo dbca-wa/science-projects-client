@@ -14,7 +14,7 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
     refetchData: () => void;
-    setToLastTab: () => void;
+    setToLastTab: (tabToGoTo?: number) => void;
 }
 
 export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData, setToLastTab }: Props) => {
@@ -68,7 +68,7 @@ export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData, s
                     queryClient.invalidateQueries(["projects", projectPk]);
                     await refetchData();
                     console.log("cheese")
-                    setToLastTab();
+                    setToLastTab(-1);
                     onClose();
 
                     // navigate('/projects');

@@ -1,7 +1,7 @@
 // Maps out the document provided to the rich text editor components for project plan documents. 
 
 import { Box, Grid, Text, useColorMode } from "@chakra-ui/react"
-import { IProjectDocuments, IProjectMember, IProjectPlan, IUserMe } from "../../../types";
+import { IProjectAreas, IProjectDocuments, IProjectMember, IProjectPlan, IUserMe } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { ProjectPlanDocActions } from "./DocActions/ProjectPlanDocActions";
 import { useEffect } from "react";
@@ -15,7 +15,8 @@ interface Props {
     userData: IUserMe;
     members: IProjectMember[];
     refetch: () => void;
-    setToLastTab: () => void;
+    setToLastTab: (tabToGoTo?: number) => void;
+    projectAreas: IProjectAreas;
 }
 
 export const ProjectPlanContents = ({
@@ -23,6 +24,7 @@ export const ProjectPlanContents = ({
     all_documents,
     document, refetch,
     setToLastTab,
+    projectAreas
 }: Props) => {
 
 
@@ -50,6 +52,7 @@ export const ProjectPlanContents = ({
                 projectPlanData={document}
                 refetchData={refetch}
                 setToLastTab={setToLastTab}
+                projectAreas={projectAreas}
 
             // projectPk={projectPk}
             />

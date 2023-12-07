@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { IConceptPlan, IProjectDocuments, IProjectMember, IProjectPlan } from "../../../../types";
+import { IConceptPlan, IProjectAreas, IProjectDocuments, IProjectMember, IProjectPlan } from "../../../../types";
 import { Box, Text, Flex, Tag, useColorMode, Grid, Button, Center, useDisclosure, Spinner, Drawer, DrawerOverlay, DrawerContent, DrawerBody, DrawerFooter, useToast, ToastId, Input } from "@chakra-ui/react";
 import { ConceptPlanActionModal } from "../../../Modals/DocumentActionModals/ConceptPlanActionModal";
 import { useUser } from "../../../../lib/hooks/useUser";
@@ -16,16 +16,18 @@ import { AxiosError } from "axios";
 import { ProjectPlanActionModal } from "../../../Modals/DocumentActionModals/ProjectPlanActionModal";
 import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { CreateProgressReportModal } from "../../../Modals/CreateProgressReportModal";
+import { SetAreasModal } from "@/components/Modals/SetAreasModal";
 
 interface IProjectPlanDocumentActions {
     projectPlanData: IProjectPlan;
     refetchData: () => void;
     all_documents: IProjectDocuments;
-    setToLastTab: () => void;
+    projectAreas: IProjectAreas;
+    setToLastTab: (tabToGoTo?: number) => void;
     // projectPk: number;
 }
 
-export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchData,
+export const ProjectPlanDocActions = ({ all_documents, projectAreas, projectPlanData, refetchData,
     // , projectPk 
     setToLastTab
 }: IProjectPlanDocumentActions) => {
@@ -45,6 +47,7 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
         // setModifyDate(projectPlanData?.document?.updated_at);
     }, [projectPlanData])
 
+    const { isOpen: isSetAreasModalOpen, onOpen: onSetAreasModalOpen, onClose: onSetAreasModalClose } = useDisclosure();
     const { isOpen: isS1ApprovalModalOpen, onOpen: onS1ApprovalModalOpen, onClose: onS1ApprovalModalClose } = useDisclosure();
     const { isOpen: isS2ApprovalModalOpen, onOpen: onS2ApprovalModalOpen, onClose: onS2ApprovalModalClose } = useDisclosure();
     const { isOpen: isS3ApprovalModalOpen, onOpen: onS3ApprovalModalOpen, onClose: onS3ApprovalModalClose } = useDisclosure();
@@ -751,13 +754,39 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
                                                         }
 
 
-                                                        <Button
-                                                            colorScheme="green"
-                                                            size={"sm"}
-                                                            onClick={onS1ApprovalModalOpen}
-                                                        >
-                                                            Approve
-                                                        </Button>
+
+                                                        {
+                                                            projectAreas.areas.length < 1 ?
+                                                                (
+                                                                    <>
+                                                                        <SetAreasModal
+                                                                            projectPk={projectPlanData?.document?.project?.pk}
+                                                                            onClose={onSetAreasModalClose}
+                                                                            isOpen={isSetAreasModalOpen}
+                                                                            refetchData={refetchData}
+                                                                            setToLastTab={setToLastTab}
+                                                                        />
+                                                                        <Button
+                                                                            colorScheme="green"
+                                                                            size={"sm"}
+                                                                            onClick={onSetAreasModalOpen}
+                                                                        >
+                                                                            Set Areas
+                                                                        </Button>
+
+                                                                    </>
+
+                                                                )
+                                                                :
+                                                                <Button
+                                                                    colorScheme="green"
+                                                                    size={"sm"}
+                                                                    onClick={onS1ApprovalModalOpen}
+                                                                >
+                                                                    Approve
+                                                                </Button>
+                                                        }
+
 
 
 
@@ -1228,8 +1257,30 @@ export const ProjectPlanDocActions = ({ all_documents, projectPlanData, refetchD
                     </>
 
                 ) :
-                <Spinner
-                />
+                baLoading === false && baData === undefined
+                    ? <Grid
+                        my={4}
+                        gridTemplateColumns={"repeat(1, 1fr)"}
+                        justifyContent={"center"}
+                    >
+                        <Text
+                            textAlign={"center"}
+                            fontWeight={'semibold'}
+                        >
+                            Document Actions cannot be displayed as this project has no business area.
+                        </Text>
+                        <Text
+                            textAlign={"center"}
+                            fontWeight={'semibold'}
+                        >
+                            Please set a business area for this project from the project settings.
+                        </Text>
+                    </Grid> :
+
+                    <Center>
+                        <Spinner
+                        />
+                    </Center>
             }
         </>
     )

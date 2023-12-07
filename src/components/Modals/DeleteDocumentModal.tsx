@@ -17,7 +17,7 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
     onDeleteSuccess?: () => void;
-    setToLastTab: () => void;
+    setToLastTab: (tabToGoTo?: number) => void;
 }
 
 export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refetchData, isOpen, onClose, onDeleteSuccess, setToLastTab }: Props) => {
@@ -76,7 +76,7 @@ export const DeleteDocumentModal = ({ projectPk, documentPk, documentKind, refet
                     queryClient.invalidateQueries(["projects", projectPk]);
                     await refetchData();
                     onClose();
-                    console.log('deletging')
+                    console.log('deleting')
                     setToLastTab();
 
                 }, 350)

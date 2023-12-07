@@ -5,7 +5,7 @@ import { AiFillCalendar, AiFillEdit, AiFillTag } from "react-icons/ai"
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineExternalLink } from 'react-icons/hi'
 import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
-import { IFullProjectDetails, IProjectAreas, IProjectData, IProjectDocuments, IProjectMember, ISimpleLocationData } from "../../../types";
+import { IExtendedProjectDetails, IFullProjectDetails, IProjectAreas, IProjectData, IProjectDocuments, IProjectMember, ISimpleLocationData } from "../../../types";
 import { FaEdit, FaEllipsisH, FaEllipsisV, FaLock, FaLockOpen, FaTrash, FaUserFriends } from "react-icons/fa";
 import { GiMaterialsScience } from "react-icons/gi";
 import { MdMoreVert, MdScience } from "react-icons/md";
@@ -16,17 +16,11 @@ import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
-import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE";
 import { useUser } from "../../../lib/hooks/useUser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ISimplePkProp, deleteProjectCall } from "../../../lib/api";
 import { DeleteProjectModal } from "../../Modals/DeleteProjectModal";
-import { useTeamLead } from "../../../lib/hooks/useTeamLead";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
 import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
 import { EditProjectModal } from "../../Modals/EditProjectModal";
-import { useCheckUserIsBaLeader } from "../../../lib/hooks/useCheckUserIsBaLeader";
-import { GrFormEdit, GrStatusInfo } from "react-icons/gr";
 import { ProjectClosureModal } from "../../Modals/ProjectClosureModal";
 import { ProjectReopenModal } from "../../Modals/ProjectReopenModal";
 import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
@@ -35,15 +29,16 @@ import { IoMdSettings } from "react-icons/io";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 import { BsCaretDownFill } from "react-icons/bs";
 import { IoCreate } from "react-icons/io5";
+import { GrStatusInfo } from "react-icons/gr";
 
 interface IProjectOverviewCardProps {
     location: IProjectAreas;
     baseInformation: IProjectData;
-    details: IFullProjectDetails | null | undefined;
+    details: IExtendedProjectDetails | null | undefined;
     members: IProjectMember[];
     documents: IProjectDocuments;
     refetchData: () => void;
-    setToLastTab: () => void;
+    setToLastTab: (tabToGoTo?: number) => void;
 }
 
 
