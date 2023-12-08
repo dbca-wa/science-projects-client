@@ -1183,11 +1183,30 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
                             Please set a business area for this project from the project settings.
                         </Text>
                     </Grid> :
-
-                    <Center>
-                        <Spinner
-                        />
-                    </Center>
+                    actionsReady && !leaderMember ?
+                        <Grid
+                            my={4}
+                            gridTemplateColumns={"repeat(1, 1fr)"}
+                            justifyContent={"center"}
+                        >
+                            <Text
+                                textAlign={"center"}
+                                fontWeight={'semibold'}
+                            >
+                                This project has no members/leader so document actions are not shown here.
+                            </Text>
+                            <Text
+                                textAlign={"center"}
+                                fontWeight={'semibold'}
+                            >
+                                Please add members to adjust document actions.
+                            </Text>
+                        </Grid>
+                        :
+                        <Center>
+                            <Spinner
+                            />
+                        </Center>
 
             }
         </>

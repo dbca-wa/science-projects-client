@@ -559,7 +559,7 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk,
                                 }
                             }
 
-                            isDisabled={usersCount === 1 || !user?.is_staff}
+                            isDisabled={!user?.is_staff}
                             onClick={promoteThisUser}
 
                         // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
