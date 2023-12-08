@@ -265,7 +265,7 @@ export const Navitar = (
                                     Scientific Site Register
                                 </Text>
                             </MenuItem>
-                            <MenuItem
+                            {/* <MenuItem
                                 onClick={() => {
                                     window.open("https://scienceprojects.dbca.wa.gov.au/arar_dashboard", "_blank")
                                 }}
@@ -274,7 +274,7 @@ export const Navitar = (
                                 <Text ml={2}>
                                     Projects Pending Approval
                                 </Text>
-                            </MenuItem>
+                            </MenuItem> */}
 
                         </MenuGroup>
 
