@@ -183,7 +183,7 @@ export const ManageTeam = ({
     }, [userLoading, userData])
 
     return (
-        !userLoading && !isTeamLoading && teamData.length > 0 && leaderPk &&
+        !userLoading && !isTeamLoading &&
         (
             <Box
                 minH={"100px"}
@@ -245,7 +245,7 @@ export const ManageTeam = ({
                     </Box>
                 </Grid>
 
-                {
+                {teamData.length > 0 ?
                     // Allow project leader or admin to change order
                     userData.is_superuser
                         || userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk
@@ -355,6 +355,7 @@ export const ManageTeam = ({
                             </Grid>
 
                         )
+                    : null
                 }
 
             </Box>
