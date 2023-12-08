@@ -152,6 +152,8 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                             </Text>
                             <UnorderedList pl={8}
                                 pt={4}>
+                                <ListItem>Rich Text Editor: functions - bold/italics etc.(coming soon)</ListItem>
+                                <ListItem>Rich Text Editor: Copy Paste from word (coming soon)</ListItem>
                                 <ListItem>'latest report' page</ListItem>
                                 <ListItem>PDF generation</ListItem>
                                 <ListItem>SPMS emails</ListItem>
