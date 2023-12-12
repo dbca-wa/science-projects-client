@@ -1,6 +1,6 @@
 // Tab data for Project Location on the creation page. WIP need to update to take in pre-set locations for use in update project.
 
-import { Box, Button, Flex, Grid, Image, Text, ModalBody, ModalFooter, Skeleton } from "@chakra-ui/react";
+import { Box, Button, Flex, Grid, Image, Text, ModalBody, ModalFooter, Skeleton, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
 import { useGetLocations } from "../../../lib/hooks/useGetLocations";
@@ -39,7 +39,7 @@ export const ProjectLocationSection = (
     const [selectedIbras, setSelectedIbras] = useState<number[]>([]);
     const [selectedImcras, setSelectedImcras] = useState<number[]>([]);
     const [selectedNrms, setSelectedNrms] = useState<number[]>([]);
-
+    const { colorMode } = useColorMode();
     useEffect(() => {
         setLocationData([
             ...selectedRegions,
@@ -140,23 +140,6 @@ export const ProjectLocationSection = (
 
                     </Flex>
 
-                    {/* <Box
-                        position={fixed ? "fixed" : "static"}
-                        top={fixed ? 0 : "auto"}
-                        zIndex={1000} // Adjust the zIndex to make sure it appears above other content
-                        overflow={'hidden'}
-                        h={'500px'} // Set the height of the image container
-                        bg={"red"}
-                        rounded={"2xl"}
-                    >
-                        <Image
-                            src="/soon.jpg"
-                            objectFit={'cover'}
-                            w={"100%"}
-                            h={"100%"}
-                        />
-                    </Box> */}
-
                     <Box
                         position="sticky"
                         top={"120px"} // Adjust the top value if needed
@@ -188,7 +171,7 @@ export const ProjectLocationSection = (
                             // top={"105px"} // Adjust the top value if needed
                             overflow={'hidden'}
                             // h={'500px'} // Set the height of the image container
-                            bg={"gray.200"}
+                            bg={colorMode === "light" ? "gray.200" : "gray.600"}
                             w={"100%"}
                             h={"500px"}
                             // h={"100%"}
@@ -240,105 +223,8 @@ export const ProjectLocationSection = (
                             </Button>
                         </Flex>
                     </Box>
-
-                    {/* <Box
-                        position="fixed"
-                        // top={0}
-                        // right={0} // Adjust the right value if needed
-                        overflow={'hidden'}
-                        h={'500px'} // Set the height of the image container
-                        bg={"red"}
-                        rounded={"2xl"}
-                    >
-                        <Image
-                            src="/soon.jpg"
-                            objectFit={'cover'}
-                            w={"100%"}
-                            h={"100%"}
-                        />
-                    </Box> */}
-
-                    {/* <Box
-                        position="sticky"
-                        top={0}
-                        overflow={'hidden'}
-                        h={'500px'} // Set the height of the image container
-                        bg={"red"}
-                        rounded={"2xl"}
-                    >
-                        <Image
-                            src="/soon.jpg"
-                            objectFit={'cover'}
-                            w={"100%"}
-                            h={"100%"}
-                        />
-                    </Box> */}
-
-                    {/* <Box
-                        overflow={'hidden'}
-                        h={'500px'} // Set the height of the image container
-                        bg={"red"}
-                        rounded={"2xl"}
-                        style={{
-                            backgroundImage: `url('/soon.jpg')`, // Set the image as background
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            backgroundAttachment: 'fixed', // Make the image fixed on scroll
-                        }}
-                    ></Box> */}
-                    {/* <Box
-                        overflow={'hidden'}
-                        h={'500px'}
-                        bg={"red"}
-                        rounded={"2xl"}
-                    >
-                        <Image
-                            src="/soon.jpg"
-                            objectFit={'cover'}
-                            w={"100%"}
-                            h={"100%"}
-                        />
-                    </Box> */}
                 </Grid>
-
             )}
-
-            {/* <Flex
-                w={"100%"}
-                justifyContent={"flex-end"}
-                pb={4}
-            >
-                <Button onClick={backClick}>Cancel</Button>
-                <Button
-                    ml={3}
-                    type="submit"
-                    colorScheme="blue"
-                    // isDisabled={!locationFilled}
-                    onClick={() => {
-                        console.log('Here is the location data'
-                        )
-                        console.log(locationData)
-                        if (projectType.includes("External") || projectType.includes("Student")) {
-                            if (locationFilled) {
-                                console.log("going next")
-                                console.log(locationData)
-                                setLocationFilled(true)
-                                nextClick(
-
-                                    locationData
-                                    // "locations": [...locationData]
-
-                                )
-                            } else return;
-                        } else {
-                            createClick()
-                        }
-                    }}
-                    rightIcon={(projectType.includes("External") || projectType.includes("Student")) ? undefined : <IoIosCreate />}
-                >
-                    {(projectType.includes("External") || projectType.includes("Student")) ? `Next` : `Create`}
-                </Button>
-            </Flex> */}
         </>
     )
 }

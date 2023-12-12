@@ -221,9 +221,12 @@ export const EditUserDetailsModal = ({ isOpen, onClose, user, branches, business
     }: IFullUserUpdateVariables) => {
         const image = activeOption === 'url' ? selectedImageUrl : selectedFile;
         // if (image !== null || isFieldChanged('about') || isFieldChanged('expertise')) {
+        // console.log({
+        //     userPk, title, phone, fax, branch, business_area, about, expertise
+        // })
         await fullMutation.mutateAsync({ userPk, title, phone, fax, branch, business_area, image, about, expertise });
         // Close the modal
-        onClose();
+        // onClose();
         // } else {
         //     // No changes, show a message or take some other action
         // }

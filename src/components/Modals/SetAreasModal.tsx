@@ -256,7 +256,7 @@ export const SetAreasModal = ({ projectPk, refetchData, isOpen, onClose, onDelet
                                             // top={"105px"} // Adjust the top value if needed
                                             overflow={'hidden'}
                                             // h={'500px'} // Set the height of the image container
-                                            bg={"gray.200"}
+                                            bg={colorMode === "light" ? "gray.200" : "gray.600"}
                                             w={"100%"}
                                             h={"500px"}
                                             // h={"100%"}

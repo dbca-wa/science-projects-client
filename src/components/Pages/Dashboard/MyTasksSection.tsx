@@ -209,6 +209,8 @@ export const MyTasksSection = ({
                                             mdlg: "repeat(2, 1fr)",
                                             "1080px": "repeat(3, 1fr)",
                                             xl: "repeat(4, 1fr)",
+                                            '2xl': "repeat(6, 1fr)",
+
                                         }}
                                         gridGap={4}
                                         gridRowGap={8}
@@ -281,6 +283,8 @@ export const MyTasksSection = ({
                                         "mdlg": "repeat(2, 1fr)",
                                         "1080px": "repeat(3, 1fr)",
                                         'xl': "repeat(4, 1fr)",
+                                        '2xl': "repeat(6, 1fr)",
+
                                     }}
                                     gridGap={4}
                                     gridRowGap={8}
@@ -324,6 +328,7 @@ export const MyTasksSection = ({
                                             "mdlg": "repeat(2, 1fr)",
                                             "1080px": "repeat(3, 1fr)",
                                             'xl': "repeat(4, 1fr)",
+                                            '2xl': "repeat(6, 1fr)",
                                         }}
                                         gridGap={4}
                                         gridRowGap={8}

@@ -18,6 +18,7 @@ import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin"
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
 import { useEffect, useState } from "react";
 import { EditorSubsections, EditorType } from "../../../../types";
+import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
 
 interface Props {
     initialConfig: any;
@@ -53,7 +54,7 @@ export const DisplaySRTE = (
     }: Props) => {
 
     const { colorMode } = useColorMode();
-
+    console.log('editorname', textEditorName)
     const [selectedNodeType, setSelectedNodeType] = useState<string>();
     // useEffect(() => {
     //     console.log("Hi:", displayData)
@@ -116,34 +117,7 @@ export const DisplaySRTE = (
                             fontSize={"14px"}
                         >
                             {`Press the edit button to add 
-                        ${textEditorName === "Description" ? "a project description"
-                                    : textEditorName === "Title" ? "a project title"
-                                        : textEditorName === "Tagline" ? "a project tagline"
-                                            : textEditorName === "Background" ? "some background"
-                                                : textEditorName === "Aims" ? "some aims"
-                                                    : textEditorName === "Outcome" ? "an expected outcome"
-                                                        : textEditorName === "Collaboration" ? "expected collaborations"
-                                                            : textEditorName === "Strategic Context" ? "a strategic context"
-                                                                : textEditorName === "Staff Time Allocation" ? "a staff time allocation"
-                                                                    : textEditorName === "Operating Budget" ? "an operating budget"
-                                                                        : textEditorName === "External Budget" ? "an external budget"
-                                                                            : textEditorName === "Knowledge Transfer" ? "knowledge transfer"
-                                                                                : textEditorName === "Tasks and Milestones" ? "tasks and milestones"
-                                                                                    : textEditorName === "Related Projects" ? "names of related projects"
-                                                                                        : textEditorName === "References" ? "references"
-                                                                                            : textEditorName === "Data Management" ? "data management"
-                                                                                                : textEditorName === "Methodology" ? "methodology"
-                                                                                                    : textEditorName === "Progress" ? "this year's progress"
-                                                                                                        : textEditorName === "Management Implications" ? "management implications"
-                                                                                                            : textEditorName === "Future Directions" ? "future directions"
-                                                                                                                : textEditorName === "Reason" ? "a reason of closure"
-                                                                                                                    : textEditorName === "Intended Outcome" ? "an intended outcome"
-                                                                                                                        : textEditorName === "Data Location" ? "a data location"
-                                                                                                                            : textEditorName === "Hardcopy Location" ? "a hardcopy location"
-                                                                                                                                : textEditorName === "Backup Location" ? "a backup location"
-                                                                                                                                    : textEditorName === "Scientific Outputs" ? "scientific outputs"
-                                                                                                                                        : textEditorName === "Context" ? "some context"
-                                                                                                                                            : "some text"}.`}
+                        ${useGetRTESectionPlaceholder(section)}.`}
 
                         </Text>
                     </div>
