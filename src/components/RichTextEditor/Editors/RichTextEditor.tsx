@@ -38,6 +38,7 @@ import { EditableSRTE } from "./Sections/EditableSRTE";
 import { DisplaySRTE } from "./Sections/DisplaySRTE";
 import { EditorSections, EditorSubsections, EditorType } from "../../../types";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
+import { useGetRTESectionTitle } from "@/lib/hooks/useGetRTESectionTitle";
 
 
 
@@ -166,44 +167,7 @@ export const RichTextEditor = ({
                         fontSize={titleTextSize ? titleTextSize : "xl"}
                     >
                         {
-                            section === "description" ? "Description" :
-
-                                section === "background" ? "Background" :
-                                    section === "aims" ? "Aims" :
-                                        section === "outcome" ? "Expected Outcome" :
-                                            section === "collaborations" ? "Collaborations" :
-                                                section === "strategic_context" ? "Strategic Context" :
-                                                    section === "staff_time_allocation" ? "Staff Time Allocation" :
-                                                        section === "budget" ? "Indicitave Operating Budget" :
-                                                            section === "knowledge_transfer" ? "Knowledge Transfer" :
-                                                                section === "project_tasks" ? "Tasks and Milestones" :
-                                                                    section === "related_projects" ? "Related Science Projects" :
-                                                                        section === "listed_references" ? "References" :
-                                                                            section === "data_management" ? "Data Management" :
-                                                                                section === "methodology" ? "Methodology" :
-                                                                                    section === "specimens" ? "No. of Specimens" :
-                                                                                        section === "operating_budget" ? "Operating Budget" :
-                                                                                            section === "operating_budget_external" ? "External Budget" :
-
-                                                                                                section === "context" ? "Context" :
-                                                                                                    section === "progress" ? "Progress" :
-                                                                                                        section === "implications" ? "Management Implications" :
-                                                                                                            section === "future" ? "Future Directions" :
-
-                                                                                                                section === "progress_report" ? "Progress Report" :
-                                                                                                                    section === "reason" ? "Reason" :
-                                                                                                                        section === "intended_outcome" ? "Intended Outcome" :
-                                                                                                                            section === "data_location" ? "Data Location" :
-                                                                                                                                section === "hardcopy_location" ? "Hardcopy Location" :
-                                                                                                                                    section === "backup_location" ? "Backup Location" :
-                                                                                                                                        section === "dm" ? "Director's Message" :
-                                                                                                                                            section === "service_delivery_intro" ? "Service Delivery Intro" :
-                                                                                                                                                section === "research_intro" ? "Research Intro" :
-                                                                                                                                                    section === "student_intro" ? "Student Intro" :
-                                                                                                                                                        section === "publications" ? "Publications" :
-
-                                                                                                                                                            // scientific_outputs
-                                                                                                                                                            "Scientific Outputs"
+                            useGetRTESectionTitle(section)
                         }
                     </Text>
                 </Flex>

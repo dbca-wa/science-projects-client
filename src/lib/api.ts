@@ -459,7 +459,7 @@ export interface IFullUserUpdateVariables {
 
 export const adminUpdateUser = async ({ userPk, title, phone, fax, branch, business_area, image, about, expertise }: IFullUserUpdateVariables) => {
     console.log(
-        userPk, title, phone, fax, branch, business_area, image, about, expertise
+        { userPk, title, phone, fax, branch, business_area, image, about, expertise }
     )
 
     try {
@@ -469,7 +469,7 @@ export const adminUpdateUser = async ({ userPk, title, phone, fax, branch, busin
         const membershipData = {
             userPk: userPk,
             branch: (branch !== null && branch !== '') ? Number(branch) : 0,
-            business_area: (business_area !== null && branch !== '') ? Number(business_area) : 0,
+            business_area: (business_area !== null && business_area !== '') ? Number(business_area) : 0,
         };
         await updateMembership(membershipData);
 

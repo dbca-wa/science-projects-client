@@ -1,4 +1,4 @@
-import { Box, Button, Center, Checkbox, Flex, Grid, Input, Switch, Tag, Text, ToastId, useDisclosure, useToast } from "@chakra-ui/react"
+import { Box, Button, Center, Checkbox, Flex, Grid, Input, Switch, Tag, Text, ToastId, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
 import { IProjectPlan, IUserData, IUserMe } from "../../../types"
 import { SetStateAction, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -73,6 +73,8 @@ export const ProjectPlanEndorsements = (
     const [userCanEditHCEndorsement, setUserCanEditHCEndorsement] = useState(false);
     const [userCanEditBMEndorsement, setUserCanEditBMEndorsement] = useState(false);
     const [userCanEditAECEndorsement, setUserCanEditAECEndorsement] = useState(false);
+
+    const { colorMode } = useColorMode();
 
     useEffect(() => {
         if (userData?.is_superuser || userData?.is_herbarium_curator) {
@@ -248,7 +250,7 @@ export const ProjectPlanEndorsements = (
                 aecPDFFile={uploadedPDF}
             />
             <Box
-                background={"gray.50"}
+                background={colorMode === "light" ? "gray.50" : "gray.700"}
                 rounded={"lg"}
                 p={4}
                 w={"100%"}
@@ -263,7 +265,7 @@ export const ProjectPlanEndorsements = (
 
                     {/* Contents */}
                     <Grid
-                        background={"gray.100"}
+                        background={colorMode === "light" ? "gray.100" : "gray.700"}
                         rounded={"lg"}
                         p={6}
                         w={"100%"}
@@ -330,7 +332,7 @@ export const ProjectPlanEndorsements = (
                                     flex={1}
                                 >
                                     <Text
-                                        color={bmEndRequiredValue ? "black" : "gray.500"}
+                                        color={bmEndRequiredValue ? colorMode === "light" ? "black" : "white" : "gray.500"}
                                     >
                                         Biometrician's Endorsement</Text>
                                 </Box>
