@@ -1,7 +1,8 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
-import { $getRoot, $getSelection, RangeSelection } from "lexical";
+import { $getRoot, $getSelection, LexicalNode, RangeSelection, createCommand } from "lexical";
+import { CLEAR_EDITOR_COMMAND, LexicalEditor } from "lexical"
 
 interface HTMLPrepopulationProp {
     data: string;
@@ -9,44 +10,33 @@ interface HTMLPrepopulationProp {
 
 export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
     const [editor, editorState] = useLexicalComposerContext();
-
-    const checkIfEmpty = () => {
-        const root = $getRoot();
-        const isEmpty = root.getFirstChild().isEmpty() && root.getChildrenSize() === 1;
-        // console.log("Is Empty: ", isEmpty);
-        return isEmpty
-    };
-
-
     useEffect(() => {
-        // if ($getRoot().isEmpty)
-
         editor.update(() => {
-
-            if (data !== null && data !== undefined) {
-                const empty = checkIfEmpty()
-                // console.log(empty)
-
-                // Create a DOMParser
-                if (empty === true) {
-                    const htmlString = data;
-                    const parser = new DOMParser();
-                    const dom = parser.parseFromString(htmlString, 'text/html'
-                        // textHtmlMimeType
-                    );
-
-                    const nodes = $generateNodesFromDOM(editor, dom);
-
-                    $getRoot().select();
-                    const selection = $getSelection() as RangeSelection;
-                    selection.insertNodes(nodes);
-                    // $insertNodes(nodes);
-
+            // editor.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined)
+            const parser = new DOMParser();
+            const dom = parser.parseFromString(data, 'text/html');
+            console.log(dom.body.children)
+            const bunchOfNodes = $generateNodesFromDOM(editor, dom)
+            const root = $getRoot();
+            bunchOfNodes.forEach((node, index) => {
+                if (root) {
+                    const firstChild = root.getFirstChild()
+                    // Remove any empty paragraph node caused by the Lexical 0.12.3 update
+                    if (firstChild.getTextContent() === "" || firstChild.getTextContent() === undefined || firstChild.getTextContent() === null) {
+                        firstChild.remove()
+                    }
+                    // Ignore any empty nodes in the data, else append the node to the root.
+                    if (node.getTextContent() === "" || node.getTextContent() === undefined || node.getTextContent() === null) {
+                        console.log("NODE PROBLEM: ", node.getTextContent())
+                    } else {
+                        console.log("NODE FINE", node.getTextContent())
+                        root.append(node)
+                    }
                 }
-
-            }
+            });
+            root.selectEnd();
         })
-    }, [editor]);
+    }, [])
     return null;
 }
 

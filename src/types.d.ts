@@ -1,3 +1,4 @@
+import { LexicalEditor } from "lexical";
 import { ReactNode } from "react";
 
 // Editor ============================================================================
@@ -697,6 +698,7 @@ export interface IBreadCrumbProps {
 
 export interface IToolbarButton {
     onClick: (event: string) => void;
+    editor: LexicalEditor;
 }
 
 

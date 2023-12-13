@@ -78,7 +78,7 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
 
 
     const deleteProject = (formData: ISimplePkProp) => {
-        console.log(formData)
+        // console.log(formData)
         deleteProjectMutation.mutate(formData);
     }
 
@@ -86,7 +86,7 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
     const { register, handleSubmit, reset, watch } = useForm<ISimplePkProp>();
 
     const projPk = watch('pk');
-    useEffect(() => console.log(projPk, projectPk), [projectPk, projPk])
+    // useEffect(() => console.log(projPk, projectPk), [projectPk, projPk])
 
     return (
         <Modal

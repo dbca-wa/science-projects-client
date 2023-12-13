@@ -13,6 +13,7 @@ import { ItalicsButton } from "../Buttons/ItalicsButton";
 import { UnderlineButton } from "../Buttons/UnderlineButton";
 import { FontFormatterButton } from "../MenuButtons/FontFormatterButton";
 import { ToolbarToggleBtn } from "../Buttons/ToolbarToggleBtn";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 
 interface Props {
@@ -24,6 +25,8 @@ interface Props {
 export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeType }: Props) => {
 
     const { onClick } = useToolbarClickListener({ currentlySelectedNode: selectedNodeType, editorRef: editorRef });
+    const [editor] = useLexicalComposerContext();
+
 
     useEffect(() => {
         console.log(selectedNodeType)
@@ -71,16 +74,16 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                     isSmall ?
                         (
                             <>
-                                <TimeButtons onClick={onClick} />
+                                <TimeButtons onClick={onClick} editor={editor} />
                                 <VerticalDivider />
                                 {
                                     currentToolbarPage === 1 ?
 
                                         <>
 
-                                            <BoldButton onClick={onClick} />
-                                            <ItalicsButton onClick={onClick} />
-                                            <UnderlineButton onClick={onClick} />
+                                            <BoldButton onClick={onClick} editor={editor} />
+                                            <ItalicsButton onClick={onClick} editor={editor} />
+                                            <UnderlineButton onClick={onClick} editor={editor} />
                                             {/* <FontHighlighterButton /> */}
 
                                         </>
@@ -117,16 +120,16 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                             shouldShowToolbarToggleBtnWhenNotSmall ?
                                 (
                                     <>
-                                        <TimeButtons onClick={onClick} />
+                                        <TimeButtons onClick={onClick} editor={editor} />
                                         <VerticalDivider />
                                         {
                                             currentToolbarPageMd === 1 ?
                                                 <>
                                                     {/* <FontStylingButtons /> */}
 
-                                                    <BoldButton onClick={onClick} />
-                                                    <ItalicsButton onClick={onClick} />
-                                                    <UnderlineButton onClick={onClick} />
+                                                    <BoldButton onClick={onClick} editor={editor} />
+                                                    <ItalicsButton onClick={onClick} editor={editor} />
+                                                    <UnderlineButton onClick={onClick} editor={editor} />
                                                 </>
 
                                                 : currentToolbarPageMd === 2 ?
@@ -160,11 +163,11 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                 ) :
                                 (
                                     <>
-                                        <TimeButtons onClick={onClick} />
+                                        <TimeButtons onClick={onClick} editor={editor} />
                                         <VerticalDivider />
-                                        <BoldButton onClick={onClick} />
-                                        <ItalicsButton onClick={onClick} />
-                                        <UnderlineButton onClick={onClick} />
+                                        <BoldButton onClick={onClick} editor={editor} />
+                                        <ItalicsButton onClick={onClick} editor={editor} />
+                                        <UnderlineButton onClick={onClick} editor={editor} />
                                         <VerticalDivider />
 
                                         <ElementTypeButton onClick={onClick} shouldFurtherConcat={true}

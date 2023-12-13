@@ -222,19 +222,19 @@ export const AddUserToProjectModal = ({ isOpen, onClose, preselectedUser, presel
 
 
 
-    useEffect(() => {
-        console.log(
-            {
-                "preselectedProject": preselectedProject,
-                "selectedProject": selectedProject,
-                "selectedUser": selectedUser,
-                "role": role,
-                "timeAllocation": timeAllocation,
-                "shortCode": shortCode
-            }
-        )
+    // useEffect(() => {
+    //     console.log(
+    //         {
+    //             "preselectedProject": preselectedProject,
+    //             "selectedProject": selectedProject,
+    //             "selectedUser": selectedUser,
+    //             "role": role,
+    //             "timeAllocation": timeAllocation,
+    //             "shortCode": shortCode
+    //         }
+    //     )
 
-    }, [selectedProject, selectedUser, role, timeAllocation, shortCode, preselectedProject])
+    // }, [selectedProject, selectedUser, role, timeAllocation, shortCode, preselectedProject])
 
     // const handleSubmissionTest = () => {
     //     console.log(
@@ -253,7 +253,7 @@ export const AddUserToProjectModal = ({ isOpen, onClose, preselectedUser, presel
 
 
     useEffect(() => {
-        console.log(preselectedProject)
+        // console.log(preselectedProject)
         if (!preselectedProject) {
             if (isOpen && projectSearchInputRef.current) {
                 projectSearchInputRef.current.focus();

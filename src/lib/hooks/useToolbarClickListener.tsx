@@ -55,14 +55,14 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
 
         // console.log(event)
         if (event === "formatUndo") {
-            // editor.dispatchCommand(UNDO_COMMAND, undefined);
+            editor.dispatchCommand(UNDO_COMMAND, undefined);
             console.log("undo")
         } else if (event === "formatRedo") {
-            // editor.dispatchCommand(REDO_COMMAND, undefined);
+            editor.dispatchCommand(REDO_COMMAND, undefined);
             console.log("redo")
         }
         else if (event === "paragraph" && currentlySelectedNode !== "paragraph") {
-            formatParagraph();
+            // formatParagraph();
             console.log("set paragraph")
             console.log(event)
 
@@ -88,7 +88,7 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
 
         }
         else if (event === "ul" && (currentlySelectedNode !== "ul" || "li")) {
-            formatBulletList();
+            // formatBulletList();
             console.log("set ul")
 
         }

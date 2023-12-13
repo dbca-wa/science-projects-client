@@ -170,17 +170,17 @@ export const ManageTeam = ({
 
     const { userLoading, userData } = useUser();
 
-    useEffect(() => {
-        if (!isTeamLoading)
-            // console.log("TEAM:", team);
-            console.log("TEAMDATA:", teamData);
+    // useEffect(() => {
+    //     if (!isTeamLoading)
+    //         // console.log("TEAM:", team);
+    //         console.log("TEAMDATA:", teamData);
 
-    }, [isTeamLoading, teamData])
+    // }, [isTeamLoading, teamData])
 
-    useEffect(() => {
-        if (!userLoading)
-            console.log(userData)
-    }, [userLoading, userData])
+    // useEffect(() => {
+    //     if (!userLoading)
+    //         console.log(userData)
+    // }, [userLoading, userData])
 
     return (
         !userLoading && !isTeamLoading &&

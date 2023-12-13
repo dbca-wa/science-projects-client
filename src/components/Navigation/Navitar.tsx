@@ -29,9 +29,9 @@ export const Navitar = (
     const { colorMode } = useColorMode();
     const { userData, userLoading } = useUser();
 
-    useEffect(() => {
-        console.log(userData)
-    }, [userData])
+    // useEffect(() => {
+    //     console.log(userData)
+    // }, [userData])
 
     const baseAPI = useApiEndpoint();
 

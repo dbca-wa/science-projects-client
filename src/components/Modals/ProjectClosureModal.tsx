@@ -26,7 +26,7 @@ export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData, s
     const projPk = watch('projectPk');
 
 
-    useEffect(() => console.log({ outcomeValue, closureReason }), [closureReason, outcomeValue])
+    // useEffect(() => console.log({ outcomeValue, closureReason }), [closureReason, outcomeValue])
 
     const navigate = useNavigate();
 
@@ -67,7 +67,7 @@ export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData, s
                     // }
                     queryClient.invalidateQueries(["projects", projectPk]);
                     await refetchData();
-                    console.log("cheese")
+                    // console.log("cheese")
                     setToLastTab(-1);
                     onClose();
 
@@ -94,8 +94,8 @@ export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData, s
 
 
     const closeProject = (formData: ICloseProjectProps) => {
-        console.log(formData);
-        console.log(reasonValue, projPk, outcomeValue);
+        // console.log(formData);
+        // console.log(reasonValue, projPk, outcomeValue);
         const newForm = {
             "reason": reasonValue,
             "projectPk": projPk,
@@ -129,14 +129,14 @@ export const ProjectClosureModal = ({ projectPk, isOpen, onClose, refetchData, s
         else {
             prefillHtml = `<p class='editor-p-dark'>${prefillText}</p>`
         }
-        console.log(prefillHtml)
+        // console.log(prefillHtml)
         setClosureReason(prefillHtml)
     }, [colorMode, outcomeValue])
 
     useEffect(() => {
         if (closureReason !== '') {
 
-            console.log(closureReason)
+            // console.log(closureReason)
             // document.querySelector('[name="reason"]').value = closureReason;
         }
 

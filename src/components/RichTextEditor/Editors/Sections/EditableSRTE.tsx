@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { DataDisplayPlugin } from "../../Plugins/DataDisplayPlugin";
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
 import { EditorSections, EditorSubsections, EditorType } from "../../../../types";
+import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
 
 interface Props {
     initialConfig: any;
@@ -57,6 +58,8 @@ export const EditableSRTE = (
 
     // useEffect(() => console.log(displayData), [displayData])
 
+    const toolBarHeight = 45;
+
     return (
         <>
             <LexicalComposer
@@ -70,6 +73,7 @@ export const EditableSRTE = (
                         const root = $getRoot();
                         setEditorText(root.__cachedText);
                         const newHtml = $generateHtmlFromNodes(editor, null)
+                        console.log(newHtml)
                         // console.log(newHtml)
                         // console.log("DATA DISPLAY PLUGIN:", newHtml);
                         setDisplayData(newHtml);
@@ -88,6 +92,7 @@ export const EditableSRTE = (
                             {/* Toolbar */}
 
                             <RichTextToolbar
+                                // editor={editor}
                                 editorRef={editorRef}
                                 selectedNodeType={selectedNodeType}
                                 setSelectedNodeType={setSelectedNodeType}
@@ -103,22 +108,24 @@ export const EditableSRTE = (
                                     borderRadius: "0 0 25px 25px",
                                     outline: "none",
                                 }}
+                                autoFocus
                             />
                         </>
                     }
                     placeholder={
-                        <div
+                        <Box
                             style={{
                                 position: "absolute",
                                 left: "32px",
-                                top: "76px",
+                                top: `${30 + toolBarHeight}px`,
                                 userSelect: "none",
                                 pointerEvents: "none",
+                                color: "gray"
 
                             }}
                         >
-                            {"Enter some text..."}
-                        </div>
+                            {`Enter ${useGetRTESectionPlaceholder(section)}..`}
+                        </Box>
                     }
                     ErrorBoundary={LexicalErrorBoundary}
                 />
