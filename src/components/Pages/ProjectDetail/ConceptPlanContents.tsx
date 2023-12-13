@@ -6,6 +6,7 @@ import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { useEffect } from "react";
 import { ConceptPlanDocActions } from "./DocActions/ConceptPlanDocActions";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
+import { motion } from "framer-motion";
 
 interface Props {
 
@@ -40,7 +41,21 @@ export const ConceptPlanContents = ({
     const userInTeam = useCheckUserInTeam(mePk, members);
 
     return (
-        <>
+        <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 10, opacity: 0 }}
+            transition={{
+                duration: 0.7, delay: ((
+                    (1) / 7))
+            }}
+            style={{
+                height: "100%",
+                animation: "oscillate 8s ease-in-out infinite",
+                // backgroundColor: "pink"
+            }}
+
+        >
 
             <ConceptPlanDocActions
                 all_documents={all_documents}
@@ -181,7 +196,7 @@ export const ConceptPlanContents = ({
                     data={document?.budget}
                 />
             </Box> */}
-        </>
+        </motion.div>
 
     )
 }

@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
 import { ProjectPlanEndorsements } from "./ProjectPlanEndorsements";
 import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
+import { motion } from "framer-motion";
 
 interface Props {
     document: IProjectPlan | null;
@@ -45,7 +46,21 @@ export const ProjectPlanContents = ({
 
 
     return (
-        <>
+        <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 10, opacity: 0 }}
+            transition={{
+                duration: 0.7, delay: ((
+                    (1) / 7))
+            }}
+            style={{
+                height: "100%",
+                animation: "oscillate 8s ease-in-out infinite",
+                // backgroundColor: "pink"
+            }}
+
+        >
             {/* <DocumentActions /> */}
             <ProjectPlanDocActions
                 all_documents={all_documents}
@@ -404,6 +419,6 @@ export const ProjectPlanContents = ({
                 section={"specimens"}
             /> */}
 
-        </>
+        </motion.div>
     )
 }
