@@ -9,6 +9,7 @@ import { VerticalDivider } from "./VerticalDivider";
 import { ItalicsButton } from "../Buttons/ItalicsButton";
 import { UnderlineButton } from "../Buttons/UnderlineButton";
 import { SimpleFontFormatterButton } from "../MenuButtons/SimpleFontFormatterButton";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 
 interface Props {
@@ -45,6 +46,7 @@ export const SimpleRichTextToolbar = ({ editorRef, selectedNodeType, setSelected
     const { colorMode } = useColorMode();
 
     useEffect(() => console.log(colorMode), [colorMode])
+    const [editor] = useLexicalComposerContext();
 
     return (
         <>
@@ -72,13 +74,13 @@ export const SimpleRichTextToolbar = ({ editorRef, selectedNodeType, setSelected
             >
 
                 <>
-                    <TimeButtons onClick={onClick} />
+                    <TimeButtons onClick={onClick} editor={editor} />
                     <VerticalDivider />
-                    <BoldButton onClick={onClick} />
-                    <ItalicsButton onClick={onClick} />
-                    <UnderlineButton onClick={onClick} />
+                    <BoldButton onClick={onClick} editor={editor} />
+                    <ItalicsButton onClick={onClick} editor={editor} />
+                    <UnderlineButton onClick={onClick} editor={editor} />
                     <VerticalDivider />
-                    <SimpleFontFormatterButton />
+                    <SimpleFontFormatterButton editor={editor} />
                 </>
 
             </Flex>
