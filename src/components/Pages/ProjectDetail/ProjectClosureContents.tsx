@@ -13,6 +13,7 @@ import { IClosureOutcomeProps, setClosureOutcome } from "../../../lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { AxiosError } from "axios";
+import { motion } from "framer-motion";
 
 interface Props {
     document: IProjectClosure | null;
@@ -123,7 +124,21 @@ export const ProjectClosureContents = ({
     // }, [selectedOutcome])
 
     return (
-        <>
+        <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 10, opacity: 0 }}
+            transition={{
+                duration: 0.7, delay: ((
+                    (1) / 7))
+            }}
+            style={{
+                height: "100%",
+                animation: "oscillate 8s ease-in-out infinite",
+                // backgroundColor: "pink"
+            }}
+
+        >
             {/* <DocumentActions /> */}
             <ProjectClosureDocActions
                 all_documents={all_documents}
@@ -267,7 +282,7 @@ export const ProjectClosureContents = ({
                 section={"scientific_outputs"}
             />
 
-        </>
+        </motion.div>
     )
 }
 
