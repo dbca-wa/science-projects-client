@@ -31,7 +31,7 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
     const [distilledTitle, setDistilledTitle] = useState<string>();
 
     useEffect(() => {
-        console.log(projectData)
+        // console.log(projectData)
         if (!isLoading && projectData) {
             setLocation(projectData.location);
             setBaseInformation(projectData.project);
@@ -47,10 +47,10 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
         }
     }, [isLoading, projectData])
 
-    useEffect(() => {
-        console.log(distilledTitle)
+    // useEffect(() => {
+    //     console.log(distilledTitle)
 
-    }, [distilledTitle])
+    // }, [distilledTitle])
 
     const me = useUser();
 
@@ -108,7 +108,7 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
             (documents?.concept_plan ? 1 : 0) +
             (documents?.project_closure ? 1 : 0) +
             (documents?.project_plan ? 1 : 0) + 1 // plus overview
-        console.log('count: ', count)
+        // console.log('count: ', count)
 
         const tabData = [
             'overview',
@@ -119,14 +119,14 @@ export const ProjectDetail = ({ selectedTab }: { selectedTab: string }): React.R
             documents?.project_closure && 'closure'
         ].filter(Boolean)
         const tabDataLength = tabData.length;
-        console.log('len of tabdata: ', tabDataLength)
+        // console.log('len of tabdata: ', tabDataLength)
 
         if (tabs.length !== count) {
-            console.log("Length different, updating")
+            // console.log("Length different, updating")
             setTabs(tabData)
         }
         else {
-            console.log('Tabs: ', tabs)
+            // console.log('Tabs: ', tabs)
         }
     }, [documents?.concept_plan, documents?.progress_reports, documents?.student_reports, documents?.progress_reports?.length, documents?.student_reports?.length, documents?.project_plan, documents?.project_closure, tabs])
 

@@ -30,6 +30,7 @@ import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 import { BsCaretDownFill } from "react-icons/bs";
 import { IoCreate } from "react-icons/io5";
 import { GrStatusInfo } from "react-icons/gr";
+import { TestRichTextEditor } from "@/components/RichTextEditor/TestRichTextEditor";
 
 interface IProjectOverviewCardProps {
     location: IProjectAreas;
@@ -50,10 +51,10 @@ export const ProjectOverviewCard = (
     const baseApi = useApiEndpoint();
     const { isOpen: isEditProjectDetailModalOpen, onOpen: onEditProjectDetailModalOpen, onClose: onEditProjectDetailModalClose } = useDisclosure()
     const { colorMode } = useColorMode();
-    useEffect(() => {
-        console.log(baseInformation)
-        console.log(details)
-    })
+    // useEffect(() => {
+    //     console.log(baseInformation)
+    //     console.log(details)
+    // })
 
 
     const { isOpen: isDeleteModalOpen, onOpen: onOpenDeleteModal, onClose: onCloseDeleteModal } = useDisclosure()
@@ -227,7 +228,7 @@ export const ProjectOverviewCard = (
         }
     }, [baseInformation])
 
-    useEffect(() => console.log(documents), [documents])
+    // useEffect(() => console.log(documents), [documents])
 
     return (
         <>
@@ -806,6 +807,9 @@ export const ProjectOverviewCard = (
                             ? <Text><b>Description:</b> {baseInformation.description}</Text>
                             : <Text><b>Description:</b> This project has no description</Text>} */}
 
+                        {/* <TestRichTextEditor
+
+                        /> */}
                         <RichTextEditor
                             canEdit={userInTeam || me?.userData?.is_superuser}
                             editorType="ProjectDetail"

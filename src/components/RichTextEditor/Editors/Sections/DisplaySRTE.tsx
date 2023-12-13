@@ -54,221 +54,97 @@ export const DisplaySRTE = (
     }: Props) => {
 
     const { colorMode } = useColorMode();
-    console.log('editorname', textEditorName)
+    // console.log('editorname', textEditorName)
     const [selectedNodeType, setSelectedNodeType] = useState<string>();
     // useEffect(() => {
     //     console.log("Hi:", displayData)
     // }, [displayData])
 
     return (
-        <LexicalComposer
-            initialConfig={initialConfig}
-        >
+        <>
+
+            <LexicalComposer
+                initialConfig={initialConfig}
+            >
 
 
-            {/* Plugins*/}
-            <HistoryPlugin />
-            <ListPlugin />
-            <OnChangePlugin onChange={(editorState, editor) => {
-                editorState.read(() => {
-                    const root = $getRoot();
-                    setEditorText(root.__cachedText);
-                    const newHtml = $generateHtmlFromNodes(editor, null)
-                    // console.log("DATA DISPLAY PLUGIN:", newHtml);
-                    setDisplayData(newHtml);
-                })
-            }} />
-            {data !== undefined && data !== null && (
-                <PrepopulateHTMLPlugin data={displayData} />
+                {/* Plugins*/}
+                <HistoryPlugin />
+                <ListPlugin />
+                {/* <OnChangePlugin onChange={(editorState, editor) => {
+                    editorState.read(() => {
+                        const root = $getRoot();
+                        console.log(root.__cachedText)
+                        setEditorText(root.__cachedText);
+                        const newHtml = $generateHtmlFromNodes(editor, null)
+                        // console.log("DATA DISPLAY PLUGIN:", newHtml);
+                        setDisplayData(newHtml);
+                    })
+                }} /> */}
+                {data !== undefined && data !== null && (
+                    <PrepopulateHTMLPlugin data={displayData} />
 
-            )}
+                )}
 
 
-            {/* Text Area */}
-            <RichTextPlugin
-                contentEditable={
+                {/* Text Area */}
+                <RichTextPlugin
+                    contentEditable={
 
-                    <ContentEditable
-                        style={{
-                            minHeight: "50px",
-                            width: "100%",
-                            height: "auto",
-                            padding: "32px",
-                            paddingBottom: "16px",
-                            paddingTop: "16px",
-                            borderRadius: "0 0 25px 25px",
-                            outline: "none",
-                        }}
-                    />
-                }
-                placeholder={
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: "32px",
-                            top: "20px",
-                            // bottom: "50px",
-                            userSelect: "none",
-                            pointerEvents: "none",
-                        }}
-                    >
-                        <Text
-                            color={"gray.500"}
-                            fontSize={"14px"}
+                        <ContentEditable
+                            style={{
+                                minHeight: "50px",
+                                width: "100%",
+                                height: "auto",
+                                padding: "32px",
+                                paddingTop: "20px",
+                                paddingBottom: "16px",
+                                borderRadius: "0 0 25px 25px",
+                                outline: "none",
+                            }}
+                        />
+                    }
+                    placeholder={
+                        <Box
+                            style={{
+                                position: "absolute",
+                                left: "32px",
+                                top: "20px",
+                                // paddingTop: "20px",
+                                // paddingBottom: "16px",
+                                userSelect: "none",
+                                pointerEvents: "none",
+                                color: "gray.500"
+
+                            }}
                         >
-                            {`Press the edit button to add 
+                            <Text
+                                color={"gray.500"}
+                                fontSize={"14px"}
+                            // pb={2}
+                            >
+                                {`Press the edit button to add 
                         ${useGetRTESectionPlaceholder(section)}.`}
 
-                        </Text>
-                    </div>
-                }
-                ErrorBoundary={LexicalErrorBoundary}
-            />
+                            </Text>
+                        </Box>
+                    }
+                    ErrorBoundary={LexicalErrorBoundary}
 
-
-            <Box>
-                <OptionsBar
-                    editorType={editorType}
-                    displayData={displayData}
-                    editorText={editorText}
-                    shouldShowTree={shouldShowTree}
-                    setShouldShowTree={setShouldShowTree}
-                    rawHTML={displayData}
-                    section={section}
-                    project_pk={project_pk}
-                    document_pk={document_pk}
-                    isUpdate={isUpdate}
-
-                    editorIsOpen={isEditorOpen}
-                    setIsEditorOpen={setIsEditorOpen}
-                    setDisplayData={setDisplayData}
                 />
-            </Box>
-            {
-                shouldShowTree ?
-                    <TreeViewPlugin />
-                    : null
-            }
-            <ClearEditorPlugin />
-            {/* <NodeEventPlugin
-                nodeType={ParagraphNode}
-                eventType={'click'}
-                eventListener={(e: Event) => {
 
-                    console.log(e)
-                    console.log('paragaph node clicked')
-                    // setSelectedNodeType('paragraph')
-                }}
-            />
-            <NodeEventPlugin
-                nodeType={ListItemNode}
-                eventType={'click'}
-                eventListener={(e: Event) => {
 
-                    console.log(e)
-                    console.log('li node clicked')
-                    // setSelectedNodeType('li')
-                }}
-            /> */}
-        </LexicalComposer>
+                <Box>
+
+                </Box>
+                {
+                    shouldShowTree ?
+                        <TreeViewPlugin />
+                        : null
+                }
+                <ClearEditorPlugin />
+
+            </LexicalComposer>
+        </>
     )
 }
-
-
-
-// <LexicalComposer
-// initialConfig={uneditableInitialCOnfig}
-// >
-// {/* Plugins*/}
-// <HistoryPlugin />
-// <ListPlugin />
-// <OnChangePlugin onChange={(editorState) => {
-//     editorState.read(() => {
-//         const root = $getRoot();
-
-//         setEditorText(root.__cachedText);
-
-//     })
-// }} />
-// {data !== undefined && data !== null && (
-//     <PrepopulateHTMLPlugin data={data} />
-
-// )}
-
-
-// {/* Text Area */}
-// <RichTextPlugin
-//     contentEditable={
-//         <>
-//             <ContentEditable
-//                 style={{
-//                     minHeight: "50px",
-//                     width: "100%",
-//                     height: "auto",
-//                     padding: "32px",
-//                     paddingBottom: "16px",
-//                     borderRadius: "0 0 25px 25px",
-//                     outline: "none",
-//                 }}
-//             />
-//         </>
-//     }
-//     placeholder={
-//         <div
-//             style={{
-//                 position: "absolute",
-//                 left: "32px",
-//                 top: "89px",
-//                 userSelect: "none",
-//                 pointerEvents: "none",
-
-//             }}
-//         >
-//             {"Enter some text..."}
-//         </div>
-//     }
-//     ErrorBoundary={LexicalErrorBoundary}
-// />
-
-
-// <Box>
-//     <OptionsBar
-//         editorText={editorText}
-//         shouldShowTree={shouldShowTree}
-//         setShouldShowTree={setShouldShowTree}
-//         rawHTML={data}
-//         editorIsOpen={isEditorOpen}
-//         setIsEditorOpen={setIsEditorOpen}
-//         setDisplayData={setDisplayData}
-//     />
-// </Box>
-// {
-//     shouldShowTree ?
-//         <TreeViewPlugin />
-//         : null
-// }
-// <ClearEditorPlugin />
-// <NodeEventPlugin
-//     nodeType={ParagraphNode}
-//     eventType={'click'}
-//     eventListener={(e: Event) => {
-
-//         console.log(e)
-//         console.log('paragaph node clicked')
-//         setSelectedNodeType('paragraph')
-//     }}
-// />
-// <NodeEventPlugin
-//     nodeType={ListItemNode}
-//     eventType={'click'}
-//     eventListener={(e: Event) => {
-
-//         console.log(e)
-//         console.log('li node clicked')
-//         setSelectedNodeType('li')
-//     }}
-// />
-
-// {/* <SelectionSetterPlugin /> */}
-// {/* <DarkModePlugin /> */}
-// </LexicalComposer>

@@ -34,15 +34,15 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
     }
     const { colorMode } = useColorMode();
 
-    useEffect(() => {
-        console.log(conceptPlanData)
-        // console.log(conceptPlanData?.document?.creator)
-        // console.log(conceptPlanData?.document?.modifier)
-        // console.log(conceptPlanData?.document?.created_at);
-        // console.log(conceptPlanData?.document?.updated_at);
-        // setCreationDate(conceptPlanData?.document?.created_at);
-        // setModifyDate(conceptPlanData?.document?.updated_at);
-    }, [conceptPlanData])
+    // useEffect(() => {
+    //     console.log(conceptPlanData)
+    //     // console.log(conceptPlanData?.document?.creator)
+    //     // console.log(conceptPlanData?.document?.modifier)
+    //     // console.log(conceptPlanData?.document?.created_at);
+    //     // console.log(conceptPlanData?.document?.updated_at);
+    //     // setCreationDate(conceptPlanData?.document?.created_at);
+    //     // setModifyDate(conceptPlanData?.document?.updated_at);
+    // }, [conceptPlanData])
 
     const { isOpen: isS1ApprovalModalOpen, onOpen: onS1ApprovalModalOpen, onClose: onS1ApprovalModalClose } = useDisclosure();
     const { isOpen: isS2ApprovalModalOpen, onOpen: onS2ApprovalModalOpen, onClose: onS2ApprovalModalClose } = useDisclosure();
@@ -61,13 +61,13 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
     const { userData, userLoading } = useUser();
 
     const { baData, baLoading } = useBusinessArea(conceptPlanData?.document?.project?.business_area?.pk)
-    useEffect(() => {
-        if (!baLoading)
-            console.log(conceptPlanData)
-        console.log(conceptPlanData?.document)
-        console.log(baData)
+    // useEffect(() => {
+    //     if (!baLoading)
+    //         console.log(conceptPlanData)
+    //     console.log(conceptPlanData?.document)
+    //     console.log(baData)
 
-    }, [baData, baLoading, conceptPlanData])
+    // }, [baData, baLoading, conceptPlanData])
     const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(baData?.leader)
     const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(conceptPlanData?.document?.modifier);
     const { userData: creator, userLoading: creatorLoading } = useFullUserByPk(conceptPlanData?.document?.creator);
@@ -77,13 +77,13 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
 
     useEffect(() => {
         if (!userLoading && !baLoading && !baLeadLoading) {
-            console.log(
-                {
-                    "ba": baData,
-                    "leadUser": baLead,
-                    "me": userData
-                }
-            )
+            // console.log(
+            //     {
+            //         "ba": baData,
+            //         "leadUser": baLead,
+            //         "me": userData
+            //     }
+            // )
         }
 
     }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading])
@@ -105,7 +105,7 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
             !userLoading && !baLoading && !modifierLoading && !creatorLoading && !isTeamLoading
             && teamData && userData && baData && modifier && creator
         ) {
-            console.log('hereeee')
+            // console.log('hereeee')
             if (!isTeamLoading) {
                 setLeaderMemeber(teamData.find((member) => member.is_leader === true))
             }
@@ -128,8 +128,8 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
     useEffect(() => {
         if (actionsReady) {
             setLeaderMemeber(teamData.find((member) => member.is_leader === true))
-            console.log(userData);
-            console.log(conceptPlanData?.document)
+            // console.log(userData);
+            // console.log(conceptPlanData?.document)
         }
     }, [actionsReady, teamData, isTeamLoading])
 
@@ -284,9 +284,9 @@ export const ConceptPlanDocActions = ({ all_documents, conceptPlanData, refetchD
 
 
 
-    useEffect(() => {
-        console.log(leaderMember)
-    }, [leaderMember])
+    // useEffect(() => {
+    //     console.log(leaderMember)
+    // }, [leaderMember])
 
     return (
         <>

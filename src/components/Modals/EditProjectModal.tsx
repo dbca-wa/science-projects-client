@@ -61,8 +61,8 @@ export const EditProjectModal = ({
             console.log(locationData);
         }
         else {
-            console.log('not zero')
-            console.log(locationData)
+            // console.log('not zero')
+            // console.log(locationData)
         }
         // console.log(currentAreas)
         // console.log(selectedRegions);
@@ -78,7 +78,7 @@ export const EditProjectModal = ({
 
     useEffect(() => {
         if (!baLoading && baSet === false) {
-            console.log(businessAreaDataFromAPI)
+            // console.log(businessAreaDataFromAPI)
             const alphabetisedBA = [...businessAreaDataFromAPI]
             alphabetisedBA.sort((a, b) => a.name.localeCompare(b.name));
             setBusinessAreaList(alphabetisedBA)
@@ -96,7 +96,7 @@ export const EditProjectModal = ({
     const [dsSet, setDsSet] = useState(false);
     useEffect(() => {
         if (!dsLoading && dsSet === false) {
-            console.log(servicesDataFromAPI)
+            // console.log(servicesDataFromAPI)
             const alphabetisedDS = [...servicesDataFromAPI]
             alphabetisedDS.sort((a, b) => a.name.localeCompare(b.name));
             setServicesList(alphabetisedDS)
@@ -111,7 +111,7 @@ export const EditProjectModal = ({
     const [rfSet, setRfSet] = useState(false);
     useEffect(() => {
         if (!rfLoading && rfSet === false) {
-            console.log(researchFunctionsFromAPI)
+            // console.log(researchFunctionsFromAPI)
             const alphabetisedRF = [...researchFunctionsFromAPI]
             alphabetisedRF.sort((a, b) => a.name.localeCompare(b.name));
             setResearchFunctionsList(alphabetisedRF)
@@ -159,15 +159,15 @@ export const EditProjectModal = ({
 
 
     useEffect(() => {
-        console.log({
-            projectTitle,
-            keywords,
-            dates,
-            businessArea,
-            service,
-            researchFunction,
-            dataCustodian
-        })
+        // console.log({
+        //     projectTitle,
+        //     keywords,
+        //     dates,
+        //     businessArea,
+        //     service,
+        //     researchFunction,
+        //     dataCustodian
+        // })
         const plainTitle = getPlainTextFromHTML(projectTitle)
         if (
             (plainTitle === '' || plainTitle.length === 0) ||
@@ -183,8 +183,8 @@ export const EditProjectModal = ({
         } else {
             setCanUpdate(true)
         }
-        console.log(selectedFile);
-        console.log(currentImage);
+        // console.log(selectedFile);
+        // console.log(currentImage);
     }, [
         projectTitle, keywords, dates, businessArea, service, researchFunction, dataCustodian,
         locationData,

@@ -62,7 +62,7 @@ export const RichTextEditor = ({
     const [shouldShowTree, setShouldShowTree] = useState(false);
     const { colorMode } = useColorMode();
 
-    const [lastSelectedNode, setLastSelectedNode] = useState();
+    // const [lastSelectedNode, setLastSelectedNode] = useState();
 
     const generateTheme = (colorMode) => {
         return {
@@ -105,18 +105,10 @@ export const RichTextEditor = ({
     const [editorText, setEditorText] = useState<string | null>("");
     const editorRef = useRef(null);
 
-    useEffect(() => {
-        setDisplayData(data);
-    }, [data])
-
     // useEffect(() => {
-    //     console.log("Data:", data)
-    //     console.log("Display Data:", displayData)
+    //     setDisplayData(data);
     // }, [data])
 
-    // useEffect(() => {
-    //     console.log("Hi:", displayData)
-    // }, [displayData])
 
     const initialConfig = {
         namespace: 'Annual Report Document Editor',
@@ -133,9 +125,6 @@ export const RichTextEditor = ({
         ...initialConfig,
         editable: false
     }
-    // useEffect(() => {
-    //     console.log("Hi:", displayData)
-    // }, [displayData])
 
     const [isEditorOpen, setIsEditorOpen] = useState(false);
     const [displayData, setDisplayData] = useState(data);
@@ -175,69 +164,23 @@ export const RichTextEditor = ({
 
                 <Flex
                     justifyContent="flex-end"
-                    // alignItems="center"
                     flex={1}
                 >
                     <Grid
-                        // px={10}
                         pr={8}
                         py={2}
                         gridTemplateColumns={"repeat(1, 1fr)"}
-                        // width={"100%"}
                         gridColumnGap={2}
                     >
-                        {/*  */}
                         {canEdit && (
                             <HideEditorButton
                                 setIsEditorOpen={setIsEditorOpen}
                                 editorIsOpen={isEditorOpen}
-                                // setDisplayData={setDisplayData}
-                                editorText={editorText}
-                            // rawHTML={rawHTML}
                             />
                         )}
 
                     </Grid>
                 </Flex>
-
-
-
-                {/* {editorIsOpen ? 
-                ()
-                :
-            ( */}
-                {/* <Flex
-                    height={20}
-                    width={"100%"}
-                    pos={"absolute"}
-                    top={0}
-                >
-                    <Flex
-                        justifyContent="flex-end"
-                        alignItems="center"
-                        flex={1}
-                    >
-                        <Grid
-                            px={10}
-                            py={4}
-                            gridTemplateColumns={"repeat(1, 1fr)"}
-                            // width={"100%"}
-                            gridColumnGap={2}
-                        >
-
-                            <HideEditorButton
-                                setIsEditorOpen={setIsEditorOpen}
-                                editorIsOpen={isEditorOpen}
-                                // setDisplayData={setDisplayData}
-                                editorText={editorText}
-                                rawHTML={rawHTML}
-                            />
-                        </Grid>
-                    </Flex>
-
-                </Flex> */}
-                {/* )
-} */}
 
             </Flex>
 
@@ -309,22 +252,26 @@ export const RichTextEditor = ({
                 }
 
             </Box>
+            {/* <p>Editor text is: {`${editorText}`}</p>
+            <p>Data is: {`${data}`}</p>
+            <p>Display Data is: {`${displayData}`}</p> */}
+
         </Box>
 
     )
 }
 
 
-const SelectionSetterPlugin = () => {
-    const [editor] = useLexicalComposerContext();
-    useEffect(() => {
-        editor.update(() => {
-            console.log($getSelection())
+// const SelectionSetterPlugin = () => {
+//     const [editor] = useLexicalComposerContext();
+//     useEffect(() => {
+//         editor.update(() => {
+//             console.log($getSelection())
 
-        })
-    }, [editor])
-    return null;
-}
+//         })
+//     }, [editor])
+//     return null;
+// }
 
 
 

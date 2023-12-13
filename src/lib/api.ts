@@ -591,7 +591,7 @@ export const updateProfile = async ({ userPk, image, about, expertise }: IProfil
 export const getFullProject = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
     const res = instance.get(`projects/${pk}`).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         return res.data
     })
     return res;
@@ -821,7 +821,7 @@ export const updateTeamMemberPosition = async (project_id: number, reorderedTeam
 export const getProjectTeam = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
     const res = instance.get(`projects/${pk}/team`).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         return res.data
     })
     return res;
@@ -2009,9 +2009,9 @@ export const getAvailableReportYearsForProgressReport = async ({ queryKey }: Que
     const [_, pk] = queryKey;
 
     try {
-        console.log(pk)
+        // console.log(pk)
         const response = await instance.get(`documents/reports/availableyears/${pk}/progressreport`);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching years:", error);

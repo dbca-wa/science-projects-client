@@ -16,7 +16,6 @@ export const UndoButton = ({ disabled, onClick }: Props) => {
             disabled={disabled}
             onClick={() => {
                 onClick(eventType);
-
             }}
         >
             <FaUndo />

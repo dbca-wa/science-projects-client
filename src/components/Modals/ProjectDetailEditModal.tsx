@@ -101,9 +101,9 @@ export const ProjectDetailEditModal = ({ projectType, isOpen, onClose, icon, bas
     const { userData: me, userLoading } = useUser();
 
 
-    useEffect(() => {
-        console.log(projectType)
-    }, [projectType])
+    // useEffect(() => {
+    //     console.log(projectType)
+    // }, [projectType])
 
     return (
         baseInformation && details ?
