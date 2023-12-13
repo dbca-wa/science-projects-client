@@ -20,6 +20,7 @@ import { DataDisplayPlugin } from "../../Plugins/DataDisplayPlugin";
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
 import { EditorSections, EditorSubsections, EditorType } from "../../../../types";
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
+import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 
 interface Props {
     initialConfig: any;
@@ -66,6 +67,7 @@ export const EditableSRTE = (
                 initialConfig={initialConfig}
             >
                 {/* Plugins*/}
+                <AutoFocusPlugin />
                 <HistoryPlugin />
                 <ListPlugin />
                 <OnChangePlugin onChange={(editorState, editor) => {
@@ -108,7 +110,7 @@ export const EditableSRTE = (
                                     borderRadius: "0 0 25px 25px",
                                     outline: "none",
                                 }}
-                                autoFocus
+                            // autoFocus
                             />
                         </>
                     }
