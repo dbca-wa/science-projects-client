@@ -6,9 +6,12 @@ import { AiOutlineStrikethrough } from "react-icons/ai"
 import { MdSubscript, MdSuperscript } from "react-icons/md"
 import { BsTrash3 } from "react-icons/bs"
 import { useState } from "react"
+import { LexicalEditor } from "lexical"
 
-
-export const SimpleFontFormatterButton = () => {
+interface Props {
+    editor: LexicalEditor
+}
+export const SimpleFontFormatterButton = ({ editor }: Props) => {
 
     const [currentTitle, setCurrentTitle] = useState<string>('Format')
 

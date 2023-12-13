@@ -8,6 +8,7 @@ import { FontColorPickerButton } from "../MenuButtons/FontColorPickerButton"
 import { FontHighlighterButton } from "../MenuButtons/FontHighlighterButton"
 import { useToolbarClickListener } from "../../../lib/hooks/useToolbarClickListener"
 import { RefObject } from "react"
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 
 
 interface Props {
@@ -17,14 +18,16 @@ interface Props {
 export const FontFormattingButtons = ({ editorRef }: Props) => {
 
     const { onClick } = useToolbarClickListener({ editorRef: editorRef });
+    const [editor] = useLexicalComposerContext();
+
 
     return (
         <Flex
         // flexGrow={1}
         >
-            <BoldButton onClick={onClick} />
-            <ItalicsButton onClick={onClick} />
-            <UnderlineButton onClick={onClick} />
+            <BoldButton onClick={onClick} editor={editor} />
+            <ItalicsButton onClick={onClick} editor={editor} />
+            <UnderlineButton onClick={onClick} editor={editor} />
             <FontColorPickerButton />
             <FontHighlighterButton />
         </Flex>
