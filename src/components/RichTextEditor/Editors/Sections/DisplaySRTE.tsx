@@ -1,4 +1,4 @@
-import { Box, Text, useColorMode } from "@chakra-ui/react";
+import { Box, Spacer, Text, useColorMode } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
@@ -105,29 +105,32 @@ export const DisplaySRTE = (
                         />
                     }
                     placeholder={
-                        <Box
-                            style={{
-                                position: "absolute",
-                                left: "32px",
-                                top: "20px",
-                                // paddingTop: "20px",
-                                // paddingBottom: "16px",
-                                userSelect: "none",
-                                pointerEvents: "none",
-                                color: "gray.500"
+                        <>
+                            <Box
+                                style={{
+                                    position: "absolute",
+                                    left: "32px",
+                                    top: "20px",
+                                    // paddingTop: "20px",
+                                    // paddingBottom: "16px",
+                                    userSelect: "none",
+                                    pointerEvents: "none",
+                                    color: "gray.500",
+                                    // paddingBottom: "20px"
 
-                            }}
-                        >
-                            <Text
-                                color={"gray.500"}
-                                fontSize={"14px"}
-                            // pb={2}
+                                }}
                             >
-                                {`Press the edit button to add 
+                                <Text
+                                    color={"gray.500"}
+                                    fontSize={"14px"}
+                                // pb={2}
+                                >
+                                    {`Press the edit button to add 
                         ${useGetRTESectionPlaceholder(section)}.`}
-
-                            </Text>
-                        </Box>
+                                </Text>
+                            </Box>
+                            <Spacer pb={2} />
+                        </>
                     }
                     ErrorBoundary={LexicalErrorBoundary}
 
