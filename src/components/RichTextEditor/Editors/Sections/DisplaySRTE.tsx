@@ -74,7 +74,7 @@ export const DisplaySRTE = (
                 <ListPlugin />
                 <TablePlugin
                     hasCellMerge={true}
-                    hasCellBackgroundColor={true}
+                    hasCellBackgroundColor={false}
                 />
                 {/* <OnChangePlugin onChange={(editorState, editor) => {
                     editorState.read(() => {

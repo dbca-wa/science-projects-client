@@ -27,7 +27,7 @@ import { createPortal } from 'react-dom';
 import { isHTMLElement } from '@/lib/utils/guard';
 import { Point } from '@/lib/utils/point';
 import { Rect } from '@/lib/utils/rect';
-import { Box, Button, Center } from '@chakra-ui/react';
+import { Box, Button, Center, useColorMode } from '@chakra-ui/react';
 import { MdDragIndicator } from 'react-icons/md';
 
 const SPACE = 4;
@@ -174,7 +174,13 @@ function getBlockElement(
 }
 
 function isOnMenu(element: HTMLElement): boolean {
-    return !!element.closest(`.${DRAGGABLE_BLOCK_MENU_CLASSNAME}`);
+    const menuClassNames = [
+        `.${DRAGGABLE_BLOCK_MENU_CLASSNAME}`,
+        `.${DRAGGABLE_BLOCK_MENU_CLASSNAME}-light`,
+        `.${DRAGGABLE_BLOCK_MENU_CLASSNAME}-dark`,
+    ];
+
+    return menuClassNames.some((className) => !!element.closest(className));
 }
 // function setMenuPosition(
 //     floatingElem: HTMLElement,
@@ -280,7 +286,7 @@ function useDraggableBlockMenu(
     toolbarHeight: number,
 ): JSX.Element {
     const scrollerElem = anchorElem.parentElement;
-
+    const { colorMode } = useColorMode();
     const menuRef = useRef<HTMLDivElement>(null);
     const targetLineRef = useRef<HTMLDivElement>(null);
     const isDraggingBlockRef = useRef<boolean>(false);
@@ -432,12 +438,18 @@ function useDraggableBlockMenu(
     return createPortal(
         <>
             <div
-                className="icon draggable-block-menu"
+                className={`icon ${colorMode === "light" ? 'draggable-block-menu-light' : 'draggable-block-menu-dark'}`}
                 ref={menuRef}
                 draggable={true}
                 onDragStart={onDragStart}
-                onDragEnd={onDragEnd}>
-                <div className={isEditable ? 'icon' : ''} />
+                onDragEnd={onDragEnd}
+            >
+                <Box
+                    className={isEditable ? colorMode === "light" ? 'icon-light' : 'icon-dark' : ''}
+                    style={{ pointerEvents: 'none' }}
+                >
+                    <MdDragIndicator style={{ userSelect: 'none' }} />
+                </Box>
             </div>
             <div className="draggable-block-target-line" ref={targetLineRef} />
         </>,
