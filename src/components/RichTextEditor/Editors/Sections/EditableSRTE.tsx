@@ -21,6 +21,7 @@ import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
 import { EditorSections, EditorSubsections, EditorType } from "../../../../types";
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 
 interface Props {
     initialConfig: any;
@@ -59,7 +60,7 @@ export const EditableSRTE = (
 
     // useEffect(() => console.log(displayData), [displayData])
 
-    const toolBarHeight = 45;
+    const toolBarHeight = 42;
 
     return (
         <>
@@ -67,6 +68,10 @@ export const EditableSRTE = (
                 initialConfig={initialConfig}
             >
                 {/* Plugins*/}
+                <TablePlugin
+                    hasCellMerge={true}
+                    hasCellBackgroundColor={true}
+                />
                 <AutoFocusPlugin />
                 <HistoryPlugin />
                 <ListPlugin />

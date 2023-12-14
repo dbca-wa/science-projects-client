@@ -39,6 +39,7 @@ import { DisplaySRTE } from "./Sections/DisplaySRTE";
 import { EditorSections, EditorSubsections, EditorType } from "../../../types";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 import { useGetRTESectionTitle } from "@/lib/hooks/useGetRTESectionTitle";
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 
 
 
@@ -91,7 +92,24 @@ export const RichTextEditor = ({
                 strikethrough: colorMode === "light" ? 'editor-textStrikethrough-light' : 'editor-textStrikethrough-dark',
                 subscript: colorMode === "light" ? 'editor-textSubscript-light' : 'editor-textSubscript-dark',
                 underlineStrikethrough: colorMode === "light" ? 'editor-textUnderlineStrikethrough-light' : 'editor-textUnderlineStrikethrough-dark',
-            }
+            },
+            table: 'PlaygroundEditorTheme__table',
+            tableAddColumns: 'PlaygroundEditorTheme__tableAddColumns',
+            tableAddRows: 'PlaygroundEditorTheme__tableAddRows',
+            tableCell: 'PlaygroundEditorTheme__tableCell',
+            tableCellActionButton: 'PlaygroundEditorTheme__tableCellActionButton',
+            tableCellActionButtonContainer:
+                'PlaygroundEditorTheme__tableCellActionButtonContainer',
+            tableCellEditing: 'PlaygroundEditorTheme__tableCellEditing',
+            tableCellHeader: 'PlaygroundEditorTheme__tableCellHeader',
+            tableCellPrimarySelected: 'PlaygroundEditorTheme__tableCellPrimarySelected',
+            tableCellResizer: 'PlaygroundEditorTheme__tableCellResizer',
+            tableCellSelected: 'PlaygroundEditorTheme__tableCellSelected',
+            tableCellSortedIndicator: 'PlaygroundEditorTheme__tableCellSortedIndicator',
+            tableResizeRuler: 'PlaygroundEditorTheme__tableCellResizeRuler',
+            tableSelected: 'PlaygroundEditorTheme__tableSelected',
+            tableSelection: 'PlaygroundEditorTheme__tableSelection',
+
         };
     };
 
@@ -119,6 +137,7 @@ export const RichTextEditor = ({
         nodes: [
             ListNode,
             ListItemNode,
+            TableCellNode, TableNode, TableRowNode,
         ],
     };
 
