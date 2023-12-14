@@ -11,6 +11,7 @@ import {
     $getSelection,
     $isRangeSelection,
     $createParagraphNode,
+    LexicalEditor,
 } from "lexical";
 import {
     $createHeadingNode,
@@ -30,6 +31,8 @@ import {
 } from "@lexical/list";
 
 import { RefObject, useCallback, useState } from "react";
+import { InsertTableModal } from "@/components/Modals/RTEModals/InsertTableModal";
+import { useDisclosure } from "@chakra-ui/react";
 
 // interface IProps {
 //     eventType: string;
@@ -37,6 +40,7 @@ import { RefObject, useCallback, useState } from "react";
 // }
 
 interface Props {
+    // editor: LexicalEditor; // The editor this is listening to
     editorRef: RefObject<HTMLTextAreaElement>; // Use RefObject to represent the textarea element reference
     currentlySelectedNode?: string;
 }
@@ -47,7 +51,6 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
     const [selectedElementKey, setSelectedElementKey] = useState(null);
     const [isRTL, setIsRTL] = useState(false);
     const [isLink, setIsLink] = useState(false);
-
 
     const onClick = (event: any) => {
 
@@ -69,6 +72,9 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
         else if (event === "formatUnderline") {
             editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
             console.log("underline")
+        } else if (event === "insertTable") {
+            console.log('running table insert')
+            // onAddTableOpen();
         }
 
 
@@ -102,6 +108,8 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
         // } 
 
     }
+
+
 
 
     const formatParagraph = () => {

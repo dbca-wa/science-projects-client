@@ -58,7 +58,7 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
             {/* <AutoFocusPlugin clickFunction={onClick} /> */}
             <Flex
                 width={"100%"}
-                my={1}
+                // my={1}
                 px={1}
                 backgroundColor={
                     colorMode === "light" ? "whiteAlpha.800"
@@ -102,7 +102,7 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                             </>
                                             :
 
-                                            <InsertTableButton />
+                                            <InsertTableButton onClick={onClick} />
 
                                 }
 
@@ -149,7 +149,7 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                                         </>
                                                     </>
                                                     :
-                                                    <InsertTableButton />
+                                                    <InsertTableButton onClick={onClick} />
 
 
                                         }
@@ -179,7 +179,7 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                         <FontFormatterButton />
 
                                         <VerticalDivider />
-                                        <InsertTableButton />
+                                        <InsertTableButton onClick={onClick} />
 
                                     </>
                                 )

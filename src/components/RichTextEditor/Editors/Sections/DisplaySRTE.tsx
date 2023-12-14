@@ -19,6 +19,7 @@ import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
 import { useEffect, useState } from "react";
 import { EditorSubsections, EditorType } from "../../../../types";
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
+import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 
 interface Props {
     initialConfig: any;
@@ -71,6 +72,10 @@ export const DisplaySRTE = (
                 {/* Plugins*/}
                 <HistoryPlugin />
                 <ListPlugin />
+                <TablePlugin
+                    hasCellMerge={true}
+                    hasCellBackgroundColor={true}
+                />
                 {/* <OnChangePlugin onChange={(editorState, editor) => {
                     editorState.read(() => {
                         const root = $getRoot();
@@ -146,6 +151,7 @@ export const DisplaySRTE = (
                         : null
                 }
                 <ClearEditorPlugin />
+
 
             </LexicalComposer>
         </>

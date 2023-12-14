@@ -10,24 +10,40 @@ import { BsFileImage, BsFiletypeGif, BsPlusSlashMinus, BsSticky, BsTable } from 
 import { RxViewHorizontal } from "react-icons/rx"
 import { TbAlphabetGreek, TbBinaryTree2 } from "react-icons/tb"
 import { MdPoll } from "react-icons/md"
+import { InsertTableModal } from "@/components/Modals/RTEModals/InsertTableModal"
+import { useDisclosure } from "@chakra-ui/react"
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 
-export const InsertTableButton = () => {
+interface Props {
+    onClick: (event: string) => void;
+}
+export const InsertTableButton = ({ onClick }: Props) => {
+
+    const { isOpen: isAddTableOpen, onClose: onAddTableClose, onOpen: onAddTableOpen } = useDisclosure();
     const TableFunc = () => {
-        console.log("Table")
+        console.log("Table");
+        // onClick('insertTable');
+        onAddTableOpen();
     }
+
+    const [editor] = useLexicalComposerContext();
     return (
-        <BaseToolbarMenuButton
-            title="Insert"
-            menuIcon={AiOutlinePlus}
-            menuItems={[
-                {
-                    leftIcon: BsTable,
-                    text: 'Table',
-                    onClick: TableFunc,
-                },
+        <>
+            <InsertTableModal isOpen={isAddTableOpen} activeEditor={editor} onClose={onAddTableClose} />
+            <BaseToolbarMenuButton
+                title="Insert"
+                menuIcon={AiOutlinePlus}
+                menuItems={[
+                    {
+                        leftIcon: BsTable,
+                        text: 'Table',
+                        onClick: TableFunc,
+                    },
 
-            ]}
+                ]}
 
-        />
+            />
+
+        </>
     )
 }
