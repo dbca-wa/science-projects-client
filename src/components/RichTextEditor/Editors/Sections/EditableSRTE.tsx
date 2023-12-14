@@ -22,6 +22,7 @@ import { EditorSections, EditorSubsections, EditorType } from "../../../../types
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import DraggableBlockPlugin from '@/components/RichTextEditor/Plugins/DraggableBlockPlugin';
 
 interface Props {
     initialConfig: any;
@@ -61,7 +62,20 @@ export const EditableSRTE = (
     // useEffect(() => console.log(displayData), [displayData])
 
     const toolBarHeight = 42;
-
+    const [floatingAnchorElem, setFloatingAnchorElem] = useState<HTMLDivElement | null>(null);
+    const onRef = (_floatingAnchorElem: HTMLDivElement) => {
+        if (_floatingAnchorElem !== null) {
+            setFloatingAnchorElem(_floatingAnchorElem);
+        }
+    };
+    useEffect(() => {
+        // Check if floatingAnchorElem is set
+        if (floatingAnchorElem !== null) {
+            // Perform any actions that depend on floatingAnchorElem being set
+            // For example, you might want to trigger something or log a message.
+            console.log('floatingAnchorElem is set:', floatingAnchorElem);
+        }
+    }, [floatingAnchorElem]);
     return (
         <>
             <LexicalComposer
@@ -105,18 +119,23 @@ export const EditableSRTE = (
                                 setSelectedNodeType={setSelectedNodeType}
                             />
 
-                            <ContentEditable
-                                style={{
-                                    minHeight: "50px",
-                                    width: "100%",
-                                    height: "auto",
-                                    padding: "32px",
-                                    paddingBottom: "16px",
-                                    borderRadius: "0 0 25px 25px",
-                                    outline: "none",
-                                }}
-                            // autoFocus
-                            />
+                            <div className="editor-scroller">
+                                <div className="editor" ref={onRef}>
+                                    <ContentEditable
+                                        style={{
+                                            minHeight: "50px",
+                                            width: "100%",
+                                            height: "auto",
+                                            padding: "32px",
+                                            paddingBottom: "16px",
+                                            borderRadius: "0 0 25px 25px",
+                                            outline: "none",
+                                        }}
+
+                                    // autoFocus
+                                    />
+                                </div>
+                            </div>
                         </>
                     }
                     placeholder={
@@ -136,7 +155,9 @@ export const EditableSRTE = (
                     }
                     ErrorBoundary={LexicalErrorBoundary}
                 />
-
+                {floatingAnchorElem !== null && (
+                    <DraggableBlockPlugin anchorElem={floatingAnchorElem} toolbarHeight={toolBarHeight} />
+                )}
 
                 <Box>
                     <OptionsBar
