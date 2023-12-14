@@ -326,38 +326,6 @@ function useDraggableBlockMenu(
     }, [anchorElem, draggableBlockElem, toolbarHeight]);
 
 
-    // const [mouseX, setMouseX] = useState<number | null>(null);
-    // const [mouseY, setMouseY] = useState<number | null>(null);
-    // useEffect(() => {
-    //     if (menuRef.current && mouseX !== null && mouseY !== null) {
-    //         setMenuPosition(menuRef.current, anchorElem, mouseX, mouseY);
-    //     }
-    // }, [anchorElem, mouseX, mouseY]);
-    // useEffect(() => {
-    //     function onMouseMove(event: MouseEvent) {
-    //         setMouseX(event.clientX);
-    //         setMouseY(event.clientY);
-
-    //         // ... (rest of your code)
-    //     }
-
-    //     function onMouseLeave() {
-    //         setMouseX(null);
-    //         setMouseY(null);
-
-    //         // ... (rest of your code)
-    //     }
-
-    //     scrollerElem?.addEventListener('mousemove', onMouseMove);
-    //     scrollerElem?.addEventListener('mouseleave', onMouseLeave);
-
-    //     return () => {
-    //         scrollerElem?.removeEventListener('mousemove', onMouseMove);
-    //         scrollerElem?.removeEventListener('mouseleave', onMouseLeave);
-    //     };
-    // }, [scrollerElem, anchorElem, editor]);
-
-
     useEffect(() => {
         function onDragover(event: DragEvent): boolean {
             if (!isDraggingBlockRef.current) {
