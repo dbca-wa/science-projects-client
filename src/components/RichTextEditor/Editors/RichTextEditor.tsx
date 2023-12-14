@@ -84,8 +84,9 @@ export const RichTextEditor = ({
                 listitemUnchecked: 'editor-listItemUnchecked',
             },
             text: {
+
                 bold: colorMode === "light" ? 'editor-bold-light' : 'editor-bold-dark',
-                italics: colorMode === "light" ? 'editor-italics-light' : 'editor-italics-dark',
+                italic: colorMode === "light" ? 'editor-italics-light' : 'editor-italics-dark',
                 underline: colorMode === "light" ? 'editor-underline-light' : 'editor-underline-dark',
                 strikethrough: colorMode === "light" ? 'editor-textStrikethrough-light' : 'editor-textStrikethrough-dark',
                 subscript: colorMode === "light" ? 'editor-textSubscript-light' : 'editor-textSubscript-dark',

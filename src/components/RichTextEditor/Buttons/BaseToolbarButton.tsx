@@ -1,6 +1,6 @@
 // A template for a RTE simple button - props fill out its icon, text and functionality
 
-import { Button } from "@chakra-ui/react"
+import { Button, useColorMode } from "@chakra-ui/react"
 import { ReactNode } from "react"
 
 interface IBaseToolbarButtonProps {
@@ -11,13 +11,15 @@ interface IBaseToolbarButtonProps {
 }
 
 export const BaseToolbarButton = ({ children, disabled, isActive, onClick }: IBaseToolbarButtonProps) => {
+
+    const { colorMode } = useColorMode();
     return (
         <Button
             // flex={1}
             // mx={1}
             variant={"ghost"}
             isDisabled={disabled}
-            bg={isActive ? "gray.200" : undefined}
+            bg={isActive ? colorMode === "light" ? "gray.200" : "gray.700" : undefined}
             onClick={onClick}
             tabIndex={-1}
         >

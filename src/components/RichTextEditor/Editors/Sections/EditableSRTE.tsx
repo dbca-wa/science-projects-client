@@ -75,7 +75,7 @@ export const EditableSRTE = (
                         const root = $getRoot();
                         setEditorText(root.__cachedText);
                         const newHtml = $generateHtmlFromNodes(editor, null)
-                        console.log(newHtml)
+                        // console.log(newHtml)
                         // console.log(newHtml)
                         // console.log("DATA DISPLAY PLUGIN:", newHtml);
                         setDisplayData(newHtml);
