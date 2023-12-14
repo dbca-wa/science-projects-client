@@ -51,9 +51,7 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
 
     const onClick = (event: any) => {
 
-        // ['h1', 'h2', 'h3', 'paragraph','ol','ul', 'quote']
-
-        // console.log(event)
+        console.log("Event is: ", event)
         if (event === "formatUndo") {
             editor.dispatchCommand(UNDO_COMMAND, undefined);
             console.log("undo")
@@ -61,77 +59,50 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
             editor.dispatchCommand(REDO_COMMAND, undefined);
             console.log("redo")
         }
-        else if (event === "paragraph" && currentlySelectedNode !== "paragraph") {
-            // formatParagraph();
-            console.log("set paragraph")
-            console.log(event)
-
-        }
-        else if (event === "h1" && currentlySelectedNode !== "h1") {
-            // formatLargeHeading();
-            console.log("set h1")
-
-        }
-        else if (event === "h2" && currentlySelectedNode !== "h2") {
-            // formatMidHeading();
-            console.log("set h2")
-
-        }
-        else if (event === "h3" && currentlySelectedNode !== "h3") {
-            // formatSmallHeading();
-            console.log("set h3")
-
-        }
-        else if (event === "ol" && currentlySelectedNode !== "ol") {
-            // formatNumberedList();
-            console.log("set ol")
-
-        }
-        else if (event === "ul" && (currentlySelectedNode !== "ul" || "li")) {
-            // formatBulletList();
-            console.log("set ul")
-
-        }
-        else if (event === "li" && (currentlySelectedNode !== "ul" || "li")) {
-            // formatBulletList();
-            console.log("set li")
-
-        }
-        else if (event === "quote" && currentlySelectedNode !== "quote") {
-            // formatQuote();
-            console.log("set quote")
-
-        }
-
-        else if (event === "formatAlignLeft") {
-            // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
-        } else if (event === "formatAlignCenter") {
-            // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
-        } else if (event === "formatAlignRight") {
-            // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
-        } else if (event === "formatAlignJustify") {
-            // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")
-        }
         else if (event === "formatBold") {
-            // editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+            console.log("bold")
         } else if (event === "formatItalic") {
-            // editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
+            console.log("italic")
         }
         else if (event === "formatUnderline") {
-            // editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
+            console.log("underline")
         }
 
+
+        // else if (event === "paragraph" && currentlySelectedNode !== "paragraph") {
+        //     // formatParagraph();
+        //     console.log("set paragraph")
+        //     console.log(event)
+        // }
+
+
+        // else if (event === "ol" && currentlySelectedNode !== "ol") {
+        //     // formatNumberedList();
+        //     console.log("set ol")
+
+        // }
+        // else if (event === "ul" && (currentlySelectedNode !== "ul" || "li")) {
+        //     // formatBulletList();
+        //     console.log("set ul")
+
+        // }
+        // else if (event === "li" && (currentlySelectedNode !== "ul" || "li")) {
+        //     // formatBulletList();
+        //     console.log("set li")
+
+        // }
+
+        // else if (event === "formatSubscript") {
+        //     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript");
+        // } else if (event === "formatSuperscript") {
+        //     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript");
+        // } 
+
     }
-    // else if (event === "formatInsertLink") {
-    //     insertLink();
-    // }
-    // else if (event === "formatStrike") {
-    //     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
-    // } else if (event === "formatSubscript") {
-    //     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript");
-    // } else if (event === "formatSuperscript") {
-    //     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript");
-    // } 
+
 
     const formatParagraph = () => {
         // console.log(blockType)
@@ -146,42 +117,6 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
         }
     };
 
-    const formatLargeHeading = () => {
-        if (blockType !== "h1") {
-            editor.update(() => {
-                const selection = $getSelection();
-
-                if ($isRangeSelection(selection)) {
-                    $wrapNodes(selection, () => $createHeadingNode("h1"));
-                }
-            });
-        }
-    };
-
-
-    const formatMidHeading = () => {
-        if (blockType !== "h2") {
-            editor.update(() => {
-                const selection = $getSelection();
-
-                if ($isRangeSelection(selection)) {
-                    $wrapNodes(selection, () => $createHeadingNode("h2"));
-                }
-            });
-        }
-    };
-
-    const formatSmallHeading = () => {
-        if (blockType !== "h3") {
-            editor.update(() => {
-                const selection = $getSelection();
-
-                if ($isRangeSelection(selection)) {
-                    $wrapNodes(selection, () => $createHeadingNode("h3"));
-                }
-            });
-        }
-    };
 
     const formatBulletList = () => {
         if (blockType !== "ul" && blockType !== "li") {
@@ -199,27 +134,6 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
             editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
         }
     };
-
-    const formatQuote = () => {
-        if (blockType !== "quote") {
-            editor.update(() => {
-                const selection = $getSelection();
-
-                if ($isRangeSelection(selection)) {
-                    $wrapNodes(selection, () => $createQuoteNode());
-                }
-            });
-        }
-    };
-
-    // const insertLink = useCallback(() => {
-    //     if (!isLink) {
-    //         editor.dispatchCommand(TOGGLE_LINK_COMMAND, "https://");
-    //     } else {
-    //         editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
-    //     }
-    // }, [editor, isLink]);
-
 
 
 
@@ -245,3 +159,99 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
 //         return $isAtNodeEnd(anchor) ? focusNode : anchorNode;
 //     }
 // }
+
+
+
+// else if (event === "quote" && currentlySelectedNode !== "quote") {
+//     // formatQuote();
+//     console.log("set quote")
+
+// }
+// else if (event === "h1" && currentlySelectedNode !== "h1") {
+//     // formatLargeHeading();
+//     console.log("set h1")
+
+// }
+// else if (event === "h2" && currentlySelectedNode !== "h2") {
+//     // formatMidHeading();
+//     console.log("set h2")
+
+// }
+// else if (event === "h3" && currentlySelectedNode !== "h3") {
+//     // formatSmallHeading();
+//     console.log("set h3")
+
+// }
+// else if (event === "formatAlignLeft") {
+//     // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
+// } else if (event === "formatAlignCenter") {
+//     // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
+// } else if (event === "formatAlignRight") {
+//     // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
+// } else if (event === "formatAlignJustify") {
+//     // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")
+// }
+    // else if (event === "formatInsertLink") {
+    //     insertLink();
+    // }
+    // else if (event === "formatStrike") {
+    //     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
+    // } 
+
+// const formatQuote = () => {
+//     if (blockType !== "quote") {
+//         editor.update(() => {
+//             const selection = $getSelection();
+
+//             if ($isRangeSelection(selection)) {
+//                 $wrapNodes(selection, () => $createQuoteNode());
+//             }
+//         });
+//     }
+// };
+// const formatLargeHeading = () => {
+//     if (blockType !== "h1") {
+//         editor.update(() => {
+//             const selection = $getSelection();
+
+//             if ($isRangeSelection(selection)) {
+//                 $wrapNodes(selection, () => $createHeadingNode("h1"));
+//             }
+//         });
+//     }
+// };
+
+
+// const formatMidHeading = () => {
+//     if (blockType !== "h2") {
+//         editor.update(() => {
+//             const selection = $getSelection();
+
+//             if ($isRangeSelection(selection)) {
+//                 $wrapNodes(selection, () => $createHeadingNode("h2"));
+//             }
+//         });
+//     }
+// };
+
+// const formatSmallHeading = () => {
+//     if (blockType !== "h3") {
+//         editor.update(() => {
+//             const selection = $getSelection();
+
+//             if ($isRangeSelection(selection)) {
+//                 $wrapNodes(selection, () => $createHeadingNode("h3"));
+//             }
+//         });
+//     }
+// };
+
+
+    // const insertLink = useCallback(() => {
+    //     if (!isLink) {
+    //         editor.dispatchCommand(TOGGLE_LINK_COMMAND, "https://");
+    //     } else {
+    //         editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+    //     }
+    // }, [editor, isLink]);
+
