@@ -3,22 +3,42 @@ import { useEffect, useState } from "react";
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
 import { $getRoot, $getSelection, LexicalNode, RangeSelection, createCommand } from "lexical";
 import { CLEAR_EDITOR_COMMAND, LexicalEditor } from "lexical"
+import { useColorMode } from "@chakra-ui/react";
 
 interface HTMLPrepopulationProp {
     data: string;
 }
 
 export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
+
+    const { colorMode } = useColorMode();
+
     const generateHtmlTable = (tableData: string[][]) => {
         const tableRows = tableData
             .map(
-                (row) =>
+                (row, rowIndex) =>
                     `<tr>${row
-                        .map((cell) => `<td>${cell}</td>`)
+                        .map(
+                            (cell, colIndex) =>
+                                `<${rowIndex === 0 || colIndex === 0 ? 'th' : 'td'} class="table-cell-dark${rowIndex === 0 ? ' table-cell-header-dark' : ''
+                                }">${cell}</${rowIndex === 0 || colIndex === 0 ? 'th' : 'td'}>`
+                        )
                         .join('')}</tr>`
             )
             .join('');
-        return `<table>${tableRows}</table>`;
+
+        return `<table class="table-dark">
+          <colgroup>
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+          </colgroup>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>`;
     };
 
     const [editor, editorState] = useLexicalComposerContext();

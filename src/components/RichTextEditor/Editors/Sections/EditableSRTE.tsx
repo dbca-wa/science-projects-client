@@ -84,7 +84,7 @@ export const EditableSRTE = (
                 {/* Plugins*/}
                 <TablePlugin
                     hasCellMerge={true}
-                    hasCellBackgroundColor={true}
+                    hasCellBackgroundColor={false}
                 />
                 <AutoFocusPlugin />
                 <HistoryPlugin />
@@ -109,7 +109,9 @@ export const EditableSRTE = (
                 {/* Text Area */}
                 <RichTextPlugin
                     contentEditable={
-                        <>
+                        <Box
+                        // mr={3}
+                        >
                             {/* Toolbar */}
 
                             <RichTextToolbar
@@ -119,10 +121,18 @@ export const EditableSRTE = (
                                 setSelectedNodeType={setSelectedNodeType}
                             />
 
-                            <div className="editor-scroller">
-                                <div className="editor" ref={onRef}>
+                            <Box className="editor-scroller"
+
+                            >
+                                <Box className="editor" ref={onRef}
+                                    style={{
+                                        // background: "red",
+                                        marginLeft: "10px",
+                                    }}
+                                >
                                     <ContentEditable
                                         style={{
+
                                             minHeight: "50px",
                                             width: "100%",
                                             height: "auto",
@@ -134,9 +144,9 @@ export const EditableSRTE = (
 
                                     // autoFocus
                                     />
-                                </div>
-                            </div>
-                        </>
+                                </Box>
+                            </Box>
+                        </Box>
                     }
                     placeholder={
                         <Box

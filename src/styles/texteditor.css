@@ -339,25 +339,30 @@
 }
 
 
-.PlaygroundEditorTheme__table {
+
+/* TABLE LIGHT MODE */
+
+.table-light {
   border-collapse: collapse;
   border-spacing: 0;
   overflow-y: scroll;
   overflow-x: scroll;
   table-layout: fixed;
-  width: max-content;
+  /* width: max-content; */
+  width: 100%;
   margin: 30px 0;
 }
-
-.PlaygroundEditorTheme__tableSelection *::selection {
+.table-selection-light *::selection {
   background-color: transparent;
 }
-
-.PlaygroundEditorTheme__tableSelected {
+.table-selected-light {
   outline: 2px solid rgb(60, 132, 244);
 }
-.PlaygroundEditorTheme__tableCell {
-  border: 1px solid #bbb;
+.table-cell-light {
+  /* border: 1px solid #bbb; */
+  border: 1px solid #575757;
+  background-color: #ffffff;
+
   width: 75px;
   min-width: 75px;
   vertical-align: top;
@@ -366,7 +371,13 @@
   position: relative;
   outline: none;
 }
-.PlaygroundEditorTheme__tableCellSortedIndicator {
+
+.table-cell-dark p {
+  /* background: red; */
+  color: black;
+}
+
+.table-cell-sorted-indicator-light {
   display: block;
   opacity: 0.5;
   position: absolute;
@@ -375,9 +386,8 @@
   width: 100%;
   height: 4px;
   background-color: #999;
-  
 }
-.PlaygroundEditorTheme__tableCellResizer {
+.table-cell-resizer-light {
   position: absolute;
   right: -4px;
   height: 100%;
@@ -386,21 +396,14 @@
   z-index: 10;
   top: 0;
 }
-.PlaygroundEditorTheme__tableCellHeader-light {
-  background-color: #f2f3f5;
+.table-cell-header-light {
+  background-color: rgb(245, 245, 245);
   text-align: start;
 }
-.PlaygroundEditorTheme__tableCellHeader {
-  background-color: #071a3e;
-  text-align: start;
-}
-.PlaygroundEditorTheme__tableCellSelected-light {
+.table-cell-selected-light {
   background-color: #c9dbf0;
 }
-.PlaygroundEditorTheme__tableCellSelected {
-  background-color: #0c2d51;
-}
-.PlaygroundEditorTheme__tableCellPrimarySelected {
+.table-cell-primary-selected-light {
   border: 2px solid rgb(60, 132, 244);
   display: block;
   height: calc(100% - 2px);
@@ -410,50 +413,22 @@
   top: -1px;
   z-index: 2;
 }
-.PlaygroundEditorTheme__tableCellEditing {
+.table-cell-editing-light {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
   border-radius: 3px;
 }
-.PlaygroundEditorTheme__tableAddColumns {
+.table-add-columns-light {
   position: absolute;
   top: 0;
   width: 20px;
-  background-color: #d20c0c;
+  background-color: #eee;
   height: 100%;
   right: -25px;
   animation: table-controls 0.2s ease;
   border: 0;
   cursor: pointer;
 }
-.PlaygroundEditorTheme__tableAddColumns:after {
-  background-image: url(../images/plus.svg);
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: block;
-  content: ' ';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.4;
-}
-.PlaygroundEditorTheme__tableAddColumns:hover {
-  background-color: #c9dbf0;
-}
-.PlaygroundEditorTheme__tableAddRows {
-  position: absolute;
-  bottom: -25px;
-  width: calc(100% - 25px);
-  background-color: #c51d1d;
-  height: 20px;
-  left: 0;
-  animation: table-controls 0.2s ease;
-  border: 0;
-  cursor: pointer;
-}
-.PlaygroundEditorTheme__tableAddRows:after {
+.table-add-columns-light:after {
   background-image: url(../images/icons/plus.svg);
   background-size: contain;
   background-position: center;
@@ -467,8 +442,36 @@
   height: 100%;
   opacity: 0.4;
 }
-.PlaygroundEditorTheme__tableAddRows:hover {
-  background-color: #061b34;
+.table-add-columns-light:hover {
+  background-color: #c9dbf0;
+}
+.table-add-rows-light {
+  position: absolute;
+  bottom: -25px;
+  width: calc(100% - 25px);
+  background-color: #eee;
+  height: 20px;
+  left: 0;
+  animation: table-controls 0.2s ease;
+  border: 0;
+  cursor: pointer;
+}
+.table-add-rows-light:after {
+  background-image: url(../images/icons/plus.svg);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: block;
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.4;
+}
+.table-add-rows-light:hover {
+  background-color: #c9dbf0;
 }
 @keyframes table-controls {
   0% {
@@ -478,15 +481,15 @@
     opacity: 1;
   }
 }
-.PlaygroundEditorTheme__tableCellResizeRuler {
+.table-cell-resize-ruler-light {
   display: block;
   position: absolute;
   width: 1px;
-  background-color: rgb(32, 59, 103);
+  background-color: rgb(60, 132, 244);
   height: 100%;
   top: 0;
 }
-.PlaygroundEditorTheme__tableCellActionButtonContainer {
+.table-action-button-container-light {
   display: block;
   right: 5px;
   top: 6px;
@@ -495,7 +498,7 @@
   width: 20px;
   height: 20px;
 }
-.PlaygroundEditorTheme__tableCellActionButton {
+.table-action-button-light {
   background-color: #eee;
   display: block;
   border: 0;
@@ -505,6 +508,178 @@
   color: #222;
   cursor: pointer;
 }
-.PlaygroundEditorTheme__tableCellActionButton:hover {
+.table-action-button-light:hover {
+  background-color: #ddd;
+}
+
+
+/* TABLE DARK MODE */
+
+.table-dark {
+  border-collapse: collapse;
+  border-spacing: 0;
+  overflow-y: scroll;
+  overflow-x: scroll;
+  table-layout: fixed;
+  /* width: max-content; */
+  width: 100%;
+  margin: 30px 0;
+}
+.table-selection-dark *::selection {
+  background-color: transparent;
+}
+.table-selected-dark {
+  outline: 2px solid rgb(60, 132, 244);
+}
+.table-cell-dark {
+  border: 1px solid #bbb;
+  width: 75px;
+  min-width: 75px;
+  vertical-align: top;
+  text-align: start;
+  padding: 6px 8px;
+  position: relative;
+  outline: none;
+
+
+}
+.table-cell-dark p {
+  /* background: red; */
+  color: white;
+}
+.table-cell-sorted-indicator-dark {
+  display: block;
+  opacity: 0.5;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #999;
+}
+.table-cell-resizer-dark {
+  position: absolute;
+  right: -4px;
+  height: 100%;
+  width: 8px;
+  cursor: ew-resize;
+  z-index: 10;
+  top: 0;
+}
+.table-cell-header-dark {
+  background-color: #1d1d1d;
+  /* background: red; */
+
+  text-align: start;
+}
+.table-cell-selected-dark {
+  background-color: #334150;
+}
+.table-cell-primary-selected-dark {
+  border: 2px solid rgb(60, 132, 244);
+  display: block;
+  height: calc(100% - 2px);
+  position: absolute;
+  width: calc(100% - 2px);
+  left: -1px;
+  top: -1px;
+  z-index: 2;
+}
+.table-cell-editing-dark {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+}
+.table-add-columns-dark {
+  position: absolute;
+  top: 0;
+  width: 20px;
+  background-color: #eee;
+  height: 100%;
+  right: -25px;
+  animation: table-controls 0.2s ease;
+  border: 0;
+  cursor: pointer;
+}
+.table-add-columns-dark:after {
+  background-image: url(../images/icons/plus.svg);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: block;
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.4;
+}
+.table-add-columns-dark:hover {
+  background-color: #c9dbf0;
+}
+.table-add-rows-dark {
+  position: absolute;
+  bottom: -25px;
+  width: calc(100% - 25px);
+  background-color: #eee;
+  height: 20px;
+  left: 0;
+  animation: table-controls 0.2s ease;
+  border: 0;
+  cursor: pointer;
+}
+.table-add-rows-dark:after {
+  background-image: url(../images/icons/plus.svg);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: block;
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.4;
+}
+.table-add-rows-dark:hover {
+  background-color: #c9dbf0;
+}
+@keyframes table-controls {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.table-cell-resize-ruler-dark {
+  display: block;
+  position: absolute;
+  width: 1px;
+  background-color: rgb(60, 132, 244);
+  height: 100%;
+  top: 0;
+}
+.table-action-button-container-dark {
+  display: block;
+  right: 5px;
+  top: 6px;
+  position: absolute;
+  z-index: 4;
+  width: 20px;
+  height: 20px;
+}
+.table-action-button-dark {
+  background-color: #eee;
+  display: block;
+  border: 0;
+  border-radius: 20px;
+  width: 20px;
+  height: 20px;
+  color: #222;
+  cursor: pointer;
+}
+.table-action-button-dark:hover {
   background-color: #ddd;
 }
