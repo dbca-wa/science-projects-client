@@ -58,7 +58,7 @@ export const EditableSRTE = (
         shouldShowTree, setShouldShowTree }: Props) => {
 
     const [selectedNodeType, setSelectedNodeType] = useState<string>();
-
+    const dragBtnMargin = 10;
     // useEffect(() => console.log(displayData), [displayData])
 
     const toolBarHeight = 42;
@@ -127,7 +127,7 @@ export const EditableSRTE = (
                                 <Box className="editor" ref={onRef}
                                     style={{
                                         // background: "red",
-                                        marginLeft: "10px",
+                                        marginLeft: `${dragBtnMargin}px`,
                                     }}
                                 >
                                     <ContentEditable
@@ -152,7 +152,7 @@ export const EditableSRTE = (
                         <Box
                             style={{
                                 position: "absolute",
-                                left: "32px",
+                                left: `${32 + dragBtnMargin}px`,
                                 top: `${30 + toolBarHeight}px`,
                                 userSelect: "none",
                                 pointerEvents: "none",
