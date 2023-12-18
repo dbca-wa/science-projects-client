@@ -1,5 +1,4 @@
-// A rich text button to determine an element type and insert it as a new node.
-// Allows for changing Paragraphs, H1-3, Lists, Quotes.
+
 
 import {
     BsTextParagraph
@@ -7,86 +6,93 @@ import {
 import { MdFormatListBulleted, MdFormatListNumbered } from "react-icons/md";
 import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton";
 
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
+import { $getSelection, LexicalEditor, RangeSelection } from "lexical";
 
 interface Props {
     isSmall?: boolean;
     shouldFurtherConcat?: boolean;
     onClick: (event: string) => void;
-    currentlyClickedNode: string;
-    setCurrentlyClickedNode: React.Dispatch<SetStateAction<string>>;
+    editor: LexicalEditor;
+    selectedNodeType: string;
 }
 
-export const ElementTypeButton = ({ isSmall, onClick, shouldFurtherConcat, setCurrentlyClickedNode, currentlyClickedNode }: Props) => {
-    const [currentTitle, setCurrentTitle] = useState<string>(shouldFurtherConcat || isSmall ? "Norm" : "Normal");
+export const ElementTypeButton = ({ isSmall, onClick, shouldFurtherConcat, editor, selectedNodeType
+    // setCurrentlyClickedNode, currentlyClickedNode 
+}: Props) => {
 
+    const [displayText, setDisplayText] = useState<string>(selectedNodeType ? selectedNodeType : "Normal");
+    const selectionRef = useRef<RangeSelection | null>(null);
 
     useEffect(() => {
-        let eventType = ''; // 
-
-        switch (currentTitle) {
-            case 'Normal':
-            case 'Norm':
-                eventType = 'formatParagraph';
-                break;
-            case 'Bullets':
-            case 'Bullet List':
-                eventType = 'ul';
-                break;
-            case 'Nums':
-            case 'Numbered List':
-                eventType = 'ol';
-                break;
-            default:
-                eventType = 'formatParagraph';
+        if (selectedNodeType) {
+            setDisplayText(selectedNodeType)
         }
-        onClick(eventType);
-    }, [currentTitle, onClick]);
+    }, [selectedNodeType])
 
-    const NormalFunc = () => {
-        setCurrentTitle("Norm");
-        // onClick('formatParagraph')
-    };
+    // const [currentlyClickedNode, setCurrentlyClickedNode] = useState(editor.getEditorState().read(() => {
+    //     const selection = $getSelection();
+    //     // selection.getNodes();
+    //     console.log(selection.getNodes())
+    // }));
 
-    const BulletListFunc = () => {
-        setCurrentTitle(
+
+    // useEffect(() => {
+    //     editor.getEditorState().read(() => {
+    //         // const selection = $getSelection();
+    //         // selection.getNodes();
+    //         editor.focus()
+    //         // console.log('NODES: ', selection.getNodes())
+    //     })
+    // }, [editor])
+
+    const clickedOnOrdinaryText = () => {
+        setDisplayText("Norm")
+    }
+
+    const clickedOnBulletText = () => {
+        setDisplayText(
             shouldFurtherConcat || isSmall ? "Bullets" : "Bullet List"
-        );
-    };
+        )
+    }
 
-    const NumberedListFunc = () => {
-        setCurrentTitle(
+    const clickedOnNumberedText = () => {
+        setDisplayText(
             shouldFurtherConcat || isSmall ? "Nums" : "Numbered List"
-        );
-    };
+        )
+    }
 
     return (
         <BaseToolbarMenuButton
+            onClick={() => {
+                editor.focus()
+                console.log('focusing editor')
+            }}
             menuIcon={
-                currentTitle === ("Normal" || "Norm") ?
+                displayText === ("Normal" || "Norm") ?
                     BsTextParagraph :
-                    currentTitle === "Bullet List" || currentTitle === "Bullets" ?
+                    displayText === "Bullet List" || displayText === "Bullets" ?
                         MdFormatListBulleted :
-                        currentTitle === "Numbered List" || currentTitle === "Nums" ?
+                        displayText === "Numbered List" || displayText === "Nums" ?
                             MdFormatListNumbered :
                             BsTextParagraph
             }
-            title={currentTitle}
+            title={displayText}
             menuItems={[
                 {
                     leftIcon: BsTextParagraph,
                     text: "Normal",
-                    onClick: NormalFunc,
+                    onClick: () => { onClick('formatParagraph') },
                 },
                 {
                     leftIcon: MdFormatListBulleted,
                     text: 'Bullet List',
-                    onClick: BulletListFunc,
+                    onClick: () => { onClick('ul') },
                 },
                 {
                     leftIcon: MdFormatListNumbered,
                     text: 'Numbered List',
-                    onClick: NumberedListFunc,
+                    onClick: () => { onClick('ol') },
                 },
             ]
             }

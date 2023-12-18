@@ -41,14 +41,22 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
         </table>`;
     };
 
+    const handleWordListItems = (data: string) => {
+        let dataToReturn = ''
+        dataToReturn = data;
+        return dataToReturn;
+    }
+
     const [editor, editorState] = useLexicalComposerContext();
     useEffect(() => {
         editor.update(() => {
             // Replace strings representing tables with actual HTML tables
-            const replacedData = data.replace(/\[\[.*?\]\]/g, (match) => {
+            let replacedData = data.replace(/\[\[.*?\]\]/g, (match) => {
                 const tableData = JSON.parse(match);
                 return generateHtmlTable(tableData);
             });
+
+            replacedData = handleWordListItems(replacedData);
 
             // Parse the replaced data
             const parser = new DOMParser();

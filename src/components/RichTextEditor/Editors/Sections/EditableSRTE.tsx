@@ -9,7 +9,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
-import { $getRoot, $getSelection, ParagraphNode } from "lexical";
+import { $getRoot, $getSelection, LexicalEditor, NodeKey, ParagraphNode } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -23,6 +23,7 @@ import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceho
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import DraggableBlockPlugin from '@/components/RichTextEditor/Plugins/DraggableBlockPlugin';
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 
 interface Props {
     initialConfig: any;
@@ -58,6 +59,11 @@ export const EditableSRTE = (
         shouldShowTree, setShouldShowTree }: Props) => {
 
     const [selectedNodeType, setSelectedNodeType] = useState<string>();
+
+    const [selectedIsBold, setSelectedIsBold] = useState(false);
+
+
+
     const dragBtnMargin = 10;
     // useEffect(() => console.log(displayData), [displayData])
 
@@ -116,6 +122,8 @@ export const EditableSRTE = (
 
                             <RichTextToolbar
                                 // editor={editor}
+                                selectedIsBold={selectedIsBold}
+                                setSelectedIsBold={setSelectedIsBold}
                                 editorRef={editorRef}
                                 selectedNodeType={selectedNodeType}
                                 setSelectedNodeType={setSelectedNodeType}
@@ -196,24 +204,42 @@ export const EditableSRTE = (
                         : null
                 }
                 <ClearEditorPlugin />
+                <TabIndentationPlugin />
                 <NodeEventPlugin
                     nodeType={ParagraphNode}
                     eventType={'click'}
-                    eventListener={(e: Event) => {
-
+                    eventListener={(e: Event, editor: LexicalEditor, nodeKey: NodeKey) => {
+                        // editor.getEditorState().read(() => {
+                        //     // 
+                        //     setSelectedIsBold(true);
+                        // })
                         console.log(e)
                         console.log('paragaph node clicked')
-                        // setSelectedNodeType('paragraph')
+                        setSelectedNodeType('Normal')
+                        setSelectedIsBold(true);
+
                     }}
                 />
                 <NodeEventPlugin
+
                     nodeType={ListItemNode}
                     eventType={'click'}
-                    eventListener={(e: Event) => {
+                    eventListener={(e: Event, editor: LexicalEditor, nodeKey: NodeKey) => {
 
                         console.log(e)
-                        console.log('li node clicked')
+                        console.log(editor)
+                        console.log(nodeKey)
+                        const a = false;
+                        if (a) {
+                            setSelectedNodeType('Bullets')
+
+                        } else {
+                            setSelectedNodeType("Nums")
+                        }
+
+                        // console.log('li node clicked')
                         // setSelectedNodeType('li')
+
                     }}
                 />
 

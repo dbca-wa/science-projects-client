@@ -16,9 +16,10 @@ export interface IBaseToolbarMenuButtonProps {
     title?: string;
     menuIcon?: IconType;
     menuItems: IMenuItem[];
+    onClick?: () => void;
 }
 
-export const BaseToolbarMenuButton = ({ title, menuIcon: MenuIcon, menuItems }: IBaseToolbarMenuButtonProps) => {
+export const BaseToolbarMenuButton = ({ title, menuIcon: MenuIcon, menuItems, onClick }: IBaseToolbarMenuButtonProps) => {
     const [buttonWidth, setButtonWidth] = useState(0);
     const buttonRef = useRef(null);
 
@@ -59,7 +60,7 @@ export const BaseToolbarMenuButton = ({ title, menuIcon: MenuIcon, menuItems }: 
                 flex={1}
                 ref={buttonRef}
                 tabIndex={-1}
-
+                onClick={onClick}
             >
                 {title ? title : null}
             </MenuButton>

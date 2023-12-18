@@ -699,6 +699,7 @@ export interface IBreadCrumbProps {
 export interface IToolbarButton {
     onClick: (event: string) => void;
     editor: LexicalEditor;
+    buttonIsOn?: boolean;
 }
 
 

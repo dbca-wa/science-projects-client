@@ -202,17 +202,17 @@ export const ProjectLocationSection = (
                                     )
                                     console.log(locationData)
                                     if (projectType.includes("External") || projectType.includes("Student")) {
-                                        if (locationFilled) {
-                                            console.log("going next")
-                                            console.log(locationData)
-                                            setLocationFilled(true)
-                                            nextClick(
+                                        // if (locationFilled) {
+                                        console.log("going next")
+                                        console.log(locationData)
+                                        setLocationFilled(true)
+                                        nextClick(
 
-                                                locationData
-                                                // "locations": [...locationData]
+                                            locationData
+                                            // "locations": [...locationData]
 
-                                            )
-                                        } else return;
+                                        )
+                                        // } else return;
                                     } else {
                                         createClick()
                                     }

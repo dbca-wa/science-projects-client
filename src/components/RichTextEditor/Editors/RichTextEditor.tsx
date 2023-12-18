@@ -81,8 +81,22 @@ export const RichTextEditor = ({
                 ul: colorMode === "light" ? 'editor-ul-light' : 'editor-ul-dark',
                 ol: colorMode === "light" ? 'editor-ol-light' : 'editor-ol-dark',
                 listitem: colorMode === "light" ? 'editor-li-light' : 'editor-li-dark',
-                listitemChecked: 'editor-listItemChecked',
-                listitemUnchecked: 'editor-listItemUnchecked',
+                listitemChecked: 'editor-list-item-checked',
+                listitemUnchecked: 'editor-list-item-unchecked',
+                nested: {
+                    listitem: 'editor-nested-list-item',
+                },
+                // Handling styling for each level of list nesting (1st is default styling)
+                ulDepth: [
+                    'editor-ul1',
+                    'editor-ul2',
+                    'editor-ul3',
+                ],
+                olDepth: [
+                    'editor-ol1',
+                    'editor-ol2',
+                    'editor-ol3',
+                ],
             },
             text: {
 

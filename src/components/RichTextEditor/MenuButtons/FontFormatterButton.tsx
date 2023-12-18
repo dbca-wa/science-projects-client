@@ -5,6 +5,8 @@ import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton"
 import { MdSubscript, MdSuperscript } from "react-icons/md"
 import { BsTrash3 } from "react-icons/bs"
 import { useState } from "react"
+import { GrSuperscript } from "react-icons/gr";
+import { LuSuperscript } from "react-icons/lu";
 
 
 interface Props {
@@ -15,19 +17,19 @@ export const FontFormatterButton = (
     { onClick }: Props
 ) => {
 
-    const [currentTitle, setCurrentTitle] = useState<string>('Format')
+    const [currentTitle, setCurrentTitle] = useState<string>('Add Script')
 
     const SubscriptFunc = () => {
-        setCurrentTitle("Sub")
+        // setCurrentTitle("Sub")
         onClick('formatSubscript');
     }
     const SuperscriptFunc = () => {
-        setCurrentTitle("Super")
+        // setCurrentTitle("Super")
         onClick('formatSuperscript');
 
     }
     const ClearFormattingFunc = () => {
-        setCurrentTitle("Clear");
+        // setCurrentTitle("Clear");
         onClick('clearFormatting');
 
     }
@@ -40,7 +42,11 @@ export const FontFormatterButton = (
                 currentTitle === "Sub" || currentTitle === "Subscript" ? MdSubscript :
                     currentTitle === "Super" || currentTitle === "Superscript" ? MdSuperscript :
                         currentTitle === "Clear" || currentTitle === "Clear Formatting" ? BsTrash3 :
-                            RxLetterCaseCapitalize}
+                            // RxLetterCaseCapitalize
+                            LuSuperscript
+
+
+            }
             menuItems={[
                 {
                     leftIcon: MdSubscript,
