@@ -11,6 +11,7 @@ import {
     $getSelection,
     $isRangeSelection,
     $createParagraphNode,
+    $INTERNAL_isPointSelection,
     LexicalEditor,
     $isTextNode,
 } from "lexical";
@@ -147,10 +148,10 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
             console.log("set ul")
         }
 
-        else if (event === "paragraph" 
+        else if (event === "formatParagraph" 
         // && currentlySelectedNode !== "paragraph"
         ) {
-            console.log("set paragraph")
+            console.log("format paragraph function running")
             console.log(event)
             formatParagraph();
 
@@ -172,18 +173,21 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
 
     const formatParagraph = () => {
         // console.log(blockType)
-        if (blockType !== "paragraph") {
+        // if (blockType !== "paragraph") {
             console.log("Running format paragraph function")
             editor.update(() => {
                 const selection = $getSelection();
-                
-                if ($isRangeSelection(selection)) {
-                    console.log('is range selection')
-                    $setBlocksType(selection, () => $createParagraphNode());
-                    // $wrapNodes(selection, () => $createParagraphNode());
+                if ($INTERNAL_isPointSelection(selection)) {
+                  $setBlocksType(selection, () => $createParagraphNode());
                 }
+                          
+                // if ($isRangeSelection(selection)) {
+                //     console.log('is range selection')
+                //     $setBlocksType(selection, () => $createParagraphNode());
+                //     // $wrapNodes(selection, () => $createParagraphNode());
+                // }
             });
-        }
+        // }
     };
 
 
