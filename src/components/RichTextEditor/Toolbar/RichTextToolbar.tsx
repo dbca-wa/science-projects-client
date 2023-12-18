@@ -8,7 +8,7 @@ import { TimeButtons } from "./TimeButtons";
 import { ElementTypeButton } from "../MenuButtons/ElementTypeButton";
 import { BoldButton } from "../Buttons/BoldButton";
 import { VerticalDivider } from "./VerticalDivider";
-import { InsertTableButton } from "../MenuButtons/InsertTableButton";
+import { InsertItemMenuButton } from "../MenuButtons/InsertItemMenuButton";
 import { ItalicsButton } from "../Buttons/ItalicsButton";
 import { UnderlineButton } from "../Buttons/UnderlineButton";
 import { FontFormatterButton } from "../MenuButtons/FontFormatterButton";
@@ -96,13 +96,13 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                                 />
                                                 <VerticalDivider />
                                                 <>
-                                                    <FontFormatterButton />
+                                                    <FontFormatterButton onClick={onClick} />
                                                     {/* <AlignButton isSmall onClick={onClick} /> */}
                                                 </>
                                             </>
                                             :
 
-                                            <InsertTableButton onClick={onClick} />
+                                            <InsertItemMenuButton onClick={onClick} />
 
                                 }
 
@@ -144,12 +144,12 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                                         {/* <VerticalDivider /> */}
 
                                                         <>
-                                                            <FontFormatterButton />
+                                                            <FontFormatterButton onClick={onClick} />
                                                             {/* <AlignButton onClick={onClick} /> */}
                                                         </>
                                                     </>
                                                     :
-                                                    <InsertTableButton onClick={onClick} />
+                                                    <InsertItemMenuButton onClick={onClick} />
 
 
                                         }
@@ -176,10 +176,10 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                             setCurrentlyClickedNode={setSelectedNodeType}
                                         />
                                         <VerticalDivider />
-                                        <FontFormatterButton />
+                                        <FontFormatterButton onClick={onClick} />
 
                                         <VerticalDivider />
-                                        <InsertTableButton onClick={onClick} />
+                                        <InsertItemMenuButton onClick={onClick} />
 
                                     </>
                                 )

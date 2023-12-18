@@ -9,6 +9,7 @@ import { LexicalEditor } from "lexical";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 import { EditorSections, EditorSubsections, EditorType } from "../../../types";
 import { useEffect } from "react";
+import { useUser } from "@/lib/hooks/useUser";
 
 interface IOptionsBarProps {
     // editor: LexicalEditor;
@@ -38,6 +39,9 @@ export const OptionsBar = ({
 
     // useEffect(() => console.log(displayData), [displayData])
 
+    const { userData, userLoading } = useUser();
+
+
     return (
 
 
@@ -64,11 +68,13 @@ export const OptionsBar = ({
                     <Grid
                         px={10}
                         py={4}
-                        gridTemplateColumns={"repeat(3, 1fr)"}
+                        gridTemplateColumns={`repeat(${userData?.is_superuser ? 3 : 2}, 1fr)`}
                         // width={"100%"}
                         gridColumnGap={2}
                     >
-                        <TreeButton shouldShowTree={shouldShowTree} setShouldShowTree={setShouldShowTree} editorText={editorText} rawHTML={rawHTML} />
+                        {userData?.is_superuser ?
+                            (<TreeButton shouldShowTree={shouldShowTree} setShouldShowTree={setShouldShowTree} editorText={editorText} rawHTML={rawHTML} />
+                            ) : null}
 
                         <ClearButton
                         // editor={editor}

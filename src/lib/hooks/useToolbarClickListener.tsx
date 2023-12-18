@@ -12,7 +12,10 @@ import {
     $isRangeSelection,
     $createParagraphNode,
     LexicalEditor,
+    $isTextNode,
 } from "lexical";
+import {$getNearestBlockElementAncestorOrThrow,} from '@lexical/utils';
+
 import {
     $createHeadingNode,
     $createQuoteNode,
@@ -33,6 +36,7 @@ import {
 import { RefObject, useCallback, useState } from "react";
 import { InsertTableModal } from "@/components/Modals/RTEModals/InsertTableModal";
 import { useDisclosure } from "@chakra-ui/react";
+import {$setBlocksType} from '@lexical/selection';
 
 // interface IProps {
 //     eventType: string;
@@ -77,35 +81,89 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
             // onAddTableOpen();
         }
 
+        else if (event === "formatSubscript") {
+            console.log("format subscript function ran")
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript");
+        } else if (event === "formatSuperscript") {
+            console.log("format superscript function ran")
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript");
+        } else if (event === "clearFormatting") {
+            console.log("clear format function ran");
+            editor.update(() => {
+                const selection = $getSelection();
+                if ($isRangeSelection(selection)) {
+                    const anchor = selection.anchor;
+                    const focus = selection.focus;
+                    const nodes = selection.getNodes();
 
-        // else if (event === "paragraph" && currentlySelectedNode !== "paragraph") {
-        //     // formatParagraph();
-        //     console.log("set paragraph")
-        //     console.log(event)
-        // }
+                    if (anchor.key === focus.key && anchor.offset === focus.offset) {
+                        return;
+                    }
+
+                    // Iterate4 over each node 
+                    nodes.forEach((node, index) => {
+                        if($isTextNode(node)) {
+                            let textNode = node;
+                            if (index === 0 && anchor.offset !== 0) {
+                                textNode = textNode.splitText(anchor.offset)[1] || textNode;
+                            }
+                            if (index === nodes.length -1) {
+                                textNode = textNode.splitText(focus.offset)[0] || textNode;
+                            }
+
+                            if (textNode.__style !== '') {
+                                textNode.setStyle('');
+                            }
+
+                            if (textNode.__format !== 0) {
+                                textNode.setFormat(0);
+                                $getNearestBlockElementAncestorOrThrow(textNode).setFormat('');
+                            }
+                            node = textNode;
+                        } 
+                        // Potentially unused in SPMS as we are not allowing heading/quite/decor nodes
+                        // else if ($isHeadingNode(node) || $isQuoteNode(node)) {
+                        //     node.replace($createParagraphNode(), true);
+                        // } else if ($isDecoratorBlockNode(node)) {
+                        //     node.setFormat('');
+                        // }
+                    })
+
+                }
+            })
+        }
 
 
-        // else if (event === "ol" && currentlySelectedNode !== "ol") {
-        //     // formatNumberedList();
-        //     console.log("set ol")
+       else if (event === "ol" 
+    //    && currentlySelectedNode !== "ol"
+       ) {
+            formatNumberedList();
+            console.log("set ol")
+        }
+        else if (event === "ul"
+        //  && (currentlySelectedNode !== "ul" || "li")
+         ) {
+            formatBulletList();
+            console.log("set ul")
+        }
 
-        // }
-        // else if (event === "ul" && (currentlySelectedNode !== "ul" || "li")) {
-        //     // formatBulletList();
-        //     console.log("set ul")
+        else if (event === "paragraph" 
+        // && currentlySelectedNode !== "paragraph"
+        ) {
+            console.log("set paragraph")
+            console.log(event)
+            formatParagraph();
 
-        // }
+        }
+
+
+ 
         // else if (event === "li" && (currentlySelectedNode !== "ul" || "li")) {
         //     // formatBulletList();
         //     console.log("set li")
 
         // }
 
-        // else if (event === "formatSubscript") {
-        //     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript");
-        // } else if (event === "formatSuperscript") {
-        //     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript");
-        // } 
 
     }
 
@@ -115,11 +173,14 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
     const formatParagraph = () => {
         // console.log(blockType)
         if (blockType !== "paragraph") {
+            console.log("Running format paragraph function")
             editor.update(() => {
                 const selection = $getSelection();
-
+                
                 if ($isRangeSelection(selection)) {
-                    $wrapNodes(selection, () => $createParagraphNode());
+                    console.log('is range selection')
+                    $setBlocksType(selection, () => $createParagraphNode());
+                    // $wrapNodes(selection, () => $createParagraphNode());
                 }
             });
         }
