@@ -17,10 +17,18 @@ export const MSWordPastePlugin = () => {
         return strippedText;
     }
 
+    const symbolConversionDict = {
+        '·': '',
+        'o': '',
+        '§': '',
+
+    }
+
     const generateUnorderedListItems = (text: string) => {
-        const thridLevelLI = '§';
-        const secondLevelLI = 'o';
         const firstLevelLI = '·';
+        const midLevelLI = 'o';
+        const finalLevelLI = '§';
+
         const item = text;
         return item;
     }
@@ -28,9 +36,11 @@ export const MSWordPastePlugin = () => {
     // Parse the text for numbers, abcs and roman numerals followed by a period and space
     // to convert into appropriate ordered list items.
     const generateOrderedListItems = (text: string) => {
-        const thirdLevelLI = ''; // 123s .
-        const secondLevelLI = ''; // abcs .
-        const firstLevelLI = ''; // roman numerals .
+        const firstLevelLI = ''; // 123s .
+        const midLevelLI = ''; // abcs .
+        const finalLevelLI = ''; // roman numerals .
+
+
         const item = text;
         return item;
     }

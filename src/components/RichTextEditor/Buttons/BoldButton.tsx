@@ -5,9 +5,9 @@ import { BaseToolbarButton } from "./BaseToolbarButton"
 import { useState } from "react"
 import { IToolbarButton } from "../../../types";
 
-export const BoldButton = ({ onClick }: IToolbarButton) => {
+export const BoldButton = ({ onClick, buttonIsOn }: IToolbarButton) => {
 
-    const [isActive, setIsActive] = useState(false);
+    const [isActive, setIsActive] = useState(buttonIsOn);
     const boldStateVisuals = () => {
         setIsActive(!isActive);
     }

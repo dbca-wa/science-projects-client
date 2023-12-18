@@ -210,9 +210,9 @@ export const useToolbarClickListener = ({ editorRef, currentlySelectedNode }: Pr
 
 
 
-    if (editorRef.current) {
-        editorRef.current.focus(); // Focus on the textarea element using the ref
-    }
+    // if (editorRef.current) {
+    //     editorRef.current.focus(); // Focus on the textarea element using the ref
+    // }
 
     return { onClick };
 }

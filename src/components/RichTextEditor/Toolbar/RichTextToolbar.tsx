@@ -20,12 +20,23 @@ interface Props {
     editorRef: RefObject<HTMLTextAreaElement>;
     selectedNodeType: string;
     setSelectedNodeType: React.Dispatch<SetStateAction<string>>;
+    selectedIsBold: boolean;
+    setSelectedIsBold: React.Dispatch<SetStateAction<boolean>>;
 }
 
-export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeType }: Props) => {
+export const RichTextToolbar = ({
+    editorRef,
+    selectedNodeType,
+    setSelectedNodeType,
+    selectedIsBold,
+    setSelectedIsBold
+}: Props) => {
 
     const { onClick } = useToolbarClickListener({ currentlySelectedNode: selectedNodeType, editorRef: editorRef });
     const [editor] = useLexicalComposerContext();
+
+    // const [selectedIsBold, setSelectedIsBold] = useState(false);
+
 
 
     useEffect(() => {
@@ -52,6 +63,8 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
     const { colorMode } = useColorMode();
 
     useEffect(() => console.log(colorMode), [colorMode])
+
+    useEffect(() => console.log("selectedIsBold:", selectedIsBold))
 
     return (
         <>
@@ -81,7 +94,7 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
 
                                         <>
 
-                                            <BoldButton onClick={onClick} editor={editor} />
+                                            <BoldButton onClick={onClick} editor={editor} buttonIsOn={selectedIsBold} />
                                             <ItalicsButton onClick={onClick} editor={editor} />
                                             <UnderlineButton onClick={onClick} editor={editor} />
                                             {/* <FontHighlighterButton /> */}
@@ -90,9 +103,13 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                         :
                                         currentToolbarPage === 2 ?
                                             <>
-                                                <ElementTypeButton onClick={onClick} isSmall
-                                                    currentlyClickedNode={selectedNodeType}
-                                                    setCurrentlyClickedNode={setSelectedNodeType}
+                                                <ElementTypeButton
+                                                    onClick={onClick}
+                                                    selectedNodeType={selectedNodeType}
+                                                    editor={editor}
+                                                    isSmall
+                                                // currentlyClickedNode={selectedNodeType}
+                                                // setCurrentlyClickedNode={setSelectedNodeType}
                                                 />
                                                 <VerticalDivider />
                                                 <>
@@ -127,16 +144,22 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                                 <>
                                                     {/* <FontStylingButtons /> */}
 
-                                                    <BoldButton onClick={onClick} editor={editor} />
+                                                    <BoldButton onClick={onClick} editor={editor} buttonIsOn={selectedIsBold} />
+
                                                     <ItalicsButton onClick={onClick} editor={editor} />
                                                     <UnderlineButton onClick={onClick} editor={editor} />
                                                 </>
 
                                                 : currentToolbarPageMd === 2 ?
                                                     <>
-                                                        <ElementTypeButton onClick={onClick}
-                                                            currentlyClickedNode={selectedNodeType}
-                                                            setCurrentlyClickedNode={setSelectedNodeType}
+                                                        <ElementTypeButton
+                                                            onClick={onClick}
+                                                            selectedNodeType={selectedNodeType}
+
+                                                            editor={editor}
+                                                            isSmall
+                                                        // currentlyClickedNode={selectedNodeType}
+                                                        // setCurrentlyClickedNode={setSelectedNodeType}
                                                         />
                                                         <VerticalDivider />
 
@@ -165,15 +188,20 @@ export const RichTextToolbar = ({ editorRef, selectedNodeType, setSelectedNodeTy
                                     <>
                                         <TimeButtons onClick={onClick} editor={editor} />
                                         <VerticalDivider />
-                                        <BoldButton onClick={onClick} editor={editor} />
+                                        <BoldButton onClick={onClick} editor={editor} buttonIsOn={selectedIsBold} />
                                         <ItalicsButton onClick={onClick} editor={editor} />
                                         <UnderlineButton onClick={onClick} editor={editor} />
                                         <VerticalDivider />
 
-                                        <ElementTypeButton onClick={onClick} shouldFurtherConcat={true}
+                                        <ElementTypeButton
+                                            onClick={onClick}
+                                            selectedNodeType={selectedNodeType}
+                                            editor={editor}
+                                            isSmall
+                                            shouldFurtherConcat={true}
 
-                                            currentlyClickedNode={selectedNodeType}
-                                            setCurrentlyClickedNode={setSelectedNodeType}
+                                        // currentlyClickedNode={selectedNodeType}
+                                        // setCurrentlyClickedNode={setSelectedNodeType}
                                         />
                                         <VerticalDivider />
                                         <FontFormatterButton onClick={onClick} />

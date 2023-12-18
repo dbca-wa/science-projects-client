@@ -200,14 +200,17 @@ export const TeamMemberDisplay = ({
                         >
                             {name !== "undefined undefined" && name !== "None None" ? name : username}
                         </Button>
-                        <Tag
-                            bg={roleArray.find((item) => item.role === role)?.bg ?? ""}
-                            color={roleArray.find((item) => item.role === role)?.color ?? ""}
-                            size={"sm"}
-                            justifyContent={"center"}
-                        >
-                            {roleArray.find((item) => item.role === role)?.displayName ?? ""}
-                        </Tag>
+                        <Box>
+                            <Tag
+                                bg={roleArray.find((item) => item.role === role)?.bg ?? ""}
+                                color={roleArray.find((item) => item.role === role)?.color ?? ""}
+                                size={"md"}
+                                justifyContent={"center"}
+                            >
+                                {roleArray.find((item) => item.role === role)?.displayName ?? ""}
+                            </Tag>
+                        </Box>
+
                     </Grid>
 
                 </Flex>

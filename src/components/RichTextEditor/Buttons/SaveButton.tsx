@@ -28,7 +28,7 @@ export const SaveButton = ({ editorType, htmlData, project_pk, document_pk, sect
     //     }
     // }, [editor, isLocked])
 
-    useEffect(() => console.log(htmlData), [htmlData])
+    // useEffect(() => console.log(htmlData), [htmlData])
 
 
     const { colorMode } = useColorMode();
