@@ -68,7 +68,11 @@ export const ProjectOverviewCard = (
     const determineAuthors = (members: IProjectMember[]) => {
         // Filters members with non-null first and last names
         const filteredMembers = members.filter((member) => {
-            return member.user.first_name !== null && member.user.last_name !== null;
+            return (
+                member.user.first_name !== null && member.user.last_name !== null &&
+                member.user.first_name !== undefined && member.user.last_name !== undefined &&
+                member.user.first_name !== "None" && member.user.last_name !== "None"
+            );
         });
 
         // Sorts the filteredMembers array alphabetically based on last_name

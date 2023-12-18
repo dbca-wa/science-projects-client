@@ -109,7 +109,7 @@
 }
 
 
-
+/* LISTS */
 
 .editor-ol-light {
   font-size: 14px;
@@ -117,7 +117,22 @@
   margin: 0;
   margin-left: 16px;
   color: #333;
+}
 
+.editor-ol-l2-light {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 32px;
+  color: #333;
+}
+
+.editor-ol-l3-light {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 40px;
+  color: #333;
 }
 
 .editor-ol-dark {
@@ -126,7 +141,20 @@
   margin: 0;
   margin-left: 16px;
   color: #eee;
-
+}
+.editor-ol-l2-dark {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 32px;
+  color: #eee;
+}
+.editor-ol-l3-dark {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 40px;
+  color: #eee;
 }
 
 .editor-ul-light {
@@ -136,7 +164,28 @@
   margin-left: 16px;
   margin-bottom: 20px;
   color: #333;
+  list-style-type: disc; /* Solid dot */
+}
 
+.editor-ul-l2-light {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 32px;
+  margin-bottom: 20px;
+  color: #333;
+  list-style-type: circle; /* Regular dot */
+}
+
+
+.editor-ul-l3-light {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 40px;
+  margin-bottom: 20px;
+  color: #333;
+  list-style-type: square; /* Square dot */
 }
 
 .editor-ul-dark {
@@ -146,8 +195,30 @@
   margin-left: 16px;
   margin-bottom: 20px;
   color: #eee;
+  list-style-type: disc; /* Solid dot */
 
 }
+
+.editor-ul-l2-dark {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 32px;
+  margin-bottom: 20px;
+  color: #eee;
+  list-style-type: circle; /* Regular dot */
+}
+
+.editor-ul-l3-dark {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 40px;
+  margin-bottom: 20px;
+  color: #eee;
+  list-style-type: square; /* Square dot */
+}
+
 
 .editor-li-light {
   font-size: 14px;
@@ -540,7 +611,7 @@
   padding: 6px 8px;
   position: relative;
   outline: none;
-
+  background-color: #2d3748;
 
 }
 .table-cell-dark p {
@@ -567,7 +638,7 @@
   top: 0;
 }
 .table-cell-header-dark {
-  background-color: #1d1d1d;
+  background-color: #1a202c;
   /* background: red; */
 
   text-align: start;

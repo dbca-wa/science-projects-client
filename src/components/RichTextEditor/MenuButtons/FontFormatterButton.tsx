@@ -7,18 +7,29 @@ import { BsTrash3 } from "react-icons/bs"
 import { useState } from "react"
 
 
-export const FontFormatterButton = () => {
+interface Props {
+    onClick: (eventName: any) => void;
+}
+
+export const FontFormatterButton = (
+    { onClick }: Props
+) => {
 
     const [currentTitle, setCurrentTitle] = useState<string>('Format')
 
     const SubscriptFunc = () => {
         setCurrentTitle("Sub")
+        onClick('formatSubscript');
     }
     const SuperscriptFunc = () => {
         setCurrentTitle("Super")
+        onClick('formatSuperscript');
+
     }
     const ClearFormattingFunc = () => {
-        setCurrentTitle("Clear")
+        setCurrentTitle("Clear");
+        onClick('clearFormatting');
+
     }
 
 

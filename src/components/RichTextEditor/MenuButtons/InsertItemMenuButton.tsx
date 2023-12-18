@@ -9,7 +9,7 @@ import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton"
 import { BsFileImage, BsFiletypeGif, BsPlusSlashMinus, BsSticky, BsTable } from "react-icons/bs"
 import { RxViewHorizontal } from "react-icons/rx"
 import { TbAlphabetGreek, TbBinaryTree2 } from "react-icons/tb"
-import { MdPoll } from "react-icons/md"
+import { MdFormatListBulleted, MdFormatListNumbered, MdPoll } from "react-icons/md"
 import { InsertTableModal } from "@/components/Modals/RTEModals/InsertTableModal"
 import { useDisclosure } from "@chakra-ui/react"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
@@ -17,7 +17,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 interface Props {
     onClick: (event: string) => void;
 }
-export const InsertTableButton = ({ onClick }: Props) => {
+export const InsertItemMenuButton = ({ onClick }: Props) => {
 
     const { isOpen: isAddTableOpen, onClose: onAddTableClose, onOpen: onAddTableOpen } = useDisclosure();
     const TableFunc = () => {
@@ -25,6 +25,21 @@ export const InsertTableButton = ({ onClick }: Props) => {
         // onClick('insertTable');
         onAddTableOpen();
     }
+
+    const BulletListFunc = () => {
+        console.log("BulletListFunc");
+
+        onClick('ul');
+        // onAddTableOpen();
+    }
+
+
+    const NumberListFunc = () => {
+        console.log("NumberListFunc");
+        onClick('ol');
+        // onAddTableOpen();
+    }
+
 
     const [editor] = useLexicalComposerContext();
     return (
@@ -34,6 +49,16 @@ export const InsertTableButton = ({ onClick }: Props) => {
                 title="Insert"
                 menuIcon={AiOutlinePlus}
                 menuItems={[
+                    {
+                        leftIcon: MdFormatListBulleted,
+                        text: 'Bullet List',
+                        onClick: BulletListFunc,
+                    },
+                    {
+                        leftIcon: MdFormatListNumbered,
+                        text: 'Numbered List',
+                        onClick: NumberListFunc,
+                    },
                     {
                         leftIcon: BsTable,
                         text: 'Table',
