@@ -27,7 +27,7 @@ export const ElementTypeButton = ({ isSmall, onClick, shouldFurtherConcat, setCu
         switch (currentTitle) {
             case 'Normal':
             case 'Norm':
-                eventType = 'paragraph';
+                eventType = 'formatParagraph';
                 break;
             case 'Bullets':
             case 'Bullet List':
@@ -38,13 +38,14 @@ export const ElementTypeButton = ({ isSmall, onClick, shouldFurtherConcat, setCu
                 eventType = 'ol';
                 break;
             default:
-                eventType = 'paragraph';
+                eventType = 'formatParagraph';
         }
         onClick(eventType);
     }, [currentTitle, onClick]);
 
     const NormalFunc = () => {
         setCurrentTitle("Norm");
+        // onClick('formatParagraph')
     };
 
     const BulletListFunc = () => {
