@@ -443,7 +443,7 @@ export const ProjectPlanEndorsements = (
                             >
                                 <Box>
                                     <Text
-                                        color={hcEndReqValue ? "black" : "gray.500"}
+                                        color={hcEndReqValue ? colorMode === "light" ? "black" : "white" : "gray.500"}
                                     >
                                         Herbarium Curator's Endorsement</Text>
                                 </Box>

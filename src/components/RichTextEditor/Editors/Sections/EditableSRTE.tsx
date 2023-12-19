@@ -24,6 +24,8 @@ import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import DraggableBlockPlugin from '@/components/RichTextEditor/Plugins/DraggableBlockPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
+import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
+import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
 
 interface Props {
     initialConfig: any;
@@ -82,10 +84,26 @@ export const EditableSRTE = (
             console.log('floatingAnchorElem is set:', floatingAnchorElem);
         }
     }, [floatingAnchorElem]);
+
+    useEffect(() => {
+        // Assuming editorRef is a reference to your Lexical editor instance
+        const editorInstance = editorRef.current;
+
+        if (editorInstance) {
+            // Perform operations on the Lexical editor instance
+            const root = editorInstance.$getRoot();
+            setEditorText(root.__cachedText);
+        }
+    }, [editorRef, setEditorText]);
+
+
+
+
     return (
         <>
             <LexicalComposer
                 initialConfig={initialConfig}
+
             >
                 {/* Plugins*/}
                 <TablePlugin
@@ -95,6 +113,7 @@ export const EditableSRTE = (
                 <AutoFocusPlugin />
                 <HistoryPlugin />
                 <ListPlugin />
+
                 <OnChangePlugin onChange={(editorState, editor) => {
                     editorState.read(() => {
                         const root = $getRoot();
@@ -104,6 +123,7 @@ export const EditableSRTE = (
                         // console.log(newHtml)
                         // console.log("DATA DISPLAY PLUGIN:", newHtml);
                         setDisplayData(newHtml);
+
                     })
                 }} />
                 {data !== undefined && data !== null && (
@@ -154,6 +174,7 @@ export const EditableSRTE = (
                                     />
                                 </Box>
                             </Box>
+                            {/* <Box>Editor: {editorText}</Box> */}
                         </Box>
                     }
                     placeholder={
@@ -205,6 +226,8 @@ export const EditableSRTE = (
                 }
                 <ClearEditorPlugin />
                 <TabIndentationPlugin />
+                <ListMaxIndentLevelPlugin maxDepth={3} />
+
                 <NodeEventPlugin
                     nodeType={ParagraphNode}
                     eventType={'click'}
@@ -242,8 +265,22 @@ export const EditableSRTE = (
 
                     }}
                 />
+                <EditorTextInitialStatePlugin
+                    setEditorText={setEditorText}
+                    editorText={editorText}
+                    isOpen={isEditorOpen}
 
+                />
                 {/* <DataDisplayPlugin setDisplayData={setDisplayData} /> */}
+                {/* {isEditorOpen && (
+                    <EditorTextInitialStatePlugin
+                        setEditorText={setEditorText}
+                        editorText={editorText}
+                        isOpen={isEditorOpen}
+                    />
+
+                )} */}
+
             </LexicalComposer>
         </>
     )

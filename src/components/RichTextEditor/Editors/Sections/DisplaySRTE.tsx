@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { EditorSubsections, EditorType } from "../../../../types";
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
 
 interface Props {
     initialConfig: any;
@@ -76,6 +77,7 @@ export const DisplaySRTE = (
                     hasCellMerge={true}
                     hasCellBackgroundColor={false}
                 />
+
                 {/* <OnChangePlugin onChange={(editorState, editor) => {
                     editorState.read(() => {
                         const root = $getRoot();
@@ -95,19 +97,21 @@ export const DisplaySRTE = (
                 {/* Text Area */}
                 <RichTextPlugin
                     contentEditable={
-
-                        <ContentEditable
-                            style={{
-                                minHeight: "50px",
-                                width: "100%",
-                                height: "auto",
-                                padding: "32px",
-                                paddingTop: "20px",
-                                paddingBottom: "16px",
-                                borderRadius: "0 0 25px 25px",
-                                outline: "none",
-                            }}
-                        />
+                        <>
+                            <ContentEditable
+                                style={{
+                                    minHeight: "50px",
+                                    width: "100%",
+                                    height: "auto",
+                                    padding: "32px",
+                                    paddingTop: "20px",
+                                    paddingBottom: "16px",
+                                    borderRadius: "0 0 25px 25px",
+                                    outline: "none",
+                                }}
+                            />
+                            {/* <Box>EditorText: {editorText}</Box> */}
+                        </>
                     }
                     placeholder={
                         <>

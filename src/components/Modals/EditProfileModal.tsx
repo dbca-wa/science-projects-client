@@ -303,7 +303,9 @@ export const EditProfileModal = ({ isOpen, onClose, userId, currentImage }: IEdi
 
                                                         alignItems={"center"}
                                                         type="file"
-                                                        accept="image/*"
+                                                        // accept="image/*"
+                                                        accept=".png, .jpeg, .jpg, image/png, image/jpeg"
+
                                                         onChange={(e) => {
                                                             const file = e.target.files?.[0];
                                                             if (file) {

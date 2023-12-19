@@ -161,7 +161,26 @@ export const RichTextEditor = ({
     }
 
     const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+
     const [displayData, setDisplayData] = useState(data);
+
+    // const stripHTML = (dataToStrip: string) => {
+    //     if (!dataToStrip) return "";
+
+    //     // Remove HTML tags using regex and insert spaces between opening/closing tags
+    //     const strippedVersion = dataToStrip.replace(/<\/?[^>]+(>|$)/g, " ").trim();
+
+    //     // Insert spaces after sentence enders, commas, and semicolons if needed
+    //     return strippedVersion.replace(/([!.;]+)(?=\S)/g, "$1 ").replace(/\s{2,}/g, " ");
+    // };
+
+    // useEffect(() => {
+
+    //     if (isEditorOpen) {
+    //         setEditorText(stripHTML(displayData));
+    //     }
+    // }, [isEditorOpen])
 
     return (
         // Wrapper

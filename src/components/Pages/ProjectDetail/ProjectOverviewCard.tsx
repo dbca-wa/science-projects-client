@@ -579,11 +579,12 @@ export const ProjectOverviewCard = (
 
 
 
-                <Flex
+                <Grid
                     // justifyContent={"flex-end"}
                     right={0}
                     zIndex={-1}
                     px={6}
+                    gridTemplateColumns={"repeat(2, 1fr)"}
                 >
                     {(me?.userData?.is_superuser || userIsLeader || userIsBaLead || me?.userData?.business_area?.name === "Directorate")
                         ?
@@ -781,7 +782,7 @@ export const ProjectOverviewCard = (
                         </Text>
                         <Box
                             mt={1}
-                            ml={2}
+                            ml={1.5}
                             color={colorMode === "dark" ? "blue.200" : "blue.400"}
                             alignItems={"center"}
                             alignContent={"center"}
@@ -791,7 +792,7 @@ export const ProjectOverviewCard = (
 
                     </Flex>
 
-                </Flex>
+                </Grid>
 
 
                 {/* Description and Edit Project Details */}

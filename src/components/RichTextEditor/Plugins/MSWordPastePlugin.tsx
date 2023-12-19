@@ -21,7 +21,7 @@ export const MSWordPastePlugin = () => {
         '·': '',
         'o': '',
         '§': '',
-
+        '': '',
     }
 
     const generateUnorderedListItems = (text: string) => {

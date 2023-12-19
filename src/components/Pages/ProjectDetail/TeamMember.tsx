@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { IImageData, IUserData, IUserMe } from "../../../types";
 import { FaCrown } from "react-icons/fa";
 import { DraggableProvided } from "react-beautiful-dnd"; // Import DraggableProvided
+import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 
 interface ITeamMember {
@@ -119,6 +120,7 @@ export const TeamMember = ({
     };
 
 
+    const baseURL = useApiEndpoint();
 
     return (
         <>
@@ -182,7 +184,16 @@ export const TeamMember = ({
                 >
                     <Box pos={"relative"}>
                         <Avatar
-                            src={image?.file ? image.file : image?.old_file ? image.old_file : undefined}
+                            // src={
+                            //     image?.file ? image.file :
+                            //         image?.old_file ? image.old_file :
+                            //             undefined
+                            // }
+                            src={
+                                image?.file ? `${baseURL}${image.file}` :
+                                    image?.old_file ? `${baseURL}${image.old_file}` :
+                                        ""
+                            }
                             userSelect={"none"}
                             onClick={onUserOpen}
                             cursor="pointer"

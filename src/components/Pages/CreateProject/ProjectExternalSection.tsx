@@ -110,7 +110,9 @@ export const ProjectExternalSection = (
             </FormControl>
 
 
-            <FormControl isRequired mb={6}>
+            <FormControl
+                // isRequired 
+                mb={6}>
                 <FormLabel>Description</FormLabel>
                 <InputGroup>
                     {/* <Textarea
@@ -129,7 +131,9 @@ export const ProjectExternalSection = (
                 <FormHelperText>Description specific to this external project.</FormHelperText>
             </FormControl>
 
-            <FormControl isRequired mb={6}>
+            <FormControl
+                // isRequired 
+                mb={6}>
                 <FormLabel>Aims</FormLabel>
                 <InputGroup>
                     {/* <Textarea
