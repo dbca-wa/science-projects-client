@@ -155,6 +155,8 @@ export const RichTextToolbar = ({
 
                                                     <ItalicsButton onClick={onClick} editor={editor} />
                                                     <UnderlineButton onClick={onClick} editor={editor} />
+                                                    <VerticalDivider />
+
                                                 </>
 
                                                 : currentToolbarPageMd === 2 ?
@@ -175,11 +177,17 @@ export const RichTextToolbar = ({
 
                                                         <>
                                                             <FontFormatterButton onClick={onClick} />
+                                                            <VerticalDivider />
+
                                                             {/* <AlignButton onClick={onClick} /> */}
                                                         </>
                                                     </>
                                                     :
-                                                    <InsertItemMenuButton onClick={onClick} />
+                                                    <>
+                                                        <InsertItemMenuButton onClick={onClick} />
+                                                        <VerticalDivider />
+
+                                                    </>
 
 
                                         }

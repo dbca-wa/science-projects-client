@@ -116,6 +116,7 @@
   padding: 0;
   margin: 0;
   list-style-position: inside;
+
 }
 .editor-ol2 {
   padding: 0;
@@ -147,7 +148,11 @@
   margin: 0;
   list-style-type: square;
   list-style-position: inside;
+  
 }
+
+
+
 
 
 .editor-list-item-checked,
@@ -261,6 +266,8 @@
   font-size: 14px;
   padding: 0;
   margin: 0;
+  /* margin-top: 3px; */
+  margin-bottom: 8px;
   margin-left: 22px;
   /* color: #723; */
   color: #333;
@@ -275,6 +282,28 @@
   /* color: #723; */
   color: #eee;
 
+}
+
+
+
+/* Style for ordered list container */
+.editor-ol1,
+.editor-ol2,
+.editor-ol3 {
+  padding: 0;
+  margin: 0;
+  list-style-position: inside;
+}
+
+
+
+/* Style for ordered list container */
+.editor-ul1,
+.editor-ul2,
+.editor-ul3 {
+  padding: 0;
+  margin: 0;
+  list-style-position: inside;
 }
 
 
