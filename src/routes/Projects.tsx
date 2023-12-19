@@ -1,7 +1,7 @@
 // Route for displaying paginated projects
 
 import { IUserData } from "../types"
-import { Checkbox, Flex, Grid, Stack, Text, useColorMode, Select, Box, Center, Button } from "@chakra-ui/react"
+import { Checkbox, Flex, Grid, Stack, Text, useColorMode, Select, Box, Center, Button, Spinner } from "@chakra-ui/react"
 import { DownloadProjectsCSVButton } from "../components/Pages/Projects/DownloadProjectsCSVButton";
 import { Head } from "../components/Base/Head";
 import { useProjectSearchContext } from "../lib/hooks/ProjectSearchContext";
@@ -305,13 +305,19 @@ export const Projects = () => {
 
             </Box>
 
-            <PaginatorProject
-                loading={loading}
-                data={filteredItems}
-                currentProjectResultsPage={currentProjectResultsPage}
-                setCurrentProjectResultsPage={setCurrentProjectResultsPage}
-                totalPages={totalPages}
-            />
+            {loading ? (
+                <Center w={"100%"} minH="100px" pt={10}>
+                    <Spinner size={"xl"} />
+                </Center>
+            ) : (
+                <PaginatorProject
+                    loading={loading}
+                    data={filteredItems}
+                    currentProjectResultsPage={currentProjectResultsPage}
+                    setCurrentProjectResultsPage={setCurrentProjectResultsPage}
+                    totalPages={totalPages}
+                />
+            )}
         </>
     )
 }
