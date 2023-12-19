@@ -17,7 +17,7 @@ export const FontFormatterButton = (
     { onClick }: Props
 ) => {
 
-    const [currentTitle, setCurrentTitle] = useState<string>('Add Script')
+    const [currentTitle, setCurrentTitle] = useState<string>('Script')
 
     const SubscriptFunc = () => {
         // setCurrentTitle("Sub")
