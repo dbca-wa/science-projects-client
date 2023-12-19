@@ -45,7 +45,7 @@ export const OptionsBar = ({
     return (
 
 
-        editorIsOpen
+        editorIsOpen && editorText
         &&
         (
             <Flex

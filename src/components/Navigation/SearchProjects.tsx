@@ -136,7 +136,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
                             color: colorMode === "dark" ? "gray.500" : "gray.500",
                         }}
                         bg="white"
-                        placeholder="Search Projects..."
+                        placeholder="Search projects by name, keyword or tag..."
                         rounded={"5px"}
                         type="text"
                         value={inputValue}

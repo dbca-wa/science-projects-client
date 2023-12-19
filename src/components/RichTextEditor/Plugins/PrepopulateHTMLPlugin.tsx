@@ -1,6 +1,8 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useEffect, useState } from "react";
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
+// import { $generateNodesFromDOM, $getRoot, $getList, ListItemNode, ListNode } from "@lexical/html";
+import { ListItemNode, ListNode } from "@lexical/list"
 import { $getRoot, $getSelection, LexicalNode, RangeSelection, createCommand } from "lexical";
 import { CLEAR_EDITOR_COMMAND, LexicalEditor } from "lexical"
 import { useColorMode } from "@chakra-ui/react";
@@ -41,11 +43,25 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
         </table>`;
     };
 
-    const handleWordListItems = (data: string) => {
-        let dataToReturn = ''
-        dataToReturn = data;
-        return dataToReturn;
-    }
+
+    const generateUnorderedListItems = (text: string) => {
+        return `<li>${text}</li>`;
+    };
+
+    const handleUnorderedList = (listItems: string[]) => {
+        const listItemsHtml = listItems.map(generateUnorderedListItems).join('');
+        return `<ul>${listItemsHtml}</ul>`;
+    };
+
+    const handleListItems = (data: string) => {
+        // Handle unordered lists
+        let replacedData = '';
+        replacedData = data.replace(/·(.*?)(?=\r\n|\n|$)/g, (match, p1) => {
+            return generateUnorderedListItems(p1.trim());
+        });
+
+        return replacedData;
+    };
 
     const [editor, editorState] = useLexicalComposerContext();
     useEffect(() => {
@@ -56,25 +72,21 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
                 return generateHtmlTable(tableData);
             });
 
-            replacedData = handleWordListItems(replacedData);
+            // Handle unordered lists
+            replacedData = replacedData.replace(/·(.*?)(?=\r\n|\n|$)/g, (match, p1) => {
+                return handleUnorderedList(p1.trim().split('\n').filter(Boolean));
+            });
 
             // Parse the replaced data
             const parser = new DOMParser();
             const dom = parser.parseFromString(replacedData, 'text/html');
 
-
-            // // editor.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined)
-            // // [["Role", "Year 1", "Year 2", "Year 3"], ["Scientist", "", "", ""], ["Technical", "", "", ""], ["Volunteer", "", "", ""], ["Collaborator", "", "", ""]]
-            // // [["Source", "Year 1", "Year 2", "Year 3"], ["Consolidated Funds (DBCA)", "", "", ""], ["External Funding", "", "", ""]]
-
-
-
-            // const parser = new DOMParser();
-            // const dom = parser.parseFromString(data, 'text/html');
-
             console.log(dom.body.children)
             const bunchOfNodes = $generateNodesFromDOM(editor, dom)
             const root = $getRoot();
+            // let currentListNode: ListNode | null = null;
+            // let currentListItemNode: ListItemNode | null = null;
+
             bunchOfNodes.forEach((node, index) => {
                 if (root) {
                     const firstChild = root.getFirstChild()
@@ -85,21 +97,31 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
                         }
                     }
 
-                    // Ignore any empty nodes in the data, else append the node to the root.
-                    // Turned off for now, due to line breaks required after tables
                     if (node !== null) {
-                        // if (node.getTextContent() === "" || node.getTextContent() === undefined || node.getTextContent() === null) {
-                        //     console.log("NODE PROBLEM: ", node.getTextContent())
-                        // } 
-                        // else {
-                        // console.log("NODE FINE", node.getTextContent())
+                        // if (node.getType() === 'list') {
+                        //     currentListNode = node as ListNode;
+                        //     root.append(currentListNode);
+                        // } else if (node.getType() === 'list-item') {
+                        //     currentListItemNode = node as ListItemNode;
+                        //     if (currentListNode !== null) {
+                        //         currentListNode.append(currentListItemNode);
+                        //     } else {
+                        //         root.append(currentListItemNode);
+                        //     }
+                        // } else {
                         root.append(node)
+
                         // }
+
                     }
 
                 }
             });
             root.selectEnd();
+            // const finalNode = root.getLastChild();
+            // if (finalNode) {
+            //     finalNode.selectStart();
+            // }
         })
     }, [])
     return null;

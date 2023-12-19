@@ -374,7 +374,11 @@ export const ProjectUserDetails = ({ onClose, pk, is_leader, leader_pk,
                     mt={4}
                 >
                     <Avatar
-                        src={user?.image?.file ? user.image.file : user?.image?.old_file ? user.image.old_file : ""}
+                        src={
+                            user?.image?.file ? user.image.file :
+                                user?.image?.old_file ? user.image.old_file :
+                                    ""
+                        }
                         size={"2xl"}
                     />
 

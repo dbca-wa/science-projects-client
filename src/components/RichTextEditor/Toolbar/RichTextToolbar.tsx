@@ -98,28 +98,35 @@ export const RichTextToolbar = ({
                                             <ItalicsButton onClick={onClick} editor={editor} />
                                             <UnderlineButton onClick={onClick} editor={editor} />
                                             {/* <FontHighlighterButton /> */}
+                                            <VerticalDivider />
 
                                         </>
                                         :
                                         currentToolbarPage === 2 ?
                                             <>
-                                                <ElementTypeButton
+                                                {/* <ElementTypeButton
                                                     onClick={onClick}
                                                     selectedNodeType={selectedNodeType}
                                                     editor={editor}
                                                     isSmall
                                                 // currentlyClickedNode={selectedNodeType}
                                                 // setCurrentlyClickedNode={setSelectedNodeType}
-                                                />
-                                                <VerticalDivider />
+                                                /> */}
                                                 <>
                                                     <FontFormatterButton onClick={onClick} />
                                                     {/* <AlignButton isSmall onClick={onClick} /> */}
                                                 </>
+                                                <VerticalDivider />
+
                                             </>
                                             :
+                                            <>
+                                                <InsertItemMenuButton onClick={onClick} />
 
-                                            <InsertItemMenuButton onClick={onClick} />
+                                                <VerticalDivider />
+
+                                            </>
+
 
                                 }
 
