@@ -874,7 +874,9 @@ export interface ICreateProjectDetails {
     departmentalService: number;
     researchFunction: number;
     businessArea: number;
-    dates: Date[];
+    startDate: Date;
+    endDate: Date;
+    // dates: Date[];
 }
 
 export interface ICreateProjectExternalDetails {
@@ -932,9 +934,16 @@ export const createProject = async ({ baseInformationData, detailsData, location
     formData.append('dataCustodian', detailsData.dataCustodian.toString());
     formData.append('supervisingScientist', detailsData.supervisingScientist.toString());
 
-    detailsData.dates.forEach((date, index) => {
-        formData.append('dates', date.toISOString());
-    });
+    if (detailsData.startDate) {
+        formData.append('startDate', detailsData.startDate.toISOString())
+    }
+    if (detailsData.endDate) {
+        formData.append('endDate', detailsData.endDate.toISOString());
+
+    }
+    // detailsData.dates.forEach((date, index) => {
+    //     formData.append('dates', date.toISOString());
+    // });
 
     locationData.forEach((location, index) => {
         formData.append('locations', location.toString());
@@ -975,7 +984,9 @@ export interface IEditProject {
     locations: number[];
     keywords: string[];
 
-    dates: Date[];
+    // dates: Date[];
+    startDate: Date;
+    endDate: Date;
     dataCustodian: number;
     departmentalService: number;
     researchFunction: number;
@@ -990,7 +1001,8 @@ export const updateProjectDetails = async ({
     image,
     locations,
 
-    dates,
+    startDate,
+    endDate,
     status,
     dataCustodian,
     departmentalService,
@@ -1054,14 +1066,29 @@ export const updateProjectDetails = async ({
         newFormData.append('locations', locationsString);
     }
 
-    if (dates !== undefined && dates.length > 0) {
-        console.log(dates)
-        dates.forEach((date, index) => {
-            const dateFormatted = new Date(date);
-            newFormData.append('dates', dateFormatted.toISOString());
-        });
-        // toISOString()
+
+    if (startDate) {
+        console.log('startDate is', startDate)
+        const dateFormatted = new Date(startDate);
+
+        newFormData.append('startDate', dateFormatted.toISOString())
     }
+    if (endDate) {
+        console.log('endDate is', endDate)
+        const dateFormatted = new Date(endDate);
+
+        newFormData.append('endDate', dateFormatted.toISOString());
+
+    }
+
+    // if (dates !== undefined && dates.length > 0) {
+    //     console.log(dates)
+    //     dates.forEach((date, index) => {
+    //         const dateFormatted = new Date(date);
+    //         newFormData.append('dates', dateFormatted.toISOString());
+    //     });
+    //     // toISOString()
+    // }
 
     if (departmentalService !== undefined) {
         newFormData.append('service', departmentalService.toString());

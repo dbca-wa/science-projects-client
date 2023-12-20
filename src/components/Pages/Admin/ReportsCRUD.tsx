@@ -8,18 +8,21 @@ import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IReport, IReportCreation } from "../../../types";
 import { ReportItemDisplay } from "./ReportItemDisplay";
-import { CalendarWithCSS } from "../CreateProject/CalendarWithCSS";
+// import { CalendarWithCSS } from "../CreateProject/CalendarWithCSS";
 import { AxiosError } from "axios";
+import { StartAndEndDateSelector } from "../CreateProject/StartAndEndDateSelector";
 
 export const ReportsCRUD = () => {
     const { register, handleSubmit, watch } = useForm<IReportCreation>();
 
     const yearData = watch('year');
-    const [selectedDates, setSelectedDates] = useState([null, null]);
+    // const [selectedDates, setSelectedDates] = useState([null, null]);
+    const [startDate, setStartDate] = useState<Date>();
+    const [endDate, setEndDate] = useState<Date>();
     const seekUpdateValue = watch('seek_update');
-    useEffect(() => {
-        console.log(selectedDates)
-    }, [selectedDates])
+    // useEffect(() => {
+    //     console.log(selectedDates)
+    // }, [selectedDates])
 
     const toast = useToast();
     const { isOpen: addIsOpen, onOpen: onAddOpen, onClose: onAddClose } = useDisclosure();
@@ -246,9 +249,13 @@ export const ReportsCRUD = () => {
                                     <FormControl
                                         isRequired
                                     >
-                                        <FormLabel>Start and End Dates</FormLabel>
-                                        <CalendarWithCSS onChange={setSelectedDates} />
-                                        <FormHelperText>Select the period in which entries for this annual report are allowed. First day clicked is the open date, second is the close date.</FormHelperText>
+                                        <StartAndEndDateSelector
+                                            startDate={startDate} endDate={endDate}
+                                            setStartDate={setStartDate} setEndDate={setEndDate}
+                                            helperText="Select the period in which entries for this annual report are allowed."
+                                        />
+                                        {/* <FormLabel>Start and End Dates</FormLabel> */}
+                                        {/* <CalendarWithCSS onChange={setSelectedDates} /> */}
                                     </FormControl>
 
                                     <FormControl>
@@ -317,7 +324,8 @@ export const ReportsCRUD = () => {
                                     isLoading={mutation.isLoading}
                                     colorScheme="blue" size="lg" width={"100%"}
                                     isDisabled={
-                                        selectedDates[0] === (undefined || null) || selectedDates[1] === (undefined || null)
+                                        startDate === undefined || endDate === undefined
+                                        || startDate > endDate
                                     }
                                     onClick={() => {
                                         console.log("clicked")
@@ -325,8 +333,8 @@ export const ReportsCRUD = () => {
                                             {
                                                 "old_id": 1,
                                                 "year": yearData,
-                                                "date_open": selectedDates[0],
-                                                "date_closed": selectedDates[1],
+                                                "date_open": startDate,
+                                                "date_closed": endDate,
                                                 dm: "<p></p>",
                                                 publications: "<p></p>",
                                                 research_intro: "<p></p>",

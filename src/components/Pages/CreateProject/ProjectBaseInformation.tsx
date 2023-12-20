@@ -123,6 +123,7 @@ export const ProjectBaseInformation = ({ projectKind, baseInformationFilled, set
                                 // pattern="[A-Za-z0-9@.+_-]*" 
                                 /> */}
                             <SimpleStateRichTextEditor
+                                // autoFocus={false}
                                 section="title"
                                 editorType="ProjectDetail"
                                 isUpdate={false}
@@ -139,13 +140,9 @@ export const ProjectBaseInformation = ({ projectKind, baseInformationFilled, set
                     <FormControl isRequired mb={6}>
                         <FormLabel>Project Summary</FormLabel>
                         <InputGroup>
-                            {/* <Textarea
-                                    placeholder={`Type your summary here...`}
-                                    value={projectSummary}
-                                    onChange={(event) => setProjectSummary(event.target.value)}
-                                /> */}
 
-                            <StateRichTextEditor
+                            <SimpleStateRichTextEditor
+                                // autoFocus={false}
                                 section="description"
                                 editorType="ProjectDetail"
                                 isUpdate={false}

@@ -10,6 +10,7 @@ import { IDashProps } from "../../../types";
 import { AddIcon } from "@chakra-ui/icons";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 import { UserFeedbackModal } from "@/components/Modals/UserFeedbackModal";
+import { DatePicker } from "../CreateProject/DatePicker";
 
 
 export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
@@ -20,6 +21,7 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
     const [spmsText, setSpmsText] = useState("Science Project Management System");
     const [annualReportText, setAnnualReportText] = useState("Annual Report");
     const [shouldConcat, setShouldConcat] = useState(false);
+    // const [startDate, setStartDate] = useState<string>();
 
     const handleResize = useCallback(() => {
         // 1150 = the breakpoint at which issues occur with text overlaying
@@ -183,6 +185,15 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                             Don't be shy, we can only make things better with your help!
                         </Text>
                     </Flex>
+
+                    {/* <Box>
+                        <Text>{startDate}</Text>
+
+                        <DatePicker
+                            placeholder="Select Start Date"
+                            onChange={(e) => setStartDate(e)}
+                        />
+                    </Box> */}
 
                     {/* <br /> */}
                     {/* <Text

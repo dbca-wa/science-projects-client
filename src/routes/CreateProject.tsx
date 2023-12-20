@@ -18,7 +18,7 @@ export const CreateProject = () => {
             title: "Science Project",
             description: "A project with a defined period of scientific activities.",
             bulletPoints: [
-                "Approval process to determine how it fits within Departmental stragegy and priorities.",
+                "Approval process to determine how it fits within Departmental strategy and priorities.",
                 "Formal Closure Process",
                 "Requires Annual Reporting"
             ],
