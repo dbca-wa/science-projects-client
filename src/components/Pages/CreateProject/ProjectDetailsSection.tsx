@@ -1,17 +1,18 @@
 // WIP project detail section for project creation
 
-import { Box, Button, Flex, FormControl, FormHelperText, FormLabel, Grid, Icon, InputGroup, ModalBody, ModalFooter, Select } from "@chakra-ui/react"
+import { Box, Text, Button, Flex, FormControl, FormHelperText, FormLabel, Grid, Icon, InputGroup, ModalBody, ModalFooter, Select } from "@chakra-ui/react"
 import { useEffect, useState } from "react";
 import { BsFillCalendarEventFill } from "react-icons/bs";
 
 import 'react-calendar/dist/Calendar.css'
 import "../../../styles/modalscrollbar.css";
-import { CalendarWithCSS } from "./CalendarWithCSS";
 import { useResearchFunctions } from "../../../lib/hooks/useResearchFunctions";
 import { IBusinessArea, IDepartmentalService, IResearchFunction } from "../../../types";
 import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
 import { useDepartmentalServices } from "../../../lib/hooks/useDepartmentalServices";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { DatePicker } from "./DatePicker";
+import { StartAndEndDateSelector } from "./StartAndEndDateSelector";
 
 
 interface IProjectDetailSectionProps {
@@ -34,7 +35,9 @@ export const ProjectDetailsSection = ({
 
     const [selectedSupervisingScientist, setSelectedSupervisingScientist] = useState<number>();
     const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
-    const [selectedDates, setSelectedDates] = useState();
+    const [startDate, setStartDate] = useState<Date>();
+    const [endDate, setEndDate] = useState<Date>();
+    // const [selectedDates, setSelectedDates] = useState();
 
     useEffect(() => {
         // Adjust to auto set, but allow for closing and re-setting data custodian.
@@ -47,7 +50,7 @@ export const ProjectDetailsSection = ({
             // && selectedResearchFunction
             && selectedSupervisingScientist
             && selectedDataCustodian
-            && selectedDates) {
+            && startDate && endDate && (startDate <= endDate)) {
             setProjectDetailsFilled(true)
             console.log(
                 {
@@ -56,7 +59,8 @@ export const ProjectDetailsSection = ({
                     "departmentalService": selectedDepartmentalService,
                     "dataCustodian": selectedDataCustodian,
                     "supervisingScientist": selectedSupervisingScientist,
-                    "dates": selectedDates,
+                    "startDate": startDate,
+                    "endDate": endDate,
                 }
 
             )
@@ -64,7 +68,7 @@ export const ProjectDetailsSection = ({
         else {
             setProjectDetailsFilled(false)
         }
-    }, [selectedDates, selectedDataCustodian, selectedSupervisingScientist, selectedResearchFunction, selectedDepartmentalService, selectedBusinessArea, setProjectDetailsFilled])
+    }, [startDate, endDate, selectedDataCustodian, selectedSupervisingScientist, selectedResearchFunction, selectedDepartmentalService, selectedBusinessArea, setProjectDetailsFilled])
 
     const [researchFunctionsList, setResearchFunctionsList] = useState<IResearchFunction[]>([]);
     const [businessAreaList, setBusinessAreaList] = useState<IBusinessArea[]>([]);
@@ -104,85 +108,12 @@ export const ProjectDetailsSection = ({
 
     return (
         <>
-
-            <Grid
-                gridTemplateColumns={"repeat(2, 1fr)"}
-                gridGap={8}
-                my={4}
-            // justifyContent={"center"}
-            // alignItems={"center"}
-            >
-
-                <UserSearchDropdown
-                    isRequired={true}
-                    setUserFunction={setSelectedSupervisingScientist}
-                    preselectedUserPk={thisUser}
-                    label={projectType !== "Student Project" ? "Research Scientist" : "Supervising Scientist"}
-                    placeholder={projectType === "Student Project" ? "Search for a Supervising Scientist" : "Search for a Research Scientist"}
-                    helperText={
-                        <Box
-                            mt={2}
-                        >
-                            {projectType === "Student Project" ? "The supervising scientist." : "Research Scientist (Project Leader)"}
-                        </Box>
-                    }
-                />
-
-                <UserSearchDropdown
-                    isRequired={true}
-                    setUserFunction={setSelectedDataCustodian}
-                    // preselectedUserPk={selectedDataCustodian}
-                    preselectedUserPk={thisUser}
-                    isEditable={true}
-                    label="Data Custodian"
-                    placeholder="Search for a data custodian"
-                    helperText={
-                        <Box
-                        >
-                            The data custodian (SPP E25) responsible for data management, publishing, and metadata documentation on the&nbsp;
-                            <Button onClick={() => {
-                                window.open("http://data.dbca.wa.gov.au/", "_blank");
-                            }}
-                                variant={"link"}
-                                colorScheme="blue"
-                            >
-                                data catalogue.
-                            </Button>
-                        </Box>
-                    }
-                />
-
-
-            </Grid>
-
             <Grid
                 gridTemplateColumns={"repeat(2, 1fr)"}
                 gridGap={8}
             >
-                <Box w={"100%"} h={"100%"} display="flex" alignItems="center" justifyContent="center">
-                    <FormControl isRequired>
-
-                        <FormLabel>
-                            <Box
-                                display={"inline-flex"}
-                                justifyContent={"center"}
-                                alignItems={"center"}
-                            >
-                                <Icon as={BsFillCalendarEventFill} mr={2} />
-                                Start and End Dates
-                            </Box>
-
-                        </FormLabel>
-
-                        <CalendarWithCSS onChange={setSelectedDates} />
-
-                        <FormHelperText>
-                            Select a start and end date by clicking on the calendar. The first clicked date is the start date, the second is the end date.
-                        </FormHelperText>
-                    </FormControl>
-                </Box>
                 <Box>
-                    <FormControl isRequired>
+                    <FormControl isRequired mb={4}>
                         <FormLabel>Business Area</FormLabel>
 
                         <InputGroup>
@@ -253,6 +184,66 @@ export const ProjectDetailsSection = ({
                     </FormControl>
 
                 </Box>
+                <Grid
+                    gridTemplateColumns={"repeat(1, 1fr)"}
+                >
+                    <FormControl>
+                        <StartAndEndDateSelector
+                            startDate={startDate} endDate={endDate}
+                            setStartDate={setStartDate} setEndDate={setEndDate}
+                            helperText="This can be tentative and adjusted from project settings later"
+                        />
+
+                    </FormControl>
+
+                    <Box mb={4}>
+                        <UserSearchDropdown
+                            isRequired={true}
+                            setUserFunction={setSelectedSupervisingScientist}
+                            preselectedUserPk={thisUser}
+                            label={projectType !== "Student Project" ? "Research Scientist" : "Supervising Scientist"}
+                            placeholder={projectType === "Student Project" ? "Search for a Supervising Scientist" : "Search for a Research Scientist"}
+                            helperText={
+                                <Box
+
+                                    mt={2}
+                                >
+                                    {projectType === "Student Project" ? "The supervising scientist." : "Research Scientist (Project Leader)"}
+                                </Box>
+                            }
+                        />
+
+                    </Box>
+
+                    <Box
+                        mb={4}
+                    >
+                        <UserSearchDropdown
+                            isRequired={true}
+                            setUserFunction={setSelectedDataCustodian}
+                            // preselectedUserPk={selectedDataCustodian}
+                            preselectedUserPk={thisUser}
+                            isEditable={true}
+                            label="Data Custodian"
+                            placeholder="Search for a data custodian"
+                            helperText={
+                                <Box
+                                >
+                                    The data custodian (SPP E25) responsible for data management, publishing, and metadata documentation on the&nbsp;
+                                    <Button onClick={() => {
+                                        window.open("http://data.dbca.wa.gov.au/", "_blank");
+                                    }}
+                                        variant={"link"}
+                                        colorScheme="blue"
+                                    >
+                                        data catalogue.
+                                    </Button>
+                                </Box>
+                            }
+                        />
+
+                    </Box>
+                </Grid>
 
             </Grid>
 
@@ -265,6 +256,7 @@ export const ProjectDetailsSection = ({
                 > */}
 
             {/* </Grid> */}
+
             <Flex
                 w={"100%"}
                 justifyContent={"flex-end"}
@@ -287,7 +279,8 @@ export const ProjectDetailsSection = ({
                                         "departmentalService": selectedDepartmentalService,
                                         "dataCustodian": selectedDataCustodian,
                                         "supervisingScientist": selectedSupervisingScientist,
-                                        "dates": selectedDates,
+                                        "startDate": startDate,
+                                        "endDate": endDate,
                                     }
                                 )
                             } else return;

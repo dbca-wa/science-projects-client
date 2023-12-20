@@ -11,7 +11,6 @@ import TagInput from "../Pages/CreateProject/TagInput";
 import { ImagePreview } from "../Pages/CreateProject/ImagePreview";
 import useApiEndpoint from "../../lib/hooks/useApiEndpoint";
 import { BsFillCalendarEventFill } from "react-icons/bs";
-import { CalendarWithCSS } from "../Pages/CreateProject/CalendarWithCSS";
 import { useResearchFunctions } from "../../lib/hooks/useResearchFunctions";
 import { useDepartmentalServices } from "../../lib/hooks/useDepartmentalServices";
 import { useBusinessAreas } from "../../lib/hooks/useBusinessAreas";
@@ -20,6 +19,7 @@ import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
 import { useNoImage } from "../../lib/hooks/useNoImage";
 import { NewImagePreview } from "../Pages/CreateProject/NewImagePreview";
+import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
 
 interface Props {
     // thisUser: IUserMe;
@@ -123,7 +123,9 @@ export const EditProjectModal = ({
     // id/pk
     const [projectTitle, setProjectTitle] = useState(currentTitle);
     const [keywords, setKeywords] = useState(currentKeywords);
-    const [dates, setDates] = useState(currentDates);
+    // const [dates, setDates] = useState(currentDates);
+    const [startDate, setStartDate] = useState(currentDates[0]);
+    const [endDate, setEndDate] = useState(currentDates[1]);
     const [businessArea, setBusinessArea] = useState(currentBa);
     const [service, setService] = useState<ISmallService | IDepartmentalService>(currentService);
     const [researchFunction, setResearchFunction] = useState<IResearchFunction | ISmallResearchFunction>(currentResearchFunction);
@@ -171,7 +173,7 @@ export const EditProjectModal = ({
         const plainTitle = getPlainTextFromHTML(projectTitle)
         if (
             (plainTitle === '' || plainTitle.length === 0) ||
-            (dates === null || dates.length < 2) ||
+            (startDate === null || endDate === null || startDate === undefined || endDate === undefined || startDate > endDate) ||
             // (service === null || service === undefined) ||
             // (researchFunction === null || researchFunction === undefined) ||
             (businessArea === null || businessArea === undefined) ||
@@ -186,7 +188,7 @@ export const EditProjectModal = ({
         // console.log(selectedFile);
         // console.log(currentImage);
     }, [
-        projectTitle, keywords, dates, businessArea, service, researchFunction, dataCustodian,
+        projectTitle, keywords, startDate, endDate, businessArea, service, researchFunction, dataCustodian,
         locationData,
         selectedFile, currentImage,
     ])
@@ -304,27 +306,17 @@ export const EditProjectModal = ({
                                 </FormControl> */}
                             <TagInput setTagFunction={setKeywords} preExistingTags={keywords} />
 
-                            <Box w={"100%"} h={"100%"} display="flex" alignItems="center" justifyContent="center">
-                                <FormControl isRequired>
-
-                                    <FormLabel>
-                                        <Box
-                                            display={"inline-flex"}
-                                            justifyContent={"center"}
-                                            alignItems={"center"}
-                                        >
-                                            <Icon as={BsFillCalendarEventFill} mr={2} />
-                                            Start and End Dates
-                                        </Box>
-
-                                    </FormLabel>
-
-                                    <CalendarWithCSS onChange={setDates} preselectedDates={dates} />
-
-                                    <FormHelperText>
-                                        Select a start and end date by clicking on the calendar. The first clicked date is the start date, the second is the end date.
-                                    </FormHelperText>
-                                </FormControl>
+                            <Box
+                                w={"100%"}
+                                h={"100%"}
+                            // display="flex"
+                            // alignItems="center" justifyContent="center"
+                            >
+                                <StartAndEndDateSelector
+                                    startDate={startDate} endDate={endDate}
+                                    setStartDate={setStartDate} setEndDate={setEndDate}
+                                    helperText={"These can be changed at any time"}
+                                />
                             </Box>
 
                             <Grid
@@ -653,7 +645,8 @@ export const EditProjectModal = ({
                                             // status: ,
                                             dataCustodian: dataCustodian,
                                             keywords: keywords,
-                                            dates: dates,
+                                            startDate: startDate,
+                                            endDate: endDate,
                                             departmentalService: service?.pk,
                                             researchFunction: researchFunction?.pk,
                                             businessArea: businessArea?.pk,
