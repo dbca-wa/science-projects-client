@@ -1064,6 +1064,8 @@ export const updateProjectDetails = async ({
     if (locations !== undefined && locations.length > 0) {
         const locationsString = JSON.stringify(locations);
         newFormData.append('locations', locationsString);
+    } else if (locations.length <= 0) {
+        newFormData.append('locations', '[]')
     }
 
 
