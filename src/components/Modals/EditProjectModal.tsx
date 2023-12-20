@@ -178,7 +178,7 @@ export const EditProjectModal = ({
             // (researchFunction === null || researchFunction === undefined) ||
             (businessArea === null || businessArea === undefined) ||
             (dataCustodian === null || dataCustodian === 0 || dataCustodian === undefined) ||
-            (locationData.length < 1) ||
+            // (locationData.length < 1) ||
             (keywords.length === 0)
         ) {
             setCanUpdate(false)
