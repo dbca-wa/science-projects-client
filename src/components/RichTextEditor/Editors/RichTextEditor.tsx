@@ -54,14 +54,20 @@ interface IProps {
     writeable_document_pk?: number | null;
     editorType: EditorType;
     isUpdate: boolean;
+    wordLimit?: number;
+    limitCanBePassed?: boolean;
 }
 
 export const RichTextEditor = ({
     canEdit,
-    data, titleTextSize, section, project_pk, document_pk, editorType, isUpdate, writeable_document_kind, writeable_document_pk }: IProps) => {
+    data, titleTextSize, section, project_pk, document_pk, editorType, isUpdate, writeable_document_kind, writeable_document_pk,
+    wordLimit, limitCanBePassed
+
+}: IProps) => {
 
     const [shouldShowTree, setShouldShowTree] = useState(false);
     const { colorMode } = useColorMode();
+    const [canSave, setCanSave] = useState<boolean>(true);
 
     // const [lastSelectedNode, setLastSelectedNode] = useState();
 
@@ -272,6 +278,10 @@ export const RichTextEditor = ({
                         isEditorOpen={isEditorOpen}
                         setIsEditorOpen={setIsEditorOpen}
                         setDisplayData={setDisplayData}
+                        wordLimit={wordLimit}
+                        limitCanBePassed={limitCanBePassed}
+                        canSave={canSave}
+                        setCanSave={setCanSave}
                     />
 
                 )

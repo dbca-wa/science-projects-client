@@ -11,9 +11,10 @@ interface BaseOptionsButtonProps {
     icon: IconType;
     onClick: () => void;
     toolTipText: string;
+    canRunFunction: boolean;
 }
 
-export const BaseOptionsButton = ({ colorScheme, icon: buttonIcon, onClick, toolTipText }: BaseOptionsButtonProps) => {
+export const BaseOptionsButton = ({ colorScheme, icon: buttonIcon, onClick, toolTipText, canRunFunction }: BaseOptionsButtonProps) => {
     const { colorMode } = useColorMode();
 
     return (
@@ -45,6 +46,7 @@ export const BaseOptionsButton = ({ colorScheme, icon: buttonIcon, onClick, tool
                 w={"35px"}
                 h={"40px"}
                 data-tip="Click to Save"
+                isDisabled={!canRunFunction}
             >
                 <Icon
                     as={buttonIcon}

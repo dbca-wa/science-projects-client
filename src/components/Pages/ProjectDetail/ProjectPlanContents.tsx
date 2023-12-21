@@ -250,6 +250,7 @@ export const ProjectPlanContents = ({
                 section={"outcome"}
             />
             <RichTextEditor
+
                 canEdit={userInTeam || userData?.is_superuser}
                 document_pk={document?.document?.pk}
                 project_pk={document?.document?.project?.pk}

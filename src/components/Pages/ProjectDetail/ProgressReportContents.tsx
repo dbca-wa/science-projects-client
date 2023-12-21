@@ -301,6 +301,8 @@ export const ProgressReportContents = ({
                         {/* Editors */}
 
                         <RichTextEditor
+                            wordLimit={150}
+                            limitCanBePassed={true}
                             canEdit={userInTeam || userData?.is_superuser}
                             writeable_document_kind={'Progress Report'}
                             writeable_document_pk={selectedProgressReport?.pk}
@@ -318,6 +320,8 @@ export const ProgressReportContents = ({
                         />
 
                         <RichTextEditor
+                            wordLimit={150}
+                            limitCanBePassed={true}
                             canEdit={userInTeam || userData?.is_superuser}
                             writeable_document_kind={'Progress Report'}
                             writeable_document_pk={selectedProgressReport?.pk}
@@ -335,6 +339,8 @@ export const ProgressReportContents = ({
                         />
 
                         <RichTextEditor
+                            wordLimit={150}
+                            limitCanBePassed={true}
                             canEdit={userInTeam || userData?.is_superuser}
                             writeable_document_kind={'Progress Report'}
                             writeable_document_pk={selectedProgressReport?.pk}
@@ -352,6 +358,8 @@ export const ProgressReportContents = ({
                         />
 
                         <RichTextEditor
+                            wordLimit={150}
+                            limitCanBePassed={true}
                             canEdit={userInTeam || userData?.is_superuser}
                             writeable_document_kind={'Progress Report'}
                             writeable_document_pk={selectedProgressReport?.pk}
@@ -369,6 +377,8 @@ export const ProgressReportContents = ({
                         />
 
                         <RichTextEditor
+                            wordLimit={150}
+                            limitCanBePassed={true}
                             canEdit={userInTeam || userData?.is_superuser}
                             writeable_document_kind={'Progress Report'}
                             writeable_document_pk={selectedProgressReport?.pk}

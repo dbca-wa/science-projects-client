@@ -49,6 +49,11 @@ interface Props {
 
     setDisplayData: React.Dispatch<React.SetStateAction<string>>;
     textEditorName?: string;
+    wordLimit: number;
+    limitCanBePassed: boolean;
+
+    canSave: boolean;
+    setCanSave: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const EditableSRTE = (
@@ -58,7 +63,10 @@ export const EditableSRTE = (
         data, editorText, setEditorText,
         isEditorOpen, setIsEditorOpen,
         displayData, setDisplayData,
-        shouldShowTree, setShouldShowTree }: Props) => {
+        shouldShowTree, setShouldShowTree,
+        wordLimit, limitCanBePassed,
+        canSave, setCanSave,
+    }: Props) => {
 
     const [selectedNodeType, setSelectedNodeType] = useState<string>();
 
@@ -200,6 +208,7 @@ export const EditableSRTE = (
 
                 <Box>
                     <OptionsBar
+
                         editorType={editorType}
                         displayData={displayData}
                         editorText={editorText}
@@ -212,7 +221,11 @@ export const EditableSRTE = (
                         isUpdate={isUpdate}
                         writeable_document_kind={writeable_document_kind}
                         writeable_document_pk={writeable_document_pk}
+                        wordLimit={wordLimit}
+                        limitCanBePassed={limitCanBePassed}
 
+                        canSave={canSave}
+                        setCanSave={setCanSave}
 
                         editorIsOpen={isEditorOpen}
                         setIsEditorOpen={setIsEditorOpen}
