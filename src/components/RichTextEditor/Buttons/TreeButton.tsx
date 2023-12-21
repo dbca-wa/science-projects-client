@@ -1,7 +1,6 @@
 // WIP Button to download the html, markdown or json of the content in the editor. 
 
 import { TbBinaryTree } from "react-icons/tb"
-import { BaseOptionsButton } from "./BaseOptionsButton"
 
 import { Box, Button } from "@chakra-ui/react"
 import { useState } from "react"
