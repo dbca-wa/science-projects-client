@@ -306,6 +306,9 @@ export const StudentReportContents = ({
                         {/* Editors */}
 
                         <RichTextEditor
+                            wordLimit={150}
+                            limitCanBePassed={false}
+
                             canEdit={userInTeam || userData?.is_superuser}
                             writeable_document_kind={'Student Report'}
                             writeable_document_pk={selectedStudentReport?.pk}

@@ -816,6 +816,8 @@ export const ProjectOverviewCard = (
 
                         /> */}
                         <RichTextEditor
+                            // wordLimit={500}
+                            limitCanBePassed={false}
                             canEdit={userInTeam || me?.userData?.is_superuser}
                             editorType="ProjectDetail"
                             data={baseInformation.description}

@@ -13,8 +13,13 @@ import { useUser } from "@/lib/hooks/useUser";
 
 interface IOptionsBarProps {
     // editor: LexicalEditor;
+    canSave: boolean;
+    setCanSave: React.Dispatch<React.SetStateAction<boolean>>;
+
     writeable_document_kind?: EditorSections | null;
     writeable_document_pk?: number | null;
+    wordLimit: number;
+    limitCanBePassed: boolean;
 
     isUpdate: boolean;
     editorText: string | null;
@@ -34,7 +39,10 @@ interface IOptionsBarProps {
 export const OptionsBar = ({
     // editor,
     displayData, editorType, isUpdate,
-    editorText, shouldShowTree, setShouldShowTree, writeable_document_kind, writeable_document_pk, rawHTML, editorIsOpen, setIsEditorOpen, setDisplayData, section, project_pk, document_pk }: IOptionsBarProps) => {
+    editorText, shouldShowTree, setShouldShowTree, writeable_document_kind, writeable_document_pk, rawHTML, editorIsOpen, setIsEditorOpen, setDisplayData, section, project_pk, document_pk,
+    wordLimit, limitCanBePassed,
+    canSave, setCanSave,
+}: IOptionsBarProps) => {
     const { colorMode } = useColorMode();
 
     // useEffect(() => console.log(displayData), [displayData])
@@ -60,7 +68,7 @@ export const OptionsBar = ({
                     flex={1}
                     px={10}
                 >
-                    <WordCount text={editorText} />
+                    <WordCount text={editorText} wordLimit={wordLimit} limitCanBePassed={limitCanBePassed} setCanSave={setCanSave} />
                 </Flex>
 
                 <Flex justifyContent="flex-end" alignItems="center" flex={1}>
@@ -77,11 +85,13 @@ export const OptionsBar = ({
                             ) : null}
 
                         <ClearButton
+                            canClear={true}
                         // editor={editor}
                         />
                         {/* <UploadButton /> */}
                         {/* <DownloadButton /> */}
                         <SaveButton
+                            canSave={canSave}
                             writeable_document_pk={writeable_document_pk}
                             writeable_document_kind={writeable_document_kind}
                             setIsEditorOpen={setIsEditorOpen}

@@ -68,6 +68,8 @@ export const ConceptPlanContents = ({
 
 
             <RichTextEditor
+                wordLimit={500}
+
                 canEdit={userInTeam || userData?.is_superuser}
                 project_pk={document?.document?.project?.pk}
                 document_pk={document?.document?.pk}
@@ -80,6 +82,8 @@ export const ConceptPlanContents = ({
                 writeable_document_pk={document?.pk}
             />
             <RichTextEditor
+                wordLimit={500}
+
                 canEdit={userInTeam || userData?.is_superuser}
                 project_pk={document?.document?.project?.pk}
                 document_pk={document?.document?.pk}
@@ -93,6 +97,8 @@ export const ConceptPlanContents = ({
             />
 
             <RichTextEditor
+                wordLimit={500}
+
                 canEdit={userInTeam || userData?.is_superuser}
                 project_pk={document?.document?.project?.pk}
                 document_pk={document?.document?.pk}
@@ -105,6 +111,8 @@ export const ConceptPlanContents = ({
                 writeable_document_pk={document?.pk}
             />
             <RichTextEditor
+                wordLimit={500}
+
                 canEdit={userInTeam || userData?.is_superuser}
                 project_pk={document?.document?.project?.pk}
                 document_pk={document?.document?.pk}
@@ -117,6 +125,8 @@ export const ConceptPlanContents = ({
                 writeable_document_pk={document?.pk}
             />
             <RichTextEditor
+                wordLimit={500}
+
                 canEdit={userInTeam || userData?.is_superuser}
                 project_pk={document?.document?.project?.pk}
                 document_pk={document?.document?.pk}
@@ -131,6 +141,8 @@ export const ConceptPlanContents = ({
 
 
             <RichTextEditor
+                wordLimit={500}
+
                 canEdit={userInTeam || userData?.is_superuser}
                 project_pk={document?.document?.project?.pk}
                 document_pk={document?.document?.pk}
@@ -144,6 +156,8 @@ export const ConceptPlanContents = ({
             />
 
             <RichTextEditor
+                wordLimit={500}
+
                 canEdit={userInTeam || userData?.is_superuser}
                 project_pk={document?.document?.project?.pk}
                 document_pk={document?.document?.pk}

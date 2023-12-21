@@ -1581,11 +1581,12 @@ export interface IHTMLSave {
     section: null | EditorSubsections;
     softRefetch?: () => void;
     setIsEditorOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+    canSave: boolean;
 }
 
 // Also have this handle directors message, research intro etc. (annual report)
 export const saveHtmlToDB = async (
-    { editorType, htmlData, project_pk, document_pk, writeable_document_kind, writeable_document_pk, section, isUpdate }: IHTMLSave) => {
+    { editorType, htmlData, project_pk, document_pk, writeable_document_kind, writeable_document_pk, section, isUpdate, canSave }: IHTMLSave) => {
 
     const urlType = isUpdate ? instance.put : instance.post;
 
