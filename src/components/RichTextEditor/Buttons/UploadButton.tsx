@@ -4,10 +4,11 @@
 import { FaUpload } from "react-icons/fa"
 import { BaseOptionsButton } from "./BaseOptionsButton"
 
-export const UploadButton = () => {
+export const UploadButton = ({ canUpload }) => {
     return (
 
         <BaseOptionsButton
+            canRunFunction={canUpload}
             toolTipText="Upload"
             icon={FaUpload}
             onClick={() => { console.log('uploading') }}
