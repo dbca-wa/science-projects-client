@@ -107,7 +107,10 @@ export const PaginatorUser = ({
                 {/* Render the pagination buttons */}
                 <Button
                     disabled={currentUserResultsPage === 1}
-                    onClick={() => handleClick(currentUserResultsPage - 1)}
+                    onClick={() => {
+                        handleClick(currentUserResultsPage - 1);
+                        window.scrollTo(0, 0);
+                    }}
                     mx={1}
                 >
                     Prev
@@ -115,7 +118,11 @@ export const PaginatorUser = ({
                 {Array.from({ length: endPage - startPage + 1 }, (_, i) => (
                     <Button
                         key={startPage + i}
-                        onClick={() => handleClick(startPage + i)}
+                        onClick={() => {
+                            handleClick(startPage + i);
+                            window.scrollTo(0, 0);
+
+                        }}
                         mx={1}
                         colorScheme={startPage + i === currentUserResultsPage ? "blue" : "gray"}
                     >
@@ -124,7 +131,10 @@ export const PaginatorUser = ({
                 ))}
                 <Button
                     disabled={currentUserResultsPage === totalPages}
-                    onClick={() => handleClick(currentUserResultsPage + 1)}
+                    onClick={() => {
+                        handleClick(currentUserResultsPage + 1)
+                        window.scrollTo(0, 0);
+                    }}
                     mx={1}
                 >
                     Next
