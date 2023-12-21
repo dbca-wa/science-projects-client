@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ModernProjectCard } from "./ModernProjectCard";
 import { useEffect } from "react";
 import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
+import { useScrollToTop } from "@/lib/hooks/useScrollToTop";
 
 interface IPaginationProps {
     loading: boolean;
@@ -26,6 +27,7 @@ export const PaginatorProject = ({
     };
 
     const maxDisplayedPages = 8;
+
 
     // useEffect(() => {
     //     if (!loading)
@@ -139,7 +141,10 @@ export const PaginatorProject = ({
                 {/* Render the pagination buttons */}
                 <Button
                     disabled={currentProjectResultsPage === 1}
-                    onClick={() => handleClick(currentProjectResultsPage - 1)}
+                    onClick={() => {
+                        handleClick(currentProjectResultsPage - 1);
+                        window.scrollTo(0, 0);
+                    }}
                     mx={1}
                 >
                     Prev
@@ -147,7 +152,10 @@ export const PaginatorProject = ({
                 {Array.from({ length: endPage - startPage + 1 }, (_, i) => (
                     <Button
                         key={startPage + i}
-                        onClick={() => handleClick(startPage + i)}
+                        onClick={() => {
+                            handleClick(startPage + i);
+                            window.scrollTo(0, 0);
+                        }}
                         mx={1}
                         colorScheme={startPage + i === currentProjectResultsPage ? "blue" : "gray"}
                     >
@@ -156,7 +164,10 @@ export const PaginatorProject = ({
                 ))}
                 <Button
                     disabled={currentProjectResultsPage === totalPages}
-                    onClick={() => handleClick(currentProjectResultsPage + 1)}
+                    onClick={() => {
+                        handleClick(currentProjectResultsPage + 1)
+                        window.scrollTo(0, 0);
+                    }}
                     mx={1}
                 >
                     Next
