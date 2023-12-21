@@ -116,11 +116,11 @@ export const NewProjectCard = ({ title, description, bulletPoints, colorScheme, 
                 </Box>
 
                 {/* INFO */}
-                <Center
+                <Box
                     mx={6}
                     pb={4}
                     color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
-
+                    ml={10}
                 >
                     <UnorderedList>
                         {bulletPoints.map((point, index2) => (
@@ -132,7 +132,7 @@ export const NewProjectCard = ({ title, description, bulletPoints, colorScheme, 
                         )
                         )}
                     </UnorderedList>
-                </Center>
+                </Box>
             </Box>
         </ParallaxTilt>
     )
