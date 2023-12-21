@@ -45,8 +45,8 @@ export const OptionsBar = ({
     return (
 
 
-        editorIsOpen && editorText
-        &&
+        editorIsOpen &&
+        // editorText &&
         (
             <Flex
                 // background={"orange"}
