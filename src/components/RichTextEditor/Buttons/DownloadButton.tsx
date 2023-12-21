@@ -3,9 +3,15 @@
 import { FaDownload } from "react-icons/fa"
 import { BaseOptionsButton } from "./BaseOptionsButton"
 
-export const DownloadButton = () => {
+
+interface Props {
+    canDownload: boolean;
+}
+
+export const DownloadButton = ({ canDownload }: Props) => {
     return (
         <BaseOptionsButton
+            canRunFunction={canDownload}
             toolTipText="Download"
             icon={FaDownload}
             // colorScheme=""
