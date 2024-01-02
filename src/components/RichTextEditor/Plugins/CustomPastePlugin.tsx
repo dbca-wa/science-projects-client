@@ -105,7 +105,10 @@ const convertFirstLevel = (text: string) => {
     // Collect a list of rogue lis
     const orphanedLiTags = Array.from(dom.querySelectorAll("li")).filter(
       (li) => {
-        if (!li.parentElement || li.parentElement.tagName !== "UL") {
+        if (
+          !li.parentElement ||
+          (li.parentElement && li.parentElement.tagName !== "UL")
+        ) {
           return li;
         }
       }
@@ -122,7 +125,7 @@ const convertFirstLevel = (text: string) => {
         if (prevSibling && prevSibling.tagName === "UL") {
           lastUl = prevSibling;
           break;
-        } else if (prevSibling.tagName === "LI") {
+        } else if (prevSibling && prevSibling.tagName === "LI") {
           prevSibling = prevSibling.previousElementSibling as HTMLElement;
         } else {
           prevSibling = null;
@@ -590,7 +593,10 @@ const convertSecondLevel = (text: string, colorMode) => {
   lis.forEach((li) => {
     if (!skippedLIs.includes(li)) {
       const liGroup: HTMLLIElement[] = [];
-      if (li.parentElement?.tagName.toLowerCase() !== "ul") {
+      if (
+        li.parentElement &&
+        li.parentElement?.tagName.toLowerCase() !== "ul"
+      ) {
         // Check if the li's next sibling element is also an li without a parent ul
         // If it is, append that too and keep checking each consecutive next sibling for if it is an li
         // Add all of them to the liGroup, until the next element in the DOM is not an li.
@@ -599,6 +605,7 @@ const convertSecondLevel = (text: string, colorMode) => {
         while (
           currentLi &&
           currentLi?.tagName.toLowerCase() === "li" &&
+          currentLi.parentElement &&
           currentLi.parentElement?.tagName.toLowerCase() !== "ul"
         ) {
           // Add the li to the liGroup
@@ -718,6 +725,7 @@ const convertThirdLevel = (text: string) => {
 
           while (currentElement) {
             if (
+              currentElement &&
               currentElement.tagName === "P" &&
               !pTagsWhichMatchLevel3.includes(
                 currentElement as HTMLParagraphElement
@@ -981,7 +989,11 @@ const handlePastedWordOrderedList = (
     group.push(li as HTMLLIElement);
     let currentItem: HTMLElement | null = li;
 
-    while (currentItem && currentItem.nextElementSibling.tagName === "LI") {
+    while (
+      currentItem &&
+      currentItem.nextElementSibling &&
+      currentItem.nextElementSibling.tagName === "LI"
+    ) {
       currentItem = currentItem.nextElementSibling as HTMLElement;
       group.push(currentItem as HTMLLIElement);
     }
@@ -1045,7 +1057,7 @@ const handlePastedWordOrderedList = (
 
       let nextElement: null | Element = pTag.nextElementSibling;
       while (nextElement) {
-        if (nextElement.tagName === "LI") {
+        if (nextElement && nextElement.tagName === "LI") {
           nextElement = nextElement.nextElementSibling;
         } else if (numeralPTags.includes(nextElement as HTMLParagraphElement)) {
           const clonedNextAsLi = dom.createElement("li");
@@ -1116,7 +1128,9 @@ const handlePastedWordOrderedList = (
   // Find groups of consecutive rogue lis
   const finalRogues = Array.from(dom.querySelectorAll("li")).filter((li) => {
     return (
-      li.parentElement.tagName !== "OL" && li.parentElement.tagName !== "UL"
+      li.parentElement &&
+      li.parentElement.tagName !== "OL" &&
+      li.parentElement.tagName !== "UL"
     );
   });
 
@@ -1482,7 +1496,7 @@ const customGenerateHTMLFromNodes = (
 
     span.innerText = n.getTextContent();
     domItem.append(span);
-    if ((domItem as Element).tagName === "P") {
+    if (domItem && (domItem as Element).tagName === "P") {
       domItem.dir = "ltr";
     }
     dom.body.append(domItem);
