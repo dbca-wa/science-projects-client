@@ -135,8 +135,8 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
                 as={"span"}
                 // fontWeight={'semibold'}
               >
-                Unordered Lists and sublists (up to a depth of 3) are now
-                supported when copy-pasting from MS Word.
+                Lists and nested lists (up to a depth of 3) are now supported
+                when copy-pasting from MS Word on Desktop.
               </Text>
             </Box>
 
