@@ -774,7 +774,14 @@ IStudentDocumentActions) => {
                               setToLastTab={setToLastTab}
                             />
                             <Button
-                              colorScheme="red"
+                              color={"white"}
+                              background={
+                                colorMode === "light" ? "red.500" : "red.600"
+                              }
+                              _hover={{
+                                background:
+                                  colorMode === "light" ? "red.400" : "red.500",
+                              }}
                               size={"sm"}
                               onClick={() => {
                                 console.log(docPk);

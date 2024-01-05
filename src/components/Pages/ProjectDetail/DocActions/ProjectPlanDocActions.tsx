@@ -812,7 +812,16 @@ export const ProjectPlanDocActions = ({
                                 setToLastTab={setToLastTab}
                               />
                               <Button
-                                colorScheme="red"
+                                color={"white"}
+                                background={
+                                  colorMode === "light" ? "red.500" : "red.600"
+                                }
+                                _hover={{
+                                  background:
+                                    colorMode === "light"
+                                      ? "red.400"
+                                      : "red.500",
+                                }}
                                 size={"sm"}
                                 onClick={onOpenDeleteDocumentModal}
                                 mr={2}
@@ -834,7 +843,18 @@ export const ProjectPlanDocActions = ({
                                 setToLastTab={setToLastTab}
                               />
                               <Button
-                                colorScheme="green"
+                                color={"white"}
+                                background={
+                                  colorMode === "light"
+                                    ? "green.500"
+                                    : "green.600"
+                                }
+                                _hover={{
+                                  background:
+                                    colorMode === "light"
+                                      ? "green.400"
+                                      : "green.500",
+                                }}
                                 size={"sm"}
                                 onClick={onSetAreasModalOpen}
                               >
@@ -1206,7 +1226,18 @@ export const ProjectPlanDocActions = ({
                               />
 
                               <Button
-                                colorScheme="orange"
+                                color={"white"}
+                                background={
+                                  colorMode === "light"
+                                    ? "orange.500"
+                                    : "orange.600"
+                                }
+                                _hover={{
+                                  background:
+                                    colorMode === "light"
+                                      ? "orange.400"
+                                      : "orange.500",
+                                }}
                                 size={"sm"}
                                 onClick={
                                   onOpenCreateProgressReportModal
