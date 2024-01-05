@@ -3,9 +3,12 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
   Select,
   Spinner,
+  Stat,
+  StatLabel,
   Text,
   useColorMode,
   useDisclosure,
@@ -26,6 +29,7 @@ import { useGetProgressReportAvailableReportYears } from "../../../lib/hooks/use
 import { getProgressReportForYear } from "../../../lib/api";
 import WordToHtmlConverter from "../../RichTextEditor/WordToHTML";
 import { CommentSection } from "./CommentSection";
+import { BsPlus } from "react-icons/bs";
 
 interface Props {
   documents: IProgressReport[];
@@ -44,6 +48,8 @@ export const ProgressReportContents = ({
   refetch,
   setToLastTab,
 }: Props) => {
+  console.log("FROM PROGRESS:", userData);
+
   // Handling years
   const {
     availableProgressReportYearsLoading,
@@ -80,9 +86,11 @@ export const ProgressReportContents = ({
   const [isLoading, setIsLoading] = useState(false);
   const { colorMode } = useColorMode();
   const documentType = "progressreport";
-  const [editorKey, setEditorKey] = useState(
-    selectedYear.toString() + colorMode + documentType
-  );
+  const editorKey = colorMode + documentType + selectedProgressReport?.year;
+
+  // const [editorKey, setEditorKey] = useState(
+  //   selectedYear.toString() + colorMode + documentType
+  // );
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
@@ -128,7 +136,7 @@ export const ProgressReportContents = ({
     if (dataForYear) {
       setIsLoading(true);
       setSelectedProgressReport(dataForYear);
-      setEditorKey(selectedYear.toString() + colorMode + documentType);
+      // setEditorKey(selectedYear.toString() + colorMode + documentType);
     }
     console.log("set year and selected doc");
   };
@@ -146,9 +154,9 @@ export const ProgressReportContents = ({
   //     // setSelectedYear(highestYear)
   // }
 
-  useEffect(() => {
-    setIsLoading(false);
-  }, [editorKey, documents]);
+  // useEffect(() => {
+  //   setIsLoading(false);
+  // }, [editorKey, documents]);
 
   const handleNewYearSelection = (event) => {
     setIsLoading(true);
@@ -196,37 +204,19 @@ export const ProgressReportContents = ({
         padding={4}
         rounded={"xl"}
         border={"1px solid"}
-        borderColor={"gray.300"}
+        borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
         mb={8}
         width={"100%"}
       >
-        <Flex width={"100%"}>
-          <Flex flex={1} justifyContent={"flex-start"} alignItems={"center"}>
-            <Text fontSize={"lg"} fontWeight={"bold"}>
-              Select a Report:
-            </Text>
-          </Flex>
-          <Flex justifyContent={"flex-end"}>
-            <Select
-              value={selectedYear}
-              onChange={(event) => handleNewYearSelection(event)}
-              minW={"200px"}
-            >
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </Select>
-          </Flex>
-        </Flex>
-        <Flex width={"100%"} mt={6}>
-          <Flex flex={1} justifyContent={"flex-start"} alignItems={"center"}>
-            <Text fontSize={"lg"} fontWeight={"bold"}></Text>
-          </Flex>
-          <Flex justifyContent={"flex-end"}>
+        <Flex width={"100%"} justifyContent={"space-between"}>
+          <Center>
             <Button
-              colorScheme="orange"
+              background={colorMode === "light" ? "orange.500" : "orange.600"}
+              color={"white"}
+              _hover={{
+                background: colorMode === "light" ? "orange.400" : "orange.500",
+              }}
+              // colorScheme="orange"
               size={"sm"}
               onClick={
                 onOpenCreateProgressReportModal
@@ -237,12 +227,37 @@ export const ProgressReportContents = ({
                 //     }
                 // )
               }
-              ml={2}
+              // ml={2}
               isDisabled={availableProgressReportYearsData?.length < 1}
+              leftIcon={<BsPlus size={"20px"} />}
             >
-              Create Progress Report
+              New Report
             </Button>
-          </Flex>
+          </Center>
+
+          <Center>
+            <Flex alignItems={"center"}>
+              <Text
+                mr={3}
+                fontWeight={"semibold"}
+                fontSize={"md"}
+                color={colorMode === "light" ? "gray.600" : "gray.200"}
+              >
+                Selected
+              </Text>
+              <Select
+                value={selectedYear}
+                onChange={(event) => handleNewYearSelection(event)}
+                minW={"100px"}
+              >
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Select>
+            </Flex>
+          </Center>
         </Flex>
       </Box>
 
@@ -289,6 +304,7 @@ export const ProgressReportContents = ({
           {/* Editors */}
 
           <RichTextEditor
+            key={`context${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
             canEdit={userInTeam || userData?.is_superuser}
@@ -298,12 +314,12 @@ export const ProgressReportContents = ({
             document_pk={selectedProgressReport?.document?.pk}
             isUpdate={true}
             editorType="ProjectDocument"
-            key={`context${editorKey}`} // Change the key to force a re-render
             data={selectedProgressReport?.context}
             section={"context"}
           />
 
           <RichTextEditor
+            key={`aims${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
             canEdit={userInTeam || userData?.is_superuser}
@@ -313,12 +329,12 @@ export const ProgressReportContents = ({
             document_pk={selectedProgressReport?.document?.pk}
             isUpdate={true}
             editorType="ProjectDocument"
-            key={`aims${editorKey}`} // Change the key to force a re-render
             data={selectedProgressReport?.aims}
             section={"aims"}
           />
 
           <RichTextEditor
+            key={`progress${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
             canEdit={userInTeam || userData?.is_superuser}
@@ -328,12 +344,12 @@ export const ProgressReportContents = ({
             document_pk={selectedProgressReport?.document?.pk}
             isUpdate={true}
             editorType="ProjectDocument"
-            key={`progress${editorKey}`} // Change the key to force a re-render
             data={selectedProgressReport?.progress}
             section={"progress"}
           />
 
           <RichTextEditor
+            key={`implications${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
             canEdit={userInTeam || userData?.is_superuser}
@@ -343,12 +359,12 @@ export const ProgressReportContents = ({
             document_pk={selectedProgressReport?.document?.pk}
             isUpdate={true}
             editorType="ProjectDocument"
-            key={`implications${editorKey}`} // Change the key to force a re-render
             data={selectedProgressReport?.implications}
             section={"implications"}
           />
 
           <RichTextEditor
+            key={`future${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
             canEdit={userInTeam || userData?.is_superuser}
@@ -358,13 +374,12 @@ export const ProgressReportContents = ({
             document_pk={selectedProgressReport?.document?.pk}
             isUpdate={true}
             editorType="ProjectDocument"
-            key={`future${editorKey}`} // Change the key to force a re-render
             data={selectedProgressReport?.future}
             section={"future"}
           />
 
           <CommentSection
-            documentID={selectedProgressReport?.document?.id}
+            documentID={selectedProgressReport?.document?.pk}
             userData={userData}
           />
         </motion.div>

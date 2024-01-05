@@ -33,6 +33,8 @@ export const ConceptPlanContents = ({
   refetch,
   setToLastTab,
 }: Props) => {
+  console.log("FROM CONCEPT:", userData);
+
   // Force a rerender when dark mode or year changed to update design and content
   // const editorKey = selectedYear.toString() + colorMode;
   const { colorMode } = useColorMode();

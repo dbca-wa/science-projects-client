@@ -1,7 +1,7 @@
 // Has mention and hashtag functionality
 
 import { ChatUser } from "@/components/Pages/Chat/ChatUser";
-import { IUserData, IUserMe } from "@/types";
+import { IBranch, IBusinessArea, IUserData, IUserMe } from "@/types";
 import {
   Box,
   Button,
@@ -69,6 +69,9 @@ interface Props {
   created_at: string;
   updated_at: string;
   payload: string;
+
+  businessAreas: IBusinessArea[];
+  branches: IBranch[];
 }
 
 export const CommentDisplayRTE = ({
@@ -79,6 +82,8 @@ export const CommentDisplayRTE = ({
   user,
   created_at,
   updated_at,
+  businessAreas,
+  branches,
 }: Props) => {
   const { colorMode } = useColorMode();
   const editorRef = useRef(null);
@@ -273,6 +278,9 @@ export const CommentDisplayRTE = ({
                         // withoutName={true}
                         // created_at={}
                         // updated_at={}
+
+                        branches={branches}
+                        businessAreas={businessAreas}
                       />
                     </Box>
                     <ContentEditable

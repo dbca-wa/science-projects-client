@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import { CommentRichTextEditor } from "@/components/RichTextEditor/Editors/CommentRichTextEditor";
 import { CommentDisplayRTE } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
 import { AnimatePresence, motion } from "framer-motion";
+import { useBranches } from "@/lib/hooks/useBranches";
+import { useBusinessAreas } from "@/lib/hooks/useBusinessAreas";
 
 export interface IDocumentComment {
   document: IMainDoc;
@@ -61,6 +63,9 @@ export const CommentSection = ({ documentID, userData }: Props) => {
     console.log(userData);
   });
 
+  const branches = useBranches();
+  const businessAreas = useBusinessAreas();
+
   return (
     <Box
       bg={colorMode === "light" ? "gray.100" : "gray.700"}
@@ -82,7 +87,7 @@ export const CommentSection = ({ documentID, userData }: Props) => {
       {!isRepainting && !documentCommentsLoading ? (
         <AnimatePresence>
           <Grid gridTemplateColumns={"repeat(1,1fr)"}>
-            {documentCommentsData.map((comment, index) => {
+            {documentCommentsData?.map((comment, index) => {
               // if (comment.is_public && !comment.is_removed) {
               return (
                 <motion.div
@@ -104,6 +109,8 @@ export const CommentSection = ({ documentID, userData }: Props) => {
                     payload={comment.text}
                     created_at={comment.created_at}
                     updated_at={comment.updated_at}
+                    branches={branches?.branchesData}
+                    businessAreas={businessAreas?.baData}
                   />
                 </motion.div>
               );
