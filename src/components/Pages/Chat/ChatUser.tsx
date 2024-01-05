@@ -95,6 +95,9 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
                 src={avatarSrc !== null ? imageUrl : undefined}
                 name={displayName}
                 mr={2}
+                userSelect={"none"}
+                style={{ pointerEvents: "none" }}
+                draggable={false}
               />
               <Flex
                 pl={1}
@@ -150,6 +153,9 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
               src={avatarSrc !== null ? imageUrl : undefined}
               name={displayName}
               mr={2}
+              userSelect={"none"}
+              style={{ pointerEvents: "none" }}
+              draggable={false}
             />
           )}
         </Flex>

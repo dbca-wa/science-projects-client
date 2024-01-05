@@ -198,18 +198,7 @@ export const CommentRichTextEditor = ({
                         selectedNodeType={selectedNodeType}
                         setSelectedNodeType={setSelectedNodeType}
                       /> */}
-                    <Box pl={3} pt={2}>
-                      <ChatUser
-                        otherUser={false}
-                        displayName={`${userData?.first_name} ${userData?.last_name}`}
-                        avatarSrc={userData?.image}
-                        iconSize="md"
-                        user={userData as IUserData}
-                        // withoutName={true}
-                        // created_at={}
-                        // updated_at={}
-                      />
-                    </Box>
+                    <UserContainer userData={userData as IUserData} />
                     <ContentEditable
                       style={{
                         // minHeight: "50px",
@@ -276,6 +265,37 @@ export const CommentRichTextEditor = ({
           </Box>
         </Box>
       </Flex>
+    </Box>
+  );
+};
+
+interface UserContainerProps {
+  userData: IUserData;
+}
+
+const UserContainer = ({ userData }: UserContainerProps) => {
+  const [editor] = useLexicalComposerContext();
+
+  return (
+    <Box
+      pl={3}
+      pt={2}
+      onClick={() => {
+        console.log("hi");
+        // If the editor is not focused, focus it.
+        editor.focus();
+      }}
+    >
+      <ChatUser
+        otherUser={false}
+        displayName={`${userData?.first_name} ${userData?.last_name}`}
+        avatarSrc={userData?.image}
+        iconSize="md"
+        user={userData as IUserData}
+        // withoutName={true}
+        // created_at={}
+        // updated_at={}
+      />
     </Box>
   );
 };
