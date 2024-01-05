@@ -16,7 +16,9 @@ interface HTMLPrepopulationProp {
   data: string;
 }
 
-export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
+export const PrepopulateCommentDisplayPlugin = ({
+  data,
+}: HTMLPrepopulationProp) => {
   const { colorMode } = useColorMode();
 
   const checkIsHtml = (data: string) => {
@@ -74,56 +76,62 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
   };
 
   const [editor, editorState] = useLexicalComposerContext();
+  const [hasRendered, setHasRendered] = useState(false);
+
   useEffect(() => {
-    editor.update(() => {
-      let replacedData = "";
-      // Remove whitespace in html format
-      replacedData = removeHTMLSpace(data);
-      // Replace ol symbols and sections with html ol lis
-      // replacedData = handlePastedWordList(replacedData, colorMode);
-      // replacedData = handlePastedWordOrderedList(replacedData, colorMode);
+    if (hasRendered) {
+      editor.update(() => {
+        let replacedData = "";
+        // Remove whitespace in html format
+        replacedData = removeHTMLSpace(fixedText);
+        // Replace ol symbols and sections with html ol lis
+        // replacedData = handlePastedWordList(replacedData, colorMode);
+        // replacedData = handlePastedWordOrderedList(replacedData, colorMode);
 
-      // Replace strings representing tables with actual HTML tables
-      replacedData = replacedData.replace(/\[\[.*?\]\]/g, (match) => {
-        const tableData = JSON.parse(match);
-        return generateHtmlTable(tableData);
-      });
+        // Replace strings representing tables with actual HTML tables
+        replacedData = replacedData.replace(/\[\[.*?\]\]/g, (match) => {
+          const tableData = JSON.parse(match);
+          return generateHtmlTable(tableData);
+        });
 
-      // Parse the replaced data
-      const parser = new DOMParser();
-      const dom = parser.parseFromString(replacedData, "text/html");
+        // Parse the replaced data
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(replacedData, "text/html");
 
-      const bunchOfNodes = $generateNodesFromDOM(editor, dom);
-      const root = $getRoot();
+        const bunchOfNodes = $generateNodesFromDOM(editor, dom);
+        const root = $getRoot();
 
-      bunchOfNodes.forEach((node, index) => {
-        if (root) {
-          const firstChild = root.getFirstChild();
-          // Remove any empty paragraph node caused by the Lexical 0.12.3 update
-          if (firstChild !== null) {
-            if (
-              firstChild.getTextContent() === "" ||
-              firstChild.getTextContent() === undefined ||
-              firstChild.getTextContent() === null
-            ) {
-              firstChild.remove();
+        bunchOfNodes.forEach((node, index) => {
+          if (root) {
+            const firstChild = root.getFirstChild();
+            // Remove any empty paragraph node caused by the Lexical 0.12.3 update
+            if (firstChild !== null) {
+              if (
+                firstChild.getTextContent() === "" ||
+                firstChild.getTextContent() === undefined ||
+                firstChild.getTextContent() === null
+              ) {
+                firstChild.remove();
+              }
+            }
+
+            if (node !== null) {
+              console.log(node);
+              if (node.__type === "text" && bunchOfNodes.length <= 1) {
+                //
+                console.log("BUNCHONODES", bunchOfNodes);
+              } else {
+                root.append(node);
+              }
             }
           }
-
-          if (node !== null) {
-            console.log(node);
-            if (node.__type === "text" && bunchOfNodes.length <= 1) {
-              //
-              console.log("BUNCHONODES", bunchOfNodes);
-            } else {
-              root.append(node);
-            }
-          }
-        }
+        });
+        root.selectEnd();
       });
-      root.selectEnd();
-    });
-  }, []);
+    } else {
+      setHasRendered(true);
+    }
+  }, [hasRendered]);
   return null;
 };
 

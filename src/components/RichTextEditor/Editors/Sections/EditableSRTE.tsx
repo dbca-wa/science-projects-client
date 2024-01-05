@@ -117,7 +117,7 @@ export const EditableSRTE = ({
   }, [floatingAnchorElem]);
 
   useEffect(() => {
-    // Assuming editorRef is a reference to your Lexical editor instance
+    // Assuming editorRef is a reference to this Lexical editor instance
     const editorInstance = editorRef.current;
 
     if (editorInstance) {
