@@ -11,10 +11,11 @@ import {
   Textarea,
   useColorMode,
   Grid,
-  useToast,
-  ToastId,
+  Center,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
+import { BiSolidDislike, BiSolidLike } from "react-icons/bi";
 
 // Lexical
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -31,49 +32,58 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 
 // Custom Components
-import { OptionsBar } from "../OptionsBar/OptionsBar";
+import { OptionsBar } from "../../OptionsBar/OptionsBar";
 // import { AutoFocusPlugin } from "../../../../lib/plugins/AutoFocusPlugin";
 
-import "../../../styles/texteditor.css";
+import "@/styles/texteditor.css";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-  $getRoot,
-  $getSelection,
-  CLEAR_EDITOR_COMMAND,
-  ParagraphNode,
-} from "lexical";
+import { $getRoot, $getSelection, ParagraphNode } from "lexical";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
 
-import { EditableSRTE } from "./Sections/EditableSRTE";
-import { DisplaySRTE } from "./Sections/DisplaySRTE";
-import { EditorSubsections, EditorType } from "../../../types";
-import { HideEditorButton } from "../Buttons/HideEditorButton";
-import { SimpleEditableRTE } from "./Sections/SimpleEditableRTE";
-import { SimpleRichTextToolbar } from "../Toolbar/SimpleRichTextToolbar";
-import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
+import { EditableSRTE } from "../Sections/EditableSRTE";
+import { DisplaySRTE } from "../Sections/DisplaySRTE";
+import { EditorSubsections, EditorType } from "../../../../types";
+import { HideEditorButton } from "../../Buttons/HideEditorButton";
+import { SimpleEditableRTE } from "../Sections/SimpleEditableRTE";
+import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
+import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import { BsFillSendFill } from "react-icons/bs";
 import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
 import { createDocumentComment } from "@/lib/api";
-import MentionsPlugin from "../Plugins/MentionsPlugin";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { PostCommentButton } from "../Buttons/PostCommentButton";
+import { useUser } from "@/lib/hooks/useUser";
+import { useFormattedDate } from "@/lib/hooks/useFormattedDate";
+import { PrepopulateCommentDisplayPlugin } from "../../Plugins/PrepopulateCommentDisplayPlugin";
+import { motion, useAnimation } from "framer-motion";
+import { FaTrash } from "react-icons/fa";
+import { ImCross } from "react-icons/im";
+import { DeleteCommentModal } from "@/components/Modals/DeleteCommentModal";
 
 interface Props {
-  userData: IUserMe;
-  documentId: number;
-  refetchDocumentComments: () => void;
+  commentPk: string | number;
+  documentPk: string | number;
+  refetchComments: () => void;
+
+  user: IUserData;
+  created_at: string;
+  updated_at: string;
+  payload: string;
 }
 
-export const CommentRichTextEditor = ({
-  userData,
-  documentId,
-  refetchDocumentComments,
+export const CommentDisplayRTE = ({
+  commentPk,
+  documentPk,
+  refetchComments,
+  payload,
+  user,
+  created_at,
+  updated_at,
 }: Props) => {
   const { colorMode } = useColorMode();
   const editorRef = useRef(null);
   const [comment, setComment] = useState("");
+  const me = useUser();
 
   const generateTheme = (colorMode) => {
     return {
@@ -136,24 +146,58 @@ export const CommentRichTextEditor = ({
 
   const distilled = useDistilledHtml(comment);
 
+  const displayDate = updated_at > created_at ? updated_at : created_at;
+
+  const formattedDate = useFormattedDate(displayDate);
+
   const lightInitialConfig = {
     namespace: "Comments",
-    editable: true,
+    editable: false,
     theme: generateTheme("light"),
     onError,
-    nodes: [ListNode, ListItemNode],
+    nodes: [ListNode, ListItemNode, HeadingNode],
   };
 
   const darkInitialConfig = {
     namespace: "Comments",
-    editable: true,
+    editable: false,
     theme: generateTheme("dark"),
     onError,
-    nodes: [ListNode, ListItemNode],
+    nodes: [ListNode, ListItemNode, HeadingNode],
   };
+
+  const otherUser = me?.userData?.pk !== user?.pk;
+
+  const likeCount = 0;
+
+  const [isHovered, setIsHovered] = useState(false);
+
+  const authorControls = useAnimation();
+  useEffect(() => {
+    if (isHovered) {
+      authorControls.start({
+        opacity: 1,
+        y: 0,
+        x: 0,
+        transition: { delay: 0.1, duration: 0.075 },
+      });
+    }
+  }, [authorControls, isHovered]);
+  const {
+    isOpen: isDeleteCommentModalOpen,
+    onOpen: onOpenDeleteCommentModal,
+    onClose: onCloseDeleteCommentModal,
+  } = useDisclosure();
 
   return (
     <Box>
+      <DeleteCommentModal
+        commentPk={commentPk}
+        documentPk={documentPk}
+        refetchData={refetchComments}
+        isOpen={isDeleteCommentModalOpen}
+        onClose={onCloseDeleteCommentModal}
+      />
       <Flex>
         <Box pb={2} w={"100%"} zIndex={2}>
           <Box
@@ -164,7 +208,9 @@ export const CommentRichTextEditor = ({
             bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
             roundedTop={20}
             zIndex={2}
+            pb={3}
           >
+            {/* {colorMode === "light" ? ( */}
             <LexicalComposer
               key={`${colorMode}-${theme}`} // Add a key with the theme for re-rendering
               initialConfig={
@@ -174,8 +220,7 @@ export const CommentRichTextEditor = ({
               <HistoryPlugin />
               <ListPlugin />
               <CustomPastePlugin />
-              <MentionsPlugin />
-
+              <PrepopulateCommentDisplayPlugin data={payload} />
               <OnChangePlugin
                 onChange={(editorState, editor) => {
                   editorState.read(() => {
@@ -190,21 +235,41 @@ export const CommentRichTextEditor = ({
               />
               <RichTextPlugin
                 contentEditable={
-                  <Box zIndex={2}>
-                    {/* Toolbar */}
-
-                    {/* <SimpleRichTextToolbar
-                        editorRef={editorRef}
-                        selectedNodeType={selectedNodeType}
-                        setSelectedNodeType={setSelectedNodeType}
-                      /> */}
-                    <Box pl={3} pt={2}>
+                  <Box
+                    zIndex={2}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                  >
+                    <Box pos={"absolute"} right={2.5} top={"15px"}>
+                      {!otherUser ? (
+                        isHovered ? (
+                          <Center
+                            as={motion.div}
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={authorControls}
+                            color={"red.500"}
+                            _hover={{ color: "red.400", cursor: "pointer" }}
+                            mr={3}
+                            mt={2}
+                            alignItems={"center"}
+                            // background={"white"}
+                            boxSize={"10px"}
+                            borderRadius={"full"}
+                            onClick={onOpenDeleteCommentModal}
+                          >
+                            <ImCross />
+                          </Center>
+                        ) : null
+                      ) : null}
+                    </Box>
+                    <Box pl={3} pt={2} pr={3}>
                       <ChatUser
-                        otherUser={false}
-                        displayName={`${userData?.first_name} ${userData?.last_name}`}
-                        avatarSrc={userData?.image}
-                        iconSize="md"
-                        user={userData as IUserData}
+                        otherUser={otherUser}
+                        displayName={`${user?.first_name} ${user?.last_name}`}
+                        avatarSrc={user?.image}
+                        iconSize="lg"
+                        user={user as IUserData}
+                        displayDate={formattedDate}
                         // withoutName={true}
                         // created_at={}
                         // updated_at={}
@@ -216,9 +281,9 @@ export const CommentRichTextEditor = ({
                         width: "100%",
                         height: "auto",
                         // padding: "32px",
-                        paddingLeft: "76px",
-                        paddingRight: "90px",
-                        marginTop: -24,
+                        paddingLeft: "92px",
+                        paddingRight: "40px",
+                        marginTop: -38,
                         top: "40px",
                         paddingBottom: "16px",
                         borderRadius: "0 0 25px 25px",
@@ -226,14 +291,39 @@ export const CommentRichTextEditor = ({
                         zIndex: 2,
                       }}
                     />
-                    <Box pos={"absolute"} right={5} bottom={4}>
-                      <PostCommentButton
-                        refetchComments={refetchDocumentComments}
-                        distilled={distilled}
-                        comment={comment}
-                        documentId={documentId}
-                        userData={userData}
-                      />
+                    <Box
+                      pos={"absolute"}
+                      right={5}
+                      bottom={4}
+                      onClick={() => {
+                        console.log("liked");
+                      }}
+                    >
+                      {isHovered ? (
+                        <Flex>
+                          <Flex
+                            alignItems={"center"}
+                            color={"blue.500"}
+                            _hover={{ color: "blue.400", cursor: "pointer" }}
+                          >
+                            <Box>
+                              <BiSolidLike />
+                            </Box>
+                          </Flex>
+                        </Flex>
+                      ) : (
+                        <Flex>
+                          <Flex
+                            alignItems={"center"}
+                            color={"gray.500"}
+                            _hover={{ color: "gray.400", cursor: "pointer" }}
+                          >
+                            <Box>
+                              <BiSolidLike />
+                            </Box>
+                          </Flex>
+                        </Flex>
+                      )}
                     </Box>
                   </Box>
                 }
@@ -248,7 +338,7 @@ export const CommentRichTextEditor = ({
                       color: "gray",
                     }}
                   >
-                    {"Say something..."}
+                    {"Would you like to say something?"}
                   </div>
                 }
                 ErrorBoundary={LexicalErrorBoundary}
@@ -279,3 +369,37 @@ export const CommentRichTextEditor = ({
     </Box>
   );
 };
+
+// {likeCount > 0 ? (
+//     <Flex alignItems={"center"}>
+//       <Text mr={1}>{likeCount}</Text>
+//       <Box>
+//         <BiSolidLike />
+//       </Box>
+//     </Flex>
+//   ) : isHovered ? (
+//     <motion.div
+//       initial={{ opacity: 0, y: 20 }}
+//       animate={authorControls}
+//     >
+//       <Flex alignItems={"center"}>
+//         <Box>
+//           <BiSolidLike />
+//         </Box>
+//       </Flex>
+//     </motion.div>
+//   ) : null}
+//   {!otherUser ? (
+//     isHovered ? (
+//       <motion.div
+//         initial={{ opacity: 0, y: 20 }}
+//         animate={authorControls}
+//       >
+//         <Flex alignItems={"center"}>
+//           <Box>
+//             <BiSolidLike />
+//           </Box>
+//         </Flex>
+//       </motion.div>
+//     ) : null
+//   ) : null}

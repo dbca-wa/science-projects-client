@@ -205,6 +205,28 @@ export const getDocumentsPendingMyAction = () => {
     return res;
 }
 
+export const getDocumentComments = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+    const res = instance.get(`documents/projectdocuments/${pk}/comments`).then(res => res.data);
+    return res;
+}
+
+export interface DocumentCommentCreationProps {
+    documentId: number;
+    payload: string;
+    user: number;
+}
+export const createDocumentComment = async ({documentId, payload, user}:DocumentCommentCreationProps) => {
+    const postContent = {
+        user,
+        payload
+    }   
+    console.log("postContent", postContent)
+    const res = instance.post(`documents/projectdocuments/${documentId}/comments`, postContent).then(res => res.data);
+    return res;
+}
+
+
 export const getMyProjects = async () => {
     const res = instance.get(`projects/mine`).then(res => {
         return res.data
@@ -1777,6 +1799,26 @@ export const deleteDocumentCall = async ({ projectPk, documentPk, documentKind }
     );
     if (documentPk !== undefined) {
         const url = `documents/projectdocuments/${documentPk}`
+        return instance.delete(
+            url,
+        ).then(res => res.data);
+    }
+}
+
+export interface IDeleteComment {
+    commentPk: number | string;
+    documentPk: number | string;
+}
+
+export const deleteCommentCall = async ({ commentPk, documentPk }: IDeleteComment) => {
+    console.log(
+        {
+            commentPk,
+            documentPk,
+        }
+    );
+    if (documentPk !== undefined) {
+        const url = `communications/comments/${commentPk}`
         return instance.delete(
             url,
         ).then(res => res.data);
