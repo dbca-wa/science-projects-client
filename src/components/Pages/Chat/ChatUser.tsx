@@ -1,7 +1,7 @@
 // Display of users above their message in chat route
 
 import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
-import { IImageData, IUserData } from "@/types";
+import { IBranch, IBusinessArea, IImageData, IUserData } from "@/types";
 import {
   Avatar,
   Box,
@@ -30,6 +30,9 @@ interface ChatUserProps {
   displayDate?: string;
   //   created_at?: string;
   //   updated_at?: string;
+
+  businessAreas: IBusinessArea[];
+  branches: IBranch[];
 }
 
 export const ChatUser: React.FC<ChatUserProps> = React.memo(
@@ -43,6 +46,8 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
     displayDate,
     // created_at,
     // updated_at,
+    businessAreas,
+    branches,
   }) => {
     const { colorMode } = useColorMode();
     const baseApi = useApiEndpoint();
@@ -74,8 +79,8 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
             <DrawerBody>
               <UserProfile
                 pk={user.pk}
-                branches={user.branches}
-                businessAreas={user.businessAreas}
+                branches={branches}
+                businessAreas={businessAreas}
               />
             </DrawerBody>
 

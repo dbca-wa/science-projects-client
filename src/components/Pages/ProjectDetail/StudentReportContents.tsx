@@ -3,6 +3,7 @@
 import {
   Box,
   Button,
+  Center,
   Flex,
   Select,
   Spinner,
@@ -25,6 +26,7 @@ import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal"
 import { useGetStudentReportAvailableReportYears } from "../../../lib/hooks/useGetStudentReportAvailableReportYears";
 import { getStudentReportForYear } from "../../../lib/api";
 import { CommentSection } from "./CommentSection";
+import { BsPlus } from "react-icons/bs";
 
 interface Props {
   documents: IStudentReport[];
@@ -81,9 +83,11 @@ export const StudentReportContents = ({
   const [isLoading, setIsLoading] = useState(false);
   const { colorMode } = useColorMode();
   const documentType = "studentreport";
-  const [editorKey, setEditorKey] = useState(
-    selectedYear.toString() + colorMode + documentType
-  );
+  // const [editorKey, setEditorKey] = useState(
+  //   selectedYear.toString() + colorMode + documentType
+  // );
+
+  const editorKey = colorMode + documentType + selectedStudentReport?.year;
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
@@ -129,7 +133,7 @@ export const StudentReportContents = ({
     if (dataForYear) {
       setIsLoading(true);
       setselectedStudentReport(dataForYear);
-      setEditorKey(selectedYear.toString() + colorMode + documentType);
+      // setEditorKey(selectedYear.toString() + colorMode + documentType);
     }
     console.log("set year and selected doc");
   };
@@ -195,7 +199,7 @@ export const StudentReportContents = ({
       />
 
       {/* Selector */}
-      <Box
+      {/* <Box
         padding={4}
         rounded={"xl"}
         border={"1px solid"}
@@ -247,6 +251,68 @@ export const StudentReportContents = ({
               Create Student Report
             </Button>
           </Flex>
+        </Flex>
+      </Box> */}
+
+      {/* Selector */}
+      <Box
+        padding={4}
+        rounded={"xl"}
+        border={"1px solid"}
+        borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
+        mb={8}
+        width={"100%"}
+      >
+        <Flex width={"100%"} justifyContent={"space-between"}>
+          <Center>
+            <Button
+              background={colorMode === "light" ? "orange.500" : "orange.600"}
+              color={"white"}
+              _hover={{
+                background: colorMode === "light" ? "orange.400" : "orange.500",
+              }}
+              // colorScheme="orange"
+              size={"sm"}
+              onClick={
+                onOpenCreateStudentReportModal
+                // () => spawnProgressReport(
+                //     {
+                //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
+                //         kind: "progressreport"
+                //     }
+                // )
+              }
+              // ml={2}
+              isDisabled={availableStudentYearsData?.length < 1}
+              leftIcon={<BsPlus size={"20px"} />}
+            >
+              New Report
+            </Button>
+          </Center>
+
+          <Center>
+            <Flex alignItems={"center"}>
+              <Text
+                mr={3}
+                fontWeight={"semibold"}
+                fontSize={"md"}
+                color={colorMode === "light" ? "gray.600" : "gray.200"}
+              >
+                Selected
+              </Text>
+              <Select
+                value={selectedYear}
+                onChange={(event) => handleNewYearSelection(event)}
+                minW={"100px"}
+              >
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Select>
+            </Flex>
+          </Center>
         </Flex>
       </Box>
 
