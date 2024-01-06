@@ -1,7 +1,7 @@
 // Has mention and hashtag functionality
 
 import { ChatUser } from "@/components/Pages/Chat/ChatUser";
-import { IUserData, IUserMe } from "@/types";
+import { IBranch, IBusinessArea, IUserData, IUserMe } from "@/types";
 import {
   Box,
   Button,
@@ -64,12 +64,16 @@ interface Props {
   userData: IUserMe;
   documentId: number;
   refetchDocumentComments: () => void;
+  businessAreas: IBusinessArea[];
+  branches: IBranch[];
 }
 
 export const CommentRichTextEditor = ({
   userData,
   documentId,
   refetchDocumentComments,
+  businessAreas,
+  branches,
 }: Props) => {
   const { colorMode } = useColorMode();
   const editorRef = useRef(null);
@@ -198,7 +202,11 @@ export const CommentRichTextEditor = ({
                         selectedNodeType={selectedNodeType}
                         setSelectedNodeType={setSelectedNodeType}
                       /> */}
-                    <UserContainer userData={userData as IUserData} />
+                    <UserContainer
+                      userData={userData as IUserData}
+                      businessAreas={businessAreas}
+                      branches={branches}
+                    />
                     <ContentEditable
                       style={{
                         // minHeight: "50px",
@@ -271,9 +279,15 @@ export const CommentRichTextEditor = ({
 
 interface UserContainerProps {
   userData: IUserData;
+  businessAreas: IBusinessArea[];
+  branches: IBranch[];
 }
 
-const UserContainer = ({ userData }: UserContainerProps) => {
+const UserContainer = ({
+  userData,
+  businessAreas,
+  branches,
+}: UserContainerProps) => {
   const [editor] = useLexicalComposerContext();
 
   return (
@@ -295,6 +309,8 @@ const UserContainer = ({ userData }: UserContainerProps) => {
         // withoutName={true}
         // created_at={}
         // updated_at={}
+        businessAreas={businessAreas}
+        branches={branches}
       />
     </Box>
   );
