@@ -173,7 +173,7 @@ export const ProjectClosureContents = ({
         p={2}
         px={4}
         border={"1px solid"}
-        borderColor={"gray.200"}
+        borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
         rounded={"2xl"}
       >
         <Flex flex={1} justifyContent={"flex-start"} alignItems={"center"}>

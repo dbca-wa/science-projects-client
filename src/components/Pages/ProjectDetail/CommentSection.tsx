@@ -81,43 +81,52 @@ export const CommentSection = ({ documentID, userData }: Props) => {
           userData={userData}
           documentId={documentID}
           refetchDocumentComments={refetchInterceptedFunction}
+          branches={branches?.branchesData}
+          businessAreas={businessAreas?.baData}
         />
-        <Divider orientation="horizontal" colorScheme={"linkedin"} />
       </Box>
       {!isRepainting && !documentCommentsLoading ? (
-        <AnimatePresence>
-          <Grid gridTemplateColumns={"repeat(1,1fr)"}>
-            {documentCommentsData?.map((comment, index) => {
-              // if (comment.is_public && !comment.is_removed) {
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ y: -10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 10, opacity: 0 }}
-                  transition={{ duration: 0.5, delay: (index + 1) / 10 }}
-                  style={{
-                    height: "100%",
-                    animation: "oscillate 8s ease-in-out infinite",
-                  }}
-                >
-                  <CommentDisplayRTE
-                    refetchComments={refetchInterceptedFunction}
-                    documentPk={documentID}
-                    commentPk={comment?.pk}
-                    user={comment.user}
-                    payload={comment.text}
-                    created_at={comment.created_at}
-                    updated_at={comment.updated_at}
-                    branches={branches?.branchesData}
-                    businessAreas={businessAreas?.baData}
-                  />
-                </motion.div>
-              );
-              // }
-            })}
-          </Grid>
-        </AnimatePresence>
+        <>
+          {documentCommentsData.length >= 1 ? (
+            <Box mb={4}>
+              <Divider orientation="horizontal" colorScheme={"linkedin"} />
+            </Box>
+          ) : null}
+
+          <AnimatePresence>
+            <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+              {documentCommentsData?.map((comment, index) => {
+                // if (comment.is_public && !comment.is_removed) {
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ y: -10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 10, opacity: 0 }}
+                    transition={{ duration: 0.5, delay: (index + 1) / 10 }}
+                    style={{
+                      height: "100%",
+                      animation: "oscillate 8s ease-in-out infinite",
+                    }}
+                  >
+                    <CommentDisplayRTE
+                      refetchComments={refetchInterceptedFunction}
+                      documentPk={documentID}
+                      commentPk={comment?.pk}
+                      user={comment.user}
+                      payload={comment.text}
+                      created_at={comment.created_at}
+                      updated_at={comment.updated_at}
+                      branches={branches?.branchesData}
+                      businessAreas={businessAreas?.baData}
+                    />
+                  </motion.div>
+                );
+                // }
+              })}
+            </Grid>
+          </AnimatePresence>
+        </>
       ) : (
         <Center my={4}>
           <Spinner />
