@@ -1931,6 +1931,14 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
 
 
 
+export const getUserFeedback = async () => {
+    const res = instance.get(`tasks/feedback`).then(res => {
+        return res.data
+    })
+    return res;
+}
+
+
 // TASKS =====================================================================================
 
 

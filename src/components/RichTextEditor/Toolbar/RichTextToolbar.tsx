@@ -1,9 +1,15 @@
 // Toolbar for the simple rich text editor
 
-import { Box, Divider, Flex, useBreakpointValue, useColorMode } from "@chakra-ui/react"
+import {
+  Box,
+  Divider,
+  Flex,
+  useBreakpointValue,
+  useColorMode,
+} from "@chakra-ui/react";
 // import { AlignButton } from "../MenuButtons/AlignButton"
-import { RefObject, SetStateAction, useEffect, useState } from "react"
-import { useToolbarClickListener } from "../../../lib/hooks/useToolbarClickListener"
+import { RefObject, SetStateAction, useEffect, useState } from "react";
+import { useToolbarClickListener } from "../../../lib/hooks/useToolbarClickListener";
 import { TimeButtons } from "./TimeButtons";
 import { ElementTypeButton } from "../MenuButtons/ElementTypeButton";
 import { BoldButton } from "../Buttons/BoldButton";
@@ -15,96 +21,83 @@ import { FontFormatterButton } from "../MenuButtons/FontFormatterButton";
 import { ToolbarToggleBtn } from "../Buttons/ToolbarToggleBtn";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
-
 interface Props {
-    editorRef: RefObject<HTMLTextAreaElement>;
-    selectedNodeType: string;
-    setSelectedNodeType: React.Dispatch<SetStateAction<string>>;
-    selectedIsBold: boolean;
-    setSelectedIsBold: React.Dispatch<SetStateAction<boolean>>;
+  editorRef: RefObject<HTMLTextAreaElement>;
+  selectedNodeType: string;
+  setSelectedNodeType: React.Dispatch<SetStateAction<string>>;
+  selectedIsBold: boolean;
+  setSelectedIsBold: React.Dispatch<SetStateAction<boolean>>;
 }
 
 export const RichTextToolbar = ({
-    editorRef,
-    selectedNodeType,
-    setSelectedNodeType,
-    selectedIsBold,
-    setSelectedIsBold
+  editorRef,
+  selectedNodeType,
+  setSelectedNodeType,
+  selectedIsBold,
+  setSelectedIsBold,
 }: Props) => {
+  const { onClick } = useToolbarClickListener({
+    currentlySelectedNode: selectedNodeType,
+    editorRef: editorRef,
+  });
+  const [editor] = useLexicalComposerContext();
 
-    const { onClick } = useToolbarClickListener({ currentlySelectedNode: selectedNodeType, editorRef: editorRef });
-    const [editor] = useLexicalComposerContext();
+  // const [selectedIsBold, setSelectedIsBold] = useState(false);
 
-    // const [selectedIsBold, setSelectedIsBold] = useState(false);
+  useEffect(() => {
+    console.log(selectedNodeType);
+  }, [selectedNodeType]);
+  const shouldShowToolbarToggleBtnWhenNotSmall = useBreakpointValue({
+    base: true,
+    xl: false,
+  });
+  const isSmall = useBreakpointValue({
+    base: true,
+    sm: true,
+    md: true,
+    lg: false,
+  });
+  const [currentToolbarPage, setCurrentToolbarPage] = useState<number>(1);
+  const [currentToolbarPageMd, setCurrentToolbarPageMd] = useState<number>(1);
+  const { colorMode } = useColorMode();
 
+  useEffect(() => console.log(colorMode), [colorMode]);
 
+  useEffect(() => console.log("selectedIsBold:", selectedIsBold));
 
-    useEffect(() => {
-        console.log(selectedNodeType)
-    }, [selectedNodeType]
-
-    )
-    const shouldShowToolbarToggleBtnWhenNotSmall = useBreakpointValue(
-        {
-            base: true,
-            xl: false,
+  return (
+    <>
+      {/* <AutoFocusPlugin clickFunction={onClick} /> */}
+      <Flex
+        width={"100%"}
+        // my={1}
+        px={1}
+        backgroundColor={
+          colorMode === "light" ? "whiteAlpha.800" : "blackAlpha.400"
         }
-    );
-    const isSmall = useBreakpointValue(
-        {
-            base: true,
-            sm: true,
-            md: true,
-            lg: false,
-        }
-    )
-    const [currentToolbarPage, setCurrentToolbarPage] = useState<number>(1);
-    const [currentToolbarPageMd, setCurrentToolbarPageMd] = useState<number>(1);
-    const { colorMode } = useColorMode();
-
-    useEffect(() => console.log(colorMode), [colorMode])
-
-    useEffect(() => console.log("selectedIsBold:", selectedIsBold))
-
-    return (
-        <>
-            {/* <AutoFocusPlugin clickFunction={onClick} /> */}
-            <Flex
-                width={"100%"}
-                // my={1}
-                px={1}
-                backgroundColor={
-                    colorMode === "light" ? "whiteAlpha.800"
-                        : "blackAlpha.400"
-                }
-                overflowX={
-                    'hidden'
-                }
-                justifyContent={"space-between"}
-                display={"flex"}
-            >
-                {
-                    isSmall ?
-                        (
-                            <>
-                                <TimeButtons onClick={onClick} editor={editor} />
-                                <VerticalDivider />
-                                {
-                                    currentToolbarPage === 1 ?
-
-                                        <>
-
-                                            <BoldButton onClick={onClick} editor={editor} buttonIsOn={selectedIsBold} />
-                                            <ItalicsButton onClick={onClick} editor={editor} />
-                                            <UnderlineButton onClick={onClick} editor={editor} />
-                                            {/* <FontHighlighterButton /> */}
-                                            <VerticalDivider />
-
-                                        </>
-                                        :
-                                        currentToolbarPage === 2 ?
-                                            <>
-                                                {/* <ElementTypeButton
+        overflowX={"hidden"}
+        justifyContent={"space-between"}
+        display={"flex"}
+      >
+        {isSmall ? (
+          <>
+            <TimeButtons onClick={onClick} editor={editor} />
+            <VerticalDivider />
+            {currentToolbarPage === 1 ? (
+              <>
+                <BoldButton
+                  onClick={onClick}
+                  editor={editor}
+                  buttonIsOn={selectedIsBold}
+                />
+                <ItalicsButton onClick={onClick} editor={editor} />
+                <UnderlineButton onClick={onClick} editor={editor} />
+                {/* <FontHighlighterButton /> */}
+                <VerticalDivider />
+              </>
+            ) : currentToolbarPage === 2 ? (
+              <>
+                {/* <ElementTypeButton
                                                     onClick={onClick}
                                                     selectedNodeType={selectedNodeType}
                                                     editor={editor}
@@ -112,124 +105,162 @@ export const RichTextToolbar = ({
                                                 // currentlyClickedNode={selectedNodeType}
                                                 // setCurrentlyClickedNode={setSelectedNodeType}
                                                 /> */}
-                                                <>
-                                                    <FontFormatterButton onClick={onClick} />
-                                                    {/* <AlignButton isSmall onClick={onClick} /> */}
-                                                </>
-                                                <VerticalDivider />
+                <>
+                  <FontFormatterButton onClick={onClick} />
+                  {/* <AlignButton isSmall onClick={onClick} /> */}
+                </>
+                <VerticalDivider />
+              </>
+            ) : (
+              <>
+                <InsertItemMenuButton onClick={onClick} />
 
-                                            </>
-                                            :
-                                            <>
-                                                <InsertItemMenuButton onClick={onClick} />
+                <VerticalDivider />
+              </>
+            )}
 
-                                                <VerticalDivider />
+            <Box>
+              <ToolbarToggleBtn
+                page={currentToolbarPage}
+                setPage={setCurrentToolbarPage}
+                maxPages={3}
+                isSmall
+              />
+            </Box>
+          </>
+        ) : shouldShowToolbarToggleBtnWhenNotSmall ? (
+          <>
+            <TimeButtons onClick={onClick} editor={editor} />
+            <VerticalDivider />
+            {currentToolbarPageMd === 1 ? (
+              <>
+                {/* <FontStylingButtons /> */}
 
-                                            </>
+                <BoldButton
+                  onClick={onClick}
+                  editor={editor}
+                  buttonIsOn={selectedIsBold}
+                />
 
+                <ItalicsButton onClick={onClick} editor={editor} />
+                <UnderlineButton onClick={onClick} editor={editor} />
+                <VerticalDivider />
+              </>
+            ) : currentToolbarPageMd === 2 ? (
+              <>
+                <ElementTypeButton
+                  onClick={onClick}
+                  selectedNodeType={selectedNodeType}
+                  editor={editor}
+                  isSmall
+                  // currentlyClickedNode={selectedNodeType}
+                  // setCurrentlyClickedNode={setSelectedNodeType}
+                />
+                <VerticalDivider />
 
-                                }
+                {/* <VerticalDivider /> */}
 
-                                <Box>
-                                    <ToolbarToggleBtn
-                                        page={currentToolbarPage}
-                                        setPage={setCurrentToolbarPage}
-                                        maxPages={3}
-                                        isSmall
-                                    />
-                                </Box>
-                            </>
-                        ) :
-                        (
-                            shouldShowToolbarToggleBtnWhenNotSmall ?
-                                (
-                                    <>
-                                        <TimeButtons onClick={onClick} editor={editor} />
-                                        <VerticalDivider />
-                                        {
-                                            currentToolbarPageMd === 1 ?
-                                                <>
-                                                    {/* <FontStylingButtons /> */}
+                <>
+                  <FontFormatterButton onClick={onClick} />
+                  <VerticalDivider />
 
-                                                    <BoldButton onClick={onClick} editor={editor} buttonIsOn={selectedIsBold} />
+                  {/* <AlignButton onClick={onClick} /> */}
+                </>
+              </>
+            ) : (
+              <>
+                <InsertItemMenuButton onClick={onClick} />
+                <VerticalDivider />
+              </>
+            )}
+            <ToolbarToggleBtn
+              page={currentToolbarPageMd}
+              setPage={setCurrentToolbarPageMd}
+              maxPages={3}
+              isSmall
+            />
+          </>
+        ) : (
+          <>
+            <TimeButtons onClick={onClick} editor={editor} />
+            <VerticalDivider />
+            <BoldButton
+              onClick={onClick}
+              editor={editor}
+              buttonIsOn={selectedIsBold}
+            />
+            <ItalicsButton onClick={onClick} editor={editor} />
+            <UnderlineButton onClick={onClick} editor={editor} />
+            <VerticalDivider />
 
-                                                    <ItalicsButton onClick={onClick} editor={editor} />
-                                                    <UnderlineButton onClick={onClick} editor={editor} />
-                                                    <VerticalDivider />
+            <ElementTypeButton
+              onClick={onClick}
+              selectedNodeType={selectedNodeType}
+              editor={editor}
+              isSmall
+              shouldFurtherConcat={true}
 
-                                                </>
+              // currentlyClickedNode={selectedNodeType}
+              // setCurrentlyClickedNode={setSelectedNodeType}
+            />
+            <VerticalDivider />
+            <FontFormatterButton onClick={onClick} />
 
-                                                : currentToolbarPageMd === 2 ?
-                                                    <>
-                                                        <ElementTypeButton
-                                                            onClick={onClick}
-                                                            selectedNodeType={selectedNodeType}
+            <VerticalDivider />
+            <InsertItemMenuButton onClick={onClick} />
+          </>
+        )}
+      </Flex>
+      <Divider />
+    </>
+  );
+};
 
-                                                            editor={editor}
-                                                            isSmall
-                                                        // currentlyClickedNode={selectedNodeType}
-                                                        // setCurrentlyClickedNode={setSelectedNodeType}
-                                                        />
-                                                        <VerticalDivider />
+// const [editor] = useLexicalComposerContext();
 
+// const [isText, setIsText] = useState(false);
+// const [selectedIsBold, setSelectedIsBold] = useState(false);
+// const [selectedIsItalic, setSelectedIsItalic] = useState(false);
+// const [selectedIsUnderlined, setSelectedIsUnderlined] = useState(false);
+// const [selectedIsSubscript, setSelectedIsSubscript] = useState(false);
+// const [selectedIsSuperscript, setSelectedIsSuperscript] = useState(false);
 
-                                                        {/* <VerticalDivider /> */}
+// useEffect(() => {
+//   editor.getEditorState().read(() => {
+//     const selection = $getSelection();
+//     const nativeSelection = window.getSelection();
+//     const rootElement = editor.getRootElement();
 
-                                                        <>
-                                                            <FontFormatterButton onClick={onClick} />
-                                                            <VerticalDivider />
+//     if (
+//       nativeSelection !== null &&
+//       (!$isRangeSelection(selection) ||
+//         rootElement === null ||
+//         !rootElement.contains(nativeSelection.anchorNode))
+//     ) {
+//       setIsText(false);
+//       return;
+//     }
 
-                                                            {/* <AlignButton onClick={onClick} /> */}
-                                                        </>
-                                                    </>
-                                                    :
-                                                    <>
-                                                        <InsertItemMenuButton onClick={onClick} />
-                                                        <VerticalDivider />
+//     if (!$isRangeSelection(selection)) {
+//       return;
+//     }
+//     setSelectedIsBold(selection.hasFormat("bold"));
+//     setSelectedIsItalic(selection.hasFormat("italic"));
+//     setSelectedIsUnderlined(selection.hasFormat("underline"));
+//     setSelectedIsSubscript(selection.hasFormat("subscript"));
+//     setSelectedIsSuperscript(selection.hasFormat("superscript"));
 
-                                                    </>
+//     // setIsStrikethrough(selection.hasFormat('strikethrough'));
+//     // setIsCode(selection.hasFormat('code'));
+//   });
+// }, [editor]);
 
-
-                                        }
-                                        <ToolbarToggleBtn
-                                            page={currentToolbarPageMd}
-                                            setPage={setCurrentToolbarPageMd}
-                                            maxPages={3}
-                                            isSmall
-                                        />
-                                    </>
-                                ) :
-                                (
-                                    <>
-                                        <TimeButtons onClick={onClick} editor={editor} />
-                                        <VerticalDivider />
-                                        <BoldButton onClick={onClick} editor={editor} buttonIsOn={selectedIsBold} />
-                                        <ItalicsButton onClick={onClick} editor={editor} />
-                                        <UnderlineButton onClick={onClick} editor={editor} />
-                                        <VerticalDivider />
-
-                                        <ElementTypeButton
-                                            onClick={onClick}
-                                            selectedNodeType={selectedNodeType}
-                                            editor={editor}
-                                            isSmall
-                                            shouldFurtherConcat={true}
-
-                                        // currentlyClickedNode={selectedNodeType}
-                                        // setCurrentlyClickedNode={setSelectedNodeType}
-                                        />
-                                        <VerticalDivider />
-                                        <FontFormatterButton onClick={onClick} />
-
-                                        <VerticalDivider />
-                                        <InsertItemMenuButton onClick={onClick} />
-
-                                    </>
-                                )
-                        )
-                }
-            </Flex>
-            <Divider />
-        </>
-    )
-}
+// useEffect(() => {
+//   console.log({
+//     selectedIsBold,
+//     selectedIsItalic,
+//     selectedIsUnderlined,
+//     selectedIsSubscript,
+//     selectedIsSuperscript,
+//   });
+// });
