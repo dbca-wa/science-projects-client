@@ -167,46 +167,6 @@ export const ConceptPlanContents = ({
       />
 
       <CommentSection documentID={document?.document?.id} userData={userData} />
-      {/* <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Staff Time Allocation
-                </Text>
-                <Box
-                    mt={4}
-
-                >
-                    {document?.staff_time_allocation}
-                    [["Role", "Year 1", "Year 2", "Year 3"], ["Scientist", "", "", ""], ["Technical", "", "", ""], ["Volunteer", "", "", ""], ["Collaborator", "", "", ""]]
-                </Box>
-                <SimpleRichTextEditor
-                    data={document?.staff_time_allocation}
-                />
-            </Box>
-
-            <Box
-                pb={6}
-            >
-                <Text
-                    fontWeight={"bold"}
-                    fontSize={"2xl"}
-                >
-                    Indicative Operating Budget
-                </Text>
-                <Box
-                    mt={4}
-                >
-                    {document?.budget}
-                    [["Source", "Year 1", "Year 2", "Year 3"], ["Consolidated Funds (DBCA)", "", "", ""], ["External Funding", "", "", ""]]
-                </Box>
-                <SimpleRichTextEditor
-                    data={document?.budget}
-                />
-            </Box> */}
     </motion.div>
   );
 };

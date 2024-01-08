@@ -26,6 +26,7 @@ interface ChatUserProps {
   otherUser: boolean;
   avatarSrc: IImageData | null;
   withoutName?: boolean;
+  nameCentered?: boolean;
   iconSize?: "xs" | "sm" | "md" | "lg" | "xl";
   displayDate?: string;
   //   created_at?: string;
@@ -48,6 +49,7 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
     // updated_at,
     businessAreas,
     branches,
+    nameCentered,
   }) => {
     const { colorMode } = useColorMode();
     const baseApi = useApiEndpoint();
@@ -62,10 +64,12 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
       onOpen: onUserOpen,
       onClose: onUserClose,
     } = useDisclosure();
-    const imageUrl = useServerImageUrl(avatarSrc?.file);
+    const baseUrl = useApiEndpoint();
+    // const imageUrl = useServerImageUrl(avatarSrc?.file);
     // useEffect(() => {
     //   console.log("IMGAGE:", imageUrl);
-    // }, []);
+    //   console.log(`${baseUrl}${imageUrl}`);
+    // });
     return (
       <>
         <Drawer
@@ -94,10 +98,14 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
           mt={2}
         >
           {!withoutName ? (
-            <>
+            <Flex w={"100%"}>
               <Avatar
                 size={iconSize ? iconSize : "md"}
-                src={avatarSrc !== null ? imageUrl : undefined}
+                src={
+                  avatarSrc?.file !== undefined && avatarSrc?.file !== null
+                    ? avatarSrc?.file
+                    : undefined
+                }
                 name={displayName}
                 mr={2}
                 userSelect={"none"}
@@ -111,7 +119,10 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
                 h={"100%"}
                 justifyContent={"space-between"}
                 paddingRight={"40px"}
+                // bg={"red"}
+                alignItems={nameCentered === true ? "center" : undefined}
               >
+                {/* {nameCentered ? } */}
                 <Box userSelect={"none"}>
                   <Text
                     onClick={otherUser ? openUserDrawer : undefined}
@@ -129,7 +140,6 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
                         ? "blackAlpha.700"
                         : "whiteAlpha.800"
                     }
-                    // w={"100%"}
                   >
                     {displayName}
                   </Text>
@@ -151,11 +161,15 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
                   </Box>
                 ) : null}
               </Flex>
-            </>
+            </Flex>
           ) : (
             <Avatar
               size={iconSize ? iconSize : "md"}
-              src={avatarSrc !== null ? imageUrl : undefined}
+              src={
+                avatarSrc?.file !== undefined && avatarSrc?.file !== null
+                  ? avatarSrc?.file
+                  : undefined
+              }
               name={displayName}
               mr={2}
               userSelect={"none"}

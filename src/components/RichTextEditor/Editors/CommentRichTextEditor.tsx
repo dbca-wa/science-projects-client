@@ -13,6 +13,7 @@ import {
   Grid,
   useToast,
   ToastId,
+  Avatar,
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
 
@@ -59,6 +60,8 @@ import { createDocumentComment } from "@/lib/api";
 import MentionsPlugin from "../Plugins/MentionsPlugin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PostCommentButton } from "../Buttons/PostCommentButton";
+import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
+import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface Props {
   userData: IUserMe;
@@ -75,9 +78,14 @@ export const CommentRichTextEditor = ({
   businessAreas,
   branches,
 }: Props) => {
+  useEffect(() => {
+    console.log("USER", userData);
+  }, []);
   const { colorMode } = useColorMode();
   const editorRef = useRef(null);
   const [comment, setComment] = useState("");
+
+  const usersImage = useServerImageUrl(userData?.image?.file);
 
   const generateTheme = (colorMode) => {
     return {
@@ -204,6 +212,7 @@ export const CommentRichTextEditor = ({
                       /> */}
                     <UserContainer
                       userData={userData as IUserData}
+                      image={usersImage}
                       businessAreas={businessAreas}
                       branches={branches}
                     />
@@ -279,6 +288,7 @@ export const CommentRichTextEditor = ({
 
 interface UserContainerProps {
   userData: IUserData;
+  image: string;
   businessAreas: IBusinessArea[];
   branches: IBranch[];
 }
@@ -290,28 +300,58 @@ const UserContainer = ({
 }: UserContainerProps) => {
   const [editor] = useLexicalComposerContext();
 
-  return (
+  const { colorMode } = useColorMode();
+  const baseUrl = useApiEndpoint();
+  const imageUrl = useServerImageUrl(userData?.image?.file);
+
+  return userData?.image?.file ? (
     <Box
       pl={3}
       pt={2}
       onClick={() => {
-        console.log("hi");
+        console.log("hi", userData?.image?.file);
         // If the editor is not focused, focus it.
         editor.focus();
       }}
     >
-      <ChatUser
-        otherUser={false}
-        displayName={`${userData?.first_name} ${userData?.last_name}`}
-        avatarSrc={userData?.image}
-        iconSize="md"
-        user={userData as IUserData}
-        // withoutName={true}
-        // created_at={}
-        // updated_at={}
-        businessAreas={businessAreas}
-        branches={branches}
-      />
+      <Flex
+        flexDir="row"
+        // color="gray.500"
+        sx={{ alignSelf: "flex-start" }}
+        mt={2}
+      >
+        <Avatar
+          size={"md"}
+          src={imageUrl}
+          name={`${userData?.first_name} ${userData?.last_name}`}
+          mr={2}
+          userSelect={"none"}
+          style={{ pointerEvents: "none" }}
+          draggable={false}
+        />
+        <Flex
+          pl={1}
+          pr={0}
+          w={"100%"}
+          h={"100%"}
+          justifyContent={"space-between"}
+          paddingRight={"40px"}
+        >
+          <Box userSelect={"none"}>
+            <Text
+              fontWeight="bold"
+              pl={1}
+              mt={0}
+              color={
+                colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
+              }
+              // w={"100%"}
+            >
+              {`${userData?.first_name} ${userData?.last_name}`}
+            </Text>
+          </Box>
+        </Flex>
+      </Flex>
     </Box>
-  );
+  ) : null;
 };
