@@ -119,6 +119,7 @@ export const CommentSection = ({ documentID, userData }: Props) => {
                       updated_at={comment.updated_at}
                       branches={branches?.branchesData}
                       businessAreas={businessAreas?.baData}
+                      reactions={comment.reactions}
                     />
                   </motion.div>
                 );

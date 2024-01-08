@@ -13,6 +13,8 @@ import {
   Grid,
   Center,
   useDisclosure,
+  useToast,
+  ToastId,
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
 import { BiSolidDislike, BiSolidLike } from "react-icons/bi";
@@ -51,7 +53,7 @@ import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import { BsFillSendFill } from "react-icons/bs";
 import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
-import { createDocumentComment } from "@/lib/api";
+import { createCommentReaction, createDocumentComment } from "@/lib/api";
 import { useUser } from "@/lib/hooks/useUser";
 import { useFormattedDate } from "@/lib/hooks/useFormattedDate";
 import { PrepopulateCommentDisplayPlugin } from "../../Plugins/PrepopulateCommentDisplayPlugin";
@@ -59,6 +61,24 @@ import { motion, useAnimation } from "framer-motion";
 import { FaTrash } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
 import { DeleteCommentModal } from "@/components/Modals/DeleteCommentModal";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+
+export interface ICommentReaction {
+  pk?: number;
+  user: IUserData;
+  comment?: number | null;
+  direct_message?: number | null;
+  reaction:
+    | "thumbup"
+    | "thumbdown"
+    | "heart"
+    | "brokenheart"
+    | "hundred"
+    | "confused"
+    | "funny"
+    | "surprised";
+}
 
 interface Props {
   commentPk: string | number;
@@ -69,6 +89,7 @@ interface Props {
   created_at: string;
   updated_at: string;
   payload: string;
+  reactions: ICommentReaction[];
 
   businessAreas: IBusinessArea[];
   branches: IBranch[];
@@ -84,6 +105,7 @@ export const CommentDisplayRTE = ({
   updated_at,
   businessAreas,
   branches,
+  reactions,
 }: Props) => {
   const { colorMode } = useColorMode();
   const editorRef = useRef(null);
@@ -173,7 +195,15 @@ export const CommentDisplayRTE = ({
 
   const otherUser = me?.userData?.pk !== user?.pk;
 
-  const likeCount = 0;
+  const [likeCount, setLikeCount] = useState<number>(0);
+
+  useEffect(() => {
+    // console.log("LIKES", reactions);
+    const likes = reactions?.map((r) => r.reaction === "thumbup");
+    setLikeCount(likes?.length ? likes.length : 0);
+  }, []);
+
+  const isLiked = false;
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -193,6 +223,89 @@ export const CommentDisplayRTE = ({
     onOpen: onOpenDeleteCommentModal,
     onClose: onCloseDeleteCommentModal,
   } = useDisclosure();
+
+  const queryClient = useQueryClient();
+  const { register, handleSubmit, reset } = useForm<ICommentReaction>();
+  const toast = useToast();
+  const toastIdRef = useRef<ToastId>();
+  const addToast = (data: any) => {
+    toastIdRef.current = toast(data);
+  };
+  const commentReactionMutation = useMutation(createCommentReaction, {
+    onMutate: () => {
+      addToast({
+        status: "loading",
+        title: "Reacting...",
+        position: "top-right",
+      });
+    },
+    onSuccess: (response) => {
+      // if (setIsAnimating) {
+      //     setIsAnimating(true)
+
+      // }
+
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: response.status === 204 ? `Reaction Removed` : `Reacted`,
+          status: "success",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      reset();
+      // onAddTaskClose()
+
+      setTimeout(() => {
+        // if (setIsAnimating) {
+        //     setIsAnimating(false)
+        // }
+        queryClient.invalidateQueries(["documentComments", documentPk]);
+        console.log("DDDDAAATA", response);
+        if (response.status === 204) {
+          setLikeCount((prev) => prev - 1);
+        } else if (response.status === 201) {
+          setLikeCount((prev) => prev + 1);
+        }
+
+        // queryClient.refetchQueries([`mytasks`])
+      }, 350);
+    },
+    onError: (error) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Could Not React",
+          description: `${error}`,
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
+
+  const onLike = (formData: ICommentReaction) => {
+    commentReactionMutation.mutate(formData);
+  };
+
+  const [userHasLiked, setUserHasLiked] = useState(false);
+
+  useEffect(() => {
+    const userLiked = reactions.some(
+      (r) => Number(r.user) === Number(user.pk) && r.reaction === "thumbup"
+    );
+    console.log("Likey", userLiked);
+    setUserHasLiked(userLiked);
+  }, [reactions, user.pk]);
+
+  // useEffect(() => {
+  //   if (userHasLiked) {
+  //     setLikeCount((prev) => prev + 1);
+  //   }
+  // }, [userHasLiked]);
 
   return (
     <Box>
@@ -305,15 +418,27 @@ export const CommentDisplayRTE = ({
                       bottom={4}
                       onClick={() => {
                         console.log("liked");
+                        onLike({
+                          user,
+                          reaction: "thumbup",
+                          comment: Number(commentPk),
+                        });
                       }}
                     >
                       {isHovered ? (
                         <Flex>
                           <Flex
                             alignItems={"center"}
-                            color={"blue.500"}
-                            _hover={{ color: "blue.400", cursor: "pointer" }}
+                            // color={"blue.500"}
+                            _hover={{
+                              color: "blue.400",
+                              cursor: "pointer",
+                            }}
                           >
+                            {likeCount !== 0 ? (
+                              <Box mr={2}>{likeCount}</Box>
+                            ) : null}
+
                             <Box>
                               <BiSolidLike />
                             </Box>
@@ -323,9 +448,12 @@ export const CommentDisplayRTE = ({
                         <Flex>
                           <Flex
                             alignItems={"center"}
-                            color={"gray.500"}
+                            color={userHasLiked ? "blue.400" : "gray.500"}
                             _hover={{ color: "gray.400", cursor: "pointer" }}
                           >
+                            {likeCount !== 0 ? (
+                              <Box mr={2}>{likeCount}</Box>
+                            ) : null}{" "}
                             <Box>
                               <BiSolidLike />
                             </Box>

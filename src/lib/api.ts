@@ -2,6 +2,7 @@ import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
 import { QueryFunction, QueryFunctionContext } from "@tanstack/react-query";
 import { EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
+import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
 
 // INSTANCE SETUP ==================================================================
 
@@ -210,6 +211,8 @@ export const getDocumentComments = async ({ queryKey }: QueryFunctionContext) =>
     const res = instance.get(`documents/projectdocuments/${pk}/comments`).then(res => res.data);
     return res;
 }
+
+
 
 export interface DocumentCommentCreationProps {
     documentId: number;
@@ -1970,6 +1973,26 @@ export const createPersonalTask = async ({ user, name, description }: IQuickTask
     })
     return res;
 }
+
+
+export const createCommentReaction = ({reaction, comment, user }:ICommentReaction) => {
+    
+    console.log({reaction, comment, user})
+    // return "hi"
+    const res = instance.post(
+        "communications/reactions", {
+        user: user,
+        comment: comment,
+        reaction: reaction,
+        direct_message: null,
+
+    }).then(res => {
+        return res
+    })
+    return res;
+
+}
+
 
 
 
