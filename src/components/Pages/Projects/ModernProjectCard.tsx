@@ -190,6 +190,7 @@ export const ModernProjectCard = ({
         }}
         // border={colorMode === "dark" ? "1px solid" : undefined}
         borderColor={"gray.700"}
+        background={colorMode === "dark" ? "black" : undefined}
       >
         <Image
           rounded={"2xl"}
