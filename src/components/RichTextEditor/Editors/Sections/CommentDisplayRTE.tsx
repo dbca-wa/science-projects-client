@@ -63,6 +63,7 @@ import { ImCross } from "react-icons/im";
 import { DeleteCommentModal } from "@/components/Modals/DeleteCommentModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { MentionNode } from "../../Plugins/MentionsPlugin";
 
 export interface ICommentReaction {
   pk?: number;
@@ -182,7 +183,7 @@ export const CommentDisplayRTE = ({
     editable: false,
     theme: generateTheme("light"),
     onError,
-    nodes: [ListNode, ListItemNode, HeadingNode],
+    nodes: [ListNode, ListItemNode, MentionNode],
   };
 
   const darkInitialConfig = {
@@ -190,7 +191,7 @@ export const CommentDisplayRTE = ({
     editable: false,
     theme: generateTheme("dark"),
     onError,
-    nodes: [ListNode, ListItemNode, HeadingNode],
+    nodes: [ListNode, ListItemNode, MentionNode],
   };
 
   const otherUser = me?.userData?.pk !== user?.pk;

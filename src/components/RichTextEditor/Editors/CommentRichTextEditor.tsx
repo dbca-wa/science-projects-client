@@ -57,7 +57,7 @@ import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import { BsFillSendFill } from "react-icons/bs";
 import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
 import { createDocumentComment } from "@/lib/api";
-import MentionsPlugin from "../Plugins/MentionsPlugin";
+import MentionsPlugin, { MentionNode } from "../Plugins/MentionsPlugin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PostCommentButton } from "../Buttons/PostCommentButton";
 import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
@@ -161,7 +161,7 @@ export const CommentRichTextEditor = ({
     editable: true,
     theme: generateTheme("dark"),
     onError,
-    nodes: [ListNode, ListItemNode],
+    nodes: [ListNode, ListItemNode, MentionNode],
   };
 
   return (
