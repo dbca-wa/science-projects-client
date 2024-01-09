@@ -2,6 +2,7 @@ import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
 import { QueryFunction, QueryFunctionContext } from "@tanstack/react-query";
 import { EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
+import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
 
 // INSTANCE SETUP ==================================================================
 
@@ -204,6 +205,30 @@ export const getDocumentsPendingMyAction = () => {
     })
     return res;
 }
+
+export const getDocumentComments = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+    const res = instance.get(`documents/projectdocuments/${pk}/comments`).then(res => res.data);
+    return res;
+}
+
+
+
+export interface DocumentCommentCreationProps {
+    documentId: number;
+    payload: string;
+    user: number;
+}
+export const createDocumentComment = async ({documentId, payload, user}:DocumentCommentCreationProps) => {
+    const postContent = {
+        user,
+        payload
+    }   
+    console.log("postContent", postContent)
+    const res = instance.post(`documents/projectdocuments/${documentId}/comments`, postContent).then(res => res.data);
+    return res;
+}
+
 
 export const getMyProjects = async () => {
     const res = instance.get(`projects/mine`).then(res => {
@@ -1783,6 +1808,26 @@ export const deleteDocumentCall = async ({ projectPk, documentPk, documentKind }
     }
 }
 
+export interface IDeleteComment {
+    commentPk: number | string;
+    documentPk: number | string;
+}
+
+export const deleteCommentCall = async ({ commentPk, documentPk }: IDeleteComment) => {
+    console.log(
+        {
+            commentPk,
+            documentPk,
+        }
+    );
+    if (documentPk !== undefined) {
+        const url = `communications/comments/${commentPk}`
+        return instance.delete(
+            url,
+        ).then(res => res.data);
+    }
+}
+
 
 export const getStudentReportForYear = async (year: number, project: number) => {
     const url = `documents/studentreports/${project}/${year}`
@@ -1889,6 +1934,14 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
 
 
 
+export const getUserFeedback = async () => {
+    const res = instance.get(`tasks/feedback`).then(res => {
+        return res.data
+    })
+    return res;
+}
+
+
 // TASKS =====================================================================================
 
 
@@ -1920,6 +1973,26 @@ export const createPersonalTask = async ({ user, name, description }: IQuickTask
     })
     return res;
 }
+
+
+export const createCommentReaction = ({reaction, comment, user }:ICommentReaction) => {
+    
+    console.log({reaction, comment, user})
+    // return "hi"
+    const res = instance.post(
+        "communications/reactions", {
+        user: user,
+        comment: comment,
+        reaction: reaction,
+        direct_message: null,
+
+    }).then(res => {
+        return res
+    })
+    return res;
+
+}
+
 
 
 

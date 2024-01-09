@@ -12,12 +12,12 @@ type StudentReportSection = "progress_report";
 type ProjectClosureSection = "reason" | "intended_outcome" | "knowledge_transfer" | "data_location" | "hardcopy_location" | "backup_location" | "scientific_outputs";
 
 
-export type EditorType = "ProjectDetail" | "ProjectDocument" | "AnnualReport";
+export type EditorType = "ProjectDetail" | "ProjectDocument" | "AnnualReport" | "Comment";
 export type EditorSections =
     "Annual Report" |
     "Description" |
-    "Concept Plan" | "Project Plan" | "Progress Report" | "Student Report" | "Project Closure";
-type EditorSubsections = ProjectSection | ConceptPlanSection | ProjectPlanSection | ProgressReportSection | StudentReportSection | ProjectClosureSection | AnnualReportSection;
+    "Concept Plan" | "Project Plan" | "Progress Report" | "Student Report" | "Project Closure" | "Comment";
+type EditorSubsections = "Comment" | ProjectSection | ConceptPlanSection | ProjectPlanSection | ProgressReportSection | StudentReportSection | ProjectClosureSection | AnnualReportSection;
 
 
 export interface CustomAxiosError extends AxiosError {
