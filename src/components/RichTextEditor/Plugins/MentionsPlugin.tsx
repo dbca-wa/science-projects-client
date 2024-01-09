@@ -1,6 +1,14 @@
 import { getInternalUsersBasedOnSearchTerm } from "@/lib/api";
 import { IUserData } from "@/types";
-import { Avatar, Box, Flex, Text } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Flex,
+  FlexProps,
+  ListItem,
+  Text,
+  UnorderedList,
+} from "@chakra-ui/react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   LexicalTypeaheadMenuPlugin,
@@ -23,6 +31,8 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+
+// import "@/styles/mentions.css";
 
 // import { $createMentionNode } from "../../nodes/MentionNode";
 
@@ -98,9 +108,9 @@ export type SerializedMentionNode = Spread<
   SerializedTextNode
 >;
 
-function convertMentionElement(
+const convertMentionElement = (
   domNode: HTMLElement
-): DOMConversionOutput | null {
+): DOMConversionOutput | null => {
   const textContent = domNode.textContent;
 
   if (textContent !== null) {
@@ -111,9 +121,17 @@ function convertMentionElement(
   }
 
   return null;
-}
+};
+// const mentionStyle = "background-color: rgba(24, 119, 232, 0.2)";
 
-const mentionStyle = "background-color: rgba(24, 119, 232, 0.2)";
+const mentionStyle = {
+  // color: "orange",
+  backgroundColor: "rgba(24, 119, 232, 0.2)",
+  paddingLeft: "5px",
+  paddingRight: "5px",
+  borderRadius: "5px",
+};
+// 13, 180, 185
 export class MentionNode extends TextNode {
   __mention: string;
 
@@ -150,7 +168,8 @@ export class MentionNode extends TextNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
-    dom.style.cssText = mentionStyle;
+    Object.assign(dom.style, mentionStyle);
+    // dom.style.cssText = mentionStyle;
     dom.className = "mention";
     return dom;
   }
@@ -189,19 +208,19 @@ export class MentionNode extends TextNode {
   }
 }
 
-export function $createMentionNode(mentionName: string): MentionNode {
+export const $createMentionNode = (mentionName: string): MentionNode => {
   const mentionNode = new MentionNode(mentionName);
   mentionNode.setMode("segmented").toggleDirectionless();
   return $applyNodeReplacement(mentionNode);
-}
+};
 
-export function $isMentionNode(
+export const $isMentionNode = (
   node: LexicalNode | null | undefined
-): node is MentionNode {
+): node is MentionNode => {
   return node instanceof MentionNode;
-}
+};
 
-// =================== ABOVE IS MENTION NODE ======================================
+// =================== ABOVE IS MENTION NODE, PRIMARILY FROM LEXICAL.DEV ======================================
 
 const realLookupService = {
   search(string: string, callback: (results: Array<IUserData>) => void): void {
@@ -220,7 +239,7 @@ const realLookupService = {
   },
 };
 
-function useMentionLookupService(mentionString: string | null) {
+const useMentionLookupService = (mentionString: string | null) => {
   const [results, setResults] = useState<Array<IUserData>>([]);
 
   useEffect(() => {
@@ -243,19 +262,15 @@ function useMentionLookupService(mentionString: string | null) {
       mentionsCache.set(mentionString, newResults);
       setResults(newResults);
     });
-    // dummyLookupService.search(mentionString, (newResults) => {
-    //   mentionsCache.set(mentionString, newResults);
-    //   setResults(newResults);
-    // });
   }, [mentionString]);
 
   return results;
-}
+};
 
-function checkForAtSignMentions(
+const checkForAtSignMentions = (
   text: string,
   minMatchLength: number
-): MenuTextMatch | null {
+): MenuTextMatch | null => {
   let match = AtSignMentionsRegex.exec(text);
 
   if (match === null) {
@@ -276,57 +291,216 @@ function checkForAtSignMentions(
     }
   }
   return null;
-}
+};
 
-function getPossibleQueryMatch(text: string): MenuTextMatch | null {
+const getPossibleQueryMatch = (text: string): MenuTextMatch | null => {
   return checkForAtSignMentions(text, 1);
-}
+};
 
-class MentionTypeaheadOption extends MenuOption {
-  name: string;
-  picture: JSX.Element;
+// =================== ABOVE IS FILTER USER LOGIC ======================================
 
-  constructor(name: string, picture: JSX.Element) {
-    super(name);
-    this.name = name;
-    this.picture = picture;
+class CustomMentionTypeheadOption extends MenuOption {
+  user: IUserData;
+
+  constructor(user: IUserData) {
+    super(`${user.first_name} ${user.last_name}`);
+    this.user = user;
   }
+  // name: string;
+  // picture: JSX.Element;
+  // pk: number;
+
+  // constructor(name: string, picture: JSX.Element, pk: number) {
+  //   super(name);
+  //   this.name = name;
+  //   this.picture = picture;
+  //   this.pk = pk;
+  // }
 }
 
-function MentionsTypeaheadMenuItem({
+interface CustomMentionsTypeheadMenuItemProps {
+  index: number;
+  isSelected: boolean;
+  onClick: () => void;
+  onMouseEnter: () => void;
+  option: CustomMentionTypeheadOption;
+  optionLength: number;
+}
+
+const CustomMentionsTypeheadMenuItem = ({
   index,
   isSelected,
   onClick,
   onMouseEnter,
   option,
-}: {
-  index: number;
-  isSelected: boolean;
-  onClick: () => void;
-  onMouseEnter: () => void;
-  option: MentionTypeaheadOption;
-}) {
-  let className = "item";
-  if (isSelected) {
-    className += " selected";
-  }
+  optionLength,
+}: CustomMentionsTypeheadMenuItemProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <li
+    <ListItem
       key={option.key}
+      margin={0}
+      minWidth={"180px"}
+      fontSize={"14px"}
+      outline={"none"}
+      cursor={"pointer"}
+      borderRadius={
+        index === 1
+          ? "8px 8px 0px 0px"
+          : index === optionLength
+          ? "0px 0px 8px 8px"
+          : "8px"
+      }
+      border={0}
+      backgroundColor={"#fff"}
+      flexShrink={0}
+      flexDirection={"row"}
+      alignContent={"center"}
+      display={"flex"}
+      zIndex={999999999}
       tabIndex={-1}
-      className={className}
-      ref={option.setRefElement}
       role="option"
       aria-selected={isSelected}
-      id={"typeahead-item-" + index}
-      onMouseEnter={onMouseEnter}
-      onClick={onClick}
+      id={`typehead-item-${index}`}
+      ref={option.setRefElement}
     >
-      {option.picture}
-      <span className="text">{option.name}</span>
-    </li>
+      {/* <CustomMenuItem user={option.user} onClick={onClick} />
+       */}
+      <Flex
+        as="button"
+        type="button"
+        w="100%"
+        textAlign="left"
+        p={2}
+        onMouseEnter={onMouseEnter}
+        onClick={onClick}
+        onMouseOver={() => setIsHovered(true)}
+        onMouseOut={() => setIsHovered(false)}
+        bg={isHovered ? "gray.200" : "transparent"}
+        alignItems="center"
+        // {...rest}
+      >
+        <Avatar
+          src={
+            option.user?.image?.file
+              ? option.user.image.file
+              : option.user?.image?.old_file
+              ? option.user.image.old_file
+              : undefined
+          }
+          h={"30px"}
+          w={"30px"}
+        />
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="start"
+          ml={3}
+          h="100%"
+        >
+          <Text
+            ml={2}
+            color={
+              option.user.is_staff
+                ? option.user.is_superuser
+                  ? "blue.500"
+                  : "green.500"
+                : "gray.500"
+            }
+          >
+            {`${
+              option.user.first_name === "None"
+                ? option.user.username
+                : option.user.first_name
+            } ${
+              option.user.last_name === "None" ? "" : option.user.last_name
+            } ${
+              option.user.is_staff
+                ? option.user.is_superuser
+                  ? "(Admin)"
+                  : "(Staff)"
+                : "(External)"
+            }`}
+          </Text>
+        </Box>
+      </Flex>
+    </ListItem>
   );
+};
+
+{
+  /* <CustomMenuItem onClick={() => console.log(option)} user={option} /> */
 }
+
+interface CustomMenuItemProps extends FlexProps {
+  onClick: () => void;
+  user: IUserData;
+}
+
+// const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
+//   const [isHovered, setIsHovered] = useState(false);
+
+//   const handleClick = () => {
+//     onClick();
+//   };
+
+//   return (
+//     <Flex
+//       as="button"
+//       type="button"
+//       w="100%"
+//       textAlign="left"
+//       p={2}
+//       onClick={handleClick}
+//       onMouseOver={() => setIsHovered(true)}
+//       onMouseOut={() => setIsHovered(false)}
+//       bg={isHovered ? "gray.200" : "transparent"}
+//       alignItems="center"
+//       {...rest}
+//     >
+//       <Avatar
+//         src={
+//           user?.image?.file
+//             ? user.image.file
+//             : user?.image?.old_file
+//             ? user.image.old_file
+//             : undefined
+//         }
+//         h={"30px"}
+//         w={"30px"}
+//       />
+//       <Box
+//         display="flex"
+//         alignItems="center"
+//         justifyContent="start"
+//         ml={3}
+//         h="100%"
+//       >
+//         <Text
+//           ml={2}
+//           color={
+//             user.is_staff
+//               ? user.is_superuser
+//                 ? "blue.500"
+//                 : "green.500"
+//               : "gray.500"
+//           }
+//         >
+//           {`${user.first_name === "None" ? user.username : user.first_name} ${
+//             user.last_name === "None" ? "" : user.last_name
+//           } ${
+//             user.is_staff
+//               ? user.is_superuser
+//                 ? "(Admin)"
+//                 : "(Staff)"
+//               : "(External)"
+//           }`}
+//         </Text>
+//       </Box>
+//     </Flex>
+//   );
+// };
 
 export default function NewMentionsPlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
@@ -343,16 +517,17 @@ export default function NewMentionsPlugin(): JSX.Element | null {
     () =>
       results
         .map(
-          (result) => (
-            <CustomMenuItem
-              user={result}
-              onClick={() => console.log(result?.first_name)}
-            />
-          )
-          // new MentionTypeaheadOption(
-          //   `${result?.first_name} ${result?.last_name}`,
-          //   <i className="icon user" />
-          // )
+          (result) =>
+            // <p>ji</p>
+            new CustomMentionTypeheadOption(
+              result
+              // `${result?.first_name} ${result?.last_name}`,
+              // <i className="icon user" />
+            )
+          // <CustomMenuItem
+          //   user={result}
+          //   onClick={() => console.log(result?.first_name)}
+          // />
         )
         .slice(0, SUGGESTION_LIST_LENGTH_LIMIT),
     [results]
@@ -360,12 +535,12 @@ export default function NewMentionsPlugin(): JSX.Element | null {
 
   const onSelectOption = useCallback(
     (
-      selectedOption: MentionTypeaheadOption,
+      selectedOption: CustomMentionTypeheadOption,
       nodeToReplace: TextNode | null,
       closeMenu: () => void
     ) => {
       editor.update(() => {
-        const mentionNode = $createMentionNode(selectedOption.name);
+        const mentionNode = $createMentionNode(selectedOption.user.first_name);
         if (nodeToReplace) {
           nodeToReplace.replace(mentionNode);
         }
@@ -388,7 +563,7 @@ export default function NewMentionsPlugin(): JSX.Element | null {
   );
 
   return (
-    <LexicalTypeaheadMenuPlugin<MentionTypeaheadOption>
+    <LexicalTypeaheadMenuPlugin<CustomMentionTypeheadOption>
       onQueryChange={setQueryString}
       onSelectOption={onSelectOption}
       triggerFn={checkForMentionMatch}
@@ -399,11 +574,40 @@ export default function NewMentionsPlugin(): JSX.Element | null {
       ) =>
         anchorElementRef.current && results.length
           ? ReactDOM.createPortal(
-              <div className="typeahead-popover mentions-menu">
-                <ul>
+              <Box
+                // className="typeahead-popover mentions-menu"
+                background={"#fff"}
+                w={"250px"}
+                boxShadow={"0px 5px 10px rgba(0, 0, 0, 0.3)"}
+                borderRadius={"8px"}
+                // position={"fixed"}
+                zIndex={999999999}
+                // pos={"fixed"}
+                // top={0}
+                // left={0}
+                position="absolute"
+                top={`${anchorElementRef.current.offsetHeight - 15}px`}
+                left={`${anchorElementRef.current.offsetWidth - 17.5}px`}
+              >
+                <UnorderedList
+                  css={{
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none",
+                    listStyle: "none",
+                    "::-webkit-scrollbar": {
+                      display: "none",
+                    },
+                  }}
+                  padding={0}
+                  margin={0}
+                  borderRadius={"8px"}
+                  maxH={"200px"}
+                  zIndex={999999999}
+                  overflowY={"scroll"}
+                >
                   {options.map((option, i: number) => (
-                    <MentionsTypeaheadMenuItem
-                      index={i}
+                    <CustomMentionsTypeheadMenuItem
+                      key={option.key}
                       isSelected={selectedIndex === i}
                       onClick={() => {
                         setHighlightedIndex(i);
@@ -412,12 +616,13 @@ export default function NewMentionsPlugin(): JSX.Element | null {
                       onMouseEnter={() => {
                         setHighlightedIndex(i);
                       }}
-                      key={option.key}
+                      index={i}
                       option={option}
+                      optionLength={options.length}
                     />
                   ))}
-                </ul>
-              </div>,
+                </UnorderedList>
+              </Box>,
               anchorElementRef.current
             )
           : null
@@ -426,69 +631,37 @@ export default function NewMentionsPlugin(): JSX.Element | null {
   );
 }
 
-interface CustomMenuItemProps {
-  onClick: () => void;
-  user: IUserData;
-}
-
-const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleClick = () => {
-    onClick();
-  };
-
-  return (
-    <Flex
-      as="button"
-      type="button"
-      w="100%"
-      textAlign="left"
-      p={2}
-      onClick={handleClick}
-      onMouseOver={() => setIsHovered(true)}
-      onMouseOut={() => setIsHovered(false)}
-      bg={isHovered ? "gray.200" : "transparent"}
-      alignItems="center"
-      {...rest}
-    >
-      <Avatar
-        src={
-          user?.image?.file
-            ? user.image.file
-            : user?.image?.old_file
-            ? user.image.old_file
-            : undefined
-        }
-      />
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="start"
-        ml={3}
-        h="100%"
-      >
-        <Text
-          ml={2}
-          color={
-            user.is_staff
-              ? user.is_superuser
-                ? "blue.500"
-                : "green.500"
-              : "gray.500"
-          }
-        >
-          {`${user.first_name === "None" ? user.username : user.first_name} ${
-            user.last_name === "None" ? "" : user.last_name
-          } ${
-            user.is_staff
-              ? user.is_superuser
-                ? "(Admin)"
-                : "(Staff)"
-              : "(External)"
-          }`}
-        </Text>
-      </Box>
-    </Flex>
-  );
-};
+// function MentionsTypeaheadMenuItem({
+//   index,
+//   isSelected,
+//   onClick,
+//   onMouseEnter,
+//   option,
+// }: {
+//   index: number;
+//   isSelected: boolean;
+//   onClick: () => void;
+//   onMouseEnter: () => void;
+//   option: MentionTypeaheadOption;
+// }) {
+//   let className = "item";
+//   if (isSelected) {
+//     className += " selected";
+//   }
+//   return (
+//     <li
+//       key={option.key}
+//       tabIndex={-1}
+//       className={className}
+//       ref={option.setRefElement}
+//       role="option"
+//       aria-selected={isSelected}
+//       id={"typeahead-item-" + index}
+//       onMouseEnter={onMouseEnter}
+//       onClick={onClick}
+//     >
+//       {option.picture}
+//       <span className="text">{option.name}</span>
+//     </li>
+//   );
+// }
