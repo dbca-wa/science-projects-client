@@ -2180,12 +2180,57 @@ export const getReportMedia = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
     // if (pk !== 0)
     // {
-    const res = instance.get(`documents/reports/${pk}/media`).then(res => {
+    const res = instance.get(`medias/report_medias/${pk}/media`).then(res => {
         // console.log(res.data)
         return res.data
     })
     return res;
 }
+
+interface IReportMediaUploadProps {
+    pk: number;
+    file: File;
+    section:
+    | "cover"
+    | "rear_cover"
+    | "sdchart"
+    | "service_delivery"
+    | "research"
+    | "partnerships"
+    | "collaborations"
+    | "student_projects"
+    | "publications";
+}
+
+export const uploadReportMediaImage = async ({pk, file, section} : IReportMediaUploadProps) => {
+    console.log({pk, file, section});
+
+    const newFormData = new FormData();
+
+    // if (pk !== undefined) {
+    //     newFormData.append('pk', pk.toString());
+    // }
+    if (section !== undefined) {
+        newFormData.append('section', section);
+    }
+    if (file !== null) {
+        console.log(file)
+        if (file instanceof File) {
+            console.log('is file')
+            newFormData.append('file', file);
+        } else if (typeof file === 'string') {
+            console.log('is string')
+            newFormData.append('file', file);
+        }
+
+    }
+
+    const res = instance.post(`medias/report_medias/${pk}/media`, newFormData).then((res) => res);
+    return res;
+    // return true;
+}
+
+
 
 
 export const getFullReport = async ({ queryKey }: QueryFunctionContext) => {
@@ -2705,9 +2750,6 @@ export const deleteDepartmentalService = async (pk: number) => {
     }
     );
 }
-
-
-
 
 
 
