@@ -6,15 +6,19 @@ import { getReportMedia } from "../api";
 // import { useEffect } from "react";
 
 export const useGetReportMedia = (pk: number) => {
-    const { isLoading, data } = useQuery(["report", pk], getReportMedia,
-        {
-            retry: false,
-        });
+  const { isLoading, data, refetch } = useQuery(
+    ["reportMedia", pk],
+    getReportMedia,
+    {
+      retry: false,
+    }
+  );
 
-    // useEffect(() => console.log(data), [data])
+  // useEffect(() => console.log(data), [data])
 
-    return {
-        reportMediaLoading: isLoading,
-        reportMediaData: data,
-    };
+  return {
+    reportMediaLoading: isLoading,
+    reportMediaData: data,
+    refetchMedia: refetch,
+  };
 };
