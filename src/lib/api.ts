@@ -2230,6 +2230,34 @@ export const uploadReportMediaImage = async ({pk, file, section} : IReportMediaU
     // return true;
 }
 
+interface IReportMediaDeleteProps {
+    pk: number;
+    section:
+    | "cover"
+    | "rear_cover"
+    | "sdchart"
+    | "service_delivery"
+    | "research"
+    | "partnerships"
+    | "collaborations"
+    | "student_projects"
+    | "publications";
+}
+
+export const deleteReportMediaImage = async ({pk, section}: IReportMediaDeleteProps) => {
+    console.log({pk, section});
+
+    const newFormData = new FormData();
+    if (section !== undefined) {
+        newFormData.append('section', section);
+    }
+    const res = instance.delete(`medias/report_medias/${pk}/media/${section}`).then((res) => res);
+
+    // const res = instance.delete(`medias/report_medias/${pk}/media`, newFormData).then((res) => res);
+    return res;
+
+}
+
 
 
 
