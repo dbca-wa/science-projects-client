@@ -45,7 +45,7 @@ import { IReport, IResearchFunction } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { FaSign } from "react-icons/fa";
+import { FaCheck, FaSign } from "react-icons/fa";
 import {
   deleteReport,
   deleteResearchFunction,
@@ -211,7 +211,8 @@ export const ReportItemDisplay = ({
     setDmValue(reportData?.dm);
   }, [reportData, reportLoading]);
 
-  const { reportMediaData, reportMediaLoading } = useGetReportMedia(pk);
+  const { reportMediaData, reportMediaLoading, refetchMedia } =
+    useGetReportMedia(pk);
   useEffect(() => {
     if (!reportMediaLoading) console.log(reportMediaData);
   }, [reportMediaData, reportMediaLoading]);
@@ -376,6 +377,17 @@ export const ReportItemDisplay = ({
   // useEffect(() => { console.log(document) }, [document])
   const { userData, userLoading } = useUser();
   const mePk = userData?.pk ? userData?.pk : userData?.id;
+
+  const isMatch = (string: string) => {
+    {
+      const matches = reportMediaData?.filter((i) => i.kind === string);
+      if (matches.length < 1) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  };
 
   return !creatorLoading && creatorData ? (
     <>
@@ -554,129 +566,103 @@ export const ReportItemDisplay = ({
         </ModalContent>
       </Modal>
 
-      <Modal
-        isOpen={isUpdateMediaModalOpen}
-        onClose={onUpdateMediaModalClose}
-        size={"6xl"}
-      >
-        <ModalOverlay />
-        <ModalBody
-          h={"100%"}
-          // bg={"red"}
+      {reportMediaData ? (
+        <Modal
+          isOpen={isUpdateMediaModalOpen}
+          onClose={onUpdateMediaModalClose}
+          size={"full"}
         >
-          <ModalContent bg={colorMode === "light" ? "white" : "gray.800"} p={4}>
-            <ModalHeader>Update {reportData?.year} Report Media</ModalHeader>
+          <ModalOverlay />
 
-            <ModalCloseButton />
+          <ModalBody>
+            <ModalContent
+              bg={colorMode === "light" ? "gray.100" : "gray.800"}
+              p={4}
+              pb={16}
+              w={"100%"}
+              h={"100%"}
+              pos={"relative"}
+            >
+              <ModalHeader>Update {reportData?.year} Report Media</ModalHeader>
+              <ModalCloseButton />
 
-            <FormControl>
-              <input
-                type="hidden"
-                {...register("pk")}
-                defaultValue={pk} // Prefill with the 'pk' prop
-              />
-            </FormControl>
-
-            <Grid gridTemplateColumns={"repeat(3, 1fr)"} gap={4} px={6}>
-              <ReportMediaChanger currentImage={null} section={"cover"} />
-              <ReportMediaChanger currentImage={null} section={"sdschart"} />
-              <ReportMediaChanger
-                currentImage={null}
-                section={"service_delivery"}
-              />
-
-              <ReportMediaChanger currentImage={null} section={"research"} />
-              <ReportMediaChanger
-                currentImage={null}
-                section={"partnerships"}
-              />
-              <ReportMediaChanger
-                currentImage={null}
-                section={"collaborations"}
-              />
-
-              <ReportMediaChanger
-                currentImage={null}
-                section={"student_projects"}
-              />
-              <ReportMediaChanger
-                currentImage={null}
-                section={"publications"}
-              />
-              <ReportMediaChanger currentImage={null} section={"rear_cover"} />
-            </Grid>
-            <Center>
-              {updateMediaMutation.isError ? (
-                <Box mt={4}>
-                  {Object.keys(
-                    (updateMediaMutation.error as AxiosError).response.data
-                  ).map((key) => (
-                    <Box key={key}>
-                      {(
-                        (updateMediaMutation.error as AxiosError).response.data[
-                          key
-                        ] as string[]
-                      ).map((errorMessage, index) => (
-                        <Text key={`${key}-${index}`} color="red.500">
-                          {`${key}: ${errorMessage}`}
-                        </Text>
-                      ))}
-                    </Box>
-                  ))}
-                </Box>
-              ) : null}
-            </Center>
-
-            <ModalFooter>
               <Grid
-                // pos={"absolute"}
-                // bottom={0}
-                // bg={"red"}
                 h={"100%"}
-                mt={10}
-                w={"100%"}
-                justifyContent={"end"}
-                gridTemplateColumns={"repeat(2, 1fr)"}
-                gridGap={4}
+                gridTemplateColumns={{
+                  base: "repeat(3, 1fr)",
+                  xl: "repeat(4, 1fr)",
+                }}
+                mt={4}
+                gap={8}
+                mx={6}
               >
-                <Button onClick={onUpdateMediaModalClose} size="lg">
-                  Cancel
-                </Button>
-                <Button
-                  // form="update-form"
-                  // type="submit"
-                  isLoading={updateMediaMutation.isLoading}
-                  size="lg"
-                  // onClick={() => {
-                  //     console.log("clicked")
-                  //     onUpdateMediaSubmit(
-                  //         {
-                  //             "pk": pk,
-                  //             "coverpage": "",
-                  //             "rearcoverpage": "",
-                  //             "sdschapterimage": "",
-                  //             "sdsorgchart": "",
-                  //             "resarchchapterimage": "",
-                  //             "partnershipschapterimage": "",
-                  //             "collaborationschapterimage": "",
-                  //             "studentprojectschapterimage": "",
-                  //             "publicationschapterimage": ""
-                  //         }
-                  //     )
-                  // }}
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
-                >
-                  Update Media
-                </Button>
+                <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"cover"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                />
+
+                <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"sdchart"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                />
+
+                <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"service_delivery"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                />
+
+                <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"research"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                />
+
+                <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"partnerships"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                />
+
+                <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"collaborations"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                />
+
+                <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"student_projects"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                />
+
+                <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"publications"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                />
+
+                <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"rear_cover"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                />
               </Grid>
-            </ModalFooter>
-          </ModalContent>
-        </ModalBody>
-      </Modal>
+            </ModalContent>
+          </ModalBody>
+        </Modal>
+      ) : null}
 
       <Modal
         isOpen={isUpdateModalOpen}
