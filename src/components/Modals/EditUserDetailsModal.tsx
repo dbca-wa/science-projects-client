@@ -651,8 +651,13 @@ export const EditUserDetailsModal = ({
                                 {activeOption === "upload" && (
                                   <FormControl>
                                     <Input
+                                      // type="file"
+                                      // accept="image/*"
+                                      autoComplete="off"
+                                      alignItems={"center"}
                                       type="file"
-                                      accept="image/*"
+                                      // accept="image/*"
+                                      accept=".png, .jpeg, .jpg, image/png, image/jpeg"
                                       onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
@@ -661,6 +666,33 @@ export const EditUserDetailsModal = ({
                                             URL.createObjectURL(file)
                                           );
                                         }
+                                      }}
+                                      border={"none"}
+                                      sx={{
+                                        "::file-selector-button": {
+                                          background:
+                                            colorMode === "light"
+                                              ? "gray.100"
+                                              : "gray.600",
+                                          borderRadius: "8px",
+                                          padding: "2px",
+                                          paddingX: "8px",
+                                          mt: "1px",
+                                          border: "1px solid",
+                                          borderColor:
+                                            colorMode === "light"
+                                              ? "gray.400"
+                                              : "gray.700",
+                                          outline: "none",
+                                          mr: "15px",
+                                          ml: "-16px",
+                                          cursor: "pointer",
+                                        },
+                                        pt: "3.5px",
+                                        color:
+                                          colorMode === "light"
+                                            ? "gray.800"
+                                            : "gray.200",
                                       }}
                                     />
                                   </FormControl>
