@@ -20,7 +20,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { ISpecialEndorsement } from "../../../lib/api";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
-import { SingleFileUpload } from "../../SingleFileStateUpload";
+import { SingleFileStateUpload } from "../../SingleFileStateUpload";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 
 import { BsFilePdfFill } from "react-icons/bs";
@@ -663,7 +663,7 @@ export const ProjectPlanEndorsements = ({
               ) : null}
 
               {userCanEditAECEndorsement && aecEndReqValue ? (
-                <SingleFileUpload
+                <SingleFileStateUpload
                   fileType={"pdf"}
                   uploadedFile={uploadedPDF}
                   setUploadedFile={setUploadedPDF}

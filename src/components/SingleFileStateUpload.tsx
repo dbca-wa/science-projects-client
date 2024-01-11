@@ -85,7 +85,7 @@ export const FileDropzone = ({
           h={64}
           m={4}
           border={"1px dashed"}
-          borderColor={colorMode === "light" ? "gray.300" : "gray.400"}
+          borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
           rounded={"lg"}
         >
           <Box
@@ -98,7 +98,7 @@ export const FileDropzone = ({
           >
             <Flex
               rounded={"lg"}
-              background={colorMode === "light" ? "gray.100" : "gray.600"}
+              background={colorMode === "light" ? "gray.100" : "gray.700"}
               flexDir={"column"}
               justifyContent={"center"}
               justifyItems={"center"}
@@ -123,17 +123,16 @@ export const FileDropzone = ({
                   textAlign={"center"}
                 >{`Drag and drop a ${fileType} file.`}</Text>
               ) : (
-                <Text
-                  px={8}
-                  textAlign={"center"}
-                >{`Drag and drop a ${fileType} file${extraText}.`}</Text>
+                <Text px={8} textAlign={"center"}>{`Drag and drop ${
+                  fileType === "image" ? "an" : "a"
+                } ${fileType} file${extraText}.`}</Text>
               )}
               {!isError && acceptedFiles && acceptedFiles[0] ? (
                 <Flex
                   mt={4}
                   maxW={"80%"}
                   // w={"80%"}
-                  bg={"white"}
+                  bg={colorMode === "light" ? "white" : "gray.800"}
                   justifyContent={"center"}
                   rounded={"md"}
                   overflow={"hidden"}
@@ -142,7 +141,7 @@ export const FileDropzone = ({
                   borderWidth={"1px"}
                   // borderRightWidth={"0px"}
                   // borderLeftWidth={"1px"}
-                  borderColor={"gray.300"}
+                  borderColor={colorMode === "light" ? "gray.300" : "gray.600"}
                 >
                   <Box
                     p={3}
@@ -150,7 +149,9 @@ export const FileDropzone = ({
                     placeItems={"center"}
                     alignItems={"center"}
                     borderRight={"1px solid"}
-                    borderColor={"gray.100"}
+                    borderColor={
+                      colorMode === "light" ? "gray.300" : "gray.600"
+                    }
                   >
                     <Box color={fileType === "pdf" ? "red.500" : "blue.500"}>
                       {fileType === "pdf" ? (
@@ -180,14 +181,9 @@ export const FileDropzone = ({
 
               {isUploading ? (
                 <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
-                  <Box
-                    w={"80%"}
-                    h={1}
-                    // bg={"gray.100"}
-
-                    px={1}
-                  >
+                  <Box w={"80%"} h={1} px={1}>
                     <Progress
+                      bg={colorMode === "light" ? "gray.200" : "gray.900"}
                       colorScheme={
                         uploadProgress === 100 && uploadedFile
                           ? "green"
@@ -205,7 +201,7 @@ export const FileDropzone = ({
               ) : null}
 
               {isError ? (
-                <Text color={"red.500"}>
+                <Text color={"red.500"} mt={4}>
                   That file is not of the correct type
                 </Text>
               ) : null}
@@ -226,7 +222,7 @@ interface Props {
   extraText?: string;
 }
 
-export const SingleFileUpload = ({
+export const SingleFileStateUpload = ({
   fileType,
   uploadedFile,
   setUploadedFile,
