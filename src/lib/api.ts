@@ -1006,6 +1006,7 @@ export interface IEditProject {
     description?: string;
     status?: 'new' | 'pending' | 'active' | 'updating' | 'terminated' | 'suspended' | 'closed';
     image?: File | null;
+    selectedImageUrl: string | null;
     locations: number[];
     keywords: string[];
 
@@ -1024,6 +1025,7 @@ export const updateProjectDetails = async ({
     description,
     keywords,
     image,
+    selectedImageUrl,
     locations,
 
     startDate,
@@ -1074,6 +1076,10 @@ export const updateProjectDetails = async ({
             newFormData.append('image', image);
         }
     }
+    if (selectedImageUrl == null) {
+        newFormData.append('selectedImageUrl', 'delete')
+    }
+    
     if (status !== undefined) {
         newFormData.append('status', status);
     }
