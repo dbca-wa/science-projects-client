@@ -23,6 +23,7 @@ import { MdCorporateFare, MdOutlineTitle } from "react-icons/md";
 import { AiFillDollarCircle } from "react-icons/ai";
 import { StateRichTextEditor } from "../../RichTextEditor/Editors/StateRichTextEditor";
 import { SimpleStateRichTextEditor } from "../../RichTextEditor/Editors/SimpleStateRichTextEditor";
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 interface IProjectExternalProps {
   externalFilled: boolean;
@@ -68,6 +69,7 @@ export const ProjectExternalSection = ({
     } else {
       console.log(
         externalDescription.length,
+        budget.length,
         aims.length,
         collaborationWith.length
       );
@@ -86,93 +88,57 @@ export const ProjectExternalSection = ({
 
   return (
     <>
-      <FormControl pb={6} isRequired>
-        <FormLabel>Collaboration With</FormLabel>
-        <InputGroup>
-          <InputLeftAddon children={<MdCorporateFare />} />
-          <Input
-            placeholder="Enter collaborating entities..."
-            value={collaborationWith}
-            onChange={(e) => {
-              setCollaborationWith(e.target.value);
-            }}
-            // {...register("name", { required: true })}
-            type="text"
-          />
-        </InputGroup>
-        <FormHelperText>
-          The entity/s this project is in collaboration with
-        </FormHelperText>
-      </FormControl>
+      <UnboundStatefulEditor
+        title="Collaboration With"
+        placeholder="Enter collaborating entities..."
+        helperText={"The entity/s this project is in collaboration with"}
+        showToolbar={false}
+        showTitle={true}
+        isRequired={true}
+        value={collaborationWith}
+        setValueFunction={setCollaborationWith}
+        setValueAsPlainText={true}
+      />
 
-      <FormControl pb={6} isRequired>
-        <FormLabel>Budget</FormLabel>
-        <InputGroup>
-          <InputLeftAddon children={<AiFillDollarCircle />} />
-          <Input
-            placeholder="Enter the budget of the project..."
-            value={budget}
-            onChange={(e) => {
-              setBudget(e.target.value);
-            }}
-            // {...register("name", { required: true })}
-            type="number"
-          />
-        </InputGroup>
-        <FormHelperText>
-          The estimated operating budget in dollars
-        </FormHelperText>
-      </FormControl>
+      <UnboundStatefulEditor
+        title="Budget"
+        placeholder="The estimated operating budget in dollars..."
+        helperText={"The entity/s this project is in collaboration with"}
+        showToolbar={false}
+        showTitle={true}
+        isRequired={true}
+        value={budget}
+        setValueFunction={setBudget}
+        setValueAsPlainText={true}
+      />
 
-      <FormControl
-        // isRequired
-        mb={6}
-      >
-        <FormLabel>Description</FormLabel>
-        <InputGroup>
-          {/* <Textarea
-                            placeholder={`Enter the description of the external project...`}
-                            value={externalDescription}
-                            onChange={(event) => setExternalDescription(event.target.value)}
-                        /> */}
-          <SimpleStateRichTextEditor
-            section="externalDescription"
-            editorType="ProjectDetail"
-            isUpdate={false}
-            value={externalDescription}
-            setValueFunction={setExternalDescription}
-          />
-        </InputGroup>
-        <FormHelperText>
-          Description specific to this external project.
-        </FormHelperText>
-      </FormControl>
+      <UnboundStatefulEditor
+        title="Description"
+        helperText={"Description specific to this external project."}
+        showToolbar={true}
+        showTitle={true}
+        isRequired={true}
+        value={externalDescription}
+        setValueFunction={setExternalDescription}
+        setValueAsPlainText={false}
+      />
 
-      <FormControl
-        // isRequired
-        mb={6}
-      >
-        <FormLabel>Aims</FormLabel>
-        <InputGroup>
-          {/* <Textarea
-                            placeholder={`Enter the aims of the project...`}
-                            value={aims}
-                            onChange={(event) => setAims(event.target.value)}
-                        /> */}
-          <SimpleStateRichTextEditor
-            section="externalAims"
-            editorType="ProjectDetail"
-            isUpdate={false}
-            value={aims}
-            setValueFunction={setAims}
-          />
-        </InputGroup>
-        <FormHelperText>List out the aims of your project.</FormHelperText>
-      </FormControl>
+      <UnboundStatefulEditor
+        title="Aims"
+        allowInsertButton
+        helperText={"List out the aims of your project."}
+        showToolbar={true}
+        showTitle={true}
+        isRequired={true}
+        value={aims}
+        setValueFunction={setAims}
+        setValueAsPlainText={false}
+      />
+
       <Flex w={"100%"} justifyContent={"flex-end"} pb={4}>
         <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
           <Button colorScheme="gray" onClick={backClick}>
-            Cancel
+            Back
           </Button>
 
           <Button

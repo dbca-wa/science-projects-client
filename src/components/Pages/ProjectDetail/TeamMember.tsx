@@ -244,13 +244,19 @@ ITeamMember) => {
               ml={"2px"}
               variant={"link"}
               justifyContent={"start"}
-              color={isCurrentlyDragging ? "white" : "blue.400"}
-              background={colorMode === "light" ? "blue.500" : "blue.600"}
+              color={
+                isCurrentlyDragging
+                  ? "white"
+                  : colorMode === "light"
+                  ? "blue.500"
+                  : "blue.600"
+              }
               _hover={{
-                background: colorMode === "light" ? "blue.400" : "blue.500",
+                color: colorMode === "light" ? "blue.400" : "blue.500",
               }}
               onClick={onUserOpen}
               cursor="pointer"
+              fontSize={"lg"}
             >
               {name !== "undefined undefined" && name !== "None None"
                 ? name
@@ -258,7 +264,7 @@ ITeamMember) => {
             </Button>
             <Box>
               <Tag
-                mt={2}
+                mt={1}
                 mb={1}
                 bg={roleArray.find((item) => item.role === role)?.bg ?? ""}
                 color={

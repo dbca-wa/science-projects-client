@@ -511,6 +511,7 @@ export const BusinessAreaItemDisplay = ({
                 isRequired={true}
                 value={nameData}
                 setValueFunction={setNameData}
+                setValueAsPlainText={false}
               />
               <UnboundStatefulEditor
                 title="Introduction"
@@ -520,6 +521,7 @@ export const BusinessAreaItemDisplay = ({
                 isRequired={true}
                 value={introductionData}
                 setValueFunction={setIntroductionData}
+                setValueAsPlainText={false}
               />
 
               <UnboundStatefulEditor
@@ -530,6 +532,7 @@ export const BusinessAreaItemDisplay = ({
                 isRequired={true}
                 value={focusData}
                 setValueFunction={setFocusData}
+                setValueAsPlainText={false}
               />
 
               <FormControl isRequired pb={4}>
