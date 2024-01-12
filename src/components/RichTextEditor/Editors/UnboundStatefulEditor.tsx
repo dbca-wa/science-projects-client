@@ -4,7 +4,17 @@
 import { useEffect, useRef, useState } from "react";
 
 // Styles and Styling Components
-import { Box, useColorMode, Text, Flex, Grid } from "@chakra-ui/react";
+import {
+  Box,
+  useColorMode,
+  Text,
+  Flex,
+  Grid,
+  FormLabel,
+  FormControl,
+  InputGroup,
+  FormHelperText,
+} from "@chakra-ui/react";
 
 // Lexical
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -35,27 +45,29 @@ import { DisplaySRTE } from "./Sections/DisplaySRTE";
 import { EditorSubsections, EditorType } from "../../../types";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 import { SimpleEditableRTE } from "./Sections/SimpleEditableRTE";
+import { SimpleStatefulRTE } from "./Sections/SimpleStatefulRTE";
 
 interface IProps {
   // data: string;
-  section: EditorSubsections;
-  editorType: EditorType;
-  isUpdate: boolean;
+  title: string;
+  showTitle: boolean;
+  helperText?: string;
+  showToolbar: boolean;
+  isRequired: boolean;
   value: string;
   setValueFunction: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const SimpleStateRichTextEditor = ({
-  section,
-  editorType,
-  isUpdate,
+export const UnboundStatefulEditor = ({
   value,
   setValueFunction,
+  showToolbar,
+  title,
+  helperText,
+  showTitle,
+  isRequired,
 }: IProps) => {
-  const [shouldShowTree, setShouldShowTree] = useState(false);
   const { colorMode } = useColorMode();
-
-  const [lastSelectedNode, setLastSelectedNode] = useState();
 
   const generateTheme = (colorMode) => {
     return {
@@ -114,7 +126,7 @@ export const SimpleStateRichTextEditor = ({
   const editorRef = useRef(null);
 
   const initialConfig = {
-    namespace: "Annual Report Document Editor",
+    namespace: "Stateful Rich Text Editor",
     editable: true,
     theme,
     onError,
@@ -122,32 +134,34 @@ export const SimpleStateRichTextEditor = ({
   };
 
   return (
-    <Box pb={2} w={"100%"} zIndex={2}>
-      <Box
-        pos={"relative"}
-        w={"100%"}
-        roundedBottom={20}
-        boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
-        bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
-        roundedTop={20}
-        zIndex={2}
-      >
-        <SimpleEditableRTE
-          initialConfig={initialConfig}
-          editorRef={editorRef}
-          data={value}
-          section={section}
-          editorType={editorType}
-          isUpdate={isUpdate}
-          displayData={value}
-          editorText={editorText}
-          setEditorText={setEditorText}
-          shouldShowTree={shouldShowTree}
-          setShouldShowTree={setShouldShowTree}
-          setDisplayData={setValueFunction}
-        />
-      </Box>
-    </Box>
+    <FormControl isRequired={isRequired} pb={2} w={"100%"} zIndex={2}>
+      {showTitle ? (
+        <FormLabel mb={3} ml={2}>
+          {title}
+        </FormLabel>
+      ) : null}
+      <InputGroup>
+        <Box
+          pos={"relative"}
+          w={"100%"}
+          roundedBottom={20}
+          boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
+          bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
+          roundedTop={20}
+          zIndex={2}
+        >
+          <SimpleStatefulRTE
+            showToolbar={showToolbar}
+            initialConfig={initialConfig}
+            editorRef={editorRef}
+            value={value}
+            setValueFunction={setValueFunction}
+          />
+        </Box>
+      </InputGroup>
+      {helperText ? <FormHelperText ml={2}>{helperText}</FormHelperText> : null}
+      {/* <Text>{value}...</Text> */}
+    </FormControl>
   );
 };
 

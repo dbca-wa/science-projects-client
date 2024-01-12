@@ -19,39 +19,22 @@ import { useEffect, useState } from "react";
 import { DataDisplayPlugin } from "../../Plugins/DataDisplayPlugin";
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
 import { EditorSubsections, EditorType } from "../../../../types";
+import { PrepopulateCommentDisplayPlugin } from "./../../Plugins/PrepopulateCommentDisplayPlugin";
 
 interface Props {
+  showToolbar: boolean;
+  value: string;
+  setValueFunction: React.Dispatch<React.SetStateAction<string>>;
   initialConfig: any;
   editorRef: any;
-  data: string;
-  section: EditorSubsections;
-  editorType: EditorType;
-  isUpdate: boolean;
-
-  editorText: string;
-  setEditorText: React.Dispatch<React.SetStateAction<string>>;
-  shouldShowTree: boolean;
-  setShouldShowTree: React.Dispatch<React.SetStateAction<boolean>>;
-  displayData: string;
-
-  setDisplayData: React.Dispatch<React.SetStateAction<string>>;
-  textEditorName?: string;
 }
 
-export const SimpleEditableRTE = ({
-  textEditorName,
-  section,
-  editorType,
-  isUpdate,
+export const SimpleStatefulRTE = ({
   initialConfig,
   editorRef,
-  data,
-  editorText,
-  setEditorText,
-  displayData,
-  setDisplayData,
-  shouldShowTree,
-  setShouldShowTree,
+  showToolbar,
+  value,
+  setValueFunction,
 }: Props) => {
   const [selectedNodeType, setSelectedNodeType] = useState<string>();
 
@@ -67,17 +50,16 @@ export const SimpleEditableRTE = ({
           onChange={(editorState, editor) => {
             editorState.read(() => {
               const root = $getRoot();
-              setEditorText(root.__cachedText);
+              //   setEditorText(root.__cachedText);
               const newHtml = $generateHtmlFromNodes(editor, null);
+              setValueFunction(newHtml);
               // console.log(newHtml)
               // console.log("DATA DISPLAY PLUGIN:", newHtml);
-              setDisplayData(newHtml);
+              //   setDisplayData(newHtml);
             });
           }}
         />
-        {data !== undefined && data !== null && (
-          <PrepopulateHTMLPlugin data={displayData} />
-        )}
+        <PrepopulateCommentDisplayPlugin data={value} />
 
         {/* Text Area */}
         <RichTextPlugin
@@ -85,11 +67,13 @@ export const SimpleEditableRTE = ({
             <Box zIndex={2}>
               {/* Toolbar */}
 
-              <SimpleRichTextToolbar
-                editorRef={editorRef}
-                selectedNodeType={selectedNodeType}
-                setSelectedNodeType={setSelectedNodeType}
-              />
+              {showToolbar ? (
+                <SimpleRichTextToolbar
+                  editorRef={editorRef}
+                  selectedNodeType={selectedNodeType}
+                  setSelectedNodeType={setSelectedNodeType}
+                />
+              ) : null}
 
               <ContentEditable
                 style={{
@@ -97,7 +81,8 @@ export const SimpleEditableRTE = ({
                   width: "100%",
                   height: "auto",
                   padding: "32px",
-                  paddingBottom: "16px",
+                  paddingTop: "23px",
+                  paddingBottom: "20px",
                   borderRadius: "0 0 25px 25px",
                   outline: "none",
                   zIndex: 2,
@@ -110,7 +95,7 @@ export const SimpleEditableRTE = ({
               style={{
                 position: "absolute",
                 left: "32px",
-                top: "89px",
+                top: "80px",
                 userSelect: "none",
                 pointerEvents: "none",
               }}
