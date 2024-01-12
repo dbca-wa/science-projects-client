@@ -241,22 +241,15 @@ export const ServiceItemDisplay = ({
           </ModalBody>
           <ModalFooter justifyContent="flex-end">
             <Flex>
-              <Button
-                onClick={onDeleteModalClose}
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-              >
+              <Button onClick={onDeleteModalClose} colorScheme={"gray"}>
                 No
               </Button>
               <Button
                 onClick={deleteBtnClicked}
                 color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
+                background={colorMode === "light" ? "red.500" : "red.600"}
                 _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
+                  background: colorMode === "light" ? "red.400" : "red.500",
                 }}
                 ml={3}
               >
