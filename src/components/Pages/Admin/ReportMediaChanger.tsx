@@ -277,9 +277,9 @@ export const ReportMediaChanger = ({
             {...getRootProps()}
             h={72}
             width={"100%"}
-            borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
             background={colorMode === "light" ? "gray.100" : "gray.700"}
             border={"1px dashed"}
+            borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
             rounded={"lg"}
             //   overflow={"hidden"}
             //   pos={"relative"}
@@ -445,19 +445,3 @@ export const ReportMediaChanger = ({
     </Box>
   );
 };
-
-// {currentImage && currentImage !== null ? (
-//     <Grid rounded="lg" w={"100%"} h={"100%"}>
-//       <Box h={60} rounded={"lg"}>
-//         <Image
-//           objectFit="cover"
-//           src={`${baseUrl}${currentImage}`}
-//           alt="Preview"
-//           userSelect="none"
-//           bg="gray.800"
-//           w={"100%"}
-//         />
-//       </Box>
-//       <Text fontWeight={"semibold"}>{titleDictionary[section]}</Text>
-//     </Grid>
-//   ) : (

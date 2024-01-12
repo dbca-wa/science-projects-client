@@ -42,6 +42,7 @@ import { ImagePreview } from "../CreateProject/ImagePreview";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useNoImage } from "../../../lib/hooks/useNoImage";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
+import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
 
 export const BusinessAreasCRUD = () => {
   const {
@@ -250,7 +251,17 @@ export const BusinessAreasCRUD = () => {
 
             <Grid gridTemplateColumns={"repeat(1,1fr)"}>
               {filteredSlices
-                .sort((a, b) => a.name.localeCompare(b.name))
+                .sort((a, b) => {
+                  const parserA = new DOMParser();
+                  const docA = parserA.parseFromString(a.name, "text/html");
+                  const contentA = docA.body.textContent;
+
+                  const parserB = new DOMParser();
+                  const docB = parserB.parseFromString(b.name, "text/html");
+                  const contentB = docB.body.textContent;
+
+                  return contentA.localeCompare(contentB);
+                })
                 .map((s) => (
                   <BusinessAreaItemDisplay
                     key={s.pk}

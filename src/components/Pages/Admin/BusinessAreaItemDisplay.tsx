@@ -38,7 +38,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { IBusinessArea } from "../../../types";
+import { BusinessAreaImage, IBusinessArea } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
@@ -50,10 +50,15 @@ import { useNoImage } from "../../../lib/hooks/useNoImage";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { TextButtonFlex } from "../../TextButtonFlex";
+import { SimpleStateRichTextEditor } from "@/components/RichTextEditor/Editors/SimpleStateRichTextEditor";
+import { SimpleStatefulRTE } from "@/components/RichTextEditor/Editors/Sections/SimpleStatefulRTE";
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
+import { StatefulMediaChanger } from "./StatefulMediaChanger";
 // import { useEffect } from "react";
 // import NoImageFile from '/sad-face.gif'
+import useDistilledHtml from "./../../../lib/hooks/useDistilledHtml";
 
 export const BusinessAreaItemDisplay = ({
   pk,
@@ -70,6 +75,7 @@ export const BusinessAreaItemDisplay = ({
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<IBusinessArea>();
 
@@ -100,9 +106,16 @@ export const BusinessAreaItemDisplay = ({
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const noImageLink = useNoImage();
   // const imageUrl = useServerImageUrl(noImageLink);
+  const baseUrl = useApiEndpoint();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>();
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
+    (image as BusinessAreaImage)?.file
+      ? `${(image as BusinessAreaImage).file}`
+      : null
+  );
+
+  const distlledTitle = useDistilledHtml(name);
 
   // console.log(image.file)
   const updateMutation = useMutation(updateBusinessArea, {
@@ -169,7 +182,6 @@ export const BusinessAreaItemDisplay = ({
     } = formData;
     const image = selectedFile;
 
-    // Create an object to pass as a single argument to mutation.mutate
     const payload = {
       pk,
       agency,
@@ -182,11 +194,17 @@ export const BusinessAreaItemDisplay = ({
       focus,
       introduction,
       image,
+      selectedImageUrl,
     };
-    console.log(payload);
+    // Create an object to pass as a single argument to mutation.mutate
+    if (!selectedFile) {
+      console.log("WITHOUT IMAGE:", payload);
+    } else {
+      console.log("WITH IMAGE:", payload);
+    }
+    console.log(selectedImageUrl);
 
     updateMutation.mutate(payload);
-    // updateMutation.mutate(formData);
   };
 
   const {
@@ -220,13 +238,17 @@ export const BusinessAreaItemDisplay = ({
   const [selectedLeader, setSelectedLeader] = useState<number>();
   const [selectedFinanceAdmin, setSelectedFinanceAdmin] = useState<number>();
   const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
-  const nameData = watch("name");
+  // const nameData = watch("name");
   // const slugData = watch('slug');
-  const focusData = watch("focus");
-  const introductionData = watch("introduction");
-  const imageData = watch("image");
+  // const focusData = watch("focus");
+  // const introductionData = watch("introduction");
+  // const imageData = watch("image");
 
   const { colorMode } = useColorMode();
+
+  const [nameData, setNameData] = useState(name);
+  const [focusData, setFocusData] = useState(focus);
+  const [introductionData, setIntroductionData] = useState(introduction);
 
   return !leaderLoading && leaderData ? (
     <>
@@ -312,7 +334,11 @@ export const BusinessAreaItemDisplay = ({
             <Skeleton rounded="lg" overflow="hidden" w="80px" h="69px" />
           )}
         </Flex>
-        <TextButtonFlex name={name} onClick={onUpdateModalOpen} />
+        <TextButtonFlex
+          // name={name}
+          name={distlledTitle}
+          onClick={onUpdateModalOpen}
+        />
         <TextButtonFlex
           name={`${leaderData.first_name} ${leaderData.last_name}`}
           onClick={leaderDrawerFunction}
@@ -477,171 +503,47 @@ export const BusinessAreaItemDisplay = ({
               id="update-form"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
-              <FormControl>
-                <FormLabel>Name</FormLabel>
-                <InputGroup>
-                  {/* <InputLeftAddon children={<FaSign />} /> */}
-                  <Input
-                    autoComplete="off"
-                    autoFocus
-                    {...register("name", { required: true })}
-                    required
-                    type="text"
-                    defaultValue={name} // Prefill with the 'name' prop
-                  />
-                </InputGroup>
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel>Focus</FormLabel>
-                <InputGroup>
-                  <Textarea
-                    {...register("focus", { required: true })}
-                    required
-                    defaultValue={focus}
-                  />
-                </InputGroup>
-                <FormHelperText>
-                  Primary concerns of the Business Area
-                </FormHelperText>
-              </FormControl>
+              <UnboundStatefulEditor
+                title="Business Area Name"
+                helperText={"Name of Business Area"}
+                showToolbar={false}
+                showTitle={true}
+                isRequired={true}
+                value={nameData}
+                setValueFunction={setNameData}
+              />
+              <UnboundStatefulEditor
+                title="Introduction"
+                helperText={"A description of the Business Area"}
+                showToolbar={true}
+                showTitle={true}
+                isRequired={true}
+                value={introductionData}
+                setValueFunction={setIntroductionData}
+              />
 
-              <FormControl isRequired>
-                <FormLabel>Introduction</FormLabel>
-                <InputGroup>
-                  <Textarea
-                    {...register("introduction", { required: true })}
-                    required
-                    defaultValue={introduction}
-                  />
-                </InputGroup>
-                <FormHelperText>
-                  A description of the Business Area
-                </FormHelperText>
+              <UnboundStatefulEditor
+                title="Focus"
+                helperText={"Primary concerns of the Business Area"}
+                showToolbar={true}
+                showTitle={true}
+                isRequired={true}
+                value={focusData}
+                setValueFunction={setFocusData}
+              />
+
+              <FormControl isRequired pb={4}>
+                <FormLabel ml={2}>Image</FormLabel>
+                <StatefulMediaChanger
+                  helperText="Drag and drop an image for the Business Area"
+                  selectedFile={selectedFile}
+                  setSelectedFile={setSelectedFile}
+                  selectedImageUrl={selectedImageUrl}
+                  setSelectedImageUrl={setSelectedImageUrl}
+                />
               </FormControl>
 
-              <FormControl isRequired>
-                {/* <FormLabel>Image</FormLabel>
-                                        <InputGroup>
-                                            <Input
-                                                {...register("image", { required: true })}
-                                                required
-                                                type="text"
-                                            />
-
-                                        </InputGroup> */}
-
-                <Grid
-                  gridTemplateColumns={{ base: "3fr 10fr", md: "4fr 8fr" }}
-                  pos="relative"
-                  w="100%"
-                  h="100%"
-                >
-                  <Box>
-                    <FormLabel>Image</FormLabel>
-                    <Center
-                      maxH={{ base: "200px", xl: "225px" }}
-                      bg="gray.50"
-                      mt={1}
-                      rounded="lg"
-                      overflow="hidden"
-                    >
-                      {!imageLoadFailed ? (
-                        <Image
-                          objectFit="cover"
-                          src={
-                            selectedFile !== null
-                              ? selectedImageUrl
-                              : image
-                              ? image instanceof File
-                                ? `${apiEndpoint}${image.name}` // Use the image directly for File
-                                : image?.file
-                                ? `${apiEndpoint}${image.file}`
-                                : NoImageFile
-                              : NoImageFile
-                          }
-                          alt="Preview"
-                          userSelect="none"
-                          bg="gray.800"
-                          // onLoad={handleImageLoadSuccess}
-                          // onError={handleImageLoadError}
-                        />
-                      ) : (
-                        <Image
-                          objectFit="cover"
-                          src={noImageLink}
-                          alt="Preview"
-                          userSelect="none"
-                          bg="gray.800"
-                        />
-                      )}
-                    </Center>
-                  </Box>
-                  <FormControl ml={4} mt={10}>
-                    <InputGroup>
-                      <Grid gridGap={2} ml={4}>
-                        <FormControl>
-                          <Input
-                            autoComplete="off"
-                            {...register("image", { required: true })}
-                            border={"none"}
-                            sx={{
-                              "::file-selector-button": {
-                                background:
-                                  colorMode === "light"
-                                    ? "gray.100"
-                                    : "gray.600",
-                                borderRadius: "8px",
-                                padding: "2px",
-                                paddingX: "8px",
-                                mt: "1px",
-                                border: "1px solid",
-                                borderColor:
-                                  colorMode === "light"
-                                    ? "gray.400"
-                                    : "gray.700",
-                                outline: "none",
-                                mr: "15px",
-                                ml: "-16px",
-                                cursor: "pointer",
-                              },
-                              pt: "3.5px",
-                              color:
-                                colorMode === "light" ? "gray.800" : "gray.200",
-                            }}
-                            // alignItems={"center"}
-                            // type="file"
-                            // accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                setSelectedFile(file);
-                                setSelectedImageUrl(URL.createObjectURL(file));
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormHelperText>
-                          Select an image for the Business Area.
-                        </FormHelperText>
-                        {errors.image && (
-                          <FormErrorMessage>
-                            {errors.image.message}
-                          </FormErrorMessage>
-                        )}
-                      </Grid>
-                    </InputGroup>
-                  </FormControl>
-                </Grid>
-
-                {/* <FormHelperText>Select an image for the Business Area</FormHelperText> */}
-              </FormControl>
-
-              <FormControl mt={3}>
-                {/* <FormLabel>Leader</FormLabel>
-                                    <Input
-                                        {...register("leader", { required: true })}
-                                        defaultValue={leader} // Prefill 
-                                    /> */}
+              <FormControl mt={3} ml={2}>
                 <UserSearchDropdown
                   {...register("leader", { required: true })}
                   onlyInternal={false}
@@ -651,11 +553,11 @@ export const BusinessAreaItemDisplay = ({
                   isEditable
                   label="Leader"
                   placeholder="Search for a user"
-                  helperText={<>The leader of the business area.</>}
+                  helperText={<>The Leader of the business area.</>}
                 />
               </FormControl>
 
-              <FormControl>
+              <FormControl ml={2}>
                 <UserSearchDropdown
                   {...register("finance_admin", { required: true })}
                   onlyInternal={false}
@@ -665,10 +567,10 @@ export const BusinessAreaItemDisplay = ({
                   isEditable
                   label="Finance Admin"
                   placeholder="Search for a user"
-                  helperText={<>The FA of the business area.</>}
+                  helperText={<>The Finance Admin of the business area.</>}
                 />
               </FormControl>
-              <FormControl>
+              <FormControl ml={2}>
                 <UserSearchDropdown
                   {...register("data_custodian", { required: true })}
                   onlyInternal={false}
@@ -678,7 +580,7 @@ export const BusinessAreaItemDisplay = ({
                   isEditable
                   label="Data Custodian"
                   placeholder="Search for a user"
-                  helperText={<>The DC of the business area.</>}
+                  helperText={<>The Data Custodian of the business area.</>}
                 />
               </FormControl>
               {updateMutation.isError ? (
@@ -707,6 +609,19 @@ export const BusinessAreaItemDisplay = ({
                 size="lg"
                 onClick={() => {
                   console.log("clicked");
+                  // console.log({
+                  //   pk: pk,
+                  //   agency: 1,
+                  //   old_id: 1,
+                  //   name: nameData,
+                  //   slug: slug,
+                  //   leader: selectedLeader,
+                  //   data_custodian: selectedDataCustodian,
+                  //   finance_admin: selectedFinanceAdmin,
+                  //   focus: focusData,
+                  //   introduction: introductionData,
+                  //   image: image,
+                  // });
                   onUpdateSubmit({
                     pk: pk,
                     agency: 1,
@@ -718,7 +633,7 @@ export const BusinessAreaItemDisplay = ({
                     finance_admin: selectedFinanceAdmin,
                     focus: focusData,
                     introduction: introductionData,
-                    image: imageData,
+                    image: selectedFile,
                   });
                 }}
               >
