@@ -1272,7 +1272,18 @@ IConceptDocumentActions) => {
                           />
 
                           <Button
-                            colorScheme="orange"
+                            color={"white"}
+                            background={
+                              colorMode === "light"
+                                ? "orange.500"
+                                : "orange.600"
+                            }
+                            _hover={{
+                              background:
+                                colorMode === "light"
+                                  ? "orange.400"
+                                  : "orange.500",
+                            }}
                             size={"sm"}
                             onClick={onS3ReopenModalOpen}
                             // onClick={

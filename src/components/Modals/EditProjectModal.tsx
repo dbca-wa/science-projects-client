@@ -652,8 +652,12 @@ export const EditProjectModal = ({
                   Cancel
                 </Button>
                 <Button
-                  colorScheme="green"
-                  // isDisabled={!changesMade}
+                  color={"white"}
+                  background={colorMode === "light" ? "green.500" : "green.600"}
+                  _hover={{
+                    background:
+                      colorMode === "light" ? "green.400" : "green.500",
+                  }} // isDisabled={!changesMade}
                   isLoading={updateProjectMutation.isLoading}
                   type="submit"
                   ml={3}
