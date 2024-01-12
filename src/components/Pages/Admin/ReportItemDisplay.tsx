@@ -432,13 +432,7 @@ export const ReportItemDisplay = ({
         // bg={"red"}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
-          <Button
-            variant={"link"}
-            colorScheme="blue"
-            onClick={onUpdateModalOpen}
-          >
-            {year}
-          </Button>
+          <TextButtonFlex name={`${year}` ?? ""} onClick={onUpdateModalOpen} />
         </Flex>
         <Grid alignItems={"center"}>
           <Box>
@@ -523,7 +517,7 @@ export const ReportItemDisplay = ({
 
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
-        <ModalContent bg="white">
+        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader>Delete Division</ModalHeader>
           <ModalBody>
             <Box>
@@ -555,10 +549,25 @@ export const ReportItemDisplay = ({
           </ModalBody>
           <ModalFooter justifyContent="flex-end">
             <Flex>
-              <Button onClick={onDeleteModalClose} colorScheme="red">
+              <Button
+                onClick={onDeleteModalClose}
+                color={"white"}
+                background={colorMode === "light" ? "red.500" : "red.600"}
+                _hover={{
+                  background: colorMode === "light" ? "red.400" : "red.500",
+                }}
+              >
                 No
               </Button>
-              <Button onClick={deleteBtnClicked} colorScheme="green" ml={3}>
+              <Button
+                onClick={deleteBtnClicked}
+                color={"white"}
+                background={colorMode === "light" ? "green.500" : "green.600"}
+                _hover={{
+                  background: colorMode === "light" ? "green.400" : "green.500",
+                }}
+                ml={3}
+              >
                 Yes
               </Button>
             </Flex>
