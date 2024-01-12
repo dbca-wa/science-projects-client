@@ -110,7 +110,11 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
             size="md"
             borderRadius="full"
             variant="solid"
-            colorScheme="blue"
+            color={"white"}
+            background={colorMode === "light" ? "blue.500" : "blue.600"}
+            _hover={{
+              background: colorMode === "light" ? "blue.400" : "blue.500",
+            }}
           >
             <TagLabel pl={1}>{tag}</TagLabel>
             <TagCloseButton

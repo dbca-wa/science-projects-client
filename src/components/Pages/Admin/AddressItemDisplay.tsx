@@ -1,5 +1,40 @@
-import { Box, Button, Center, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerOverlay, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useColorMode, useDisclosure, useToast } from "@chakra-ui/react"
-import { IAddress, IBranch } from "../../../types"
+import {
+  Box,
+  Button,
+  Center,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  DrawerOverlay,
+  Flex,
+  FormControl,
+  FormLabel,
+  Grid,
+  HStack,
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Text,
+  Textarea,
+  VStack,
+  useColorMode,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
+import { IAddress, IBranch } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
@@ -9,351 +44,329 @@ import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
 import { useState } from "react";
 import { TextButtonFlex } from "../../TextButtonFlex";
 
-export const AddressItemDisplay = ({ pk, street, city, zipcode, state, country, agency, branch, pobox }: IAddress) => {
+export const AddressItemDisplay = ({
+  pk,
+  street,
+  city,
+  zipcode,
+  state,
+  country,
+  agency,
+  branch,
+  pobox,
+}: IAddress) => {
+  const { register, handleSubmit, watch } = useForm<IAddress>();
 
-    const { register, handleSubmit, watch } = useForm<IAddress>();
+  const toast = useToast();
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: onDeleteModalOpen,
+    onClose: onDeleteModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isUpdateaModalOpen,
+    onOpen: onUpdateModalOpen,
+    onClose: onUpdateModalClose,
+  } = useDisclosure();
+  const queryClient = useQueryClient();
+  const { colorMode } = useColorMode();
+  const [selectedBranch, setSelectedBranch] = useState<number>();
 
-    const toast = useToast();
-    const { isOpen: isDeleteModalOpen, onOpen: onDeleteModalOpen, onClose: onDeleteModalClose } = useDisclosure();
-    const { isOpen: isUpdateaModalOpen, onOpen: onUpdateModalOpen, onClose: onUpdateModalClose } = useDisclosure();
-    const queryClient = useQueryClient();
-    const { colorMode } = useColorMode();
-    const [selectedBranch, setSelectedBranch] = useState<number>();
+  const branchObj = typeof branch === "object" ? (branch as IBranch) : null;
+  const streetData = watch("street");
+  // const suburbData = watch('suburb')
+  const cityData = watch("city");
+  const zipcodeData = watch("zipcode");
+  const stateData = watch("state");
+  const countryData = watch("country");
+  const poboxData = watch("pobox");
 
+  const updateMutation = useMutation(updateAddress, {
+    onSuccess: () => {
+      // console.log("success")
+      toast({
+        status: "success",
+        title: "Updated",
+        position: "top-right",
+      });
+      onUpdateModalClose();
+      queryClient.invalidateQueries(["addresses"]);
+    },
+    onError: () => {
+      // console.log("error")
+      toast({
+        status: "error",
+        title: "Failed",
+        position: "top-right",
+      });
+    },
+    onMutate: () => {
+      // console.log("attempting update private")
+    },
+  });
 
-    const branchObj = typeof branch === 'object' ? branch as IBranch : null;
-    const streetData = watch('street')
-    // const suburbData = watch('suburb')
-    const cityData = watch('city')
-    const zipcodeData = watch('zipcode')
-    const stateData = watch('state')
-    const countryData = watch('country')
-    const poboxData = watch('pobox')
+  const deleteMutation = useMutation(deleteAddress, {
+    onSuccess: () => {
+      // console.log("success")
+      toast({
+        status: "success",
+        title: "Deleted",
+        position: "top-right",
+      });
+      onDeleteModalClose();
+      queryClient.invalidateQueries(["addresses"]);
+    },
+    onError: () => {
+      // console.log("error")
+    },
+    onMutate: () => {
+      // console.log("mutation")
+    },
+  });
 
-    const updateMutation = useMutation(updateAddress,
-        {
-            onSuccess: () => {
-                // console.log("success")
-                toast({
-                    status: "success",
-                    title: "Updated",
-                    position: "top-right"
-                })
-                onUpdateModalClose();
-                queryClient.invalidateQueries(["addresses"]);
+  const deleteBtnClicked = () => {
+    deleteMutation.mutate(pk);
+  };
+  const onUpdateSubmit = (formData: IAddress) => {
+    console.log(formData);
+    updateMutation.mutate(formData);
+  };
 
-            },
-            onError: () => {
-                // console.log("error")
-                toast({
-                    status: "error",
-                    title: "Failed",
-                    position: "top-right"
-                })
-            },
-            onMutate: () => {
-                // console.log("attempting update private")
-            }
-        })
+  return (
+    <>
+      <Grid
+        gridTemplateColumns="2fr 4fr 2fr 2fr 1fr 1fr"
+        width="100%"
+        p={3}
+        borderWidth={1}
+        // bg={"red"}
+      >
+        <TextButtonFlex
+          name={branchObj?.name ?? ""}
+          onClick={onUpdateModalOpen}
+        />
+        <Flex alignItems={"center"}>
+          <Text>{street}</Text>
+        </Flex>
+        <Flex alignItems={"center"}>
+          <Text>{city}</Text>
+        </Flex>
+        <Flex alignItems={"center"}>
+          <Text>{country}</Text>
+        </Flex>
+        <Flex alignItems={"center"}>
+          <Text>{pobox ? pobox : "-"}</Text>
+        </Flex>
 
-
-    const deleteMutation = useMutation(deleteAddress,
-        {
-            onSuccess: () => {
-                // console.log("success")
-                toast({
-                    status: "success",
-                    title: "Deleted",
-                    position: "top-right"
-                })
-                onDeleteModalClose();
-                queryClient.invalidateQueries(["addresses"]);
-
-            },
-            onError: () => {
-                // console.log("error")
-
-            },
-            onMutate: () => {
-                // console.log("mutation")
-
-            }
-        }
-    );
-
-    const deleteBtnClicked = () => {
-        deleteMutation.mutate(pk);
-    }
-    const onUpdateSubmit = (formData: IAddress) => {
-        console.log(formData)
-        updateMutation.mutate(formData);
-    }
-
-
-    return (
-        <>
-            <Grid
-                gridTemplateColumns="2fr 4fr 2fr 2fr 1fr 1fr"
-                width="100%"
-                p={3}
-                borderWidth={1}
-            // bg={"red"}
+        <Flex justifyContent="flex-end" mr={2} alignItems={"center"}>
+          <Menu>
+            <MenuButton
+              px={2}
+              py={2}
+              transition="all 0.2s"
+              rounded={4}
+              borderRadius="md"
+              borderWidth="1px"
+              _hover={{ bg: "gray.400" }}
+              _expanded={{ bg: "blue.400" }}
+              _focus={{ boxShadow: "outline" }}
+              alignItems={"center"}
+              justifyContent={"center"}
             >
-                <TextButtonFlex
-                    name={branchObj?.name ?? ""}
+              <Flex alignItems={"center"} justifyContent={"center"}>
+                <MdMoreVert />
+              </Flex>
+            </MenuButton>
+            <MenuList>
+              <MenuItem onClick={onUpdateModalOpen}>Edit</MenuItem>
+              <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
+      </Grid>
+      <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
+        <ModalOverlay />
+        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+          <ModalHeader>Delete Address</ModalHeader>
+          <ModalBody>
+            <Box>
+              <Text fontSize="lg" fontWeight="semibold">
+                Are you sure you want to delete the address for this branch?
+              </Text>
+
+              <Text
+                fontSize="lg"
+                fontWeight="semibold"
+                color={"blue.500"}
+                mt={4}
+              >
+                "{branchObj?.name}"
+              </Text>
+            </Box>
+          </ModalBody>
+          <ModalFooter justifyContent="flex-end">
+            <Flex>
+              <Button
+                onClick={onDeleteModalClose}
+                color={"white"}
+                background={colorMode === "light" ? "red.500" : "red.600"}
+                _hover={{
+                  background: colorMode === "light" ? "red.400" : "red.500",
+                }}
+              >
+                No
+              </Button>
+              <Button
+                onClick={deleteBtnClicked}
+                color={"white"}
+                background={colorMode === "light" ? "green.500" : "green.600"}
+                _hover={{
+                  background: colorMode === "light" ? "green.400" : "green.500",
+                }}
+                ml={3}
+              >
+                Yes
+              </Button>
+            </Flex>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={isUpdateaModalOpen}
+        onClose={onUpdateModalClose}
+        size={"xl"}
+      >
+        <ModalOverlay />
+        <ModalHeader>Update Address</ModalHeader>
+        <ModalBody>
+          <ModalContent
+            bg={colorMode === "light" ? "white" : "gray.800"}
+            p={4}
+            px={6}
+          >
+            <FormControl>
+              {/* Hidden input to capture the pk */}
+              <input
+                type="hidden"
+                {...register("pk")}
+                defaultValue={pk} // Prefill with the 'pk' prop
+              />
+              <input
+                {...register("agency", { required: true })}
+                type="hidden"
+                defaultValue={1} // Prefill with the 'name' prop
+              />
+            </FormControl>
+            <VStack
+              spacing={6}
+              as="form"
+              id="update-form"
+              onSubmit={handleSubmit(onUpdateSubmit)}
+            >
+              <BranchSearchDropdown
+                {...register("branch", { required: true })}
+                isRequired={true}
+                setBranchFunction={setSelectedBranch}
+                preselectedBranchPk={branchObj.pk}
+                // isEditable
+                label="Branch"
+                placeholder="Search for a Branch"
+                helperText={<>The branch the address belongs to.</>}
+              />
+              <FormControl>
+                <FormLabel>Street</FormLabel>
+                <Input
+                  {...register("street", { required: true })}
+                  defaultValue={street} // Prefill
                 />
-                {/* <Flex justifyContent="flex-start"
-                    alignItems={"center"}
+              </FormControl>
 
-                >
-                    <Button
-                        variant={"link"}
-                        colorScheme="blue"
-                        onClick={onUpdateModalOpen}
-                    >
-                        {branchObj?.name ?? ""}
-                    </Button>
+              <FormControl>
+                <FormLabel>Zip Code</FormLabel>
+                <Input
+                  {...register("zipcode", { required: true })}
+                  defaultValue={zipcode}
+                  type="number"
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>City</FormLabel>
+                <Input
+                  {...register("city", { required: true })}
+                  defaultValue={city}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>State</FormLabel>
+                <Input
+                  {...register("state", { required: true })}
+                  defaultValue={state}
+                />
+              </FormControl>
 
-                </Flex> */}
-                <Flex
-                    alignItems={"center"}
-                >
-                    <Text>{street}</Text>
-                </Flex>
-                <Flex
-                    alignItems={"center"}
-                >
-                    <Text>{city}</Text>
-                </Flex>
-                <Flex
-                    alignItems={"center"}
-                >
-                    <Text>{country}</Text>
-                </Flex>
-                <Flex
-                    alignItems={"center"}
-                >
-                    <Text>{pobox ? pobox : "-"}</Text>
-                </Flex>
+              <FormControl>
+                <FormLabel>Country</FormLabel>
+                <Input
+                  {...register("country", { required: true })}
+                  defaultValue={country}
+                />
+              </FormControl>
 
-
-
-
-                <Flex
-                    justifyContent="flex-end"
-                    mr={2}
-                    alignItems={"center"}
-
-                >
-                    <Menu
-                    >
-                        <MenuButton
-                            px={2}
-                            py={2}
-                            transition='all 0.2s'
-                            rounded={4}
-                            borderRadius='md'
-                            borderWidth='1px'
-                            _hover={{ bg: 'gray.400' }}
-                            _expanded={{ bg: 'blue.400' }}
-                            _focus={{ boxShadow: 'outline' }}
-                            alignItems={"center"} justifyContent={"center"}
-
-                        >
-                            <Flex alignItems={"center"} justifyContent={"center"}>
-
-                                <MdMoreVert />
-                            </Flex>
-
-                        </MenuButton>
-                        <MenuList>
-                            <MenuItem onClick={onUpdateModalOpen}>
-                                Edit
-                            </MenuItem>
-                            <MenuItem onClick={onDeleteModalOpen}>
-                                Delete
-                            </MenuItem>
-                        </MenuList>
-                    </Menu>
-                </Flex>
+              <FormControl>
+                <FormLabel>PO Box</FormLabel>
+                <Input
+                  {...register("pobox", { required: true })}
+                  defaultValue={pobox}
+                />
+              </FormControl>
+              {updateMutation.isError ? (
+                <Text color={"red.500"}>Something went wrong</Text>
+              ) : null}
+            </VStack>
+            <Grid
+              mt={10}
+              w={"100%"}
+              justifyContent={"end"}
+              gridTemplateColumns={"repeat(2, 1fr)"}
+              gridGap={4}
+            >
+              <Button onClick={onUpdateModalClose} size="lg">
+                Cancel
+              </Button>
+              <Button
+                // form="update-form"
+                // type="submit"
+                onClick={() => {
+                  console.log("clicked");
+                  onUpdateSubmit({
+                    // "old_id": 1, //default
+                    pk: pk,
+                    // "agency": 1, // dbca
+                    // "branch": branchObj.pk,
+                    street: streetData,
+                    // "suburb": suburbData,
+                    city: cityData,
+                    zipcode: zipcodeData,
+                    state: stateData,
+                    country: countryData,
+                    pobox: poboxData,
+                  });
+                }}
+                isLoading={updateMutation.isLoading}
+                color={"white"}
+                background={colorMode === "light" ? "blue.500" : "blue.600"}
+                _hover={{
+                  background: colorMode === "light" ? "blue.400" : "blue.500",
+                }}
+                size="lg"
+              >
+                Update
+              </Button>
             </Grid>
-            <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}
-            >
-                <ModalOverlay />
-                <ModalContent bg="white">
-                    <ModalHeader>Delete Address</ModalHeader>
-                    <ModalBody>
-                        <Box>
-                            <Text fontSize="lg" fontWeight="semibold">
-                                Are you sure you want to delete the address for this branch?
-                            </Text>
-
-                            <Text
-                                fontSize="lg"
-                                fontWeight="semibold"
-                                color={"blue.500"}
-                                mt={4}
-                            >
-                                "{branchObj?.name}"
-                            </Text>
-
-                        </Box>
-                    </ModalBody>
-                    <ModalFooter justifyContent="flex-end">
-                        <Flex>
-                            <Button onClick={onDeleteModalClose} colorScheme="red">
-                                No
-                            </Button>
-                            <Button onClick={deleteBtnClicked} colorScheme="green" ml={3}>
-                                Yes
-                            </Button>
-                        </Flex>
-
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-
-            <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}
-                size={"xl"}
-            >
-                <ModalOverlay />
-                <ModalHeader>Update Address</ModalHeader>
-                <ModalBody
-                >
-                    <ModalContent bg={colorMode === "light" ? "white" : "gray.800"} p={4}
-                        px={6}
-                    >
-                        <FormControl>
-                            {/* Hidden input to capture the pk */}
-                            <input
-                                type="hidden"
-                                {...register("pk")}
-                                defaultValue={pk} // Prefill with the 'pk' prop
-                            />
-                            <input
-                                {...register("agency", { required: true })}
-                                type="hidden"
-                                defaultValue={1} // Prefill with the 'name' prop
-                            />
-                        </FormControl>
-                        <VStack spacing={6} as="form" id="update-form" onSubmit={handleSubmit(onUpdateSubmit)}>
-
-                            <BranchSearchDropdown
-                                {...register("branch", { required: true })}
-                                isRequired={true}
-                                setBranchFunction={setSelectedBranch}
-                                preselectedBranchPk={branchObj.pk}
-                                // isEditable
-                                label="Branch"
-                                placeholder="Search for a Branch"
-                                helperText={
-                                    <>
-                                        The branch the address belongs to.
-                                    </>
-                                }
-                            />
-                            <FormControl>
-
-                                <FormLabel>Street</FormLabel>
-                                <Input
-                                    {...register("street", { required: true })}
-                                    defaultValue={street} // Prefill 
-                                />
-                            </FormControl>
-
-
-
-                            <FormControl>
-                                <FormLabel>Zip Code</FormLabel>
-                                <Input
-                                    {...register("zipcode", { required: true })}
-                                    defaultValue={zipcode}
-                                    type="number"
-                                />
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>City</FormLabel>
-                                <Input
-                                    {...register("city", { required: true })}
-                                    defaultValue={city}
-
-                                />
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>State</FormLabel>
-                                <Input
-                                    {...register("state", { required: true })}
-                                    defaultValue={state}
-                                />
-                            </FormControl>
-
-
-
-                            <FormControl>
-                                <FormLabel>Country</FormLabel>
-                                <Input
-                                    {...register("country", { required: true })}
-                                    defaultValue={country}
-                                />
-                            </FormControl>
-
-                            <FormControl>
-                                <FormLabel>PO Box</FormLabel>
-                                <Input
-                                    {...register("pobox", { required: true })}
-                                    defaultValue={pobox}
-                                />
-                            </FormControl>
-                            {updateMutation.isError ? (
-                                <Text color={"red.500"}>Something went wrong</Text>
-                            ) : null}
-                        </VStack>
-                        <Grid
-                            mt={10}
-                            w={"100%"}
-                            justifyContent={"end"}
-                            gridTemplateColumns={"repeat(2, 1fr)"}
-                            gridGap={4}
-                        >
-                            <Button onClick={onUpdateModalClose}
-                                size="lg"
-
-                            >Cancel</Button>
-                            <Button
-                                // form="update-form"
-                                // type="submit"
-                                onClick={() => {
-                                    console.log("clicked")
-                                    onUpdateSubmit(
-                                        {
-                                            // "old_id": 1, //default
-                                            "pk": pk,
-                                            // "agency": 1, // dbca
-                                            // "branch": branchObj.pk,
-                                            "street": streetData,
-                                            // "suburb": suburbData,
-                                            "city": cityData,
-                                            "zipcode": zipcodeData,
-                                            "state": stateData,
-                                            "country": countryData,
-                                            "pobox": poboxData,
-                                        }
-                                    )
-
-                                }}
-
-                                isLoading={updateMutation.isLoading}
-                                colorScheme="blue"
-                                size="lg"
-                            >
-                                Update
-                            </Button>
-                        </Grid>
-
-                    </ModalContent>
-                </ModalBody>
-            </Modal>
-
-        </>
-    )
-}
+          </ModalContent>
+        </ModalBody>
+      </Modal>
+    </>
+  );
+};
