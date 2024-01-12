@@ -98,6 +98,17 @@ export const PrepopulateCommentDisplayPlugin = ({
         const parser = new DOMParser();
         const dom = parser.parseFromString(replacedData, "text/html");
 
+        const removableNulls = Array.from(dom.querySelectorAll("span")).filter(
+          (span) => {
+            return span.textContent === "null";
+          }
+        );
+
+        if (removableNulls.length > 0) {
+          const domBreak = dom.createElement("br");
+          removableNulls[0].replaceWith(domBreak);
+        }
+
         const bunchOfNodes = $generateNodesFromDOM(editor, dom);
         const root = $getRoot();
 
@@ -106,8 +117,10 @@ export const PrepopulateCommentDisplayPlugin = ({
             const firstChild = root.getFirstChild();
             // Remove any empty paragraph node caused by the Lexical 0.12.3 update
             if (firstChild !== null) {
+              // console.log("CHILD", firstChild.getTextContent());
               if (
                 firstChild.getTextContent() === "" ||
+                firstChild.getTextContent() === "null" ||
                 firstChild.getTextContent() === undefined ||
                 firstChild.getTextContent() === null
               ) {

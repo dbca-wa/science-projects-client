@@ -1,7 +1,7 @@
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
 import { QueryFunction, QueryFunctionContext } from "@tanstack/react-query";
-import { EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
+import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
 import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
 
 // INSTANCE SETUP ==================================================================
@@ -2509,7 +2509,23 @@ export const createBusinessArea = async (formData: IBusinessArea) => {
     );
 }
 
-export const updateBusinessArea = async (formData: IBusinessArea) => {
+
+export interface BusinessAreaUpdateProps {
+    agency?: number;
+    old_id?: number;
+    pk?: number;
+    slug: string;
+    name: string;
+    focus: string;
+    introduction: string;
+    image: BusinessAreaImage | File;
+    leader: number;
+    finance_admin: number;
+    data_custodian: number;
+    selectedImageUrl: string | null;
+}
+
+export const updateBusinessArea = async (formData: BusinessAreaUpdateProps) => {
 
     console.log(formData)
 
@@ -2551,6 +2567,10 @@ export const updateBusinessArea = async (formData: IBusinessArea) => {
             newFormData.append('image', formData.image);
         }
 
+    } else {
+        if (formData.selectedImageUrl === null) {
+            newFormData.append('selectedImageUrl', "delete");
+        }
     }
 
     console.log(newFormData);
