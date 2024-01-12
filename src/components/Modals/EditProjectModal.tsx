@@ -414,9 +414,28 @@ export const EditProjectModal = ({
                           value={businessArea?.pk}
                         >
                           {businessAreaList.map((ba, index) => {
+                            const checkIsHtml = (data: string) => {
+                              // Regular expression to check for HTML tags
+                              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+                              // Check if the string contains any HTML tags
+                              return htmlRegex.test(data);
+                            };
+
+                            const isHtml = checkIsHtml(ba.name);
+                            let baName = ba?.name;
+                            if (isHtml === true) {
+                              const parser = new DOMParser();
+                              const dom = parser.parseFromString(
+                                ba.name,
+                                "text/html"
+                              );
+                              const content = dom.body.textContent;
+                              baName = content;
+                            }
                             return (
                               <option key={index} value={ba.pk}>
-                                {ba.name}
+                                {baName}
                               </option>
                             );
                           })}
@@ -452,9 +471,28 @@ export const EditProjectModal = ({
                           value={researchFunction?.pk}
                         >
                           {researchFunctionsList?.map((rf, index) => {
+                            const checkIsHtml = (data: string) => {
+                              // Regular expression to check for HTML tags
+                              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+                              // Check if the string contains any HTML tags
+                              return htmlRegex.test(data);
+                            };
+
+                            const isHtml = checkIsHtml(rf.name);
+                            let rfName = rf?.name;
+                            if (isHtml === true) {
+                              const parser = new DOMParser();
+                              const dom = parser.parseFromString(
+                                rf.name,
+                                "text/html"
+                              );
+                              const content = dom.body.textContent;
+                              rfName = content;
+                            }
                             return (
                               <option key={index} value={rf.pk}>
-                                {rf.name}
+                                {rfName}
                               </option>
                             );
                           })}
@@ -474,7 +512,7 @@ export const EditProjectModal = ({
                       <InputGroup>
                         <Select
                           variant="filled"
-                          placeholder="Select a Deparmental Service"
+                          placeholder="Select a Departmental Service"
                           onChange={(event) => {
                             const pkVal = event.target.value;
                             const depService = servicesList.find(
@@ -490,9 +528,29 @@ export const EditProjectModal = ({
                           value={service?.pk}
                         >
                           {servicesList.map((service, index) => {
+                            const checkIsHtml = (data: string) => {
+                              // Regular expression to check for HTML tags
+                              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+                              // Check if the string contains any HTML tags
+                              return htmlRegex.test(data);
+                            };
+
+                            const isHtml = checkIsHtml(service.name);
+                            let serviceName = service?.name;
+                            if (isHtml === true) {
+                              const parser = new DOMParser();
+                              const dom = parser.parseFromString(
+                                service.name,
+                                "text/html"
+                              );
+                              const content = dom.body.textContent;
+                              serviceName = content;
+                            }
+
                             return (
                               <option key={index} value={service.pk}>
-                                {service.name}
+                                {serviceName}
                               </option>
                             );
                           })}

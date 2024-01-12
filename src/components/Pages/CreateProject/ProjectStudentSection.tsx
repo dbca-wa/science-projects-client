@@ -28,6 +28,7 @@ import { MdCorporateFare, MdOutlineTitle } from "react-icons/md";
 import { AiFillDollarCircle } from "react-icons/ai";
 import { HiAcademicCap } from "react-icons/hi";
 import { FaUniversity } from "react-icons/fa";
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 interface IProjectStudentProps {
   studentFilled: boolean;
@@ -82,25 +83,17 @@ export const ProjectStudentSection = ({
 
   return (
     <>
-      <FormControl pb={6} isRequired>
-        <FormLabel>Organisation</FormLabel>
-        <InputGroup>
-          <InputLeftAddon children={<FaUniversity />} />
-          <Input
-            autoFocus
-            placeholder="Enter the corresponding organisation..."
-            value={organisation}
-            onChange={(e) => {
-              setOrganisation(e.target.value);
-            }}
-            // {...register("name", { required: true })}
-            type="text"
-          />
-        </InputGroup>
-        <FormHelperText>
-          The academic organisation of the student
-        </FormHelperText>
-      </FormControl>
+      <UnboundStatefulEditor
+        title="Organisation"
+        placeholder="Enter the academic organisation..."
+        helperText={"The academic organisation of the student"}
+        showToolbar={false}
+        showTitle={true}
+        isRequired={true}
+        value={organisation}
+        setValueFunction={setOrganisation}
+        setValueAsPlainText={true}
+      />
 
       <FormControl pb={6} isRequired userSelect={"none"}>
         <FormLabel
@@ -157,7 +150,7 @@ export const ProjectStudentSection = ({
       <Flex w={"100%"} justifyContent={"flex-end"} pb={4}>
         <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
           <Button colorScheme="gray" onClick={backClick}>
-            Cancel
+            Back
           </Button>
 
           <Button

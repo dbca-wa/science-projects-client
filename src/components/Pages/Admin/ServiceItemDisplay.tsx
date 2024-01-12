@@ -50,6 +50,7 @@ import {
 import { useState } from "react";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 export const ServiceItemDisplay = ({
   pk,
@@ -58,7 +59,8 @@ export const ServiceItemDisplay = ({
 }: IDepartmentalService) => {
   const { register, handleSubmit, watch } = useForm<IDepartmentalService>();
   const [selectedDirector, setSelectedDirector] = useState<number>();
-  const nameData = watch("name");
+  // const nameData = watch("name");
+  const [nameData, setNameData] = useState(name);
 
   const toast = useToast();
   const {
@@ -259,7 +261,11 @@ export const ServiceItemDisplay = ({
           </ModalFooter>
         </ModalContent>
       </Modal>{" "}
-      <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
+      <Modal
+        isOpen={isUpdateaModalOpen}
+        onClose={onUpdateModalClose}
+        size={"xl"}
+      >
         <ModalOverlay />
         <ModalHeader>Update Research Function</ModalHeader>
         <ModalBody>
@@ -282,10 +288,9 @@ export const ServiceItemDisplay = ({
               id="update-form"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
-              <FormControl>
+              {/* <FormControl>
                 <FormLabel>Name</FormLabel>
                 <InputGroup>
-                  {/* <InputLeftAddon children={<FaSign />} /> */}
                   <Input
                     autoComplete="off"
                     autoFocus
@@ -295,7 +300,17 @@ export const ServiceItemDisplay = ({
                     defaultValue={name} // Prefill
                   />
                 </InputGroup>
-              </FormControl>
+              </FormControl> */}
+              <UnboundStatefulEditor
+                title="Service Name"
+                helperText={"Name of Service"}
+                showToolbar={false}
+                showTitle={true}
+                isRequired={true}
+                value={nameData}
+                setValueFunction={setNameData}
+                setValueAsPlainText={true}
+              />
 
               <FormControl>
                 <UserSearchDropdown

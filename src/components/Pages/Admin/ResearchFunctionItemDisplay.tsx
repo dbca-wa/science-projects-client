@@ -51,6 +51,7 @@ import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useState } from "react";
 import { AxiosError } from "axios";
 import { TextButtonFlex } from "../../TextButtonFlex";
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 export const ResearchFunctionItemDisplay = ({
   pk,
@@ -61,9 +62,13 @@ export const ResearchFunctionItemDisplay = ({
   leader,
 }: IResearchFunction) => {
   const { register, handleSubmit, watch } = useForm<IResearchFunction>();
-  const nameData = watch("name");
-  const descriptionData = watch("description");
-  const associationData = watch("association");
+  // const nameData = watch("name");
+  const [nameData, setNameData] = useState(name);
+  const [descriptionData, setDescriptionData] = useState(description);
+  const [associationData, setAssociationData] = useState(association);
+
+  // const descriptionData = watch("description");
+  // const associationData = watch("association");
   const [isChecked, setIsChecked] = useState(is_active);
 
   const activeData = watch("is_active");
@@ -277,7 +282,11 @@ export const ResearchFunctionItemDisplay = ({
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
+      <Modal
+        isOpen={isUpdateaModalOpen}
+        onClose={onUpdateModalClose}
+        size={"2xl"}
+      >
         <ModalOverlay />
         <ModalHeader>Update Research Function</ModalHeader>
         <ModalBody>
@@ -300,10 +309,9 @@ export const ResearchFunctionItemDisplay = ({
               id="update-form"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
-              <FormControl>
+              {/* <FormControl>
                 <FormLabel>Name</FormLabel>
                 <InputGroup>
-                  {/* <InputLeftAddon children={<FaSign />} /> */}
                   <Input
                     autoFocus
                     autoComplete="off"
@@ -313,23 +321,55 @@ export const ResearchFunctionItemDisplay = ({
                     defaultValue={name} // Prefill
                   />
                 </InputGroup>
-              </FormControl>
-              <FormControl>
+              </FormControl> */}
+
+              <UnboundStatefulEditor
+                title="Research Function Name"
+                helperText={"Name of Research Function"}
+                showToolbar={false}
+                showTitle={true}
+                isRequired={true}
+                value={nameData}
+                setValueFunction={setNameData}
+                setValueAsPlainText={true}
+              />
+              <UnboundStatefulEditor
+                title="Description"
+                helperText={"A description of the Function"}
+                showToolbar={true}
+                showTitle={true}
+                isRequired={true}
+                value={descriptionData}
+                setValueFunction={setDescriptionData}
+                setValueAsPlainText={false}
+              />
+
+              <UnboundStatefulEditor
+                title="Association"
+                helperText={"What is this function associated with?"}
+                showToolbar={false}
+                showTitle={true}
+                isRequired={true}
+                value={associationData}
+                setValueFunction={setAssociationData}
+                setValueAsPlainText={true}
+              />
+              {/* <FormControl>
                 <FormLabel>Description</FormLabel>
                 <Input
                   autoComplete="off"
                   {...register("description", { required: true })}
                   defaultValue={description} // Prefill
                 />
-              </FormControl>
-              <FormControl>
+              </FormControl> */}
+              {/* <FormControl>
                 <FormLabel>Association</FormLabel>
                 <Input
                   autoComplete="off"
                   {...register("association", { required: true })}
                   defaultValue={association} // Prefill
                 />
-              </FormControl>
+              </FormControl> */}
               <FormControl>
                 <UserSearchDropdown
                   {...register("leader", { required: true })}
