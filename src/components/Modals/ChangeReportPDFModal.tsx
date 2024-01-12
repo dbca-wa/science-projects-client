@@ -230,7 +230,6 @@ export const ChangeReportPDFModal = ({
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }}
-                colorScheme={"red"}
                 onClick={deleteFile}
               >
                 Remove Current PDF

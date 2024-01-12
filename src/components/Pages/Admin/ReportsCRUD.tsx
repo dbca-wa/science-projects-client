@@ -26,6 +26,7 @@ import {
   Select,
   FormHelperText,
   Switch,
+  useColorMode,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -117,6 +118,8 @@ export const ReportsCRUD = () => {
     }
   }, [slices]);
 
+  const { colorMode } = useColorMode();
+
   return (
     <>
       {isLoading ? (
@@ -141,11 +144,11 @@ export const ReportsCRUD = () => {
               <Flex>
                 <Button
                   onClick={onAddOpen}
-                  colorScheme="green"
-                  bg={"green.500"}
                   color={"white"}
+                  background={colorMode === "light" ? "green.500" : "green.600"}
                   _hover={{
-                    bg: "green.400",
+                    background:
+                      colorMode === "light" ? "green.400" : "green.500",
                   }}
                 >
                   Add
@@ -285,7 +288,9 @@ export const ReportsCRUD = () => {
                       defaultChecked={false}
                       {...register("seek_update")}
                     />
-                    <FormHelperText color={"red.700"}>
+                    <FormHelperText
+                      color={colorMode === "light" ? "red.700" : "red.500"}
+                    >
                       This will set eligible projects to updating, create a
                       progress/student report for this report, and send an email
                       to users letting them know that an update is required.
@@ -348,7 +353,11 @@ export const ReportsCRUD = () => {
                   // form="add-form"
                   // type="submit"
                   isLoading={mutation.isLoading}
-                  colorScheme="blue"
+                  color={"white"}
+                  background={colorMode === "light" ? "blue.500" : "blue.600"}
+                  _hover={{
+                    background: colorMode === "light" ? "blue.400" : "blue.500",
+                  }}
                   size="lg"
                   width={"100%"}
                   isDisabled={

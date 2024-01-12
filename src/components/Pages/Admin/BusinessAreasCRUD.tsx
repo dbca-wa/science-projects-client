@@ -209,11 +209,11 @@ export const BusinessAreasCRUD = () => {
               <Flex justifyContent={"flex-end"} w={"100%"}>
                 <Button
                   onClick={onAddOpen}
-                  colorScheme="green"
-                  bg={"green.500"}
                   color={"white"}
+                  background={colorMode === "light" ? "green.500" : "green.600"}
                   _hover={{
-                    bg: "green.400",
+                    background:
+                      colorMode === "light" ? "green.400" : "green.500",
                   }}
                 >
                   Add
@@ -487,7 +487,11 @@ export const BusinessAreasCRUD = () => {
                   // form="add-form"
                   // type="submit"
                   isLoading={mutation.isLoading}
-                  colorScheme="blue"
+                  color={"white"}
+                  background={colorMode === "light" ? "blue.500" : "blue.600"}
+                  _hover={{
+                    background: colorMode === "light" ? "blue.400" : "blue.500",
+                  }}
                   size="lg"
                   width={"100%"}
                   onClick={() => {

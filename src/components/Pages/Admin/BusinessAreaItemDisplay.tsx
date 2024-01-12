@@ -403,7 +403,7 @@ export const BusinessAreaItemDisplay = ({
       </Grid>
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
-        <ModalContent bg="white">
+        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader>Delete Business Area</ModalHeader>
           <ModalBody>
             <Box>
@@ -423,10 +423,25 @@ export const BusinessAreaItemDisplay = ({
           </ModalBody>
           <ModalFooter justifyContent="flex-end">
             <Flex>
-              <Button onClick={onDeleteModalClose} colorScheme="red">
+              <Button
+                onClick={onDeleteModalClose}
+                color={"white"}
+                background={colorMode === "light" ? "red.500" : "red.600"}
+                _hover={{
+                  background: colorMode === "light" ? "red.400" : "red.500",
+                }}
+              >
                 No
               </Button>
-              <Button onClick={deleteBtnClicked} colorScheme="green" ml={3}>
+              <Button
+                onClick={deleteBtnClicked}
+                color={"white"}
+                background={colorMode === "light" ? "green.500" : "green.600"}
+                _hover={{
+                  background: colorMode === "light" ? "green.400" : "green.500",
+                }}
+                ml={3}
+              >
                 Yes
               </Button>
             </Flex>
@@ -442,7 +457,11 @@ export const BusinessAreaItemDisplay = ({
         <ModalOverlay />
         <ModalHeader>Update Business Area</ModalHeader>
         <ModalBody>
-          <ModalContent bg="white" p={4} px={6}>
+          <ModalContent
+            bg={colorMode === "light" ? "white" : "gray.800"}
+            p={4}
+            px={6}
+          >
             <FormControl>
               {/* Hidden input to capture the pk */}
               <input
@@ -687,7 +706,11 @@ export const BusinessAreaItemDisplay = ({
                 // form="update-form"
                 // type="submit"
                 isLoading={updateMutation.isLoading}
-                colorScheme="blue"
+                color={"white"}
+                background={colorMode === "light" ? "blue.500" : "blue.600"}
+                _hover={{
+                  background: colorMode === "light" ? "blue.400" : "blue.500",
+                }}
                 size="lg"
                 onClick={() => {
                   console.log("clicked");

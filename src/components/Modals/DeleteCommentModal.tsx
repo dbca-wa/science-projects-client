@@ -169,7 +169,11 @@ export const DeleteCommentModal = ({
                 Cancel
               </Button>
               <Button
-                colorScheme="red"
+                color={"white"}
+                background={colorMode === "light" ? "red.500" : "red.600"}
+                _hover={{
+                  background: colorMode === "light" ? "red.400" : "red.500",
+                }}
                 isLoading={deleteCommentMutation.isLoading}
                 type="submit"
                 ml={3}
