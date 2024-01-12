@@ -211,13 +211,14 @@ ITeamMember) => {
               ml={"2px"}
               variant={"link"}
               justifyContent={"start"}
-              color={"white"}
-              background={colorMode === "light" ? "blue.500" : "blue.600"}
+              // color={"white"}
+              color={colorMode === "light" ? "blue.500" : "blue.600"}
               _hover={{
-                background: colorMode === "light" ? "blue.400" : "blue.500",
+                color: colorMode === "light" ? "blue.400" : "blue.500",
               }}
               onClick={onUserOpen}
               cursor="pointer"
+              fontSize={"lg"}
             >
               {name !== "undefined undefined" && name !== "None None"
                 ? name

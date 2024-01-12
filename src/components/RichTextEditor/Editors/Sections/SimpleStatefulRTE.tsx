@@ -22,7 +22,10 @@ import { EditorSubsections, EditorType } from "../../../../types";
 import { PrepopulateCommentDisplayPlugin } from "./../../Plugins/PrepopulateCommentDisplayPlugin";
 
 interface Props {
+  allowInsertButton?: boolean;
+  placeholderText?: string;
   showToolbar: boolean;
+  setValueAsPlainText: boolean;
   value: string;
   setValueFunction: React.Dispatch<React.SetStateAction<string>>;
   initialConfig: any;
@@ -30,9 +33,12 @@ interface Props {
 }
 
 export const SimpleStatefulRTE = ({
+  allowInsertButton,
+  placeholderText,
   initialConfig,
   editorRef,
   showToolbar,
+  setValueAsPlainText,
   value,
   setValueFunction,
 }: Props) => {
@@ -52,7 +58,15 @@ export const SimpleStatefulRTE = ({
               const root = $getRoot();
               //   setEditorText(root.__cachedText);
               const newHtml = $generateHtmlFromNodes(editor, null);
-              setValueFunction(newHtml);
+              if (setValueAsPlainText === true) {
+                const parserA = new DOMParser();
+                const docA = parserA.parseFromString(newHtml, "text/html");
+                const contentA = docA.body.textContent;
+                console.log(contentA);
+                setValueFunction(contentA);
+              } else {
+                setValueFunction(newHtml);
+              }
               // console.log(newHtml)
               // console.log("DATA DISPLAY PLUGIN:", newHtml);
               //   setDisplayData(newHtml);
@@ -69,6 +83,7 @@ export const SimpleStatefulRTE = ({
 
               {showToolbar ? (
                 <SimpleRichTextToolbar
+                  allowInsertButton={allowInsertButton}
                   editorRef={editorRef}
                   selectedNodeType={selectedNodeType}
                   setSelectedNodeType={setSelectedNodeType}
@@ -81,7 +96,7 @@ export const SimpleStatefulRTE = ({
                   width: "100%",
                   height: "auto",
                   padding: "32px",
-                  paddingTop: "23px",
+                  paddingTop: showToolbar ? "20px" : "23px",
                   paddingBottom: "20px",
                   borderRadius: "0 0 25px 25px",
                   outline: "none",
@@ -95,12 +110,12 @@ export const SimpleStatefulRTE = ({
               style={{
                 position: "absolute",
                 left: "32px",
-                top: "80px",
+                top: showToolbar ? "76px" : "22px",
                 userSelect: "none",
                 pointerEvents: "none",
               }}
             >
-              {"Enter some text..."}
+              {placeholderText ? placeholderText : "Enter some text..."}
             </div>
           }
           ErrorBoundary={LexicalErrorBoundary}
