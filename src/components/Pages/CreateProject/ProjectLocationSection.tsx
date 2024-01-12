@@ -197,7 +197,7 @@ export const ProjectLocationSection = ({
             <Grid mr={4}>
               <></>
               <Box>
-                <Button onClick={backClick}>Cancel</Button>
+                <Button onClick={backClick}>Back</Button>
                 <Button
                   ml={3}
                   type="submit"

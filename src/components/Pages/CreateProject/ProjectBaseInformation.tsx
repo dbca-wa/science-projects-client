@@ -27,6 +27,7 @@ import { IUserData } from "../../../types";
 import { color, motion } from "framer-motion";
 import { SimpleStateRichTextEditor } from "../../RichTextEditor/Editors/SimpleStateRichTextEditor";
 import { StateRichTextEditor } from "../../RichTextEditor/Editors/StateRichTextEditor";
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 interface IProjectBaseInformationProps {
   projectKind: string;
@@ -130,55 +131,34 @@ export const ProjectBaseInformation = ({
             />
           </InputGroup>
 
-          <FormControl isRequired mb={4}>
-            <FormLabel>Project Title</FormLabel>
-            <InputGroup>
-              {/* <InputLeftElement children={<Icon as={MdTitle} />} /> */}
-              {/* <Input
-                                    type="text"
-                                    placeholder={`Type your Project Title here...`}
-                                    value={projectTitle}
-                                    onChange={(event) => setProjectTitle(event.target.value)}
-                                    maxLength={30}
-                                // pattern="[A-Za-z0-9@.+_-]*" 
-                                /> */}
-              <SimpleStateRichTextEditor
-                // autoFocus={false}
-                section="title"
-                editorType="ProjectDetail"
-                isUpdate={false}
-                value={projectTitle}
-                setValueFunction={setProjectTitle}
-              />
-            </InputGroup>
-            <FormHelperText
-              color={colorMode === "light" ? "gray.500" : "gray.400"}
-            >
-              The project title with formatting if required (e.g. for taxonomic
-              names).
-            </FormHelperText>
-          </FormControl>
+          <UnboundStatefulEditor
+            title="Project Title"
+            // allowInsertButton
+            helperText={
+              "The project title with formatting if required (e.g. for taxonomic names)."
+            }
+            showToolbar={true}
+            showTitle={true}
+            isRequired={true}
+            value={projectTitle}
+            setValueFunction={setProjectTitle}
+            setValueAsPlainText={false}
+          />
 
           <TagInput setTagFunction={setKeywords} />
-
-          <FormControl isRequired mb={6}>
-            <FormLabel>Project Summary</FormLabel>
-            <InputGroup>
-              <SimpleStateRichTextEditor
-                // autoFocus={false}
-                section="description"
-                editorType="ProjectDetail"
-                isUpdate={false}
-                value={projectSummary}
-                setValueFunction={setProjectSummary}
-              />
-            </InputGroup>
-            <FormHelperText
-              color={colorMode === "light" ? "gray.500" : "gray.400"}
-            >
-              A concise project summary, or any additional useful information.
-            </FormHelperText>
-          </FormControl>
+          <UnboundStatefulEditor
+            title="Project Summary"
+            // allowInsertButton
+            helperText={
+              "A concise project summary, or any additional useful information."
+            }
+            showToolbar={true}
+            showTitle={true}
+            isRequired={true}
+            value={projectSummary}
+            setValueFunction={setProjectSummary}
+            setValueAsPlainText={false}
+          />
         </Box>
 
         <Box>

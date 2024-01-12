@@ -111,15 +111,7 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
         </ModalBody>
         <ModalFooter>
           <Flex>
-            <Button
-              onClick={onClose}
-              mr={3}
-              color={"white"}
-              background={colorMode === "light" ? "red.500" : "red.600"}
-              _hover={{
-                background: colorMode === "light" ? "red.400" : "red.500",
-              }}
-            >
+            <Button onClick={onClose} mr={3} colorScheme={"gray"}>
               Cancel
             </Button>
             <Button

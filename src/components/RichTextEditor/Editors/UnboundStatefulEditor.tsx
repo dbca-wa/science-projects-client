@@ -51,21 +51,27 @@ interface IProps {
   // data: string;
   title: string;
   showTitle: boolean;
+  setValueAsPlainText: boolean;
   helperText?: string;
   showToolbar: boolean;
   isRequired: boolean;
+  placeholder?: string;
   value: string;
   setValueFunction: React.Dispatch<React.SetStateAction<string>>;
+  allowInsertButton?: boolean;
 }
 
 export const UnboundStatefulEditor = ({
   value,
   setValueFunction,
+  setValueAsPlainText,
   showToolbar,
   title,
   helperText,
   showTitle,
   isRequired,
+  placeholder,
+  allowInsertButton,
 }: IProps) => {
   const { colorMode } = useColorMode();
 
@@ -145,16 +151,20 @@ export const UnboundStatefulEditor = ({
           pos={"relative"}
           w={"100%"}
           roundedBottom={20}
+          //   boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
           boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
           bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
           roundedTop={20}
           zIndex={2}
         >
           <SimpleStatefulRTE
+            allowInsertButton={allowInsertButton}
+            placeholderText={placeholder}
             showToolbar={showToolbar}
             initialConfig={initialConfig}
             editorRef={editorRef}
             value={value}
+            setValueAsPlainText={setValueAsPlainText}
             setValueFunction={setValueFunction}
           />
         </Box>
