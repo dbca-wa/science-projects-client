@@ -125,18 +125,10 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
               <Text
                 ml={1}
                 as={"span"}
-                // fontWeight={'semibold'}
+              // fontWeight={'semibold'}
               >
-                We are trialing dark mode and another layout. These are
-                accessible by hovering over your name/image on the top right.
-              </Text>
-              <Text
-                ml={1}
-                as={"span"}
-                // fontWeight={'semibold'}
-              >
-                Lists and nested lists (up to a depth of 3) are now supported
-                when copy-pasting from MS Word on Desktop.
+                Lists and nested lists are now supported when copy-pasting from MS Word on Desktop.
+                If you are using MS Word online, you must download the file and copy content from there.
               </Text>
             </Box>
 
