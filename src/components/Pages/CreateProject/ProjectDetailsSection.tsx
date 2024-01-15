@@ -82,15 +82,15 @@ export const ProjectDetailsSection = ({
       startDate <= endDate
     ) {
       setProjectDetailsFilled(true);
-      console.log({
-        businessArea: selectedBusinessArea,
-        researchFunction: selectedResearchFunction,
-        departmentalService: selectedDepartmentalService,
-        dataCustodian: selectedDataCustodian,
-        supervisingScientist: selectedSupervisingScientist,
-        startDate: startDate,
-        endDate: endDate,
-      });
+      // console.log({
+      //   businessArea: selectedBusinessArea,
+      //   researchFunction: selectedResearchFunction,
+      //   departmentalService: selectedDepartmentalService,
+      //   dataCustodian: selectedDataCustodian,
+      //   supervisingScientist: selectedSupervisingScientist,
+      //   startDate: startDate,
+      //   endDate: endDate,
+      // });
     } else {
       setProjectDetailsFilled(false);
     }
@@ -379,7 +379,7 @@ export const ProjectDetailsSection = ({
           isDisabled={!projectDetailsFilled}
           onClick={() => {
             if (projectDetailsFilled) {
-              console.log("going next");
+              // console.log("going next");
               nextClick({
                 businessArea: selectedBusinessArea,
                 researchFunction: selectedResearchFunction,

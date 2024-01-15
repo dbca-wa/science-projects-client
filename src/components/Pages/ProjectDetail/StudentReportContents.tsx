@@ -119,14 +119,14 @@ export const StudentReportContents = ({
     fetchData();
   }, [selectedYear, forceRefresh, projectPk]);
 
-  useEffect(() => console.log(selectedStudentReport), [selectedStudentReport]);
+  // useEffect(() => console.log(selectedStudentReport), [selectedStudentReport]);
 
   useEffect(() => {
     if (selectedStudentReport) setIsLoading(false);
   }, [selectedStudentReport]);
 
   const refetchDataForYearFunction = () => {
-    console.log("SELECTED YEAR IS:", selectedYear);
+    // console.log("SELECTED YEAR IS:", selectedYear);
     const dataForYear = documents.find(
       (report) => report.year === selectedYear
     );
@@ -135,7 +135,7 @@ export const StudentReportContents = ({
       setselectedStudentReport(dataForYear);
       // setEditorKey(selectedYear.toString() + colorMode + documentType);
     }
-    console.log("set year and selected doc");
+    // console.log("set year and selected doc");
   };
 
   // const refetchFunc = () => {

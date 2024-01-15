@@ -27,7 +27,7 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
   const [tags, setTags] = useState<string[]>([]);
   useEffect(() => {
     if (preExistingTags?.length >= 1) {
-      console.log(preExistingTags.length, preExistingTags);
+      // console.log(preExistingTags.length, preExistingTags);
       if (preExistingTags[0] === "") {
         setTags([]);
       } else {
@@ -45,11 +45,11 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
     setTags(updatedTags);
   };
 
-  useEffect(() => {
-    if (tags) {
-      console.log(tags);
-    }
-  }, [tags]);
+  // useEffect(() => {
+  //   if (tags) {
+  //     console.log(tags);
+  //   }
+  // }, [tags]);
 
   const addTags = () => {
     const newTags = inputValue
@@ -64,7 +64,7 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
           )
       );
 
-    console.log(newTags);
+    // console.log(newTags);
 
     if (newTags.length > 0) {
       const updatedTags = [...tags, ...newTags.map(capitalizeFirstLetter)];

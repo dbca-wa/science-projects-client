@@ -52,27 +52,27 @@ export const ProjectPlanEndorsements = ({
 
   const baseApi = useApiEndpoint();
 
-  useEffect(
-    () =>
-      console.log({
-        bmEndRequiredValue: bmEndRequiredValue,
-        bmEndProvidedValue: bmEndProvidedValue,
-        hcEndReqValue: hcEndReqValue,
-        hcEndProvidedValue: hcEndProvidedValue,
-        aecEndReqValue: aecEndReqValue,
-        aecEndProvidedValue: aecEndProvidedValue,
-        document,
-      }),
-    [
-      bmEndRequiredValue,
-      bmEndProvidedValue,
-      aecEndReqValue,
-      aecEndProvidedValue,
-      hcEndReqValue,
-      hcEndProvidedValue,
-      document,
-    ]
-  );
+  // useEffect(
+  //   () =>
+  //     console.log({
+  //       bmEndRequiredValue: bmEndRequiredValue,
+  //       bmEndProvidedValue: bmEndProvidedValue,
+  //       hcEndReqValue: hcEndReqValue,
+  //       hcEndProvidedValue: hcEndProvidedValue,
+  //       aecEndReqValue: aecEndReqValue,
+  //       aecEndProvidedValue: aecEndProvidedValue,
+  //       document,
+  //     }),
+  //   [
+  //     bmEndRequiredValue,
+  //     bmEndProvidedValue,
+  //     aecEndReqValue,
+  //     aecEndProvidedValue,
+  //     hcEndReqValue,
+  //     hcEndProvidedValue,
+  //     document,
+  //   ]
+  // );
 
   // const [involvesDataCollection, setInvolvesDataCollection] = useState(true);
 
@@ -244,7 +244,7 @@ export const ProjectPlanEndorsements = ({
   );
 
   useEffect(() => {
-    console.log(uploadedPDF);
+    // console.log(uploadedPDF);
     if (uploadedPDF && uploadedPDF.type === "application/pdf") {
       setShouldSwitchBeChecked(true);
     }

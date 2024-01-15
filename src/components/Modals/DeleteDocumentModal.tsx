@@ -135,7 +135,7 @@ export const DeleteDocumentModal = ({
   });
 
   const deleteDocument = (formData: IDeleteDocument) => {
-    console.log(formData);
+    // console.log(formData);
     deleteDocumentMutation.mutate(formData);
   };
 
@@ -143,7 +143,7 @@ export const DeleteDocumentModal = ({
   const { register, handleSubmit, reset, watch } = useForm<IDeleteDocument>();
 
   const projPk = watch("projectPk");
-  useEffect(() => console.log(projPk, projectPk), [projectPk, projPk]);
+  // useEffect(() => console.log(projPk, projectPk), [projectPk, projPk]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>

@@ -110,7 +110,7 @@ export const EditProjectModal = ({
   useEffect(() => {
     if (locationData.length === 0) {
       setLocationData(currentAreas.map((area) => area.pk));
-      console.log(locationData);
+      // console.log(locationData);
     } else {
       // console.log('not zero')
       // console.log(locationData)

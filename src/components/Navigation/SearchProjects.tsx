@@ -43,7 +43,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
     HTMLSelectElement
   > = (event) => {
     const businessAreaValue = event.target.value;
-    console.log(businessAreaValue);
+    // console.log(businessAreaValue);
     setSearchFilters({
       onlyActive: onlyActive,
       onlyInactive: onlyInactive,
@@ -58,7 +58,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
     HTMLSelectElement
   > = (event) => {
     const yearValue = Number(event.target.value);
-    console.log(yearValue);
+    // console.log(yearValue);
     setSearchFilters({
       onlyActive: onlyActive,
       onlyInactive: onlyInactive,
@@ -86,7 +86,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
     const fetchAvailableProjectYears = async () => {
       try {
         const data = await getAllProjectsYears();
-        console.log(data);
+        // console.log(data);
         setAvailableYears(data);
       } catch (error) {
         console.log("Error fetching Project's years", error);

@@ -67,9 +67,9 @@ IProgressDocumentActions) => {
   const { colorMode } = useColorMode();
 
   useEffect(() => {
-    console.log(progressReportData);
-    console.log(progressReportData?.document?.creator);
-    console.log(progressReportData?.document?.modifier);
+    // console.log(progressReportData);
+    // console.log(progressReportData?.document?.creator);
+    // console.log(progressReportData?.document?.modifier);
     // console.log(progressReportData?.document?.created_at);
     // console.log(progressReportData?.document?.updated_at);
     // setCreationDate(progressReportData?.document?.created_at);
@@ -182,15 +182,15 @@ IProgressDocumentActions) => {
   //         setDocPk},
   //     [documents])
 
-  useEffect(() => {
-    if (!userLoading && !baLoading && !baLeadLoading) {
-      console.log({
-        ba: baData,
-        leadUser: baLead,
-        me: userData,
-      });
-    }
-  }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
+  // useEffect(() => {
+  //   if (!userLoading && !baLoading && !baLeadLoading) {
+  //     console.log({
+  //       ba: baData,
+  //       leadUser: baLead,
+  //       me: userData,
+  //     });
+  //   }
+  // }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
 
   const creationDate = useFormattedDate(
     progressReportData?.document?.created_at
@@ -220,7 +220,7 @@ IProgressDocumentActions) => {
       modifier &&
       creator
     ) {
-      console.log();
+      // console.log();
       if (!isTeamLoading) {
         setLeaderMemeber(teamData.find((member) => member.is_leader === true));
       }
@@ -249,8 +249,8 @@ IProgressDocumentActions) => {
   useEffect(() => {
     if (actionsReady) {
       setLeaderMemeber(teamData.find((member) => member.is_leader === true));
-      console.log(userData);
-      console.log(progressReportData?.document);
+      // console.log(userData);
+      // console.log(progressReportData?.document);
     }
   }, [actionsReady, teamData, isTeamLoading]);
 
@@ -367,9 +367,9 @@ IProgressDocumentActions) => {
     projectDocPDFGenerationMutation.mutate(formData);
   };
 
-  useEffect(() => {
-    console.log(leaderMember);
-  }, [leaderMember]);
+  // useEffect(() => {
+  //   console.log(leaderMember);
+  // }, [leaderMember]);
 
   return (
     <>
@@ -784,7 +784,7 @@ IProgressDocumentActions) => {
                               }}
                               size={"sm"}
                               onClick={() => {
-                                console.log(docPk);
+                                // console.log(docPk);
                                 onOpenDeleteDocumentModal();
                               }}
                               mr={2}

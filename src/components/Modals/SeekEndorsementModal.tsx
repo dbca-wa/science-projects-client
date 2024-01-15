@@ -121,10 +121,10 @@ export const SeekEndorsementModal = ({
     },
   });
 
-  useEffect(() => console.log(errors));
+  // useEffect(() => console.log(errors));
 
   const seekEndorsementAndSaveFunc = (formData: ISpecialEndorsement) => {
-    console.log(formData);
+    // console.log(formData);
     seekEndorsementAndSaveMutation.mutate(formData);
   };
 
@@ -163,20 +163,22 @@ export const SeekEndorsementModal = ({
           <ModalBody>
             <Box mt={2}>
               <Text fontWeight={"semibold"} fontSize={"lg"}>
-                {// AEC not required or AEC required and given
-                (aecEndorsementRequired === false ||
-                  (aecEndorsementRequired === true &&
-                    aecEndorsementProvided === true)) &&
-                // Herb not required or herb required and given
-                (herbariumEndorsementRequired === false ||
-                  (herbariumEndorsementRequired === true &&
-                    herbariumEndorsementProvided === true)) &&
-                // Bio not required or bio required and given
-                (bmEndorsementRequired === false ||
-                  (bmEndorsementRequired === true &&
-                    bmEndorsementProvided === true))
-                  ? "As all required endorsements have been provided, no emails are necessary. You may still save."
-                  : "Also send notifications?"}
+                {
+                  // AEC not required or AEC required and given
+                  (aecEndorsementRequired === false ||
+                    (aecEndorsementRequired === true &&
+                      aecEndorsementProvided === true)) &&
+                  // Herb not required or herb required and given
+                  (herbariumEndorsementRequired === false ||
+                    (herbariumEndorsementRequired === true &&
+                      herbariumEndorsementProvided === true)) &&
+                  // Bio not required or bio required and given
+                  (bmEndorsementRequired === false ||
+                    (bmEndorsementRequired === true &&
+                      bmEndorsementProvided === true))
+                    ? "As all required endorsements have been provided, no emails are necessary. You may still save."
+                    : "Also send notifications?"
+                }
               </Text>
               <Flex>
                 <Checkbox

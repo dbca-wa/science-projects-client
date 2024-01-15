@@ -170,7 +170,11 @@ export const ProjectClosureModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
       <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(closeProject)}>
+      <Flex
+        as={"form"}
+        onSubmit={handleSubmit(closeProject)}
+        bg={colorMode === "light" ? "white" : "gray.800"}
+      >
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader>
             Are you sure you want to close this project?
@@ -178,8 +182,16 @@ export const ProjectClosureModal = ({
           <ModalCloseButton />
 
           <ModalBody>
-            <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={10}>
-              <Box bg={"gray.50"} rounded={"2xl"} p={2}>
+            <Grid
+              gridTemplateColumns={"repeat(1, 1fr)"}
+              gridGap={10}
+              bg={colorMode === "light" ? "white" : "gray.800"}
+            >
+              <Box
+                bg={colorMode === "light" ? "white" : "gray.800"}
+                rounded={"2xl"}
+                p={2}
+              >
                 <Box px={4}>
                   <Text fontWeight={"semibold"} fontSize={"xl"}>
                     Info

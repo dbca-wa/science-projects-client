@@ -85,7 +85,7 @@ export const DeleteCommentModal = ({
 
       setTimeout(async () => {
         await refetchData();
-        console.log("removing");
+        // console.log("removing");
         onClose();
       }, 150);
     },
@@ -104,15 +104,12 @@ export const DeleteCommentModal = ({
   });
 
   const deleteComment = (formData: IDeleteComment) => {
-    console.log(formData);
+    // console.log(formData);
     deleteCommentMutation.mutate(formData);
   };
 
   const { colorMode } = useColorMode();
   const { register, handleSubmit, reset, watch } = useForm<IDeleteComment>();
-
-  const commentsPk = watch("commentPk");
-  useEffect(() => console.log(commentsPk, commentPk), [commentPk, commentsPk]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>

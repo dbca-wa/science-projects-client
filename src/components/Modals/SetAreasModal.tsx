@@ -114,7 +114,7 @@ export const SetAreasModal = ({
   });
 
   const setAreas = (formData: ISetProjectAreas) => {
-    console.log("from func", formData);
+    // console.log("from func", formData);
     setAreasMutation.mutate(formData);
   };
 
@@ -128,7 +128,7 @@ export const SetAreasModal = ({
   } = useForm<ISetProjectAreas>();
 
   const projPk = watch("projectPk");
-  useEffect(() => console.log(projPk, projectPk), [projectPk, projPk]);
+  // useEffect(() => console.log(projPk, projectPk), [projectPk, projPk]);
 
   const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } =
     useGetLocations();
@@ -156,9 +156,6 @@ export const SetAreasModal = ({
     selectedNrms,
     setLocationData,
   ]);
-  useEffect(() => {
-    console.log(locationData);
-  }, [locationData]);
 
   const [fixed, setFixed] = useState(false);
 
@@ -201,16 +198,14 @@ export const SetAreasModal = ({
                   gridColumnGap={4}
                   px={4}
                 >
-                  <Flex flexDir={"column"}>
-                    {dbcaRegions && (
-                      <AreaCheckAndMaps
-                        title="DBCA Regions"
-                        areas={dbcaRegions}
-                        required
-                        selectedAreas={selectedRegions}
-                        setSelectedAreas={setSelectedRegions}
-                      />
-                    )}
+                  <Center
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignContent={"center"}
+                    alignItems={"center"}
+                    w={"100%"}
+                  >
+                    {" "}
                     {dbcaDistricts && (
                       <AreaCheckAndMaps
                         title="DBCA Districts"
@@ -220,15 +215,15 @@ export const SetAreasModal = ({
                         setSelectedAreas={setSelectedDistricts}
                       />
                     )}
-                    {ibra && (
-                      <AreaCheckAndMaps
-                        title="IBRAs"
-                        areas={ibra}
-                        required
-                        selectedAreas={selectedIbras}
-                        setSelectedAreas={setSelectedIbras}
-                      />
-                    )}
+                  </Center>
+                  <Center
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignContent={"center"}
+                    alignItems={"center"}
+                    w={"100%"}
+                  >
+                    {" "}
                     {imcra && (
                       <AreaCheckAndMaps
                         title="IMCRAs"
@@ -238,6 +233,33 @@ export const SetAreasModal = ({
                         setSelectedAreas={setSelectedImcras}
                       />
                     )}
+                  </Center>
+                  <Center
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignContent={"center"}
+                    alignItems={"center"}
+                    w={"100%"}
+                  >
+                    {" "}
+                    {dbcaRegions && (
+                      <AreaCheckAndMaps
+                        title="DBCA Regions"
+                        areas={dbcaRegions}
+                        required
+                        selectedAreas={selectedRegions}
+                        setSelectedAreas={setSelectedRegions}
+                      />
+                    )}
+                  </Center>
+                  <Center
+                    display={"flex"}
+                    flexDir={"column"}
+                    justifyContent={"center"}
+                    alignContent={"center"}
+                    alignItems={"center"}
+                    w={"100%"}
+                  >
                     {nrm && (
                       <AreaCheckAndMaps
                         title="Natural Resource Management Regions"
@@ -247,54 +269,7 @@ export const SetAreasModal = ({
                         setSelectedAreas={setSelectedNrms}
                       />
                     )}
-                  </Flex>
-
-                  <Box
-                    position="sticky"
-                    top={"120px"} // Adjust the top value if needed
-                    overflow={"hidden"}
-                    h={"700px"} // Set the height of the image container
-                    // bg={"red"}
-                    rounded={"2xl"}
-                  >
-                    <Text
-                      // color={"white"}
-                      // zIndex={999}
-                      fontWeight={"bold"}
-                      my={2}
-                      // ml={2}
-                      textAlign={"center"}
-                    >
-                      Map in development
-                    </Text>
-                    {/* <Skeleton
-                            // position="sticky"
-                            // top={"125px"} // Adjust the top value if needed
-                            // overflow={'hidden'}
-                            // h={'500px'} // Set the height of the image container
-                            // bg={"red"}
-                            rounded={"2xl"}
-                        > */}
-                    <Box
-                      position="sticky"
-                      // top={"105px"} // Adjust the top value if needed
-                      overflow={"hidden"}
-                      // h={'500px'} // Set the height of the image container
-                      bg={colorMode === "light" ? "gray.200" : "gray.600"}
-                      w={"100%"}
-                      h={"500px"}
-                      // h={"100%"}
-                      rounded={"2xl"}
-                    >
-                      {/* <Image
-                                src="/soon.jpg"
-                                objectFit={'cover'}
-                                w={"100%"}
-                                h={"100%"}
-                            /> */}
-                    </Box>
-                    {/* </Skeleton> */}
-                    <Flex w={"100%"} justifyContent={"flex-end"} pb={4} pt={4}>
+                    <Flex w={"100%"} justifyContent={"flex-end"}>
                       <Button onClick={onClose}>Cancel</Button>
                       <Button
                         ml={3}
@@ -323,7 +298,25 @@ export const SetAreasModal = ({
                         Set Areas
                       </Button>
                     </Flex>
-                  </Box>
+                  </Center>
+                  <Center
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignContent={"center"}
+                    alignItems={"center"}
+                    w={"100%"}
+                  >
+                    {" "}
+                    {ibra && (
+                      <AreaCheckAndMaps
+                        title="IBRAs"
+                        areas={ibra}
+                        required
+                        selectedAreas={selectedIbras}
+                        setSelectedAreas={setSelectedIbras}
+                      />
+                    )}
+                  </Center>{" "}
                 </Grid>
               )}
             </>
@@ -354,3 +347,50 @@ export const SetAreasModal = ({
     </Modal>
   );
 };
+
+// <Box
+// position="sticky"
+// top={"120px"} // Adjust the top value if needed
+// overflow={"hidden"}
+// h={"700px"} // Set the height of the image container
+// // bg={"red"}
+// rounded={"2xl"}
+// >
+// <Text
+//   // color={"white"}
+//   // zIndex={999}
+//   fontWeight={"bold"}
+//   my={2}
+//   // ml={2}
+//   textAlign={"center"}
+// >
+//   Map in development
+// </Text>
+// {/* <Skeleton
+//         // position="sticky"
+//         // top={"125px"} // Adjust the top value if needed
+//         // overflow={'hidden'}
+//         // h={'500px'} // Set the height of the image container
+//         // bg={"red"}
+//         rounded={"2xl"}
+//     > */}
+// <Box
+//   position="sticky"
+//   // top={"105px"} // Adjust the top value if needed
+//   overflow={"hidden"}
+//   // h={'500px'} // Set the height of the image container
+//   bg={colorMode === "light" ? "gray.200" : "gray.600"}
+//   w={"100%"}
+//   h={"500px"}
+//   // h={"100%"}
+//   rounded={"2xl"}
+// >
+//   {/* <Image
+//             src="/soon.jpg"
+//             objectFit={'cover'}
+//             w={"100%"}
+//             h={"100%"}
+//         /> */}
+// </Box>
+// {/* </Skeleton> */}
+// </Box>

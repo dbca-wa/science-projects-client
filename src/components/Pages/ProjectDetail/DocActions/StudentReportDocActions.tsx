@@ -67,9 +67,9 @@ IStudentDocumentActions) => {
   const { colorMode } = useColorMode();
 
   useEffect(() => {
-    console.log(studentReportData);
-    console.log(studentReportData?.document?.creator);
-    console.log(studentReportData?.document?.modifier);
+    // console.log(studentReportData);
+    // console.log(studentReportData?.document?.creator);
+    // console.log(studentReportData?.document?.modifier);
     // console.log(studentReportData?.document?.created_at);
     // console.log(studentReportData?.document?.updated_at);
     // setCreationDate(studentReportData?.document?.created_at);
@@ -182,15 +182,15 @@ IStudentDocumentActions) => {
   //         setDocPk},
   //     [documents])
 
-  useEffect(() => {
-    if (!userLoading && !baLoading && !baLeadLoading) {
-      console.log({
-        ba: baData,
-        leadUser: baLead,
-        me: userData,
-      });
-    }
-  }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
+  // useEffect(() => {
+  //   if (!userLoading && !baLoading && !baLeadLoading) {
+  //     console.log({
+  //       ba: baData,
+  //       leadUser: baLead,
+  //       me: userData,
+  //     });
+  //   }
+  // }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
 
   const creationDate = useFormattedDate(
     studentReportData?.document?.created_at
@@ -220,7 +220,7 @@ IStudentDocumentActions) => {
       modifier &&
       creator
     ) {
-      console.log();
+      // console.log();
       if (!isTeamLoading) {
         setLeaderMemeber(teamData.find((member) => member.is_leader === true));
       }
@@ -249,8 +249,8 @@ IStudentDocumentActions) => {
   useEffect(() => {
     if (actionsReady) {
       setLeaderMemeber(teamData.find((member) => member.is_leader === true));
-      console.log(userData);
-      console.log(studentReportData?.document);
+      // console.log(userData);
+      // console.log(studentReportData?.document);
     }
   }, [actionsReady, teamData, isTeamLoading]);
 
@@ -367,9 +367,9 @@ IStudentDocumentActions) => {
     projectDocPDFGenerationMutation.mutate(formData);
   };
 
-  useEffect(() => {
-    console.log(leaderMember);
-  }, [leaderMember]);
+  // useEffect(() => {
+  //   console.log(leaderMember);
+  // }, [leaderMember]);
 
   return (
     <>
@@ -784,7 +784,7 @@ IStudentDocumentActions) => {
                               }}
                               size={"sm"}
                               onClick={() => {
-                                console.log(docPk);
+                                // console.log(docPk);
                                 onOpenDeleteDocumentModal();
                               }}
                               mr={2}

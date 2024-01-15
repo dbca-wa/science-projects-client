@@ -56,7 +56,7 @@ export const CreateStudentReportModal = ({
 
   const yearValue = watch("year");
 
-  useEffect(() => console.log(yearValue), [yearValue]);
+  // useEffect(() => console.log(yearValue), [yearValue]);
 
   const projPk = watch("projectPk");
 
@@ -152,7 +152,7 @@ export const CreateStudentReportModal = ({
       projectPk: formData.projectPk,
     };
 
-    console.log(newFormData);
+    // console.log(newFormData);
 
     createStudentReportMutation.mutate(newFormData);
   };

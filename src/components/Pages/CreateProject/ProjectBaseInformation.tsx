@@ -249,7 +249,7 @@ export const ProjectBaseInformation = ({
             ml={3}
             onClick={() => {
               if (baseInformationFilled) {
-                console.log("going next");
+                // console.log("going next");
                 nextClick({
                   kind: projectKind,
                   year: currentYear,
