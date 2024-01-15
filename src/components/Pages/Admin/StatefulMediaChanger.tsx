@@ -114,6 +114,13 @@ export const StatefulMediaChanger = ({
     //   deleteImageMutation.mutate(data);
   };
 
+  useEffect(() => {
+    if (isError) {
+      clearInterval(progressInterval);
+      setUploadProgress(0);
+    }
+  }, [isError, progressInterval]);
+
   //   const deleteImageMutation = useMutation(deleteReportMediaImage, {
   //     onMutate: () => {
   //       addToast({
@@ -349,9 +356,11 @@ export const StatefulMediaChanger = ({
                   ) : null}
 
                   {isError ? (
-                    <Text color={"red.500"} mt={4}>
-                      That file is not of the correct type
-                    </Text>
+                    <Center>
+                      <Text color={"red.500"} mt={4}>
+                        That file is not of the correct type
+                      </Text>
+                    </Center>
                   ) : null}
                 </Flex>
               )

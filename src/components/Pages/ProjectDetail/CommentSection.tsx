@@ -53,15 +53,15 @@ export const CommentSection = ({ documentID, userData }: Props) => {
     }
   }, [documentCommentsLoading, isRepainting]);
 
-  useEffect(() => {
-    if (!documentCommentsLoading) {
-      console.log("COMMENT DATA:", documentCommentsData);
-    }
-  }, [documentCommentsLoading, documentCommentsData]);
+  // useEffect(() => {
+  //   if (!documentCommentsLoading) {
+  //     console.log("COMMENT DATA:", documentCommentsData);
+  //   }
+  // }, [documentCommentsLoading, documentCommentsData]);
 
-  useEffect(() => {
-    console.log(userData);
-  });
+  // useEffect(() => {
+  //   console.log(userData);
+  // });
 
   const branches = useBranches();
   const businessAreas = useBusinessAreas();

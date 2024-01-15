@@ -49,18 +49,18 @@ export const ProjectClosureContents = ({
   const { colorMode } = useColorMode();
   const documentType = "closure";
   const editorKey = colorMode + documentType;
-  useEffect(() => {
-    console.log(document);
-  }, [document]);
+  // useEffect(() => {
+  //   console.log(document);
+  // }, [document]);
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
   const userIsLeader = useCheckUserIsTeamLeader(mePk, members);
 
-  useEffect(() => {
-    console.log(userData);
-    console.log(userInTeam);
-  }, [userData, userInTeam]);
+  // useEffect(() => {
+  //   console.log(userData);
+  //   console.log(userInTeam);
+  // }, [userData, userInTeam]);
 
   // const [isLoading, setIsLoading] = useState(false);
   const [selectedOutcome, setSelectedOutcome] = useState<string>(

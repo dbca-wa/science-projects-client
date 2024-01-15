@@ -75,7 +75,7 @@ export const ProjectPlanDocActions = ({
   const { colorMode } = useColorMode();
 
   useEffect(() => {
-    console.log(projectPlanData);
+    // console.log(projectPlanData);
     // console.log(projectPlanData?.document?.creator)
     // console.log(projectPlanData?.document?.modifier)
     // console.log(projectPlanData?.document?.created_at);
@@ -153,10 +153,10 @@ export const ProjectPlanDocActions = ({
   const { baData, baLoading } = useBusinessArea(
     projectPlanData?.document?.project?.business_area?.pk
   );
-  useEffect(() => {
-    if (!baLoading) console.log(projectPlanData?.document);
-    console.log(baData);
-  }, [baData, baLoading, projectPlanData]);
+  // useEffect(() => {
+  //   if (!baLoading) console.log(projectPlanData?.document);
+  //   console.log(baData);
+  // }, [baData, baLoading, projectPlanData]);
   const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
     baData?.leader
   );
@@ -171,15 +171,15 @@ export const ProjectPlanDocActions = ({
     String(projectPlanData?.document?.project?.pk)
   );
 
-  useEffect(() => {
-    if (!userLoading && !baLoading && !baLeadLoading) {
-      console.log({
-        ba: baData,
-        leadUser: baLead,
-        me: userData,
-      });
-    }
-  }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
+  // useEffect(() => {
+  //   if (!userLoading && !baLoading && !baLeadLoading) {
+  //     console.log({
+  //       ba: baData,
+  //       leadUser: baLead,
+  //       me: userData,
+  //     });
+  //   }
+  // }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
 
   const creationDate = useFormattedDate(projectPlanData?.document?.created_at);
   const modifyDate = useFormattedDate(projectPlanData?.document?.updated_at);
@@ -202,7 +202,7 @@ export const ProjectPlanDocActions = ({
       modifier &&
       creator
     ) {
-      console.log("hereeee");
+      // console.log("hereeee");
       if (!isTeamLoading) {
         setLeaderMemeber(teamData.find((member) => member.is_leader === true));
       }
@@ -236,8 +236,8 @@ export const ProjectPlanDocActions = ({
   useEffect(() => {
     if (actionsReady) {
       setLeaderMemeber(teamData.find((member) => member.is_leader === true));
-      console.log(userData);
-      console.log(projectPlanData?.document);
+      // console.log(userData);
+      // console.log(projectPlanData?.document);
     }
   }, [actionsReady, teamData, isTeamLoading]);
 
@@ -388,12 +388,12 @@ export const ProjectPlanDocActions = ({
   };
 
   const spawnProgressReport = (data: ISpawnDocument) => {
-    console.log(data);
+    // console.log(data);
     spawnMutation.mutate(data);
   };
 
   useEffect(() => {
-    console.log(leaderMember);
+    // console.log(leaderMember);
   }, [leaderMember]);
 
   return (

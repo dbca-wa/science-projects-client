@@ -72,9 +72,9 @@ IConceptDocumentActions) => {
   };
   const { colorMode } = useColorMode();
 
-  useEffect(() => {
-    console.log(projectClosureData);
-  }, [projectClosureData]);
+  // useEffect(() => {
+  //   console.log(projectClosureData);
+  // }, [projectClosureData]);
 
   const {
     isOpen: isS1ApprovalModalOpen,
@@ -135,10 +135,10 @@ IConceptDocumentActions) => {
   const { baData, baLoading } = useBusinessArea(
     projectClosureData?.document?.project?.business_area?.pk
   );
-  useEffect(() => {
-    if (!baLoading) console.log(projectClosureData?.document);
-    console.log(baData);
-  }, [baData, baLoading, projectClosureData]);
+  // useEffect(() => {
+  //   if (!baLoading) console.log(projectClosureData?.document);
+  //   console.log(baData);
+  // }, [baData, baLoading, projectClosureData]);
   const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
     baData?.leader
   );
@@ -153,15 +153,15 @@ IConceptDocumentActions) => {
     String(projectClosureData?.document?.project?.pk)
   );
 
-  useEffect(() => {
-    if (!userLoading && !baLoading && !baLeadLoading) {
-      console.log({
-        ba: baData,
-        leadUser: baLead,
-        me: userData,
-      });
-    }
-  }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
+  // useEffect(() => {
+  //   if (!userLoading && !baLoading && !baLeadLoading) {
+  //     console.log({
+  //       ba: baData,
+  //       leadUser: baLead,
+  //       me: userData,
+  //     });
+  //   }
+  // }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
 
   const creationDate = useFormattedDate(
     projectClosureData?.document?.created_at
@@ -191,7 +191,7 @@ IConceptDocumentActions) => {
       modifier &&
       creator
     ) {
-      console.log("hereeee");
+      // console.log("hereeee");
       if (!isTeamLoading) {
         setLeaderMemeber(teamData.find((member) => member.is_leader === true));
       }
@@ -225,8 +225,8 @@ IConceptDocumentActions) => {
   useEffect(() => {
     if (actionsReady) {
       setLeaderMemeber(teamData.find((member) => member.is_leader === true));
-      console.log(userData);
-      console.log(projectClosureData?.document);
+      // console.log(userData);
+      // console.log(projectClosureData?.document);
     }
   }, [actionsReady, teamData, isTeamLoading]);
 
@@ -331,9 +331,9 @@ IConceptDocumentActions) => {
     projectDocPDFGenerationMutation.mutate(formData);
   };
 
-  useEffect(() => {
-    console.log(leaderMember);
-  }, [leaderMember]);
+  // useEffect(() => {
+  //   console.log(leaderMember);
+  // }, [leaderMember]);
 
   // const closeProjectMutation = useMutation(closeProjectCall,
   //     {
@@ -433,7 +433,7 @@ IConceptDocumentActions) => {
   // }
 
   const openProjectFunc = (data: ISimplePkProp) => {
-    console.log(data);
+    // console.log(data);
     openProjectMutation.mutate(data);
   };
 
@@ -883,7 +883,7 @@ IConceptDocumentActions) => {
                               }}
                               size={"sm"}
                               onClick={() => {
-                                console.log(docPk);
+                                // console.log(docPk);
                                 onOpenDeleteDocumentModal();
                               }}
                               mr={2}

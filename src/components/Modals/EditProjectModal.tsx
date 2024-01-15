@@ -63,6 +63,8 @@ import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
 import { useNoImage } from "../../lib/hooks/useNoImage";
 import { NewImagePreview } from "../Pages/CreateProject/NewImagePreview";
 import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
+import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
+import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
 
 interface Props {
   // thisUser: IUserMe;
@@ -108,7 +110,7 @@ export const EditProjectModal = ({
   useEffect(() => {
     if (locationData.length === 0) {
       setLocationData(currentAreas.map((area) => area.pk));
-      console.log(locationData);
+      // console.log(locationData);
     } else {
       // console.log('not zero')
       // console.log(locationData)
@@ -184,7 +186,9 @@ export const EditProjectModal = ({
   // const imageUrl = useServerImageUrl(noImageLink);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>();
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
+    currentImage?.file
+  );
 
   const baseAPI = useApiEndpoint();
 
@@ -332,45 +336,289 @@ export const EditProjectModal = ({
                 value={projectPk}
                 readOnly
               />
-              <FormControl>
-                <FormLabel>Project Title</FormLabel>
-                <StateRichTextEditor
-                  section={"title"}
-                  editorType={"ProjectDetail"}
-                  isUpdate={true}
-                  value={projectTitle}
-                  setValueFunction={setProjectTitle}
-                />
-              </FormControl>
-              {/* <FormControl>
-                                    <FormLabel>Project Description</FormLabel>
-                                    <StateRichTextEditor
-                                        section={"description"}
-                                        editorType={"ProjectDetail"}
-                                        isUpdate={true}
-                                        value={projectDescription}
-                                        setValueFunction={setProjectDescription}
-                                    />
-                                </FormControl> */}
-              <TagInput
-                setTagFunction={setKeywords}
-                preExistingTags={keywords}
-              />
+              <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
+                <Box>
+                  <UnboundStatefulEditor
+                    title="Project Title"
+                    placeholder="Enter the project't title..."
+                    // helperText={"The academic organisation of the student"}
+                    showToolbar={true}
+                    showTitle={true}
+                    isRequired={true}
+                    value={projectTitle}
+                    setValueFunction={setProjectTitle}
+                    setValueAsPlainText={false}
+                  />
 
-              <Box
-                w={"100%"}
-                h={"100%"}
-                // display="flex"
-                // alignItems="center" justifyContent="center"
-              >
-                <StartAndEndDateSelector
-                  startDate={startDate}
-                  endDate={endDate}
-                  setStartDate={setStartDate}
-                  setEndDate={setEndDate}
-                  helperText={"These can be changed at any time"}
-                />
-              </Box>
+                  <Box
+                    w={"100%"}
+                    h={"100%"}
+                    mt={2}
+                    mx={2}
+                    // display="flex"
+                    // alignItems="center" justifyContent="center"
+                  >
+                    <StartAndEndDateSelector
+                      startDate={startDate}
+                      endDate={endDate}
+                      setStartDate={setStartDate}
+                      setEndDate={setEndDate}
+                      helperText={"These can be changed at any time"}
+                    />
+
+                    <StatefulMediaChanger
+                      helperText={
+                        "Upload an image that represents the project."
+                      }
+                      selectedImageUrl={selectedImageUrl}
+                      setSelectedImageUrl={setSelectedImageUrl}
+                      selectedFile={selectedFile}
+                      setSelectedFile={setSelectedFile}
+                    />
+                  </Box>
+                </Box>
+                {/* 
+              <FormControl my={4}>
+                <FormLabel>Image</FormLabel>
+                <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
+                  <NewImagePreview
+                    selectedFile={selectedFile}
+                    currentString={
+                      currentImage?.file
+                        ? `${baseAPI}${currentImage?.file}`
+                        : undefined
+                    }
+                  />
+
+                  <Box>
+                    <InputGroup>
+                      <Button
+                        as="label"
+                        htmlFor="fileInput"
+                        pt={1}
+                        display="inline-flex"
+                        justifyContent="center"
+                        alignItems="center"
+                        bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                        color={colorMode === "light" ? "black" : "white"}
+                        cursor={"pointer"}
+                      >
+                        Choose File
+                      </Button>
+                      <Input
+                        id="fileInput"
+                        type="file"
+                        accept=".png, .jpeg, .jpg, image/png, image/jpeg"
+                        onChange={handleFileInputChange}
+                        opacity={0}
+                        position="absolute"
+                        width="0.1px"
+                        height="0.1px"
+                        zIndex="-1"
+                      />
+                    </InputGroup>
+                    <FormHelperText>
+                      Upload an image that represents the project.
+                    </FormHelperText>
+                  </Box>
+                </Grid>
+              </FormControl> */}
+
+                <Flex flexDir={"column"}>
+                  <TagInput
+                    setTagFunction={setKeywords}
+                    preExistingTags={keywords}
+                  />
+
+                  <Box py={2}>
+                    <UserSearchDropdown
+                      {...register("dataCustodian", { required: true })}
+                      onlyInternal={false}
+                      isRequired={true}
+                      setUserFunction={setDataCustodian}
+                      isEditable
+                      preselectedUserPk={currentDataCustodian}
+                      label="Data Custodian"
+                      placeholder="Search for a user"
+                      helperText={<>The user you would like to handle data.</>}
+                    />
+                  </Box>
+
+                  {!baLoading && baSet && (
+                    <>
+                      <FormControl isRequired>
+                        <FormLabel>Business Area</FormLabel>
+
+                        <InputGroup>
+                          <Select
+                            variant="filled"
+                            placeholder="Select a Business Area"
+                            onChange={(event) => {
+                              const pkVal = event.target.value;
+                              const relatedBa = businessAreaList.find(
+                                (ba) => Number(ba.pk) === Number(pkVal)
+                              );
+
+                              console.log(event.target.value);
+                              console.log(relatedBa);
+                              if (relatedBa !== undefined) {
+                                setBusinessArea(relatedBa);
+                              }
+                            }}
+                            value={businessArea?.pk}
+                          >
+                            {businessAreaList.map((ba, index) => {
+                              const checkIsHtml = (data: string) => {
+                                // Regular expression to check for HTML tags
+                                const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+                                // Check if the string contains any HTML tags
+                                return htmlRegex.test(data);
+                              };
+
+                              const isHtml = checkIsHtml(ba.name);
+                              let baName = ba?.name;
+                              if (isHtml === true) {
+                                const parser = new DOMParser();
+                                const dom = parser.parseFromString(
+                                  ba.name,
+                                  "text/html"
+                                );
+                                const content = dom.body.textContent;
+                                baName = content;
+                              }
+                              return (
+                                <option key={index} value={ba.pk}>
+                                  {baName}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                        </InputGroup>
+                        <FormHelperText>
+                          The Business Area / Program that this project belongs
+                          to.
+                        </FormHelperText>
+                      </FormControl>
+
+                      <FormControl
+                        // isRequired
+                        mb={4}
+                      >
+                        <FormLabel>Research Function</FormLabel>
+                        <InputGroup>
+                          <Select
+                            variant="filled"
+                            placeholder="Select a Research Function"
+                            onChange={(event) => {
+                              const pkVal = event.target.value;
+                              const relatedRF = researchFunctionsList.find(
+                                (rf) => Number(rf.pk) === Number(pkVal)
+                              );
+
+                              console.log(event.target.value);
+                              console.log(relatedRF);
+                              if (relatedRF !== undefined) {
+                                setResearchFunction(relatedRF);
+                              }
+                            }}
+                            value={researchFunction?.pk}
+                          >
+                            {researchFunctionsList?.map((rf, index) => {
+                              const checkIsHtml = (data: string) => {
+                                // Regular expression to check for HTML tags
+                                const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+                                // Check if the string contains any HTML tags
+                                return htmlRegex.test(data);
+                              };
+
+                              const isHtml = checkIsHtml(rf.name);
+                              let rfName = rf?.name;
+                              if (isHtml === true) {
+                                const parser = new DOMParser();
+                                const dom = parser.parseFromString(
+                                  rf.name,
+                                  "text/html"
+                                );
+                                const content = dom.body.textContent;
+                                rfName = content;
+                              }
+                              return (
+                                <option key={index} value={rf.pk}>
+                                  {rfName}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                        </InputGroup>
+                        <FormHelperText>
+                          The Research Function this project mainly contributes
+                          to.
+                        </FormHelperText>
+                      </FormControl>
+
+                      <FormControl
+                        // isRequired
+                        mb={4}
+                      >
+                        <FormLabel>Departmental Service</FormLabel>
+                        <InputGroup>
+                          <Select
+                            variant="filled"
+                            placeholder="Select a Departmental Service"
+                            onChange={(event) => {
+                              const pkVal = event.target.value;
+                              const depService = servicesList.find(
+                                (serv) => Number(serv.pk) === Number(pkVal)
+                              );
+
+                              console.log(event.target.value);
+                              console.log(depService);
+                              if (depService !== undefined) {
+                                setService(depService);
+                              }
+                            }}
+                            value={service?.pk}
+                          >
+                            {servicesList.map((service, index) => {
+                              const checkIsHtml = (data: string) => {
+                                // Regular expression to check for HTML tags
+                                const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+                                // Check if the string contains any HTML tags
+                                return htmlRegex.test(data);
+                              };
+
+                              const isHtml = checkIsHtml(service.name);
+                              let serviceName = service?.name;
+                              if (isHtml === true) {
+                                const parser = new DOMParser();
+                                const dom = parser.parseFromString(
+                                  service.name,
+                                  "text/html"
+                                );
+                                const content = dom.body.textContent;
+                                serviceName = content;
+                              }
+
+                              return (
+                                <option key={index} value={service.pk}>
+                                  {serviceName}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                        </InputGroup>
+                        <FormHelperText>
+                          The DBCA service that this project delivers outputs
+                          to.
+                        </FormHelperText>
+                      </FormControl>
+                    </>
+                  )}
+                </Flex>
+              </Grid>
 
               <Grid
                 gridTemplateColumns={"repeat(1, 1fr)"}
@@ -378,191 +626,6 @@ export const EditProjectModal = ({
                 // flexDir={"column"}
                 mt={4}
               >
-                <UserSearchDropdown
-                  {...register("dataCustodian", { required: true })}
-                  onlyInternal={false}
-                  isRequired={true}
-                  setUserFunction={setDataCustodian}
-                  isEditable
-                  preselectedUserPk={currentDataCustodian}
-                  label="Data Custodian"
-                  placeholder="Search for a user"
-                  helperText={<>The user you would like to handle data.</>}
-                />
-
-                {!baLoading && baSet && (
-                  <>
-                    <FormControl isRequired>
-                      <FormLabel>Business Area</FormLabel>
-
-                      <InputGroup>
-                        <Select
-                          variant="filled"
-                          placeholder="Select a Business Area"
-                          onChange={(event) => {
-                            const pkVal = event.target.value;
-                            const relatedBa = businessAreaList.find(
-                              (ba) => Number(ba.pk) === Number(pkVal)
-                            );
-
-                            console.log(event.target.value);
-                            console.log(relatedBa);
-                            if (relatedBa !== undefined) {
-                              setBusinessArea(relatedBa);
-                            }
-                          }}
-                          value={businessArea?.pk}
-                        >
-                          {businessAreaList.map((ba, index) => {
-                            const checkIsHtml = (data: string) => {
-                              // Regular expression to check for HTML tags
-                              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-
-                              // Check if the string contains any HTML tags
-                              return htmlRegex.test(data);
-                            };
-
-                            const isHtml = checkIsHtml(ba.name);
-                            let baName = ba?.name;
-                            if (isHtml === true) {
-                              const parser = new DOMParser();
-                              const dom = parser.parseFromString(
-                                ba.name,
-                                "text/html"
-                              );
-                              const content = dom.body.textContent;
-                              baName = content;
-                            }
-                            return (
-                              <option key={index} value={ba.pk}>
-                                {baName}
-                              </option>
-                            );
-                          })}
-                        </Select>
-                      </InputGroup>
-                      <FormHelperText>
-                        The Business Area / Program that this project belongs
-                        to.
-                      </FormHelperText>
-                    </FormControl>
-
-                    <FormControl
-                      // isRequired
-                      mb={4}
-                    >
-                      <FormLabel>Research Function</FormLabel>
-                      <InputGroup>
-                        <Select
-                          variant="filled"
-                          placeholder="Select a Research Function"
-                          onChange={(event) => {
-                            const pkVal = event.target.value;
-                            const relatedRF = researchFunctionsList.find(
-                              (rf) => Number(rf.pk) === Number(pkVal)
-                            );
-
-                            console.log(event.target.value);
-                            console.log(relatedRF);
-                            if (relatedRF !== undefined) {
-                              setResearchFunction(relatedRF);
-                            }
-                          }}
-                          value={researchFunction?.pk}
-                        >
-                          {researchFunctionsList?.map((rf, index) => {
-                            const checkIsHtml = (data: string) => {
-                              // Regular expression to check for HTML tags
-                              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-
-                              // Check if the string contains any HTML tags
-                              return htmlRegex.test(data);
-                            };
-
-                            const isHtml = checkIsHtml(rf.name);
-                            let rfName = rf?.name;
-                            if (isHtml === true) {
-                              const parser = new DOMParser();
-                              const dom = parser.parseFromString(
-                                rf.name,
-                                "text/html"
-                              );
-                              const content = dom.body.textContent;
-                              rfName = content;
-                            }
-                            return (
-                              <option key={index} value={rf.pk}>
-                                {rfName}
-                              </option>
-                            );
-                          })}
-                        </Select>
-                      </InputGroup>
-                      <FormHelperText>
-                        The Research Function this project mainly contributes
-                        to.
-                      </FormHelperText>
-                    </FormControl>
-
-                    <FormControl
-                      // isRequired
-                      mb={4}
-                    >
-                      <FormLabel>Departmental Service</FormLabel>
-                      <InputGroup>
-                        <Select
-                          variant="filled"
-                          placeholder="Select a Departmental Service"
-                          onChange={(event) => {
-                            const pkVal = event.target.value;
-                            const depService = servicesList.find(
-                              (serv) => Number(serv.pk) === Number(pkVal)
-                            );
-
-                            console.log(event.target.value);
-                            console.log(depService);
-                            if (depService !== undefined) {
-                              setService(depService);
-                            }
-                          }}
-                          value={service?.pk}
-                        >
-                          {servicesList.map((service, index) => {
-                            const checkIsHtml = (data: string) => {
-                              // Regular expression to check for HTML tags
-                              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-
-                              // Check if the string contains any HTML tags
-                              return htmlRegex.test(data);
-                            };
-
-                            const isHtml = checkIsHtml(service.name);
-                            let serviceName = service?.name;
-                            if (isHtml === true) {
-                              const parser = new DOMParser();
-                              const dom = parser.parseFromString(
-                                service.name,
-                                "text/html"
-                              );
-                              const content = dom.body.textContent;
-                              serviceName = content;
-                            }
-
-                            return (
-                              <option key={index} value={service.pk}>
-                                {serviceName}
-                              </option>
-                            );
-                          })}
-                        </Select>
-                      </InputGroup>
-                      <FormHelperText>
-                        The DBCA service that this project delivers outputs to.
-                      </FormHelperText>
-                    </FormControl>
-                  </>
-                )}
-
                 {!locationsLoading && (
                   <>
                     <Grid
@@ -618,91 +681,10 @@ export const EditProjectModal = ({
                           setSelectedAreas={setLocationData}
                         />
                       )}
-                      {/* </Flex> */}
-
-                      {/* <Box
-                                                position="sticky"
-                                                top={"120px"} // Adjust the top value if needed
-                                                overflow={'hidden'}
-                                                h={'700px'} // Set the height of the image container
-                                                // bg={"red"}
-                                                rounded={"2xl"}
-                                            >
-                                                <Text
-                                                    // color={"white"}
-                                                    // zIndex={999}
-                                                    fontWeight={'bold'}
-                                                    my={2}
-                                                    // ml={2}
-                                                    textAlign={'center'}
-                                                >
-                                                    Map in development
-                                                </Text>
-                                     
-                                                <Box
-                                                    position="sticky"
-                                                    // top={"105px"} // Adjust the top value if needed
-                                                    overflow={'hidden'}
-                                                    // h={'500px'} // Set the height of the image container
-                                                    bg={colorMode === "light" ? "gray.200" : "gray.600"}
-                                                    w={"100%"}
-                                                    h={"500px"}
-                                                    // h={"100%"}
-                                                    rounded={"2xl"}
-                                                >
-                                            
-                                                </Box>
-                                            </Box> */}
                     </Grid>
                   </>
                 )}
               </Grid>
-
-              <FormControl my={4}>
-                <FormLabel>Image</FormLabel>
-                <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-                  <NewImagePreview
-                    selectedFile={selectedFile}
-                    currentString={
-                      currentImage?.file
-                        ? `${baseAPI}${currentImage?.file}`
-                        : undefined
-                    }
-                  />
-
-                  <Box>
-                    <InputGroup>
-                      <Button
-                        as="label"
-                        htmlFor="fileInput"
-                        pt={1}
-                        display="inline-flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                        color={colorMode === "light" ? "black" : "white"}
-                        cursor={"pointer"}
-                      >
-                        Choose File
-                      </Button>
-                      <Input
-                        id="fileInput"
-                        type="file"
-                        accept=".png, .jpeg, .jpg, image/png, image/jpeg"
-                        onChange={handleFileInputChange}
-                        opacity={0}
-                        position="absolute"
-                        width="0.1px"
-                        height="0.1px"
-                        zIndex="-1"
-                      />
-                    </InputGroup>
-                    <FormHelperText>
-                      Upload an image that represents the project.
-                    </FormHelperText>
-                  </Box>
-                </Grid>
-              </FormControl>
             </ModalBody>
             <ModalFooter>
               <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
@@ -735,6 +717,7 @@ export const EditProjectModal = ({
                       researchFunction: researchFunction?.pk,
                       businessArea: businessArea?.pk,
                       locations: locationData,
+                      selectedImageUrl: selectedImageUrl,
                     });
                   }}
                 >

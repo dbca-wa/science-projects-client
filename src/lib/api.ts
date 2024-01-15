@@ -857,7 +857,7 @@ export const getDirectorateMembers = async ({ queryKey }: QueryFunctionContext) 
 
     // GET DIRECTORATE FROM BACKEND HERE!!
     const res = instance.get(`users/directorate`).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         return res.data
     })
     return res;
@@ -926,9 +926,9 @@ export interface IProjectCreationVariables {
 
 export const createProject = async ({ baseInformationData, detailsData, locationData, externalData, studentData }: IProjectCreationVariables) => {
 
-    console.log(
-        baseInformationData, detailsData, locationData, externalData, studentData
-    )
+    // console.log(
+    //     baseInformationData, detailsData, locationData, externalData, studentData
+    // )
 
     const formData = new FormData();
     formData.append('year', baseInformationData.year.toString());
@@ -986,7 +986,7 @@ export const createProject = async ({ baseInformationData, detailsData, location
         formData.append('collaborationWith', externalData.collaborationWith);
     }
 
-    console.log(formData);
+    // console.log(formData);
 
     return instance.post(
         `projects/`,
@@ -1006,6 +1006,7 @@ export interface IEditProject {
     description?: string;
     status?: 'new' | 'pending' | 'active' | 'updating' | 'terminated' | 'suspended' | 'closed';
     image?: File | null;
+    selectedImageUrl: string | null;
     locations: number[];
     keywords: string[];
 
@@ -1024,6 +1025,7 @@ export const updateProjectDetails = async ({
     description,
     keywords,
     image,
+    selectedImageUrl,
     locations,
 
     startDate,
@@ -1074,6 +1076,10 @@ export const updateProjectDetails = async ({
             newFormData.append('image', image);
         }
     }
+    if (selectedImageUrl == null) {
+        newFormData.append('selectedImageUrl', 'delete')
+    }
+    
     if (status !== undefined) {
         newFormData.append('status', status);
     }
@@ -1372,7 +1378,7 @@ export const handleDocumentAction = async ({ action, stage, documentPk }: IAppro
         "documentPk": documentPk,
         // "conceptPlanPk": conceptPlanPk,
     }
-    console.log(params)
+    // console.log(params)
 
     return instance.post(
         url,
@@ -1441,7 +1447,7 @@ export const handleDocumentAction = async ({ action, stage, documentPk }: IAppro
 export const getProgressReportForYear = async (year: number, project: number) => {
     const url = `documents/progressreports/${project}/${year}`
     const progressReportData = await instance.get(url).then(res => res.data)
-    console.log(progressReportData);
+    // console.log(progressReportData);
     return progressReportData;
 }
 
@@ -1832,22 +1838,23 @@ export const deleteCommentCall = async ({ commentPk, documentPk }: IDeleteCommen
 export const getStudentReportForYear = async (year: number, project: number) => {
     const url = `documents/studentreports/${project}/${year}`
     const studentReportData = await instance.get(url).then(res => res.data)
-    console.log(studentReportData);
+    // console.log(studentReportData);
     return studentReportData;
 }
 
 export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }: ISpawnDocument) => {
-    console.log(projectPk, kind, year, report_id);
+    // console.log(projectPk, kind, year, report_id);
 
     const choices = ["concept", "projectplan", "progressreport", "studentreport", "projectclosure"]
     if (!choices.includes(kind)) {
         console.log("returning")
         return;
-    } else {
-        console.log(
-            "valid choice"
-        )
-    }
+    } 
+    // else {
+    //     console.log(
+    //         "valid choice"
+    //     )
+    // }
     const yearAsNumber = Number(year);
 
     // Create the document first (as a document object)
@@ -2139,7 +2146,7 @@ export const getAvailableReportYearsForStudentReport = async ({ queryKey }: Quer
 
     try {
         const response = await instance.get(`documents/reports/availableyears/${pk}/studentreport`);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching years:", error);

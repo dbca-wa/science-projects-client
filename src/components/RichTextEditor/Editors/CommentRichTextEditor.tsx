@@ -52,7 +52,6 @@ import { DisplaySRTE } from "./Sections/DisplaySRTE";
 import { EditorSubsections, EditorType } from "../../../types";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 import { SimpleEditableRTE } from "./Sections/SimpleEditableRTE";
-import { SimpleRichTextToolbar } from "../Toolbar/SimpleRichTextToolbar";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import { BsFillSendFill } from "react-icons/bs";
 import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
@@ -78,9 +77,6 @@ export const CommentRichTextEditor = ({
   businessAreas,
   branches,
 }: Props) => {
-  useEffect(() => {
-    console.log("USER", userData);
-  }, []);
   const { colorMode } = useColorMode();
   const editorRef = useRef(null);
   const [comment, setComment] = useState("");
@@ -194,8 +190,6 @@ export const CommentRichTextEditor = ({
                     const root = $getRoot();
                     setEditorText(root.__cachedText);
                     const newHtml = $generateHtmlFromNodes(editor, null);
-                    // console.log(newHtml)
-                    // console.log("DATA DISPLAY PLUGIN:", newHtml);
                     setComment(newHtml);
                   });
                 }}
@@ -260,24 +254,6 @@ export const CommentRichTextEditor = ({
                 ErrorBoundary={LexicalErrorBoundary}
               />
               <ClearEditorPlugin />
-              <NodeEventPlugin
-                nodeType={ParagraphNode}
-                eventType={"click"}
-                eventListener={(e: Event) => {
-                  console.log(e);
-                  console.log("paragaph node clicked");
-                  setSelectedNodeType("paragraph");
-                }}
-              />
-              <NodeEventPlugin
-                nodeType={ListItemNode}
-                eventType={"click"}
-                eventListener={(e: Event) => {
-                  console.log(e);
-                  console.log("li node clicked");
-                  setSelectedNodeType("li");
-                }}
-              />
             </LexicalComposer>
           </Box>
         </Box>
@@ -309,7 +285,6 @@ const UserContainer = ({
       pl={3}
       pt={2}
       onClick={() => {
-        console.log("hi", userData?.image?.file);
         // If the editor is not focused, focus it.
         editor.focus();
       }}
