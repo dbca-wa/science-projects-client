@@ -35,9 +35,10 @@ export const UserFeedbackPage = () => {
       {feedbackData && baData && branchesData && !feedbackLoading ? (
         feedbackData?.length > 0 ?
           <Grid gridTemplateColumns={"repeat(4, 1fr)"} gridGap={4}>
-            {feedbackData?.map((item) => {
+            {feedbackData?.map((item, idx) => {
               return (
                 <Box
+                  key={idx}
                   bg={colorMode === "light" ? "gray.100" : "gray.700"}
                   minH={"125px"}
                   rounded={"lg"}
