@@ -219,11 +219,11 @@ export interface DocumentCommentCreationProps {
     payload: string;
     user: number;
 }
-export const createDocumentComment = async ({documentId, payload, user}:DocumentCommentCreationProps) => {
+export const createDocumentComment = async ({ documentId, payload, user }: DocumentCommentCreationProps) => {
     const postContent = {
         user,
         payload
-    }   
+    }
     console.log("postContent", postContent)
     const res = instance.post(`documents/projectdocuments/${documentId}/comments`, postContent).then(res => res.data);
     return res;
@@ -1975,9 +1975,9 @@ export const createPersonalTask = async ({ user, name, description }: IQuickTask
 }
 
 
-export const createCommentReaction = ({reaction, comment, user }:ICommentReaction) => {
-    
-    console.log({reaction, comment, user})
+export const createCommentReaction = ({ reaction, comment, user }: ICommentReaction) => {
+
+    console.log({ reaction, comment, user })
     // return "hi"
     const res = instance.post(
         "communications/reactions", {
@@ -2202,8 +2202,8 @@ interface IReportMediaUploadProps {
     | "publications";
 }
 
-export const uploadReportMediaImage = async ({pk, file, section} : IReportMediaUploadProps) => {
-    console.log({pk, file, section});
+export const uploadReportMediaImage = async ({ pk, file, section }: IReportMediaUploadProps) => {
+    console.log({ pk, file, section });
 
     const newFormData = new FormData();
 
@@ -2244,8 +2244,8 @@ interface IReportMediaDeleteProps {
     | "publications";
 }
 
-export const deleteReportMediaImage = async ({pk, section}: IReportMediaDeleteProps) => {
-    console.log({pk, section});
+export const deleteReportMediaImage = async ({ pk, section }: IReportMediaDeleteProps) => {
+    console.log({ pk, section });
 
     const newFormData = new FormData();
     if (section !== undefined) {
