@@ -76,7 +76,7 @@ export const ProjectBaseInformation = ({
   const meData = queryClient.getQueryData<IUserData>(["me"]);
 
   const [projectTitle, setProjectTitle] = useState("");
-  useEffect(() => console.log(projectTitle), [projectTitle]);
+  // useEffect(() => console.log(projectTitle), [projectTitle]);
 
   const [projectSummary, setProjectSummary] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);

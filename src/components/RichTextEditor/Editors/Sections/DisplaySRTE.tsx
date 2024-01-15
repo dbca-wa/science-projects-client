@@ -11,95 +11,92 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
 import { $getRoot, $getSelection, ParagraphNode } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
-import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin"
-import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html"
+import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
+import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
 import { useEffect, useState } from "react";
 import { EditorSubsections, EditorType } from "../../../../types";
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
-import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
 import React from "react";
 
-
 interface PrepopulateHTMLPluginProps {
-    data: string;
+  data: string;
 }
 
 const PrepopulateHTMLPluginWrapper = ({ data }: PrepopulateHTMLPluginProps) => {
-    // You can use state to force a rerender when data changes
-    const [, forceUpdate] = React.useState({});
+  // You can use state to force a rerender when data changes
+  const [, forceUpdate] = React.useState({});
 
-    React.useEffect(() => {
-        forceUpdate({});
-    }, [data]);
+  React.useEffect(() => {
+    forceUpdate({});
+  }, [data]);
 
-    return <PrepopulateHTMLPlugin data={data} />;
+  return <PrepopulateHTMLPlugin data={data} />;
 };
 
-
 interface Props {
-    initialConfig: any;
-    editorRef: any;
-    originalData?: string;
-    data: string;
+  initialConfig: any;
+  editorRef: any;
+  originalData?: string;
+  data: string;
 
-    section: EditorSubsections;
-    project_pk: number;
-    document_pk: number;
-    editorType: EditorType;
-    isUpdate: boolean;
+  section: EditorSubsections;
+  project_pk: number;
+  document_pk: number;
+  editorType: EditorType;
+  isUpdate: boolean;
 
-    editorText: string;
-    setEditorText: React.Dispatch<React.SetStateAction<string>>;
-    shouldShowTree: boolean;
-    setShouldShowTree: React.Dispatch<React.SetStateAction<boolean>>;
-    isEditorOpen: boolean;
-    setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    displayData: string;
-    setDisplayData: React.Dispatch<React.SetStateAction<string>>;
-    textEditorName?: string;
+  editorText: string;
+  setEditorText: React.Dispatch<React.SetStateAction<string>>;
+  shouldShowTree: boolean;
+  setShouldShowTree: React.Dispatch<React.SetStateAction<boolean>>;
+  isEditorOpen: boolean;
+  setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  displayData: string;
+  setDisplayData: React.Dispatch<React.SetStateAction<string>>;
+  textEditorName?: string;
 }
 
-export const DisplaySRTE = (
-    {
-        initialConfig, editorRef, data, originalData,
+export const DisplaySRTE = ({
+  initialConfig,
+  editorRef,
+  data,
+  originalData,
 
-        section, project_pk, document_pk, isUpdate,
-        editorType,
-        editorText, setEditorText,
-        isEditorOpen, setIsEditorOpen,
-        displayData, setDisplayData,
-        shouldShowTree, setShouldShowTree,
-        textEditorName
-    }: Props) => {
+  section,
+  project_pk,
+  document_pk,
+  isUpdate,
+  editorType,
+  editorText,
+  setEditorText,
+  isEditorOpen,
+  setIsEditorOpen,
+  displayData,
+  setDisplayData,
+  shouldShowTree,
+  setShouldShowTree,
+  textEditorName,
+}: Props) => {
+  const { colorMode } = useColorMode();
+  // console.log('editorname', textEditorName)
+  const [selectedNodeType, setSelectedNodeType] = useState<string>();
+  // useEffect(() => {
+  //     console.log("Hi:", displayData)
+  // }, [displayData])
 
-    const { colorMode } = useColorMode();
-    // console.log('editorname', textEditorName)
-    const [selectedNodeType, setSelectedNodeType] = useState<string>();
-    // useEffect(() => {
-    //     console.log("Hi:", displayData)
-    // }, [displayData])
+  return (
+    <>
+      <LexicalComposer initialConfig={initialConfig}>
+        {/* Plugins*/}
+        <HistoryPlugin />
+        <ListPlugin />
+        <TablePlugin hasCellMerge={true} hasCellBackgroundColor={false} />
 
-    return (
-        <>
-
-            <LexicalComposer
-                initialConfig={initialConfig}
-            >
-
-
-                {/* Plugins*/}
-                <HistoryPlugin />
-                <ListPlugin />
-                <TablePlugin
-                    hasCellMerge={true}
-                    hasCellBackgroundColor={false}
-                />
-
-                {/* <OnChangePlugin onChange={(editorState, editor) => {
+        {/* <OnChangePlugin onChange={(editorState, editor) => {
                     editorState.read(() => {
                         const root = $getRoot();
                         console.log(root.__cachedText)
@@ -109,75 +106,63 @@ export const DisplaySRTE = (
                         setDisplayData(newHtml);
                     })
                 }} /> */}
-                {/* {data !== undefined && data !== null && ( */}
-                <PrepopulateHTMLPlugin data={data} />
-                {/* )} */}
+        {/* {data !== undefined && data !== null && ( */}
+        <PrepopulateHTMLPlugin data={data} />
+        {/* )} */}
 
-
-                {/* Text Area */}
-                <RichTextPlugin
-                    contentEditable={
-                        <>
-                            <ContentEditable
-                                style={{
-                                    minHeight: "50px",
-                                    width: "100%",
-                                    height: "auto",
-                                    padding: "32px",
-                                    paddingTop: "20px",
-                                    paddingBottom: "16px",
-                                    borderRadius: "0 0 25px 25px",
-                                    outline: "none",
-                                }}
-                            />
-                            {/* <Box>EditorText: {editorText}</Box> */}
-                        </>
-                    }
-                    placeholder={
-                        <>
-                            <Box
-                                style={{
-                                    position: "absolute",
-                                    left: "32px",
-                                    top: "20px",
-                                    // paddingTop: "20px",
-                                    // paddingBottom: "16px",
-                                    userSelect: "none",
-                                    pointerEvents: "none",
-                                    color: "gray.500",
-                                    // paddingBottom: "20px"
-
-                                }}
-                            >
-                                <Text
-                                    color={"gray.500"}
-                                    fontSize={"14px"}
-                                // pb={2}
-                                >
-                                    {`Press the edit button to add 
+        {/* Text Area */}
+        <RichTextPlugin
+          contentEditable={
+            <>
+              <ContentEditable
+                style={{
+                  minHeight: "50px",
+                  width: "100%",
+                  height: "auto",
+                  padding: "32px",
+                  paddingTop: "20px",
+                  paddingBottom: "16px",
+                  borderRadius: "0 0 25px 25px",
+                  outline: "none",
+                }}
+              />
+              {/* <Box>EditorText: {editorText}</Box> */}
+            </>
+          }
+          placeholder={
+            <>
+              <Box
+                style={{
+                  position: "absolute",
+                  left: "32px",
+                  top: "20px",
+                  // paddingTop: "20px",
+                  // paddingBottom: "16px",
+                  userSelect: "none",
+                  pointerEvents: "none",
+                  color: "gray.500",
+                  // paddingBottom: "20px"
+                }}
+              >
+                <Text
+                  color={"gray.500"}
+                  fontSize={"14px"}
+                  // pb={2}
+                >
+                  {`Press the edit button to add 
                         ${useGetRTESectionPlaceholder(section)}.`}
-                                </Text>
-                            </Box>
-                            <Spacer pb={2} />
-                        </>
-                    }
-                    ErrorBoundary={LexicalErrorBoundary}
+                </Text>
+              </Box>
+              <Spacer pb={2} />
+            </>
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
 
-                />
-
-
-                <Box>
-
-                </Box>
-                {
-                    shouldShowTree ?
-                        <TreeViewPlugin />
-                        : null
-                }
-                <ClearEditorPlugin />
-
-
-            </LexicalComposer>
-        </>
-    )
-}
+        <Box></Box>
+        {shouldShowTree ? <TreeViewPlugin /> : null}
+        <ClearEditorPlugin />
+      </LexicalComposer>
+    </>
+  );
+};
