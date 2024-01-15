@@ -11,7 +11,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
 import { $getRoot, $getSelection, ParagraphNode } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
-import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
+import { RevisedSimpleRichTextToolbar } from "../../Toolbar/RevisedSimpleRichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
@@ -85,12 +85,7 @@ export const SimpleEditableRTE = ({
             <Box zIndex={2}>
               {/* Toolbar */}
 
-              <SimpleRichTextToolbar
-                editorRef={editorRef}
-                selectedNodeType={selectedNodeType}
-                setSelectedNodeType={setSelectedNodeType}
-                allowInsertButton={false}
-              />
+              <RevisedSimpleRichTextToolbar allowInserts={false} />
 
               <ContentEditable
                 style={{

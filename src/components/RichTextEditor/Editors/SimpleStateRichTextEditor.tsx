@@ -150,13 +150,3 @@ export const SimpleStateRichTextEditor = ({
     </Box>
   );
 };
-
-const SelectionSetterPlugin = () => {
-  const [editor] = useLexicalComposerContext();
-  useEffect(() => {
-    editor.update(() => {
-      console.log($getSelection());
-    });
-  }, [editor]);
-  return null;
-};

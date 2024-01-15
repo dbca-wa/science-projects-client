@@ -17,7 +17,7 @@ import {
   ParagraphNode,
 } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
-import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
+// import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
@@ -41,7 +41,7 @@ import React from "react";
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
 import { RevisedRichTextToolbar } from "../../Toolbar/RevisedRichTextToolbar";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
+// import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 interface Props {
@@ -73,8 +73,6 @@ interface Props {
   canSave: boolean;
   setCanSave: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-
 
 export const EditableSRTE = ({
   textEditorName,
@@ -109,12 +107,10 @@ export const EditableSRTE = ({
   // const [selectedIsSubscript, setSelectedIsSubscript] = useState(false);
   // const [selectedIsSuperscript, setSelectedIsSuperscript] = useState(false);
 
-
-
   const dragBtnMargin = 10;
   // useEffect(() => console.log(displayData), [displayData])
 
-  const toolBarHeight = 42;
+  const toolBarHeight = 45;
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
@@ -162,7 +158,6 @@ export const EditableSRTE = ({
 
   // const [editor] = useLexicalComposerContext();
 
-
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -197,9 +192,7 @@ export const EditableSRTE = ({
             // mr={3}
             >
               {/* Toolbar */}
-              <RevisedRichTextToolbar
-                anchorElem={floatingAnchorElem}
-              />
+              <RevisedRichTextToolbar anchorElem={floatingAnchorElem} />
 
               <Box className="editor-scroller">
                 <Box
@@ -221,7 +214,7 @@ export const EditableSRTE = ({
                       outline: "none",
                     }}
 
-                  // autoFocus
+                    // autoFocus
                   />
                 </Box>
               </Box>
@@ -325,9 +318,7 @@ export const EditableSRTE = ({
           isOpen={isEditorOpen}
         />
 
-        <FloatingToolbarPlugin
-          anchorElem={floatingAnchorElem}
-        />
+        <FloatingToolbarPlugin anchorElem={floatingAnchorElem} />
 
         <AutoFocusPlugin />
 
