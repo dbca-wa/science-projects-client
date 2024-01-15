@@ -11,6 +11,7 @@ interface IMessageProps {
 }
 
 export const ChatMessage = ({ chatMessage, displayName }: IMessageProps) => {
+
     const { colorMode } = useColorMode();
     const messageTime = chatMessage.timeSent.toLocaleTimeString([], {
         hour: "numeric",
@@ -24,7 +25,14 @@ export const ChatMessage = ({ chatMessage, displayName }: IMessageProps) => {
             pb={4}
             flexDir={"column"}
         >
-            <ChatUser displayName={displayName} avatarSrc={chatMessage.sendingUser.avatar} />
+            {/* <ChatUser 
+            displayName={displayName} 
+            avatarSrc={chatMessage.sendingUser.avatar} 
+            user={undefined} 
+            otherUser={false} 
+            businessAreas={[]} 
+            branches={[]} 
+            /> */}
 
             {/* Chat Message */}
             <Flex
