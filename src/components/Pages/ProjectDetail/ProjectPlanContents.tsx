@@ -42,9 +42,9 @@ export const ProjectPlanContents = ({
 
   const documentType = "projectplan";
   const editorKey = colorMode + documentType;
-  useEffect(() => {
-    console.log(document);
-  }, [document]);
+  // useEffect(() => {
+  //   console.log(document);
+  // }, [document]);
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);

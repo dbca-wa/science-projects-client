@@ -74,7 +74,7 @@ export const ProjectStudentSection = ({
 
   useEffect(() => {
     if (organisation.length > 0 && level.length > 0) {
-      console.log(studentData);
+      // console.log(studentData);
       setStudentFilled(true);
     } else {
       setStudentFilled(false);
@@ -163,8 +163,8 @@ export const ProjectStudentSection = ({
             }}
             isDisabled={!studentFilled}
             onClick={() => {
-              console.log("Here is the student data");
-              console.log(studentData);
+              // console.log("Here is the student data");
+              // console.log(studentData);
               createClick();
             }}
             rightIcon={<IoIosCreate />}

@@ -212,15 +212,15 @@ export const ProjectLocationSection = ({
                   }}
                   // isDisabled={!locationFilled}
                   onClick={() => {
-                    console.log("Here is the location data");
-                    console.log(locationData);
+                    // console.log("Here is the location data");
+                    // console.log(locationData);
                     if (
                       projectType.includes("External") ||
                       projectType.includes("Student")
                     ) {
                       // if (locationFilled) {
-                      console.log("going next");
-                      console.log(locationData);
+                      // console.log("going next");
+                      // console.log(locationData);
                       setLocationFilled(true);
                       nextClick(
                         locationData

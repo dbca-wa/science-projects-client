@@ -255,7 +255,7 @@ export const CommentDisplayRTE = ({
         //     setIsAnimating(false)
         // }
         queryClient.invalidateQueries(["documentComments", documentPk]);
-        console.log("DDDDAAATA", response);
+        // console.log("DDDDAAATA", response);
         if (response.status === 204) {
           setLikeCount((prev) => prev - 1);
         } else if (response.status === 201) {
@@ -289,7 +289,7 @@ export const CommentDisplayRTE = ({
     const userLiked = reactions.some(
       (r) => Number(r.user) === Number(user.pk) && r.reaction === "thumbup"
     );
-    console.log("Likey", userLiked);
+    // console.log("Likey", userLiked);
     setUserHasLiked(userLiked);
   }, [reactions, user.pk]);
 
@@ -409,7 +409,7 @@ export const CommentDisplayRTE = ({
                       right={5}
                       bottom={4}
                       onClick={() => {
-                        console.log("liked");
+                        // console.log("liked");
                         onLike({
                           user,
                           reaction: "thumbup",
@@ -472,7 +472,7 @@ export const CommentDisplayRTE = ({
                 ErrorBoundary={LexicalErrorBoundary}
               />
               <ClearEditorPlugin />
-              <NodeEventPlugin
+              {/* <NodeEventPlugin
                 nodeType={ParagraphNode}
                 eventType={"click"}
                 eventListener={(e: Event) => {
@@ -489,7 +489,7 @@ export const CommentDisplayRTE = ({
                   console.log("li node clicked");
                   setSelectedNodeType("li");
                 }}
-              />
+              /> */}
             </LexicalComposer>
           </Box>
         </Box>

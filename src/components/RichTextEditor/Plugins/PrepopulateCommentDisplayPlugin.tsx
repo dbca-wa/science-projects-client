@@ -32,7 +32,7 @@ export const PrepopulateCommentDisplayPlugin = ({
   const [fixedText, setFixedText] = useState(data);
   const isHtml = checkIsHtml(data);
   useEffect(() => {
-    console.log("IS Html:", isHtml);
+    // console.log("IS Html:", isHtml);
     if (!isHtml) {
       setFixedText(
         `<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;">${data}</span></p>`
@@ -129,10 +129,10 @@ export const PrepopulateCommentDisplayPlugin = ({
             }
 
             if (node !== null) {
-              console.log(node);
+              // console.log(node);
               if (node.__type === "text" && bunchOfNodes.length <= 1) {
                 //
-                console.log("BUNCHONODES", bunchOfNodes);
+                // console.log("BUNCHONODES", bunchOfNodes);
               } else {
                 root.append(node);
               }

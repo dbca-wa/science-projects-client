@@ -48,7 +48,7 @@ export const ProgressReportContents = ({
   refetch,
   setToLastTab,
 }: Props) => {
-  console.log("FROM PROGRESS:", userData);
+  // console.log("FROM PROGRESS:", userData);
 
   // Handling years
   const {
@@ -129,7 +129,7 @@ export const ProgressReportContents = ({
   }, [selectedProgressReport]);
 
   const refetchDataForYearFunction = () => {
-    console.log("SELECTED YEAR IS:", selectedYear);
+    // console.log("SELECTED YEAR IS:", selectedYear);
     const dataForYear = documents.find(
       (report) => report.year === selectedYear
     );
@@ -138,7 +138,7 @@ export const ProgressReportContents = ({
       setSelectedProgressReport(dataForYear);
       // setEditorKey(selectedYear.toString() + colorMode + documentType);
     }
-    console.log("set year and selected doc");
+    // console.log("set year and selected doc");
   };
 
   // const refetchFunc = () => {

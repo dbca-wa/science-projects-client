@@ -118,14 +118,14 @@ export const EditableSRTE = ({
       setFloatingAnchorElem(_floatingAnchorElem);
     }
   };
-  useEffect(() => {
-    // Check if floatingAnchorElem is set
-    if (floatingAnchorElem !== null) {
-      // Perform any actions that depend on floatingAnchorElem being set
-      // For example, you might want to trigger something or log a message.
-      console.log("floatingAnchorElem is set:", floatingAnchorElem);
-    }
-  }, [floatingAnchorElem]);
+  // useEffect(() => {
+  //   // Check if floatingAnchorElem is set
+  //   if (floatingAnchorElem !== null) {
+  //     // Perform any actions that depend on floatingAnchorElem being set
+  //     // For example, you might want to trigger something or log a message.
+  //     console.log("floatingAnchorElem is set:", floatingAnchorElem);
+  //   }
+  // }, [floatingAnchorElem]);
 
   useEffect(() => {
     // Assuming editorRef is a reference to this Lexical editor instance
