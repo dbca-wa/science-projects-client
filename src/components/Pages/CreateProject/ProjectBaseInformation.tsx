@@ -76,7 +76,7 @@ export const ProjectBaseInformation = ({
   const meData = queryClient.getQueryData<IUserData>(["me"]);
 
   const [projectTitle, setProjectTitle] = useState("");
-  useEffect(() => console.log(projectTitle), [projectTitle]);
+  // useEffect(() => console.log(projectTitle), [projectTitle]);
 
   const [projectSummary, setProjectSummary] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -249,7 +249,7 @@ export const ProjectBaseInformation = ({
             ml={3}
             onClick={() => {
               if (baseInformationFilled) {
-                console.log("going next");
+                // console.log("going next");
                 nextClick({
                   kind: projectKind,
                   year: currentYear,

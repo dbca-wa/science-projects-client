@@ -11,7 +11,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
 import { $getRoot, $getSelection, ParagraphNode } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
-import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
+import { RevisedSimpleRichTextToolbar } from "../../Toolbar/RevisedSimpleRichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
@@ -42,10 +42,6 @@ export const SimpleStatefulRTE = ({
   value,
   setValueFunction,
 }: Props) => {
-  const [selectedNodeType, setSelectedNodeType] = useState<string>();
-
-  // useEffect(() => console.log(displayData), [displayData])
-
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -62,14 +58,11 @@ export const SimpleStatefulRTE = ({
                 const parserA = new DOMParser();
                 const docA = parserA.parseFromString(newHtml, "text/html");
                 const contentA = docA.body.textContent;
-                console.log(contentA);
+                // console.log(contentA);
                 setValueFunction(contentA);
               } else {
                 setValueFunction(newHtml);
               }
-              // console.log(newHtml)
-              // console.log("DATA DISPLAY PLUGIN:", newHtml);
-              //   setDisplayData(newHtml);
             });
           }}
         />
@@ -82,11 +75,8 @@ export const SimpleStatefulRTE = ({
               {/* Toolbar */}
 
               {showToolbar ? (
-                <SimpleRichTextToolbar
-                  allowInsertButton={allowInsertButton}
-                  editorRef={editorRef}
-                  selectedNodeType={selectedNodeType}
-                  setSelectedNodeType={setSelectedNodeType}
+                <RevisedSimpleRichTextToolbar
+                  allowInserts={allowInsertButton}
                 />
               ) : null}
 
@@ -110,7 +100,7 @@ export const SimpleStatefulRTE = ({
               style={{
                 position: "absolute",
                 left: "32px",
-                top: showToolbar ? "76px" : "22px",
+                top: showToolbar ? "64px" : "22px",
                 userSelect: "none",
                 pointerEvents: "none",
               }}
@@ -122,25 +112,6 @@ export const SimpleStatefulRTE = ({
         />
 
         <ClearEditorPlugin />
-        <NodeEventPlugin
-          nodeType={ParagraphNode}
-          eventType={"click"}
-          eventListener={(e: Event) => {
-            console.log(e);
-            console.log("paragaph node clicked");
-            setSelectedNodeType("paragraph");
-          }}
-        />
-        <NodeEventPlugin
-          nodeType={ListItemNode}
-          eventType={"click"}
-          eventListener={(e: Event) => {
-            console.log(e);
-            console.log("li node clicked");
-            setSelectedNodeType("li");
-          }}
-        />
-
         {/* <DataDisplayPlugin setDisplayData={setDisplayData} /> */}
       </LexicalComposer>
     </>

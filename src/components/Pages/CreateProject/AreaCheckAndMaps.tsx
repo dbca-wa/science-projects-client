@@ -32,7 +32,7 @@ export const AreaCheckAndMaps = ({
 
   useEffect(() => {
     // Check if the "All " checkbox is checked
-    console.log(selectedAreas);
+    // console.log(selectedAreas);
     const isAllAreaChecked = areas.some((area) => {
       return (
         area.name.toLowerCase().startsWith("all ") &&
