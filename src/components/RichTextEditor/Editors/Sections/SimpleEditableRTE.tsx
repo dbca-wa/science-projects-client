@@ -89,6 +89,7 @@ export const SimpleEditableRTE = ({
                 editorRef={editorRef}
                 selectedNodeType={selectedNodeType}
                 setSelectedNodeType={setSelectedNodeType}
+                allowInsertButton={false}
               />
 
               <ContentEditable
