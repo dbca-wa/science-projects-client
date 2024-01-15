@@ -38,6 +38,7 @@ import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
 import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import React from "react";
+import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
 
 interface Props {
   initialConfig: any;
@@ -170,7 +171,6 @@ export const EditableSRTE = ({
       <LexicalComposer initialConfig={initialConfig}>
         {/* Plugins*/}
         <TablePlugin hasCellMerge={true} hasCellBackgroundColor={false} />
-        <AutoFocusPlugin />
         <HistoryPlugin />
         <ListPlugin />
 
@@ -332,6 +332,13 @@ export const EditableSRTE = ({
           editorText={editorText}
           isOpen={isEditorOpen}
         />
+
+        <FloatingToolbarPlugin
+          anchorElem={floatingAnchorElem}
+        />
+
+        <AutoFocusPlugin />
+
         {/* <DataDisplayPlugin setDisplayData={setDisplayData} /> */}
         {/* {isEditorOpen && (
                     <EditorTextInitialStatePlugin

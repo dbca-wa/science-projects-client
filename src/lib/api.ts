@@ -1941,6 +1941,18 @@ export const getUserFeedback = async () => {
     return res;
 }
 
+export interface IUpdateFeedbackStatus {
+    pk: number;
+    status: string;
+}
+
+export const updateUserFeedbackStatus = async ({ pk, status }: IUpdateFeedbackStatus) => {
+    const res = instance.put(`tasks/feedback/${pk}`, { status: status }).then(res => {
+        return res.data
+    })
+    return res;
+}
+
 
 // TASKS =====================================================================================
 
