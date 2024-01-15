@@ -3,7 +3,9 @@ name: Docker Image CI for GHCR
 on:
   push:
     tags:
-      - '*'
+      - "*"
+  pull_request:
+    branches: ["main"]
 
 jobs:
   build_and_publish:
@@ -19,9 +21,23 @@ jobs:
         id: tag
         run: echo "::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}"
 
+      - name: Determine next version
+        id: next_version
+        run: |
+          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            current_version=$(echo "${{ steps.tag.outputs.TAG_NAME }}" | sed -E 's/v//')
+            if [ -z "$current_version" ]; then
+              current_version="0.0.0"
+            fi
+            next_version=$(awk -F. -v v="$current_version" '{printf "v%d.%d.%d\n", $1, $2, $3 + 1}' <<< "")
+            echo "::set-output name=NEXT_VERSION::$next_version"
+          else
+            echo "::set-output name=NEXT_VERSION::"
+          fi
+
       - name: Build and Push Image
         run: |
-          docker build . --tag ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
-          docker push ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
-          docker tag ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }} ghcr.io/dbca-wa/science-projects-client:latest
+          docker build . --tag ghcr.io/dbca-wa/science-projects-client:${{ steps.next_version.outputs.NEXT_VERSION }}
+          docker push ghcr.io/dbca-wa/science-projects-client:${{ steps.next_version.outputs.NEXT_VERSION }}
+          docker tag ghcr.io/dbca-wa/science-projects-client:${{ steps.next_version.outputs.NEXT_VERSION }} ghcr.io/dbca-wa/science-projects-client:latest
           docker push ghcr.io/dbca-wa/science-projects-client:latest
