@@ -169,26 +169,23 @@ export const RichTextEditor = ({
     const [isEditorOpen, setIsEditorOpen] = useState(false);
 
 
+
+
+    useEffect(() => {
+        if (data !== undefined && data !== null) {
+            setDisplayData(data);
+        }
+    }, [])
+
     const [displayData, setDisplayData] = useState(data);
 
-    useEffect(() => { console.log("DISPLAY DATA:", displayData) }, [displayData])
+    useEffect(() => {
+        console.log("DISPLAY DATA:", displayData);
+        setPrepopulationData(displayData);
+    }, [displayData])
 
-    // const stripHTML = (dataToStrip: string) => {
-    //     if (!dataToStrip) return "";
+    const [prepopulationData, setPrepopulationData] = useState(displayData);
 
-    //     // Remove HTML tags using regex and insert spaces between opening/closing tags
-    //     const strippedVersion = dataToStrip.replace(/<\/?[^>]+(>|$)/g, " ").trim();
-
-    //     // Insert spaces after sentence enders, commas, and semicolons if needed
-    //     return strippedVersion.replace(/([!.;]+)(?=\S)/g, "$1 ").replace(/\s{2,}/g, " ");
-    // };
-
-    // useEffect(() => {
-
-    //     if (isEditorOpen) {
-    //         setEditorText(stripHTML(displayData));
-    //     }
-    // }, [isEditorOpen])
 
     return (
         // Wrapper
@@ -257,11 +254,13 @@ export const RichTextEditor = ({
 
                 {isEditorOpen ? (
                     <EditableSRTE
+                        // key={prepopulationData} 
+
                         initialConfig={initialConfig}
                         editorRef={editorRef}
 
 
-                        data={data}
+                        data={prepopulationData}
                         section={section}
                         project_pk={project_pk}
                         document_pk={document_pk}
@@ -290,11 +289,12 @@ export const RichTextEditor = ({
                     :
                     (
                         <DisplaySRTE
+                            key={prepopulationData}
                             initialConfig={uneditableInitialCOnfig}
                             editorRef={editorRef}
 
 
-                            data={data}
+                            data={prepopulationData}
                             section={section}
                             project_pk={project_pk}
                             document_pk={document_pk}

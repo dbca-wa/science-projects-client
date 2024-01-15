@@ -21,11 +21,31 @@ import { EditorSubsections, EditorType } from "../../../../types";
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
+import React from "react";
+
+
+interface PrepopulateHTMLPluginProps {
+    data: string;
+}
+
+const PrepopulateHTMLPluginWrapper = ({ data }: PrepopulateHTMLPluginProps) => {
+    // You can use state to force a rerender when data changes
+    const [, forceUpdate] = React.useState({});
+
+    React.useEffect(() => {
+        forceUpdate({});
+    }, [data]);
+
+    return <PrepopulateHTMLPlugin data={data} />;
+};
+
 
 interface Props {
     initialConfig: any;
     editorRef: any;
+    originalData?: string;
     data: string;
+
     section: EditorSubsections;
     project_pk: number;
     document_pk: number;
@@ -45,7 +65,8 @@ interface Props {
 
 export const DisplaySRTE = (
     {
-        initialConfig, editorRef, data,
+        initialConfig, editorRef, data, originalData,
+
         section, project_pk, document_pk, isUpdate,
         editorType,
         editorText, setEditorText,
@@ -61,15 +82,6 @@ export const DisplaySRTE = (
     // useEffect(() => {
     //     console.log("Hi:", displayData)
     // }, [displayData])
-
-
-
-    useEffect(() => {
-        if (data !== undefined && data !== null) {
-            setDisplayData(data);
-        }
-    }, [data])
-
 
     return (
         <>
@@ -97,10 +109,9 @@ export const DisplaySRTE = (
                         setDisplayData(newHtml);
                     })
                 }} /> */}
-                {displayData !== undefined && displayData !== null && (
-                    <PrepopulateHTMLPlugin data={displayData} />
-
-                )}
+                {/* {data !== undefined && data !== null && ( */}
+                <PrepopulateHTMLPlugin data={data} />
+                {/* )} */}
 
 
                 {/* Text Area */}

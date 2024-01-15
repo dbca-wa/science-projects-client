@@ -37,10 +37,12 @@ import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin
 import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
 import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
+import React from "react";
 
 interface Props {
   initialConfig: any;
   editorRef: any;
+  originalData?: string;
   data: string;
   section: EditorSubsections;
   project_pk: number;
@@ -67,6 +69,23 @@ interface Props {
   setCanSave: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+
+interface PrepopulateHTMLPluginProps {
+  data: string;
+}
+
+const PrepopulateHTMLPluginWrapper = ({ data }: PrepopulateHTMLPluginProps) => {
+  // You can use state to force a rerender when data changes
+  const [, forceUpdate] = React.useState({});
+
+  React.useEffect(() => {
+    forceUpdate({});
+  }, [data]);
+
+  return <PrepopulateHTMLPlugin data={data} />;
+};
+
+
 export const EditableSRTE = ({
   textEditorName,
   section,
@@ -78,6 +97,7 @@ export const EditableSRTE = ({
   writeable_document_pk,
   initialConfig,
   editorRef,
+  originalData,
   data,
   editorText,
   setEditorText,
@@ -145,13 +165,6 @@ export const EditableSRTE = ({
   const [blockType, setBlockType] =
     useState<keyof typeof blockTypeToBlockName>("paragraph");
 
-
-  useEffect(() => {
-    if (data !== undefined && data !== null) {
-      setDisplayData(data);
-    }
-  }, [data])
-
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -174,9 +187,9 @@ export const EditableSRTE = ({
             });
           }}
         />
-        {displayData !== undefined && displayData !== null && (
-          <PrepopulateHTMLPlugin data={displayData} />
-        )}
+        {/* {data !== undefined && data !== null && ( */}
+        <PrepopulateHTMLPlugin data={data} />
+        {/* )} */}
         <CustomPastePlugin />
 
         {/* Text Area */}
