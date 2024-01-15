@@ -145,6 +145,13 @@ export const EditableSRTE = ({
   const [blockType, setBlockType] =
     useState<keyof typeof blockTypeToBlockName>("paragraph");
 
+
+  useEffect(() => {
+    if (data !== undefined && data !== null) {
+      setDisplayData(data);
+    }
+  }, [data])
+
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -167,7 +174,7 @@ export const EditableSRTE = ({
             });
           }}
         />
-        {data !== undefined && data !== null && (
+        {displayData !== undefined && displayData !== null && (
           <PrepopulateHTMLPlugin data={displayData} />
         )}
         <CustomPastePlugin />
@@ -209,7 +216,7 @@ export const EditableSRTE = ({
                       outline: "none",
                     }}
 
-                    // autoFocus
+                  // autoFocus
                   />
                 </Box>
               </Box>

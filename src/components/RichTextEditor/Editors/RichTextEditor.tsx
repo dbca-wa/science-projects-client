@@ -171,6 +171,8 @@ export const RichTextEditor = ({
 
     const [displayData, setDisplayData] = useState(data);
 
+    useEffect(() => { console.log("DISPLAY DATA:", displayData) }, [displayData])
+
     // const stripHTML = (dataToStrip: string) => {
     //     if (!dataToStrip) return "";
 

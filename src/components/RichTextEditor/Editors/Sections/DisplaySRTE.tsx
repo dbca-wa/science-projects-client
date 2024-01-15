@@ -62,6 +62,15 @@ export const DisplaySRTE = (
     //     console.log("Hi:", displayData)
     // }, [displayData])
 
+
+
+    useEffect(() => {
+        if (data !== undefined && data !== null) {
+            setDisplayData(data);
+        }
+    }, [data])
+
+
     return (
         <>
 
@@ -88,7 +97,7 @@ export const DisplaySRTE = (
                         setDisplayData(newHtml);
                     })
                 }} /> */}
-                {data !== undefined && data !== null && (
+                {displayData !== undefined && displayData !== null && (
                     <PrepopulateHTMLPlugin data={displayData} />
 
                 )}
