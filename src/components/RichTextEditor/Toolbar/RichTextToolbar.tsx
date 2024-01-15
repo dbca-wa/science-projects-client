@@ -153,8 +153,8 @@ export const RichTextToolbar = ({
                   selectedNodeType={selectedNodeType}
                   editor={editor}
                   isSmall
-                  // currentlyClickedNode={selectedNodeType}
-                  // setCurrentlyClickedNode={setSelectedNodeType}
+                // currentlyClickedNode={selectedNodeType}
+                // setCurrentlyClickedNode={setSelectedNodeType}
                 />
                 <VerticalDivider />
 
@@ -200,8 +200,8 @@ export const RichTextToolbar = ({
               isSmall
               shouldFurtherConcat={true}
 
-              // currentlyClickedNode={selectedNodeType}
-              // setCurrentlyClickedNode={setSelectedNodeType}
+            // currentlyClickedNode={selectedNodeType}
+            // setCurrentlyClickedNode={setSelectedNodeType}
             />
             <VerticalDivider />
             <FontFormatterButton onClick={onClick} />

@@ -45,10 +45,8 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
           `<tr>${row
             .map(
               (cell, colIndex) =>
-                `<${
-                  rowIndex === 0 || colIndex === 0 ? "th" : "td"
-                } class="table-cell-dark${
-                  rowIndex === 0 ? " table-cell-header-dark" : ""
+                `<${rowIndex === 0 || colIndex === 0 ? "th" : "td"
+                } class="table-cell-dark${rowIndex === 0 ? " table-cell-header-dark" : ""
                 }">${cell}</${rowIndex === 0 || colIndex === 0 ? "th" : "td"}>`
             )
             .join("")}</tr>`
@@ -70,7 +68,7 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
   };
 
   const removeHTMLSpace = (text: string) => {
-    return text.replace(/&nbsp;/g, "");
+    return text?.replace(/&nbsp;/g, "");
   };
 
   const [editor, editorState] = useLexicalComposerContext();
@@ -84,7 +82,7 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
       // replacedData = handlePastedWordOrderedList(replacedData, colorMode);
 
       // Replace strings representing tables with actual HTML tables
-      replacedData = replacedData.replace(/\[\[.*?\]\]/g, (match) => {
+      replacedData = replacedData?.replace(/\[\[.*?\]\]/g, (match) => {
         const tableData = JSON.parse(match);
         return generateHtmlTable(tableData);
       });
