@@ -39,6 +39,10 @@ import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialSta
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import React from "react";
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
+import { RevisedRichTextToolbar } from "../../Toolbar/RevisedRichTextToolbar";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
+// import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 interface Props {
   initialConfig: any;
@@ -71,21 +75,6 @@ interface Props {
 }
 
 
-interface PrepopulateHTMLPluginProps {
-  data: string;
-}
-
-const PrepopulateHTMLPluginWrapper = ({ data }: PrepopulateHTMLPluginProps) => {
-  // You can use state to force a rerender when data changes
-  const [, forceUpdate] = React.useState({});
-
-  React.useEffect(() => {
-    forceUpdate({});
-  }, [data]);
-
-  return <PrepopulateHTMLPlugin data={data} />;
-};
-
 
 export const EditableSRTE = ({
   textEditorName,
@@ -113,9 +102,14 @@ export const EditableSRTE = ({
   canSave,
   setCanSave,
 }: Props) => {
-  const [selectedNodeType, setSelectedNodeType] = useState<string>();
+  // const [isText, setIsText] = useState(false);
+  // const [selectedIsBold, setSelectedIsBold] = useState(false);
+  // const [selectedIsItalic, setSelectedIsItalic] = useState(false);
+  // const [selectedIsUnderlined, setSelectedIsUnderlined] = useState(false);
+  // const [selectedIsSubscript, setSelectedIsSubscript] = useState(false);
+  // const [selectedIsSuperscript, setSelectedIsSuperscript] = useState(false);
 
-  const [selectedIsBold, setSelectedIsBold] = useState(false);
+
 
   const dragBtnMargin = 10;
   // useEffect(() => console.log(displayData), [displayData])
@@ -166,6 +160,9 @@ export const EditableSRTE = ({
   const [blockType, setBlockType] =
     useState<keyof typeof blockTypeToBlockName>("paragraph");
 
+  // const [editor] = useLexicalComposerContext();
+
+
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -178,6 +175,7 @@ export const EditableSRTE = ({
           onChange={(editorState, editor) => {
             editorState.read(() => {
               const root = $getRoot();
+
               setEditorText(root.__cachedText);
               const newHtml = $generateHtmlFromNodes(editor, null);
               // console.log(newHtml)
@@ -199,14 +197,8 @@ export const EditableSRTE = ({
             // mr={3}
             >
               {/* Toolbar */}
-
-              <RichTextToolbar
-                // editor={editor}
-                selectedIsBold={selectedIsBold}
-                setSelectedIsBold={setSelectedIsBold}
-                editorRef={editorRef}
-                selectedNodeType={selectedNodeType}
-                setSelectedNodeType={setSelectedNodeType}
+              <RevisedRichTextToolbar
+                anchorElem={floatingAnchorElem}
               />
 
               <Box className="editor-scroller">
@@ -287,7 +279,7 @@ export const EditableSRTE = ({
         <TabIndentationPlugin />
         <ListMaxIndentLevelPlugin maxDepth={3} />
 
-        <NodeEventPlugin
+        {/* <NodeEventPlugin
           nodeType={ParagraphNode}
           eventType={"click"}
           eventListener={(
@@ -326,7 +318,7 @@ export const EditableSRTE = ({
             // console.log('li node clicked')
             // setSelectedNodeType('li')
           }}
-        />
+        /> */}
         <EditorTextInitialStatePlugin
           setEditorText={setEditorText}
           editorText={editorText}
