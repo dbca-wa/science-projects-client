@@ -36,7 +36,6 @@ interface IModalProps {
   onClose: () => void;
   userPk: string | number;
   userIsSuper: boolean;
-  userIsMe: boolean;
   userIsExternal: boolean;
 }
 

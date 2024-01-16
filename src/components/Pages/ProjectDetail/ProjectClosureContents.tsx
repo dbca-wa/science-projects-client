@@ -1,9 +1,7 @@
 // Maps out the document provided to the rich text editor components for project closure documents.
 
 import {
-  Box,
   Flex,
-  Grid,
   Select,
   Text,
   ToastId,
@@ -16,18 +14,15 @@ import {
   IProjectMember,
   IUserMe,
 } from "../../../types";
-import { DocumentActions } from "./DocumentActions";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
-import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
 import { ProjectClosureDocActions } from "./DocActions/ProjectClosureDocActions";
-import { IClosureOutcomeProps, setClosureOutcome } from "../../../lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
 import { AxiosError } from "axios";
 import { motion } from "framer-motion";
 import { CommentSection } from "./CommentSection";
+import { setClosureOutcome } from "@/lib/api";
 
 interface Props {
   document: IProjectClosure | null;
@@ -49,20 +44,10 @@ export const ProjectClosureContents = ({
   const { colorMode } = useColorMode();
   const documentType = "closure";
   const editorKey = colorMode + documentType;
-  // useEffect(() => {
-  //   console.log(document);
-  // }, [document]);
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
-  const userIsLeader = useCheckUserIsTeamLeader(mePk, members);
 
-  // useEffect(() => {
-  //   console.log(userData);
-  //   console.log(userInTeam);
-  // }, [userData, userInTeam]);
-
-  // const [isLoading, setIsLoading] = useState(false);
   const [selectedOutcome, setSelectedOutcome] = useState<string>(
     document?.intended_outcome
   );
@@ -74,10 +59,9 @@ export const ProjectClosureContents = ({
   ];
 
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<IClosureOutcomeProps>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -89,7 +73,7 @@ export const ProjectClosureContents = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -125,8 +109,6 @@ export const ProjectClosureContents = ({
   });
 
   const handleNewOutcomeSelection = (event) => {
-    // setIsLoading(true);
-    // setSelectedOutcome(event.target.value)
     const outcome = event.target.value;
     const closurePk = document?.pk;
     const formData = {
@@ -136,12 +118,6 @@ export const ProjectClosureContents = ({
     setSelectedOutcome(outcome);
     setClosureMutation.mutate(formData);
   };
-
-  // useEffect(() => {
-  //     console.log(selectedOutcome)
-  //     // api call to set the outcome
-
-  // }, [selectedOutcome])
 
   return (
     <motion.div
@@ -197,19 +173,6 @@ export const ProjectClosureContents = ({
           </Select>
         </Flex>
       </Flex>
-
-      {/* <RichTextEditor
-                canEdit={userInTeam || userData?.is_superuser}
-                document_pk={document?.document?.pk}
-                project_pk={document?.document?.project?.pk}
-                writeable_document_kind={'Project Closure'}
-                writeable_document_pk={document?.pk}
-                isUpdate={true}
-                editorType="ProjectDocument"
-                key={`intended_outcome${editorKey}`} // Change the key to force a re-render
-                data={document?.intended_outcome}
-                section={"intended_outcome"}
-            /> */}
 
       <RichTextEditor
         canEdit={userInTeam || userData?.is_superuser}

@@ -5,18 +5,14 @@ import {
   Checkbox,
   Flex,
   Grid,
-  Input,
   Switch,
   Tag,
   Text,
-  ToastId,
   useColorMode,
   useDisclosure,
-  useToast,
 } from "@chakra-ui/react";
-import { IProjectPlan, IUserData, IUserMe } from "../../../types";
-import { SetStateAction, useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { IProjectPlan, IUserMe } from "../../../types";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ISpecialEndorsement } from "../../../lib/api";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
@@ -35,11 +31,9 @@ interface IEndorsementProps {
 export const ProjectPlanEndorsements = ({
   document,
   userData,
-  userIsLeader,
   refetchDocument,
 }: IEndorsementProps) => {
-  const { register, handleSubmit, reset, watch, setValue } =
-    useForm<ISpecialEndorsement>();
+  const { register, watch } = useForm<ISpecialEndorsement>();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const hcEndReqValue = watch("herbariumEndorsementRequired");
@@ -52,58 +46,20 @@ export const ProjectPlanEndorsements = ({
 
   const baseApi = useApiEndpoint();
 
-  // useEffect(
-  //   () =>
-  //     console.log({
-  //       bmEndRequiredValue: bmEndRequiredValue,
-  //       bmEndProvidedValue: bmEndProvidedValue,
-  //       hcEndReqValue: hcEndReqValue,
-  //       hcEndProvidedValue: hcEndProvidedValue,
-  //       aecEndReqValue: aecEndReqValue,
-  //       aecEndProvidedValue: aecEndProvidedValue,
-  //       document,
-  //     }),
-  //   [
-  //     bmEndRequiredValue,
-  //     bmEndProvidedValue,
-  //     aecEndReqValue,
-  //     aecEndProvidedValue,
-  //     hcEndReqValue,
-  //     hcEndProvidedValue,
-  //     document,
-  //   ]
-  // );
+  const aecEndRequired: boolean =
+    document?.endorsements?.ae_endorsement_required;
+  const hcEndRequired: boolean =
+    document?.endorsements?.hc_endorsement_required;
 
-  // const [involvesDataCollection, setInvolvesDataCollection] = useState(true);
+  const hcEndProvided: boolean =
+    document?.endorsements?.hc_endorsement_provided;
+  const aecEndProvided: boolean =
+    document?.endorsements?.ae_endorsement_provided;
 
-  // useEffect(() => {
-  //     console.log(involvesAnimals)
-  //     if (involvesAnimals === false) {
-  //         setValue("aecEndorsementRequired", false);
-  //         setValue("aecEndorsementProvided", false);
-  //     }
-  // }, [involvesAnimals])
-
-  const [aecEndRequired, setAecEndRequired] = useState<boolean>(
-    document?.endorsements?.ae_endorsement_required
-  );
-  const [hcEndRequired, setHcEndRequired] = useState<boolean>(
-    document?.endorsements?.hc_endorsement_required
-  );
-
-  const [hcEndProvided, setHcEndProvided] = useState<boolean>(
-    document?.endorsements?.hc_endorsement_provided
-  );
-  const [aecEndProvided, setAecEndProvided] = useState<boolean>(
-    document?.endorsements?.ae_endorsement_provided
-  );
-
-  const [bmEndProvided, setBmEndProvided] = useState<boolean>(
-    document?.endorsements?.bm_endorsement_provided
-  );
-  const [bmEndRequired, setBmEndRequired] = useState<boolean>(
-    document?.endorsements?.bm_endorsement_required
-  );
+  const bmEndProvided: boolean =
+    document?.endorsements?.bm_endorsement_provided;
+  const bmEndRequired: boolean =
+    document?.endorsements?.bm_endorsement_required;
 
   const [userCanEditHCEndorsement, setUserCanEditHCEndorsement] =
     useState(false);
@@ -137,101 +93,6 @@ export const ProjectPlanEndorsements = ({
       setUserCanEditAECEndorsement(false);
     }
   }, [userData]);
-
-  // const [herbCuratorInteractable, setHerbCuratorInteractable] = useState(false);
-  // const [aecInteractable, setAecInteractable] = useState(false);
-  // const [bmInteractable, setBmInteractable] = useState(false);
-
-  // const handleTogglePlantsInvolved = () => {
-  //     setInvolvesPlants((prev) => !prev);
-  // }
-
-  // const handleToggleAnimalsInvolved = () => {
-  //     setInvolvesAnimals((prev) => !prev);
-  // }
-
-  // useEffect(() => {
-  //     if (aecEndRequired === true) {
-  //         setAecInteractable(true)
-  //     }
-  //     else {
-  //         setAecInteractable(false)
-  //     }
-  // }, [aecEndRequired])
-
-  // useEffect(() => {
-  //     if (hcEndRequired === true) {
-  //         setHerbCuratorInteractable(true);
-  //     }
-  //     else {
-  //         setHerbCuratorInteractable(false);
-  //     }
-  // }, [hcEndRequired])
-
-  // useEffect(() => {
-  //     if (bmEndRequired === true) {
-  //         setBmInteractable(true);
-  //     }
-  //     else {
-  //         setBmInteractable(false);
-  //     }
-  // }, [bmEndRequired])
-
-  const queryClient = useQueryClient();
-  const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
-    toastIdRef.current = toast(data);
-  };
-
-  // const endorsementMutation = useMutation(setEndorsement,
-  //     {
-  //         onMutate: () => {
-  //             addToast({
-  //                 status: "loading",
-  //                 title: "Creating Task",
-  //                 position: "top-right"
-  //             })
-  //         },
-  //         onSuccess: (data) => {
-
-  //             if (toastIdRef.current) {
-  //                 toast.update(toastIdRef.current, {
-  //                     title: 'Success',
-  //                     description: `Task Created`,
-  //                     status: 'success',
-  //                     position: "top-right",
-  //                     duration: 3000,
-  //                     isClosable: true,
-  //                 })
-  //             }
-  //             reset()
-  //             // onClose()
-
-  //             setTimeout(() => {
-
-  //                 queryClient.invalidateQueries(["projects"]);
-
-  //             }, 350)
-  //         },
-  //         onError: (error) => {
-  //             if (toastIdRef.current) {
-  //                 toast.update(toastIdRef.current, {
-  //                     title: 'Could Not Create Task',
-  //                     description: `${error}`,
-  //                     status: 'error',
-  //                     position: "top-right",
-  //                     duration: 3000,
-  //                     isClosable: true,
-  //                 })
-  //             }
-  //         }
-
-  //     })
-
-  // const onSubmitUpdateEndorsement = (formData: ISpecialEndorsement) => {
-  //     endorsementMutation.mutate(formData);
-  // }
 
   const [uploadedPDF, setUploadedPDF] = useState<File>();
   const [isError, setIsError] = useState(false);
@@ -378,32 +239,6 @@ export const ProjectPlanEndorsements = ({
               borderTop={0}
               roundedBottom={0}
             >
-              {/* <Flex
-                                alignItems={"center"}
-                                userSelect={"none"}
-                            >
-                                <Box
-                                    flex={1}
-                                >
-                                    <Text
-                                        fontWeight={"semibold"}
-                                    >
-                                        Plant Specimen Collection
-                                    </Text>
-                                </Box>
-
-                                <Checkbox
-                                    defaultChecked={
-                                        involvesPlants === true
-                                    }
-                                    mr={3}
-                                    // isDisabled
-                                    {...register('involvesPlants', { value: involvesPlants })}
-
-                                />
-
-                            </Flex> */}
-
               <Flex>
                 <Box flex={1}>
                   <Text fontWeight={"semibold"}>
@@ -563,20 +398,6 @@ export const ProjectPlanEndorsements = ({
                         : "Required"}
                     </Tag>
                   ) : (
-                    // null
-                    // <Switch
-                    //     isDisabled={!aecEndReqValue}
-                    //     defaultChecked={
-                    //         (document?.endorsements?.ae_endorsement_provided === true || (uploadedPDF)) ? true : false
-                    //     }
-                    //     // defaultChecked={document?.endorsements?.ae_endorsement_provided === true || aecEndProvided}
-                    //     {...register('aecEndorsementProvided', { value: aecEndProvided })}
-                    // />
-                    // <Input
-                    //     {...register('aecEndorsementProvided', { value: shouldSwitchBeChecked })}
-                    //     type="hidden"
-                    // />
-
                     <Switch
                       isDisabled={true} // Disable direct toggling
                       defaultChecked={shouldSwitchBeChecked}
@@ -585,17 +406,6 @@ export const ProjectPlanEndorsements = ({
                         value: shouldSwitchBeChecked,
                       })}
                     />
-                    // shouldSwitchBeChecked === true ?
-                    //     (<Switch
-                    //         // isDisabled={true} // Disable direct toggling
-                    //         defaultChecked={true}
-                    //         {...register('aecEndorsementProvided', { value: true })}
-                    //     />) :
-                    //     (<Switch
-                    //         // isDisabled={true} // Disable direct toggling
-                    //         defaultChecked={false}
-                    //         {...register('aecEndorsementProvided', { value: false })}
-                    //     />)
                   )}
                 </Flex>
               </Flex>

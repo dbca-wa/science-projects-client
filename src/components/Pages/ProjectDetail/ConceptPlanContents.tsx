@@ -1,15 +1,13 @@
 // Maps out the document provided to the rich text editor components for concept plan documents.
 
-import { Box, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@chakra-ui/react";
 import {
   IConceptPlan,
   IProjectDocuments,
   IProjectMember,
-  IUserData,
   IUserMe,
 } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { useEffect } from "react";
 import { ConceptPlanDocActions } from "./DocActions/ConceptPlanDocActions";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
 import { motion } from "framer-motion";
@@ -22,7 +20,7 @@ interface Props {
   document: IConceptPlan | null;
 
   refetch: () => void;
-  setToLastTab: (tabToGoTo?: number) => void;
+  // setToLastTab: (tabToGoTo?: number) => void;
 }
 
 export const ConceptPlanContents = ({
@@ -31,18 +29,12 @@ export const ConceptPlanContents = ({
   all_documents,
   document,
   refetch,
-  setToLastTab,
-}: Props) => {
-  // console.log("FROM CONCEPT:", userData);
-
-  // Force a rerender when dark mode or year changed to update design and content
-  // const editorKey = selectedYear.toString() + colorMode;
+}: // setToLastTab,
+Props) => {
   const { colorMode } = useColorMode();
 
   const documentType = "conceptplan";
   const editorKey = colorMode + documentType;
-
-  // useEffect(() => { console.log(document) }, [document])
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
@@ -59,16 +51,12 @@ export const ConceptPlanContents = ({
       style={{
         height: "100%",
         animation: "oscillate 8s ease-in-out infinite",
-        // backgroundColor: "pink"
       }}
     >
       <ConceptPlanDocActions
         all_documents={all_documents}
         conceptPlanData={document}
         refetchData={refetch}
-        // setToLastTab={setToLastTab}
-
-        // projectPk={projectPk}
       />
 
       <RichTextEditor

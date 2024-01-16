@@ -19,8 +19,6 @@ import {
 } from "@chakra-ui/react";
 import { IUserData } from "../../../types";
 import { UserProfile } from "./UserProfile";
-import { useEffect } from "react";
-import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 
 interface BoxContainerProps extends BoxProps {
@@ -95,13 +93,13 @@ export const UserGridItem = ({
   } = useDisclosure();
 
   const drawerFunction = () => {
-    console.log(`${first_name} clicked`);
+    // console.log(`${first_name} clicked`);
     onUserOpen();
   };
 
-  useEffect(() => {
-    console.log(is_active);
-  }, [is_active]);
+  // useEffect(() => {
+  //   console.log(is_active);
+  // }, [is_active]);
 
   return (
     <>
