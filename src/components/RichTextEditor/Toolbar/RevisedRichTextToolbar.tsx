@@ -258,167 +258,169 @@ const useToolbar = ({
   ];
 };
 
-interface Props {
-  anchorElem?: HTMLElement;
-}
+// interface Props {
+//   anchorElem?: HTMLElement;
+// }
 
-export const RevisedRichTextToolbar = ({ anchorElem }: Props) => {
-  if (!anchorElem) {
-    console.log("anchorElem not present");
-  }
-  const [editor] = useLexicalComposerContext();
-  const [
-    isBold,
-    isItalic,
-    isUnderline,
-    isSubscript,
-    isSuperscript,
-    // isStrikethrough,
-    canUndo,
-    canRedo,
-    blockType,
-  ] = useToolbar({ editor });
-  const {
-    isOpen: isAddTableOpen,
-    onClose: onAddTableClose,
-    onOpen: onAddTableOpen,
-  } = useDisclosure();
+export const RevisedRichTextToolbar = () =>
+  // { anchorElem }: Props
+  {
+    // if (!anchorElem) {
+    //   console.log("anchorElem not present");
+    // }
+    const [editor] = useLexicalComposerContext();
+    const [
+      isBold,
+      isItalic,
+      isUnderline,
+      isSubscript,
+      isSuperscript,
+      // isStrikethrough,
+      canUndo,
+      canRedo,
+      blockType,
+    ] = useToolbar({ editor });
+    const {
+      isOpen: isAddTableOpen,
+      onClose: onAddTableClose,
+      onOpen: onAddTableOpen,
+    } = useDisclosure();
 
-  const formatParagraph = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($INTERNAL_isPointSelection(selection)) {
-        $setBlocksType(selection, () => $createParagraphNode());
+    const formatParagraph = () => {
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($INTERNAL_isPointSelection(selection)) {
+          $setBlocksType(selection, () => $createParagraphNode());
+        }
+      });
+    };
+
+    const formatBulletList = () => {
+      if (blockType !== "bullet") {
+        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+      } else {
+        editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
       }
+    };
+
+    const formatNumberedList = () => {
+      if (blockType !== "number") {
+        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+      } else {
+        editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+      }
+    };
+
+    const boldEtcCanRender = useBreakpointValue({
+      base: false,
+      sm: false,
+      md: false,
+      "768px": false,
+      mdlg: false,
+      lg: true,
+      xl: true,
     });
-  };
 
-  const formatBulletList = () => {
-    if (blockType !== "bullet") {
-      editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
-    } else {
-      editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
-    }
-  };
+    const formattingCanRender = useBreakpointValue({
+      base: false,
+      sm: false,
+      md: false,
+      "768px": false,
+      mdlg: false,
+      lg: false,
+      "1200px": true,
+    });
 
-  const formatNumberedList = () => {
-    if (blockType !== "number") {
-      editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
-    } else {
-      editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
-    }
-  };
+    const { colorMode } = useColorMode();
 
-  const boldEtcCanRender = useBreakpointValue({
-    base: false,
-    sm: false,
-    md: false,
-    "768px": false,
-    mdlg: false,
-    lg: true,
-    xl: true,
-  });
-
-  const formattingCanRender = useBreakpointValue({
-    base: false,
-    sm: false,
-    md: false,
-    "768px": false,
-    mdlg: false,
-    lg: false,
-    "1200px": true,
-  });
-
-  const { colorMode } = useColorMode();
-
-  return (
-    <>
-      <InsertTableModal
-        isOpen={isAddTableOpen}
-        activeEditor={editor}
-        onClose={onAddTableClose}
-      />
-
-      <Flex
-        px={5}
-        py={0.5}
-        bg={colorMode === "light" ? undefined : "gray.900"}
-        borderBottom={"1px solid"}
-        borderColor={colorMode === "dark" ? "gray.700" : "gray.200"}
-      >
-        <RevisedBaseToolbarButton
-          ariaLabel="Undo"
-          // isActive={isBold}
-          variant={"ghost"}
-          isDisabled={!canUndo}
-          onClick={() => {
-            editor.dispatchCommand(UNDO_COMMAND, undefined);
-          }}
-        >
-          <FaUndo />
-        </RevisedBaseToolbarButton>
-        <RevisedBaseToolbarButton
-          ariaLabel="Undo"
-          // isActive={isBold}
-          variant={"ghost"}
-          isDisabled={!canRedo}
-          onClick={() => {
-            editor.dispatchCommand(REDO_COMMAND, undefined);
-          }}
-        >
-          <FaRedo />
-        </RevisedBaseToolbarButton>
-        <VerticalDivider />
-
-        {boldEtcCanRender ? (
-          <>
-            <RevisedBaseToolbarButton
-              ariaLabel="Format text as Bold"
-              isActive={isBold}
-              variant={"ghost"}
-              isDisabled={false}
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
-              }}
-            >
-              <FaBold />
-            </RevisedBaseToolbarButton>
-            <RevisedBaseToolbarButton
-              ariaLabel="Format text as Italic"
-              isActive={isItalic}
-              variant={"ghost"}
-              isDisabled={false}
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
-              }}
-            >
-              <FaItalic />
-            </RevisedBaseToolbarButton>
-            <RevisedBaseToolbarButton
-              ariaLabel="Format text as Underlined"
-              isActive={isUnderline}
-              variant={"ghost"}
-              isDisabled={false}
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
-              }}
-            >
-              <FaUnderline />
-            </RevisedBaseToolbarButton>
-            <VerticalDivider />
-          </>
-        ) : null}
-
-        <ElementSelector
-          formatBulletList={formatBulletList}
-          formatNumberList={formatNumberedList}
-          formatParagraph={formatParagraph}
-          blockType={blockType}
+    return (
+      <>
+        <InsertTableModal
+          isOpen={isAddTableOpen}
+          activeEditor={editor}
+          onClose={onAddTableClose}
         />
 
-        <VerticalDivider />
+        <Flex
+          px={5}
+          py={0.5}
+          bg={colorMode === "light" ? undefined : "gray.900"}
+          borderBottom={"1px solid"}
+          borderColor={colorMode === "dark" ? "gray.700" : "gray.200"}
+        >
+          <RevisedBaseToolbarButton
+            ariaLabel="Undo"
+            // isActive={isBold}
+            variant={"ghost"}
+            isDisabled={!canUndo}
+            onClick={() => {
+              editor.dispatchCommand(UNDO_COMMAND, undefined);
+            }}
+          >
+            <FaUndo />
+          </RevisedBaseToolbarButton>
+          <RevisedBaseToolbarButton
+            ariaLabel="Undo"
+            // isActive={isBold}
+            variant={"ghost"}
+            isDisabled={!canRedo}
+            onClick={() => {
+              editor.dispatchCommand(REDO_COMMAND, undefined);
+            }}
+          >
+            <FaRedo />
+          </RevisedBaseToolbarButton>
+          <VerticalDivider />
 
-        {/* <RevisedBaseToolbarButton
+          {boldEtcCanRender ? (
+            <>
+              <RevisedBaseToolbarButton
+                ariaLabel="Format text as Bold"
+                isActive={isBold}
+                variant={"ghost"}
+                isDisabled={false}
+                onClick={() => {
+                  editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+                }}
+              >
+                <FaBold />
+              </RevisedBaseToolbarButton>
+              <RevisedBaseToolbarButton
+                ariaLabel="Format text as Italic"
+                isActive={isItalic}
+                variant={"ghost"}
+                isDisabled={false}
+                onClick={() => {
+                  editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
+                }}
+              >
+                <FaItalic />
+              </RevisedBaseToolbarButton>
+              <RevisedBaseToolbarButton
+                ariaLabel="Format text as Underlined"
+                isActive={isUnderline}
+                variant={"ghost"}
+                isDisabled={false}
+                onClick={() => {
+                  editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
+                }}
+              >
+                <FaUnderline />
+              </RevisedBaseToolbarButton>
+              <VerticalDivider />
+            </>
+          ) : null}
+
+          <ElementSelector
+            formatBulletList={formatBulletList}
+            formatNumberList={formatNumberedList}
+            formatParagraph={formatParagraph}
+            blockType={blockType}
+          />
+
+          <VerticalDivider />
+
+          {/* <RevisedBaseToolbarButton
                         ariaLabel="Format text with a strikethrough"
                         isActive={isStrikethrough}
                         variant={"ghost"}
@@ -427,105 +429,105 @@ export const RevisedRichTextToolbar = ({ anchorElem }: Props) => {
                     >
                         Strike
                     </RevisedBaseToolbarButton> */}
-        {formattingCanRender ? (
-          <>
-            <RevisedBaseToolbarButton
-              ariaLabel="Format Subscript"
-              isActive={isSubscript}
-              variant={"ghost"}
-              isDisabled={false}
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript");
-              }}
-            >
-              <MdSubscript />
-            </RevisedBaseToolbarButton>
-            <RevisedBaseToolbarButton
-              ariaLabel="Format Superscript"
-              isActive={isSuperscript}
-              variant={"ghost"}
-              isDisabled={false}
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript");
-              }}
-            >
-              <MdSuperscript />
-            </RevisedBaseToolbarButton>
-            <RevisedBaseToolbarButton
-              ariaLabel="Clear Formatting"
-              variant={"ghost"}
-              isDisabled={false}
-              onClick={() => {
-                editor.update(() => {
-                  const selection = $getSelection();
-                  if ($isRangeSelection(selection)) {
-                    const anchor = selection.anchor;
-                    const focus = selection.focus;
-                    const nodes = selection.getNodes();
+          {formattingCanRender ? (
+            <>
+              <RevisedBaseToolbarButton
+                ariaLabel="Format Subscript"
+                isActive={isSubscript}
+                variant={"ghost"}
+                isDisabled={false}
+                onClick={() => {
+                  editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript");
+                }}
+              >
+                <MdSubscript />
+              </RevisedBaseToolbarButton>
+              <RevisedBaseToolbarButton
+                ariaLabel="Format Superscript"
+                isActive={isSuperscript}
+                variant={"ghost"}
+                isDisabled={false}
+                onClick={() => {
+                  editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript");
+                }}
+              >
+                <MdSuperscript />
+              </RevisedBaseToolbarButton>
+              <RevisedBaseToolbarButton
+                ariaLabel="Clear Formatting"
+                variant={"ghost"}
+                isDisabled={false}
+                onClick={() => {
+                  editor.update(() => {
+                    const selection = $getSelection();
+                    if ($isRangeSelection(selection)) {
+                      const anchor = selection.anchor;
+                      const focus = selection.focus;
+                      const nodes = selection.getNodes();
 
-                    if (
-                      anchor.key === focus.key &&
-                      anchor.offset === focus.offset
-                    ) {
-                      return;
-                    }
-
-                    // Iterate4 over each node
-                    nodes.forEach((node, index) => {
-                      if ($isTextNode(node)) {
-                        let textNode = node;
-                        if (index === 0 && anchor.offset !== 0) {
-                          textNode =
-                            textNode.splitText(anchor.offset)[1] || textNode;
-                        }
-                        if (index === nodes.length - 1) {
-                          textNode =
-                            textNode.splitText(focus.offset)[0] || textNode;
-                        }
-
-                        if (textNode.__style !== "") {
-                          textNode.setStyle("");
-                        }
-
-                        if (textNode.__format !== 0) {
-                          textNode.setFormat(0);
-                          $getNearestBlockElementAncestorOrThrow(
-                            textNode
-                          ).setFormat("");
-                        }
-                        node = textNode;
+                      if (
+                        anchor.key === focus.key &&
+                        anchor.offset === focus.offset
+                      ) {
+                        return;
                       }
-                      // Potentially unused in SPMS as we are not allowing heading/quite/decor nodes
-                      // else if ($isHeadingNode(node) || $isQuoteNode(node)) {
-                      //     node.replace($createParagraphNode(), true);
-                      // } else if ($isDecoratorBlockNode(node)) {
-                      //     node.setFormat('');
-                      // }
-                    });
-                  }
-                });
-              }}
-            >
-              <ImClearFormatting />
-            </RevisedBaseToolbarButton>
-            <VerticalDivider />
-          </>
-        ) : null}
-        <RevisedBaseToolbarButton
-          ariaLabel="Insert Table"
-          // isActive={isSuperscript}
-          variant={"ghost"}
-          isDisabled={false}
-          onClick={() => {
-            onAddTableOpen();
-          }}
-        >
-          <FaTable />
-        </RevisedBaseToolbarButton>
-      </Flex>
-    </>
-  );
-};
+
+                      // Iterate4 over each node
+                      nodes.forEach((node, index) => {
+                        if ($isTextNode(node)) {
+                          let textNode = node;
+                          if (index === 0 && anchor.offset !== 0) {
+                            textNode =
+                              textNode.splitText(anchor.offset)[1] || textNode;
+                          }
+                          if (index === nodes.length - 1) {
+                            textNode =
+                              textNode.splitText(focus.offset)[0] || textNode;
+                          }
+
+                          if (textNode.__style !== "") {
+                            textNode.setStyle("");
+                          }
+
+                          if (textNode.__format !== 0) {
+                            textNode.setFormat(0);
+                            $getNearestBlockElementAncestorOrThrow(
+                              textNode
+                            ).setFormat("");
+                          }
+                          node = textNode;
+                        }
+                        // Potentially unused in SPMS as we are not allowing heading/quite/decor nodes
+                        // else if ($isHeadingNode(node) || $isQuoteNode(node)) {
+                        //     node.replace($createParagraphNode(), true);
+                        // } else if ($isDecoratorBlockNode(node)) {
+                        //     node.setFormat('');
+                        // }
+                      });
+                    }
+                  });
+                }}
+              >
+                <ImClearFormatting />
+              </RevisedBaseToolbarButton>
+              <VerticalDivider />
+            </>
+          ) : null}
+          <RevisedBaseToolbarButton
+            ariaLabel="Insert Table"
+            // isActive={isSuperscript}
+            variant={"ghost"}
+            isDisabled={false}
+            onClick={() => {
+              onAddTableOpen();
+            }}
+          >
+            <FaTable />
+          </RevisedBaseToolbarButton>
+        </Flex>
+      </>
+    );
+  };
 
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { useRef } from "react";

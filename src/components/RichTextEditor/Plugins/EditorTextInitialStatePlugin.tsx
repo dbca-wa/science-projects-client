@@ -1,17 +1,6 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useEffect, useState } from "react";
-import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
-// import { $generateNodesFromDOM, $getRoot, $getList, ListItemNode, ListNode } from "@lexical/html";
-import { ListItemNode, ListNode } from "@lexical/list";
-import {
-  $getRoot,
-  $getSelection,
-  LexicalNode,
-  RangeSelection,
-  createCommand,
-} from "lexical";
-import { CLEAR_EDITOR_COMMAND, LexicalEditor } from "lexical";
-import { useColorMode } from "@chakra-ui/react";
+import { $getRoot } from "lexical";
 
 interface Props {
   isOpen: boolean;
@@ -19,12 +8,8 @@ interface Props {
   setEditorText: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const EditorTextInitialStatePlugin = ({
-  isOpen,
-  editorText,
-  setEditorText,
-}: Props) => {
-  const [editor, editorState] = useLexicalComposerContext();
+export const EditorTextInitialStatePlugin = ({ setEditorText }: Props) => {
+  const [editor] = useLexicalComposerContext();
   const [isFirstPass, setIsFirstPass] = useState(true);
   useEffect(() => {
     if (isFirstPass) {
@@ -32,8 +17,6 @@ export const EditorTextInitialStatePlugin = ({
         const root = $getRoot();
         const text = root.__cachedText;
         if (text === null || text === undefined || text === "") {
-          // console.log(text)
-          // console.log('first pass, is empty, reading again')
           setIsFirstPass(false);
         }
       });
@@ -41,12 +24,8 @@ export const EditorTextInitialStatePlugin = ({
       editor._editorState.read(() => {
         const root = $getRoot();
         const text = root.__cachedText;
-        if (text === null || text === undefined || text === "") {
-          // console.log(text)
-          // console.log('second pass and is empty')
-        } else {
+        if (text !== null && text !== undefined && text !== "") {
           setEditorText(root.__cachedText);
-          // console.log(root.__cachedText)
         }
       });
     }

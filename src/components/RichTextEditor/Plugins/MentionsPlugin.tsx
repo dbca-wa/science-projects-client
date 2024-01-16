@@ -1,10 +1,11 @@
+// WIP
+
 import { getInternalUsersBasedOnSearchTerm } from "@/lib/api";
 import { IUserData } from "@/types";
 import {
   Avatar,
   Box,
   Flex,
-  FlexProps,
   ListItem,
   Text,
   UnorderedList,
@@ -433,10 +434,10 @@ const CustomMentionsTypeheadMenuItem = ({
   /* <CustomMenuItem onClick={() => console.log(option)} user={option} /> */
 }
 
-interface CustomMenuItemProps extends FlexProps {
-  onClick: () => void;
-  user: IUserData;
-}
+// interface CustomMenuItemProps extends FlexProps {
+//   onClick: () => void;
+//   user: IUserData;
+// }
 
 // const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
 //   const [isHovered, setIsHovered] = useState(false);
