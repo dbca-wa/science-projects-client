@@ -6,13 +6,16 @@ import { getSingleBusinessArea } from "../api";
 import { IBusinessArea } from "../../types";
 
 export const useBusinessArea = (baPk: number) => {
-    const { isLoading, data } = useQuery(["businessArea", baPk], getSingleBusinessArea,
-        {
-            retry: false,
-        });
+  const { isLoading, data } = useQuery(
+    ["businessArea", baPk],
+    getSingleBusinessArea,
+    {
+      retry: false,
+    }
+  );
 
-    return {
-        baLoading: isLoading,
-        baData: data as IBusinessArea,
-    };
+  return {
+    baLoading: isLoading,
+    baData: data as IBusinessArea,
+  };
 };

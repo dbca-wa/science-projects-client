@@ -261,9 +261,7 @@ export const AddUserToProjectModal = ({
                   }
                   label="Project"
                   placeholder="Search for the project"
-                  helperText={
-                    <>The project you would like to add the user to.</>
-                  }
+                  helperText={"The project you would like to add the user to."}
                 />
               ) : (
                 <ProjectSearchDropdown
@@ -275,9 +273,7 @@ export const AddUserToProjectModal = ({
                   setProjectFunction={setSelectedProject}
                   label="Project"
                   placeholder="Search for the project"
-                  helperText={
-                    <>The project you would like to add the user to.</>
-                  }
+                  helperText={"The project you would like to add the user to."}
                 />
               )}
 
@@ -292,7 +288,7 @@ export const AddUserToProjectModal = ({
                   preselectedUserPk={preselectedUser}
                   label="User"
                   placeholder="Search for a user"
-                  helperText={<>The user you would like to add.</>}
+                  helperText={"The user you would like to add."}
                 />
               ) : (
                 <UserSearchDropdown
@@ -303,7 +299,7 @@ export const AddUserToProjectModal = ({
                   // preselectedUserPk={preselectedUser}
                   label="User"
                   placeholder="Search for a user"
-                  helperText={<>The user you would like to add.</>}
+                  helperText={"The user you would like to add."}
                 />
               )}
             </Flex>

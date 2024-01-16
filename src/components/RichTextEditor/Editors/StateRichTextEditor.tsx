@@ -3,7 +3,7 @@
 import "../../../styles/texteditor.css";
 import { EditorSubsections, EditorType } from "../../../types";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Box, useColorMode } from "@chakra-ui/react";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
@@ -82,7 +82,7 @@ export const StateRichTextEditor = ({
   };
 
   const [editorText, setEditorText] = useState<string | null>("");
-  const editorRef = useRef(null);
+  // const editorRef = useRef(null);
 
   const initialConfig = {
     namespace: "Annual Report Document Editor",
@@ -105,7 +105,7 @@ export const StateRichTextEditor = ({
       >
         <SimpleEditableRTE
           initialConfig={initialConfig}
-          editorRef={editorRef}
+          // editorRef={editorRef}
           data={value}
           section={section}
           editorType={editorType}

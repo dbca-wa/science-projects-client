@@ -6,15 +6,12 @@ import { getFullUser } from "../api";
 // import { useEffect } from "react";
 
 export const useFullUserByPk = (pk: number) => {
-    const { isLoading, data } = useQuery(["user", pk], getFullUser,
-        {
-            retry: false,
-        });
+  const { isLoading, data } = useQuery(["user", pk], getFullUser, {
+    retry: false,
+  });
 
-    // useEffect(() => console.log(data), [data])
-
-    return {
-        userLoading: isLoading,
-        userData: data,
-    };
+  return {
+    userLoading: isLoading,
+    userData: data,
+  };
 };

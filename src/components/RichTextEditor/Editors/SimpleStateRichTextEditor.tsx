@@ -1,7 +1,7 @@
 // The basic rich text editor component; does not allow sticky notes, emotes, etc.
 
 // React
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 // Styles and Styling Components
 import { Box, useColorMode } from "@chakra-ui/react";
@@ -85,7 +85,7 @@ export const SimpleStateRichTextEditor = ({
   };
 
   const [editorText, setEditorText] = useState<string | null>("");
-  const editorRef = useRef(null);
+  // const editorRef = useRef(null);
 
   const initialConfig = {
     namespace: "Annual Report Document Editor",
@@ -108,7 +108,7 @@ export const SimpleStateRichTextEditor = ({
       >
         <SimpleEditableRTE
           initialConfig={initialConfig}
-          editorRef={editorRef}
+          // editorRef={editorRef}
           data={value}
           section={section}
           editorType={editorType}

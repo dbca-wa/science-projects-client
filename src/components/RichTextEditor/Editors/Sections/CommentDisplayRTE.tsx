@@ -165,7 +165,6 @@ export const CommentDisplayRTE = ({
   const [likeCount, setLikeCount] = useState<number>(0);
 
   useEffect(() => {
-    // console.log("LIKES", reactions);
     const likes = reactions?.map((r) => r.reaction === "thumbup");
     setLikeCount(likes?.length ? likes.length : 0);
   }, []);

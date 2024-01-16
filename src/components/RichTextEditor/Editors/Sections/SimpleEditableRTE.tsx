@@ -1,28 +1,24 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
-import { OptionsBar } from "../../OptionsBar/OptionsBar";
+import {
+  InitialConfigType,
+  LexicalComposer,
+} from "@lexical/react/LexicalComposer";
+import { $generateHtmlFromNodes } from "@lexical/html";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { ListItemNode, ListNode } from "@lexical/list";
-import { HeadingNode } from "@lexical/rich-text";
-import { $getRoot, $getSelection, ParagraphNode } from "lexical";
+import { $getRoot } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 import { RevisedSimpleRichTextToolbar } from "../../Toolbar/RevisedSimpleRichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
-import { useEffect, useState } from "react";
-import { DataDisplayPlugin } from "../../Plugins/DataDisplayPlugin";
-import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
 import { EditorSubsections, EditorType } from "../../../../types";
 
 interface Props {
-  initialConfig: any;
-  editorRef: any;
+  initialConfig: InitialConfigType;
+  // editorRef: any;
   data: string;
   section: EditorSubsections;
   editorType: EditorType;
@@ -39,24 +35,12 @@ interface Props {
 }
 
 export const SimpleEditableRTE = ({
-  textEditorName,
-  section,
-  editorType,
-  isUpdate,
   initialConfig,
-  editorRef,
   data,
-  editorText,
   setEditorText,
   displayData,
   setDisplayData,
-  shouldShowTree,
-  setShouldShowTree,
 }: Props) => {
-  const [selectedNodeType, setSelectedNodeType] = useState<string>();
-
-  // useEffect(() => console.log(displayData), [displayData])
-
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -116,28 +100,7 @@ export const SimpleEditableRTE = ({
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
-
         <ClearEditorPlugin />
-        <NodeEventPlugin
-          nodeType={ParagraphNode}
-          eventType={"click"}
-          eventListener={(e: Event) => {
-            console.log(e);
-            console.log("paragaph node clicked");
-            setSelectedNodeType("paragraph");
-          }}
-        />
-        <NodeEventPlugin
-          nodeType={ListItemNode}
-          eventType={"click"}
-          eventListener={(e: Event) => {
-            console.log(e);
-            console.log("li node clicked");
-            setSelectedNodeType("li");
-          }}
-        />
-
-        {/* <DataDisplayPlugin setDisplayData={setDisplayData} /> */}
       </LexicalComposer>
     </>
   );
