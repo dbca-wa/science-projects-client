@@ -1,7 +1,6 @@
 // User Search component - works/appears on the Users page with UserSearchContext
 
 import {
-  Box,
   Flex,
   Input,
   InputGroup,
@@ -13,6 +12,7 @@ import { FiSearch } from "react-icons/fi";
 import { useUserSearchContext } from "../../lib/hooks/UserSearchContext";
 import { useEffect, useState } from "react";
 import { getAllBusinessAreas } from "@/lib/api";
+import { IBusinessArea } from "@/types";
 
 export const SearchUsers = () => {
   const {
@@ -54,7 +54,7 @@ export const SearchUsers = () => {
     setInputValue(value);
   };
 
-  const [businessAreas, setBusinessAreas] = useState<any[]>([]);
+  const [businessAreas, setBusinessAreas] = useState<IBusinessArea[]>([]);
 
   const handleOnlySelectedBusinessAreaChange: React.ChangeEventHandler<
     HTMLSelectElement
@@ -109,14 +109,29 @@ export const SearchUsers = () => {
         <option value={"All"} color={"black"}>
           All Business Areas
         </option>
-        {businessAreas &&
-          businessAreas
-            .sort((a, b) => a.name.localeCompare(b.name)) // Sort the array alphabetically
-            .map((ba, index) => (
-              <option key={index} value={ba.name}>
-                {ba.name}
-              </option>
-            ))}
+        {businessAreas.map((ba, index) => {
+          const checkIsHtml = (data: string) => {
+            // Regular expression to check for HTML tags
+            const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+            // Check if the string contains any HTML tags
+            return htmlRegex.test(data);
+          };
+
+          const isHtml = checkIsHtml(ba.name);
+          let baName = ba?.name;
+          if (isHtml === true) {
+            const parser = new DOMParser();
+            const dom = parser.parseFromString(ba.name, "text/html");
+            const content = dom.body.textContent;
+            baName = content;
+          }
+          return (
+            <option key={index} value={ba.pk}>
+              {baName}
+            </option>
+          );
+        })}{" "}
       </Select>
 
       <InputGroup borderColor="gray.200" size="sm">

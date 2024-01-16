@@ -9,7 +9,6 @@ import {
   Box,
   Button,
   Center,
-  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -24,7 +23,6 @@ import {
   Text,
   VStack,
   useColorMode,
-  useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -39,22 +37,13 @@ import { GiArchiveResearch, GiHamburgerMenu } from "react-icons/gi";
 import { IoMdDocument } from "react-icons/io";
 import { AiFillProject } from "react-icons/ai";
 import { BsFillPeopleFill } from "react-icons/bs";
-import { AiFillPrinter } from "react-icons/ai";
 import { CgViewList } from "react-icons/cg";
-import { ImBook, ImBriefcase, ImUsers } from "react-icons/im";
-import { RiNewspaperFill } from "react-icons/ri";
-import {
-  FaAddressCard,
-  FaLocationArrow,
-  FaUserPlus,
-  FaUsers,
-} from "react-icons/fa";
+import { ImBriefcase, ImUsers } from "react-icons/im";
+import { FaAddressCard, FaLocationArrow, FaUserPlus } from "react-icons/fa";
 
 import { Navitar } from "./Navitar";
 import { SidebarNavMenu } from "./SidebarNavMenu";
 import { CreateUserModal } from "../Modals/CreateUserModal";
-// import { SearchUsers } from "./SearchUsers";
-// import { SearchProjects } from "./SearchProjects";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { useUser } from "../../lib/hooks/useUser";
@@ -66,7 +55,6 @@ import {
 } from "react-icons/md";
 import { GoOrganization } from "react-icons/go";
 import { FcApproval, FcDataBackup } from "react-icons/fc";
-import { useGetReportPDFs } from "../../lib/hooks/useGetReportPDFs";
 import { VscFeedback } from "react-icons/vsc";
 
 const ProjectMenuContents = () => {
@@ -102,41 +90,8 @@ const ProjectMenuContents = () => {
 
 const ReportMenuContents = () => {
   const navigate = useNavigate();
-  const dividerColor = useColorModeValue("gray.400", "whiteAlpha.700");
 
-  const arar_publications = [
-    {
-      fileUrl:
-        "https://scienceprojects.dbca.wa.gov.au/media/ararreports/11/AnnualReport20212022_138.pdf",
-      years: "2021-2022",
-    },
-    {
-      fileUrl:
-        "https://scienceprojects.dbca.wa.gov.au/static/files/arar-2017-2018.pdf",
-      years: "2017-2018",
-    },
-    {
-      fileUrl:
-        "https://scienceprojects.dbca.wa.gov.au/static/files/arar-2016-2017.pdf",
-      years: "2016-2017",
-    },
-    {
-      fileUrl:
-        "https://scienceprojects.dbca.wa.gov.au/static/files/arar-2015-2016.pdf",
-      years: "2015-2016",
-    },
-  ];
-
-  // const { reportPdfsData, reportPdfsLoading } = useGetReportPDFs();
-
-  // useEffect(() => {
-  //     if (!reportPdfsLoading) {
-  //         console.log(reportPdfsData);
-
-  //     }
-  // }, [reportPdfsData, reportPdfsLoading])
-
-  const { userData, userLoading } = useUser();
+  const { userData } = useUser();
 
   return (
     <>
@@ -297,63 +252,6 @@ const AdminMenuContents = () => {
         </MenuItem>
       </MenuGroup>
 
-      {/* <MenuGroup
-                title="PROJECT CRUD" fontSize={"12px"} color={"gray.500"} textAlign={"center"}
-
-            >
-
-                <MenuItem
-                    onClick={() => {
-                        navigate('/crud/conceptplans')
-                    }}                 >
-                    {<RiNewspaperFill />}
-                    <Text ml={2}
-                    >
-                        Manage Concept Plans
-                    </Text>
-                </MenuItem>
-                <MenuItem
-                    onClick={() => {
-                        navigate('/crud/projectplans')
-                    }}                 >
-                    {<RiNewspaperFill />}
-                    <Text ml={2}
-                    >
-                        Manage Project Plans
-                    </Text>
-                </MenuItem>
-                <MenuItem
-                    onClick={() => {
-                        navigate('/crud/progressreports')
-                    }}                 >
-                    {<RiNewspaperFill />}
-                    <Text ml={2}
-                    >
-                        Manage Progress Reports
-                    </Text>
-                </MenuItem>
-                <MenuItem
-                    onClick={() => {
-                        navigate('/crud/studentreports')
-                    }}                 >
-                    {<RiNewspaperFill />}
-                    <Text ml={2}
-                    >
-                        Manage Student Reports
-                    </Text>
-                </MenuItem>
-                <MenuItem
-                    onClick={() => {
-                        navigate('/crud/closures')
-                    }}                >
-                    {<RiNewspaperFill />}
-                    <Text ml={2}
-                    >
-                        Manage Closure Forms
-                    </Text>
-                </MenuItem>
-            </MenuGroup> */}
-
       <MenuGroup
         title="OTHER"
         fontSize={"12px"}
@@ -430,11 +328,6 @@ const OldHeader = () => {
   }, [location.pathname]);
 
   const { userLoading, userData } = useUser();
-
-  // useEffect(() => {
-  //     if (!userLoading)
-  //         console.log(userData);
-  // }, [userLoading, userData])
 
   return (
     <Box>
@@ -524,17 +417,6 @@ const OldHeader = () => {
                             alignItems={"center"}
                           >
                             <Center mr={4}>
-                              {/* {
-                                                                    shouldRenderUserSearch === true && (
-                                                                        <SearchUsers />
-                                                                    )
-                                                                }
-
-                                                                {
-                                                                    shouldRenderProjectSearch === true && (
-                                                                        <SearchProjects />
-                                                                    )
-                                                                } */}
                               <ToggleLayout />
                               <ToggleDarkMode />
                             </Center>
@@ -605,18 +487,6 @@ const OldHeader = () => {
 
               {/* RHS Items */}
               <HStack px={3}>
-                {/* {
-                                        shouldRenderUserSearch === true && (
-                                            <SearchUsers />
-                                        )
-                                    } */}
-
-                {/* {
-                                        shouldRenderProjectSearch === true && (
-                                            <SearchProjects />
-                                        )
-                                    } */}
-
                 <Navitar
                   shouldShowName
                   windowSize={windowSizeValue}
