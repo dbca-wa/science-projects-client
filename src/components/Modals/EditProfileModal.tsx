@@ -1,9 +1,7 @@
 // Modal for editing profile section of user
-// const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
 
 import {
   Image,
-  Text,
   Button,
   Modal,
   ModalOverlay,
@@ -25,10 +23,9 @@ import {
   FormHelperText,
   Textarea,
   Center,
-  Flex,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import { useForm, useWatch, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   updateProfile,
@@ -38,7 +35,6 @@ import {
   IProfileUpdateSuccess,
 } from "../../lib/api";
 import { IProfile } from "../../types";
-// import noImageLink from "/sad-face.png"
 import useServerImageUrl from "../../lib/hooks/useServerImageUrl";
 import { useNoImage } from "../../lib/hooks/useNoImage";
 
@@ -68,22 +64,8 @@ export const EditProfileModal = ({
 
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
     currentImage
-    // imageUrl
-    // data?.image?.file || data?.image?.old_file || null
   );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imageLoadFailed, setImageLoadFailed] = useState(false);
-
-  const handleImageLoadError = () => {
-    console.log(
-      `There was an error loading images. Selected: ${selectedImageUrl}. Current ${imageUrl}`
-    );
-    setImageLoadFailed(true);
-  };
-
-  const handleImageLoadSuccess = () => {
-    setImageLoadFailed(false);
-  };
 
   // Update this useEffect to set the selectedImageUrl when a new file is selected
   useEffect(() => {
@@ -91,13 +73,6 @@ export const EditProfileModal = ({
       setSelectedImageUrl(URL.createObjectURL(selectedFile));
     }
   }, [selectedFile]);
-
-  const handleFileInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    setSelectedFile(file || null);
-  };
 
   const initialData: IProfile = data || {
     image: null,
@@ -115,13 +90,12 @@ export const EditProfileModal = ({
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm<IProfileUpdateVariables>();
 
   // Toast
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -144,8 +118,7 @@ export const EditProfileModal = ({
       });
     },
     // Success handling based on API- file - declared interface
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       queryClient.refetchQueries([`profile`, userId]);
       queryClient.refetchQueries([`me`]);
 
@@ -223,7 +196,6 @@ export const EditProfileModal = ({
       } else {
         console.log("Nothing changed");
       }
-      // onClose();
     }
   };
 
@@ -323,29 +295,19 @@ export const EditProfileModal = ({
                       rounded="lg"
                       overflow="hidden"
                     >
-                      {!imageLoadFailed ? (
-                        <Image
-                          objectFit="cover"
-                          src={
-                            (selectedFile !== null && selectedImageUrl) ||
-                            imageUrl ||
-                            noImageLink
-                          }
-                          alt="Preview"
-                          userSelect="none"
-                          bg="gray.800"
-                          // onLoad={handleImageLoadSuccess}
-                          // onError={handleImageLoadError}
-                        />
-                      ) : (
-                        <Image
-                          objectFit="cover"
-                          src={noImageLink}
-                          alt="Preview"
-                          userSelect="none"
-                          bg="gray.800"
-                        />
-                      )}
+                      <Image
+                        objectFit="cover"
+                        src={
+                          (selectedFile !== null && selectedImageUrl) ||
+                          imageUrl ||
+                          noImageLink
+                        }
+                        alt="Preview"
+                        userSelect="none"
+                        bg="gray.800"
+                        // onLoad={handleImageLoadSuccess}
+                        // onError={handleImageLoadError}
+                      />
                     </Center>
                   </Box>
                   <FormControl ml={4} mt={10}>

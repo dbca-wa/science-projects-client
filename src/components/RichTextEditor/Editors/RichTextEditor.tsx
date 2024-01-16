@@ -6,29 +6,9 @@ import { useEffect, useRef, useState } from "react";
 // Styles and Styling Components
 import { Box, useColorMode, Text, Flex, Grid } from "@chakra-ui/react";
 
-// Lexical
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-
-// Lexical Plugins
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
-
-// Custom Components
-import { OptionsBar } from "../OptionsBar/OptionsBar";
-// import { AutoFocusPlugin } from "../../../../lib/plugins/AutoFocusPlugin";
-
 import "../../../styles/texteditor.css";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getRoot, $getSelection, ParagraphNode, TextNode } from "lexical";
 
 import { ListItemNode, ListNode } from "@lexical/list";
-import { HeadingNode } from "@lexical/rich-text";
 
 import { EditableSRTE } from "./Sections/EditableSRTE";
 import { DisplaySRTE } from "./Sections/DisplaySRTE";

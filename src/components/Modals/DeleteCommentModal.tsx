@@ -11,8 +11,6 @@ import {
   ToastId,
   useToast,
   useColorMode,
-  UnorderedList,
-  ListItem,
   FormControl,
   InputGroup,
   Input,
@@ -20,19 +18,10 @@ import {
   Grid,
   Button,
 } from "@chakra-ui/react";
-import {
-  IDeleteComment,
-  ISimplePkProp,
-  deleteCommentCall,
-  deleteProjectCall,
-} from "../../lib/api";
-import { useEffect, useRef } from "react";
+import { IDeleteComment, deleteCommentCall } from "../../lib/api";
+import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { IUserMe } from "../../types";
 import { useForm } from "react-hook-form";
-import { useGetStudentReportAvailableReportYears } from "../../lib/hooks/useGetStudentReportAvailableReportYears";
-import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/useGetProgressReportAvailableReportYears";
 
 interface Props {
   commentPk: string | number;
@@ -53,7 +42,7 @@ export const DeleteCommentModal = ({
 }: Props) => {
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -68,7 +57,7 @@ export const DeleteCommentModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -80,12 +69,10 @@ export const DeleteCommentModal = ({
         });
         onDeleteSuccess && onDeleteSuccess();
       }
-      // onClose();
       queryClient.invalidateQueries(["documentComments", documentPk]);
 
       setTimeout(async () => {
         await refetchData();
-        // console.log("removing");
         onClose();
       }, 150);
     },
@@ -109,7 +96,7 @@ export const DeleteCommentModal = ({
   };
 
   const { colorMode } = useColorMode();
-  const { register, handleSubmit, reset, watch } = useForm<IDeleteComment>();
+  const { register, handleSubmit } = useForm<IDeleteComment>();
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>

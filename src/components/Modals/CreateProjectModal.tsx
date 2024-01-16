@@ -1,13 +1,5 @@
 // Modal for creating new projects
 
-// useEffect(() => {
-//     console.log({
-//         "baseInformationData": baseInformationData,
-//         "detailsData": detailsData,
-//         "locationData": locationData,
-//     })
-// }, [baseInformationData, detailsData, locationData])
-
 import {
   Text,
   Modal,
@@ -25,7 +17,7 @@ import {
   useToast,
   ToastId,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useCurrentYear } from "../../lib/hooks/useCurrentYear";
 import { IconType } from "react-icons";
 import { ProjectDetailsSection } from "../Pages/CreateProject/ProjectDetailsSection";
@@ -40,7 +32,6 @@ import {
   ICreateProjectStudentDetails,
   IProjectCreationVariables,
   MutationError,
-  MutationSuccess,
   ProjectCreationMutationSuccess,
   createProject,
   spawnNewEmptyDocument,
@@ -101,17 +92,17 @@ export const CreateProjectModal = ({
     onClose();
   };
 
-  const goToDetailsTab = (data: any) => {
+  const goToDetailsTab = (data) => {
     setBaseInformationData(data);
     setActiveTabIndex(1);
   };
 
-  const goToLocationTab = (data: any) => {
+  const goToLocationTab = (data) => {
     setDetailsData(data);
     setActiveTabIndex(2);
   };
 
-  const goToFinalTab = (data: any) => {
+  const goToFinalTab = (data) => {
     setLocationData(data);
     setLocationFilled(true);
     setActiveTabIndex(3);
@@ -129,7 +120,7 @@ export const CreateProjectModal = ({
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -155,7 +146,6 @@ export const CreateProjectModal = ({
     },
     // Success handling based on API-file-declared interface
     onSuccess: async (data) => {
-      // console.log(data)
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -217,28 +207,13 @@ export const CreateProjectModal = ({
     },
   });
 
-  // useEffect(() => {
-  //     console.log(projectType)
-  // }, [projectType])
-
-  const { userLoading, userData } = useUser();
+  const { userData } = useUser();
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={controlledClose}
-      // scrollBehavior="inside"
-      // size={"6xl"}
-      size={"full"}
-    >
+    <Modal isOpen={isOpen} onClose={controlledClose} size={"full"}>
       <ModalOverlay />
       <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-        <ModalHeader
-          display={"inline-flex"}
-          // justifyContent={"center"}
-          alignItems={"center"}
-          // pb={6}
-        >
+        <ModalHeader display={"inline-flex"} alignItems={"center"}>
           <Box
             color={
               projectType === "Core Function"
@@ -279,9 +254,7 @@ export const CreateProjectModal = ({
               <Tab isDisabled={!locationFilled}>Student Details</Tab>
             )}
           </TabList>
-          <TabPanels
-          // h={"100%"}
-          >
+          <TabPanels>
             <TabPanel h={"100%"} px={10}>
               <ProjectBaseInformation
                 projectKind={
@@ -301,12 +274,9 @@ export const CreateProjectModal = ({
                 setBaseInformationFilled={setBaseInformationFilled}
               />
             </TabPanel>
-            <TabPanel
-            // h={"100%"}
-            // px={10}
-            >
+            <TabPanel>
               <ProjectDetailsSection
-                thisUser={userData.pk}
+                thisUser={userData?.pk}
                 backClick={goBack}
                 nextClick={goToLocationTab}
                 onClose={onClose}
@@ -316,10 +286,7 @@ export const CreateProjectModal = ({
                 setProjectDetailsFilled={setProjectDetailsFilled}
               />
             </TabPanel>
-            <TabPanel
-            // h={"100%"}
-            // px={10}
-            >
+            <TabPanel>
               {projectType.includes("External") ||
               projectType.includes("Student") ? (
                 <ProjectLocationSection
@@ -351,10 +318,7 @@ export const CreateProjectModal = ({
               )}
             </TabPanel>
             {projectType.includes("External") && (
-              <TabPanel
-              // h={"100%"}
-              // px={10}
-              >
+              <TabPanel>
                 <ProjectExternalSection
                   externalFilled={externalFilled}
                   externalData={externalData}
@@ -363,16 +327,12 @@ export const CreateProjectModal = ({
                   onClose={onClose}
                   backClick={goBack}
                   createClick={kickOffMutation}
-                  // projectPk={}
                 />
               </TabPanel>
             )}
 
             {projectType.includes("Student") && (
-              <TabPanel
-              // h={"100%"}
-              // px={10}
-              >
+              <TabPanel>
                 <ProjectStudentSection
                   studentFilled={studentFilled}
                   studentData={studentData}
@@ -381,7 +341,6 @@ export const CreateProjectModal = ({
                   onClose={onClose}
                   backClick={goBack}
                   createClick={kickOffMutation}
-                  // projectPk={}
                 />
               </TabPanel>
             )}

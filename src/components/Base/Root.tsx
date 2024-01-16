@@ -5,13 +5,8 @@ import { TraditionalLayout } from "./TraditionalLayout";
 import { ModernLayout } from "./ModernLayout";
 import { useLayoutSwitcher } from "../../lib/hooks/LayoutSwitcherContext";
 
-
 export const Root = () => {
-    const { layout } = useLayoutSwitcher();
-    useScrollToTop();
-    return (
-        <>
-            {layout === 'modern' ? <ModernLayout /> : <TraditionalLayout />}
-        </>
-    )
-}
+  const { layout } = useLayoutSwitcher();
+  useScrollToTop();
+  return <>{layout === "modern" ? <ModernLayout /> : <TraditionalLayout />}</>;
+};
