@@ -3,33 +3,26 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../lib/hooks/useUser";
-import { IUserData } from "../../types";
 
 interface IProtectedPageProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export const ProtectedPage = ({ children }: IProtectedPageProps) => {
-    const { isLoggedIn, userData, userLoading } = useUser();
-    const navigate = useNavigate();
-    const [showContent, setShowContent] = useState(false);
+  const { isLoggedIn, userData, userLoading } = useUser();
+  const navigate = useNavigate();
+  const [showContent, setShowContent] = useState(false);
 
-    useEffect(() => {
-        if (!userLoading) {
-            if (!isLoggedIn || userData?.pk === undefined) {
-                console.log("No user. Navigating to login.")
-                navigate("/login")
-            }
-            else {
-                setShowContent(true);
-            }
-        }
-    }, [userLoading])
+  useEffect(() => {
+    if (!userLoading) {
+      if (!isLoggedIn || userData?.pk === undefined) {
+        console.log("No user. Navigating to login.");
+        navigate("/login");
+      } else {
+        setShowContent(true);
+      }
+    }
+  }, [userLoading]);
 
-
-    return (
-        <>
-            {showContent ? children : null}
-        </>
-    )
+  return <>{showContent ? children : null}</>;
 };

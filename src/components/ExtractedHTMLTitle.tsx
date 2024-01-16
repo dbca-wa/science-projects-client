@@ -1,4 +1,4 @@
-import { Tag, Text, TextProps } from "@chakra-ui/react";
+import { Text, TextProps } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
 interface Props extends TextProps {
@@ -27,8 +27,6 @@ export const ExtractedHTMLTitle: React.FC<Props> = ({
       setText(tag.textContent);
     }
   }, [htmlContent]);
-
-  // console.log(extraText)
 
   return (
     <Text {...textProps} onClick={onClick}>
