@@ -48,7 +48,7 @@ export const Login = ({ onClose }: IIsModal) => {
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
 
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -70,7 +70,7 @@ export const Login = ({ onClose }: IIsModal) => {
           duration: 3000,
         });
       },
-      onSuccess: async (data) => {
+      onSuccess: async () => {
         // Refetch user data after a successful login
         queryClient.invalidateQueries(["me"]);
         queryClient.refetchQueries(["me"]);
@@ -107,9 +107,6 @@ export const Login = ({ onClose }: IIsModal) => {
             duration: 3000,
           });
         }
-        console.log("mut error");
-
-        console.log(error);
       },
     }
   );

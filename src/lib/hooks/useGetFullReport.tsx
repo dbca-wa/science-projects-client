@@ -3,18 +3,14 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getFullReport } from "../api";
-// import { useEffect } from "react";
 
 export const useGetFullReport = (pk: number) => {
-    const { isLoading, data } = useQuery(["report", pk], getFullReport,
-        {
-            retry: false,
-        });
+  const { isLoading, data } = useQuery(["report", pk], getFullReport, {
+    retry: false,
+  });
 
-    // useEffect(() => console.log(data), [data])
-
-    return {
-        reportLoading: isLoading,
-        reportData: data,
-    };
+  return {
+    reportLoading: isLoading,
+    reportData: data,
+  };
 };

@@ -1,6 +1,5 @@
 // The basic rich text editor component; does not allow sticky notes, emotes, etc.
 
-import { useRef } from "react";
 import {
   Box,
   useColorMode,
@@ -95,8 +94,6 @@ export const UnboundStatefulEditor = ({
     console.log(error);
   };
 
-  const editorRef = useRef(null);
-
   const initialConfig = {
     namespace: "Stateful Rich Text Editor",
     editable: true,
@@ -128,7 +125,6 @@ export const UnboundStatefulEditor = ({
             placeholderText={placeholder}
             showToolbar={showToolbar}
             initialConfig={initialConfig}
-            editorRef={editorRef}
             value={value}
             setValueAsPlainText={setValueAsPlainText}
             setValueFunction={setValueFunction}

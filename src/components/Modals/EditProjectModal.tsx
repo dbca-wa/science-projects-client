@@ -502,7 +502,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="DBCA Districts"
                           areas={dbcaDistricts}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />
@@ -513,7 +513,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="IMCRAs"
                           areas={imcra}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />
@@ -522,7 +522,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="DBCA Regions"
                           areas={dbcaRegions}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />
@@ -531,7 +531,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="Natural Resource Management Regions"
                           areas={nrm}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />
@@ -540,7 +540,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="IBRAs"
                           areas={ibra}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />

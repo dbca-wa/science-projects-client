@@ -58,16 +58,6 @@ export const AccountEdit = () => {
           }
           px={2}
           minW={174}
-          //   overflowY={"auto"}
-          //   flexShrink={0}
-          //   flex={0}
-          //   // maxH={"100vh"}
-
-          //   textAlign={"center"}
-          //   //   maxW={200}
-          //   display={"flex"}
-          //   flexDirection={"column"}
-          //   py={1}
         >
           <SideMenuButton
             pageName={"Profile"}

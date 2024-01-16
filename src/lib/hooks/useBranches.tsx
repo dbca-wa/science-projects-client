@@ -5,18 +5,17 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllBranches } from "../api";
 
 export const useBranches = () => {
-    const { isLoading, data } = useQuery(["branches"], getAllBranches,
-        {
-            retry: false,
-        });
+  const { isLoading, data } = useQuery(["branches"], getAllBranches, {
+    retry: false,
+  });
 
-    // Sort the branches alphabetically
-    const sortedBranches = data
-        ? [...data].sort((a, b) => a.name.localeCompare(b.name))
-        : [];
+  // Sort the branches alphabetically
+  const sortedBranches = data
+    ? [...data].sort((a, b) => a.name.localeCompare(b.name))
+    : [];
 
-    return {
-        branchesLoading: isLoading,
-        branchesData: sortedBranches,
-    };
+  return {
+    branchesLoading: isLoading,
+    branchesData: sortedBranches,
+  };
 };

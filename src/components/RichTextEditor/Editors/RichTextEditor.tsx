@@ -292,24 +292,24 @@ export const RichTextEditor = ({
           <DisplaySRTE
             key={prepopulationData}
             initialConfig={uneditableInitialCOnfig}
-            editorRef={editorRef}
+            // editorRef={editorRef}
             data={prepopulationData}
             section={section}
-            project_pk={project_pk}
-            document_pk={document_pk}
-            editorType={editorType}
-            isUpdate={isUpdate}
-            displayData={displayData}
-            editorText={editorText}
-            setEditorText={setEditorText}
+            // project_pk={project_pk}
+            // document_pk={document_pk}
+            // editorType={editorType}
+            // isUpdate={isUpdate}
+            // displayData={displayData}
+            // editorText={editorText}
+            // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-            setShouldShowTree={setShouldShowTree}
-            isEditorOpen={isEditorOpen}
-            setIsEditorOpen={setIsEditorOpen}
-            setDisplayData={setDisplayData}
-            textEditorName={
-              section === "description" ? "Description" : undefined
-            }
+            // setShouldShowTree={setShouldShowTree}
+            // isEditorOpen={isEditorOpen}
+            // setIsEditorOpen={setIsEditorOpen}
+            // setDisplayData={setDisplayData}
+            // textEditorName={
+            //   section === "description" ? "Description" : undefined
+            // }
           />
         )}
       </Box>
