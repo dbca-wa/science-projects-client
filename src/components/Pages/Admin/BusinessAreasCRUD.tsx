@@ -77,9 +77,9 @@ export const BusinessAreasCRUD = () => {
     queryKey: ["businessAreas"],
   });
 
-  useEffect(() => {
-    if (!isLoading) console.log(slices);
-  }, [isLoading, slices]);
+  // useEffect(() => {
+  //   if (!isLoading) console.log(slices);
+  // }, [isLoading, slices]);
 
   const [searchTerm, setSearchTerm] = useState("");
 

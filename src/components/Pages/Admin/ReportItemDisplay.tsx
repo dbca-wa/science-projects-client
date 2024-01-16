@@ -39,7 +39,6 @@ import { deleteReport, updateReport } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
 import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
-import { useEffect } from "react";
 import { AxiosError } from "axios";
 import { useGetFullReport } from "../../../lib/hooks/useGetFullReport";
 import { useGetReportMedia } from "../../../lib/hooks/useGetReportMedia";
@@ -58,11 +57,10 @@ export const ReportItemDisplay = ({
 }: IReport) => {
   const { reportData, reportLoading } = useGetFullReport(pk);
 
-  const { reportMediaData, reportMediaLoading, refetchMedia } =
-    useGetReportMedia(pk);
-  useEffect(() => {
-    if (!reportMediaLoading) console.log(reportMediaData);
-  }, [reportMediaData, reportMediaLoading]);
+  const { reportMediaData, refetchMedia } = useGetReportMedia(pk);
+  // useEffect(() => {
+  //   if (!reportMediaLoading) console.log(reportMediaData);
+  // }, [reportMediaData, reportMediaLoading]);
 
   const { register, watch } = useForm<IReport>();
   const selectedDates = [date_open, date_closed];
@@ -143,7 +141,7 @@ export const ReportItemDisplay = ({
   };
 
   const onUpdateSubmit = (formData: IReport) => {
-    console.log(formData);
+    // console.log(formData);
     updateMutation.mutate(formData);
   };
 
@@ -158,11 +156,11 @@ export const ReportItemDisplay = ({
     onClose: onModifierClose,
   } = useDisclosure();
   const creatorDrawerFunction = () => {
-    console.log(`${creatorData?.first_name} clicked`);
+    // console.log(`${creatorData?.first_name} clicked`);
     onCreatorOpen();
   };
   const modifierDrawerFunction = () => {
-    console.log(`${modifierData?.first_name} clicked`);
+    // console.log(`${modifierData?.first_name} clicked`);
     onModifierOpen();
   };
 
@@ -558,7 +556,7 @@ export const ReportItemDisplay = ({
                       isLoading={updateMutation.isLoading}
                       size="lg"
                       onClick={() => {
-                        console.log("clicked");
+                        // console.log("clicked");
                         onUpdateSubmit({
                           pk: pk,
                           year: year,

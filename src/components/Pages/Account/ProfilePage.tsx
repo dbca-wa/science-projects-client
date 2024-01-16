@@ -18,7 +18,7 @@ import { UserGridItem } from "../Users/UserGridItem";
 import { EditPersonalInformationModal } from "../../Modals/EditPersonalInformationModal";
 import { EditMembershipModal } from "../../Modals/EditMembershipModal";
 import { EditProfileModal } from "../../Modals/EditProfileModal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
@@ -44,11 +44,11 @@ export const ProfilePage = () => {
   const baseAPI = useApiEndpoint();
 
   const { userLoading: loading, userData: me } = useUser();
-  useEffect(() => {
-    if (!loading) {
-      console.log(me);
-    }
-  }, [me, loading]);
+  // useEffect(() => {
+  //   if (!loading) {
+  //     console.log(me);
+  //   }
+  // }, [me, loading]);
   const NoDataText = "Not Provided ON API";
 
   const { colorMode } = useColorMode();
