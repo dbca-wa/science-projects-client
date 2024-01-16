@@ -2,7 +2,6 @@
 
 import {
   Box,
-  Divider,
   Flex,
   useBreakpointValue,
   useColorMode,
@@ -34,12 +33,10 @@ import {
   $isParagraphNode,
   $isRangeSelection,
   $isTextNode,
-  COMMAND_PRIORITY_LOW,
   FORMAT_TEXT_COMMAND,
   LexicalEditor,
   NodeKey,
   REDO_COMMAND,
-  SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND,
   $isRootOrShadowRoot,
 } from "lexical";
@@ -50,41 +47,20 @@ import {
   $getNearestNodeOfType,
 } from "@lexical/utils";
 
-import { getDOMRangeRect } from "@/lib/utils/getDOMRangeRect";
-import { setFloatingElemPosition } from "@/lib/utils/setFloatingElemPosition";
 import { getSelectedNode } from "@/lib/utils/getSelectedNode";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-  $getSelectionStyleValueForProperty,
-  $isParentElementRTL,
-  $patchStyleText,
-  $setBlocksType,
-} from "@lexical/selection";
+import { $setBlocksType } from "@lexical/selection";
 
 import {
   $isListNode,
-  INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
   ListNode,
   REMOVE_LIST_COMMAND,
 } from "@lexical/list";
 
-import {
-  $createCodeNode,
-  $isCodeNode,
-  CODE_LANGUAGE_FRIENDLY_NAME_MAP,
-  CODE_LANGUAGE_MAP,
-  getLanguageFriendlyName,
-  $isCodeHighlightNode,
-} from "@lexical/code";
-import {
-  $createHeadingNode,
-  $createQuoteNode,
-  $isHeadingNode,
-  $isQuoteNode,
-  HeadingTagType,
-} from "@lexical/rich-text";
+import { $isCodeHighlightNode } from "@lexical/code";
+import { $isHeadingNode } from "@lexical/rich-text";
 
 interface ToolbarProps {
   editor: LexicalEditor;
@@ -100,7 +76,7 @@ const useToolbar = ({
   boolean,
   boolean,
   boolean,
-  boolean,
+  // boolean,
   boolean,
   keyof typeof blockTypeToBlockName
 ] => {
@@ -117,7 +93,7 @@ const useToolbar = ({
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
     null
   );
-  const [codeLanguage, setCodeLanguage] = useState<string>("");
+  // const [codeLanguage, setCodeLanguage] = useState<string>("");
   const blockTypeToBlockName = {
     bullet: "Bulleted List",
     check: "Check List",
@@ -275,7 +251,7 @@ const useToolbar = ({
     isUnderline,
     isSubscript,
     isSuperscript,
-    isStrikethrough,
+    // isStrikethrough,
     canUndo,
     canRedo,
     blockType,
@@ -287,6 +263,9 @@ interface Props {
 }
 
 export const RevisedRichTextToolbar = ({ anchorElem }: Props) => {
+  if (!anchorElem) {
+    console.log("anchorElem not present");
+  }
   const [editor] = useLexicalComposerContext();
   const [
     isBold,
@@ -294,7 +273,7 @@ export const RevisedRichTextToolbar = ({ anchorElem }: Props) => {
     isUnderline,
     isSubscript,
     isSuperscript,
-    isStrikethrough,
+    // isStrikethrough,
     canUndo,
     canRedo,
     blockType,
