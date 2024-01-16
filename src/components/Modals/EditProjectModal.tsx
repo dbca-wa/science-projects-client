@@ -318,7 +318,7 @@ export const EditProjectModal = ({
                       preselectedUserPk={currentDataCustodian}
                       label="Data Custodian"
                       placeholder="Search for a user"
-                      helperText={<>The user you would like to handle data.</>}
+                      helperText={"The user you would like to handle data."}
                     />
                   </Box>
 
