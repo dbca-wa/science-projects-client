@@ -1,7 +1,5 @@
 // Dropdown search component for branches. Displays 5 branches below the search box.
 
-// Dropdown search component for users. Displays 5 users below the search box.
-
 import {
   Box,
   Flex,
@@ -31,7 +29,7 @@ interface IBranchSearchDropdown {
   setBranchFunction: (setBranchPk: number) => void;
   label: string;
   placeholder: string;
-  helperText: any;
+  helperText: string;
   preselectedBranchPk?: number;
   isEditable?: boolean;
   autoFocus?: boolean;
@@ -47,7 +45,6 @@ export const BranchSearchDropdown = forwardRef(
       helperText,
       preselectedBranchPk,
       isEditable,
-      autoFocus,
     }: IBranchSearchDropdown,
     ref
   ) => {
@@ -132,8 +129,6 @@ export const BranchSearchDropdown = forwardRef(
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder={placeholder}
               autoComplete="off"
-              // autoFocus={autoFocus}
-
               onFocus={() => setIsMenuOpen(true)}
             />
           </InputGroup>
@@ -217,9 +212,6 @@ const CustomMenuItem = ({ onClick, branch, ...rest }: CustomMenuItemProps) => {
       alignItems="center"
       {...rest}
     >
-      {/* <Avatar
-                src={user.image?.file ? user.image?.file : user.image?.old_file}
-            /> */}
       <Box
         display="flex"
         alignItems="center"
@@ -270,10 +262,6 @@ const SelectedBranchInput = ({
       py={1}
       mr={2}
     >
-      {/* <Avatar
-                size="sm"
-                src={branch.image?.file ? user.image?.file : user.image?.old_file}
-            /> */}
       <Text ml={2} color={colorMode === "light" ? "green.500" : "green.400"}>
         {`${branch.name}`}
       </Text>

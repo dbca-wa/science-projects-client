@@ -13,6 +13,7 @@ import { FiSearch } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { useProjectSearchContext } from "../../lib/hooks/ProjectSearchContext";
 import { getAllBusinessAreas, getAllProjectsYears } from "../../lib/api";
+import { IBusinessArea } from "@/types";
 
 interface IProps {
   orientation?: "vertical" | "horizontal";
@@ -36,7 +37,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
     filterYear,
   } = useProjectSearchContext();
 
-  const [businessAreas, setBusinessAreas] = useState<any[]>([]);
+  const [businessAreas, setBusinessAreas] = useState<IBusinessArea[]>([]);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
 
   const handleOnlySelectedBusinessAreaChange: React.ChangeEventHandler<
@@ -205,14 +206,29 @@ export const SearchProjects = ({ orientation }: IProps) => {
             <option value={"All"} color={"black"}>
               All Business Areas
             </option>
-            {businessAreas &&
-              businessAreas
-                .sort((a, b) => a.name.localeCompare(b.name)) // Sort the array alphabetically
-                .map((ba, index) => (
-                  <option key={index} value={ba.slug}>
-                    {ba.name}
-                  </option>
-                ))}
+            {businessAreas.map((ba, index) => {
+              const checkIsHtml = (data: string) => {
+                // Regular expression to check for HTML tags
+                const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+                // Check if the string contains any HTML tags
+                return htmlRegex.test(data);
+              };
+
+              const isHtml = checkIsHtml(ba.name);
+              let baName = ba?.name;
+              if (isHtml === true) {
+                const parser = new DOMParser();
+                const dom = parser.parseFromString(ba.name, "text/html");
+                const content = dom.body.textContent;
+                baName = content;
+              }
+              return (
+                <option key={index} value={ba.pk}>
+                  {baName}
+                </option>
+              );
+            })}{" "}
           </Select>
         </Grid>
       </Grid>
@@ -245,14 +261,29 @@ export const SearchProjects = ({ orientation }: IProps) => {
           <option value={"All"} color={"black"}>
             All Business Areas
           </option>
-          {businessAreas &&
-            businessAreas
-              .sort((a, b) => a.name.localeCompare(b.name)) // Sort the array alphabetically
-              .map((ba, index) => (
-                <option key={index} value={ba.slug}>
-                  {ba.name}
-                </option>
-              ))}
+          {businessAreas.map((ba, index) => {
+            const checkIsHtml = (data: string) => {
+              // Regular expression to check for HTML tags
+              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+              // Check if the string contains any HTML tags
+              return htmlRegex.test(data);
+            };
+
+            const isHtml = checkIsHtml(ba.name);
+            let baName = ba?.name;
+            if (isHtml === true) {
+              const parser = new DOMParser();
+              const dom = parser.parseFromString(ba.name, "text/html");
+              const content = dom.body.textContent;
+              baName = content;
+            }
+            return (
+              <option key={index} value={ba.pk}>
+                {baName}
+              </option>
+            );
+          })}{" "}
         </Select>
 
         <InputGroup borderColor="gray.200" size="sm">
