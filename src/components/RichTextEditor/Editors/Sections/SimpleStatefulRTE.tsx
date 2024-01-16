@@ -1,24 +1,18 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
-import { OptionsBar } from "../../OptionsBar/OptionsBar";
+import {
+  InitialConfigType,
+  LexicalComposer,
+} from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { ListItemNode, ListNode } from "@lexical/list";
-import { HeadingNode } from "@lexical/rich-text";
-import { $getRoot, $getSelection, ParagraphNode } from "lexical";
-import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
+// import { $getRoot } from "lexical";
 import { RevisedSimpleRichTextToolbar } from "../../Toolbar/RevisedSimpleRichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
-import { useEffect, useState } from "react";
-import { DataDisplayPlugin } from "../../Plugins/DataDisplayPlugin";
-import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
-import { EditorSubsections, EditorType } from "../../../../types";
+import { $generateHtmlFromNodes } from "@lexical/html";
 import { PrepopulateCommentDisplayPlugin } from "./../../Plugins/PrepopulateCommentDisplayPlugin";
 
 interface Props {
@@ -28,15 +22,15 @@ interface Props {
   setValueAsPlainText: boolean;
   value: string;
   setValueFunction: React.Dispatch<React.SetStateAction<string>>;
-  initialConfig: any;
-  editorRef: any;
+  initialConfig: InitialConfigType;
+  // editorRef: any;
 }
 
 export const SimpleStatefulRTE = ({
   allowInsertButton,
   placeholderText,
   initialConfig,
-  editorRef,
+  // editorRef,
   showToolbar,
   setValueAsPlainText,
   value,
@@ -51,7 +45,7 @@ export const SimpleStatefulRTE = ({
         <OnChangePlugin
           onChange={(editorState, editor) => {
             editorState.read(() => {
-              const root = $getRoot();
+              // const root = $getRoot();
               //   setEditorText(root.__cachedText);
               const newHtml = $generateHtmlFromNodes(editor, null);
               if (setValueAsPlainText === true) {
