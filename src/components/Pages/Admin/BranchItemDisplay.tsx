@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Center,
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -11,24 +10,18 @@ import {
   FormControl,
   FormLabel,
   Grid,
-  HStack,
   Input,
-  InputGroup,
-  InputLeftAddon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   Text,
-  Textarea,
   VStack,
   useColorMode,
   useDisclosure,
@@ -38,7 +31,6 @@ import { IBranch } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { FaSign } from "react-icons/fa";
 import { deleteBranch, updateBranch } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
@@ -46,7 +38,7 @@ import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useState } from "react";
 import { TextButtonFlex } from "../../TextButtonFlex";
 
-export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
+export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
   const { register, handleSubmit, watch, reset } = useForm<IBranch>();
 
   const toast = useToast();
@@ -70,7 +62,6 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
 
   const updateMutation = useMutation(updateBranch, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Updated",
@@ -81,21 +72,16 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
       reset();
     },
     onError: () => {
-      // console.log("error")
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
     },
-    onMutate: () => {
-      // console.log("attempting update private")
-    },
   });
 
   const deleteMutation = useMutation(deleteBranch, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Deleted",
@@ -104,22 +90,11 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
       onDeleteModalClose();
       queryClient.invalidateQueries(["branches"]);
     },
-    onError: () => {
-      // console.log("error")
-    },
-    onMutate: () => {
-      // console.log("mutation")
-    },
   });
 
   const deleteBtnClicked = () => {
-    // console.log("deleted")
     deleteMutation.mutate(pk);
   };
-
-  // const onUpdateSubmit = (formData: IBranch) => {
-  //     updateMutation.mutate(formData);
-  // }
 
   const onSubmitBranchUpdate = (formData: IBranch) => {
     updateMutation.mutate(formData);
@@ -164,17 +139,6 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
         // bg={"red"}
       >
         <TextButtonFlex name={name} onClick={onUpdateModalOpen} />
-        {/* <Flex justifyContent="flex-start" alignItems={"center"}>
-                        <Button
-                            variant={"link"}
-                            colorScheme="blue"
-                            onClick={onUpdateModalOpen}
-                        >
-                            {name ?? ""}
-                        </Button>
-
-                    </Flex> */}
-
         <TextButtonFlex
           name={
             managerData?.first_name
@@ -183,16 +147,6 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
           }
           onClick={managerDrawerFunction}
         />
-        {/* <Flex>
-                        <Button
-                            variant={"link"}
-                            colorScheme="blue"
-                            onClick={managerDrawerFunction}
-                        >
-                            {managerData?.first_name ? `${managerData?.first_name} ${managerData?.last_name}` : `${managerData?.username}`}
-                        </Button>
-
-                    </Flex> */}
 
         <Flex justifyContent="flex-end" mr={2} alignItems={"center"}>
           <Menu>
@@ -216,7 +170,6 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
               <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
             </MenuList>
           </Menu>
-          {/* </Button> */}
         </Flex>
       </Grid>
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
@@ -283,18 +236,12 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
               id="update-form"
               onSubmit={handleSubmit(onSubmitBranchUpdate)}
             >
-              {/* <FormControl> */}
-              {/* <FormLabel>Agency</FormLabel> */}
-              {/* <InputGroup> */}
-              {/* <InputLeftAddon children={<FaSign />} /> */}
               <Input
                 {...register("agency", { required: true })}
                 value={1}
                 required
                 type="hidden"
               />
-              {/* </InputGroup> */}
-              {/* </FormControl> */}
               <FormControl>
                 <FormLabel>Branch Name</FormLabel>
                 <Input
@@ -303,7 +250,6 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                 />
               </FormControl>
               <FormControl>
-                {/* <FormLabel>Manager</FormLabel> */}
                 <UserSearchDropdown
                   {...register("manager", { required: true })}
                   onlyInternal={false}
@@ -313,7 +259,7 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                   isEditable
                   label="Manager"
                   placeholder="Search for a user"
-                  helperText={<>The manager of the branch.</>}
+                  helperText={"The manager of the branch."}
                 />
                 {/* <Input
                                             {...register("manager", { required: true })}
@@ -338,7 +284,6 @@ export const BranchItemDisplay = ({ pk, agency, name, manager }: IBranch) => {
                 // form="update-form"
                 // type="submit"
                 onClick={() => {
-                  console.log("clicked");
                   onSubmitBranchUpdate({
                     // "old_id": 1, //default
                     pk: pk,

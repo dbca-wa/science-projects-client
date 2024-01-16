@@ -19,14 +19,14 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import { IFeedback, IUserData } from "../../types";
+import { IFeedback, IUserMe } from "../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useRef } from "react";
 import { createFeedbackItem } from "../../lib/api";
 
 interface IUserInterface {
-  userData: IUserData;
+  userData: IUserMe;
   isLoggedIn: boolean;
   userLoading: boolean;
 }

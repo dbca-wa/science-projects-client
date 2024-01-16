@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaBiohazard } from "react-icons/fa";
 import { FaShieldDog } from "react-icons/fa6";
-import { HiDocumentCheck } from "react-icons/hi2";
 import { PiPlantFill } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
 

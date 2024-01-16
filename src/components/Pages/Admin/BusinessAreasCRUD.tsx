@@ -11,7 +11,6 @@ import {
   FormControl,
   Input,
   InputGroup,
-  InputLeftAddon,
   VStack,
   useDisclosure,
   Center,
@@ -22,27 +21,20 @@ import {
   DrawerHeader,
   FormLabel,
   Textarea,
-  Checkbox,
   useToast,
-  Select,
   FormHelperText,
   FormErrorMessage,
   useColorMode,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BusinessAreaItemDisplay } from "./BusinessAreaItemDisplay";
 import { createBusinessArea, getAllBusinessAreas } from "../../../lib/api";
-import _ from "lodash";
-import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IBusinessArea } from "../../../types";
-import { ImagePreview } from "../CreateProject/ImagePreview";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useNoImage } from "../../../lib/hooks/useNoImage";
-import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
-import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
 
 export const BusinessAreasCRUD = () => {
   const {
@@ -60,27 +52,21 @@ export const BusinessAreasCRUD = () => {
 
   const queryClient = useQueryClient();
   const mutation = useMutation(createBusinessArea, {
-    onSuccess: (data: IBusinessArea) => {
-      // console.log("success")
+    onSuccess: () => {
       toast({
         status: "success",
         title: "Created",
         position: "top-right",
       });
-      console.log(data);
       onAddClose();
       queryClient.invalidateQueries(["businessAreas"]);
     },
     onError: () => {
-      console.log("error");
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
-    },
-    onMutate: () => {
-      console.log("mutation");
     },
   });
   const onSubmit = (formData: IBusinessArea) => {
@@ -166,21 +152,10 @@ export const BusinessAreasCRUD = () => {
     mutation.mutate(payload);
   };
 
-  const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const noImageLink = useNoImage();
-  // const imageUrl = useServerImageUrl(noImageLink);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>();
-
-  const handleFileInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setSelectedFile(files[0]);
-    }
-  };
 
   const { colorMode } = useColorMode();
 
@@ -317,16 +292,6 @@ export const BusinessAreasCRUD = () => {
                     </FormHelperText>
                   </FormControl>
                   <FormControl isRequired>
-                    {/* <FormLabel>Image</FormLabel>
-                                        <InputGroup>
-                                            <Input
-                                                {...register("image", { required: true })}
-                                                required
-                                                type="text"
-                                            />
-
-                                        </InputGroup> */}
-
                     <Grid
                       gridTemplateColumns={{ base: "3fr 10fr", md: "4fr 8fr" }}
                       pos="relative"
@@ -342,28 +307,18 @@ export const BusinessAreasCRUD = () => {
                           rounded="lg"
                           overflow="hidden"
                         >
-                          {!imageLoadFailed ? (
-                            <Image
-                              objectFit="cover"
-                              src={
-                                (selectedFile !== null && selectedImageUrl) ||
-                                noImageLink
-                              }
-                              alt="Preview"
-                              userSelect="none"
-                              bg="gray.800"
-                              // onLoad={handleImageLoadSuccess}
-                              // onError={handleImageLoadError}
-                            />
-                          ) : (
-                            <Image
-                              objectFit="cover"
-                              src={noImageLink}
-                              alt="Preview"
-                              userSelect="none"
-                              bg="gray.800"
-                            />
-                          )}
+                          <Image
+                            objectFit="cover"
+                            src={
+                              (selectedFile !== null && selectedImageUrl) ||
+                              noImageLink
+                            }
+                            alt="Preview"
+                            userSelect="none"
+                            bg="gray.800"
+                            // onLoad={handleImageLoadSuccess}
+                            // onError={handleImageLoadError}
+                          />
                         </Center>
                       </Box>
                       <FormControl ml={4} mt={10}>
@@ -436,7 +391,7 @@ export const BusinessAreasCRUD = () => {
                       setUserFunction={setSelectedLeader}
                       label="Leader"
                       placeholder="Search for a user..."
-                      helperText={<>The leader of the Business Area</>}
+                      helperText={"The leader of the Business Area"}
                     />
                   </FormControl>
                   <FormControl>
@@ -448,7 +403,7 @@ export const BusinessAreasCRUD = () => {
                       setUserFunction={setSelectedFinanceAdmin}
                       label="Finance Admin"
                       placeholder="Search for a user..."
-                      helperText={<>The finance admin of the Business Area</>}
+                      helperText={"The finance admin of the Business Area"}
                     />
                   </FormControl>
                   <FormControl>
@@ -459,7 +414,7 @@ export const BusinessAreasCRUD = () => {
                       setUserFunction={setSelectedDataCustodian}
                       label="Data Custodian"
                       placeholder="Search for a user..."
-                      helperText={<>The data custodian of the Business Area</>}
+                      helperText={"The data custodian of the Business Area"}
                     />
                   </FormControl>
                   <FormControl isRequired>
@@ -506,7 +461,6 @@ export const BusinessAreasCRUD = () => {
                   size="lg"
                   width={"100%"}
                   onClick={() => {
-                    console.log("clicked");
                     onSubmitBusinessAreaCreation({
                       agency: 1,
                       old_id: 1,

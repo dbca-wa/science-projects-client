@@ -10,7 +10,6 @@ import {
   FormControl,
   Input,
   InputGroup,
-  InputLeftAddon,
   VStack,
   useDisclosure,
   Center,
@@ -20,21 +19,16 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   FormLabel,
-  Textarea,
-  Checkbox,
   useToast,
-  Select,
   useColorMode,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   createDepartmentalService,
   getAllDepartmentalServices,
 } from "../../../lib/api";
-import _ from "lodash";
-import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IDepartmentalService } from "../../../types";
 import { ServiceItemDisplay } from "./ServiceItemDisplay";
@@ -55,14 +49,12 @@ export const ServicesCRUD = () => {
 
   const queryClient = useQueryClient();
   const mutation = useMutation(createDepartmentalService, {
-    onSuccess: (data: IDepartmentalService) => {
-      // console.log("success")
+    onSuccess: () => {
       toast({
         status: "success",
         title: "Created",
         position: "top-right",
       });
-      console.log(data);
       onAddClose();
       queryClient.invalidateQueries(["departmentalServices"]);
     },
@@ -223,7 +215,7 @@ export const ServicesCRUD = () => {
                       label="Director"
                       placeholder="Search for a user..."
                       isEditable
-                      helperText={<>The director of the Service</>}
+                      helperText={"The director of the Service"}
                     />
                   </FormControl>
                   {mutation.isError ? (
@@ -260,7 +252,6 @@ export const ServicesCRUD = () => {
                   size="lg"
                   width={"100%"}
                   onClick={() => {
-                    console.log("clicked");
                     onSubmit({
                       old_id: 1,
                       name: nameData,

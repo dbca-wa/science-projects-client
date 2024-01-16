@@ -10,7 +10,6 @@ import {
   FormControl,
   Input,
   InputGroup,
-  InputLeftAddon,
   VStack,
   useDisclosure,
   Center,
@@ -20,21 +19,17 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   FormLabel,
-  Textarea,
   Checkbox,
   useToast,
-  Select,
   useColorMode,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   createResearchFunction,
   getAllResearchFunctions,
 } from "../../../lib/api";
-import _ from "lodash";
-import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IResearchFunction } from "../../../types";
 import { ResearchFunctionItemDisplay } from "./ResearchFunctionItemDisplay";
@@ -60,14 +55,12 @@ export const ResearchFunctionsCRUD = () => {
 
   const queryClient = useQueryClient();
   const mutation = useMutation(createResearchFunction, {
-    onSuccess: (data: IResearchFunction) => {
-      // console.log("success")
+    onSuccess: () => {
       toast({
         status: "success",
         title: "Created",
         position: "top-right",
       });
-      console.log(data);
       onAddClose();
       queryClient.invalidateQueries(["researchFunctions"]);
     },
@@ -84,7 +77,6 @@ export const ResearchFunctionsCRUD = () => {
     },
   });
   const onSubmit = (formData: IResearchFunction) => {
-    console.log(formData);
     mutation.mutate(formData);
   };
   const { isLoading, data: slices } = useQuery<IResearchFunction[]>({
@@ -256,7 +248,6 @@ export const ResearchFunctionsCRUD = () => {
                   <FormControl>
                     <FormLabel>Name</FormLabel>
                     <InputGroup>
-                      {/* <InputLeftAddon children={<FaSign />} /> */}
                       <Input
                         autoComplete="off"
                         autoFocus
@@ -288,7 +279,7 @@ export const ResearchFunctionsCRUD = () => {
                       setUserFunction={setSelectedLeader}
                       label="Leader"
                       placeholder="Search for a user..."
-                      helperText={<>The leader of the Research Function</>}
+                      helperText={"The leader of the Research Function"}
                     />
                   </FormControl>
                   <FormControl>

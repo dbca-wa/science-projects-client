@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Center,
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -11,24 +10,19 @@ import {
   FormControl,
   FormLabel,
   Grid,
-  HStack,
   Input,
   InputGroup,
-  InputLeftAddon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   Text,
-  Textarea,
   VStack,
   useColorMode,
   useDisclosure,
@@ -38,7 +32,6 @@ import { IDivision } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { FaSign } from "react-icons/fa";
 import { deleteDivision, updateDivision } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
@@ -80,7 +73,6 @@ export const DivisionItemDisplay = ({
   const nameData = watch("name");
   const updateMutation = useMutation(updateDivision, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Updated",
@@ -90,21 +82,16 @@ export const DivisionItemDisplay = ({
       queryClient.invalidateQueries(["divisions"]);
     },
     onError: () => {
-      // console.log("error")
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
     },
-    onMutate: () => {
-      // console.log("attempting update private")
-    },
   });
 
   const deleteMutation = useMutation(deleteDivision, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Deleted",
@@ -113,16 +100,9 @@ export const DivisionItemDisplay = ({
       onDeleteModalClose();
       queryClient.invalidateQueries(["divisions"]);
     },
-    onError: () => {
-      // console.log("error")
-    },
-    onMutate: () => {
-      // console.log("mutation")
-    },
   });
 
   const deleteBtnClicked = () => {
-    // console.log("deleted")
     deleteMutation.mutate(pk);
   };
 
@@ -197,22 +177,7 @@ export const DivisionItemDisplay = ({
         // bg={"red"}
       >
         <TextButtonFlex name={name} onClick={onUpdateModalOpen} />
-        {/* <Flex justifyContent="flex-start"
-                        alignItems={"center"}
-                    >
-                        <Text
-                            fontWeight={"semibold"}
-                        >
-                            <Button
-                                variant={"link"}
-                                colorScheme="blue"
-                                onClick={onUpdateModalOpen}
-                            >
-                                {name ?? ""}
-                            </Button>
-                        </Text>
 
-                    </Flex> */}
         <Flex alignItems={"center"}>
           <Text fontWeight={"semibold"}>{slug}</Text>
         </Flex>
@@ -224,27 +189,6 @@ export const DivisionItemDisplay = ({
           name={`${approverData.first_name} ${approverData.last_name}`}
           onClick={approverDrawerFunction}
         />
-        {/*               
-                    <Flex>
-                        <Button
-                            variant={"link"}
-                            colorScheme="blue"
-                            onClick={directorDrawerFunction}
-                        >
-                            {directorData.first_name} {directorData.last_name}
-                        </Button>
-
-                    </Flex> */}
-        {/* <Flex>
-                        <Button
-                            variant={"link"}
-                            colorScheme="blue"
-                            onClick={approverDrawerFunction}
-                        >
-                            {approverData.first_name} {approverData.last_name}
-                        </Button>
-                    </Flex> */}
-
         <Flex justifyContent="flex-end" mr={2} alignItems={"center"}>
           <Menu>
             <MenuButton
@@ -335,13 +279,7 @@ export const DivisionItemDisplay = ({
                 defaultValue={old_id} // Prefill with the 'pk' prop
               />
             </FormControl>
-            {/* <FormControl>
-                                <input
-                                    type="hidden"
-                                    {...register("slug")}
-                                    defaultValue={slug} // Prefill with the 'pk' prop
-                                />
-                            </FormControl> */}
+
             <VStack
               spacing={6}
               as="form"
@@ -380,7 +318,7 @@ export const DivisionItemDisplay = ({
                   placeholder="Search for a user..."
                   preselectedUserPk={director}
                   isEditable
-                  helperText={<>The director of the Division</>}
+                  helperText={"The director of the Division"}
                 />
               </FormControl>
               <FormControl>
@@ -393,7 +331,7 @@ export const DivisionItemDisplay = ({
                   placeholder="Search for a user..."
                   preselectedUserPk={approver}
                   isEditable
-                  helperText={<>The approver of the Division</>}
+                  helperText={"The approver of the Division"}
                 />
               </FormControl>
               {updateMutation.isError ? (

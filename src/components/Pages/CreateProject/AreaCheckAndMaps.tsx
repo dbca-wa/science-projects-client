@@ -7,8 +7,6 @@ import {
   InputGroup,
   Flex,
   Checkbox,
-  Text,
-  Center,
 } from "@chakra-ui/react";
 import { ISimpleLocationData } from "../../../types";
 import { useEffect, useState } from "react";
@@ -16,7 +14,6 @@ import { useEffect, useState } from "react";
 interface Props {
   title: string;
   areas: ISimpleLocationData[];
-  required: boolean;
   selectedAreas: number[];
   setSelectedAreas: React.Dispatch<React.SetStateAction<number[]>>;
 }
@@ -24,15 +21,12 @@ interface Props {
 export const AreaCheckAndMaps = ({
   areas,
   title,
-  required = false,
   selectedAreas,
   setSelectedAreas,
 }: Props) => {
   const [allAreaChecked, setAllAreaChecked] = useState(false);
 
   useEffect(() => {
-    // Check if the "All " checkbox is checked
-    // console.log(selectedAreas);
     const isAllAreaChecked = areas.some((area) => {
       return (
         area.name.toLowerCase().startsWith("all ") &&
@@ -61,15 +55,7 @@ export const AreaCheckAndMaps = ({
   };
 
   return (
-    // <Center>
-    <FormControl
-      // bg={"orange"}
-      // alignContent={"center"}
-      // justifyContent={"center"}
-      // alignItems={"center"}
-      // isRequired={required}
-      mb={4}
-    >
+    <FormControl mb={4}>
       <FormLabel>{title}</FormLabel>
       <InputGroup>
         <Grid
@@ -77,7 +63,6 @@ export const AreaCheckAndMaps = ({
           gridGap={3}
           py={4}
           gridColumnGap={10}
-          // bg={"pink"}
         >
           {areas?.map((area, index) => {
             const isChecked = selectedAreas?.includes(area.pk);
@@ -116,6 +101,5 @@ export const AreaCheckAndMaps = ({
         </Grid>
       </InputGroup>
     </FormControl>
-    // </Center>
   );
 };
