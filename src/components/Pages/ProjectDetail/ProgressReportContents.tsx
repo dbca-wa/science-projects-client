@@ -7,8 +7,6 @@ import {
   Flex,
   Select,
   Spinner,
-  Stat,
-  StatLabel,
   Text,
   useColorMode,
   useDisclosure,
@@ -27,7 +25,6 @@ import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
 import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
 import { useGetProgressReportAvailableReportYears } from "../../../lib/hooks/useGetProgressReportAvailableReportYears";
 import { getProgressReportForYear } from "../../../lib/api";
-import WordToHtmlConverter from "../../RichTextEditor/WordToHTML";
 import { CommentSection } from "./CommentSection";
 import { BsPlus } from "react-icons/bs";
 
@@ -48,16 +45,11 @@ export const ProgressReportContents = ({
   refetch,
   setToLastTab,
 }: Props) => {
-  // console.log("FROM PROGRESS:", userData);
-
   // Handling years
-  const {
-    availableProgressReportYearsLoading,
-    availableProgressReportYearsData,
-    refetchProgressYears,
-  } = useGetProgressReportAvailableReportYears(
-    Number(documents[0].document?.project?.pk)
-  );
+  const { availableProgressReportYearsData } =
+    useGetProgressReportAvailableReportYears(
+      Number(documents[0].document?.project?.pk)
+    );
   const years = Array.from(
     new Set(documents.map((progressReport) => progressReport.year))
   ).sort((a, b) => b - a);
@@ -82,15 +74,10 @@ export const ProgressReportContents = ({
   });
 
   // Force a rerender when dark mode or year changed to update design and content
-  // const editorKey = selectedYear.toString() + colorMode;
   const [isLoading, setIsLoading] = useState(false);
   const { colorMode } = useColorMode();
   const documentType = "progressreport";
   const editorKey = colorMode + documentType + selectedProgressReport?.year;
-
-  // const [editorKey, setEditorKey] = useState(
-  //   selectedYear.toString() + colorMode + documentType
-  // );
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
@@ -128,51 +115,11 @@ export const ProgressReportContents = ({
     if (selectedProgressReport) setIsLoading(false);
   }, [selectedProgressReport]);
 
-  const refetchDataForYearFunction = () => {
-    // console.log("SELECTED YEAR IS:", selectedYear);
-    const dataForYear = documents.find(
-      (report) => report.year === selectedYear
-    );
-    if (dataForYear) {
-      setIsLoading(true);
-      setSelectedProgressReport(dataForYear);
-      // setEditorKey(selectedYear.toString() + colorMode + documentType);
-    }
-    // console.log("set year and selected doc");
-  };
-
-  // const refetchFunc = () => {
-  //     refetch();
-  //     setIsLoading(true);
-  //     const getHighestAvailable = () => {
-  //         const years = documents.map((progressReport) => progressReport.year);
-  //         const highestYear = Math.max(...years);
-  //         return highestYear;
-
-  //     }
-  //     const highestYear = getHighestAvailable();
-  //     // setSelectedYear(highestYear)
-  // }
-
-  // useEffect(() => {
-  //   setIsLoading(false);
-  // }, [editorKey, documents]);
-
   const handleNewYearSelection = (event) => {
     setIsLoading(true);
     setSelectedYear(Number(event.target.value));
   };
 
-  // const handleSetSameYear = () => {
-  //     setIsLoading(true);
-  //     setSelectedYear(selectedYear);
-  // }
-
-  // const refetchData = () => {
-  //     setIsLoading(true);
-  //     // setSelectedYear(selectedYear);
-  //     setIsLoading(false);
-  // }
   const {
     isOpen: isCreateProgressReportModalOpen,
     onOpen: onOpenCreateProgressReportModal,
@@ -181,16 +128,6 @@ export const ProgressReportContents = ({
 
   return (
     <>
-      {/* <ProgressReportSelector
-                projectPk={projectPk}
-                documents={documents}
-                onYearSelect={onYearSelect}
-                selectedProgressReportYear={selectedYear}
-                selectedProgressReport={selectedProgressReport}
-            /> */}
-
-      {/* <WordToHtmlConverter /> */}
-
       <CreateProgressReportModal
         projectPk={selectedProgressReport?.document?.project?.pk}
         documentKind="progressreport"
@@ -216,7 +153,6 @@ export const ProgressReportContents = ({
               _hover={{
                 background: colorMode === "light" ? "orange.400" : "orange.500",
               }}
-              // colorScheme="orange"
               size={"sm"}
               onClick={
                 onOpenCreateProgressReportModal
@@ -227,7 +163,6 @@ export const ProgressReportContents = ({
                 //     }
                 // )
               }
-              // ml={2}
               isDisabled={availableProgressReportYearsData?.length < 1}
               leftIcon={<BsPlus size={"20px"} />}
             >
@@ -266,8 +201,6 @@ export const ProgressReportContents = ({
           minH={"100vh"}
           display="flex" // Use display: flex to enable flexbox layout
           justifyContent="center" // Center horizontally
-          // alignItems="center"     // Center vertically
-          // bg="red"
           pt={"50px"}
         >
           <Spinner
@@ -290,7 +223,6 @@ export const ProgressReportContents = ({
           style={{
             height: "100%",
             animation: "oscillate 8s ease-in-out infinite",
-            // backgroundColor: "pink"
           }}
         >
           {/* Actions */}

@@ -60,7 +60,7 @@ export const SearchUsers = () => {
     HTMLSelectElement
   > = (event) => {
     const businessAreaValue = event.target.value;
-    console.log(businessAreaValue);
+    // console.log(businessAreaValue);
     setSearchFilters({
       onlySuperuser: onlySuperuser,
       onlyExternal: onlyExternal,
@@ -82,7 +82,7 @@ export const SearchUsers = () => {
     fetchBusinessAreas();
   }, []);
 
-  console.log(businessAreas);
+  // console.log(businessAreas);
 
   return (
     <Flex>

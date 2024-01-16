@@ -29,8 +29,6 @@ import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
 import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
 import { useNavigate } from "react-router-dom";
 import { useUpdatePage } from "../../../lib/hooks/useUpdatePage";
-import { useBranches } from "../../../lib/hooks/useBranches";
-import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
 import { IBranch, IBusinessArea } from "../../../types";
 import { DeactivateUserModal } from "@/components/Modals/DeactivateUserModal";
 
@@ -85,7 +83,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   const me = useUser();
   const [userInQuestionIsSuperuser, setUserInQuestionIsSuperuser] =
     useState(false);
-  const [userInQuestionIsMe, setUserInQuestionIsMe] = useState(false);
+  // const [userInQuestionIsMe, setUserInQuestionIsMe] = useState(false);
 
   const setVariablesForPromoteModalAndOpen = (
     isUserToChangeSuperUser: boolean
@@ -106,14 +104,12 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         userIsSuper={userInQuestionIsSuperuser}
-        userIsMe={userInQuestionIsMe}
         userPk={user.pk}
       />
       <DeactivateUserModal
         isOpen={isDeactivateModalOpen}
         onClose={onDeactivateModalClose}
         userIsSuper={userInQuestionIsSuperuser}
-        userIsMe={userInQuestionIsMe}
         userPk={user.pk}
       />
       <PromoteUserModal
@@ -121,7 +117,6 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
         onClose={onPromoteModalClose}
         userPk={user.pk}
         userIsSuper={userInQuestionIsSuperuser}
-        userIsMe={userInQuestionIsMe}
         userIsExternal={!user.is_staff}
       />
       <AddUserToProjectModal

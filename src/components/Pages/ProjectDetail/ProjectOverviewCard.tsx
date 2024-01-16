@@ -13,41 +13,34 @@ import {
   MenuList,
   Tag,
   Text,
-  ToastId,
   useColorMode,
   useDisclosure,
-  useToast,
 } from "@chakra-ui/react";
-import { AiFillCalendar, AiFillEdit, AiFillTag } from "react-icons/ai";
-import { Link, useNavigate } from "react-router-dom";
+import { AiFillCalendar, AiFillTag } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
 import {
   IExtendedProjectDetails,
-  IFullProjectDetails,
   IProjectAreas,
   IProjectData,
   IProjectDocuments,
   IProjectMember,
-  ISimpleLocationData,
 } from "../../../types";
 import {
   FaEdit,
-  FaEllipsisH,
-  FaEllipsisV,
   FaLock,
   FaLockOpen,
   FaTrash,
   FaUserFriends,
 } from "react-icons/fa";
 import { GiMaterialsScience } from "react-icons/gi";
-import { MdMoreVert, MdScience } from "react-icons/md";
+import { MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 import { useNoImage } from "../../../lib/hooks/useNoImage";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 import { useUser } from "../../../lib/hooks/useUser";
 import { DeleteProjectModal } from "../../Modals/DeleteProjectModal";
@@ -63,7 +56,6 @@ import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 import { BsCaretDownFill } from "react-icons/bs";
 import { IoCreate } from "react-icons/io5";
 import { GrStatusInfo } from "react-icons/gr";
-import { TestRichTextEditor } from "@/components/RichTextEditor/TestRichTextEditor";
 
 interface IProjectOverviewCardProps {
   location: IProjectAreas;
@@ -84,17 +76,11 @@ export const ProjectOverviewCard = ({
   documents,
   setToLastTab,
 }: IProjectOverviewCardProps) => {
-  const baseApi = useApiEndpoint();
   const {
     isOpen: isEditProjectDetailModalOpen,
-    onOpen: onEditProjectDetailModalOpen,
     onClose: onEditProjectDetailModalClose,
   } = useDisclosure();
   const { colorMode } = useColorMode();
-  // useEffect(() => {
-  //     console.log(baseInformation)
-  //     console.log(details)
-  // })
 
   const {
     isOpen: isDeleteModalOpen,

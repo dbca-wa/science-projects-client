@@ -10,7 +10,6 @@ import {
 } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { ProjectPlanDocActions } from "./DocActions/ProjectPlanDocActions";
-import { useEffect } from "react";
 import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
 import { ProjectPlanEndorsements } from "./ProjectPlanEndorsements";
 import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
@@ -36,21 +35,14 @@ export const ProjectPlanContents = ({
   setToLastTab,
   projectAreas,
 }: Props) => {
-  // Force a rerender when dark mode or year changed to update design and content
-  // const editorKey = selectedYear.toString() + colorMode;
   const { colorMode } = useColorMode();
 
   const documentType = "projectplan";
   const editorKey = colorMode + documentType;
-  // useEffect(() => {
-  //   console.log(document);
-  // }, [document]);
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
   const userIsLeader = useCheckUserIsTeamLeader(mePk, members);
-
-  // console.log(document?.endorsements)
 
   return (
     <motion.div
@@ -64,146 +56,15 @@ export const ProjectPlanContents = ({
       style={{
         height: "100%",
         animation: "oscillate 8s ease-in-out infinite",
-        // backgroundColor: "pink"
       }}
     >
-      {/* <DocumentActions /> */}
       <ProjectPlanDocActions
         all_documents={all_documents}
         projectPlanData={document}
         refetchData={refetch}
         setToLastTab={setToLastTab}
         projectAreas={projectAreas}
-
-        // projectPk={projectPk}
       />
-
-      {/* 
-
-            <Grid
-                gridTemplateColumns={"repeat(2, 1fr)"}
-                my={4}
-                // px={8}
-                gridColumnGap={4}
-                background={"gray.50"}
-                rounded={"lg"}
-                p={4}
-            >
-                <Box
-                    background={"gray.100"}
-                    rounded={"lg"}
-                    p={6}
-                >
-                    <Text
-                        fontWeight={"bold"}
-                        fontSize={"2xl"}
-                    >
-                        Involves
-                    </Text>
-                    <Grid
-                        mt={4}
-                    >
-
-                        <Flex
-                            alignItems={"center"}
-                        >
-                            <Checkbox
-                                checked={
-                                    involvesPlants
-                                }
-                                mr={3}
-                                onChange={handleTogglePlantsInvolved}
-                            />
-                            <Box>
-                                <Text>Plant Specimen Collection</Text>
-                            </Box>
-
-                        </Flex>
-
-                        <Flex
-                            alignItems={"center"}
-                        >
-                            <Checkbox
-                                checked={
-                                    involvesAnimals
-                                }
-                                mr={3}
-                                onChange={handleToggleAnimalsInvolved}
-                            />
-                            <Box>
-                                <Text>Interaction with Vertebrate Animals</Text>
-                            </Box>
-
-                        </Flex>
-                    </Grid>
-
-                </Box>
-
-
-                <Box
-                    background={"gray.100"}
-                    rounded={"lg"}
-                    p={6}
-
-
-                >
-                    <Text
-                        fontWeight={"bold"}
-                        fontSize={"2xl"}
-                    >
-                        Endorsements
-                    </Text>
-                    <Grid
-                        mt={4}
-
-                    >
-                        {
-                            document?.endorsements && (
-
-                                <Flex
-                                    alignItems={"center"}
-                                >
-
-                                    <Switch
-                                        defaultChecked={
-                                            document.endorsements.hc_endorsement === true
-                                        }
-                                        mr={3}
-                                        isDisabled={!herbCuratorInteractable}
-                                    />
-                                    <Box>
-                                        <Text>Herbarium Curator's Endorsement</Text>
-                                    </Box>
-
-                                </Flex>
-
-                            )
-                        }
-
-
-                        {
-                            document?.endorsements && (
-                                <Flex
-                                    alignItems={"center"}
-
-                                >
-                                    <Switch
-                                        defaultChecked={
-                                            document.endorsements.ae_endorsement === true
-                                        }
-                                        mr={3}
-                                        isDisabled={!aecInteractable}
-                                    />
-                                    <Box>
-                                        <Text>Animal Ethics Committee's Endorsement</Text>
-                                    </Box>
-                                </Flex>
-                            )
-                        }
-                    </Grid>
-                </Box>
-            </Grid>
- */}
 
       <ProjectPlanEndorsements
         document={document}
@@ -280,11 +141,7 @@ export const ProjectPlanContents = ({
         <Text fontWeight={"bold"} fontSize={"2xl"}>
           Funding
         </Text>
-        <Grid
-          mt={4}
-          // gridRowGap={10}
-          gridTemplateColumns={"repeat(1, 1fr)"}
-        >
+        <Grid mt={4} gridTemplateColumns={"repeat(1, 1fr)"}>
           <RichTextEditor
             canEdit={userInTeam || userData?.is_superuser}
             document_pk={document?.document?.pk}
@@ -390,12 +247,6 @@ export const ProjectPlanContents = ({
           userData={userData}
         />
       </Box>
-
-      {/* <SimpleRichTextEditor
-                key={`no_specimens${editorKey}`} // Change the key to force a re-render
-                data={document?.endorsemeents?.no_specimens}
-                section={"specimens"}
-            /> */}
     </motion.div>
   );
 };

@@ -29,7 +29,6 @@ import { useUser } from "../../../../lib/hooks/useUser";
 import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
 import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { Link } from "react-router-dom";
 import { UserProfile } from "../../Users/UserProfile";
 import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -59,21 +58,7 @@ export const ConceptPlanDocActions = ({
   refetchData,
 }: // , projectPk
 IConceptDocumentActions) => {
-  const [showActions, setShowActions] = useState(false);
-  const handleToggleActionsVisibility = () => {
-    setShowActions(!showActions);
-  };
   const { colorMode } = useColorMode();
-
-  // useEffect(() => {
-  //     console.log(conceptPlanData)
-  //     // console.log(conceptPlanData?.document?.creator)
-  //     // console.log(conceptPlanData?.document?.modifier)
-  //     // console.log(conceptPlanData?.document?.created_at);
-  //     // console.log(conceptPlanData?.document?.updated_at);
-  //     // setCreationDate(conceptPlanData?.document?.created_at);
-  //     // setModifyDate(conceptPlanData?.document?.updated_at);
-  // }, [conceptPlanData])
 
   const {
     isOpen: isS1ApprovalModalOpen,
@@ -108,11 +93,6 @@ IConceptDocumentActions) => {
   } = useDisclosure();
 
   const {
-    isOpen: isS1SendbackModalOpen,
-    onOpen: onS1SendbackModalOpen,
-    onClose: onS1SendbackModalClose,
-  } = useDisclosure();
-  const {
     isOpen: isS2SendbackModalOpen,
     onOpen: onS2SendbackModalOpen,
     onClose: onS2SendbackModalClose,
@@ -128,16 +108,7 @@ IConceptDocumentActions) => {
   const { baData, baLoading } = useBusinessArea(
     conceptPlanData?.document?.project?.business_area?.pk
   );
-  // useEffect(() => {
-  //     if (!baLoading)
-  //         console.log(conceptPlanData)
-  //     console.log(conceptPlanData?.document)
-  //     console.log(baData)
-
-  // }, [baData, baLoading, conceptPlanData])
-  const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
-    baData?.leader
-  );
+  const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
     conceptPlanData?.document?.modifier
   );
@@ -145,32 +116,14 @@ IConceptDocumentActions) => {
     conceptPlanData?.document?.creator
   );
 
-  const { teamData, isTeamLoading, refetchTeamData } = useProjectTeam(
+  const { teamData, isTeamLoading } = useProjectTeam(
     String(conceptPlanData?.document?.project?.pk)
   );
-
-  useEffect(() => {
-    if (!userLoading && !baLoading && !baLeadLoading) {
-      // console.log(
-      //     {
-      //         "ba": baData,
-      //         "leadUser": baLead,
-      //         "me": userData
-      //     }
-      // )
-    }
-  }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
 
   const creationDate = useFormattedDate(conceptPlanData?.document?.created_at);
   const modifyDate = useFormattedDate(conceptPlanData?.document?.updated_at);
 
   const [actionsReady, setActionsReady] = useState(false);
-  const [userIsLeader, setUserIsLeader] = useState(false);
-  // const [teamLeaderPk, setTeamLeaderPk] = useState(0);
-
-  // Find the team member with is_leader === true
-  // const leaderMember = teamData.find((member) => member.is_leader === true);
-
   const [leaderMember, setLeaderMemeber] = useState<IProjectMember>();
 
   useEffect(() => {
@@ -187,23 +140,11 @@ IConceptDocumentActions) => {
       modifier &&
       creator
     ) {
-      // console.log('hereeee')
       if (!isTeamLoading) {
         setLeaderMemeber(teamData.find((member) => member.is_leader === true));
       }
       setActionsReady(true);
     }
-    // else {
-    //     console.log({
-    //         userLoading, baLoading, modifierLoading, creatorLoading, userData, baData, modifier, creator, actionsReady, teamData, isTeamLoading
-    //     })
-    // }
-    // else {
-    //     if (actionsReady === true) {
-    //         setActionsReady(false);
-
-    //     }
-    // }
   }, [
     userLoading,
     baLoading,
@@ -221,8 +162,6 @@ IConceptDocumentActions) => {
   useEffect(() => {
     if (actionsReady) {
       setLeaderMemeber(teamData.find((member) => member.is_leader === true));
-      // console.log(userData);
-      // console.log(conceptPlanData?.document)
     }
   }, [actionsReady, teamData, isTeamLoading]);
 
@@ -238,10 +177,10 @@ IConceptDocumentActions) => {
   } = useDisclosure();
 
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<IDocGenerationProps>();
+  const { register, handleSubmit } = useForm<IDocGenerationProps>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -253,7 +192,7 @@ IConceptDocumentActions) => {
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -287,7 +226,7 @@ IConceptDocumentActions) => {
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -325,7 +264,7 @@ IConceptDocumentActions) => {
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -365,23 +304,16 @@ IConceptDocumentActions) => {
   });
 
   const beginProjectDocPDFDownload = (formData: IDocGenerationProps) => {
-    // const docPk = conceptPlanData?.document?.pk;
     projectPDFDownloadMutation.mutate(formData);
   };
 
   const beginProjectDocPDFGeneration = (formData: IDocGenerationProps) => {
-    // const docPk = conceptPlanData?.document?.pk;
     projectDocPDFGenerationMutation.mutate(formData);
   };
 
   const spawnDocumentFunc = (data: ISpawnDocument) => {
-    console.log(data);
     spawnMutation.mutate(data);
   };
-
-  // useEffect(() => {
-  //     console.log(leaderMember)
-  // }, [leaderMember])
 
   return (
     <>
@@ -512,17 +444,10 @@ IConceptDocumentActions) => {
                     <Text flex={1} fontWeight={"semibold"}>
                       Created
                     </Text>
-                    <Text>
-                      {creationDate}
-                      {/* {creator?.first_name} {creator?.last_name} */}
-                    </Text>
+                    <Text>{creationDate}</Text>
                   </Flex>
 
-                  <Flex
-                    w={"100%"}
-                    // bg={"red"}
-                    justifyContent={"flex-end"}
-                  >
+                  <Flex w={"100%"} justifyContent={"flex-end"}>
                     <Text flex={1} fontWeight={"semibold"}>
                       By
                     </Text>
@@ -543,10 +468,8 @@ IConceptDocumentActions) => {
                   </Flex>
                 </Flex>
                 <Flex
-                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   border={"1px solid"}
                   borderColor={"gray.300"}
-                  // roundedTop={"2xl"}
                   p={2}
                   borderBottom={"0px"}
                   alignItems={"center"}
@@ -650,13 +573,7 @@ IConceptDocumentActions) => {
                 </Text>
               </Box>
 
-              <Grid
-                pt={2}
-                gridTemplateColumns={"repeat(1, 1fr)"}
-                // gridGap={2}
-                // pt={4}
-                // pos={"relative"}
-              >
+              <Grid pt={2} gridTemplateColumns={"repeat(1, 1fr)"}>
                 {/* Project Lead GRID */}
                 <Grid
                   // gridTemplateColumns={"repeat(1, 1fr)"}

@@ -43,10 +43,6 @@ export const ManageTeam = ({
     String(project_id)
   );
 
-  useEffect(() => {
-    if (currentlyDraggingIndex !== null) console.log(currentlyDraggingIndex);
-  }, [currentlyDraggingIndex]);
-
   const [leaderPk, setLeaderPk] = useState();
 
   useEffect(() => {
@@ -65,13 +61,6 @@ export const ManageTeam = ({
     }
   }, [teamData, isTeamLoading, rerenderKey]);
 
-  // useEffect(() => {
-  //     if (!isTeamLoading && teamData) {
-  //         const sortedTeam = [...teamData].sort((a, b) => a.position - b.position);
-  //         setRearrangedTeam(sortedTeam);
-  //     }
-  // }, [rerenderKey, teamData])
-
   const {
     isOpen: isAddUserModalOpen,
     onOpen: onOpenAddUserModal,
@@ -79,7 +68,7 @@ export const ManageTeam = ({
   } = useDisclosure();
   const { colorMode } = useColorMode();
 
-  const handleDragDrop = async (results: any) => {
+  const handleDragDrop = async (results) => {
     setCurrentlyDraggingIndex(null);
 
     const { source, destination, type } = results;
@@ -132,12 +121,7 @@ export const ManageTeam = ({
       reorderedTeam.splice(destinationIndex, 0, removedItem);
 
       // Update the positions of both users and send the updated reorderedTeam
-      const updatedTeam = await updateTeamMemberPosition(
-        project_id,
-        reorderedTeam
-      );
-      console.log("Before setRearrangedTeam:", rearrangedTeam);
-      console.log("Updated team:", updatedTeam);
+      await updateTeamMemberPosition(project_id, reorderedTeam);
 
       // After 1 second, set the backgroundColor to yellow and then reset it to undefined
       setTimeout(() => {
@@ -156,44 +140,7 @@ export const ManageTeam = ({
     }
   };
 
-  // useEffect(() => {
-  //     setBackgroundColors({});
-
-  //     setTimeout(() => {
-  //         // Reset all background colors to undefined
-  //         setBackgroundColors({});
-  //     }, 1000);
-  // }, [backgroundColors]);
-
-  // useEffect(() => {
-  //         // After 1 second, set the backgroundColor to yellow and then reset it to undefined
-  //         setTimeout(() => {
-  //             const newBackgroundColors = { ...backgroundColors };
-  //             newBackgroundColors[removedItem.user.pk] = "green.400";
-  //             setBackgroundColors(newBackgroundColors);
-
-  //             setTimeout(() => {
-  //                 setBackgroundColors({});
-  //             }, 250);
-  //         }, 150);
-
-  //         // setRearrangedTeam(updatedTeam);
-  //         refetchTeamData()
-  // }, [rearrangedTeam])
-
   const { userLoading, userData } = useUser();
-
-  // useEffect(() => {
-  //     if (!isTeamLoading)
-  //         // console.log("TEAM:", team);
-  //         console.log("TEAMDATA:", teamData);
-
-  // }, [isTeamLoading, teamData])
-
-  // useEffect(() => {
-  //     if (!userLoading)
-  //         console.log(userData)
-  // }, [userLoading, userData])
 
   return (
     !userLoading &&
