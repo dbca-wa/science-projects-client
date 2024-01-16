@@ -1,14 +1,6 @@
-import {
-  FORMAT_TEXT_COMMAND,
-  INSERT_LINE_BREAK_COMMAND,
-  LexicalEditor,
-} from "lexical";
+import { INSERT_LINE_BREAK_COMMAND, LexicalEditor } from "lexical";
 import { useEffect, useState } from "react";
-import {
-  $createTableNodeWithDimensions,
-  INSERT_TABLE_COMMAND,
-  TableNode,
-} from "@lexical/table";
+import { INSERT_TABLE_COMMAND } from "@lexical/table";
 import {
   Button,
   Flex,
