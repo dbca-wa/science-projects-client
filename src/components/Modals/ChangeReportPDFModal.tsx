@@ -1,10 +1,9 @@
+// Modal for updating a report's pdf
 import {
   Button,
   Text,
   FormControl,
   FormLabel,
-  Input,
-  InputGroup,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -13,32 +12,19 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Textarea,
   ToastId,
   useColorMode,
-  useDisclosure,
   useToast,
-  FormHelperText,
   Box,
   Flex,
   Divider,
   AbsoluteCenter,
 } from "@chakra-ui/react";
-import { MdOutlineTitle } from "react-icons/md";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "../../lib/hooks/useUser";
-import {
-  IAddPDF,
-  addPDFToReport,
-  deleteFinalAnnualReportPDF,
-  updateReportPDF,
-} from "../../lib/api";
-import { useGetARARsWithoputPDF } from "../../lib/hooks/useGetARARsWithoputPDF";
+import { deleteFinalAnnualReportPDF, updateReportPDF } from "../../lib/api";
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
-import { report } from "process";
-import { IReport, ISmallReport } from "../../types";
+import { ISmallReport } from "@/types";
 
 interface Props {
   isChangePDFOpen: boolean;
@@ -55,12 +41,10 @@ export const ChangeReportPDFModal = ({
 }: Props) => {
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
-  // const { register, handleSubmit, reset, watch } = useForm<IAddPDF>();
-  // const reportPk = watch('reportMediaId');
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -68,21 +52,10 @@ export const ChangeReportPDFModal = ({
   const [reportMediaId, setReportMediaId] = useState<number>();
   const [isError, setIsError] = useState(false);
 
-  const { userData, userLoading } = useUser();
-  // const { reportsWithoutPDFLoading, reportsWithoutPDFData, refetchReportsWithoutPDFs } = useGetARARsWithoputPDF();
-
   useEffect(() => {
     console.log(report);
     setReportMediaId(report && report?.pdf?.pk);
   }, [report]);
-
-  // const downloadPDF = (report) => {
-  //     console.log(report);
-  //     console.log(report.pdf.file);
-  //     if (report.pdf.file) {
-  //         console.log('downloading file')
-  //     }
-  // }
 
   const ararPDFChangeMutation = useMutation(updateReportPDF, {
     onMutate: () => {
@@ -92,7 +65,7 @@ export const ChangeReportPDFModal = ({
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -135,7 +108,7 @@ export const ChangeReportPDFModal = ({
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",

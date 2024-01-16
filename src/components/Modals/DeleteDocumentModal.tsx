@@ -20,19 +20,12 @@ import {
   Grid,
   Button,
 } from "@chakra-ui/react";
-import {
-  IDeleteDocument,
-  ISimplePkProp,
-  deleteDocumentCall,
-  deleteProjectCall,
-} from "../../lib/api";
-import { useEffect, useRef } from "react";
+import { IDeleteDocument, deleteDocumentCall } from "../../lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { IUserMe } from "../../types";
 import { useForm } from "react-hook-form";
 import { useGetStudentReportAvailableReportYears } from "../../lib/hooks/useGetStudentReportAvailableReportYears";
 import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/useGetProgressReportAvailableReportYears";
+import { useRef } from "react";
 
 interface Props {
   projectPk: string | number;
@@ -60,21 +53,16 @@ export const DeleteDocumentModal = ({
   onDeleteSuccess,
   setToLastTab,
 }: Props) => {
-  const navigate = useNavigate();
-  const {
-    availableProgressReportYearsLoading,
-    availableProgressReportYearsData,
-    refetchProgressYears,
-  } = useGetProgressReportAvailableReportYears(Number(projectPk));
-  const {
-    availableStudentYearsLoading,
-    availableStudentYearsData,
-    refetchStudentYears,
-  } = useGetStudentReportAvailableReportYears(Number(projectPk));
+  const { refetchProgressYears } = useGetProgressReportAvailableReportYears(
+    Number(projectPk)
+  );
+  const { refetchStudentYears } = useGetStudentReportAvailableReportYears(
+    Number(projectPk)
+  );
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -89,7 +77,7 @@ export const DeleteDocumentModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -107,12 +95,8 @@ export const DeleteDocumentModal = ({
         });
         onDeleteSuccess && onDeleteSuccess();
       }
-      // onClose();
 
       setTimeout(async () => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries(["projects", projectPk]);
         await refetchData();
         onClose();
@@ -135,15 +119,11 @@ export const DeleteDocumentModal = ({
   });
 
   const deleteDocument = (formData: IDeleteDocument) => {
-    // console.log(formData);
     deleteDocumentMutation.mutate(formData);
   };
 
   const { colorMode } = useColorMode();
-  const { register, handleSubmit, reset, watch } = useForm<IDeleteDocument>();
-
-  const projPk = watch("projectPk");
-  // useEffect(() => console.log(projPk, projectPk), [projectPk, projPk]);
+  const { register, handleSubmit, reset } = useForm<IDeleteDocument>();
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>

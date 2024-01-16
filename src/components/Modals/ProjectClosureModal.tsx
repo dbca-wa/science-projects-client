@@ -23,20 +23,11 @@ import {
   Box,
   FormLabel,
   FormHelperText,
-  Textarea,
 } from "@chakra-ui/react";
-import {
-  ICloseProjectProps,
-  ISimplePkProp,
-  closeProjectCall,
-  deleteProjectCall,
-} from "../../lib/api";
+import { ICloseProjectProps, closeProjectCall } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { IUserMe } from "../../types";
 import { useForm } from "react-hook-form";
-import { SimpleStateRichTextEditor } from "../RichTextEditor/Editors/SimpleStateRichTextEditor";
 
 interface Props {
   // thisUser: IUserMe;
@@ -55,20 +46,15 @@ export const ProjectClosureModal = ({
   refetchData,
   setToLastTab,
 }: Props) => {
-  const { register, handleSubmit, reset, watch } =
-    useForm<ICloseProjectProps>();
+  const { register, handleSubmit, watch } = useForm<ICloseProjectProps>();
   const [closureReason, setClosureReason] = useState("");
   const reasonValue = watch("reason");
   const outcomeValue = watch("outcome");
   const projPk = watch("projectPk");
 
-  // useEffect(() => console.log({ outcomeValue, closureReason }), [closureReason, outcomeValue])
-
-  const navigate = useNavigate();
-
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -83,7 +69,7 @@ export const ProjectClosureModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -96,18 +82,10 @@ export const ProjectClosureModal = ({
       }
 
       setTimeout(async () => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries(["projects", projectPk]);
         await refetchData();
-        // console.log("cheese")
         setToLastTab(-1);
         onClose();
-
-        // navigate('/projects');
-
-        // queryClient.refetchQueries([`mytasks`])
       }, 350);
     },
     onError: (error) => {
@@ -124,9 +102,7 @@ export const ProjectClosureModal = ({
     },
   });
 
-  const closeProject = (formData: ICloseProjectProps) => {
-    // console.log(formData);
-    // console.log(reasonValue, projPk, outcomeValue);
+  const closeProject = () => {
     const newForm = {
       reason: reasonValue,
       projectPk: projPk,
@@ -136,8 +112,6 @@ export const ProjectClosureModal = ({
   };
 
   const { colorMode } = useColorMode();
-
-  // useEffect(() => console.log(projPk, projectPk), [projectPk, projPk])
 
   useEffect(() => {
     let prefillText = "";
@@ -156,16 +130,8 @@ export const ProjectClosureModal = ({
     } else {
       prefillHtml = `<p class='editor-p-dark'>${prefillText}</p>`;
     }
-    // console.log(prefillHtml)
     setClosureReason(prefillHtml);
   }, [colorMode, outcomeValue]);
-
-  useEffect(() => {
-    if (closureReason !== "") {
-      // console.log(closureReason)
-      // document.querySelector('[name="reason"]').value = closureReason;
-    }
-  }, [closureReason]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>

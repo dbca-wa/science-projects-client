@@ -1,3 +1,5 @@
+// Modal for handling creation of student reports
+
 import {
   Text,
   Center,
@@ -27,7 +29,6 @@ import {
 import { ISpawnDocument, spawnNewEmptyDocument } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useGetStudentReportAvailableReportYears } from "../../lib/hooks/useGetStudentReportAvailableReportYears";
 
@@ -56,8 +57,6 @@ export const CreateStudentReportModal = ({
 
   const yearValue = watch("year");
 
-  // useEffect(() => console.log(yearValue), [yearValue]);
-
   const projPk = watch("projectPk");
 
   const [selectedReportId, setSelectedReportId] = useState<number>();
@@ -72,7 +71,6 @@ export const CreateStudentReportModal = ({
       const obj = availableStudentYearsData.find(
         (item) => Number(item.year) === Number(yearValue)
       );
-      // console.log(obj)
       setSelectedReportId(obj.pk);
     }
   }, [
@@ -82,15 +80,13 @@ export const CreateStudentReportModal = ({
     availableStudentYearsLoading,
   ]);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     refetchStudentYears();
   }, [selectedReportId]);
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -105,7 +101,7 @@ export const CreateStudentReportModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -119,12 +115,8 @@ export const CreateStudentReportModal = ({
           reset();
         });
       }
-      // onClose();
 
       setTimeout(() => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries(["projects", projectPk]);
         refetchData();
         onClose();
@@ -152,14 +144,10 @@ export const CreateStudentReportModal = ({
       projectPk: formData.projectPk,
     };
 
-    // console.log(newFormData);
-
     createStudentReportMutation.mutate(newFormData);
   };
 
   const { colorMode } = useColorMode();
-
-  // useEffect(() => console.log(projPk, projectPk), [projectPk, projPk])
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>

@@ -30,9 +30,8 @@ import {
   MutationError,
   MutationSuccess,
   deactivateUserAdmin,
-  deleteUserAdmin,
 } from "../../lib/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useUserSearchContext } from "../../lib/hooks/UserSearchContext";
 
 interface IModalProps {
@@ -47,15 +46,10 @@ export const DeactivateUserModal = ({
   isOpen,
   onClose,
   userIsSuper,
-  userIsMe,
   userPk,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const {
-    isOpen: isToastOpen,
-    onOpen: openToast,
-    onClose: closeToast,
-  } = useDisclosure();
+  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
 
   useEffect(() => {
     if (isToastOpen) {
@@ -73,19 +67,11 @@ export const DeactivateUserModal = ({
   // Toast
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
-  const queryClient = useQueryClient();
-
-  const {
-    register,
-    // setValue,
-    reset,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<AdminSwitchVar>();
+  const { register, handleSubmit } = useForm<AdminSwitchVar>();
 
   const deactivationMutation = useMutation<
     MutationSuccess,
@@ -127,7 +113,7 @@ export const DeactivateUserModal = ({
       console.log(error);
       let errorMessage = "An error occurred while deactivating"; // Default error message
 
-      const collectErrors: any = (data: any, prefix = "") => {
+      const collectErrors = (data, prefix = "") => {
         if (typeof data === "string") {
           return [data];
         }
@@ -172,7 +158,6 @@ export const DeactivateUserModal = ({
   });
 
   const onSubmit = async ({ userPk }: AdminSwitchVar) => {
-    console.log("Submitted deactivated");
     await deactivationMutation.mutateAsync({ userPk });
     onClose();
   };
@@ -208,8 +193,6 @@ export const DeactivateUserModal = ({
             <Center mt={6} p={5}>
               <Text>If this is okay, please proceed.</Text>
             </Center>
-            {/* <Text>You can't demote yourself.</Text>
-                    <Text>You can't delete yourself.</Text> */}
           </ModalBody>
           <ModalFooter>
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>

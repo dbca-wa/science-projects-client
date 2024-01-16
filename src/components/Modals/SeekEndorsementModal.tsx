@@ -7,10 +7,7 @@ import {
   Button,
   Center,
   Flex,
-  FormControl,
   Grid,
-  Input,
-  InputGroup,
   ListItem,
   Modal,
   ModalBody,
@@ -25,19 +22,10 @@ import {
   useColorMode,
   Checkbox,
   Box,
-  FormErrorMessage,
 } from "@chakra-ui/react";
-import {
-  ISimplePkProp,
-  ISpecialEndorsement,
-  deleteProjectCall,
-  seekEndorsementAndSave,
-} from "../../lib/api";
-import { useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { IUserMe } from "../../types";
-import { useForm } from "react-hook-form";
+import { ISpecialEndorsement, seekEndorsementAndSave } from "../../lib/api";
+import { useRef, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 interface Props {
   projectPlanPk: number;
@@ -66,17 +54,14 @@ export const SeekEndorsementModal = ({
   onClose,
   refetchEndorsements,
 }: Props) => {
-  const navigate = useNavigate();
-
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
   const [shouldSendEmails, setShouldSendEmails] = useState(false);
   // Mutation, query client, onsubmit, and api function
-  const queryClient = useQueryClient();
 
   const seekEndorsementAndSaveMutation = useMutation(seekEndorsementAndSave, {
     onMutate: () => {
@@ -86,7 +71,7 @@ export const SeekEndorsementModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -121,33 +106,11 @@ export const SeekEndorsementModal = ({
     },
   });
 
-  // useEffect(() => console.log(errors));
-
   const seekEndorsementAndSaveFunc = (formData: ISpecialEndorsement) => {
-    // console.log(formData);
     seekEndorsementAndSaveMutation.mutate(formData);
   };
 
   const { colorMode } = useColorMode();
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors },
-  } = useForm<ISpecialEndorsement>();
-
-  // const projPlanPk = watch('projectPlanPk');
-  // const aecPDFFile = watch('aecPDFFile');
-
-  // useEffect(() => {
-  //     console.log({
-  //         projPlanPk,
-  //         bmEndorsementRequired, bmEndorsementProvided,
-  //         herbariumEndorsementRequired, herbariumEndorsementProvided,
-  //         aecEndorsementRequired, aecEndorsementProvided, aecPDFFile,
-  //     });
-  // })
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
@@ -261,33 +224,6 @@ export const SeekEndorsementModal = ({
               </Center>
             ) : null}
 
-            {/* <FormControl>
-                            <InputGroup>
-                                <Input type="hidden" {...register("projectPlanPk", { required: true, value: Number(projectPlanPk) })} readOnly />
-                            </InputGroup>
-                            <InputGroup>
-                                <Input type="hidden" {...register("aecEndorsementRequired", { required: true, value: aecEndorsementRequired })} readOnly />
-                            </InputGroup>
-                            <InputGroup>
-                                <Input type="hidden" {...register("aecEndorsementProvided", { required: true, value: aecEndorsementProvided })} readOnly />
-                            </InputGroup>
-                            <InputGroup>
-                                <Input type="hidden" {...register("herbariumEndorsementRequired", { required: true, value: herbariumEndorsementRequired })} readOnly />
-                            </InputGroup>
-                            <InputGroup>
-                                <Input type="hidden" {...register("herbariumEndorsementProvided", { required: true, value: herbariumEndorsementProvided })} readOnly />
-                            </InputGroup>
-                            <InputGroup>
-                                <Input type="hidden" {...register("bmEndorsementRequired", { required: true, value: bmEndorsementRequired })} readOnly />
-                            </InputGroup>
-                            <InputGroup>
-                                <Input type="hidden" {...register("bmEndorsementProvided", { required: true, value: bmEndorsementProvided })} readOnly />
-                            </InputGroup>
-                            <InputGroup>
-                                <Input type="hidden" {...register("aecPDFFile", { required: false, value: uploadedPDF })} readOnly />
-                            </InputGroup>
-                        </FormControl> */}
-
             {aecPDFFile ? (
               <Box mt={8}>
                 <Text color={"green.500"}>
@@ -302,7 +238,6 @@ export const SeekEndorsementModal = ({
                     display="flex"
                     flex={1}
                     minH={"40px"}
-                    // bg={"blue"}
                     alignItems="center"
                   >
                     <Text
@@ -314,52 +249,6 @@ export const SeekEndorsementModal = ({
                 </Flex>
               </Box>
             ) : null}
-            {/* {errors ?
-                            <Box
-                                mt={8}
-                            >
-                                <Text>Errors:</Text>
-                                {Object.keys(errors).length > 0 && (
-                                    <div>
-                                        <p>Errors:</p>
-                                        <ul>
-                                            {Object.entries(errors).map(([fieldName, error]) => (
-                                                <li key={fieldName}>
-                                                    <strong>{fieldName}:</strong> {error?.message}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                                {errors.bmEndorsementRequired && (
-                                    <FormErrorMessage>{errors.bmEndorsementRequired.message}</FormErrorMessage>
-                                )}
-                                {errors.bmEndorsementProvided && (
-                                    <FormErrorMessage>{errors.bmEndorsementProvided.message}</FormErrorMessage>
-                                )}
-                                {errors.herbariumEndorsementRequired && (
-                                    <FormErrorMessage>{errors.herbariumEndorsementRequired.message}</FormErrorMessage>
-                                )}
-                                {errors.herbariumEndorsementProvided && (
-                                    <FormErrorMessage>{errors.herbariumEndorsementProvided.message}</FormErrorMessage>
-                                )}
-                                {errors.aecEndorsementRequired && (
-                                    <FormErrorMessage>{errors.aecEndorsementRequired.message}</FormErrorMessage>
-                                )}
-                                {errors.aecEndorsementProvided && (
-                                    <FormErrorMessage>{errors.aecEndorsementProvided.message}</FormErrorMessage>
-                                )}
-                                {errors.aecPDFFile && (
-                                    <FormErrorMessage>{errors.aecPDFFile.message}</FormErrorMessage>
-                                )}
-                                {errors.projectPlanPk && (
-                                    <FormErrorMessage>{errors.projectPlanPk.message}</FormErrorMessage>
-                                )}
-                                {errors.shouldSendEmails && (
-                                    <FormErrorMessage>{errors.shouldSendEmails.message}</FormErrorMessage>
-                                )}
-                            </Box>
-                            : null} */}
           </ModalBody>
           <ModalFooter>
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>

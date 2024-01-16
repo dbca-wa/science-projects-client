@@ -21,10 +21,9 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { ISimplePkProp, deleteProjectCall } from "../../lib/api";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { IUserMe } from "../../types";
 import { useForm } from "react-hook-form";
 
 interface Props {
@@ -40,7 +39,7 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -55,7 +54,7 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -66,16 +65,10 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
           isClosable: true,
         });
       }
-      // onClose();
 
       setTimeout(() => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries(["projects", projectPk]);
         navigate("/projects");
-
-        // queryClient.refetchQueries([`mytasks`])
       }, 350);
     },
     onError: (error) => {
@@ -93,15 +86,11 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
   });
 
   const deleteProject = (formData: ISimplePkProp) => {
-    // console.log(formData)
     deleteProjectMutation.mutate(formData);
   };
 
   const { colorMode } = useColorMode();
-  const { register, handleSubmit, reset, watch } = useForm<ISimplePkProp>();
-
-  const projPk = watch("pk");
-  // useEffect(() => console.log(projPk, projectPk), [projectPk, projPk])
+  const { register, handleSubmit } = useForm<ISimplePkProp>();
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
