@@ -25,13 +25,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
 import { TraditionalPersonalTaskDisplay } from "./TraditionalPersonalTaskDisplay";
-import { AddIcon } from "@chakra-ui/icons";
-import { GoProjectRoadmap } from "react-icons/go";
-import { SimpleDisplaySRTE } from "../../RichTextEditor/Editors/Sections/SimpleDisplayRTE";
-// import { useGetDocumentsPendingApproval } from "../../../lib/hooks/useGetDocumentsPendingApproval"
-import { HiDocumentCheck } from "react-icons/hi2";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
-import { FaArrowRight, FaUserFriends } from "react-icons/fa";
+import { FaUserFriends } from "react-icons/fa";
 import { MdScience } from "react-icons/md";
 import { GiMaterialsScience } from "react-icons/gi";
 import { RiBook3Fill } from "react-icons/ri";
@@ -56,9 +51,6 @@ interface Props {
 export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
   const { taskData, tasksLoading } = useGetMyTasks();
   const [taskDataState, setTaskDataState] = useState<ITaskFromAPI | null>(null); // Replace 'null' with initial data or a loading state if required
-  const [inprogress, setInprogress] = useState<ITaskDisplayCard[]>([]);
-  const [todo, setTodo] = useState<ITaskDisplayCard[]>([]);
-  const [done, setDone] = useState<ITaskDisplayCard[]>([]);
   const [combinedData, setCombinedData] = useState<ITaskDisplayCard[]>([]);
 
   useEffect(() => {
@@ -78,34 +70,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
   const { pendingEndorsementsData, pendingEndorsementsDataLoading } =
     useGetEndorsementsPendingMyAction();
 
-  // useEffect(() => {
-  //     console.log(pendingProjectDocumentData)
-  // }, [pendingProjectDocumentData])
-
-  // useEffect(() => {
-  //     console.log(pendingEndorsementsData)
-  // }, [pendingEndorsementsData])
-
   const { colorMode } = useColorMode();
-
-  const formattedKind = (kind: string) => {
-    // "conceptplan" | "projectplan" | "progressreport" | "studentreport" | "projectclosure"
-    if (kind === "concept" || kind === "conceptplan") {
-      return "Concept Plan";
-    } else if (kind === "projectplan") {
-      return "Project Plan";
-    } else if (kind === "progressreport") {
-      return "Progress Report";
-    } else if (kind === "projectclosure") {
-      return "Project Closure";
-    } else if (kind === "studentreport") {
-      return "Student Report";
-    } else {
-      // catchall
-
-      return kind;
-    }
-  };
   const me = useUser();
 
   // Once the component receives new data, update the state accordingly
@@ -120,13 +85,6 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
             new Date(a.date_assigned).getTime()
         );
       const sortedAssignedTodo = taskDataState.todo
-        .filter((item) => item.task_type === "assigned")
-        .sort(
-          (a, b) =>
-            new Date(b.date_assigned).getTime() -
-            new Date(a.date_assigned).getTime()
-        );
-      const sortedAssignedDone = taskDataState.done
         .filter((item) => item.task_type === "assigned")
         .sort(
           (a, b) =>
@@ -149,55 +107,18 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
             new Date(b.date_assigned).getTime() -
             new Date(a.date_assigned).getTime()
         );
-      const sortedPersonalDone = taskDataState.done
-        .filter((item) => item.task_type === "personal")
-        .sort(
-          (a, b) =>
-            new Date(b.date_assigned).getTime() -
-            new Date(a.date_assigned).getTime()
-        );
 
       // Combine the sorted arrays, with "assigned" tasks coming first
       const combinedData = [
         ...sortedAssignedInprogress,
         ...sortedAssignedTodo,
-        // ...sortedAssignedDone,
         ...sortedPersonalInprogress,
         ...sortedPersonalTodo,
-        // ...sortedPersonalDone,
       ];
 
-      setInprogress(
-        combinedData.filter(
-          (item) =>
-            item.task_type === "assigned" && item.status === "inprogress"
-        )
-      );
-      setTodo(
-        combinedData.filter(
-          (item) => item.task_type === "assigned" && item.status === "todo"
-        )
-      );
-      setDone(
-        combinedData.filter(
-          (item) => item.task_type === "assigned" && item.status === "done"
-        )
-      );
       setCombinedData(combinedData);
     }
   }, [taskDataState, tasksLoading]);
-
-  // useEffect(() => {
-  //     setCombinedData((prev) => ...prev + )
-
-  // }, [pendingProjectDocumentData, projectDocumentDataLoading])
-
-  // const defaultIndex = [
-  //     (taskData?.inprogress.length + taskData?.todo.length) <= 5
-  //         && (taskData?.inprogress?.length + taskData?.todo?.length) >= 1 ? 0 : null,
-  //     1
-  //     // projectData?.length <= 5 && projectData?.length >= 1 ? 1 : null,
-  // ].map((index) => (index !== null ? index : -1));
 
   const { isOnProjectsPage } = useProjectSearchContext();
   const navigate = useNavigate();
@@ -212,29 +133,6 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
     }
   };
 
-  const goToProjectDocument = (pk: number | undefined, document: IMainDoc) => {
-    let urlkind = "";
-    if (document?.kind === "progressreport") {
-      urlkind = "progress";
-    } else if (document?.kind === "projectclosure") {
-      urlkind = "closure";
-    } else if (document?.kind === "studentreport") {
-      urlkind = "student";
-    } else if (document?.kind === "concept") {
-      urlkind = "concept";
-    } else if (document?.kind === "projectplan") {
-      urlkind = "project";
-    }
-
-    if (pk === undefined) {
-      console.log("The Pk is undefined. Potentially use 'id' instead.");
-    } else if (isOnProjectsPage) {
-      navigate(`${pk}/${urlkind}`);
-    } else {
-      navigate(`projects/${pk}/${urlkind}`);
-    }
-  };
-
   const handleAddTaskClick = () => {
     // console.log("Clicked add button");
     onAddTaskOpen();
@@ -243,13 +141,6 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
   const boxShadow = useBoxShadow();
 
   return (
-    // {
-    //     !tasksLoading && !projectsLoading && !pendingProjectDocumentDataLoading ? (
-    //         )
-    //         : <Center>
-    //             <Spinner />
-    //         </Center>
-    // }
     <>
       <Box mt={6}>
         <Accordion
@@ -291,23 +182,14 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                   {combinedData?.length +
                     pendingProjectDocumentData?.all?.length >=
                   1 ? (
-                    // pendingProjectDocumentData?.team?.length +
-                    // pendingProjectDocumentData?.ba?.length +
-                    // pendingProjectDocumentData?.directorate?.length
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
                       alignItems={"center"}
                     >
                       <Box mr={2}>
-                        {
-                          combinedData?.length +
-                            pendingProjectDocumentData?.all?.length
-
-                          // pendingProjectDocumentData?.team?.length +
-                          // pendingProjectDocumentData?.ba?.length +
-                          // pendingProjectDocumentData?.directorate?.length
-                        }
+                        {combinedData?.length +
+                          pendingProjectDocumentData?.all?.length}
                       </Box>
                       <FcHighPriority />
                     </Box>
@@ -318,82 +200,74 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                 </AccordionButton>
 
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
-                  {
-                    combinedData?.length +
-                      pendingProjectDocumentData?.all?.length >=
-                    // pendingProjectDocumentData?.team?.length +
-                    // pendingProjectDocumentData?.ba?.length +
-                    // pendingProjectDocumentData?.directorate?.length
-                    1 ? (
-                      <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
-                        {combinedData.map(
-                          (task: ITaskDisplayCard, index: number) => {
-                            return (
-                              <TraditionalPersonalTaskDisplay
-                                key={index}
-                                task={task}
-                              />
-                            );
-                          }
-                        )}
+                  {combinedData?.length +
+                    pendingProjectDocumentData?.all?.length >=
+                  1 ? (
+                    <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
+                      {combinedData.map(
+                        (task: ITaskDisplayCard, index: number) => {
+                          return (
+                            <TraditionalPersonalTaskDisplay
+                              key={index}
+                              task={task}
+                            />
+                          );
+                        }
+                      )}
 
-                        {!(
-                          pendingProjectDocumentDataLoading &&
-                          pendingProjectDocumentData?.team?.length +
-                            pendingProjectDocumentData?.lead?.length +
-                            pendingProjectDocumentData?.ba?.length +
-                            pendingProjectDocumentData?.directorate?.length >=
-                            1
-                        )
-                          ? [
-                              ...pendingProjectDocumentData.team.map(
-                                (document) => ({
-                                  document,
-                                  inputKind: "team_member",
-                                })
-                              ),
-                              ...pendingProjectDocumentData.lead.map(
-                                (document) => ({
-                                  document,
-                                  inputKind: "project_lead",
-                                })
-                              ),
-                              ...pendingProjectDocumentData.ba.map(
-                                (document) => ({
-                                  document,
-                                  inputKind: "business_area_lead",
-                                })
-                              ),
-                              ...pendingProjectDocumentData.directorate.map(
-                                (document) => ({
-                                  document,
-                                  inputKind: "directorate",
-                                })
-                              ),
-                            ]?.map(({ document, inputKind }, index: number) => (
-                              <TraditionalDocumentTaskDisplay
-                                key={index}
-                                document={document}
-                                inputKind={inputKind}
-                              />
-                            ))
-                          : null}
-                      </Grid>
-                    ) : (
-                      <Center>
-                        <Flex>
-                          <Center pt={10}>
-                            <FcOk />
-                            &nbsp;
-                            <Text>All done!</Text>
-                          </Center>
-                        </Flex>
-                      </Center>
-                    )
-                    // }
-
-                    // )
-                  }
+                      {!(
+                        pendingProjectDocumentDataLoading &&
+                        pendingProjectDocumentData?.team?.length +
+                          pendingProjectDocumentData?.lead?.length +
+                          pendingProjectDocumentData?.ba?.length +
+                          pendingProjectDocumentData?.directorate?.length >=
+                          1
+                      )
+                        ? [
+                            ...pendingProjectDocumentData.team.map(
+                              (document) => ({
+                                document,
+                                inputKind: "team_member",
+                              })
+                            ),
+                            ...pendingProjectDocumentData.lead.map(
+                              (document) => ({
+                                document,
+                                inputKind: "project_lead",
+                              })
+                            ),
+                            ...pendingProjectDocumentData.ba.map(
+                              (document) => ({
+                                document,
+                                inputKind: "business_area_lead",
+                              })
+                            ),
+                            ...pendingProjectDocumentData.directorate.map(
+                              (document) => ({
+                                document,
+                                inputKind: "directorate",
+                              })
+                            ),
+                          ]?.map(({ document, inputKind }, index: number) => (
+                            <TraditionalDocumentTaskDisplay
+                              key={index}
+                              document={document}
+                              inputKind={inputKind}
+                            />
+                          ))
+                        : null}
+                    </Grid>
+                  ) : (
+                    <Center>
+                      <Flex>
+                        <Center pt={10}>
+                          <FcOk />
+                          &nbsp;
+                          <Text>All done!</Text>
+                        </Center>
+                      </Flex>
+                    </Center>
+                  )}
 
                   <Box
                     display="flex"
@@ -417,7 +291,6 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                       size={"sm"}
                     >
                       Add Quick Task
-                      {/* <AddIcon ml={2} color="white" /> */}
                     </Button>
                   </Box>
                 </AccordionPanel>

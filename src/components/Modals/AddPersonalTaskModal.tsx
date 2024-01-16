@@ -16,14 +16,14 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import { IQuickTask, IUserData } from "../../types";
+import { IQuickTask, IUserMe } from "../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useRef } from "react";
 import { createPersonalTask } from "../../lib/api";
 
 interface IUserInterface {
-  userData: IUserData;
+  userData: IUserMe;
   isLoggedIn: boolean;
   userLoading: boolean;
 }

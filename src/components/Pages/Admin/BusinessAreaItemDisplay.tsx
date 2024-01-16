@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Center,
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -9,30 +8,21 @@ import {
   DrawerOverlay,
   Flex,
   FormControl,
-  FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Grid,
-  HStack,
   Image,
-  Input,
-  InputGroup,
-  InputLeftAddon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   Skeleton,
   Text,
-  Textarea,
   VStack,
   useColorMode,
   useDisclosure,
@@ -42,23 +32,17 @@ import { BusinessAreaImage, IBusinessArea } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { FaSign } from "react-icons/fa";
 import { deleteBusinessArea, updateBusinessArea } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
 import { useNoImage } from "../../../lib/hooks/useNoImage";
-import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
-import { SetStateAction, useState } from "react";
 import { TextButtonFlex } from "../../TextButtonFlex";
-import { SimpleStateRichTextEditor } from "@/components/RichTextEditor/Editors/SimpleStateRichTextEditor";
-import { SimpleStatefulRTE } from "@/components/RichTextEditor/Editors/Sections/SimpleStatefulRTE";
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import { StatefulMediaChanger } from "./StatefulMediaChanger";
-// import { useEffect } from "react";
-// import NoImageFile from '/sad-face.gif'
 import useDistilledHtml from "./../../../lib/hooks/useDistilledHtml";
+import { useState } from "react";
 
 export const BusinessAreaItemDisplay = ({
   pk,
@@ -71,13 +55,7 @@ export const BusinessAreaItemDisplay = ({
   introduction,
   image,
 }: IBusinessArea) => {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm<IBusinessArea>();
+  const { register, handleSubmit } = useForm<IBusinessArea>();
 
   const toast = useToast();
   const {
@@ -101,12 +79,6 @@ export const BusinessAreaItemDisplay = ({
 
   const NoImageFile = useNoImage();
   const apiEndpoint = useApiEndpoint();
-  // console.log(`${apiEndpoint}/files/${image.file}`)
-
-  const [imageLoadFailed, setImageLoadFailed] = useState(false);
-  const noImageLink = useNoImage();
-  // const imageUrl = useServerImageUrl(noImageLink);
-  const baseUrl = useApiEndpoint();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
@@ -353,27 +325,6 @@ export const BusinessAreaItemDisplay = ({
           <TextButtonFlex />
         )}
 
-        {/* 
-                    <Flex
-                        alignItems={"center"}
-
-                    >
-                        {
-                            !financeAdminLoading && (
-                                financeAdminData ?
-                                    <Button
-                                        variant={"link"}
-                                        colorScheme="blue"
-                                        onClick={financeAdminDrawerFunction}
-                                    >
-                                        {`${financeAdminData.first_name} ${financeAdminData.last_name}`}
-                                    </Button> :
-                                    <Text>Unset</Text>
-
-                            )
-                        }
-
-                    </Flex> */}
         {!dataCustodianLoading && dataCustodianData ? (
           <TextButtonFlex
             name={`${dataCustodianData.first_name} ${dataCustodianData.last_name}`}
@@ -382,25 +333,6 @@ export const BusinessAreaItemDisplay = ({
         ) : (
           <TextButtonFlex />
         )}
-        {/* <Flex
-                        alignItems={"center"}
-                    >
-                        {
-                            !dataCustodianLoading && (
-                                dataCustodianData ?
-                                    <Button
-                                        variant={"link"}
-                                        colorScheme="blue"
-                                        onClick={dataCustodianDrawerFunction}
-                                    >
-                                        {`${dataCustodianData.first_name} ${dataCustodianData.last_name}`}
-                                    </Button> :
-                                    <Text>Unset</Text>
-
-                            )
-                        }
-
-                    </Flex> */}
 
         <Flex justifyContent="flex-end" mr={2} alignItems={"center"}>
           <Menu>
@@ -556,7 +488,7 @@ export const BusinessAreaItemDisplay = ({
                   isEditable
                   label="Leader"
                   placeholder="Search for a user"
-                  helperText={<>The Leader of the business area.</>}
+                  helperText={"The Leader of the business area."}
                 />
               </FormControl>
 
@@ -570,7 +502,7 @@ export const BusinessAreaItemDisplay = ({
                   isEditable
                   label="Finance Admin"
                   placeholder="Search for a user"
-                  helperText={<>The Finance Admin of the business area.</>}
+                  helperText={"The Finance Admin of the business area."}
                 />
               </FormControl>
               <FormControl ml={2}>
@@ -583,7 +515,7 @@ export const BusinessAreaItemDisplay = ({
                   isEditable
                   label="Data Custodian"
                   placeholder="Search for a user"
-                  helperText={<>The Data Custodian of the business area.</>}
+                  helperText={"The Data Custodian of the business area."}
                 />
               </FormControl>
               {updateMutation.isError ? (
@@ -611,20 +543,6 @@ export const BusinessAreaItemDisplay = ({
                 }}
                 size="lg"
                 onClick={() => {
-                  console.log("clicked");
-                  // console.log({
-                  //   pk: pk,
-                  //   agency: 1,
-                  //   old_id: 1,
-                  //   name: nameData,
-                  //   slug: slug,
-                  //   leader: selectedLeader,
-                  //   data_custodian: selectedDataCustodian,
-                  //   finance_admin: selectedFinanceAdmin,
-                  //   focus: focusData,
-                  //   introduction: introductionData,
-                  //   image: image,
-                  // });
                   onUpdateSubmit({
                     pk: pk,
                     agency: 1,

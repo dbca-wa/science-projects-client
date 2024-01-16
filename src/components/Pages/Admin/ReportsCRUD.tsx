@@ -10,7 +10,6 @@ import {
   FormControl,
   Input,
   InputGroup,
-  InputLeftAddon,
   VStack,
   useDisclosure,
   Center,
@@ -20,38 +19,28 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   FormLabel,
-  Textarea,
-  Checkbox,
   useToast,
-  Select,
   FormHelperText,
   Switch,
   useColorMode,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { createReport, getAllReports } from "../../../lib/api";
-import _ from "lodash";
-import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IReport, IReportCreation } from "../../../types";
 import { ReportItemDisplay } from "./ReportItemDisplay";
-// import { CalendarWithCSS } from "../CreateProject/CalendarWithCSS";
 import { AxiosError } from "axios";
 import { StartAndEndDateSelector } from "../CreateProject/StartAndEndDateSelector";
 
 export const ReportsCRUD = () => {
-  const { register, handleSubmit, watch } = useForm<IReportCreation>();
+  const { register, watch } = useForm<IReportCreation>();
 
   const yearData = watch("year");
-  // const [selectedDates, setSelectedDates] = useState([null, null]);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const seekUpdateValue = watch("seek_update");
-  // useEffect(() => {
-  //     console.log(selectedDates)
-  // }, [selectedDates])
 
   const toast = useToast();
   const {
@@ -62,19 +51,16 @@ export const ReportsCRUD = () => {
 
   const queryClient = useQueryClient();
   const mutation = useMutation(createReport, {
-    onSuccess: (data: IReport) => {
-      // console.log("success")
+    onSuccess: () => {
       toast({
         status: "success",
         title: "Created",
         position: "top-right",
       });
-      console.log(data);
       onAddClose();
       queryClient.invalidateQueries(["reports"]);
     },
     onError: (e: AxiosError) => {
-      // console.log(Array.isArray(e.response.data))
       let errorDescription = "";
 
       // Check if e.response.data is an object
@@ -130,13 +116,7 @@ export const ReportsCRUD = () => {
         <>
           <Box maxW={"100%"} maxH={"100%"} w={"100%"}>
             <Flex width={"100%"} mt={4} justifyContent={"space-between"}>
-              <Box
-                alignItems={"center"}
-                display={"flex"}
-                flex={1}
-                ml={1}
-                //   bg={"red"}
-              >
+              <Box alignItems={"center"} display={"flex"} flex={1} ml={1}>
                 <Text fontWeight={"semibold"} fontSize={"lg"}>
                   Reports ({countOfItems})
                 </Text>
@@ -220,7 +200,6 @@ export const ReportsCRUD = () => {
                   <FormControl isRequired>
                     <FormLabel>Year</FormLabel>
                     <InputGroup>
-                      {/* <InputLeftAddon children={<FaSign />} /> */}
                       <Input
                         autoFocus
                         autoComplete="off"
@@ -235,37 +214,6 @@ export const ReportsCRUD = () => {
                       type 2023.
                     </FormHelperText>
                   </FormControl>
-                  {/* <FormControl>
-                                        <FormLabel>Creator</FormLabel>
-                                        <Input
-                                            {...register("creator", { required: true })}
-                                        />
-                                    </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Created At</FormLabel>
-                                        <Input
-                                            {...register("created_at", { required: true })}
-                                        />
-                                    </FormControl>
-
-                                    <FormControl>
-                                        <FormLabel>Updated At</FormLabel>
-                                        <Input
-                                            {...register("updated_at", { required: true })}
-                                        />
-                                    </FormControl> */}
-                  {/* <FormControl>
-                                        <FormLabel>Date Open</FormLabel>
-                                        <Input
-                                            {...register("date_open", { required: true })}
-                                        />
-                                    </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Date Closed</FormLabel>
-                                        <Input
-                                            {...register("date_closed", { required: true })}
-                                        />
-                                    </FormControl> */}
 
                   <FormControl isRequired>
                     <StartAndEndDateSelector
@@ -275,8 +223,6 @@ export const ReportsCRUD = () => {
                       setEndDate={setEndDate}
                       helperText="Select the period in which entries for this annual report are allowed."
                     />
-                    {/* <FormLabel>Start and End Dates</FormLabel> */}
-                    {/* <CalendarWithCSS onChange={setSelectedDates} /> */}
                   </FormControl>
 
                   <FormControl>
@@ -301,32 +247,6 @@ export const ReportsCRUD = () => {
                     </FormHelperText>
                   </FormControl>
 
-                  {/* <FormControl>
-                                        <FormLabel>Service Delivery Intro</FormLabel>
-                                        <Textarea
-                                            {...register("service_delivery_intro", { required: false })}
-                                        />
-                                    </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Research Intro</FormLabel>
-                                        <Textarea
-                                            {...register("research_intro", { required: false })}
-                                        />
-                                    </FormControl>
-
-                                    <FormControl>
-                                        <FormLabel>Student Intro</FormLabel>
-                                        <Textarea
-                                            {...register("student_intro", { required: false })}
-                                        />
-                                    </FormControl>
-
-                                    <FormControl>
-                                        <FormLabel>Publications</FormLabel>
-                                        <Textarea
-                                            {...register("publications", { required: false })}
-                                        />
-                                    </FormControl> */}
                   {mutation.isError ? (
                     <Box mt={4}>
                       {Object.keys(
@@ -366,7 +286,6 @@ export const ReportsCRUD = () => {
                     startDate > endDate
                   }
                   onClick={() => {
-                    console.log("clicked");
                     onSubmit({
                       old_id: 1,
                       year: yearData,

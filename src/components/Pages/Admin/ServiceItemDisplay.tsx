@@ -1,8 +1,6 @@
 import {
   Box,
   Button,
-  Center,
-  Checkbox,
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -10,26 +8,18 @@ import {
   DrawerOverlay,
   Flex,
   FormControl,
-  FormLabel,
   Grid,
-  HStack,
-  Input,
-  InputGroup,
-  InputLeftAddon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   Text,
-  Textarea,
   VStack,
   useColorMode,
   useDisclosure,
@@ -39,10 +29,8 @@ import { IDepartmentalService } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { FaSign } from "react-icons/fa";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
-import { FcOk, FcCancel } from "react-icons/fc";
 import {
   deleteDepartmentalService,
   updateDepartmentalService,
@@ -57,9 +45,8 @@ export const ServiceItemDisplay = ({
   name,
   director,
 }: IDepartmentalService) => {
-  const { register, handleSubmit, watch } = useForm<IDepartmentalService>();
+  const { register, handleSubmit } = useForm<IDepartmentalService>();
   const [selectedDirector, setSelectedDirector] = useState<number>();
-  // const nameData = watch("name");
   const [nameData, setNameData] = useState(name);
 
   const toast = useToast();
@@ -88,7 +75,6 @@ export const ServiceItemDisplay = ({
 
   const updateMutation = useMutation(updateDepartmentalService, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Updated",
@@ -98,21 +84,16 @@ export const ServiceItemDisplay = ({
       queryClient.invalidateQueries(["departmentalServices"]);
     },
     onError: () => {
-      // console.log("error")
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
     },
-    onMutate: () => {
-      // console.log("attempting update private")
-    },
   });
 
   const deleteMutation = useMutation(deleteDepartmentalService, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Deleted",
@@ -121,16 +102,9 @@ export const ServiceItemDisplay = ({
       onDeleteModalClose();
       queryClient.invalidateQueries(["departmentalServices"]);
     },
-    onError: () => {
-      // console.log("error")
-    },
-    onMutate: () => {
-      // console.log("mutation")
-    },
   });
 
   const deleteBtnClicked = () => {
-    // console.log("deleted")
     deleteMutation.mutate(pk);
   };
 
@@ -165,31 +139,6 @@ export const ServiceItemDisplay = ({
         // gridColumnGap={8}
       >
         <TextButtonFlex name={name} onClick={onUpdateModalOpen} />
-        {/* <Flex justifyContent="flex-start"
-
-                            overflow="auto"
-                            textOverflow="ellipsis"
-                            maxW="100%"
-                            pr={8}
-                        >
-                            <Text
-                                variant={"link"}
-                                color="blue.500"
-                                fontWeight={"semibold"}
-                                onClick={onUpdateModalOpen}
-                                whiteSpace="normal"
-                                textOverflow="ellipsis"
-                                cursor={"pointer"}
-                                _hover={
-                                    {
-                                        textDecoration: "underline",
-                                    }
-                                }
-                            >
-                                {name ?? ""}
-                            </Text>
-                        </Flex> */}
-
         <Flex>
           <TextButtonFlex
             name={`${userData.first_name} ${userData.last_name}`}
@@ -288,19 +237,6 @@ export const ServiceItemDisplay = ({
               id="update-form"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
-              {/* <FormControl>
-                <FormLabel>Name</FormLabel>
-                <InputGroup>
-                  <Input
-                    autoComplete="off"
-                    autoFocus
-                    {...register("name", { required: true })}
-                    required
-                    type="text"
-                    defaultValue={name} // Prefill
-                  />
-                </InputGroup>
-              </FormControl> */}
               <UnboundStatefulEditor
                 title="Service Name"
                 helperText={"Name of Service"}
@@ -322,7 +258,7 @@ export const ServiceItemDisplay = ({
                   placeholder="Search for a user..."
                   preselectedUserPk={director}
                   isEditable
-                  helperText={<>The director of the Service</>}
+                  helperText={"The director of the Service"}
                 />
               </FormControl>
 

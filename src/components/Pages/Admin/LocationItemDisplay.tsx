@@ -1,29 +1,24 @@
 import {
   Box,
   Button,
-  Center,
   Flex,
   FormControl,
   FormLabel,
   Grid,
-  HStack,
   Input,
   InputGroup,
-  InputLeftAddon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
   Select,
   Text,
-  Textarea,
   VStack,
   useColorMode,
   useDisclosure,
@@ -33,7 +28,6 @@ import { IAddLocationForm, ISimpleLocationData } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { FaSign } from "react-icons/fa";
 import { deleteLocation, updateLocation } from "../../../lib/api";
 import { AxiosError } from "axios";
 import { TextButtonFlex } from "@/components/TextButtonFlex";
@@ -61,7 +55,6 @@ export const LocationItemDisplay = ({
 
   const updateMutation = useMutation(updateLocation, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Updated",
@@ -71,21 +64,16 @@ export const LocationItemDisplay = ({
       queryClient.invalidateQueries(["locations"]);
     },
     onError: () => {
-      // console.log("error")
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
     },
-    onMutate: () => {
-      // console.log("attempting update private")
-    },
   });
 
   const deleteMutation = useMutation(deleteLocation, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Deleted",
@@ -94,16 +82,9 @@ export const LocationItemDisplay = ({
       onDeleteModalClose();
       queryClient.invalidateQueries(["locations"]);
     },
-    onError: () => {
-      // console.log("error")
-    },
-    onMutate: () => {
-      // console.log("mutation")
-    },
   });
 
   const deleteBtnClicked = () => {
-    // console.log("deleted")
     deleteMutation.mutate(pk);
   };
 

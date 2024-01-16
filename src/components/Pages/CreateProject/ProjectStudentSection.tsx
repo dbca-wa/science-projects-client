@@ -8,33 +8,26 @@ import {
   FormLabel,
   Grid,
   Icon,
-  Input,
   InputGroup,
   InputLeftAddon,
-  ModalBody,
-  ModalFooter,
   Select,
-  Textarea,
   useColorMode,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
 import { IoIosCreate } from "react-icons/io";
-import {
-  ICreateProjectExternalDetails,
-  ICreateProjectStudentDetails,
-} from "../../../lib/api";
-import { MdCorporateFare, MdOutlineTitle } from "react-icons/md";
-import { AiFillDollarCircle } from "react-icons/ai";
+import { ICreateProjectStudentDetails } from "../../../lib/api";
 import { HiAcademicCap } from "react-icons/hi";
-import { FaUniversity } from "react-icons/fa";
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 interface IProjectStudentProps {
   studentFilled: boolean;
   setStudentFilled: React.Dispatch<React.SetStateAction<boolean>>;
   studentData: ICreateProjectStudentDetails;
-  setStudentData: (data: any) => void;
+  setStudentData: React.Dispatch<
+    React.SetStateAction<ICreateProjectStudentDetails>
+  >;
+  // (data) => void;
   createClick: () => void;
   onClose: () => void;
   backClick: () => void;

@@ -1,506 +1,273 @@
 // Component for displaying the tasks the user has on the dashboard (modern)
 
-import { AbsoluteCenter, Box, Center, Divider, Flex, Grid, Heading, Spinner, Text, useColorMode } from "@chakra-ui/react"
+import {
+  AbsoluteCenter,
+  Box,
+  Divider,
+  Flex,
+  Grid,
+  Heading,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
 // import { TaskDisplayCard } from "./TaskDisplayCard"
-import { useEffect, useLayoutEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { IMainDoc, ITaskDisplayCard } from "../../../types";
 import { ModernPersonalTaskDisplayCard } from "./ModernPersonalTaskDisplayCard";
 import { ModernEndorsementTaskDisplayCard } from "./ModernEndorsementTaskDisplayCard";
 import { ModernDocumentTaskDisplayCard } from "./ModernDocumentTaskDisplayCard";
 
-
-
-
 interface ITaskSection {
-    personalTaskData: {
-        todo: ITaskDisplayCard[];
-        inprogress: ITaskDisplayCard[];
-        done: ITaskDisplayCard[];
-    };
-    personalTaskDataLoading: boolean;
-    endorsementTaskData: {
-        aec: IMainDoc[];
-        bm: IMainDoc[];
-        hc: IMainDoc[];
-    };
-    endorsementTaskDataLoading: boolean;
-    documentTaskData: {
-        all: IMainDoc[];
-        ba: IMainDoc[];
-        directorate: IMainDoc[];
-        lead: IMainDoc[];
-        team: IMainDoc[];
-    };
-    documentTaskDataLoading: boolean;
-
+  personalTaskData: {
+    todo: ITaskDisplayCard[];
+    inprogress: ITaskDisplayCard[];
+    done: ITaskDisplayCard[];
+  };
+  personalTaskDataLoading: boolean;
+  endorsementTaskData: {
+    aec: IMainDoc[];
+    bm: IMainDoc[];
+    hc: IMainDoc[];
+  };
+  endorsementTaskDataLoading: boolean;
+  documentTaskData: {
+    all: IMainDoc[];
+    ba: IMainDoc[];
+    directorate: IMainDoc[];
+    lead: IMainDoc[];
+    team: IMainDoc[];
+  };
+  documentTaskDataLoading: boolean;
 }
 
 export const MyTasksSection = ({
-    personalTaskData,
-    personalTaskDataLoading,
-    endorsementTaskData,
-    endorsementTaskDataLoading,
-    documentTaskData,
-    documentTaskDataLoading,
-}: ITaskSection) => {
-    const { colorMode } = useColorMode();
-    const [inprogress, setInprogress] = useState<ITaskDisplayCard[]>([]);
-    const [todo, setTodo] = useState<ITaskDisplayCard[]>([]);
+  personalTaskData,
+  //   personalTaskDataLoading,
+  endorsementTaskData,
+  //   endorsementTaskDataLoading,
+  documentTaskData,
+}: //   documentTaskDataLoading,
+ITaskSection) => {
+  const { colorMode } = useColorMode();
+  const [total, setTotal] = useState(0);
 
-    const [done, setDone] = useState<ITaskDisplayCard[]>([]);
-    // const [combinedTaskData, setCombinedTaskData] = useState<ITaskDisplayCard[]>([]);
-    // const [combinedDataKey, setCombinedTaskDataKey] = useState<number>(0); // Key for <AnimatePresence>
+  useEffect(() => {
+    console.log({
+      personalTaskData,
+      endorsementTaskData,
+      documentTaskData,
+    });
+    personalTaskData &&
+      endorsementTaskData &&
+      documentTaskData &&
+      setTotal(
+        personalTaskData?.todo?.length +
+          personalTaskData?.inprogress?.length +
+          endorsementTaskData.aec.length +
+          endorsementTaskData.bm.length +
+          endorsementTaskData.hc.length +
+          documentTaskData?.all?.length
+      );
+  }, [personalTaskData, endorsementTaskData, documentTaskData]);
 
-    // // Once the component receives new data, update the state accordingly
-    // useEffect(() => {
-    //     if (!personalTaskDataLoading && personalTaskData) {
-    //         // console.log(data)
+  useEffect(() => {
+    console.log(total);
+  }, [total]);
 
-    //         // Filter and sort "assigned" tasks
-    //         const sortedAssignedInprogress = personalTaskData?.inprogress.filter(item => item.task_type === "assigned").sort((a, b) => new Date(b.date_assigned).getTime() - new Date(a.date_assigned).getTime());
-    //         const sortedAssignedTodo = personalTaskData?.todo.filter(item => item.task_type === "assigned").sort((a, b) => new Date(b.date_assigned).getTime() - new Date(a.date_assigned).getTime());
-    //         const sortedAssignedDone = personalTaskData?.done.filter(item => item.task_type === "assigned").sort((a, b) => new Date(b.date_assigned).getTime() - new Date(a.date_assigned).getTime());
+  const renderEndorsementTaskCards = (documents, kind) => {
+    if (!documents) return null;
 
-    //         // Filter and sort "personal" tasks
-    //         const sortedPersonalInprogress = personalTaskData?.inprogress.filter(item => item.task_type === "personal").sort((a, b) => new Date(b.date_assigned).getTime() - new Date(a.date_assigned).getTime());
-    //         const sortedPersonalTodo = personalTaskData?.todo.filter(item => item.task_type === "personal").sort((a, b) => new Date(b.date_assigned).getTime() - new Date(a.date_assigned).getTime());
-    //         const sortedPersonalDone = personalTaskData?.done.filter(item => item.task_type === "personal").sort((a, b) => new Date(b.date_assigned).getTime() - new Date(a.date_assigned).getTime());
+    return documents.map((doc, index) => (
+      <motion.div
+        key={`endorsementtask${kind}${index}`}
+        initial={{ y: -10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 10, opacity: 0 }}
+        transition={{ duration: 0.4, delay: index / 8 }}
+        style={{
+          position: "relative",
+          height: "100%",
+          animation: "oscillate 8s ease-in-out infinite",
+        }}
+      >
+        <ModernEndorsementTaskDisplayCard document={doc} kind={kind} />
+      </motion.div>
+    ));
+  };
 
-    //         // Combine the sorted arrays, with "assigned" tasks coming first
-    //         const combinedData = [
-    //             ...sortedAssignedInprogress,
-    //             ...sortedAssignedTodo,
-    //             // ...sortedAssignedDone,
-    //             ...sortedPersonalInprogress,
-    //             ...sortedPersonalTodo,
-    //             // ...sortedPersonalDone,
-    //         ];
+  const renderDocumentTaskCards = (documents, kind) => {
+    if (!documents) return null;
 
-    //         setInprogress(combinedTaskData?.filter(item => item.task_type === "assigned"));
-    //         setTodo(combinedTaskData?.filter(item => item.task_type === "assigned"));
-    //         setDone(combinedTaskData?.filter(item => item.task_type === "assigned"));
-    //         setCombinedTaskData(combinedData);
-    //         setCombinedTaskDataKey(key => key + 1); // Update the key
-    //     }
-    // }, [personalTaskData, personalTaskDataLoading]);
+    return documents.map((doc, index) => (
+      <motion.div
+        key={`documenttask${kind}${index}`}
+        initial={{ y: -10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 10, opacity: 0 }}
+        transition={{ duration: 0.4, delay: index / 8 }}
+        style={{
+          position: "relative",
+          height: "100%",
+          animation: "oscillate 8s ease-in-out infinite",
+        }}
+      >
+        <ModernDocumentTaskDisplayCard document={doc} kind={kind} />
+      </motion.div>
+    ));
+  };
 
-    // useLayoutEffect(() => {
-    //     if (!personalTaskDataLoading && combinedTaskData?.length > 0) {
-    //         const lastIndex = combinedTaskData?.length - 1;
-    //         const lastCardId = personalTaskData[lastIndex].pk.toString();
-
-    //         const newCard = document.getElementById(lastCardId);
-    //         if (newCard) {
-    //             newCard.style.opacity = "0";
-    //             newCard.style.transform = "translateY(-10px)";
-
-    //             requestAnimationFrame(() => {
-    //                 newCard.style.opacity = "1";
-    //                 newCard.style.transform = "translateY(0)";
-    //             });
-    //         }
-    //     }
-    // }, [personalTaskDataLoading, combinedTaskData]);
-
-    // Combine the arrays in the desired order: inprogress, todo, done
-    const [total, setTotal] = useState(0);
-
-    useEffect(() => {
-        console.log(
-            {
-                personalTaskData, endorsementTaskData, documentTaskData
-            }
-        )
-        personalTaskData && endorsementTaskData && documentTaskData &&
-            setTotal(
-                personalTaskData?.todo?.length +
-                personalTaskData?.inprogress?.length +
-                endorsementTaskData.aec.length + endorsementTaskData.bm.length + endorsementTaskData.hc.length +
-                documentTaskData?.all?.length
-            )
-    }, [personalTaskData, endorsementTaskData, documentTaskData])
-
-    useEffect(() => {
-        console.log(total)
-    }, [total])
-
-    const renderEndorsementTaskCards = (documents, kind) => {
-        if (!documents) return null;
-
-        return documents.map((doc, index) => (
-            <motion.div
-                key={`endorsementtask${kind}${index}`}
-                initial={{ y: -10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 10, opacity: 0 }}
-                transition={{ duration: 0.4, delay: (index / 8) }}
-                style={{
-                    position: "relative",
-                    height: "100%",
-                    animation: "oscillate 8s ease-in-out infinite",
-                }}
+  return total < 1 ? (
+    <Box w={"100%"} h={"100%"}>
+      <Text>Your tasks will be shown here...</Text>
+    </Box>
+  ) : (
+    <Flex flexDir={"column"} w={"100%"} h={"100%"}>
+      {personalTaskData &&
+      [...personalTaskData.todo, ...personalTaskData.inprogress].length >= 1 ? (
+        <>
+          <Box position="relative" padding="10">
+            <Divider />
+            <AbsoluteCenter
+              bg={colorMode === "light" ? "white" : "gray.800"}
+              px="4"
             >
-                <ModernEndorsementTaskDisplayCard document={doc} kind={kind} />
-            </motion.div>
-        ));
-    };
+              <Heading size={"md"}>Quick Tasks</Heading>
+            </AbsoluteCenter>
+          </Box>
 
-    const renderDocumentTaskCards = (documents, kind) => {
-        if (!documents) return null;
-
-        return documents.map((doc, index) => (
-            <motion.div
-                key={`documenttask${kind}${index}`}
-                initial={{ y: -10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 10, opacity: 0 }}
-                transition={{ duration: 0.4, delay: (index / 8) }}
-                style={{
+          <Grid
+            gridTemplateColumns={{
+              base: "repeat(1, 1fr)",
+              md: "repeat(1, 1fr)",
+              mdlg: "repeat(2, 1fr)",
+              "1080px": "repeat(3, 1fr)",
+              xl: "repeat(4, 1fr)",
+              "2xl": "repeat(6, 1fr)",
+            }}
+            gridGap={4}
+            gridRowGap={8}
+            mb={6}
+          >
+            {(personalTaskData?.inprogress || [])
+              .concat(personalTaskData?.todo || [])
+              .map((task, index) => (
+                <motion.div
+                  key={`quicktask${task.pk}_${task.status}_${index}`}
+                  initial={{ y: -10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 10, opacity: 0 }}
+                  transition={{ duration: 0.4, delay: index / 8 }}
+                  layout
+                  layoutId={task.pk.toString()}
+                  style={{
                     position: "relative",
+                    minHeight: "200px",
                     height: "100%",
+                    maxHeight: "250px",
                     animation: "oscillate 8s ease-in-out infinite",
-                }}
+                  }}
+                >
+                  <ModernPersonalTaskDisplayCard
+                    pk={task.pk}
+                    name={task.name}
+                    description={task.description}
+                    notes={task.notes}
+                    task_type={task.task_type}
+                    status={task.status}
+                    document={task.document}
+                    user={task.user}
+                    project={task.project}
+                    date_assigned={task.date_assigned}
+                    creator={task.creator}
+                  />
+                </motion.div>
+              ))}
+          </Grid>
+        </>
+      ) : null}
+
+      {documentTaskData?.team &&
+      documentTaskData?.directorate &&
+      documentTaskData?.ba &&
+      documentTaskData?.lead &&
+      [
+        ...documentTaskData.team,
+        ...documentTaskData.lead,
+        ...documentTaskData.directorate,
+        ...documentTaskData.ba,
+      ].length >= 1 ? (
+        <>
+          <Box position="relative" padding="10">
+            <Divider />
+            <AbsoluteCenter
+              bg={colorMode === "light" ? "white" : "gray.800"}
+              px="4"
             >
-                <ModernDocumentTaskDisplayCard document={doc} kind={kind} />
-            </motion.div>
-        ));
-    };
+              <Heading size={"md"}>Document Tasks</Heading>
+            </AbsoluteCenter>
+          </Box>
+          <Grid
+            gridTemplateColumns={{
+              base: "repeat(1, 1fr)",
+              md: "repeat(1, 1fr)",
+              mdlg: "repeat(2, 1fr)",
+              "1080px": "repeat(3, 1fr)",
+              xl: "repeat(4, 1fr)",
+              "2xl": "repeat(6, 1fr)",
+            }}
+            gridGap={4}
+            gridRowGap={8}
+            mb={6}
+          >
+            {renderDocumentTaskCards(documentTaskData?.team, "team")}
+            {renderDocumentTaskCards(documentTaskData?.lead, "project_lead")}
+            {renderDocumentTaskCards(documentTaskData?.ba, "ba_lead")}
+            {renderDocumentTaskCards(
+              documentTaskData?.directorate,
+              "directorate"
+            )}
+          </Grid>
+        </>
+      ) : null}
 
-    return (
-
-        total < 1 ?
-            (
-                <Box
-                    w={"100%"}
-                    h={"100%"}
-                >
-                    <Text>Your tasks will be shown here...</Text>
-                </Box>
-            ) :
-            (
-                <Flex
-                    flexDir={"column"}
-                    w={"100%"}
-                    h={"100%"}
-                >
-                    {
-                        personalTaskData && [
-                            ...personalTaskData.todo,
-                            ...personalTaskData.inprogress
-                        ].length >= 1 ?
-                            (
-                                <>
-                                    <Box position='relative' padding='10'>
-                                        <Divider />
-                                        <AbsoluteCenter bg={colorMode === "light" ? "white" : "gray.800"} px='4'>
-                                            <Heading
-                                                size={"md"}
-                                            >
-                                                Quick Tasks
-                                            </Heading>
-                                        </AbsoluteCenter>
-                                    </Box>
-
-                                    <Grid
-                                        gridTemplateColumns={{
-                                            base: "repeat(1, 1fr)",
-                                            md: "repeat(1, 1fr)",
-                                            mdlg: "repeat(2, 1fr)",
-                                            "1080px": "repeat(3, 1fr)",
-                                            xl: "repeat(4, 1fr)",
-                                            '2xl': "repeat(6, 1fr)",
-
-                                        }}
-                                        gridGap={4}
-                                        gridRowGap={8}
-                                        mb={6}
-                                    >
-                                        {(personalTaskData?.inprogress || []).concat(personalTaskData?.todo || []).map((task, index) => (
-                                            <motion.div
-                                                key={`quicktask${task.pk}_${task.status}_${index}`}
-                                                initial={{ y: -10, opacity: 0 }}
-                                                animate={{ y: 0, opacity: 1 }}
-                                                exit={{ y: 10, opacity: 0 }}
-                                                transition={{ duration: 0.4, delay: (((index) / 8)) }}
-                                                layout
-                                                layoutId={task.pk.toString()}
-                                                style={{
-                                                    position: "relative",
-                                                    minHeight: "200px",
-                                                    height: "100%",
-                                                    maxHeight: "250px",
-                                                    animation: "oscillate 8s ease-in-out infinite",
-                                                }}
-                                            >
-                                                <ModernPersonalTaskDisplayCard
-                                                    pk={task.pk}
-                                                    name={task.name}
-                                                    description={task.description}
-                                                    notes={task.notes}
-                                                    task_type={task.task_type}
-                                                    status={task.status}
-                                                    document={task.document}
-                                                    user={task.user}
-                                                    project={task.project}
-                                                    date_assigned={task.date_assigned}
-                                                    creator={task.creator}
-                                                />
-                                            </motion.div>
-                                        ))}
-                                    </Grid>
-                                </>
-
-                            ) :
-                            null
-
-                    }
-
-
-
-                    {
-                        documentTaskData?.team &&
-                            documentTaskData?.directorate &&
-                            documentTaskData?.ba &&
-                            documentTaskData?.lead &&
-                            ([
-                                ...documentTaskData.team,
-                                ...documentTaskData.lead,
-                                ...documentTaskData.directorate,
-                                ...documentTaskData.ba
-                            ].length) >= 1 ? (
-                            <>
-                                <Box position='relative' padding='10'>
-                                    <Divider />
-                                    <AbsoluteCenter bg={colorMode === "light" ? "white" : "gray.800"} px='4'>
-                                        <Heading size={"md"}>Document Tasks</Heading>
-                                    </AbsoluteCenter>
-                                </Box>
-                                <Grid
-                                    gridTemplateColumns={{
-                                        base: "repeat(1, 1fr)",
-                                        md: "repeat(1, 1fr)",
-                                        "mdlg": "repeat(2, 1fr)",
-                                        "1080px": "repeat(3, 1fr)",
-                                        'xl': "repeat(4, 1fr)",
-                                        '2xl': "repeat(6, 1fr)",
-
-                                    }}
-                                    gridGap={4}
-                                    gridRowGap={8}
-                                    mb={6}
-                                >
-                                    {renderDocumentTaskCards(documentTaskData?.team, "team")}
-                                    {renderDocumentTaskCards(documentTaskData?.lead, "project_lead")}
-                                    {renderDocumentTaskCards(documentTaskData?.ba, "ba_lead")}
-                                    {renderDocumentTaskCards(documentTaskData?.directorate, "directorate")}
-                                </Grid>
-                            </>
-                        ) : null
-                    }
-
-                    {
-                        endorsementTaskData?.aec &&
-                            endorsementTaskData?.bm &&
-                            endorsementTaskData?.hc &&
-                            ([
-                                ...endorsementTaskData.aec,
-                                ...endorsementTaskData.bm,
-                                ...endorsementTaskData.hc
-                            ].length) >= 1 ?
-                            (
-                                <>
-
-                                    <Box position='relative' padding='10'>
-                                        <Divider />
-                                        <AbsoluteCenter bg={colorMode === "light" ? "white" : "gray.800"} px='4'>
-                                            <Heading
-                                                size={"md"}
-                                            >
-                                                Endorsement Tasks
-                                            </Heading>
-                                        </AbsoluteCenter>
-                                    </Box>
-                                    <Grid
-                                        gridTemplateColumns={{
-                                            base: "repeat(1, 1fr)",
-                                            md: "repeat(1, 1fr)",
-                                            "mdlg": "repeat(2, 1fr)",
-                                            "1080px": "repeat(3, 1fr)",
-                                            'xl': "repeat(4, 1fr)",
-                                            '2xl': "repeat(6, 1fr)",
-                                        }}
-                                        gridGap={4}
-                                        gridRowGap={8}
-                                        mb={6}
-
-                                    >
-                                        {renderEndorsementTaskCards(endorsementTaskData?.aec, "aec")}
-                                        {renderEndorsementTaskCards(endorsementTaskData?.bm, "bm")}
-                                        {renderEndorsementTaskCards(endorsementTaskData?.hc, "hc")}
-                                    </Grid>
-                                    {/* <Grid
-                                        gridTemplateColumns={{
-                                            base: "repeat(1, 1fr)",
-                                            md: "repeat(1, 1fr)",
-                                            "mdlg": "repeat(2, 1fr)",
-                                            "1080px": "repeat(3, 1fr)",
-                                            'xl': "repeat(4, 1fr)",
-                                        }}
-                                        gridGap={4}
-                                        gridRowGap={8}
-                                    >
-
-                                        {
-                                            endorsementTaskData?.aec?.map((aecDoc, index) => {
-                                                return (
-                                                    <motion.div
-                                                        key={`endorsementaec${index}`}
-                                                        initial={{ y: -10, opacity: 0 }}
-                                                        animate={{ y: 0, opacity: 1 }}
-                                                        exit={{ y: 10, opacity: 0 }}
-                                                        transition={{ duration: 0.4, delay: (((index) / 8)) }}
-                                                        layout
-                                                        layoutId={aecDoc.pk.toString()}
-                                                        style={{
-                                                            position: "relative",
-                                                            height: "100%",
-                                                            animation: "oscillate 8s ease-in-out infinite",
-                                                        }}
-                                                    >
-                                                        <ModernEndorsementTaskDisplayCard
-                                                            document={aecDoc}
-                                                            kind={"aec"}
-                                                        />
-
-                                                    </motion.div>
-
-                                                )
-                                            })
-                                        }
-                                        {
-                                            endorsementTaskData?.bm?.map((bmDoc, index) => {
-                                                return (
-                                                    <motion.div
-                                                        key={`endorsementbm${index}`}
-                                                        initial={{ y: -10, opacity: 0 }}
-                                                        animate={{ y: 0, opacity: 1 }}
-                                                        exit={{ y: 10, opacity: 0 }}
-                                                        transition={{ duration: 0.4, delay: (((index) / 8)) }}
-                                                        layout
-                                                        layoutId={bmDoc.pk.toString()}
-                                                        style={{
-                                                            position: "relative",
-                                                            height: "100%",
-                                                            animation: "oscillate 8s ease-in-out infinite",
-                                                        }}
-                                                    >
-                                                        <ModernEndorsementTaskDisplayCard
-                                                            document={bmDoc}
-                                                            kind={"bm"}
-                                                        />
-
-                                                    </motion.div>
-
-                                                )
-                                            })
-                                        }
-                                        {
-                                            endorsementTaskData?.hc?.map((hcDoc, index) => {
-                                                return (
-                                                    <motion.div
-                                                        key={`endorsementhc${index}`}
-                                                        initial={{ y: -10, opacity: 0 }}
-                                                        animate={{ y: 0, opacity: 1 }}
-                                                        exit={{ y: 10, opacity: 0 }}
-                                                        transition={{ duration: 0.4, delay: (((index) / 8)) }}
-                                                        layout
-                                                        layoutId={hcDoc.pk.toString()}
-                                                        style={{
-                                                            position: "relative",
-                                                            height: "100%",
-                                                            animation: "oscillate 8s ease-in-out infinite",
-                                                        }}
-                                                    >
-                                                        <ModernEndorsementTaskDisplayCard
-                                                            document={hcDoc}
-                                                            kind={"hc"}
-                                                        />
-                                                    </motion.div>
-
-                                                )
-                                            })
-                                        }
-
-                                    </Grid> */}
-                                </>
-                            ) : null
-
-                    }
-                </Flex>
-            )
-
-
-        // <AnimatePresence key={combinedDataKey}>
-        //     {combinedTaskData?.length < 1 ?
-        //         (
-        //             <Box
-        //                 w={"100%"}
-        //                 h={"100%"}
-        //             >
-        //                 <Text>Your tasks will be shown here...</Text>
-        //             </Box>
-        //         )
-        //         :
-        //         (
-        //             <Grid
-        //                 gridTemplateColumns={{
-        //                     base: "repeat(1, 1fr)",
-        //                     md: "repeat(1, 1fr)",
-        //                     "mdlg": "repeat(2, 1fr)",
-        //                     "1080px": "repeat(3, 1fr)",
-        //                     'xl': "repeat(4, 1fr)",
-        //                 }}
-        //                 gridGap={4}
-        //                 gridRowGap={8}
-        //             >
-        //                 {combinedTaskData?.map((card: ITaskDisplayCard, index: number) => (
-        //                     <motion.div
-        //                         key={index}
-        //                         initial={{ y: -10, opacity: 0 }}
-        //                         animate={{ y: 0, opacity: 1 }}
-        //                         exit={{ y: 10, opacity: 0 }}
-        //                         transition={{ duration: 0.4, delay: (((index) / 8)) }}
-        //                         layout
-        //                         layoutId={card.pk.toString()}
-        //                         style={{
-        //                             position: "relative",
-        //                             height: "100%",
-        //                             animation: "oscillate 8s ease-in-out infinite",
-        //                         }}
-        //                     >
-        //                         <TaskDisplayCard
-        //                             pk={card.pk}
-        //                             name={card.name}
-        //                             description={card.description}
-        //                             notes={card.notes}
-        //                             task_type={card.task_type}
-        //                             status={card.status}
-        //                             document={card.document}
-        //                             user={card.user}
-        //                             project={card.project}
-        //                             date_assigned={card.date_assigned}
-        //                             creator={card.creator}
-        //                         />
-
-        //                     </motion.div>
-        //                 ))}
-        //             </Grid>
-
-        //         )
-        //     }
-
-        // </AnimatePresence>
-
-    )
-}
+      {endorsementTaskData?.aec &&
+      endorsementTaskData?.bm &&
+      endorsementTaskData?.hc &&
+      [
+        ...endorsementTaskData.aec,
+        ...endorsementTaskData.bm,
+        ...endorsementTaskData.hc,
+      ].length >= 1 ? (
+        <>
+          <Box position="relative" padding="10">
+            <Divider />
+            <AbsoluteCenter
+              bg={colorMode === "light" ? "white" : "gray.800"}
+              px="4"
+            >
+              <Heading size={"md"}>Endorsement Tasks</Heading>
+            </AbsoluteCenter>
+          </Box>
+          <Grid
+            gridTemplateColumns={{
+              base: "repeat(1, 1fr)",
+              md: "repeat(1, 1fr)",
+              mdlg: "repeat(2, 1fr)",
+              "1080px": "repeat(3, 1fr)",
+              xl: "repeat(4, 1fr)",
+              "2xl": "repeat(6, 1fr)",
+            }}
+            gridGap={4}
+            gridRowGap={8}
+            mb={6}
+          >
+            {renderEndorsementTaskCards(endorsementTaskData?.aec, "aec")}
+            {renderEndorsementTaskCards(endorsementTaskData?.bm, "bm")}
+            {renderEndorsementTaskCards(endorsementTaskData?.hc, "hc")}
+          </Grid>
+        </>
+      ) : null}
+    </Flex>
+  );
+};

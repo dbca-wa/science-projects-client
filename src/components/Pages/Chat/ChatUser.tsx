@@ -1,11 +1,9 @@
 // Display of users above their message in chat route
 
-import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 import { IBranch, IBusinessArea, IImageData, IUserData } from "@/types";
 import {
   Avatar,
   Box,
-  Center,
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -16,9 +14,8 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import React from "react";
 import { UserProfile } from "../Users/UserProfile";
-import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
 
 interface ChatUserProps {
   displayName: string;
@@ -52,11 +49,8 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
     nameCentered,
   }) => {
     const { colorMode } = useColorMode();
-    const baseApi = useApiEndpoint();
 
     const openUserDrawer = () => {
-      console.log("opening draw");
-      console.log(user);
       onUserOpen();
     };
     const {
@@ -64,12 +58,6 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
       onOpen: onUserOpen,
       onClose: onUserClose,
     } = useDisclosure();
-    const baseUrl = useApiEndpoint();
-    // const imageUrl = useServerImageUrl(avatarSrc?.file);
-    // useEffect(() => {
-    //   console.log("IMGAGE:", imageUrl);
-    //   console.log(`${baseUrl}${imageUrl}`);
-    // });
     return (
       <>
         <Drawer
