@@ -53,11 +53,11 @@ ITaskSection) => {
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    console.log({
-      personalTaskData,
-      endorsementTaskData,
-      documentTaskData,
-    });
+    // console.log({
+    //   personalTaskData,
+    //   endorsementTaskData,
+    //   documentTaskData,
+    // });
     personalTaskData &&
       endorsementTaskData &&
       documentTaskData &&
@@ -71,9 +71,9 @@ ITaskSection) => {
       );
   }, [personalTaskData, endorsementTaskData, documentTaskData]);
 
-  useEffect(() => {
-    console.log(total);
-  }, [total]);
+  // useEffect(() => {
+  //   console.log(total);
+  // }, [total]);
 
   const renderEndorsementTaskCards = (documents, kind) => {
     if (!documents) return null;

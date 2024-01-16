@@ -53,7 +53,7 @@ export const ChangeReportPDFModal = ({
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    console.log(report);
+    // console.log(report);
     setReportMediaId(report && report?.pdf?.pk);
   }, [report]);
 
@@ -144,13 +144,13 @@ export const ChangeReportPDFModal = ({
   });
 
   const deleteFile = () => {
-    console.log("delete btn clicked");
+    // console.log("delete btn clicked");
     deletePDFMutation.mutate(report?.pdf?.pk);
   };
 
   const onSubmitPDFUpdate = () => {
-    console.log(reportMediaId);
-    console.log(uploadedPDF);
+    // console.log(reportMediaId);
+    // console.log(uploadedPDF);
     const formData = {
       // userId: userData?.pk ? userData.pk : userData.id,
       reportMediaId,

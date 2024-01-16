@@ -23,7 +23,7 @@ import {
   FormErrorMessage,
   ToastId,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import { GrMail } from "react-icons/gr";
 import { GiGraduateCap } from "react-icons/gi";
@@ -56,12 +56,12 @@ export const EditPersonalInformationModal = ({
     getPersonalInformation
   );
 
-  useEffect(() => {
-    if (!isLoading)
-      console.log(
-        `Phone: ${data?.phone}\nFax: ${data?.fax}\nTitle: ${data?.title}\nFirst: ${data?.first_name}\nLast: ${data?.last_name}\nEmail: ${data?.email}\n`
-      );
-  }, [data, isLoading]);
+  // useEffect(() => {
+  //   if (!isLoading)
+  //     console.log(
+  //       `Phone: ${data?.phone}\nFax: ${data?.fax}\nTitle: ${data?.title}\nFirst: ${data?.first_name}\nLast: ${data?.last_name}\nEmail: ${data?.email}\n`
+  //     );
+  // }, [data, isLoading]);
 
   const { colorMode } = useColorMode();
 

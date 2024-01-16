@@ -160,7 +160,7 @@ export const EditProfileModal = ({
     expertise,
   }: IProfileUpdateVariables) => {
     const image = selectedFile;
-    console.log(selectedFile);
+    // console.log(selectedFile);
     // Check if about and expertise fields have changed
     const aboutChanged = about !== undefined && isFieldChanged("about", about);
     const expertiseChanged =
@@ -168,33 +168,33 @@ export const EditProfileModal = ({
 
     if (selectedFile !== null || aboutChanged || expertiseChanged) {
       if (aboutChanged && expertiseChanged) {
-        console.log("image + about and expertise changed");
+        // console.log("image + about and expertise changed");
         await mutation.mutateAsync({ userPk, image, about, expertise });
       } else if (aboutChanged) {
-        console.log("image + about changed");
+        // console.log("image + about changed");
         await mutation.mutateAsync({ userPk, image, about });
       } else if (expertiseChanged) {
-        console.log("image + expertise changed");
+        // console.log("image + expertise changed");
         await mutation.mutateAsync({ userPk, image, expertise });
       } else if (!expertiseChanged && !aboutChanged) {
-        console.log("only image changed");
+        // console.log("only image changed");
         await mutation.mutateAsync({ userPk, image });
       }
       // onClose();
     } else {
       if (aboutChanged && expertiseChanged) {
-        console.log("about + expertise changed");
+        // console.log("about + expertise changed");
         await mutation.mutateAsync({ userPk, about, expertise });
       } else if (aboutChanged) {
-        console.log("about changed");
+        // console.log("about changed");
 
         await mutation.mutateAsync({ userPk, about });
       } else if (expertiseChanged) {
-        console.log("expertise changed");
+        // console.log("expertise changed");
 
         await mutation.mutateAsync({ userPk, expertise });
       } else {
-        console.log("Nothing changed");
+        // console.log("Nothing changed");
       }
     }
   };
@@ -209,14 +209,14 @@ export const EditProfileModal = ({
     }
   }, [data, isLoading]);
 
-  useEffect(() => {
-    console.log({
-      selectedImageUrl: selectedImageUrl,
-      selectedFile: selectedFile,
-      imageUrl: imageUrl,
-      currentImage: currentImage,
-    });
-  }, [selectedImageUrl, selectedFile, imageUrl, currentImage]);
+  // useEffect(() => {
+  //   console.log({
+  //     selectedImageUrl: selectedImageUrl,
+  //     selectedFile: selectedFile,
+  //     imageUrl: imageUrl,
+  //     currentImage: currentImage,
+  //   });
+  // }, [selectedImageUrl, selectedFile, imageUrl, currentImage]);
 
   return (
     <Modal
