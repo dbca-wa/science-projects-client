@@ -1680,6 +1680,16 @@ export const saveHtmlToDB = async (
         ).then(res => res.data);
 
 
+    } else if (editorType === "AnnualReport") {
+        const url = `documents/reports/${writeable_document_pk}`
+        const payload = {
+            [section]: htmlData,
+        }
+        return urlType(
+            url,
+            payload,
+        ).then(res => res.data);
+
     }
 
 

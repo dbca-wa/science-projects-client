@@ -62,15 +62,15 @@ export const ReportItemDisplay = ({
   //   if (!reportMediaLoading) console.log(reportMediaData);
   // }, [reportMediaData, reportMediaLoading]);
 
-  const { register, watch } = useForm<IReport>();
-  const selectedDates = [date_open, date_closed];
+  const { register } = useForm<IReport>();
+  // const selectedDates = [date_open, date_closed];
 
-  const dmData = watch("dm");
-  const serviceDeliveryData = watch("service_delivery_intro");
-  const researchIntroData = watch("research_intro");
-  const studentIntroData = watch("student_intro");
+  // const dmData = watch("dm");
+  // const serviceDeliveryData = watch("service_delivery_intro");
+  // const researchIntroData = watch("research_intro");
+  // const studentIntroData = watch("student_intro");
 
-  const publicationsData = watch("publications");
+  // const publicationsData = watch("publications");
 
   const toast = useToast();
   const {
@@ -140,10 +140,10 @@ export const ReportItemDisplay = ({
     deleteMutation.mutate(pk);
   };
 
-  const onUpdateSubmit = (formData: IReport) => {
-    // console.log(formData);
-    updateMutation.mutate(formData);
-  };
+  // const onUpdateSubmit = (formData: IReport) => {
+  //   // console.log(formData);
+  //   updateMutation.mutate(formData);
+  // };
 
   const {
     isOpen: isCreatorOpen,
@@ -348,12 +348,12 @@ export const ReportItemDisplay = ({
                 gap={8}
                 mx={6}
               >
-                <ReportMediaChanger
+                {/* <ReportMediaChanger
                   reportMediaData={reportMediaData}
                   section={"cover"}
                   reportPk={pk}
                   refetchData={refetchMedia}
-                />
+                /> */}
 
                 <ReportMediaChanger
                   reportMediaData={reportMediaData}
@@ -404,12 +404,12 @@ export const ReportItemDisplay = ({
                   refetchData={refetchMedia}
                 />
 
-                <ReportMediaChanger
+                {/* <ReportMediaChanger
                   reportMediaData={reportMediaData}
                   section={"rear_cover"}
                   reportPk={pk}
                   refetchData={refetchMedia}
-                />
+                /> */}
               </Grid>
             </ModalContent>
           </ModalBody>
@@ -457,7 +457,7 @@ export const ReportItemDisplay = ({
                       data={reportData?.dm}
                       section={"dm"}
                       writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.pk}
+                      writeable_document_pk={reportData?.id}
                     />
                   </FormControl>
 
@@ -470,7 +470,7 @@ export const ReportItemDisplay = ({
                       data={reportData?.service_delivery_intro}
                       section={"service_delivery_intro"}
                       writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.pk}
+                      writeable_document_pk={reportData?.id}
                     />
                   </FormControl>
                   <FormControl>
@@ -482,7 +482,7 @@ export const ReportItemDisplay = ({
                       data={reportData?.research_intro}
                       section={"research_intro"}
                       writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.pk}
+                      writeable_document_pk={reportData?.id}
                     />
                   </FormControl>
 
@@ -495,7 +495,7 @@ export const ReportItemDisplay = ({
                       data={reportData?.student_intro}
                       section={"student_intro"}
                       writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.pk}
+                      writeable_document_pk={reportData?.id}
                     />
                   </FormControl>
 
@@ -508,7 +508,7 @@ export const ReportItemDisplay = ({
                       data={reportData?.publications}
                       section={"publications"}
                       writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.pk}
+                      writeable_document_pk={reportData?.id}
                     />
                   </FormControl>
                 </VStack>
@@ -534,54 +534,6 @@ export const ReportItemDisplay = ({
                     </Box>
                   ) : null}
                 </Center>
-
-                <ModalFooter>
-                  <Grid
-                    // pos={"absolute"}
-                    // bottom={0}
-                    // bg={"red"}
-                    h={"100%"}
-                    mt={10}
-                    w={"100%"}
-                    justifyContent={"end"}
-                    gridTemplateColumns={"repeat(2, 1fr)"}
-                    gridGap={4}
-                  >
-                    <Button onClick={onUpdateModalClose} size="lg">
-                      Cancel
-                    </Button>
-                    <Button
-                      // form="update-form"
-                      // type="submit"
-                      isLoading={updateMutation.isLoading}
-                      size="lg"
-                      onClick={() => {
-                        // console.log("clicked");
-                        onUpdateSubmit({
-                          pk: pk,
-                          year: year,
-                          date_open: selectedDates[0],
-                          date_closed: selectedDates[1],
-                          dm: dmData,
-                          publications: publicationsData,
-                          research_intro: researchIntroData,
-                          service_delivery_intro: serviceDeliveryData,
-                          student_intro: studentIntroData,
-                        });
-                      }}
-                      color={"white"}
-                      background={
-                        colorMode === "light" ? "blue.500" : "blue.600"
-                      }
-                      _hover={{
-                        background:
-                          colorMode === "light" ? "blue.400" : "blue.500",
-                      }}
-                    >
-                      Update
-                    </Button>
-                  </Grid>
-                </ModalFooter>
               </>
             )}
           </ModalContent>
