@@ -133,8 +133,6 @@ export const ProjectExternalSection = ({
             }}
             isDisabled={!externalFilled}
             onClick={() => {
-              // console.log("Here is the external data");
-              // console.log(externalData);
               createClick();
             }}
             rightIcon={<IoIosCreate />}
