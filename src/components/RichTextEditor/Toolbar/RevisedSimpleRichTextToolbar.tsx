@@ -1,27 +1,13 @@
 // Toolbar for the simple rich text editor
 
-import {
-  Box,
-  Divider,
-  Flex,
-  useBreakpointValue,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Flex, useColorMode, useDisclosure } from "@chakra-ui/react";
 
 import { useCallback, useEffect, useState } from "react";
 import { VerticalDivider } from "./VerticalDivider";
 import { RevisedBaseToolbarButton } from "../Buttons/RevisedBaseToolbarButton";
 import { ImClearFormatting } from "react-icons/im";
 import { MdSubscript, MdSuperscript } from "react-icons/md";
-import {
-  FaBold,
-  FaItalic,
-  FaRedo,
-  FaTable,
-  FaUnderline,
-  FaUndo,
-} from "react-icons/fa";
+import { FaBold, FaItalic, FaRedo, FaUnderline, FaUndo } from "react-icons/fa";
 import { InsertTableModal } from "@/components/Modals/RTEModals/InsertTableModal";
 
 import {
@@ -34,12 +20,10 @@ import {
   $isParagraphNode,
   $isRangeSelection,
   $isTextNode,
-  COMMAND_PRIORITY_LOW,
   FORMAT_TEXT_COMMAND,
   LexicalEditor,
   NodeKey,
   REDO_COMMAND,
-  SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND,
   $isRootOrShadowRoot,
 } from "lexical";
@@ -50,47 +34,25 @@ import {
   $getNearestNodeOfType,
 } from "@lexical/utils";
 
-import { getDOMRangeRect } from "@/lib/utils/getDOMRangeRect";
-import { setFloatingElemPosition } from "@/lib/utils/setFloatingElemPosition";
 import { getSelectedNode } from "@/lib/utils/getSelectedNode";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-  $getSelectionStyleValueForProperty,
-  $isParentElementRTL,
-  $patchStyleText,
-  $setBlocksType,
-} from "@lexical/selection";
+import { $setBlocksType } from "@lexical/selection";
 
 import {
   $isListNode,
-  INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
   ListNode,
   REMOVE_LIST_COMMAND,
 } from "@lexical/list";
 
-import {
-  $createCodeNode,
-  $isCodeNode,
-  CODE_LANGUAGE_FRIENDLY_NAME_MAP,
-  CODE_LANGUAGE_MAP,
-  getLanguageFriendlyName,
-  $isCodeHighlightNode,
-} from "@lexical/code";
-import {
-  $createHeadingNode,
-  $createQuoteNode,
-  $isHeadingNode,
-  $isQuoteNode,
-  HeadingTagType,
-} from "@lexical/rich-text";
+import { $isCodeHighlightNode } from "@lexical/code";
+import { $isHeadingNode } from "@lexical/rich-text";
 
 interface ToolbarProps {
   editor: LexicalEditor;
 }
 
-// const useToolbar = ({ editor }: ToolbarProps) => {
 const useToolbar = ({
   editor,
 }: ToolbarProps): [
@@ -100,7 +62,7 @@ const useToolbar = ({
   boolean,
   boolean,
   boolean,
-  boolean,
+  // boolean,
   boolean,
   keyof typeof blockTypeToBlockName
 ] => {
@@ -117,7 +79,7 @@ const useToolbar = ({
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
     null
   );
-  const [codeLanguage, setCodeLanguage] = useState<string>("");
+  // const [codeLanguage, setCodeLanguage] = useState<string>("");
   const blockTypeToBlockName = {
     bullet: "Bulleted List",
     check: "Check List",
@@ -275,7 +237,7 @@ const useToolbar = ({
     isUnderline,
     isSubscript,
     isSuperscript,
-    isStrikethrough,
+    // isStrikethrough,
     canUndo,
     canRedo,
     blockType,
@@ -294,7 +256,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
     isUnderline,
     isSubscript,
     isSuperscript,
-    isStrikethrough,
+    // isStrikethrough,
     canUndo,
     canRedo,
     blockType,
@@ -302,7 +264,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
   const {
     isOpen: isAddTableOpen,
     onClose: onAddTableClose,
-    onOpen: onAddTableOpen,
+    // onOpen: onAddTableOpen,
   } = useDisclosure();
 
   const formatParagraph = () => {
@@ -329,26 +291,6 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
       editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
     }
   };
-
-  const boldEtcCanRender = useBreakpointValue({
-    base: false,
-    sm: false,
-    md: false,
-    "768px": false,
-    mdlg: false,
-    lg: true,
-    xl: true,
-  });
-
-  const formattingCanRender = useBreakpointValue({
-    base: false,
-    sm: false,
-    md: false,
-    "768px": false,
-    mdlg: false,
-    lg: false,
-    "1200px": true,
-  });
 
   const { colorMode } = useColorMode();
 

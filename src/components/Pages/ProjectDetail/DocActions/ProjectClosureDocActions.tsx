@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  IConceptPlan,
   IProjectClosure,
   IProjectDocuments,
   IProjectMember,
@@ -29,23 +28,16 @@ import { useUser } from "../../../../lib/hooks/useUser";
 import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
 import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { Link } from "react-router-dom";
 import { UserProfile } from "../../Users/UserProfile";
 import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import {
   IDocGenerationProps,
   generateProjectDocument,
   downloadProjectDocument,
-  spawnNewEmptyDocument,
-  ISpawnDocument,
   setProjectStatus,
   ISetProjectProps,
-  closeProjectCall,
-  ICloseProjectProps,
-  openProjectCall,
-  ISimplePkProp,
 } from "../../../../lib/api";
 import { AxiosError } from "axios";
 import { ProjectClosureActionModal } from "../../../Modals/DocumentActionModals/ProjectClosureActionModal";
@@ -60,16 +52,11 @@ interface IConceptDocumentActions {
 }
 
 export const ProjectClosureDocActions = ({
-  all_documents,
   projectClosureData,
   refetchData,
   setToLastTab,
 }: // , projectPk
 IConceptDocumentActions) => {
-  const [showActions, setShowActions] = useState(false);
-  const handleToggleActionsVisibility = () => {
-    setShowActions(!showActions);
-  };
   const { colorMode } = useColorMode();
 
   // useEffect(() => {
@@ -109,11 +96,6 @@ IConceptDocumentActions) => {
   } = useDisclosure();
 
   const {
-    isOpen: isS1SendbackModalOpen,
-    onOpen: onS1SendbackModalOpen,
-    onClose: onS1SendbackModalClose,
-  } = useDisclosure();
-  const {
     isOpen: isS2SendbackModalOpen,
     onOpen: onS2SendbackModalOpen,
     onClose: onS2SendbackModalClose,
@@ -135,13 +117,8 @@ IConceptDocumentActions) => {
   const { baData, baLoading } = useBusinessArea(
     projectClosureData?.document?.project?.business_area?.pk
   );
-  // useEffect(() => {
-  //   if (!baLoading) console.log(projectClosureData?.document);
-  //   console.log(baData);
-  // }, [baData, baLoading, projectClosureData]);
-  const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
-    baData?.leader
-  );
+
+  const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
     projectClosureData?.document?.modifier
   );
@@ -149,19 +126,9 @@ IConceptDocumentActions) => {
     projectClosureData?.document?.creator
   );
 
-  const { teamData, isTeamLoading, refetchTeamData } = useProjectTeam(
+  const { teamData, isTeamLoading } = useProjectTeam(
     String(projectClosureData?.document?.project?.pk)
   );
-
-  // useEffect(() => {
-  //   if (!userLoading && !baLoading && !baLeadLoading) {
-  //     console.log({
-  //       ba: baData,
-  //       leadUser: baLead,
-  //       me: userData,
-  //     });
-  //   }
-  // }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
 
   const creationDate = useFormattedDate(
     projectClosureData?.document?.created_at
@@ -169,11 +136,6 @@ IConceptDocumentActions) => {
   const modifyDate = useFormattedDate(projectClosureData?.document?.updated_at);
 
   const [actionsReady, setActionsReady] = useState(false);
-  const [userIsLeader, setUserIsLeader] = useState(false);
-  // const [teamLeaderPk, setTeamLeaderPk] = useState(0);
-
-  // Find the team member with is_leader === true
-  // const leaderMember = teamData.find((member) => member.is_leader === true);
 
   const [leaderMember, setLeaderMemeber] = useState<IProjectMember>();
 
@@ -197,17 +159,6 @@ IConceptDocumentActions) => {
       }
       setActionsReady(true);
     }
-    // else {
-    //     console.log({
-    //         userLoading, baLoading, modifierLoading, creatorLoading, userData, baData, modifier, creator, actionsReady, teamData, isTeamLoading
-    //     })
-    // }
-    // else {
-    //     if (actionsReady === true) {
-    //         setActionsReady(false);
-
-    //     }
-    // }
   }, [
     userLoading,
     baLoading,
@@ -225,8 +176,6 @@ IConceptDocumentActions) => {
   useEffect(() => {
     if (actionsReady) {
       setLeaderMemeber(teamData.find((member) => member.is_leader === true));
-      // console.log(userData);
-      // console.log(projectClosureData?.document);
     }
   }, [actionsReady, teamData, isTeamLoading]);
 
@@ -241,11 +190,10 @@ IConceptDocumentActions) => {
     onClose: onCreatorClose,
   } = useDisclosure();
 
-  const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<IDocGenerationProps>();
+  const { register, handleSubmit } = useForm<IDocGenerationProps>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -257,7 +205,7 @@ IConceptDocumentActions) => {
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -291,7 +239,7 @@ IConceptDocumentActions) => {
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -322,119 +270,11 @@ IConceptDocumentActions) => {
   });
 
   const beginProjectDocPDFDownload = (formData: IDocGenerationProps) => {
-    // const docPk = projectClosureData?.document?.pk;
     projectPDFDownloadMutation.mutate(formData);
   };
 
   const beginProjectDocPDFGeneration = (formData: IDocGenerationProps) => {
-    // const docPk = projectClosureData?.document?.pk;
     projectDocPDFGenerationMutation.mutate(formData);
-  };
-
-  // useEffect(() => {
-  //   console.log(leaderMember);
-  // }, [leaderMember]);
-
-  // const closeProjectMutation = useMutation(closeProjectCall,
-  //     {
-  //         onMutate: () => {
-  //             addToast({
-  //                 status: "loading",
-  //                 title: "Closing Project",
-  //                 position: "top-right"
-  //             })
-  //         },
-  //         onSuccess: async (data) => {
-
-  //             if (toastIdRef.current) {
-  //                 toast.update(toastIdRef.current, {
-  //                     title: 'Success',
-  //                     description: `Project Closed`,
-  //                     status: 'success',
-  //                     position: "top-right",
-  //                     duration: 3000,
-  //                     isClosable: true,
-  //                 })
-  //             }
-  //             const updateData: ISetProjectProps = {
-  //                 projectId: projectClosureData?.document?.project.pk ? projectClosureData.document.project.pk : projectClosureData?.document?.project?.id,
-  //                 status: 'closed',
-  //             }
-  //             await setProjectStatus(updateData)
-  //             queryClient.invalidateQueries(["projects", updateData.projectId]);
-  //             refetchData();
-  //         },
-  //         onError: (error: AxiosError) => {
-  //             if (toastIdRef.current) {
-  //                 toast.update(toastIdRef.current, {
-  //                     title: 'Could Not Close Project',
-  //                     description: error?.response?.data
-  //                         ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
-  //                         : 'Error',
-  //                     status: 'error',
-  //                     position: "top-right",
-  //                     duration: 3000,
-  //                     isClosable: true,
-  //                 })
-  //             }
-  //         }
-  //     })
-
-  const openProjectMutation = useMutation(openProjectCall, {
-    onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Reopening Project",
-        position: "top-right",
-      });
-    },
-    onSuccess: async (data) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Success",
-          description: `Project Reopened`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-      const updateData: ISetProjectProps = {
-        projectId: projectClosureData?.document?.project.pk
-          ? projectClosureData.document.project.pk
-          : projectClosureData?.document?.project?.id,
-        status: "closed",
-      };
-      await setProjectStatus(updateData);
-      queryClient.invalidateQueries(["projects", updateData.projectId]);
-      refetchData();
-    },
-    onError: (error: AxiosError) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Could Not Reopen Project",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-  });
-
-  // const closeProjectFunc = (data: ICloseProjectProps) => {
-  //     console.log(data);
-  //     closeProjectMutation.mutate(data);
-  // }
-
-  const openProjectFunc = (data: ISimplePkProp) => {
-    // console.log(data);
-    openProjectMutation.mutate(data);
   };
 
   const {
@@ -465,11 +305,6 @@ IConceptDocumentActions) => {
 
     setProjectStatus(data);
   };
-  const [docPk, setDocPk] = useState(
-    projectClosureData?.document?.pk
-      ? projectClosureData.document.pk
-      : projectClosureData?.document?.id
-  );
 
   return (
     <>

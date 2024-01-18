@@ -16,12 +16,9 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { BsGripVertical } from "react-icons/bs";
 import { ProjectUserDetails } from "./ProjectUserDetails";
-import { useEffect, useState } from "react";
-import { IImageData, IUserData } from "../../../types";
+import { IImageData } from "../../../types";
 import { FaCrown } from "react-icons/fa";
-import { DraggableProvided } from "react-beautiful-dnd"; // Import DraggableProvided
 
 interface ITeamMember {
   user_id: number;
@@ -37,10 +34,6 @@ interface ITeamMember {
   project_id: number;
   leader_pk: number;
   refetchTeamData: () => void;
-  // draggableProps: DraggableProvided['draggableProps'];
-  // dragHandleProps: DraggableProvided['dragHandleProps'];
-  // isCurrentlyDragging: boolean;
-  // draggingUser: IUser;
 }
 
 export const TeamMemberDisplay = ({
@@ -53,23 +46,12 @@ export const TeamMemberDisplay = ({
   image,
   short_code,
   time_allocation,
-  position,
+  // position,
   username,
   usersCount,
   project_id,
-}: // isCurrentlyDragging,
-// draggableProps,
-// dragHandleProps,
-// draggingUser
-// isDragging, // Receive isDragging prop
-
-ITeamMember) => {
-  // Define your styles for the dragged state
+}: ITeamMember) => {
   const { colorMode } = useColorMode();
-
-  // useEffect(() => {
-  //     console.log(`${name} dragging: ${isCurrentlyDragging}`);
-  // })
 
   const roleColors: { [key: string]: { bg: string; color: string } } = {
     "Research Scientist": { bg: "green.700", color: "white" },
@@ -122,14 +104,6 @@ ITeamMember) => {
     onClose: onUserClose,
   } = useDisclosure();
 
-  // const draggedStyles = {
-  //     background: colorMode === "light" ? "blue.500" : "blue.500",
-  //     scale: 1.1,
-  //     borderRadius: '10px',
-  //     cursor: 'grabbing',
-  //     zIndex: 999,
-  // };
-
   return (
     <>
       <Drawer
@@ -148,7 +122,7 @@ ITeamMember) => {
               is_leader={is_leader}
               role={role}
               shortCode={short_code}
-              position={position}
+              // position={position}
               time_allocation={time_allocation}
               usersCount={usersCount}
               refetchTeamData={refetchTeamData}
@@ -164,12 +138,6 @@ ITeamMember) => {
       </Drawer>
 
       <HStack
-        // {...draggableProps}
-        // {...dragHandleProps}
-        // style={isCurrentlyDragging ? draggedStyles : {}}
-
-        // scale={isCurrentlyDragging ? 1.1 : 1}
-        // borderRadius={isCurrentlyDragging ? "10px" : "0px"}
         bg={colorMode === "light" ? "white" : "gray.800"}
         justifyContent={"space-between"}
         _hover={{
@@ -243,20 +211,3 @@ ITeamMember) => {
     </>
   );
 };
-
-{
-  /* Right Section
-                <Box
-                    userSelect={"none"}
-                    right={0}
-                    h={20}
-                    // cursor={isGrabbed ? "grabbing" : "grab"}
-                    p={4}
-                    flex={1}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="flex-end"
-                >
-                    {<BsGripVertical />}
-                </Box> */
-}

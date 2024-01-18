@@ -1,7 +1,4 @@
 import {
-  Text,
-  Image,
-  Center,
   Flex,
   Modal,
   ModalBody,
@@ -12,11 +9,8 @@ import {
   ToastId,
   useToast,
   useColorMode,
-  UnorderedList,
-  ListItem,
   FormControl,
   InputGroup,
-  Input,
   ModalFooter,
   Grid,
   Button,
@@ -24,18 +18,11 @@ import {
   VisuallyHiddenInput,
   FormHelperText,
   Box,
-  Icon,
   Select,
 } from "@chakra-ui/react";
-import {
-  IEditProject,
-  ISimplePkProp,
-  deleteProjectCall,
-  updateProjectDetails,
-} from "../../lib/api";
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { IEditProject, updateProjectDetails } from "../../lib/api";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import {
   IBusinessArea,
   IDepartmentalService,
@@ -43,25 +30,16 @@ import {
   ISimpleLocationData,
   ISmallResearchFunction,
   ISmallService,
-  ISmallUser,
-  IUserMe,
   ProjectImage,
 } from "../../types";
 import { useForm } from "react-hook-form";
-import { StateRichTextEditor } from "../RichTextEditor/Editors/StateRichTextEditor";
-import { useProject } from "../../lib/hooks/useProject";
 import TagInput from "../Pages/CreateProject/TagInput";
-import { ImagePreview } from "../Pages/CreateProject/ImagePreview";
-import useApiEndpoint from "../../lib/hooks/useApiEndpoint";
-import { BsFillCalendarEventFill } from "react-icons/bs";
 import { useResearchFunctions } from "../../lib/hooks/useResearchFunctions";
 import { useDepartmentalServices } from "../../lib/hooks/useDepartmentalServices";
 import { useBusinessAreas } from "../../lib/hooks/useBusinessAreas";
 import { useGetLocations } from "../../lib/hooks/useGetLocations";
 import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
-import { useNoImage } from "../../lib/hooks/useNoImage";
-import { NewImagePreview } from "../Pages/CreateProject/NewImagePreview";
 import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
 import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
 import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
@@ -110,17 +88,7 @@ export const EditProjectModal = ({
   useEffect(() => {
     if (locationData.length === 0) {
       setLocationData(currentAreas.map((area) => area.pk));
-      // console.log(locationData);
-    } else {
-      // console.log('not zero')
-      // console.log(locationData)
     }
-    // console.log(currentAreas)
-    // console.log(selectedRegions);
-    // console.log(selectedDistricts);
-    // console.log(selectedIbras);
-    // console.log(selectedImcras);
-    // console.log(selectedNrms);
   }, []);
 
   const [businessAreaList, setBusinessAreaList] = useState<IBusinessArea[]>([]);
@@ -129,7 +97,6 @@ export const EditProjectModal = ({
 
   useEffect(() => {
     if (!baLoading && baSet === false) {
-      // console.log(businessAreaDataFromAPI)
       const alphabetisedBA = [...businessAreaDataFromAPI];
       alphabetisedBA.sort((a, b) => a.name.localeCompare(b.name));
       setBusinessAreaList(alphabetisedBA);
@@ -142,7 +109,6 @@ export const EditProjectModal = ({
   const [dsSet, setDsSet] = useState(false);
   useEffect(() => {
     if (!dsLoading && dsSet === false) {
-      // console.log(servicesDataFromAPI)
       const alphabetisedDS = [...servicesDataFromAPI];
       alphabetisedDS.sort((a, b) => a.name.localeCompare(b.name));
       setServicesList(alphabetisedDS);
@@ -158,7 +124,6 @@ export const EditProjectModal = ({
   const [rfSet, setRfSet] = useState(false);
   useEffect(() => {
     if (!rfLoading && rfSet === false) {
-      // console.log(researchFunctionsFromAPI)
       const alphabetisedRF = [...researchFunctionsFromAPI];
       alphabetisedRF.sort((a, b) => a.name.localeCompare(b.name));
       setResearchFunctionsList(alphabetisedRF);
@@ -169,7 +134,6 @@ export const EditProjectModal = ({
   // id/pk
   const [projectTitle, setProjectTitle] = useState(currentTitle);
   const [keywords, setKeywords] = useState(currentKeywords);
-  // const [dates, setDates] = useState(currentDates);
   const [startDate, setStartDate] = useState(currentDates[0]);
   const [endDate, setEndDate] = useState(currentDates[1]);
   const [businessArea, setBusinessArea] = useState(currentBa);
@@ -181,27 +145,11 @@ export const EditProjectModal = ({
   >(currentResearchFunction);
   const [dataCustodian, setDataCustodian] = useState(currentDataCustodian);
 
-  const [imageLoadFailed, setImageLoadFailed] = useState(false);
-  const noImageLink = useNoImage();
-  // const imageUrl = useServerImageUrl(noImageLink);
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
     currentImage?.file
   );
 
-  const baseAPI = useApiEndpoint();
-
-  const handleFileInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setSelectedFile(files[0]);
-    }
-  };
-
-  // const [status, setStatus] = useState(projectData?.project?.status);
   const [canUpdate, setCanUpdate] = useState(false);
 
   const getPlainTextFromHTML = (htmlString) => {
@@ -214,15 +162,6 @@ export const EditProjectModal = ({
   };
 
   useEffect(() => {
-    // console.log({
-    //     projectTitle,
-    //     keywords,
-    //     dates,
-    //     businessArea,
-    //     service,
-    //     researchFunction,
-    //     dataCustodian
-    // })
     const plainTitle = getPlainTextFromHTML(projectTitle);
     if (
       plainTitle === "" ||
@@ -232,22 +171,17 @@ export const EditProjectModal = ({
       startDate === undefined ||
       endDate === undefined ||
       startDate > endDate ||
-      // (service === null || service === undefined) ||
-      // (researchFunction === null || researchFunction === undefined) ||
       businessArea === null ||
       businessArea === undefined ||
       dataCustodian === null ||
       dataCustodian === 0 ||
       dataCustodian === undefined ||
-      // (locationData.length < 1) ||
       keywords.length === 0
     ) {
       setCanUpdate(false);
     } else {
       setCanUpdate(true);
     }
-    // console.log(selectedFile);
-    // console.log(currentImage);
   }, [
     projectTitle,
     keywords,
@@ -262,11 +196,11 @@ export const EditProjectModal = ({
     currentImage,
   ]);
 
-  const { register, handleSubmit, reset, watch } = useForm<IEditProject>();
+  const { register } = useForm<IEditProject>();
   const queryClient = useQueryClient();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
   const { colorMode } = useColorMode();
@@ -285,7 +219,7 @@ export const EditProjectModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -321,10 +255,7 @@ export const EditProjectModal = ({
     <>
       <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
         <ModalOverlay />
-        <Flex
-        // as={"form"}
-        //     onSubmit={handleSubmit(updateProject)}
-        >
+        <Flex>
           <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
             <ModalHeader>Edit Project?</ModalHeader>
             <ModalCloseButton />
@@ -350,14 +281,7 @@ export const EditProjectModal = ({
                     setValueAsPlainText={false}
                   />
 
-                  <Box
-                    w={"100%"}
-                    h={"100%"}
-                    mt={2}
-                    mx={2}
-                    // display="flex"
-                    // alignItems="center" justifyContent="center"
-                  >
+                  <Box w={"100%"} h={"100%"} mt={2} mx={2}>
                     <StartAndEndDateSelector
                       startDate={startDate}
                       endDate={endDate}
@@ -377,52 +301,6 @@ export const EditProjectModal = ({
                     />
                   </Box>
                 </Box>
-                {/* 
-              <FormControl my={4}>
-                <FormLabel>Image</FormLabel>
-                <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-                  <NewImagePreview
-                    selectedFile={selectedFile}
-                    currentString={
-                      currentImage?.file
-                        ? `${baseAPI}${currentImage?.file}`
-                        : undefined
-                    }
-                  />
-
-                  <Box>
-                    <InputGroup>
-                      <Button
-                        as="label"
-                        htmlFor="fileInput"
-                        pt={1}
-                        display="inline-flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                        color={colorMode === "light" ? "black" : "white"}
-                        cursor={"pointer"}
-                      >
-                        Choose File
-                      </Button>
-                      <Input
-                        id="fileInput"
-                        type="file"
-                        accept=".png, .jpeg, .jpg, image/png, image/jpeg"
-                        onChange={handleFileInputChange}
-                        opacity={0}
-                        position="absolute"
-                        width="0.1px"
-                        height="0.1px"
-                        zIndex="-1"
-                      />
-                    </InputGroup>
-                    <FormHelperText>
-                      Upload an image that represents the project.
-                    </FormHelperText>
-                  </Box>
-                </Grid>
-              </FormControl> */}
 
                 <Flex flexDir={"column"}>
                   <TagInput
@@ -440,7 +318,7 @@ export const EditProjectModal = ({
                       preselectedUserPk={currentDataCustodian}
                       label="Data Custodian"
                       placeholder="Search for a user"
-                      helperText={<>The user you would like to handle data.</>}
+                      helperText={"The user you would like to handle data."}
                     />
                   </Box>
 
@@ -458,9 +336,6 @@ export const EditProjectModal = ({
                               const relatedBa = businessAreaList.find(
                                 (ba) => Number(ba.pk) === Number(pkVal)
                               );
-
-                              console.log(event.target.value);
-                              console.log(relatedBa);
                               if (relatedBa !== undefined) {
                                 setBusinessArea(relatedBa);
                               }
@@ -558,10 +433,7 @@ export const EditProjectModal = ({
                         </FormHelperText>
                       </FormControl>
 
-                      <FormControl
-                        // isRequired
-                        mb={4}
-                      >
+                      <FormControl mb={4}>
                         <FormLabel>Departmental Service</FormLabel>
                         <InputGroup>
                           <Select
@@ -572,9 +444,6 @@ export const EditProjectModal = ({
                               const depService = servicesList.find(
                                 (serv) => Number(serv.pk) === Number(pkVal)
                               );
-
-                              console.log(event.target.value);
-                              console.log(depService);
                               if (depService !== undefined) {
                                 setService(depService);
                               }
@@ -620,12 +489,7 @@ export const EditProjectModal = ({
                 </Flex>
               </Grid>
 
-              <Grid
-                gridTemplateColumns={"repeat(1, 1fr)"}
-                gridGap={4}
-                // flexDir={"column"}
-                mt={4}
-              >
+              <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4} mt={4}>
                 {!locationsLoading && (
                   <>
                     <Grid
@@ -638,7 +502,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="DBCA Districts"
                           areas={dbcaDistricts}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />
@@ -649,7 +513,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="IMCRAs"
                           areas={imcra}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />
@@ -658,7 +522,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="DBCA Regions"
                           areas={dbcaRegions}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />
@@ -667,7 +531,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="Natural Resource Management Regions"
                           areas={nrm}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />
@@ -676,7 +540,7 @@ export const EditProjectModal = ({
                         <AreaCheckAndMaps
                           title="IBRAs"
                           areas={ibra}
-                          required={false}
+                          // required={false}
                           selectedAreas={locationData}
                           setSelectedAreas={setLocationData}
                         />
@@ -697,7 +561,7 @@ export const EditProjectModal = ({
                   _hover={{
                     background:
                       colorMode === "light" ? "green.400" : "green.500",
-                  }} // isDisabled={!changesMade}
+                  }}
                   isLoading={updateProjectMutation.isLoading}
                   type="submit"
                   ml={3}
@@ -706,9 +570,7 @@ export const EditProjectModal = ({
                     updateProject({
                       projectPk: projectPk,
                       title: projectTitle,
-                      // description: ,
                       image: selectedFile,
-                      // status: ,
                       dataCustodian: dataCustodian,
                       keywords: keywords,
                       startDate: startDate,

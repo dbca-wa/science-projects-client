@@ -3,24 +3,16 @@
 
 import {
   Box,
-  Text,
   Button,
   Flex,
   Grid,
   useDisclosure,
-  Image,
-  Center,
-  Divider,
-  AbsoluteCenter,
   useColorMode,
   Spinner,
 } from "@chakra-ui/react";
 import { Head } from "../components/Base/Head";
 import { AddReportPDFModal } from "../components/Modals/AddReportPDFModal";
 import { useGetARARsWithPDF } from "../lib/hooks/useGetARARsWithPDF";
-import { FaEdit, FaFileDownload } from "react-icons/fa";
-import { MdDownload } from "react-icons/md";
-import { ChangeReportPDFModal } from "../components/Modals/ChangeReportPDFModal";
 import { motion } from "framer-motion";
 import { AnnualReportPDFGridItem } from "../components/Pages/Reports/AnnualReportPDFGridItem";
 

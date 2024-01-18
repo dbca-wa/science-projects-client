@@ -23,14 +23,6 @@ export const SideMenuButton = ({
     setSelected(selectedString.toLowerCase() === pageName.toLowerCase());
   }, [selectedString, pageName]);
 
-  const isLargerOrLarger = useBreakpointValue({
-    base: false,
-    sm: false,
-    md: false,
-    lg: true,
-    xl: true,
-  });
-
   const isOver750 = useBreakpointValue({
     false: true,
     sm: false,
@@ -69,26 +61,15 @@ export const SideMenuButton = ({
       display={"flex"}
       rounded={"lg"}
       cursor={"pointer"}
-      //   alignItems={"center"}
-      //   textAlign={"center"}
       transitionProperty={
         "background-color, border-color, color, fill, stroke, opacity, box-shadow, transform"
       }
       onClick={handleOnClick}
       ml={isOver750 ? 4 : undefined}
     >
-      <Box
-        flex={1}
-        //    bg={"orange"}
-      >
+      <Box flex={1}>
         <Box _focus={{ outline: "none" }}>
-          <Box
-            // display={"flex"}
-            // justifyContent={"space-between"}
-            // alignItems={"center"}
-            // mb={0.5}
-            textAlign={"center"}
-          >
+          <Box textAlign={"center"}>
             <Text textAlign={"center"}>{pageName}</Text>
           </Box>
         </Box>

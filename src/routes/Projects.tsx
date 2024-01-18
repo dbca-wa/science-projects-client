@@ -1,11 +1,9 @@
 // Route for displaying paginated projects
 
-import { IUserData } from "../types";
 import {
   Checkbox,
   Flex,
   Grid,
-  Stack,
   Text,
   useColorMode,
   Select,
@@ -14,12 +12,9 @@ import {
   Button,
   Spinner,
 } from "@chakra-ui/react";
-import { DownloadProjectsCSVButton } from "../components/Pages/Projects/DownloadProjectsCSVButton";
 import { Head } from "../components/Base/Head";
 import { useProjectSearchContext } from "../lib/hooks/ProjectSearchContext";
-import { useEffect } from "react";
 import { PaginatorProject } from "../components/Pages/Projects/PaginatorProject";
-import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
 import { SearchProjects } from "@/components/Navigation/SearchProjects";
@@ -122,9 +117,7 @@ export const Projects = () => {
     });
   };
 
-  const queryClient = useQueryClient();
-
-  const user = queryClient.getQueryData<IUserData>(["me"]);
+  // const user = queryClient.getQueryData<IUserData>(["me"]);
 
   const navigate = useNavigate();
 
@@ -165,18 +158,6 @@ export const Projects = () => {
             New Project
           </Button>
         </Flex>
-        {/* {user?.is_superuser && (
-                    <Flex
-                        flex={1}
-                        w={"100%"}
-                        justifyContent={"flex-end"}
-                        alignItems={"center"}
-                    >
-                        <DownloadProjectsCSVButton />
-                    </Flex>
-
-
-                )} */}
       </Flex>
 
       <Box

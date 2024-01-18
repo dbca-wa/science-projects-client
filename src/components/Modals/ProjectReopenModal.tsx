@@ -19,25 +19,12 @@ import {
   ModalFooter,
   Grid,
   Button,
-  Select,
   Box,
-  FormLabel,
-  FormHelperText,
-  Textarea,
 } from "@chakra-ui/react";
-import {
-  ICloseProjectProps,
-  ISimplePkProp,
-  closeProjectCall,
-  deleteProjectCall,
-  openProjectCall,
-} from "../../lib/api";
-import { useEffect, useRef, useState } from "react";
+import { ISimplePkProp, openProjectCall } from "../../lib/api";
+import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { IUserMe } from "../../types";
 import { useForm } from "react-hook-form";
-import { SimpleStateRichTextEditor } from "../RichTextEditor/Editors/SimpleStateRichTextEditor";
 
 interface Props {
   // thisUser: IUserMe;
@@ -54,14 +41,12 @@ export const ProjectReopenModal = ({
   onClose,
   refetchData,
 }: Props) => {
-  const { register, handleSubmit, reset, watch } = useForm<ISimplePkProp>();
+  const { register, handleSubmit, watch } = useForm<ISimplePkProp>();
   const projPk = watch("pk");
-
-  const navigate = useNavigate();
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -76,7 +61,7 @@ export const ProjectReopenModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",

@@ -2,17 +2,12 @@ import {
   Box,
   Center,
   Flex,
-  FormHelperText,
   Progress,
   Text,
-  ToastId,
   useColorMode,
-  useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Dropzone from "react-dropzone";
-import { useForm } from "react-hook-form";
 import { BsCloudArrowUp } from "react-icons/bs";
 import { FaFile, FaFilePdf } from "react-icons/fa";
 import { TbPhotoFilled } from "react-icons/tb";
@@ -57,6 +52,7 @@ export const FileDropzone = ({
     const newProgressInterval = startSimulatedProgress();
     setProgressInterval(newProgressInterval);
     const res = await new Promise((resolve) => setTimeout(resolve, 1500));
+    console.log(res);
     clearInterval(progressInterval);
     setUploadProgress(100);
     setUploadedFile(acceptedFile[0]);
@@ -79,7 +75,11 @@ export const FileDropzone = ({
 
   return (
     <Dropzone multiple={false} onDrop={onFileDrop}>
-      {({ getRootProps, getInputProps, acceptedFiles }) => (
+      {({
+        getRootProps,
+        // getInputProps,
+        acceptedFiles,
+      }) => (
         <Box
           {...getRootProps()}
           h={64}
@@ -131,7 +131,6 @@ export const FileDropzone = ({
                 <Flex
                   mt={4}
                   maxW={"80%"}
-                  // w={"80%"}
                   bg={colorMode === "light" ? "white" : "gray.800"}
                   justifyContent={"center"}
                   rounded={"md"}
@@ -139,8 +138,6 @@ export const FileDropzone = ({
                   outline={"1px"}
                   outlineColor={"gray.800"}
                   borderWidth={"1px"}
-                  // borderRightWidth={"0px"}
-                  // borderLeftWidth={"1px"}
                   borderColor={colorMode === "light" ? "gray.300" : "gray.600"}
                 >
                   <Box
@@ -194,7 +191,6 @@ export const FileDropzone = ({
                       value={uploadProgress}
                       // hasStripe
                       // animation={"step-start"}
-                      //
                     />
                   </Box>
                 </Center>

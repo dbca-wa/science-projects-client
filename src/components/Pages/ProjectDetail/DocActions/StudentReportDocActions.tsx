@@ -24,10 +24,9 @@ import { useUser } from "../../../../lib/hooks/useUser";
 import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
 import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { Link } from "react-router-dom";
 import { UserProfile } from "../../Users/UserProfile";
 import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import {
   IDocGenerationProps,
@@ -60,21 +59,7 @@ export const StudentReportDocActions = ({
 }: // setselectedStudentReport, setSelectedYear,
 // , projectPk
 IStudentDocumentActions) => {
-  const [showActions, setShowActions] = useState(false);
-  const handleToggleActionsVisibility = () => {
-    setShowActions(!showActions);
-  };
   const { colorMode } = useColorMode();
-
-  useEffect(() => {
-    // console.log(studentReportData);
-    // console.log(studentReportData?.document?.creator);
-    // console.log(studentReportData?.document?.modifier);
-    // console.log(studentReportData?.document?.created_at);
-    // console.log(studentReportData?.document?.updated_at);
-    // setCreationDate(studentReportData?.document?.created_at);
-    // setModifyDate(studentReportData?.document?.updated_at);
-  }, [studentReportData]);
 
   const {
     isOpen: isS1ApprovalModalOpen,
@@ -109,11 +94,6 @@ IStudentDocumentActions) => {
   } = useDisclosure();
 
   const {
-    isOpen: isS1SendbackModalOpen,
-    onOpen: onS1SendbackModalOpen,
-    onClose: onS1SendbackModalClose,
-  } = useDisclosure();
-  const {
     isOpen: isS2SendbackModalOpen,
     onOpen: onS2SendbackModalOpen,
     onClose: onS2SendbackModalClose,
@@ -129,9 +109,7 @@ IStudentDocumentActions) => {
   const { baData, baLoading } = useBusinessArea(
     studentReportData?.document?.project?.business_area?.pk
   );
-  const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
-    baData?.leader
-  );
+  const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
     studentReportData?.document?.modifier
   );
@@ -139,7 +117,7 @@ IStudentDocumentActions) => {
     studentReportData?.document?.creator
   );
 
-  const { teamData, isTeamLoading, refetchTeamData } = useProjectTeam(
+  const { teamData, isTeamLoading } = useProjectTeam(
     String(studentReportData?.document?.project?.pk)
   );
 
@@ -149,48 +127,24 @@ IStudentDocumentActions) => {
     onClose: onCloseDeleteDocumentModal,
   } = useDisclosure();
 
-  const [docPk, setDocPk] = useState(
-    studentReportData?.document?.pk
-      ? studentReportData.document.pk
-      : studentReportData?.document?.id
-  );
+  // const [docPk, setDocPk] = useState(
+  //   studentReportData?.document?.pk
+  //     ? studentReportData.document.pk
+  //     : studentReportData?.document?.id
+  // );
 
   const keyForDeleteDocumentModal = studentReportData?.document?.pk
     ? `document-${studentReportData?.document?.pk}`
     : `document-${studentReportData?.document?.id}`;
 
   // useEffect(() => {
-  //     const highestYearDocument = documents.reduce((maxDocument, currentDocument) => {
-  //         if (!maxDocument || currentDocument.year > maxDocument.year) {
-  //             return currentDocument;
-  //         }
-  //         return maxDocument;
-  //     }, null)
-
-  //     setSelectedYear(highestYearDocument.year)
-  //     setselectedStudentReport(highestYearDocument);
-  //     // console.log('DOC LENGTH: ', documents.length);
-  //     // refetchDataForYearFunction();
-  // }, [documents])
-
-  useEffect(() => {
-    setDocPk(studentReportData.document.pk);
-  }, [studentReportData]);
+  //   setDocPk(studentReportData.document.pk);
+  // }, [studentReportData]);
 
   // useEffect(
   //     () => {
   //         setDocPk},
   //     [documents])
-
-  // useEffect(() => {
-  //   if (!userLoading && !baLoading && !baLeadLoading) {
-  //     console.log({
-  //       ba: baData,
-  //       leadUser: baLead,
-  //       me: userData,
-  //     });
-  //   }
-  // }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
 
   const creationDate = useFormattedDate(
     studentReportData?.document?.created_at
@@ -198,11 +152,6 @@ IStudentDocumentActions) => {
   const modifyDate = useFormattedDate(studentReportData?.document?.updated_at);
 
   const [actionsReady, setActionsReady] = useState(false);
-  const [userIsLeader, setUserIsLeader] = useState(false);
-  // const [teamLeaderPk, setTeamLeaderPk] = useState(0);
-
-  // Find the team member with is_leader === true
-  // const leaderMember = teamData.find((member) => member.is_leader === true);
 
   const [leaderMember, setLeaderMemeber] = useState<IProjectMember>();
 
@@ -220,18 +169,11 @@ IStudentDocumentActions) => {
       modifier &&
       creator
     ) {
-      // console.log();
       if (!isTeamLoading) {
         setLeaderMemeber(teamData.find((member) => member.is_leader === true));
       }
       setActionsReady(true);
     }
-    // else {
-    //     if (actionsReady === true) {
-    //         setActionsReady(false);
-
-    //     }
-    // }
   }, [
     userLoading,
     baLoading,
@@ -249,8 +191,6 @@ IStudentDocumentActions) => {
   useEffect(() => {
     if (actionsReady) {
       setLeaderMemeber(teamData.find((member) => member.is_leader === true));
-      // console.log(userData);
-      // console.log(studentReportData?.document);
     }
   }, [actionsReady, teamData, isTeamLoading]);
 
@@ -265,11 +205,10 @@ IStudentDocumentActions) => {
     onClose: onCreatorClose,
   } = useDisclosure();
 
-  const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<IDocGenerationProps>();
+  const { register, handleSubmit } = useForm<IDocGenerationProps>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -293,7 +232,7 @@ IStudentDocumentActions) => {
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -327,7 +266,7 @@ IStudentDocumentActions) => {
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -358,18 +297,12 @@ IStudentDocumentActions) => {
   });
 
   const beginProjectDocPDFDownload = (formData: IDocGenerationProps) => {
-    // const docPk = studentReportData?.document?.pk;
     projectPDFDownloadMutation.mutate(formData);
   };
 
   const beginProjectDocPDFGeneration = (formData: IDocGenerationProps) => {
-    // const docPk = studentReportData?.document?.pk;
     projectDocPDFGenerationMutation.mutate(formData);
   };
-
-  // useEffect(() => {
-  //   console.log(leaderMember);
-  // }, [leaderMember]);
 
   return (
     <>
@@ -792,8 +725,6 @@ IStudentDocumentActions) => {
                               Delete Document
                             </Button>
                           </>
-                          {/* )
-                                                        } */}
 
                           <Button
                             color={"white"}
@@ -818,13 +749,10 @@ IStudentDocumentActions) => {
 
                 {/* Business Area GRID */}
                 <Grid
-                  // gridTemplateColumns={"repeat(1, 1fr)"}
                   border={"1px solid"}
                   borderColor={"gray.300"}
                   borderBottom={"0px"}
-                  // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -835,9 +763,6 @@ IStudentDocumentActions) => {
                       Business Area Lead
                     </Text>
 
-                    {/* {
-                                                userData
-                                            } */}
                     <Tag
                       alignItems={"center"}
                       justifyContent={"center"}
@@ -867,7 +792,6 @@ IStudentDocumentActions) => {
                         ? 3
                         : 0
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {studentReportData?.document
                       ?.project_lead_approval_granted &&
@@ -875,10 +799,7 @@ IStudentDocumentActions) => {
                         ?.business_area_lead_approval_granted === false &&
                       (userData?.is_superuser ||
                         userData?.pk === baLead?.pk) && (
-                        <Center
-                        // justifyContent={"flex-start"}
-                        // ml={4}
-                        >
+                        <Center>
                           <StudentReportActionModal
                             userData={userData}
                             refetchData={refetchData}

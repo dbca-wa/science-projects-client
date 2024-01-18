@@ -1,4 +1,4 @@
-// WIP/Currently unused: Component for changing a user's password
+// Component for changing a user's password
 
 import {
   Button,

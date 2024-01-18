@@ -2,21 +2,16 @@
 
 import {
   Box,
-  Text,
   Button,
   Flex,
   FormControl,
   FormHelperText,
   FormLabel,
   Grid,
-  Icon,
   InputGroup,
-  ModalBody,
-  ModalFooter,
   Select,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { BsFillCalendarEventFill } from "react-icons/bs";
 
 import "react-calendar/dist/Calendar.css";
 import "../../../styles/modalscrollbar.css";
@@ -29,14 +24,13 @@ import {
 import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
 import { useDepartmentalServices } from "../../../lib/hooks/useDepartmentalServices";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
-import { DatePicker } from "./DatePicker";
 import { StartAndEndDateSelector } from "./StartAndEndDateSelector";
 
 interface IProjectDetailSectionProps {
   thisUser: number;
   projectDetailsFilled: boolean;
   setProjectDetailsFilled: (val: boolean) => void;
-  nextClick: (data: any) => void;
+  nextClick: (data) => void;
   onClose: () => void;
   backClick: () => void;
   projectType: string;
@@ -50,7 +44,7 @@ export const ProjectDetailsSection = ({
   setProjectDetailsFilled,
   projectType,
   thisUser,
-  onClose,
+  // onClose,
   colorMode,
 }: IProjectDetailSectionProps) => {
   const [selectedBusinessArea, setSelectedBusinessArea] = useState<number>(0);
@@ -68,9 +62,6 @@ export const ProjectDetailsSection = ({
 
   useEffect(() => {
     // Adjust to auto set, but allow for closing and re-setting data custodian.
-    // if (selectedSupervisingScientist && !selectedDataCustodian) {
-    //     setSelectedDataCustodian(selectedSupervisingScientist);
-    // }
     if (
       selectedBusinessArea &&
       // && selectedDepartmentalService
@@ -82,15 +73,6 @@ export const ProjectDetailsSection = ({
       startDate <= endDate
     ) {
       setProjectDetailsFilled(true);
-      // console.log({
-      //   businessArea: selectedBusinessArea,
-      //   researchFunction: selectedResearchFunction,
-      //   departmentalService: selectedDepartmentalService,
-      //   dataCustodian: selectedDataCustodian,
-      //   supervisingScientist: selectedSupervisingScientist,
-      //   startDate: startDate,
-      //   endDate: endDate,
-      // });
     } else {
       setProjectDetailsFilled(false);
     }
@@ -118,7 +100,6 @@ export const ProjectDetailsSection = ({
 
   useEffect(() => {
     if (!rfLoading) {
-      // console.log(researchFunctionsFromAPI)
       const alphabetisedRF = [...researchFunctionsFromAPI];
       alphabetisedRF.sort((a, b) => a.name.localeCompare(b.name));
       setResearchFunctionsList(alphabetisedRF);
@@ -127,7 +108,6 @@ export const ProjectDetailsSection = ({
 
   useEffect(() => {
     if (!baLoading) {
-      // console.log(businessAreaDataFromAPI)
       const alphabetisedBA = [...businessAreaDataFromAPI];
       alphabetisedBA.sort((a, b) => a.name.localeCompare(b.name));
       setBusinessAreaList(alphabetisedBA);
@@ -136,7 +116,6 @@ export const ProjectDetailsSection = ({
 
   useEffect(() => {
     if (!dsLoading) {
-      // console.log(servicesDataFromAPI)
       const alphabetisedDS = [...servicesDataFromAPI];
       alphabetisedDS.sort((a, b) => a.name.localeCompare(b.name));
       setServicesList(alphabetisedDS);
@@ -315,14 +294,9 @@ export const ProjectDetailsSection = ({
                   : "Search for a Research Scientist"
               }
               helperText={
-                <Box
-                  mt={2}
-                  color={colorMode === "light" ? "gray.500" : "gray.400"}
-                >
-                  {projectType === "Student Project"
-                    ? "The supervising scientist."
-                    : "Research Scientist (Project Leader)"}
-                </Box>
+                projectType === "Student Project"
+                  ? "The supervising scientist."
+                  : "Research Scientist (Project Leader)"
               }
             />
           </Box>
@@ -337,33 +311,12 @@ export const ProjectDetailsSection = ({
               label="Data Custodian"
               placeholder="Search for a data custodian"
               helperText={
-                <Box color={colorMode === "light" ? "gray.500" : "gray.400"}>
-                  The data custodian (SPP E25) responsible for data management,
-                  publishing, and metadata documentation on the&nbsp;
-                  <Button
-                    onClick={() => {
-                      window.open("http://data.dbca.wa.gov.au/", "_blank");
-                    }}
-                    variant={"link"}
-                    colorScheme="blue"
-                  >
-                    data catalogue.
-                  </Button>
-                </Box>
+                "The data custodian (SPP E25) responsible for data management, publishing, and metadata documentation on the data catalogue"
               }
             />
           </Box>
         </Grid>
       </Grid>
-
-      {/* <Grid
-                    gridTemplateColumns={"repeat(2, 1fr)"}
-                    gridColumnGap={8}
-                    my={4}
-                    bg={"red"}
-                > */}
-
-      {/* </Grid> */}
 
       <Flex w={"100%"} justifyContent={"flex-end"} pb={4}>
         <Button onClick={backClick}>Back</Button>
@@ -379,7 +332,6 @@ export const ProjectDetailsSection = ({
           isDisabled={!projectDetailsFilled}
           onClick={() => {
             if (projectDetailsFilled) {
-              // console.log("going next");
               nextClick({
                 businessArea: selectedBusinessArea,
                 researchFunction: selectedResearchFunction,
@@ -398,17 +350,3 @@ export const ProjectDetailsSection = ({
     </>
   );
 };
-
-{
-  /* HIDING USER __ SHOULD TAKE CURRENT USER */
-}
-{
-  /* <FormControl isRequired mb={4}>
-                <FormLabel>Username</FormLabel>
-                <InputGroup>
-                    <InputLeftElement children={<Icon as={FaUser} />} />
-                    <Input type="text" placeholder="Username" value={username} onChange={(event) => setUsername(event.target.value)} maxLength={30} pattern="[A-Za-z0-9@.+_-]*" />
-                </InputGroup>
-                <FormHelperText>The DBCA staff member to participate in the project team.</FormHelperText>
-            </FormControl> */
-}

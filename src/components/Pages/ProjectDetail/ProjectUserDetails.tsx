@@ -29,7 +29,7 @@ import {
 import { FiCopy } from "react-icons/fi";
 import { FcApproval } from "react-icons/fc";
 import { AiFillCloseCircle } from "react-icons/ai";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
 import { useCopyText } from "../../../lib/hooks/useCopyText";
@@ -48,7 +48,6 @@ interface Props {
   is_leader: boolean;
   leader_pk: number;
   role: string;
-  position: number;
   time_allocation: number;
   usersCount: number;
   project_id: number;
@@ -64,7 +63,6 @@ export const ProjectUserDetails = ({
   leader_pk,
   role,
   shortCode,
-  position,
   time_allocation,
   usersCount,
   project_id,
@@ -86,26 +84,11 @@ export const ProjectUserDetails = ({
   const [userRole, setUserRole] = useState(role);
   const [shortCodeValue, setShortCodeValue] = useState(shortCode);
 
-  useEffect(() => {
-    if (userRole && userRole !== role) {
-      // POST TO API HERE
-      console.log(project_id);
-    }
-  }, [userRole]);
-
-  useEffect(() => {
-    if (fteValue && fteValue !== time_allocation) {
-      // POST TO API HERE
-      console.log(project_id);
-    }
-  }, [fteValue]);
-
   const handleUpdateRole = (newRole: string) => {
     setUserRole(newRole);
   };
 
   const handleUpdateFTE = (newFTE: number) => {
-    console.log(`Changed to ${newFTE}`);
     setFteValue(newFTE);
   };
 
@@ -180,7 +163,7 @@ export const ProjectUserDetails = ({
   // Toast
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -189,7 +172,7 @@ export const ProjectUserDetails = ({
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const updateProjectUser = (formData: any) => {
+  const updateProjectUser = (formData) => {
     console.log(formData);
     updateMemberMutation.mutate(formData);
   };
@@ -205,7 +188,7 @@ export const ProjectUserDetails = ({
       });
     },
 
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -261,7 +244,7 @@ export const ProjectUserDetails = ({
       });
     },
 
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -317,7 +300,7 @@ export const ProjectUserDetails = ({
       });
     },
 
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -551,8 +534,6 @@ export const ProjectUserDetails = ({
           (me?.userData?.is_superuser || me?.userData?.pk === leader_pk) && (
             <Button
               mt={4}
-              // bg={colorMode === "light" ? "green.500" : "green.600"}
-              // color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
               bg={colorMode === "dark" ? "green.600" : "green.500"}
               color={"white"}
               _hover={{
@@ -587,9 +568,7 @@ export const ProjectUserDetails = ({
         </Button>
       </Flex>
 
-      <Box
-      // mt={2}
-      >
+      <Box>
         <Flex
           border={"1px solid"}
           rounded={"xl"}
@@ -605,10 +584,7 @@ export const ProjectUserDetails = ({
                   rounded={"lg"}
                   w="60px"
                   h="60px"
-                  src={
-                    "/dbca.jpg"
-                    // user?.agency?.image?.file ? user.agency.image.file : user?.agency?.image?.old_file ? user.agency.image.old_file : ""
-                  }
+                  src={"/dbca.jpg"}
                   objectFit="cover"
                 />
                 <Center>

@@ -10,13 +10,6 @@ const useDistilledHtml = (rawHTML) => {
 
     const content = doc.body.textContent;
 
-    // Find the <p> and <span> elements
-    // const pElement = doc.querySelector('p');
-    // const spanElement = pElement.querySelector('span') ? pElement.querySelector('span') : pElement;
-
-    // Extract the text content of the <span> element
-    // const title = spanElement ? spanElement.textContent : '';
-
     // Update the state with the extracted title
     setDistilledHtml(content);
   }, [rawHTML]);

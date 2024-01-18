@@ -1,33 +1,26 @@
 // Simple wrapper to ensure content is padded and 100% of the height of the other wrappers
 
-import { Box } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react";
 import { useLayoutSwitcher } from "../../lib/hooks/LayoutSwitcherContext";
 
 interface IPageWrapperProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export const ContentWrapper: React.FC<IPageWrapperProps> = ({ children }) => {
-    // Your ContentWrapper component implementation
+  const { layout } = useLayoutSwitcher();
 
-
-    const { layout } = useLayoutSwitcher();
-
-    return (
-        <Box
-            p={4}
-            px={layout === "traditional" ? 0 : 9}
-            flex={1}
-            style={{
-                minHeight: "70vh",
-                height: "100%",
-            }}
-        >
-            <Box
-                pb={4}
-            >
-                {children}
-            </Box>
-        </Box>
-    )
-}
+  return (
+    <Box
+      p={4}
+      px={layout === "traditional" ? 0 : 9}
+      flex={1}
+      style={{
+        minHeight: "70vh",
+        height: "100%",
+      }}
+    >
+      <Box pb={4}>{children}</Box>
+    </Box>
+  );
+};

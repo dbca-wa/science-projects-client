@@ -10,7 +10,6 @@ import {
   FormControl,
   Input,
   InputGroup,
-  InputLeftAddon,
   VStack,
   useDisclosure,
   Center,
@@ -20,18 +19,14 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   FormLabel,
-  Textarea,
-  Checkbox,
   useToast,
-  Select,
   useColorMode,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { createDivision, getAllDivisions } from "../../../lib/api";
 import _ from "lodash";
-import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IDivision } from "../../../types";
 import { DivisionItemDisplay } from "./DivisionItemDisplay";
@@ -269,7 +264,6 @@ export const DivisionsCRUD = () => {
                   <FormControl>
                     <FormLabel>Slug</FormLabel>
                     <InputGroup>
-                      {/* <InputLeftAddon children={<FaSign />} /> */}
                       <Input
                         {...register("slug", { required: true })}
                         required
@@ -287,7 +281,7 @@ export const DivisionsCRUD = () => {
                       setUserFunction={setSelectedDirector}
                       label="Director"
                       placeholder="Search for a user..."
-                      helperText={<>The director of the Division</>}
+                      helperText={"The director of the Division"}
                     />
                   </FormControl>
                   <FormControl>
@@ -298,7 +292,7 @@ export const DivisionsCRUD = () => {
                       setUserFunction={setSelectedApprover}
                       label="Approver"
                       placeholder="Search for a user..."
-                      helperText={<>The approver of the Division</>}
+                      helperText={"The approver of the Division"}
                     />
                   </FormControl>
                   {mutation.isError ? (

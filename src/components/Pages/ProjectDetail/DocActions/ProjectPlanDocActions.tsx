@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  IConceptPlan,
   IProjectAreas,
   IProjectDocuments,
   IProjectMember,
@@ -26,24 +25,18 @@ import {
   ToastId,
   Input,
 } from "@chakra-ui/react";
-import { ConceptPlanActionModal } from "../../../Modals/DocumentActionModals/ConceptPlanActionModal";
 import { useUser } from "../../../../lib/hooks/useUser";
 import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
 import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { Link } from "react-router-dom";
 import { UserProfile } from "../../Users/UserProfile";
 import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import {
   IDocGenerationProps,
   generateProjectDocument,
   downloadProjectDocument,
-  spawnNewEmptyDocument,
-  ISpawnDocument,
-  setProjectStatus,
-  ISetProjectProps,
 } from "../../../../lib/api";
 import { AxiosError } from "axios";
 import { ProjectPlanActionModal } from "../../../Modals/DocumentActionModals/ProjectPlanActionModal";
@@ -68,21 +61,7 @@ export const ProjectPlanDocActions = ({
   // , projectPk
   setToLastTab,
 }: IProjectPlanDocumentActions) => {
-  const [showActions, setShowActions] = useState(false);
-  const handleToggleActionsVisibility = () => {
-    setShowActions(!showActions);
-  };
   const { colorMode } = useColorMode();
-
-  useEffect(() => {
-    // console.log(projectPlanData);
-    // console.log(projectPlanData?.document?.creator)
-    // console.log(projectPlanData?.document?.modifier)
-    // console.log(projectPlanData?.document?.created_at);
-    // console.log(projectPlanData?.document?.updated_at);
-    // setCreationDate(projectPlanData?.document?.created_at);
-    // setModifyDate(projectPlanData?.document?.updated_at);
-  }, [projectPlanData]);
 
   const {
     isOpen: isSetAreasModalOpen,
@@ -122,11 +101,6 @@ export const ProjectPlanDocActions = ({
   } = useDisclosure();
 
   const {
-    isOpen: isS1SendbackModalOpen,
-    onOpen: onS1SendbackModalOpen,
-    onClose: onS1SendbackModalClose,
-  } = useDisclosure();
-  const {
     isOpen: isS2SendbackModalOpen,
     onOpen: onS2SendbackModalOpen,
     onClose: onS2SendbackModalClose,
@@ -153,13 +127,8 @@ export const ProjectPlanDocActions = ({
   const { baData, baLoading } = useBusinessArea(
     projectPlanData?.document?.project?.business_area?.pk
   );
-  // useEffect(() => {
-  //   if (!baLoading) console.log(projectPlanData?.document);
-  //   console.log(baData);
-  // }, [baData, baLoading, projectPlanData]);
-  const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
-    baData?.leader
-  );
+
+  const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
     projectPlanData?.document?.modifier
   );
@@ -167,25 +136,14 @@ export const ProjectPlanDocActions = ({
     projectPlanData?.document?.creator
   );
 
-  const { teamData, isTeamLoading, refetchTeamData } = useProjectTeam(
+  const { teamData, isTeamLoading } = useProjectTeam(
     String(projectPlanData?.document?.project?.pk)
   );
-
-  // useEffect(() => {
-  //   if (!userLoading && !baLoading && !baLeadLoading) {
-  //     console.log({
-  //       ba: baData,
-  //       leadUser: baLead,
-  //       me: userData,
-  //     });
-  //   }
-  // }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
 
   const creationDate = useFormattedDate(projectPlanData?.document?.created_at);
   const modifyDate = useFormattedDate(projectPlanData?.document?.updated_at);
 
   const [actionsReady, setActionsReady] = useState(false);
-  const [userIsLeader, setUserIsLeader] = useState(false);
   const [leaderMember, setLeaderMemeber] = useState<IProjectMember>();
 
   useEffect(() => {
@@ -202,23 +160,11 @@ export const ProjectPlanDocActions = ({
       modifier &&
       creator
     ) {
-      // console.log("hereeee");
       if (!isTeamLoading) {
         setLeaderMemeber(teamData.find((member) => member.is_leader === true));
       }
       setActionsReady(true);
     }
-    // else {
-    //     console.log({
-    //         userLoading, baLoading, modifierLoading, creatorLoading, userData, baData, modifier, creator, actionsReady, teamData, isTeamLoading
-    //     })
-    // }
-    // else {
-    //     if (actionsReady === true) {
-    //         setActionsReady(false);
-
-    //     }
-    // }
   }, [
     userLoading,
     baLoading,
@@ -236,8 +182,6 @@ export const ProjectPlanDocActions = ({
   useEffect(() => {
     if (actionsReady) {
       setLeaderMemeber(teamData.find((member) => member.is_leader === true));
-      // console.log(userData);
-      // console.log(projectPlanData?.document);
     }
   }, [actionsReady, teamData, isTeamLoading]);
 
@@ -252,11 +196,10 @@ export const ProjectPlanDocActions = ({
     onClose: onCreatorClose,
   } = useDisclosure();
 
-  const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<IDocGenerationProps>();
+  const { register, handleSubmit } = useForm<IDocGenerationProps>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -268,7 +211,7 @@ export const ProjectPlanDocActions = ({
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -302,7 +245,7 @@ export const ProjectPlanDocActions = ({
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -332,69 +275,13 @@ export const ProjectPlanDocActions = ({
     },
   });
 
-  const spawnMutation = useMutation(spawnNewEmptyDocument, {
-    onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Spawning Progress Report",
-        position: "top-right",
-      });
-    },
-    onSuccess: async (data) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Success",
-          description: `Progress Report Spawned`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-      // const updateData: ISetProjectProps = {
-      //     projectId: projectPlanData?.document?.project.pk ? projectPlanData.document.project.pk : projectPlanData?.document?.project?.id,
-      //     status: 'pending',
-      // }
-      // await setProjectStatus(updateData)
-      // queryClient.invalidateQueries(["projects", updateData.projectId]);
-      refetchData();
-    },
-    onError: (error: AxiosError) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Could Not Spawn Progress Report",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-  });
-
   const beginProjectDocPDFDownload = (formData: IDocGenerationProps) => {
-    // const docPk = projectPlanData?.document?.pk;
     projectPDFDownloadMutation.mutate(formData);
   };
 
   const beginProjectDocPDFGeneration = (formData: IDocGenerationProps) => {
-    // const docPk = projectPlanData?.document?.pk;
     projectDocPDFGenerationMutation.mutate(formData);
   };
-
-  const spawnProgressReport = (data: ISpawnDocument) => {
-    // console.log(data);
-    spawnMutation.mutate(data);
-  };
-
-  useEffect(() => {
-    // console.log(leaderMember);
-  }, [leaderMember]);
 
   return (
     <>

@@ -1,3 +1,5 @@
+// Modal for creating progress reports
+
 import {
   Text,
   Center,
@@ -27,7 +29,6 @@ import {
 import { ISpawnDocument, spawnNewEmptyDocument } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/useGetProgressReportAvailableReportYears";
 
@@ -69,7 +70,6 @@ export const CreateProgressReportModal = ({
       const obj = availableProgressReportYearsData.find(
         (item) => Number(item.year) === Number(yearValue)
       );
-      // console.log(obj)
       setSelectedReportId(obj.pk);
     }
   }, [
@@ -79,15 +79,13 @@ export const CreateProgressReportModal = ({
     availableProgressReportYearsLoading,
   ]);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     refetchProgressYears();
   }, [selectedReportId]);
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -102,7 +100,7 @@ export const CreateProgressReportModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -116,12 +114,8 @@ export const CreateProgressReportModal = ({
           reset();
         });
       }
-      // onClose();
 
       setTimeout(() => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries(["projects", projectPk]);
         refetchData();
         onClose();
@@ -155,8 +149,6 @@ export const CreateProgressReportModal = ({
   };
 
   const { colorMode } = useColorMode();
-
-  // useEffect(() => console.log(projPk, projectPk), [projectPk, projPk])
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>

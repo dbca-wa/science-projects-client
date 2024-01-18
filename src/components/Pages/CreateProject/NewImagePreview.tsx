@@ -6,9 +6,9 @@ export const NewImagePreview: React.FC<{
   selectedFile: File | null;
   currentString: string;
 }> = ({ selectedFile, currentString }) => {
-  const aspectRatio = 9 / 16; // 16:9 aspect ratio
-  const width = 600;
-  const height = width * aspectRatio;
+  // const aspectRatio = 9 / 16; // 16:9 aspect ratio
+  // const width = 600;
+  // const height = width * aspectRatio;
 
   // console.log(URL.createObjectURL(selectedFile))
   const imageUrl = selectedFile

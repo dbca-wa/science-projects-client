@@ -10,7 +10,6 @@ import {
   FormControl,
   Input,
   InputGroup,
-  InputLeftAddon,
   VStack,
   useDisclosure,
   Center,
@@ -20,7 +19,6 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   FormLabel,
-  Textarea,
   Checkbox,
   useToast,
   Select,
@@ -37,7 +35,6 @@ import {
 } from "../../../types";
 import { createLocation, getAllLocations } from "../../../lib/api";
 import _ from "lodash";
-import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
@@ -51,8 +48,7 @@ export const LocationsCRUD = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation(createLocation, {
-    onSuccess: (data: ISimpleLocationData) => {
-      // console.log("success")
+    onSuccess: () => {
       toast({
         status: "success",
         title: "Created",
@@ -62,15 +58,11 @@ export const LocationsCRUD = () => {
       queryClient.invalidateQueries(["locations"]);
     },
     onError: () => {
-      // console.log("error")
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
-    },
-    onMutate: () => {
-      // console.log("mutation")
     },
   });
   const onSubmit = (formData: IAddLocationForm) => {
@@ -191,11 +183,9 @@ export const LocationsCRUD = () => {
         }
 
         setFilteredSlices(filteredSlices);
-        // setCountOfItems(filteredSlices.length); // Update the count based on the filtered slices
       } else {
         // If no checkboxes are selected and no search term, reset to show all slices
         setFilteredSlices(filteredSlices);
-        // setCountOfItems(currentFilteredSlices.length); // Update the count based on the current filtered slices
       }
     }
   }, [selectedAreaTypes, searchTerm, slices, filteredSlices]);
@@ -379,7 +369,6 @@ export const LocationsCRUD = () => {
                   <FormControl>
                     <FormLabel>Name</FormLabel>
                     <InputGroup>
-                      {/* <InputLeftAddon children={<FaSign />} /> */}
                       <Input
                         autoFocus
                         autoComplete="off"
@@ -438,17 +427,6 @@ export const LocationsCRUD = () => {
                   }}
                   size="lg"
                   width={"100%"}
-                  // onClick={() => {
-                  //     console.log("clicked")
-                  //     onSubmit(
-                  //         {
-                  //             "old_id": 1,
-                  //             "name": nameData,
-                  //             "area_type": slugData,
-                  //         }
-                  //     )
-
-                  // }}
                 >
                   Create
                 </Button>

@@ -1,66 +1,35 @@
 // Has mention and hashtag functionality
 
-import { ChatUser } from "@/components/Pages/Chat/ChatUser";
 import { IBranch, IBusinessArea, IUserData, IUserMe } from "@/types";
-import {
-  Box,
-  Button,
-  Flex,
-  Input,
-  Text,
-  Textarea,
-  useColorMode,
-  Grid,
-  useToast,
-  ToastId,
-  Avatar,
-} from "@chakra-ui/react";
-import { useState, useEffect, useRef } from "react";
+import { Box, Flex, Text, useColorMode, Avatar } from "@chakra-ui/react";
+import { useState } from "react";
 
 // Lexical
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
+import { $generateHtmlFromNodes } from "@lexical/html";
 
 // Lexical Plugins
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 
-// Custom Components
-import { OptionsBar } from "../OptionsBar/OptionsBar";
-// import { AutoFocusPlugin } from "../../../../lib/plugins/AutoFocusPlugin";
-
 import "../../../styles/texteditor.css";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-  $getRoot,
-  $getSelection,
-  CLEAR_EDITOR_COMMAND,
-  ParagraphNode,
-} from "lexical";
+// import {
+//   $getRoot,
+// } from "lexical";
 
 import { ListItemNode, ListNode } from "@lexical/list";
-import { HeadingNode } from "@lexical/rich-text";
-
-import { EditableSRTE } from "./Sections/EditableSRTE";
-import { DisplaySRTE } from "./Sections/DisplaySRTE";
-import { EditorSubsections, EditorType } from "../../../types";
-import { HideEditorButton } from "../Buttons/HideEditorButton";
-import { SimpleEditableRTE } from "./Sections/SimpleEditableRTE";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
-import { BsFillSendFill } from "react-icons/bs";
 import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
-import { createDocumentComment } from "@/lib/api";
 import MentionsPlugin, { MentionNode } from "../Plugins/MentionsPlugin";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PostCommentButton } from "../Buttons/PostCommentButton";
 import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
-import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
+// import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface Props {
   userData: IUserMe;
@@ -78,7 +47,6 @@ export const CommentRichTextEditor = ({
   branches,
 }: Props) => {
   const { colorMode } = useColorMode();
-  const editorRef = useRef(null);
   const [comment, setComment] = useState("");
 
   const usersImage = useServerImageUrl(userData?.image?.file);
@@ -135,12 +103,7 @@ export const CommentRichTextEditor = ({
     console.log(error);
   };
   const [theme, setTheme] = useState(generateTheme(colorMode));
-
-  const [lastSelectedNode, setLastSelectedNode] = useState();
-  const [shouldShowTree, setShouldShowTree] = useState(false);
-
-  const [editorText, setEditorText] = useState<string | null>("");
-  const [selectedNodeType, setSelectedNodeType] = useState<string>();
+  // const [editorText, setEditorText] = useState<string | null>("");
 
   const distilled = useDistilledHtml(comment);
 
@@ -187,8 +150,8 @@ export const CommentRichTextEditor = ({
               <OnChangePlugin
                 onChange={(editorState, editor) => {
                   editorState.read(() => {
-                    const root = $getRoot();
-                    setEditorText(root.__cachedText);
+                    // const root = $getRoot();
+                    // setEditorText(root.__cachedText);
                     const newHtml = $generateHtmlFromNodes(editor, null);
                     setComment(newHtml);
                   });
@@ -264,20 +227,15 @@ export const CommentRichTextEditor = ({
 
 interface UserContainerProps {
   userData: IUserData;
-  image: string;
-  businessAreas: IBusinessArea[];
-  branches: IBranch[];
+  image?: string;
+  businessAreas?: IBusinessArea[];
+  branches?: IBranch[];
 }
 
-const UserContainer = ({
-  userData,
-  businessAreas,
-  branches,
-}: UserContainerProps) => {
+const UserContainer = ({ userData }: UserContainerProps) => {
   const [editor] = useLexicalComposerContext();
 
   const { colorMode } = useColorMode();
-  const baseUrl = useApiEndpoint();
   const imageUrl = useServerImageUrl(userData?.image?.file);
 
   return userData?.image?.file ? (

@@ -1,36 +1,21 @@
-import {
-  FileDropzone,
-  SingleFileStateUpload,
-} from "@/components/SingleFileStateUpload";
 import { deleteReportMediaImage, uploadReportMediaImage } from "@/lib/api";
 import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
-import { useNoImage } from "@/lib/hooks/useNoImage";
-import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
-import { IImageData } from "@/types";
 import {
   Box,
   Center,
-  FormControl,
-  FormHelperText,
   Grid,
-  Input,
   Text,
   Image,
-  InputGroup,
   useColorMode,
-  FormLabel,
   Flex,
   Progress,
   useToast,
   ToastId,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Dropzone from "react-dropzone";
 import { BsCloudArrowUp } from "react-icons/bs";
-import { TbPhotoFilled } from "react-icons/tb";
-import { color } from "framer-motion";
-import { FaCheck, FaCross } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
 
 interface Props {
@@ -57,8 +42,6 @@ export const ReportMediaChanger = ({
   refetchData,
 }: Props) => {
   const { colorMode } = useColorMode();
-  const noImageLink = useNoImage();
-
   const titleDictionary = {
     cover: "Cover Page",
     sdchart: "Service Delivery Org Chart",
@@ -71,8 +54,6 @@ export const ReportMediaChanger = ({
     rear_cover: "Rear Cover Page",
   };
 
-  // const instantImageUploadMutation = useMutation()
-
   const [uploadedFile, setUploadedFile] = useState<File>();
   const [isError, setIsError] = useState(false);
   const acceptedImageTypes = ["image/jpeg", "image/png", "image/jpg"];
@@ -82,7 +63,7 @@ export const ReportMediaChanger = ({
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
   const queryClient = useQueryClient();
@@ -103,9 +84,8 @@ export const ReportMediaChanger = ({
     }
   };
 
-  const onDeleteEntry = (e: any) => {
+  const onDeleteEntry = (e) => {
     e.preventDefault();
-    console.log("delete");
     const data = {
       pk: reportPk,
       section: section,
@@ -139,14 +119,10 @@ export const ReportMediaChanger = ({
           isClosable: true,
         });
       }
-      // onClose();
       setUploadedFile(mutationData.file);
       setCurrentImage(URL.createObjectURL(mutationData.file));
 
       setTimeout(async () => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         clearInterval(progressInterval);
         setUploadProgress(100);
 
@@ -213,12 +189,6 @@ export const ReportMediaChanger = ({
     },
   });
 
-  //   useEffect(() => {
-  //     if (!isUploading && !isError && uploadedFile) {
-  //       console.log(uploadedFile);
-  //     }
-  //   }, [uploadedFile, isError, isUploading]);
-
   const startSimulatedProgress = () => {
     setUploadProgress(0);
 
@@ -281,164 +251,107 @@ export const ReportMediaChanger = ({
             border={"1px dashed"}
             borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
             rounded={"lg"}
-            //   overflow={"hidden"}
-            //   pos={"relative"}
           >
-            {
-              // (acceptedFiles && !isError && acceptedFiles[0] instanceof File) ||
-              // (currentImage && currentImage !== null)
-              (acceptedFiles &&
-                !isError &&
-                currentImage !== null &&
-                acceptedFiles[0] instanceof File) ||
-              currentImage !== null ? (
-                <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
-                  <Box
-                    pos={"absolute"}
-                    bottom={0}
-                    w={"100%"}
-                    py={4}
-                    px={4}
-                    bg={"blackAlpha.800"}
-                    roundedBottom={"lg"}
-                    textAlign={"center"}
-                    zIndex={99}
-                  >
-                    <Text color={"white"}>{titleDictionary[section]}</Text>
-                  </Box>
-
-                  <Box overflow={"hidden"} w={"100%"} h={"100%"} rounded={"lg"}>
-                    <Image
-                      //   pos={"relative"}
-                      rounded={"lg"}
-                      src={
-                        acceptedFiles &&
-                        !isError &&
-                        currentImage !== null &&
-                        acceptedFiles[0] instanceof File
-                          ? URL.createObjectURL(acceptedFiles[0])
-                          : currentImage && currentImage !== null
-                          ? `${baseUrl}${currentImage}`
-                          : undefined
-                      }
-                      objectFit={"cover"}
-                      // zIndex={1}
-                      //   pos={"absolute"}
-                      w={"100%"}
-                      h={"100%"}
-                    />
-                  </Box>
+            {(acceptedFiles &&
+              !isError &&
+              currentImage !== null &&
+              acceptedFiles[0] instanceof File) ||
+            currentImage !== null ? (
+              <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
+                <Box
+                  pos={"absolute"}
+                  bottom={0}
+                  w={"100%"}
+                  py={4}
+                  px={4}
+                  bg={"blackAlpha.800"}
+                  roundedBottom={"lg"}
+                  textAlign={"center"}
+                  zIndex={99}
+                >
+                  <Text color={"white"}>{titleDictionary[section]}</Text>
                 </Box>
-              ) : (
-                <Flex
-                  rounded={"lg"}
+
+                <Box overflow={"hidden"} w={"100%"} h={"100%"} rounded={"lg"}>
+                  <Image
+                    rounded={"lg"}
+                    src={
+                      acceptedFiles &&
+                      !isError &&
+                      currentImage !== null &&
+                      acceptedFiles[0] instanceof File
+                        ? URL.createObjectURL(acceptedFiles[0])
+                        : currentImage && currentImage !== null
+                        ? `${baseUrl}${currentImage}`
+                        : undefined
+                    }
+                    objectFit={"cover"}
+                    w={"100%"}
+                    h={"100%"}
+                  />
+                </Box>
+              </Box>
+            ) : (
+              <Flex
+                rounded={"lg"}
+                flexDir={"column"}
+                justifyContent={"center"}
+                justifyItems={"center"}
+                w={"100%"}
+                h={"100%"}
+                background={"blackAlpha.800"}
+                zIndex={3}
+              >
+                <Center
                   flexDir={"column"}
                   justifyContent={"center"}
                   justifyItems={"center"}
-                  w={"100%"}
-                  h={"100%"}
-                  background={"blackAlpha.800"}
-                  zIndex={3}
                 >
-                  <Center
-                    flexDir={"column"}
-                    justifyContent={"center"}
-                    justifyItems={"center"}
-                  >
-                    <BsCloudArrowUp size={"50px"} color={"white"} />
-                  </Center>
+                  <BsCloudArrowUp size={"50px"} color={"white"} />
+                </Center>
 
-                  <Grid
-                    flexDir={"column"}
-                    alignItems={"center"}
-                    textAlign={"center"}
-                    color={"white"}
-                  >
-                    <Text px={8} textAlign={"center"}>
-                      {`Drag and drop an image for the`}
-                    </Text>
-                    <Text
-                      fontWeight={"semibold"}
-                    >{`${titleDictionary[section]}`}</Text>
-                  </Grid>
+                <Grid
+                  flexDir={"column"}
+                  alignItems={"center"}
+                  textAlign={"center"}
+                  color={"white"}
+                >
+                  <Text px={8} textAlign={"center"}>
+                    {`Drag and drop an image for the`}
+                  </Text>
+                  <Text
+                    fontWeight={"semibold"}
+                  >{`${titleDictionary[section]}`}</Text>
+                </Grid>
 
-                  {/* {!isError && acceptedFiles && acceptedFiles[0] ? (
-                    <Center>
-                      <Flex
-                        mt={4}
-                        maxW={"80%"}
-                        // w={"80%"}
-                        bg={colorMode === "light" ? "white" : "gray.800"}
-                        justifyContent={"center"}
-                        rounded={"md"}
-                        overflow={"hidden"}
-                        outline={"1px"}
-                        outlineColor={"gray.800"}
-                        borderWidth={"1px"}
-                        borderColor={
-                          colorMode === "light" ? "gray.300" : "gray.600"
+                {isUploading ? (
+                  <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
+                    <Box w={"80%"} h={1} px={1}>
+                      <Progress
+                        bg={colorMode === "light" ? "gray.200" : "gray.900"}
+                        colorScheme={
+                          uploadProgress === 100 && uploadedFile
+                            ? "green"
+                            : "blue"
                         }
-                      >
-                        <Box
-                          p={3}
-                          h={"100%"}
-                          placeItems={"center"}
-                          alignItems={"center"}
-                          borderRight={"1px solid"}
-                          borderColor={
-                            colorMode === "light" ? "gray.300" : "gray.600"
-                          }
-                        >
-                          <Box color={"blue.500"}>
-                            <TbPhotoFilled />
-                          </Box>
-                        </Box>
-                        <Box
-                          flex={1}
-                          whiteSpace={"nowrap"}
-                          textOverflow={"ellipsis"}
-                          overflow={"hidden"}
-                          pl={2}
-                          pr={3}
-                          py={2}
-                          fontSize={"sm"}
-                          mt={"1px"}
-                        >
-                          {acceptedFiles[0].name}
-                        </Box>
-                      </Flex>
-                    </Center>
-                  ) : null} */}
+                        // isIndeterminate
+                        size={"xs"}
+                        value={uploadProgress}
+                        // hasStripe
+                        // animation={"step-start"}
+                        //
+                      />
+                    </Box>
+                  </Center>
+                ) : null}
 
-                  {isUploading ? (
-                    <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
-                      <Box w={"80%"} h={1} px={1}>
-                        <Progress
-                          bg={colorMode === "light" ? "gray.200" : "gray.900"}
-                          colorScheme={
-                            uploadProgress === 100 && uploadedFile
-                              ? "green"
-                              : "blue"
-                          }
-                          // isIndeterminate
-                          size={"xs"}
-                          value={uploadProgress}
-                          // hasStripe
-                          // animation={"step-start"}
-                          //
-                        />
-                      </Box>
-                    </Center>
-                  ) : null}
-
-                  {isError ? (
-                    <Text color={"red.500"} mt={4}>
-                      That file is not of the correct type
-                    </Text>
-                  ) : null}
-                </Flex>
-              )
-            }
+                {isError ? (
+                  <Text color={"red.500"} mt={4}>
+                    That file is not of the correct type
+                  </Text>
+                ) : null}
+              </Flex>
+            )}
           </Box>
         )}
       </Dropzone>

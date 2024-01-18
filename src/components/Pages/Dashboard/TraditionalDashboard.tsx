@@ -18,19 +18,17 @@ import { Head } from "../../Base/Head";
 import { useCallback, useEffect, useState } from "react";
 import theme from "../../../theme";
 import { useUser } from "../../../lib/hooks/useUser";
-import { IDashProps } from "../../../types";
-import { AddIcon } from "@chakra-ui/icons";
+// import { IDashProps } from "../../../types";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 import { UserFeedbackModal } from "@/components/Modals/UserFeedbackModal";
-import { DatePicker } from "../CreateProject/DatePicker";
 
-export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
+export const TraditionalDashboard = () => {
   const user = useUser();
 
   const { colorMode } = useColorMode();
   const [welcomeUser, setWelcomeUser] = useState("");
   const [spmsText, setSpmsText] = useState("Science Project Management System");
-  const [annualReportText, setAnnualReportText] = useState("Annual Report");
+  // const [annualReportText, setAnnualReportText] = useState("Annual Report");
   const [shouldConcat, setShouldConcat] = useState(false);
   // const [startDate, setStartDate] = useState<string>();
 
@@ -40,13 +38,13 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
       setWelcomeUser("");
       setShouldConcat(true);
       setSpmsText("SPMS");
-      setAnnualReportText("Report");
+      // setAnnualReportText("Report");
     } else {
       setWelcomeUser(
         `Hello, ${user?.userData?.first_name}! Welcome to SPMS, DBCA's portal for science project documentation, approval and reporting.`
       );
       setShouldConcat(false);
-      setAnnualReportText("Annual Report");
+      // setAnnualReportText("Annual Report");
       if (window.innerWidth < 1350) {
         setSpmsText("Science Project <br/> Management System (TEST)");
       } else {
@@ -125,10 +123,11 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
               <Text
                 ml={1}
                 as={"span"}
-              // fontWeight={'semibold'}
+                // fontWeight={'semibold'}
               >
-                Lists and nested lists are now supported when copy-pasting from MS Word on Desktop.
-                If you are using MS Word online, you must download the file and copy content from there.
+                Lists and nested lists are now supported when copy-pasting from
+                MS Word on Desktop. If you are using MS Word online, you must
+                download the file and copy content from there.
               </Text>
             </Box>
 
@@ -160,23 +159,6 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
             Don't be shy, we can only make things better with your help!
           </Text>
         </Flex>
-
-        {/* <Box>
-                        <Text>{startDate}</Text>
-
-                        <DatePicker
-                            placeholder="Select Start Date"
-                            onChange={(e) => setStartDate(e)}
-                        />
-                    </Box> */}
-
-        {/* <br /> */}
-        {/* <Text
-                        fontWeight={"thin"}
-
-                    >
-                        Welcome to the test instance of the new SPMS. This version is still under development and is live on the test network to find any bugs and areas for improvement.
-                    </Text> */}
       </Box>
       <Grid
         my={5}
@@ -212,31 +194,6 @@ export const TraditionalDashboard = ({ activeTab }: IDashProps) => {
         >
           {shouldConcat ? "Scientific Sites" : "Scientific Site Register"}
         </Button>
-        {/* <Button
-                        bgColor={
-                            colorMode === "light" ? `red.500` : `red.600 `
-                        }
-                        color={
-                            colorMode === "light" ? `white` : `whiteAlpha.900`
-                        }
-                        _hover={
-                            {
-                                bg: colorMode === "light" ? `red.600` : `red.400`,
-                                color: colorMode === "light" ? `white` : `white`
-                            }
-                        }
-                        // colorScheme="red"
-                        as={"a"} href="https://scienceprojects.dbca.wa.gov.au/arar_dashboard"
-                        gridColumn={{ base: "1 / -1", xl: "auto" }}
-
-                    >
-                        {
-                            shouldConcat ?
-                                "Projects Pending" :
-                                "Projects Pending Approval"
-                        }
-
-                    </Button> */}
       </Grid>
       <TraditionalTasksAndProjects onAddTaskOpen={onAddTaskOpen} />
 

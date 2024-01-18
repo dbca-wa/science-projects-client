@@ -6,29 +6,9 @@ import { useEffect, useRef, useState } from "react";
 // Styles and Styling Components
 import { Box, useColorMode, Text, Flex, Grid } from "@chakra-ui/react";
 
-// Lexical
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-
-// Lexical Plugins
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
-
-// Custom Components
-import { OptionsBar } from "../OptionsBar/OptionsBar";
-// import { AutoFocusPlugin } from "../../../../lib/plugins/AutoFocusPlugin";
-
 import "../../../styles/texteditor.css";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getRoot, $getSelection, ParagraphNode, TextNode } from "lexical";
 
 import { ListItemNode, ListNode } from "@lexical/list";
-import { HeadingNode } from "@lexical/rich-text";
 
 import { EditableSRTE } from "./Sections/EditableSRTE";
 import { DisplaySRTE } from "./Sections/DisplaySRTE";
@@ -312,24 +292,24 @@ export const RichTextEditor = ({
           <DisplaySRTE
             key={prepopulationData}
             initialConfig={uneditableInitialCOnfig}
-            editorRef={editorRef}
+            // editorRef={editorRef}
             data={prepopulationData}
             section={section}
-            project_pk={project_pk}
-            document_pk={document_pk}
-            editorType={editorType}
-            isUpdate={isUpdate}
-            displayData={displayData}
-            editorText={editorText}
-            setEditorText={setEditorText}
+            // project_pk={project_pk}
+            // document_pk={document_pk}
+            // editorType={editorType}
+            // isUpdate={isUpdate}
+            // displayData={displayData}
+            // editorText={editorText}
+            // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-            setShouldShowTree={setShouldShowTree}
-            isEditorOpen={isEditorOpen}
-            setIsEditorOpen={setIsEditorOpen}
-            setDisplayData={setDisplayData}
-            textEditorName={
-              section === "description" ? "Description" : undefined
-            }
+            // setShouldShowTree={setShouldShowTree}
+            // isEditorOpen={isEditorOpen}
+            // setIsEditorOpen={setIsEditorOpen}
+            // setDisplayData={setDisplayData}
+            // textEditorName={
+            //   section === "description" ? "Description" : undefined
+            // }
           />
         )}
       </Box>

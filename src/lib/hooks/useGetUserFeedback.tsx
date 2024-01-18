@@ -15,13 +15,9 @@ export interface IFeedback {
 }
 
 export const useGetUserFeedback = () => {
-  const { isLoading, data, isError } = useQuery(
-    ["userfeedback"],
-    getUserFeedback,
-    {
-      retry: false,
-    }
-  );
+  const { isLoading, data } = useQuery(["userfeedback"], getUserFeedback, {
+    retry: false,
+  });
   return {
     feedbackLoading: isLoading,
     feedbackData: data as IFeedback[],

@@ -1,50 +1,16 @@
 // The basic rich text editor component; does not allow sticky notes, emotes, etc.
 
-// React
-import { useEffect, useRef, useState } from "react";
-
-// Styles and Styling Components
 import {
   Box,
   useColorMode,
-  Text,
-  Flex,
-  Grid,
   FormLabel,
   FormControl,
   InputGroup,
   FormHelperText,
 } from "@chakra-ui/react";
 
-// Lexical
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-
-// Lexical Plugins
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
-
-// Custom Components
-import { OptionsBar } from "../OptionsBar/OptionsBar";
-// import { AutoFocusPlugin } from "../../../../lib/plugins/AutoFocusPlugin";
-
-import "../../../styles/texteditor.css";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getRoot, $getSelection, ParagraphNode } from "lexical";
-
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
-
-import { EditableSRTE } from "./Sections/EditableSRTE";
-import { DisplaySRTE } from "./Sections/DisplaySRTE";
-import { EditorSubsections, EditorType } from "../../../types";
-import { HideEditorButton } from "../Buttons/HideEditorButton";
-import { SimpleEditableRTE } from "./Sections/SimpleEditableRTE";
 import { SimpleStatefulRTE } from "./Sections/SimpleStatefulRTE";
 
 interface IProps {
@@ -128,9 +94,6 @@ export const UnboundStatefulEditor = ({
     console.log(error);
   };
 
-  const [editorText, setEditorText] = useState<string | null>("");
-  const editorRef = useRef(null);
-
   const initialConfig = {
     namespace: "Stateful Rich Text Editor",
     editable: true,
@@ -162,7 +125,6 @@ export const UnboundStatefulEditor = ({
             placeholderText={placeholder}
             showToolbar={showToolbar}
             initialConfig={initialConfig}
-            editorRef={editorRef}
             value={value}
             setValueAsPlainText={setValueAsPlainText}
             setValueFunction={setValueFunction}
@@ -170,7 +132,6 @@ export const UnboundStatefulEditor = ({
         </Box>
       </InputGroup>
       {helperText ? <FormHelperText ml={2}>{helperText}</FormHelperText> : null}
-      {/* <Text>{value}...</Text> */}
     </FormControl>
   );
 };

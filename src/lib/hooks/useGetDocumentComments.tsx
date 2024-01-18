@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getDocumentComments } from "../api";
 
 export const useGetDocumentComments = (documentId: number) => {
-  const { isLoading, data, isError, refetch } = useQuery(
+  const { isLoading, data, refetch } = useQuery(
     ["documentComments", documentId],
     getDocumentComments,
     {

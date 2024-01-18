@@ -1,9 +1,9 @@
+// Modal for handling Project Closure Actions
+
 import {
   Button,
   Text,
-  FormControl,
   Input,
-  InputGroup,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -20,7 +20,7 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   IApproveDocument,
@@ -29,7 +29,6 @@ import {
   IUserMe,
 } from "../../../types";
 import { handleDocumentAction } from "../../../lib/api";
-import { useBusinessArea } from "../../../lib/hooks/useBusinessArea";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers";
 
@@ -51,7 +50,7 @@ export const ProjectClosureActionModal = ({
   userData,
   stage,
   documentPk,
-  projectClosurePk,
+  // projectClosurePk,
   action,
   onClose,
   isOpen,
@@ -59,27 +58,15 @@ export const ProjectClosureActionModal = ({
   baData,
   refetchData,
 }: Props) => {
-  // useEffect(() => {
-  //     console.log(
-  //         { stage: stage, documentPk: documentPk, projectClosurePk: projectClosurePk }
-  //     )
-  // }
-  //     , [stage, documentPk, projectClosurePk])
-
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const { register, handleSubmit, reset, watch } = useForm<IApproveDocument>();
+  const { register, handleSubmit, reset } = useForm<IApproveDocument>();
 
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
-
-  const watchedAction = watch("action");
-  const watchedStage = watch("stage");
-  const watchedDocumentPk = watch("documentPk");
-  // const watchedprojectClosurePk = watch("projectClosurePk");
 
   const [shouldSendEmail, setShouldSendEmail] = useState(true);
   const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
@@ -112,7 +99,7 @@ export const ProjectClosureActionModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -136,12 +123,7 @@ export const ProjectClosureActionModal = ({
       onClose();
 
       setTimeout(() => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries(["projects", projectData?.pk]);
-
-        // queryClient.refetchQueries([`mytasks`])
       }, 350);
     },
     onError: (error) => {
@@ -165,26 +147,10 @@ export const ProjectClosureActionModal = ({
   });
 
   const onApprove = (formData: IApproveDocument) => {
-    // console.log(formData)
     approveProjectClosureMutation.mutate(formData);
   };
 
-  // useEffect(() => {
-  //     console.log(
-  //         stage, documentPk, projectClosurePk, projectData
-  //     )
-  //     if (baData) {
-  //         console.log(baData)
-  //     }
-  // }, [baData])
-
-  const { directorateData, isDirectorateLoading, refetchDirectorateData } =
-    useDirectorateMembers();
-
-  // useEffect(() => {
-  //     if (directorateData)
-  //         console.log(directorateData)
-  // }, [directorateData])
+  const { directorateData, isDirectorateLoading } = useDirectorateMembers();
 
   return (
     <Modal
@@ -214,9 +180,7 @@ export const ProjectClosureActionModal = ({
           id="approval-form"
           onSubmit={handleSubmit(onApprove)}
         >
-          {!baData ||
-          !baLead ? // || isDirectorateLoading || directorateData?.length < 1
-          null : (
+          {!baData || !baLead ? null : ( // || isDirectorateLoading || directorateData?.length < 1
             <>
               <Input
                 type="hidden"
@@ -292,22 +256,18 @@ export const ProjectClosureActionModal = ({
                     p={4}
                     mt={4}
                   >
-                    <Text
-                      // px={1}
-                      fontWeight={"semibold"}
-                    >
-                      Directorate Members
-                    </Text>
+                    <Text fontWeight={"semibold"}>Directorate Members</Text>
                     <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
-                      {directorateData
-                        ?.filter((member) => member.is_active) // Filter only active members
-                        .map((member, index) => (
-                          <Center key={index}>
-                            <Box px={2} w={"100%"}>
-                              <Text>{`${member.first_name} ${member.last_name}`}</Text>
-                            </Box>
-                          </Center>
-                        ))}
+                      {!isDirectorateLoading &&
+                        directorateData
+                          ?.filter((member) => member.is_active) // Filter only active members
+                          .map((member, index) => (
+                            <Center key={index}>
+                              <Box px={2} w={"100%"}>
+                                <Text>{`${member.first_name} ${member.last_name}`}</Text>
+                              </Box>
+                            </Center>
+                          ))}
                     </Grid>
                   </Box>
                   <Checkbox
@@ -347,12 +307,7 @@ export const ProjectClosureActionModal = ({
                         p={4}
                         mt={4}
                       >
-                        <Text
-                          // px={1}
-                          fontWeight={"semibold"}
-                        >
-                          Business Area Lead
-                        </Text>
+                        <Text fontWeight={"semibold"}>Business Area Lead</Text>
                         <Box pt={2}>
                           {baLead?.first_name} {baLead?.last_name}
                         </Box>
@@ -385,7 +340,6 @@ export const ProjectClosureActionModal = ({
           <Button
             form="approval-form"
             type="submit"
-            // onClick={() => console.log(watchedDocumentPk, watchedStage, watchedAction)}
             isLoading={approveProjectClosureMutation.isLoading}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}

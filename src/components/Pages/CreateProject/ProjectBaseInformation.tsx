@@ -8,32 +8,24 @@ import {
   FormLabel,
   Input,
   InputGroup,
-  ModalBody,
-  ModalFooter,
   Grid,
   VisuallyHiddenInput,
-  InputLeftElement,
-  Icon,
-  Textarea,
   Flex,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
 import TagInput from "./TagInput";
 import { ImagePreview } from "./ImagePreview";
-import { MdTitle } from "react-icons/md";
 import { useQueryClient } from "@tanstack/react-query";
 import { IUserData } from "../../../types";
-import { color, motion } from "framer-motion";
-import { SimpleStateRichTextEditor } from "../../RichTextEditor/Editors/SimpleStateRichTextEditor";
-import { StateRichTextEditor } from "../../RichTextEditor/Editors/StateRichTextEditor";
+import { motion } from "framer-motion";
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 interface IProjectBaseInformationProps {
   projectKind: string;
   onClose: () => void;
   colorMode: string;
-  nextClick: (data: any) => void;
+  nextClick: (data) => void;
   currentYear: number;
   baseInformationFilled: boolean;
   setBaseInformationFilled: React.Dispatch<React.SetStateAction<boolean>>;
@@ -165,29 +157,6 @@ export const ProjectBaseInformation = ({
           <FormControl my={4}>
             <FormLabel>Image</FormLabel>
             <InputGroup>
-              {/* <Button
-                as="label"
-                htmlFor="fileInput"
-                pt={1}
-                display="inline-flex"
-                justifyContent="center"
-                alignItems="center"
-                bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                color={colorMode === "light" ? "black" : "white"}
-                cursor={"pointer"}
-              >
-                Choose File
-              </Button> */}
-              {/* <Input
-                                id="fileInput"
-                                type="file"
-                                onChange={handleFileInputChange}
-                                opacity={0}
-                                position="absolute"
-                                width="0.1px"
-                                height="0.1px"
-                                zIndex="-1"
-                            /> */}
               <Input
                 autoComplete="off"
                 alignItems={"center"}

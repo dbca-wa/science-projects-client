@@ -7,15 +7,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  useColorMode,
   Spinner,
-  Select,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Box,
-  Text,
-  Flex,
   Center,
 } from "@chakra-ui/react";
 import { ProjectOverviewCard } from "../components/Pages/ProjectDetail/ProjectOverviewCard";
@@ -24,13 +16,10 @@ import { ProjectPlanContents } from "../components/Pages/ProjectDetail/ProjectPl
 import { ProgressReportContents } from "../components/Pages/ProjectDetail/ProgressReportContents";
 import {
   IExtendedProjectDetails,
-  IFullProjectDetails,
-  IProgressReport,
   IProjectAreas,
   IProjectData,
   IProjectDocuments,
   IProjectMember,
-  IStudentReport,
 } from "../types";
 import { ManageTeam } from "../components/Pages/ProjectDetail/ManageTeam";
 import { useProject } from "../lib/hooks/useProject";
@@ -38,8 +27,6 @@ import { useEffect, useState } from "react";
 import { ProjectClosureContents } from "../components/Pages/ProjectDetail/ProjectClosureContents";
 import { StudentReportContents } from "../components/Pages/ProjectDetail/StudentReportContents";
 import { Head } from "../components/Base/Head";
-import { DocumentActions } from "../components/Pages/ProjectDetail/DocumentActions";
-import useDistilledProjectTitle from "../lib/hooks/useDistlledProjectTitle";
 import { useUser } from "../lib/hooks/useUser";
 import { motion } from "framer-motion";
 // import { ProgressReportSelector } from "../components/Pages/ProjectDetail/ProgressReportSelector";
@@ -60,7 +47,6 @@ export const ProjectDetail = ({
   const [distilledTitle, setDistilledTitle] = useState<string>();
 
   useEffect(() => {
-    // console.log(projectData)
     if (!isLoading && projectData) {
       setLocation(projectData.location);
       setBaseInformation(projectData.project);
@@ -81,11 +67,6 @@ export const ProjectDetail = ({
     }
   }, [isLoading, projectData]);
 
-  // useEffect(() => {
-  //     console.log(distilledTitle)
-
-  // }, [distilledTitle])
-
   const me = useUser();
 
   // Refetch data on tab change and ensure falsy items are removed from the array
@@ -104,11 +85,8 @@ export const ProjectDetail = ({
   const setToLastTab = (tabToGoTo?: number) => {
     if (tabToGoTo) {
       if (tabToGoTo === -1) {
-        // console.log("HEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
         setActiveTabIndex(tabs.length);
       } else if (tabToGoTo === 0) {
-        // console.log("Theses are the tabs mate", tabs)
-        // console.log("This is the index of the previous tab, mate", tabs.length - 1)
         setActiveTabIndex(tabs.length - 1);
       }
     } else {
@@ -136,7 +114,6 @@ export const ProjectDetail = ({
       (documents?.project_closure ? 1 : 0) +
       (documents?.project_plan ? 1 : 0) +
       1; // plus overview
-    // console.log('count: ', count)
 
     const tabData = [
       "overview",
@@ -150,14 +127,9 @@ export const ProjectDetail = ({
         "student",
       documents?.project_closure && "closure",
     ].filter(Boolean);
-    const tabDataLength = tabData.length;
-    // console.log('len of tabdata: ', tabDataLength)
 
     if (tabs.length !== count) {
-      // console.log("Length different, updating")
       setTabs(tabData);
-    } else {
-      // console.log('Tabs: ', tabs)
     }
   }, [
     documents?.concept_plan,
@@ -170,85 +142,18 @@ export const ProjectDetail = ({
     tabs,
   ]);
 
-  // useEffect(() => {
-  //     console.log('Tabs:', tabs);
-  // }, [tabs])
-
   useEffect(() => {
     if (isInitialRender) {
-      // if (documents) {
       setIsInitialRender(false);
-      // }
     } else {
       if (selectedTab && selectedTab !== "overview") {
-        // console.log('there is a selected tab: ', selectedTab)
         if (selectedTabSet === false) {
-          // console.log('and it hasnt been set')
           setToSelectedTab();
           setSelectedTabSet(true);
         }
-      } else {
-        // const tabData = [
-        //     'overview',
-        //     documents?.concept_plan && 'concept',
-        //     documents?.project_plan && 'project',
-        //     documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
-        //     documents?.student_reports && documents.student_reports.length > 0 && 'student',
-        //     documents?.project_closure && 'closure'
-        // ].filter(Boolean)
-        // if (tabData.length !== tabs.length) {
-        //     console.log("Len:", tabs.length, tabs)
-        //     setTabs(tabData)
-        // }
       }
     }
   }, [tabs, isInitialRender, selectedTab, selectedTabSet]);
-
-  // useEffect(() => {
-
-  //     if (isInitialRender) {
-  //         if (documents) {
-  //             const tabData = [
-  //                 'overview',
-  //                 documents?.concept_plan && 'concept',
-  //                 documents?.project_plan && 'project',
-  //                 documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
-  //                 documents?.student_reports && documents.student_reports.length > 0 && 'student',
-  //                 documents?.project_closure && 'closure'
-  //             ].filter(Boolean)
-  //             setTabs(tabData)
-  //             setIsInitialRender(false);
-
-  //         }
-  //         // if (tabs.length >= 1) {
-  //         // }
-  //     } else {
-  //         if (selectedTab) {
-  //             console.log('there is a selected tab')
-  //             if (selectedTabSet === false) {
-  //                 console.log('and it hasnt been set')
-  //                 setToSelectedTab();
-  //                 setSelectedTabSet(true);
-  //             }
-  //         } else {
-  //             // if the tab has been set already
-  //             const tabData = [
-  //                 'overview',
-  //                 documents?.concept_plan && 'concept',
-  //                 documents?.project_plan && 'project',
-  //                 documents?.progress_reports && documents.progress_reports.length > 0 && 'progress',
-  //                 documents?.student_reports && documents.student_reports.length > 0 && 'student',
-  //                 documents?.project_closure && 'closure'
-  //             ].filter(Boolean)
-  //             if (tabData.length !== tabs.length) {
-  //                 console.log("Len:", tabs.length, tabs)
-
-  //                 setTabs(tabData)
-  //             }
-  //         }
-
-  //     }
-  // }, [documents, tabs, isInitialRender, selectedTab, selectedTabSet])
 
   return (
     <div
@@ -375,12 +280,6 @@ export const ProjectDetail = ({
                           projectPk !== undefined ? Number(projectPk) : 0
                         }
                       />
-
-                      {/* <DocumentActions
-                                            tabType="overview"
-                                            documents={documents}
-                                            projectData={projectData}
-                                        /> */}
                     </motion.div>
                   ) : (
                     <Spinner />
@@ -396,9 +295,6 @@ export const ProjectDetail = ({
                       document={documents.concept_plan}
                       all_documents={documents}
                       refetch={refetch}
-                      setToLastTab={setToLastTab}
-
-                      // projectPk={Number(projectPk)}
                     />
                   </TabPanel>
                 )}
@@ -442,12 +338,9 @@ export const ProjectDetail = ({
                         projectPk={projectPk}
                         documents={documents.student_reports}
                         refetch={refetch}
-                        all_documents={documents}
                         userData={me?.userData}
                         members={members}
                         setToLastTab={setToLastTab}
-
-                        //  selectedYear={selectedStudentReportYear}
                       />
                     </TabPanel>
                   )}

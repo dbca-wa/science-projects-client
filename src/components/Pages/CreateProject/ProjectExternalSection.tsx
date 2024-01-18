@@ -1,35 +1,17 @@
 // Tab data for Project External Project info on the creation page.
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Button, Flex, Grid, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
 import { IoIosCreate } from "react-icons/io";
 import { ICreateProjectExternalDetails } from "../../../lib/api";
-import { MdCorporateFare, MdOutlineTitle } from "react-icons/md";
-import { AiFillDollarCircle } from "react-icons/ai";
-import { StateRichTextEditor } from "../../RichTextEditor/Editors/StateRichTextEditor";
-import { SimpleStateRichTextEditor } from "../../RichTextEditor/Editors/SimpleStateRichTextEditor";
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 interface IProjectExternalProps {
   externalFilled: boolean;
   setExternalFilled: React.Dispatch<React.SetStateAction<boolean>>;
   externalData: ICreateProjectExternalDetails;
-  setExternalData: (data: any) => void;
+  setExternalData: (data) => void;
   createClick: () => void;
   onClose: () => void;
   backClick: () => void;

@@ -3,13 +3,12 @@
 import { Box, Button, Center, Flex, Grid, Spinner } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ModernProjectCard } from "./ModernProjectCard";
-import { useEffect } from "react";
 import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
-import { useScrollToTop } from "@/lib/hooks/useScrollToTop";
+import { IProjectData } from "@/types";
 
 interface IPaginationProps {
   loading: boolean;
-  data: any;
+  data: IProjectData[];
   currentProjectResultsPage: number;
   setCurrentProjectResultsPage: (page: number) => void;
   totalPages: number;
@@ -27,11 +26,6 @@ export const PaginatorProject = ({
   };
 
   const maxDisplayedPages = 8;
-
-  // useEffect(() => {
-  //     if (!loading)
-  //         console.log(data)
-  // }, [loading, data])
 
   // Calculate the start and end page numbers for rendering
   let startPage = Math.max(
@@ -52,12 +46,7 @@ export const PaginatorProject = ({
       pos={"relative"}
       flexDir={"column"}
     >
-      <Box
-        h={"100%"}
-        flex={1}
-
-        // bg={"blue"}
-      >
+      <Box h={"100%"} flex={1}>
         {/* Render the current page's data */}
         {!loading ? (
           <AnimatePresence>
@@ -82,7 +71,7 @@ export const PaginatorProject = ({
               }
               gridGap={8}
             >
-              {data.map((project: any, index: number) => {
+              {data.map((project: IProjectData, index: number) => {
                 return (
                   <motion.div
                     key={index}
