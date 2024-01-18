@@ -4,32 +4,25 @@ import {
   LexicalCommand,
   LexicalEditor,
   LexicalNode,
-  RangeSelection,
   TextNode,
 } from "lexical";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { ListItemNode, ListNode } from "@lexical/list";
 
-import { $getListDepth, $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $INTERNAL_isPointSelection,
-  $createTabNode,
   $getSelection,
-  $isElementNode,
-  $isRangeSelection,
   $isTextNode,
   $parseSerializedNode,
   COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_EDITOR,
   PASTE_COMMAND,
   createCommand,
 } from "lexical";
 
 import { useEffect } from "react";
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
+import { $generateNodesFromDOM } from "@lexical/html";
 import { useColorMode } from "@chakra-ui/react";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
 
 export interface BaseSerializedNode {
   children?: Array<BaseSerializedNode>;
@@ -115,7 +108,7 @@ const convertFirstLevel = (text: string) => {
     );
 
     // One by one,
-    orphanedLiTags.forEach((rogue, rogueIndex) => {
+    orphanedLiTags.forEach((rogue) => {
       // make a copy of the rogue li
       const rogueClone = rogue.cloneNode(true) as HTMLElement;
       // add that copy to the last ul found in the dom before the rogue li
@@ -168,7 +161,7 @@ const convertFirstLevel = (text: string) => {
     //   console.log("Consecutive rogue lis:", orphanedLiTagsWhichFollowPTag);
 
     // For each
-    orphanedLiTagsWhichFollowPTag.forEach((rogue, index) => {
+    orphanedLiTagsWhichFollowPTag.forEach((rogue) => {
       // make a clone
       const clone = rogue.cloneNode(true) as HTMLLIElement;
 
@@ -426,110 +419,6 @@ const convertSecondLevel = (text: string, colorMode) => {
     return null;
   };
 
-  // Get any p tags that have multiple spans underneath them. Get the innerText of each
-  // and concatenate them. Remove the spans and replace with a span that has the concatenated string as the inner text
-  // const processText = (text: string) => {
-  //   const parser = new DOMParser();
-  //   const dom = parser.parseFromString(text, "text/html");
-
-  //   // Get all p tags
-  //   const pTags = dom.querySelectorAll("p");
-
-  //   pTags.forEach((pTag) => {
-  //     // Check if the p tag has multiple spans
-  //     const spans = pTag.querySelectorAll("span");
-  //     if (spans.length > 1) {
-  //       // Get the innerText of each span and concatenate them
-  //       let concatenatedText = "";
-  //       spans.forEach((span) => {
-  //         concatenatedText += span.innerText;
-  //       });
-
-  //       // Remove the spans
-  //       pTag.innerHTML = "";
-
-  //       // Create a new span with the concatenated text and append it to the p tag
-  //       const newSpan = dom.createElement("span");
-  //       newSpan.innerText = concatenatedText;
-  //       pTag.appendChild(newSpan);
-  //     }
-  //   });
-
-  //   // Return the modified HTML
-  //   return dom.body.innerHTML;
-  // };
-  // const startsWithUnicode = (text, unicode) => {
-  //   // Get the Unicode value of the first character in the text
-  //   const firstCharUnicode = text.charCodeAt(0);
-
-  //   // Compare with the Unicode value of the specified character
-  //   return firstCharUnicode === unicode;
-  // };
-
-  // const secondProcessText = (text: string) => {
-  //   const parser = new DOMParser();
-  //   const dom = parser.parseFromString(text, "text/html");
-
-  //   // Convert them all to the same format by replacing weird special characters
-  //   // Where they come first in the innerText
-  //   const newPtags = dom.querySelectorAll("p");
-
-  //   newPtags.forEach((tag) => {
-  //     const content = tag.innerText;
-  //     const newPTag = dom.createElement("p");
-  //     const newSpan = dom.createElement("span");
-  //     newSpan.innerHTML = "";
-  //     let spanContent = "";
-
-  //     if (
-  //       startsWithUnicode(content, 0x2022) ||
-  //       tag.innerText.startsWith("·")
-  //     ) {
-  //       // · 0x00B7
-  //       // • 0x2022
-  //       console.log("STARTS WITH 1st level");
-  //       spanContent = `·${tag.innerText.substring(1)}`;
-  //     } else if (startsWithUnicode(content, 0x006f)) {
-  //       // o 0x006F
-  //       // o 0x006F
-  //       console.log("STARTS WITH 2nd level");
-  //       spanContent = `z!${tag.innerText.substring(1)}`;
-  //     } else if (
-  //       startsWithUnicode(content, 0x25a0) ||
-  //       startsWithUnicode(content, 0x201d) ||
-  //       tag.innerHTML.startsWith("§") ||
-  //       tag.innerHTML.startsWith("")
-  //     ) {
-  //       // § 0x00A7
-  //       //  0x25A0
-  //       //   U+201D
-  //       console.log("STARTS WITH 3rd level");
-  //       spanContent = `§${tag.innerText.substring(1)}`;
-  //     } else {
-  //       console.log(`Starts with something else: ${tag.innerText[0]}`);
-  //     }
-
-  //     if (spanContent !== "") {
-  //       newSpan.innerText = spanContent;
-  //       newPTag.append(newSpan);
-  //       console.log("NEW PTAG: ", newPTag);
-  //       tag.replaceWith(newPTag);
-  //     }
-  //   });
-
-  //   const fixUp = (innerHTML) => {
-  //     const p = new DOMParser();
-  //     const d = parser.parseFromString(innerHTML, "text/html");
-  //     console.log("ICE", d);
-  //     // ·\t
-  //     // z!\t
-  //     // \t
-  //     return d.body.innerHTML;
-  //   };
-
-  //   return fixUp(dom.body.innerHTML);
-  // };
-
   // •
   // o
   // 
@@ -540,39 +429,17 @@ const convertSecondLevel = (text: string, colorMode) => {
   const secondFormat =
     /<p class="editor-p-(dark|light)" dir="ltr"><span style="white-space: pre-wrap;">o (.*?)<\/span><\/p>/;
 
-  // const secondFormat = /<p class="editor-p-(dark|light)" dir="ltr"><span style="white-space: pre-wrap;">z! (.*?)<\/span><\/p>/;
   const secondDesiredFormat =
     '<li value=${index} class=`editor-li-${colorMode} editor-nested-list-item`}><span style="white-space: pre-wrap;">${content}</span></li>';
-
-  //   console.log(text);
-  // 1. Check if there are any instances in the refined string that match the second format (p tag with a span that has the special character and a space)
 
   const secondMatches =
     secondLevel.match(
       /<p class="editor-p-(dark|light)" dir="ltr"><span style="white-space: pre-wrap;">o (.*?)<\/span><\/p>/g
-    ) ||
-    //   secondLevel.match(
-    //     /<p class="editor-p-(dark|light)" dir="ltr"><span style="white-space: pre-wrap;">z! (.*?)<\/span><\/p>/g
-    //   ) ||
-    //   //   secondLevel.match(
-    //   //     /<p class="editor-p-(dark|light)" dir="ltr"><span style="white-space: pre-wrap;">o<\/span>(<span style="white-space: pre-wrap;">.*?<\/span>.*?)?<\/p>/g
-    //   //   ) ||
-    [];
-
-  // const regex = /<p\b[^>]*><span\b[^>]*>\s*z!.*?<\/span>.*?<\/p>/g;
-  // const secondMatches = secondLevel.match(regex) || [];
-
-  // console.log("SM", secondMatches);
-  // console.log(secondLevel);
+    ) || [];
 
   // 2. replace items in the first matches array with the new li format
-  secondMatches.forEach((match, index) => {
-    //   const newParser = new DOMParser();
-    //   const newDOM = newParser.parseFromString(match, "text/html");
-    //   const item = newDOM.querySelectorAll("p")[0];
-    //   const content = item.innerText.substring(2);
+  secondMatches.forEach((match) => {
     const content = match.match(secondFormat)?.[2] || "";
-    // console.log("CONTENT", content);
     secondLevel = secondLevel.replace(
       match,
       secondDesiredFormat.replace("${content}", content)
@@ -641,9 +508,6 @@ const convertSecondLevel = (text: string, colorMode) => {
     lisToInsert.push(clonedLiElement);
   });
 
-  // console.log(lisToInsert);
-  // Replacement logic ================================================ (ABOVE IS OKAY)
-
   // Use the text to create a new dom which will be the one returned/cloned then returned.
   const textTocreateDomFrom = secondLevel;
   const newParser = new DOMParser();
@@ -653,18 +517,15 @@ const convertSecondLevel = (text: string, colorMode) => {
   groupedLIs.forEach((liGroup, index) => {
     // For each liGroup first item, find where that li is in the newDom that matches.
     const originalLi = liGroup[0];
-    const selector =
-      'li.editor-nested-list-item span[style="white-space: pre-wrap;"]';
+
     const originalLiContent = originalLi.textContent || "";
 
     let previousElement;
     const matchingLi = findLiByContent(newDom, originalLiContent);
-    //   console.log("Match!: ", matchingLi);
 
     if (matchingLi) {
       previousElement = matchingLi.previousElementSibling;
       if (previousElement) {
-        //   console.log("Previous element sibling: ", previousElement);
         if (previousElement.className.includes("editor-ul1")) {
           previousElement.append(lisToInsert[index]);
           // Now remove the items in that li Group from the dom so that the content doesnt repeat outside of the ul it is appended to
@@ -679,13 +540,11 @@ const convertSecondLevel = (text: string, colorMode) => {
               classToAvoid
             );
             if (matchinLiToRemove) {
-              // console.log("LI TO REMOVE: ", matchinLiToRemove);
               matchinLiToRemove.remove();
             }
           });
         }
       }
-      // console.log the previous element before each match
     }
   });
 
@@ -771,15 +630,6 @@ const convertThirdLevel = (text: string) => {
       }
     });
 
-    //   console.log("P TAGS WHICH MATCH:");
-    pTagsWhichMatchLevel3.forEach((item) => {
-      // console.log(item.querySelector("span"));
-    });
-
-    //   console.log("PARAGRAPH GROUPS:");
-    paragraphGroups.forEach((group) => {
-      // console.log(group.map((item) => item.textContent));
-    });
     return paragraphGroups;
   };
   // const pGroups = getPGroups(text, "§ ");
@@ -846,7 +696,6 @@ const convertThirdLevel = (text: string) => {
       // Create a copy of the li as a child of wrapperUl
       const liCopy = dom.createElement("li");
       liCopy.textContent = previousSibling.textContent;
-      // console.log("LICOPY CONTENT", liCopy);
 
       wrapperUl.appendChild(liCopy);
 
@@ -865,13 +714,7 @@ const convertThirdLevel = (text: string) => {
   return newHtml;
 };
 
-const finalPass = (text: string) => {
-  return text;
-};
-const handlePastedWordOrderedList = (
-  replacedData: string,
-  colorMode: string
-) => {
+const handlePastedWordOrderedList = (replacedData: string) => {
   const handled = replacedData;
 
   const parser = new DOMParser();
@@ -1008,7 +851,7 @@ const handlePastedWordOrderedList = (
   // For each group, create an ol, add copies of the items of the group, wrap it in in li
   // and remove/replace originals
 
-  liGroups.forEach((group, index) => {
+  liGroups.forEach((group) => {
     const ol = dom.createElement("ol");
     const li = dom.createElement("li");
 
@@ -1043,15 +886,7 @@ const handlePastedWordOrderedList = (
     if (!processed.includes(pTag)) {
       const li = dom.createElement("li");
       li.innerText = pTag.innerText;
-      // const strIndex = pTag.innerText.indexOf(". ");
 
-      // if (strIndex !== -1) {
-      //   // Set span.innerText to the substring starting from the position after the first period and space
-      //   li.innerText = pTag.innerText.substring(strIndex + 2);
-      // } else {
-      //   // If no period and space found, set span.innerText to the full text
-      //   li.innerText = pTag.innerText;
-      // }
       group.push(li);
       processed.push(pTag);
 
@@ -1064,18 +899,6 @@ const handlePastedWordOrderedList = (
           clonedNextAsLi.innerText = (
             nextElement as HTMLParagraphElement
           ).innerText;
-
-          // const strIndex = (
-          //   nextElement as HTMLParagraphElement
-          // ).innerText.indexOf(". ");
-
-          // if (strIndex !== -1) {
-          //   // Set span.innerText to the substring starting from the position after the first period and space
-          //   clonedNextAsLi.innerText = pTag.innerText.substring(strIndex + 2);
-          // } else {
-          //   // If no period and space found, set span.innerText to the full text
-          //   clonedNextAsLi.innerText = pTag.innerText;
-          // }
 
           if (!processed.includes(nextElement)) {
             group.push(clonedNextAsLi);
@@ -1093,8 +916,8 @@ const handlePastedWordOrderedList = (
     // For each group
     console.log("Final LI GROUPS:", finalLiGroups);
 
-    finalLiGroups.forEach((group, index) => {
-      group.forEach((liItem, innerIndex) => {
+    finalLiGroups.forEach((group) => {
+      group.forEach((liItem) => {
         const copy = (liItem as HTMLLIElement).cloneNode(true);
         // console.log("COPY", copy);
 
@@ -1167,48 +990,6 @@ const handlePastedWordOrderedList = (
     });
   });
 
-  // 6. Finally, we need to remove the original starter ol text from lis
-  // (all a. b. c. / i. ii. iii. iv. / 1. 2. 3. )
-
-  // console.log("DOM STATE", dom);
-  // // Get all lis within ols
-  // const liInOl = Array.from(dom.querySelectorAll("li")).filter((li) => {
-  //   return (
-  //     li.parentElement.tagName === "OL" &&
-  //     (li.firstChild as Element).tagName !== "OL"
-  //   );
-  // });
-  // const textLI = [];
-  // liInOl.forEach((i) => {
-  //   textLI.push(i.innerText);
-  // });
-  // console.log("LIIN OL", textLI);
-
-  // liInOl.forEach((li) => {
-  //   // const liSpan = li.querySelector("span");
-  //   if (li.querySelector("span")) {
-  //     const oldSpan = li.querySelector("span");
-  //     // console.log(oldSpan.innerText);
-  //     // Remove unwanted prefixes: numerals or lowercase letters followed by a period and a space
-  //     // const cleanedText = oldSpan.innerText.replace(
-  //     //   /^[0-9]+\. |^[ivxlcdm]+\.\s|^[a-z]\. /i,
-  //     //   ""
-  //     // );
-
-  //     const cleanedText = oldSpan.innerText.replace(
-  //       /^\d+\. |^[ivxlcdm]+\.\s|^[a-z]\. /i,
-  //       ""
-  //     );
-
-  //     const newSpan = dom.createElement("span");
-  //     newSpan.textContent = cleanedText;
-  //     newSpan.style.cssText = "white-space: pre-wrap;";
-  //     // newLi.append(newSpan);
-  //     oldSpan.replaceWith(newSpan);
-  //   }
-  //   console.log(li);
-  // });
-
   console.log("Handled Dom", dom);
 
   return dom.body.innerHTML;
@@ -1257,18 +1038,8 @@ function $insertDataTransferForRichText(
   // 	Level 3 (2: 2-1)
   // o	Level 2 (2:1-3)
 
-  //   console.log("THIS IS THE HTML STRING:", htmlString);
   if (htmlString) {
-    // let replacedData = "";
-    // // Remove whitespace in html format
-    // replacedData = removeHTMLSpace(htmlString);
-    // // Replace ol symbols and sections with html ol lis
-    // replacedData = handlePastedWordList(replacedData, colorMode);
-
-    // console.log("HTML STRING");
     try {
-      //   const domString = handlePastedWordList(htmlString, colorMode);
-      //   console.log("domString string:", htmlString);
       const withoutWhite = removeHTMLSpace(htmlString);
 
       const parser = new DOMParser();
@@ -1280,18 +1051,13 @@ function $insertDataTransferForRichText(
         newHTMLDom.body.innerHTML,
         colorMode
       );
-      newDomString = handlePastedWordOrderedList(newDomString, colorMode);
+      newDomString = handlePastedWordOrderedList(newDomString);
       const newDom = parser.parseFromString(newDomString, "text/html");
 
       const newNodes = $generateNodesFromDOM(editor, newDom);
 
       console.log(newDom);
       console.log(newNodes);
-
-      //   console.log("DOM BODY INNER", dom.body.innerHTML);
-
-      //   const newDOmString = handlePastedWordList(dom.body.innerHTML, colorMode);
-      //   const newDOM = parser.parseFromString(newDOmString, "text/html");
 
       return $insertGeneratedNodes(editor, newNodes, selection);
     } catch (e) {
@@ -1343,9 +1109,6 @@ export const CustomPastePlugin = () => {
         }
         const { clipboardData } = e;
         if (clipboardData && clipboardData.getData) {
-          //   const clipboardText = clipboardData?.getData(
-          //     "application/x-lexical-editor"
-          //   );
           const selection = $getSelection();
           console.log(selection);
           if (clipboardData !== null && $INTERNAL_isPointSelection(selection)) {
@@ -1486,10 +1249,7 @@ const customGenerateHTMLFromNodes = (
   const dom = parser.parseFromString("", "text/html");
 
   const editor = null;
-  //   console.log(dom);
   nodes.forEach((n) => {
-    // console.log(n.createDOM(initialConfig));
-    // console.log(n);
     const domItem = n.createDOM(initialConfig, editor);
     const span = dom.createElement("span");
     span.style.cssText = "white-space: pre-wrap;";
@@ -1501,6 +1261,5 @@ const customGenerateHTMLFromNodes = (
     }
     dom.body.append(domItem);
   });
-  //   console.log(dom);
   return dom;
 };

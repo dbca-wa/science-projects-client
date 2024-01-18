@@ -27,7 +27,6 @@ import {
   ToastId,
   useColorMode,
   useDisclosure,
-  useQuery,
   useToast,
   FormHelperText,
   TabList,
@@ -38,14 +37,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import {
-  IBranch,
-  IBusinessArea,
-  IPersonalInformation,
-  IProfile,
-  IUserData,
-} from "../../types";
-import { useBranches } from "../../lib/hooks/useBranches";
+import { IBranch, IBusinessArea, IUserData } from "../../types";
 import { GiGraduateCap } from "react-icons/gi";
 import { AiFillPhone } from "react-icons/ai";
 import { GrMail } from "react-icons/gr";
@@ -53,11 +45,9 @@ import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   IFullUserUpdateVariables,
-  IProfileUpdateSuccess,
   MutationError,
   MutationSuccess,
   adminUpdateUser,
-  getPersonalInformation,
 } from "../../lib/api";
 import { useForm } from "react-hook-form";
 import { MdFax } from "react-icons/md";
@@ -81,11 +71,7 @@ export const EditUserDetailsModal = ({
   businessAreas,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const {
-    isOpen: isToastOpen,
-    onOpen: openToast,
-    onClose: closeToast,
-  } = useDisclosure();
+  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
 
   useEffect(() => {
     if (isToastOpen) {
@@ -103,8 +89,6 @@ export const EditUserDetailsModal = ({
   // React Hook Form
   const {
     register,
-    // setValue,
-    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<IFullUserUpdateVariables>();
@@ -152,23 +136,6 @@ export const EditUserDetailsModal = ({
   };
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleFileInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    setSelectedFile(file || null);
-  };
-
-  const initialData: IProfile = {
-    image: userData.image,
-    about: userData.about,
-    expertise: userData.expertise,
-    // Initialize other properties with default values
-  };
-  const isFieldChanged = (fieldName: keyof IProfile) => {
-    return userData ? userData[fieldName] !== initialData[fieldName] : false;
-  };
-
   useEffect(() => {
     if (!userLoading) {
       setAboutValue(userData?.about || "");
@@ -179,7 +146,7 @@ export const EditUserDetailsModal = ({
   // Toast
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -204,9 +171,7 @@ export const EditUserDetailsModal = ({
       });
     },
     // Success handling based on API- file - declared interface
-    onSuccess: (data) => {
-      console.log(data);
-
+    onSuccess: () => {
       queryClient.refetchQueries([`user`, user.pk]);
       queryClient.refetchQueries([`personalInfo`, user.pk]);
       queryClient.refetchQueries([`membership`, user.pk]);
@@ -232,7 +197,7 @@ export const EditUserDetailsModal = ({
       console.log(error);
       let errorMessage = "An error occurred while updating"; // Default error message
 
-      const collectErrors: any = (data: any, prefix = "") => {
+      const collectErrors = (data, prefix = "") => {
         if (typeof data === "string") {
           return [data];
         }
@@ -287,10 +252,6 @@ export const EditUserDetailsModal = ({
     expertise,
   }: IFullUserUpdateVariables) => {
     const image = activeOption === "url" ? selectedImageUrl : selectedFile;
-    // if (image !== null || isFieldChanged('about') || isFieldChanged('expertise')) {
-    // console.log({
-    //     userPk, title, phone, fax, branch, business_area, about, expertise
-    // })
     await fullMutation.mutateAsync({
       userPk,
       title,
@@ -302,11 +263,6 @@ export const EditUserDetailsModal = ({
       about,
       expertise,
     });
-    // Close the modal
-    // onClose();
-    // } else {
-    //     // No changes, show a message or take some other action
-    // }
   };
 
   return (
@@ -318,11 +274,7 @@ export const EditUserDetailsModal = ({
         <Flex as={"form"} onSubmit={handleSubmit(onSubmit)} id="edit-details">
           <ModalBody>
             {!userLoading && (
-              <Tabs
-                isFitted
-                variant="enclosed"
-                // index={activeTabIndex}
-              >
+              <Tabs isFitted variant="enclosed">
                 <TabList mb="1em">
                   <Tab>Base Information</Tab>
                   <Tab>Profile</Tab>
@@ -410,7 +362,6 @@ export const EditUserDetailsModal = ({
                                 type="text"
                                 placeholder={"Enter a phone number"}
                                 {...register("phone", {
-                                  // placeHolder: "Enter a phone number",
                                   pattern: {
                                     value: phoneValidationPattern,
                                     message: "Invalid phone number",
@@ -438,7 +389,6 @@ export const EditUserDetailsModal = ({
                                 type="text"
                                 placeholder={"Enter a fax number"}
                                 {...register("fax", {
-                                  // placeHolder: "Enter a phone number",
                                   pattern: {
                                     value: phoneValidationPattern,
                                     message: "Invalid fax number",
@@ -622,7 +572,6 @@ export const EditUserDetailsModal = ({
                                 </Button>
                                 {activeOption === "url" && (
                                   <Input
-                                    // value={selectedImageUrl || ''}
                                     onChange={(e) => {
                                       setImageLoadFailed(false);
                                       setSelectedImageUrl(e.target.value);
@@ -651,12 +600,9 @@ export const EditUserDetailsModal = ({
                                 {activeOption === "upload" && (
                                   <FormControl>
                                     <Input
-                                      // type="file"
-                                      // accept="image/*"
                                       autoComplete="off"
                                       alignItems={"center"}
                                       type="file"
-                                      // accept="image/*"
                                       accept=".png, .jpeg, .jpg, image/png, image/jpeg"
                                       onChange={(e) => {
                                         const file = e.target.files?.[0];
@@ -722,18 +668,13 @@ export const EditUserDetailsModal = ({
                             {branches && (
                               <Select
                                 placeholder={"Select a Branch"}
-                                // defaultValue={currentBranchData?.pk}
                                 defaultValue={userData?.branch?.pk || ""}
                                 {...register("branch")}
                               >
                                 {branches.map(
                                   (branch: IBranch, index: number) => {
                                     return (
-                                      <option
-                                        key={index}
-                                        value={branch.pk}
-                                        // selected={branch.pk === currentBranchData?.pk || branch.pk === undefined}
-                                      >
+                                      <option key={index} value={branch.pk}>
                                         {branch.name}
                                       </option>
                                     );
@@ -757,11 +698,7 @@ export const EditUserDetailsModal = ({
                                 {businessAreas.map(
                                   (ba: IBusinessArea, index: number) => {
                                     return (
-                                      <option
-                                        key={index}
-                                        value={ba.pk}
-                                        // selected={ba.pk === currentBaData?.pk || ba.pk === undefined}
-                                      >
+                                      <option key={index} value={ba.pk}>
                                         {ba.name}
                                       </option>
                                     );
@@ -784,15 +721,12 @@ export const EditUserDetailsModal = ({
           </ModalBody>
         </Flex>
 
-        <ModalFooter
-        //  pos="absolute" bottom={0} right={0}
-        >
+        <ModalFooter>
           <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
             <Button colorScheme="gray" onClick={onClose}>
               Cancel
             </Button>
             <Button
-              // isDisabled={!changesMade}
               isLoading={fullMutation.isLoading}
               form="edit-details"
               type="submit"

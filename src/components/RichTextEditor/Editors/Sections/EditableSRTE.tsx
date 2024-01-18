@@ -1,29 +1,22 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
+import {
+  InitialConfigType,
+  LexicalComposer,
+} from "@lexical/react/LexicalComposer";
 import { OptionsBar } from "../../OptionsBar/OptionsBar";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { ListItemNode, ListNode } from "@lexical/list";
-import { HeadingNode } from "@lexical/rich-text";
-import {
-  $getRoot,
-  $getSelection,
-  LexicalEditor,
-  NodeKey,
-  ParagraphNode,
-} from "lexical";
+import { $getRoot } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 // import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
 import { useEffect, useState } from "react";
-import { DataDisplayPlugin } from "../../Plugins/DataDisplayPlugin";
-import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
+import { $generateHtmlFromNodes } from "@lexical/html";
 import {
   EditorSections,
   EditorSubsections,
@@ -40,13 +33,13 @@ import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import React from "react";
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
 import { RevisedRichTextToolbar } from "../../Toolbar/RevisedRichTextToolbar";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+// import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 // import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 interface Props {
-  initialConfig: any;
-  editorRef: any;
+  initialConfig: InitialConfigType;
+  editorRef: React.MutableRefObject<any>;
   originalData?: string;
   data: string;
   section: EditorSubsections;
@@ -75,7 +68,6 @@ interface Props {
 }
 
 export const EditableSRTE = ({
-  textEditorName,
   section,
   project_pk,
   document_pk,
@@ -85,7 +77,6 @@ export const EditableSRTE = ({
   writeable_document_pk,
   initialConfig,
   editorRef,
-  originalData,
   data,
   editorText,
   setEditorText,
@@ -100,16 +91,7 @@ export const EditableSRTE = ({
   canSave,
   setCanSave,
 }: Props) => {
-  // const [isText, setIsText] = useState(false);
-  // const [selectedIsBold, setSelectedIsBold] = useState(false);
-  // const [selectedIsItalic, setSelectedIsItalic] = useState(false);
-  // const [selectedIsUnderlined, setSelectedIsUnderlined] = useState(false);
-  // const [selectedIsSubscript, setSelectedIsSubscript] = useState(false);
-  // const [selectedIsSuperscript, setSelectedIsSuperscript] = useState(false);
-
   const dragBtnMargin = 10;
-  // useEffect(() => console.log(displayData), [displayData])
-
   const toolBarHeight = 45;
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
@@ -118,17 +100,8 @@ export const EditableSRTE = ({
       setFloatingAnchorElem(_floatingAnchorElem);
     }
   };
-  // useEffect(() => {
-  //   // Check if floatingAnchorElem is set
-  //   if (floatingAnchorElem !== null) {
-  //     // Perform any actions that depend on floatingAnchorElem being set
-  //     // For example, you might want to trigger something or log a message.
-  //     console.log("floatingAnchorElem is set:", floatingAnchorElem);
-  //   }
-  // }, [floatingAnchorElem]);
 
   useEffect(() => {
-    // Assuming editorRef is a reference to this Lexical editor instance
     const editorInstance = editorRef.current;
 
     if (editorInstance) {
@@ -138,25 +111,23 @@ export const EditableSRTE = ({
     }
   }, [editorRef, setEditorText]);
 
-  const blockTypeToBlockName = {
-    bullet: "Bulleted List",
-    check: "Check List",
-    code: "Code Block",
-    h1: "Heading 1",
-    h2: "Heading 2",
-    h3: "Heading 3",
-    h4: "Heading 4",
-    h5: "Heading 5",
-    h6: "Heading 6",
-    number: "Numbered List",
-    paragraph: "Normal",
-    quote: "Quote",
-  };
+  // const blockTypeToBlockName = {
+  //   bullet: "Bulleted List",
+  //   check: "Check List",
+  //   code: "Code Block",
+  //   h1: "Heading 1",
+  //   h2: "Heading 2",
+  //   h3: "Heading 3",
+  //   h4: "Heading 4",
+  //   h5: "Heading 5",
+  //   h6: "Heading 6",
+  //   number: "Numbered List",
+  //   paragraph: "Normal",
+  //   quote: "Quote",
+  // };
 
-  const [blockType, setBlockType] =
-    useState<keyof typeof blockTypeToBlockName>("paragraph");
-
-  // const [editor] = useLexicalComposerContext();
+  // const [blockType, setBlockType] =
+  //   useState<keyof typeof blockTypeToBlockName>("paragraph");
 
   return (
     <>
@@ -173,9 +144,6 @@ export const EditableSRTE = ({
 
               setEditorText(root.__cachedText);
               const newHtml = $generateHtmlFromNodes(editor, null);
-              // console.log(newHtml)
-              // console.log(newHtml)
-              // console.log("DATA DISPLAY PLUGIN:", newHtml);
               setDisplayData(newHtml);
             });
           }}
@@ -192,7 +160,7 @@ export const EditableSRTE = ({
             // mr={3}
             >
               {/* Toolbar */}
-              <RevisedRichTextToolbar anchorElem={floatingAnchorElem} />
+              <RevisedRichTextToolbar />
 
               <Box className="editor-scroller">
                 <Box
@@ -264,7 +232,7 @@ export const EditableSRTE = ({
             setCanSave={setCanSave}
             editorIsOpen={isEditorOpen}
             setIsEditorOpen={setIsEditorOpen}
-            setDisplayData={setDisplayData}
+            // setDisplayData={setDisplayData}
           />
         </Box>
         {shouldShowTree ? <TreeViewPlugin /> : null}
@@ -272,46 +240,6 @@ export const EditableSRTE = ({
         <TabIndentationPlugin />
         <ListMaxIndentLevelPlugin maxDepth={3} />
 
-        {/* <NodeEventPlugin
-          nodeType={ParagraphNode}
-          eventType={"click"}
-          eventListener={(
-            e: Event,
-            editor: LexicalEditor,
-            nodeKey: NodeKey
-          ) => {
-            // editor.getEditorState().read(() => {
-            //     //
-            //     setSelectedIsBold(true);
-            // })
-            console.log(e);
-            console.log("paragaph node clicked");
-            setSelectedNodeType("Normal");
-            setSelectedIsBold(true);
-          }}
-        />
-        <NodeEventPlugin
-          nodeType={ListItemNode}
-          eventType={"click"}
-          eventListener={(
-            e: Event,
-            editor: LexicalEditor,
-            nodeKey: NodeKey
-          ) => {
-            console.log(e);
-            console.log(editor);
-            console.log(nodeKey);
-            const a = false;
-            if (a) {
-              setSelectedNodeType("Bullets");
-            } else {
-              setSelectedNodeType("Nums");
-            }
-
-            // console.log('li node clicked')
-            // setSelectedNodeType('li')
-          }}
-        /> */}
         <EditorTextInitialStatePlugin
           setEditorText={setEditorText}
           editorText={editorText}
@@ -321,16 +249,6 @@ export const EditableSRTE = ({
         <FloatingToolbarPlugin anchorElem={floatingAnchorElem} />
 
         <AutoFocusPlugin />
-
-        {/* <DataDisplayPlugin setDisplayData={setDisplayData} /> */}
-        {/* {isEditorOpen && (
-                    <EditorTextInitialStatePlugin
-                        setEditorText={setEditorText}
-                        editorText={editorText}
-                        isOpen={isEditorOpen}
-                    />
-
-                )} */}
       </LexicalComposer>
     </>
   );

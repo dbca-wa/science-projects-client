@@ -1,34 +1,22 @@
 import {
   Box,
   Button,
-  Center,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerOverlay,
   Flex,
   FormControl,
   FormLabel,
   Grid,
-  HStack,
   Input,
-  InputGroup,
-  InputLeftAddon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   Text,
-  Textarea,
   VStack,
   useColorMode,
   useDisclosure,
@@ -38,11 +26,10 @@ import { IAddress, IBranch } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { FaSign } from "react-icons/fa";
 import { deleteAddress, updateAddress } from "../../../lib/api";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
-import { useState } from "react";
 import { TextButtonFlex } from "../../TextButtonFlex";
+import { useState } from "react";
 
 export const AddressItemDisplay = ({
   pk,
@@ -51,7 +38,6 @@ export const AddressItemDisplay = ({
   zipcode,
   state,
   country,
-  agency,
   branch,
   pobox,
 }: IAddress) => {
@@ -70,11 +56,9 @@ export const AddressItemDisplay = ({
   } = useDisclosure();
   const queryClient = useQueryClient();
   const { colorMode } = useColorMode();
-  const [selectedBranch, setSelectedBranch] = useState<number>();
 
   const branchObj = typeof branch === "object" ? (branch as IBranch) : null;
   const streetData = watch("street");
-  // const suburbData = watch('suburb')
   const cityData = watch("city");
   const zipcodeData = watch("zipcode");
   const stateData = watch("state");
@@ -83,7 +67,6 @@ export const AddressItemDisplay = ({
 
   const updateMutation = useMutation(updateAddress, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Updated",
@@ -93,15 +76,11 @@ export const AddressItemDisplay = ({
       queryClient.invalidateQueries(["addresses"]);
     },
     onError: () => {
-      // console.log("error")
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
-    },
-    onMutate: () => {
-      // console.log("attempting update private")
     },
   });
 
@@ -116,21 +95,16 @@ export const AddressItemDisplay = ({
       onDeleteModalClose();
       queryClient.invalidateQueries(["addresses"]);
     },
-    onError: () => {
-      // console.log("error")
-    },
-    onMutate: () => {
-      // console.log("mutation")
-    },
   });
 
   const deleteBtnClicked = () => {
     deleteMutation.mutate(pk);
   };
   const onUpdateSubmit = (formData: IAddress) => {
-    console.log(formData);
     updateMutation.mutate(formData);
   };
+
+  const [selectedBranch, setSelectedBranch] = useState<number>();
 
   return (
     <>
@@ -265,7 +239,7 @@ export const AddressItemDisplay = ({
                 // isEditable
                 label="Branch"
                 placeholder="Search for a Branch"
-                helperText={<>The branch the address belongs to.</>}
+                helperText={"The branch the address belongs to."}
               />
               <FormControl>
                 <FormLabel>Street</FormLabel>
@@ -331,14 +305,10 @@ export const AddressItemDisplay = ({
                 // form="update-form"
                 // type="submit"
                 onClick={() => {
-                  console.log("clicked");
                   onUpdateSubmit({
                     // "old_id": 1, //default
                     pk: pk,
-                    // "agency": 1, // dbca
-                    // "branch": branchObj.pk,
                     street: streetData,
-                    // "suburb": suburbData,
                     city: cityData,
                     zipcode: zipcodeData,
                     state: stateData,

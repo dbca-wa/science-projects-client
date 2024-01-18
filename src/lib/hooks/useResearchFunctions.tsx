@@ -5,13 +5,16 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllResearchFunctions } from "../api";
 
 export const useResearchFunctions = () => {
-    const { isLoading, data } = useQuery(["researchFunctions"], getAllResearchFunctions,
-        {
-            retry: false,
-        });
+  const { isLoading, data } = useQuery(
+    ["researchFunctions"],
+    getAllResearchFunctions,
+    {
+      retry: false,
+    }
+  );
 
-    return {
-        rfLoading: isLoading,
-        rfData: data,
-    };
+  return {
+    rfLoading: isLoading,
+    rfData: data,
+  };
 };

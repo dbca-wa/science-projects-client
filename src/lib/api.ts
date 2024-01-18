@@ -1,6 +1,6 @@
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import { QueryFunction, QueryFunctionContext } from "@tanstack/react-query";
+import {  QueryFunctionContext } from "@tanstack/react-query";
 import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
 import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
 
@@ -289,9 +289,9 @@ export const getTeamLead = async ({ queryKey }: QueryFunctionContext) => {
 }
 getTeamLead
 
-interface IFullUserProps {
-    pk: string;
-}
+// interface IFullUserProps {
+//     pk: string;
+// }
 
 export const getFullUser = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
@@ -463,7 +463,7 @@ export const getPersonalInformation = ({ queryKey }: QueryFunctionContext): Prom
 
 export const getProfile = ({ queryKey }: QueryFunctionContext): Promise<IProfile> => {
     const [_, userId] = queryKey;
-    console.log(userId)
+    // console.log(userId)
     return instance
         .get(`users/${userId}/profile`).then(res => res.data);
 }
@@ -1580,7 +1580,7 @@ export interface IUploadFile {
 export const getArarsWithPDFs = async () => {
     try {
         const response = await instance.get(`documents/reports/withPDF`);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching reports with pdfs:", error);
@@ -1593,7 +1593,7 @@ export const getArarsWithoutPDFs = async () => {
 
     try {
         const response = await instance.get(`documents/reports/withoutPDF`);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching reports without pdfs:", error);

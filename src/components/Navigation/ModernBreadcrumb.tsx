@@ -2,7 +2,7 @@
 
 import { Button, Center, Flex, Icon, useColorMode } from "@chakra-ui/react";
 import { useUpdatePage } from "../../lib/hooks/useUpdatePage";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { AiFillHome } from "react-icons/ai";
 
@@ -27,10 +27,9 @@ export const ModernBreadcrumb = () => {
             size="sm"
             onClick={handleClick}
             variant="link"
-            color={"white"}
-            background={colorMode === "light" ? "blue.500" : "blue.600"}
+            color={colorMode === "light" ? "blue.500" : "blue.300"}
             _hover={{
-              background: colorMode === "light" ? "blue.400" : "blue.500",
+              color: colorMode === "light" ? "blue.400" : "blue.200",
             }}
           >
             {capitalizedPage}
@@ -42,10 +41,9 @@ export const ModernBreadcrumb = () => {
             size="sm"
             onClick={handleClick}
             variant="link"
-            color={"white"}
-            background={colorMode === "light" ? "blue.500" : "blue.600"}
+            color={colorMode === "light" ? "blue.500" : "blue.300"}
             _hover={{
-              background: colorMode === "light" ? "blue.400" : "blue.500",
+              color: colorMode === "light" ? "blue.400" : "blue.200",
             }}
             fontWeight="normal" // Set fontWeight to normal for the last breadcrumb item
           >
@@ -57,27 +55,6 @@ export const ModernBreadcrumb = () => {
   });
 
   const isBaseRoute = pages.length === 0;
-
-  const [visible, setVisible] = useState(true);
-  const [nextPage, setNextPage] = useState("");
-  const [fadeDelay, setFadeDelay] = useState(0);
-  const [shouldAnimate, setShouldAnimate] = useState(true); // New state variable
-
-  useEffect(() => {
-    if (currentPage !== nextPage) {
-      if (!visible) {
-        setShouldAnimate(false); // Disable animation when becoming invisible
-      }
-      setVisible(false);
-      setFadeDelay(200);
-      setTimeout(() => {
-        setNextPage(currentPage);
-        setVisible(true);
-        setFadeDelay(100);
-        setShouldAnimate(true); // Enable animation when becoming visible again
-      }, 300);
-    }
-  }, [currentPage, nextPage]);
 
   return (
     <motion.div initial={{ opacity: 1, y: 0 }}>

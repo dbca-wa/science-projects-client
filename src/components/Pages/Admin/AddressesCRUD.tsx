@@ -10,7 +10,6 @@ import {
   FormControl,
   Input,
   InputGroup,
-  InputLeftAddon,
   VStack,
   useDisclosure,
   Center,
@@ -20,10 +19,7 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   FormLabel,
-  Textarea,
-  Checkbox,
   useToast,
-  Select,
   useColorMode,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -31,7 +27,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IAddress, IBranch } from "../../../types";
 import { createAddress, getAllAddresses } from "../../../lib/api";
-import _ from "lodash";
 import { useQueryClient } from "@tanstack/react-query";
 import { AddressItemDisplay } from "./AddressItemDisplay";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
@@ -48,34 +43,24 @@ export const AddressesCRUD = () => {
 
   const queryClient = useQueryClient();
   const mutation = useMutation(createAddress, {
-    onSuccess: (data: IAddress) => {
-      // console.log("success")
+    onSuccess: () => {
       toast({
         status: "success",
         title: "Created",
         position: "top-right",
       });
-      console.log(data);
       reset();
       onAddClose();
       queryClient.invalidateQueries(["addresses"]);
     },
     onError: () => {
-      console.log("error");
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
     },
-    onMutate: () => {
-      console.log("mutation");
-    },
   });
-  // const onSubmit = (formData: IAddress) => {
-  //     mutation.mutate(formData);
-  // }
-
   const onSubmitAddressCreation = (formData: IAddress) => {
     mutation.mutate(formData);
   };
@@ -84,10 +69,6 @@ export const AddressesCRUD = () => {
     queryFn: getAllAddresses,
     queryKey: ["addresses"],
   });
-
-  useEffect(() => {
-    if (!isLoading) console.log(slices);
-  }, [isLoading, slices]);
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -251,10 +232,6 @@ export const AddressesCRUD = () => {
                   onSubmit={handleSubmit(onSubmitAddressCreation)}
                 >
                   <FormControl>
-                    {/* <FormLabel>Branch</FormLabel> */}
-                    {/* <Input
-                                            {...register("branch", { required: true })}
-                                        /> */}
                     <BranchSearchDropdown
                       {...register("branch", { required: true })}
                       autoFocus
@@ -263,14 +240,13 @@ export const AddressesCRUD = () => {
                       isEditable
                       label="Branch"
                       placeholder="Search for a branch"
-                      helperText={<>The branch this address belongs to.</>}
+                      helperText={"The branch this address belongs to."}
                     />
                   </FormControl>
 
                   <FormControl>
                     <FormLabel>Street</FormLabel>
                     <InputGroup>
-                      {/* <InputLeftAddon children={<FaSign />} /> */}
                       <Input
                         {...register("street", { required: true })}
                         required
@@ -308,12 +284,6 @@ export const AddressesCRUD = () => {
                     <FormLabel>PO Box</FormLabel>
                     <Input {...register("pobox", { required: false })} />
                   </FormControl>
-                  {/* <FormControl>
-                                        <FormLabel>Agency</FormLabel>
-                                        <Input
-                                            {...register("agency", { required: true })}
-                                        />
-                                    </FormControl> */}
                   {mutation.isError && (
                     <Box mt={4}>
                       {Object.keys(

@@ -33,7 +33,7 @@ import {
   useDisclosure,
   useColorMode,
 } from "@chakra-ui/react";
-import React, { useState, createRef, useEffect, useRef } from "react";
+import React, { useState, createRef } from "react";
 import dayjs from "dayjs";
 import { BsFillCalendarEventFill } from "react-icons/bs";
 
@@ -141,7 +141,7 @@ export interface IDatePickerProps extends Omit<ChakraInputProps, "onChange"> {
   label: string;
   required: boolean;
   dateFormat?: string;
-  onChange?: (date: string) => void;
+  // onChange?: (date: string) => void;
   selectedDate?: Date;
   setSelectedDate: (date: Date) => void; // Change the type of onChange
 }
@@ -152,7 +152,7 @@ export const DatePicker = ({
   dateFormat,
   selectedDate,
   setSelectedDate,
-  onChange,
+  // onChange,
   ...rest
 }: IDatePickerProps) => {
   // const { onChange, dateFormat = 'DD/MM/YYYY', ...rest } = props;
@@ -167,7 +167,6 @@ export const DatePicker = ({
   );
   const inputRef = createRef<HTMLInputElement>();
   const color = useColorModeValue("gray", "white");
-  const menuRef = useRef<HTMLDivElement>();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const isCurrentDay = (day: any) => {
@@ -190,9 +189,6 @@ export const DatePicker = ({
     }
 
     onClose();
-    // if (menuRef.current) {
-    //     menuRef.current.onClose();
-    // }
   };
 
   const setYearAction = (offset: number) => {
@@ -358,29 +354,3 @@ export const DatePicker = ({
     </Flex>
   );
 };
-
-// const parseDateToString = (date: Date): string => {
-//     if (!(date instanceof Date) || isNaN(date.getTime())) {
-//         return ''; // Invalid date, return an empty string or throw an error
-//     }
-
-//     const day = date.getDate();
-//     const month = date.getMonth() + 1; // Month is 0-based, so add 1
-//     const year = date.getFullYear();
-
-//     // Use template literals to format the string with leading zeros if needed
-//     const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
-
-//     return formattedDate;
-// };
-
-// const parseStringToDate = (dateString: string) => {
-//     if (!dateString || dateString === '' || dateString === undefined || !dateString.includes('/')) {
-//         return undefined;
-//     }
-//     const [day, month, year] = dateString.split('/').map(Number);
-//     if (isNaN(day) || isNaN(month) || isNaN(year)) {
-//         return undefined;
-//     }
-//     return new Date(year, month - 1, day); // Month is 0-based in JavaScript Dates
-// };

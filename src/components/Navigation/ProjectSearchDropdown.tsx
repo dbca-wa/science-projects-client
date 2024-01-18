@@ -11,21 +11,16 @@ import {
   Input,
   InputGroup,
   Skeleton,
-  Text,
   useColorMode,
-  useQuery,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { IFullProjectDetails, IProjectData, IUserData } from "../../types";
+import { IProjectData } from "../../types";
 import {
-  getFullProject,
   getFullProjectSimple,
   getMyProjectsBasedOnSearchTerm,
 } from "../../lib/api";
 import { CloseIcon } from "@chakra-ui/icons";
-import { useFullUserByPk } from "../../lib/hooks/useFullUserByPk";
 import { useUser } from "../../lib/hooks/useUser";
-import { useProject } from "../../lib/hooks/useProject";
 import { useNoImage } from "../../lib/hooks/useNoImage";
 import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";
 
@@ -36,7 +31,7 @@ interface IProjectSearchDropdown {
   user: number;
   label: string;
   placeholder: string;
-  helperText: any;
+  helperText: string;
   preselectedProjectPk?: number;
   inputRef: React.RefObject<HTMLInputElement | null>;
 
@@ -44,7 +39,6 @@ interface IProjectSearchDropdown {
 }
 
 export const ProjectSearchDropdown = ({
-  allProjects = true, // Default if not set
   isRequired,
   setProjectFunction,
   label,
@@ -52,8 +46,7 @@ export const ProjectSearchDropdown = ({
   helperText,
   preselectedProjectPk,
   inputRef,
-}: // register
-IProjectSearchDropdown) => {
+}: IProjectSearchDropdown) => {
   const [searchTerm, setSearchTerm] = useState(""); // Local state for search term
   const [filteredItems, setFilteredItems] = useState<IProjectData[]>([]); // Local state for filtered items
   const [isMenuOpen, setIsMenuOpen] = useState(true); // Stores the menu open state
@@ -81,35 +74,15 @@ IProjectSearchDropdown) => {
             setProjectFunction(projectData.project.pk);
             setIsMenuOpen(false);
 
-            // setFilteredItems([]);
             setSelectedProject(projectData.project);
             setSearchTerm(""); // Clear the search term when a user is selected
           })
           .catch((error) => {
             console.error("Error fetching users:", error);
-            // setFilteredItems([]);
-            // setSelectedProject
           });
       }
     }
   }, [searchTerm, userLoading, userData, preselectedProjectPk]);
-
-  // const { isLoading, projectData } = useProject(String(preselectedProjectPk));
-
-  // useEffect(() => {
-  //     if (!isLoading && projectData) {
-  //         console.log("Preselected Project PK:", preselectedProjectPk)
-
-  //         setProjectFunction(projectData.pk);
-  //         setIsMenuOpen(false);
-  //         setSelectedProject(projectData); // Update the selected project
-  //         setSearchTerm(''); // Clear the search term when a user is selected
-  //     }
-  // }, [isLoading, projectData])
-
-  // useEffect(() => {
-  //     console.log(filteredItems)
-  // }, [])
 
   const handleSelectProject = (project: IProjectData) => {
     setProjectFunction(project.pk);
@@ -148,7 +121,6 @@ IProjectSearchDropdown) => {
                 preselectedProjectPk !== null &&
                 preselectedProjectPk !== undefined
               }
-              // register={register}
             />
           </Box>
         ) : (
@@ -183,9 +155,6 @@ IProjectSearchDropdown) => {
                 </CustomMenu>
               </Box>
             )}
-        {/* <Box h="50px">
-                {helperText}
-            </Box> */}
         <FormHelperText>{helperText}</FormHelperText>
       </FormControl>
     )
@@ -316,17 +285,13 @@ interface SelectedProjectInputProps {
   project: IProjectData;
   onClear: () => void;
   isPreselected: boolean;
-  // register: any;
 }
 
 const SelectedProjectInput = ({
   project,
   onClear,
   isPreselected,
-}: // , register
-SelectedProjectInputProps) => {
-  // console.log(project)
-  // const {watch}
+}: SelectedProjectInputProps) => {
   const noImage = useNoImage();
 
   const [projectPk, setProjectPk] = useState(project.pk);

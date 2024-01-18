@@ -38,12 +38,8 @@ export const ModernProjectCard = ({
     rest: { scale: 1, rotateX: 0 },
     hover: {
       scale: 1.08,
-      //   scaleX: 1,
-      //   scaleY: 1,
-      // rotateX: 7,
       transition: {
         scale: { duration: 0.35 },
-        // rotateX: { delay: 0.15, duration: 0.1 },
       },
     },
   };
@@ -188,7 +184,6 @@ export const ModernProjectCard = ({
         onClick={() => {
           goToProject();
         }}
-        // border={colorMode === "dark" ? "1px solid" : undefined}
         borderColor={"gray.700"}
         background={colorMode === "dark" ? "black" : undefined}
       >

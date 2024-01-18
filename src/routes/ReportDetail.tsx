@@ -1,11 +1,7 @@
 // WIP: For displaying data on a given report
 
-import { Box } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react";
 
 export const ReportDetail = () => {
-    return (
-        <Box>
-            Report Detail
-        </Box>
-    )
-}
+  return <Box>Report Detail</Box>;
+};

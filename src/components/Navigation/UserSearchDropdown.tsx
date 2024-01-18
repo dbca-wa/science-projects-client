@@ -12,7 +12,6 @@ import {
   InputGroup,
   Text,
   useColorMode,
-  useQuery,
 } from "@chakra-ui/react";
 import {
   forwardRef,
@@ -22,7 +21,7 @@ import {
   useState,
 } from "react";
 import { IUserData } from "../../types";
-import { getFullUser, getInternalUsersBasedOnSearchTerm } from "../../lib/api";
+import { getInternalUsersBasedOnSearchTerm } from "../../lib/api";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useFullUserByPk } from "../../lib/hooks/useFullUserByPk";
 
@@ -32,7 +31,7 @@ interface IUserSearchDropdown {
   setUserFunction: (setUserPk: number) => void;
   label: string;
   placeholder: string;
-  helperText: any;
+  helperText: string;
   preselectedUserPk?: number;
   isEditable?: boolean;
 }
@@ -315,7 +314,6 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
             : "gray.500"
         }
       >
-        {/* {`${user.first_name} ${user.last_name} ${user.is_staff ? user.is_superuser ? '(Admin)' : '(Staff)' : '(External)'}`} */}
         {`${user.first_name === "None" ? user.username : user.first_name} ${
           user.last_name === "None" ? "" : user.last_name
         } ${

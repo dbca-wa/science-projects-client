@@ -9,8 +9,6 @@ import {
   Flex,
   FormControl,
   Input,
-  InputGroup,
-  InputLeftAddon,
   VStack,
   useDisclosure,
   Center,
@@ -20,18 +18,13 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   FormLabel,
-  Textarea,
-  Checkbox,
   useToast,
-  Select,
   useColorMode,
 } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { createBranch, getAllBranches } from "../../../lib/api";
-import _ from "lodash";
-import { FaSign } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import { IBranch } from "../../../types";
 import { BranchItemDisplay } from "./BranchItemDisplay";
@@ -51,27 +44,21 @@ export const BranchesCRUD = () => {
 
   const queryClient = useQueryClient();
   const mutation = useMutation(createBranch, {
-    onSuccess: (data: IBranch) => {
-      // console.log("success")
+    onSuccess: () => {
       toast({
         status: "success",
         title: "Created",
         position: "top-right",
       });
-      console.log(data);
       onAddClose();
       queryClient.invalidateQueries(["branches"]);
     },
     onError: () => {
-      console.log("error");
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
-    },
-    onMutate: () => {
-      console.log("mutation");
     },
   });
 
@@ -99,7 +86,6 @@ export const BranchesCRUD = () => {
 
   useEffect(() => {
     if (slices) {
-      // console.log(slices)
       const filtered = slices.filter((s) => {
         const nameMatch = s.name
           .toLowerCase()
@@ -205,18 +191,12 @@ export const BranchesCRUD = () => {
                   id="add-form"
                   onSubmit={handleSubmit(onSubmit)}
                 >
-                  {/* <FormControl> */}
-                  {/* <FormLabel>Agency</FormLabel> */}
-                  {/* <InputGroup> */}
-                  {/* <InputLeftAddon children={<FaSign />} /> */}
                   <Input
                     {...register("agency", { required: true })}
                     value={1}
                     required
                     type="hidden"
                   />
-                  {/* </InputGroup> */}
-                  {/* </FormControl> */}
                   <FormControl>
                     <FormLabel>Name</FormLabel>
                     <Input
@@ -226,7 +206,6 @@ export const BranchesCRUD = () => {
                     />
                   </FormControl>
                   <FormControl>
-                    {/* <FormLabel>Manager</FormLabel> */}
                     <UserSearchDropdown
                       {...register("manager", { required: true })}
                       onlyInternal={false}
@@ -234,11 +213,8 @@ export const BranchesCRUD = () => {
                       setUserFunction={setSelectedUser}
                       label="Manager"
                       placeholder="Search for a user"
-                      helperText={<>The manager of the branch.</>}
+                      helperText={"The manager of the branch."}
                     />
-                    {/* <Input
-                                            {...register("manager", { required: true })}
-                                        /> */}
                   </FormControl>
                   {mutation.isError ? (
                     <Text color={"red.500"}>Something went wrong</Text>

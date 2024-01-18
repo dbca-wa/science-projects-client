@@ -12,15 +12,14 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { IconType } from "react-icons";
-import { FaAddressCard, FaLocationArrow, FaUsers } from "react-icons/fa";
+import { FaAddressCard, FaLocationArrow } from "react-icons/fa";
 import { FcApproval, FcDataBackup } from "react-icons/fc";
-import { GiArchiveResearch, GiBrainDump } from "react-icons/gi";
+import { GiArchiveResearch } from "react-icons/gi";
 import { GoOrganization } from "react-icons/go";
 import { ImBriefcase } from "react-icons/im";
 import { MdManageHistory, MdOutlineSettingsSuggest } from "react-icons/md";
-import { RiNewspaperFill, RiOrganizationChart } from "react-icons/ri";
+import { RiOrganizationChart } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { VscFeedback } from "react-icons/vsc";
 
@@ -68,35 +67,6 @@ export const Admin = () => {
           />
         ))}
       </Grid>
-
-      {/* <Text
-                my={3}
-                fontWeight={"bold"}
-                fontSize={"lg"}
-                color={colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.700"}
-            >
-                PROJECTS CRUD
-            </Text>
-            <Divider my={4} />
-
-            <Grid
-                mt={6}
-                gridTemplateColumns={"repeat(3, 1fr)"}
-                gridGap={6}
-            >
-                {projectAdminActions.map((action, index) => (
-                    <AdminOptionBox
-                        key={index}
-                        name={action.name}
-                        description={action.description}
-                        onClick={() => console.log(action.description)}
-                        route={action.route}
-                        reactIcon={action.reactIcon}
-                    />
-                ))}
-            </Grid>
- */}
-
       <Text
         my={3}
         fontWeight={"bold"}
@@ -154,45 +124,6 @@ const adminActions = [
     reactIcon: VscFeedback,
     onClick: handleViewFeedback,
     route: "/crud/feedback",
-  },
-];
-
-const projectAdminActions = [
-  // {
-  //     name: "Manage Project Memberships",
-  //     description: "CRUD operations for Project Memberships",
-  //     reactIcon: FaUsers,
-  //     route: "/crud/memberships"
-  // },
-  {
-    name: "Manage Concept Plans",
-    description: "CRUD operations for Concept Plans",
-    reactIcon: RiNewspaperFill,
-    route: "/crud/conceptplans",
-  },
-  {
-    name: "Manage Project Plans",
-    description: "CRUD operations for Project Plans",
-    reactIcon: RiNewspaperFill,
-    route: "/crud/projectplans",
-  },
-  {
-    name: "Manage Progress Reports",
-    description: "CRUD operations for Progress Reports",
-    reactIcon: RiNewspaperFill,
-    route: "/crud/progressreports",
-  },
-  {
-    name: "Manage Student Reports",
-    description: "CRUD operations for Student Reports",
-    reactIcon: RiNewspaperFill,
-    route: "/crud/studentreports",
-  },
-  {
-    name: "Manage Project Closures",
-    description: "CRUD operations for Project Closures",
-    reactIcon: RiNewspaperFill,
-    route: "/crud/closures",
   },
 ];
 
@@ -258,16 +189,13 @@ interface IAdminOptionBox {
 
 const AdminOptionBox = ({
   name,
-  description,
+  // description,
   onClick,
   reactIcon,
   route,
 }: IAdminOptionBox) => {
   const { colorMode } = useColorMode();
   const navigate = useNavigate();
-  //   if (route !== null && route !== undefined) {
-  //     navigate(route);
-  //   }
 
   const cardVariants = {
     rest: { scale: 1, rotateX: 0 },
@@ -279,7 +207,7 @@ const AdminOptionBox = ({
     },
   };
 
-  const [hovered, setHovered] = useState(false);
+  // const [hovered, setHovered] = useState(false);
 
   const IconComponent = reactIcon;
 
@@ -288,10 +216,7 @@ const AdminOptionBox = ({
     if (route !== undefined && route !== null) {
       navigate(route);
     } else if (!route) {
-      console.log("No route", route);
       onClick();
-    } else {
-      console.log("No route or onclick set");
     }
   };
 
@@ -303,8 +228,8 @@ const AdminOptionBox = ({
       style={{ perspective: 1000 }}
     >
       <Center
-        onMouseOver={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        // onMouseOver={() => setHovered(true)}
+        // onMouseLeave={() => setHovered(false)}
         rounded={"2xl"}
         pos={"relative"}
         overflow={"hidden"}

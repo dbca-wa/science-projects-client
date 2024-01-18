@@ -1,51 +1,36 @@
 // Has mention and hashtag functionality
 
 import { ChatUser } from "@/components/Pages/Chat/ChatUser";
-import { IBranch, IBusinessArea, IUserData, IUserMe } from "@/types";
+import { IBranch, IBusinessArea, IUserData } from "@/types";
 import {
   Box,
-  Button,
   Flex,
-  Input,
-  Text,
-  Textarea,
   useColorMode,
-  Grid,
   Center,
   useDisclosure,
   useToast,
   ToastId,
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
-import { BiSolidDislike, BiSolidLike } from "react-icons/bi";
+import { BiSolidLike } from "react-icons/bi";
 
 // Lexical
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
 
 // Lexical Plugins
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 
-// Custom Components
-import { OptionsBar } from "../../OptionsBar/OptionsBar";
-// import { AutoFocusPlugin } from "../../../../lib/plugins/AutoFocusPlugin";
-
 import "@/styles/texteditor.css";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getRoot, $getSelection, ParagraphNode } from "lexical";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
-import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
-import { createCommentReaction, createDocumentComment } from "@/lib/api";
+import { createCommentReaction } from "@/lib/api";
 import { useUser } from "@/lib/hooks/useUser";
 import { useFormattedDate } from "@/lib/hooks/useFormattedDate";
 import { PrepopulateCommentDisplayPlugin } from "../../Plugins/PrepopulateCommentDisplayPlugin";
@@ -100,8 +85,6 @@ export const CommentDisplayRTE = ({
   reactions,
 }: Props) => {
   const { colorMode } = useColorMode();
-  const editorRef = useRef(null);
-  const [comment, setComment] = useState("");
   const me = useUser();
 
   const generateTheme = (colorMode) => {
@@ -157,14 +140,6 @@ export const CommentDisplayRTE = ({
   };
   const [theme, setTheme] = useState(generateTheme(colorMode));
 
-  const [lastSelectedNode, setLastSelectedNode] = useState();
-  const [shouldShowTree, setShouldShowTree] = useState(false);
-
-  const [editorText, setEditorText] = useState<string | null>("");
-  const [selectedNodeType, setSelectedNodeType] = useState<string>();
-
-  const distilled = useDistilledHtml(comment);
-
   const displayDate = updated_at > created_at ? updated_at : created_at;
 
   const formattedDate = useFormattedDate(displayDate);
@@ -190,12 +165,9 @@ export const CommentDisplayRTE = ({
   const [likeCount, setLikeCount] = useState<number>(0);
 
   useEffect(() => {
-    // console.log("LIKES", reactions);
     const likes = reactions?.map((r) => r.reaction === "thumbup");
     setLikeCount(likes?.length ? likes.length : 0);
   }, []);
-
-  const isLiked = false;
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -217,10 +189,10 @@ export const CommentDisplayRTE = ({
   } = useDisclosure();
 
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<ICommentReaction>();
+  const { reset } = useForm<ICommentReaction>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
   const commentReactionMutation = useMutation(createCommentReaction, {
@@ -232,11 +204,6 @@ export const CommentDisplayRTE = ({
       });
     },
     onSuccess: (response) => {
-      // if (setIsAnimating) {
-      //     setIsAnimating(true)
-
-      // }
-
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -248,21 +215,14 @@ export const CommentDisplayRTE = ({
         });
       }
       reset();
-      // onAddTaskClose()
 
       setTimeout(() => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries(["documentComments", documentPk]);
-        // console.log("DDDDAAATA", response);
         if (response.status === 204) {
           setLikeCount((prev) => prev - 1);
         } else if (response.status === 201) {
           setLikeCount((prev) => prev + 1);
         }
-
-        // queryClient.refetchQueries([`mytasks`])
       }, 350);
     },
     onError: (error) => {
@@ -289,15 +249,8 @@ export const CommentDisplayRTE = ({
     const userLiked = reactions.some(
       (r) => Number(r.user) === Number(user.pk) && r.reaction === "thumbup"
     );
-    // console.log("Likey", userLiked);
     setUserHasLiked(userLiked);
   }, [reactions, user.pk]);
-
-  // useEffect(() => {
-  //   if (userHasLiked) {
-  //     setLikeCount((prev) => prev + 1);
-  //   }
-  // }, [userHasLiked]);
 
   return (
     <Box>
@@ -331,18 +284,6 @@ export const CommentDisplayRTE = ({
               <ListPlugin />
               <CustomPastePlugin />
               <PrepopulateCommentDisplayPlugin data={payload} />
-              <OnChangePlugin
-                onChange={(editorState, editor) => {
-                  editorState.read(() => {
-                    const root = $getRoot();
-                    setEditorText(root.__cachedText);
-                    const newHtml = $generateHtmlFromNodes(editor, null);
-                    // console.log(newHtml)
-                    // console.log("DATA DISPLAY PLUGIN:", newHtml);
-                    setComment(newHtml);
-                  });
-                }}
-              />
               <RichTextPlugin
                 contentEditable={
                   <Box
@@ -362,7 +303,6 @@ export const CommentDisplayRTE = ({
                             mr={3}
                             mt={2}
                             alignItems={"center"}
-                            // background={"white"}
                             boxSize={"10px"}
                             borderRadius={"full"}
                             onClick={onOpenDeleteCommentModal}
@@ -380,10 +320,6 @@ export const CommentDisplayRTE = ({
                         iconSize="lg"
                         user={user as IUserData}
                         displayDate={formattedDate}
-                        // withoutName={true}
-                        // created_at={}
-                        // updated_at={}
-
                         branches={branches}
                         businessAreas={businessAreas}
                       />
@@ -472,24 +408,6 @@ export const CommentDisplayRTE = ({
                 ErrorBoundary={LexicalErrorBoundary}
               />
               <ClearEditorPlugin />
-              {/* <NodeEventPlugin
-                nodeType={ParagraphNode}
-                eventType={"click"}
-                eventListener={(e: Event) => {
-                  console.log(e);
-                  console.log("paragaph node clicked");
-                  setSelectedNodeType("paragraph");
-                }}
-              />
-              <NodeEventPlugin
-                nodeType={ListItemNode}
-                eventType={"click"}
-                eventListener={(e: Event) => {
-                  console.log(e);
-                  console.log("li node clicked");
-                  setSelectedNodeType("li");
-                }}
-              /> */}
             </LexicalComposer>
           </Box>
         </Box>
@@ -497,37 +415,3 @@ export const CommentDisplayRTE = ({
     </Box>
   );
 };
-
-// {likeCount > 0 ? (
-//     <Flex alignItems={"center"}>
-//       <Text mr={1}>{likeCount}</Text>
-//       <Box>
-//         <BiSolidLike />
-//       </Box>
-//     </Flex>
-//   ) : isHovered ? (
-//     <motion.div
-//       initial={{ opacity: 0, y: 20 }}
-//       animate={authorControls}
-//     >
-//       <Flex alignItems={"center"}>
-//         <Box>
-//           <BiSolidLike />
-//         </Box>
-//       </Flex>
-//     </motion.div>
-//   ) : null}
-//   {!otherUser ? (
-//     isHovered ? (
-//       <motion.div
-//         initial={{ opacity: 0, y: 20 }}
-//         animate={authorControls}
-//       >
-//         <Flex alignItems={"center"}>
-//           <Box>
-//             <BiSolidLike />
-//           </Box>
-//         </Flex>
-//       </motion.div>
-//     ) : null
-//   ) : null}

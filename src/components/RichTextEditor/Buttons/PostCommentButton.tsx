@@ -17,9 +17,6 @@ export const PostCommentButton = ({
   const { colorMode } = useColorMode();
 
   const postComment = () => {
-    console.log(comment);
-    console.log(distilled);
-    console.log("DOC:", documentId);
     if (distilled.length > 1) {
       const data = {
         user: userData.pk,
@@ -28,13 +25,12 @@ export const PostCommentButton = ({
       };
 
       postCommentMutation.mutate(data);
-      // createDocumentComment(data);
     }
   };
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -48,7 +44,7 @@ export const PostCommentButton = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -93,7 +89,6 @@ export const PostCommentButton = ({
               bg: "blue.400",
             }
           : {
-              // For dark mode
               color: "white",
               bg: "blue.500",
             }
@@ -103,7 +98,6 @@ export const PostCommentButton = ({
       rounded={"full"}
       boxSize={"40px"}
       w={"100%"}
-      // h={"100%"}
     >
       <BsFillSendFill />
     </Button>

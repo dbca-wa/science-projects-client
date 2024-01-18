@@ -3,7 +3,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getReportMedia } from "../api";
-// import { useEffect } from "react";
 
 export const useGetReportMedia = (pk: number) => {
   const { isLoading, data, refetch } = useQuery(
@@ -13,8 +12,6 @@ export const useGetReportMedia = (pk: number) => {
       retry: false,
     }
   );
-
-  // useEffect(() => console.log(data), [data])
 
   return {
     reportMediaLoading: isLoading,

@@ -25,10 +25,9 @@ import { useUser } from "../../../../lib/hooks/useUser";
 import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
 import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { Link } from "react-router-dom";
 import { UserProfile } from "../../Users/UserProfile";
 import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import {
   IDocGenerationProps,
@@ -46,9 +45,6 @@ interface IProgressDocumentActions {
   callSameData: () => void;
   documents: IProgressReport[];
   setToLastTab: (tabToGoTo?: number) => void;
-  // setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
-  // setSelectedProgressReport: React.Dispatch<React.SetStateAction<IProgressReport>>;
-  // projectPk: number;
 }
 
 export const ProgressReportDocActions = ({
@@ -60,21 +56,7 @@ export const ProgressReportDocActions = ({
 }: // setSelectedProgressReport, setSelectedYear,
 // , projectPk
 IProgressDocumentActions) => {
-  const [showActions, setShowActions] = useState(false);
-  const handleToggleActionsVisibility = () => {
-    setShowActions(!showActions);
-  };
   const { colorMode } = useColorMode();
-
-  useEffect(() => {
-    // console.log(progressReportData);
-    // console.log(progressReportData?.document?.creator);
-    // console.log(progressReportData?.document?.modifier);
-    // console.log(progressReportData?.document?.created_at);
-    // console.log(progressReportData?.document?.updated_at);
-    // setCreationDate(progressReportData?.document?.created_at);
-    // setModifyDate(progressReportData?.document?.updated_at);
-  }, [progressReportData]);
 
   const {
     isOpen: isS1ApprovalModalOpen,
@@ -109,11 +91,6 @@ IProgressDocumentActions) => {
   } = useDisclosure();
 
   const {
-    isOpen: isS1SendbackModalOpen,
-    onOpen: onS1SendbackModalOpen,
-    onClose: onS1SendbackModalClose,
-  } = useDisclosure();
-  const {
     isOpen: isS2SendbackModalOpen,
     onOpen: onS2SendbackModalOpen,
     onClose: onS2SendbackModalClose,
@@ -129,9 +106,7 @@ IProgressDocumentActions) => {
   const { baData, baLoading } = useBusinessArea(
     progressReportData?.document?.project?.business_area?.pk
   );
-  const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
-    baData?.leader
-  );
+  const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
     progressReportData?.document?.modifier
   );
@@ -139,7 +114,7 @@ IProgressDocumentActions) => {
     progressReportData?.document?.creator
   );
 
-  const { teamData, isTeamLoading, refetchTeamData } = useProjectTeam(
+  const { teamData, isTeamLoading } = useProjectTeam(
     String(progressReportData?.document?.project?.pk)
   );
 
@@ -149,48 +124,9 @@ IProgressDocumentActions) => {
     onClose: onCloseDeleteDocumentModal,
   } = useDisclosure();
 
-  const [docPk, setDocPk] = useState(
-    progressReportData?.document?.pk
-      ? progressReportData.document.pk
-      : progressReportData?.document?.id
-  );
-
   const keyForDeleteDocumentModal = progressReportData?.document?.pk
     ? `document-${progressReportData?.document?.pk}`
     : `document-${progressReportData?.document?.id}`;
-
-  // useEffect(() => {
-  //     const highestYearDocument = documents.reduce((maxDocument, currentDocument) => {
-  //         if (!maxDocument || currentDocument.year > maxDocument.year) {
-  //             return currentDocument;
-  //         }
-  //         return maxDocument;
-  //     }, null)
-
-  //     setSelectedYear(highestYearDocument.year)
-  //     setSelectedProgressReport(highestYearDocument);
-  //     // console.log('DOC LENGTH: ', documents.length);
-  //     // refetchDataForYearFunction();
-  // }, [documents])
-
-  useEffect(() => {
-    setDocPk(progressReportData.document.pk);
-  }, [progressReportData]);
-
-  // useEffect(
-  //     () => {
-  //         setDocPk},
-  //     [documents])
-
-  // useEffect(() => {
-  //   if (!userLoading && !baLoading && !baLeadLoading) {
-  //     console.log({
-  //       ba: baData,
-  //       leadUser: baLead,
-  //       me: userData,
-  //     });
-  //   }
-  // }, [baLead, baLoading, baData, baLeadLoading, userData, userLoading]);
 
   const creationDate = useFormattedDate(
     progressReportData?.document?.created_at
@@ -198,11 +134,6 @@ IProgressDocumentActions) => {
   const modifyDate = useFormattedDate(progressReportData?.document?.updated_at);
 
   const [actionsReady, setActionsReady] = useState(false);
-  const [userIsLeader, setUserIsLeader] = useState(false);
-  // const [teamLeaderPk, setTeamLeaderPk] = useState(0);
-
-  // Find the team member with is_leader === true
-  // const leaderMember = teamData.find((member) => member.is_leader === true);
 
   const [leaderMember, setLeaderMemeber] = useState<IProjectMember>();
 
@@ -220,18 +151,11 @@ IProgressDocumentActions) => {
       modifier &&
       creator
     ) {
-      // console.log();
       if (!isTeamLoading) {
         setLeaderMemeber(teamData.find((member) => member.is_leader === true));
       }
       setActionsReady(true);
     }
-    // else {
-    //     if (actionsReady === true) {
-    //         setActionsReady(false);
-
-    //     }
-    // }
   }, [
     userLoading,
     baLoading,
@@ -249,8 +173,6 @@ IProgressDocumentActions) => {
   useEffect(() => {
     if (actionsReady) {
       setLeaderMemeber(teamData.find((member) => member.is_leader === true));
-      // console.log(userData);
-      // console.log(progressReportData?.document);
     }
   }, [actionsReady, teamData, isTeamLoading]);
 
@@ -265,11 +187,10 @@ IProgressDocumentActions) => {
     onClose: onCreatorClose,
   } = useDisclosure();
 
-  const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm<IDocGenerationProps>();
+  const { register, handleSubmit } = useForm<IDocGenerationProps>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -293,7 +214,7 @@ IProgressDocumentActions) => {
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -327,7 +248,7 @@ IProgressDocumentActions) => {
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -358,18 +279,12 @@ IProgressDocumentActions) => {
   });
 
   const beginProjectDocPDFDownload = (formData: IDocGenerationProps) => {
-    // const docPk = progressReportData?.document?.pk;
     projectPDFDownloadMutation.mutate(formData);
   };
 
   const beginProjectDocPDFGeneration = (formData: IDocGenerationProps) => {
-    // const docPk = progressReportData?.document?.pk;
     projectDocPDFGenerationMutation.mutate(formData);
   };
-
-  // useEffect(() => {
-  //   console.log(leaderMember);
-  // }, [leaderMember]);
 
   return (
     <>

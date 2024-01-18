@@ -5,11 +5,6 @@ import {
   Button,
   Flex,
   Grid,
-  Image,
-  Text,
-  ModalBody,
-  ModalFooter,
-  Skeleton,
   useColorMode,
   Center,
 } from "@chakra-ui/react";
@@ -23,11 +18,11 @@ interface IProjectLocationProps {
   locationFilled: boolean;
   setLocationFilled: (val: boolean) => void;
   locationData: number[];
-  setLocationData: React.Dispatch<React.SetStateAction<any>>;
+  setLocationData: React.Dispatch<React.SetStateAction<number[]>>;
   createClick: () => void;
   onClose: () => void;
   backClick: () => void;
-  nextClick?: (data: any) => void;
+  nextClick?: (data) => void;
   projectType: string;
   currentYear: number;
   colorMode: string;
@@ -37,7 +32,7 @@ export const ProjectLocationSection = ({
   backClick,
   nextClick,
   createClick,
-  locationFilled,
+  // locationFilled,
   setLocationFilled,
   locationData,
   setLocationData,
@@ -69,29 +64,19 @@ export const ProjectLocationSection = ({
     setLocationData,
   ]);
 
-  const [fixed, setFixed] = useState(false);
+  // const [fixed, setFixed] = useState(false);
 
-  const handleScroll = () => {
-    const offset = window.scrollY;
-    setFixed(offset < 200);
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+  // const handleScroll = () => {
+  //   const offset = window.scrollY;
+  //   setFixed(offset < 200);
+  // };
 
   // useEffect(() => {
-  //     if (locationData.length > 0) {
-  //         console.log(locationData)
-  //         setLocationFilled(true)
-  //     }
-  //     else if (locationData.length === 0) {
-  //         setLocationFilled(false);
-  //     }
-  // }, [locationData])
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => {
+  //     window.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, []);
 
   return (
     <>
@@ -108,7 +93,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="DBCA Districts"
                 areas={dbcaDistricts}
-                required={false}
+                // required={false}
                 selectedAreas={selectedDistricts}
                 setSelectedAreas={setSelectedDistricts}
               />
@@ -128,7 +113,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="IMCRAs"
                 areas={imcra}
-                required={false}
+                // required={false}
                 selectedAreas={selectedImcras}
                 setSelectedAreas={setSelectedImcras}
               />
@@ -145,7 +130,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="DBCA Regions"
                 areas={dbcaRegions}
-                required={false}
+                // required={false}
                 selectedAreas={selectedRegions}
                 setSelectedAreas={setSelectedRegions}
               />
@@ -163,7 +148,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="Natural Resource Management Regions"
                 areas={nrm}
-                required={false}
+                // required={false}
                 selectedAreas={selectedNrms}
                 setSelectedAreas={setSelectedNrms}
               />
@@ -180,7 +165,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="IBRAs"
                 areas={ibra}
-                required={false}
+                // required={false}
                 selectedAreas={selectedIbras}
                 setSelectedAreas={setSelectedIbras}
               />
@@ -212,15 +197,10 @@ export const ProjectLocationSection = ({
                   }}
                   // isDisabled={!locationFilled}
                   onClick={() => {
-                    // console.log("Here is the location data");
-                    // console.log(locationData);
                     if (
                       projectType.includes("External") ||
                       projectType.includes("Student")
                     ) {
-                      // if (locationFilled) {
-                      // console.log("going next");
-                      // console.log(locationData);
                       setLocationFilled(true);
                       nextClick(
                         locationData
@@ -246,58 +226,6 @@ export const ProjectLocationSection = ({
               </Box>
             </Grid>
           </Flex>
-
-          {/* {dbcaRegions && (
-                            <AreaCheckAndMaps
-                                title="DBCA Regions"
-                                areas={dbcaRegions}
-                                required
-                                selectedAreas={selectedRegions}
-                                setSelectedAreas={setSelectedRegions}
-                            />
-
-                        )}
-                        {dbcaDistricts && (
-                            <AreaCheckAndMaps
-                                title="DBCA Districts"
-                                areas={dbcaDistricts}
-                                required
-                                selectedAreas={selectedDistricts}
-                                setSelectedAreas={setSelectedDistricts}
-                            />
-
-                        )}
-                        {ibra && (
-                            <AreaCheckAndMaps
-                                title="IBRAs"
-                                areas={ibra}
-                                required
-                                selectedAreas={selectedIbras}
-                                setSelectedAreas={setSelectedIbras}
-                            />
-
-                        )}
-                        {imcra && (
-                            <AreaCheckAndMaps
-                                title="IMCRAs"
-                                areas={imcra}
-                                required
-                                selectedAreas={selectedImcras}
-                                setSelectedAreas={setSelectedImcras}
-                            />
-
-                        )}
-                        {nrm && (
-                            <AreaCheckAndMaps
-                                title="Natural Resource Management Regions"
-                                areas={nrm}
-                                required
-                                selectedAreas={selectedNrms}
-                                setSelectedAreas={setSelectedNrms}
-                            />
-
-                        )} */}
-          {/* </Flex> */}
         </Grid>
       )}
     </>

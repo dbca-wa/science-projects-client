@@ -3,8 +3,6 @@ import {
   Text,
   FormControl,
   FormLabel,
-  Input,
-  InputGroup,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -13,22 +11,16 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Textarea,
   ToastId,
   useColorMode,
-  useDisclosure,
   useToast,
-  FormHelperText,
 } from "@chakra-ui/react";
-import { MdOutlineTitle } from "react-icons/md";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../lib/hooks/useUser";
-import { IAddPDF, addPDFToReport } from "../../lib/api";
+import { addPDFToReport } from "../../lib/api";
 import { useGetARARsWithoputPDF } from "../../lib/hooks/useGetARARsWithoputPDF";
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
-import { report } from "process";
 
 interface Props {
   isAddPDFOpen: boolean;
@@ -43,12 +35,10 @@ export const AddReportPDFModal = ({
 }: Props) => {
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
-  // const { register, handleSubmit, reset, watch } = useForm<IAddPDF>();
-  // const reportPk = watch('reportId');
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -56,7 +46,7 @@ export const AddReportPDFModal = ({
   const [reportId, setReportId] = useState<number>();
   const [isError, setIsError] = useState(false);
 
-  const { userData, userLoading } = useUser();
+  const { userData } = useUser();
   const {
     reportsWithoutPDFLoading,
     reportsWithoutPDFData,
@@ -79,7 +69,7 @@ export const AddReportPDFModal = ({
         position: "top-right",
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -90,7 +80,6 @@ export const AddReportPDFModal = ({
           isClosable: true,
         });
       }
-      // reset()
       onAddPDFClose();
 
       setTimeout(() => {
@@ -115,8 +104,6 @@ export const AddReportPDFModal = ({
   });
 
   const onSubmitPDFAdd = () => {
-    console.log(reportId);
-    console.log(uploadedPDF);
     const formData = {
       userId: userData?.pk ? userData.pk : userData.id,
       reportId,
@@ -126,13 +113,7 @@ export const AddReportPDFModal = ({
   };
 
   return (
-    <Modal
-      isOpen={isAddPDFOpen}
-      onClose={onAddPDFClose}
-      size={"sm"}
-      // scrollBehavior="inside"
-      // isCentered={true}
-    >
+    <Modal isOpen={isAddPDFOpen} onClose={onAddPDFClose} size={"sm"}>
       <ModalOverlay />
       <ModalContent
         color={colorMode === "light" ? "black" : "white"}
@@ -141,23 +122,10 @@ export const AddReportPDFModal = ({
         <ModalHeader>Add PDF to Report</ModalHeader>
         <ModalCloseButton />
 
-        <ModalBody
-        // as="form" id="addpdf-form"
-        // onSubmit={handleSubmit(onSubmitPDFAdd)}
-        >
+        <ModalBody>
           <Text mb={4}>
             Use this form to add the finalized pdf to the report.
           </Text>
-          {/* {user.userLoading === false
-                        &&
-                        (
-                            <Input
-                                {...register("user", { required: true })}
-                                type="hidden"
-                                defaultValue={user.userData.pk}
-                            />
-                        )} */}
-
           {!reportsWithoutPDFLoading && reportsWithoutPDFData ? (
             <>
               <FormControl pb={6}>
@@ -194,16 +162,10 @@ export const AddReportPDFModal = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button
-            // variant="ghost"
-            mr={3}
-            onClick={onAddPDFClose}
-          >
+          <Button mr={3} onClick={onAddPDFClose}>
             Cancel
           </Button>
           <Button
-            // form="addpdf-form"
-            // type="submit"
             isLoading={ararPDFAdditionMutation.isLoading}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}

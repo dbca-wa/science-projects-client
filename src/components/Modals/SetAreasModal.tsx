@@ -1,5 +1,4 @@
 import {
-  Text,
   Center,
   Flex,
   Modal,
@@ -11,31 +10,12 @@ import {
   ToastId,
   useToast,
   useColorMode,
-  UnorderedList,
-  ListItem,
-  FormControl,
-  InputGroup,
-  Input,
-  ModalFooter,
   Grid,
   Button,
-  Box,
 } from "@chakra-ui/react";
-import {
-  IDeleteDocument,
-  ISetProjectAreas,
-  ISimplePkProp,
-  deleteDocumentCall,
-  deleteProjectCall,
-  setProjectAreas,
-} from "../../lib/api";
+import { ISetProjectAreas, setProjectAreas } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { IUserMe } from "../../types";
-import { useForm } from "react-hook-form";
-import { useGetStudentReportAvailableReportYears } from "../../lib/hooks/useGetStudentReportAvailableReportYears";
-import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/useGetProgressReportAvailableReportYears";
 import { useGetLocations } from "@/lib/hooks/useGetLocations";
 import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 import { IoIosCreate } from "react-icons/io";
@@ -59,7 +39,7 @@ export const SetAreasModal = ({
 }: Props) => {
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -74,7 +54,7 @@ export const SetAreasModal = ({
         position: "top-right",
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -86,16 +66,11 @@ export const SetAreasModal = ({
         });
         onDeleteSuccess && onDeleteSuccess();
       }
-      // onClose();
 
       setTimeout(async () => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries(["projects", "areas", projectPk]);
         await refetchData();
         onClose();
-        // console.log('deleting')
         setToLastTab();
       }, 350);
     },
@@ -114,21 +89,10 @@ export const SetAreasModal = ({
   });
 
   const setAreas = (formData: ISetProjectAreas) => {
-    // console.log("from func", formData);
     setAreasMutation.mutate(formData);
   };
 
   const { colorMode } = useColorMode();
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { isSubmitting, isDirty, isValid },
-  } = useForm<ISetProjectAreas>();
-
-  const projPk = watch("projectPk");
-  // useEffect(() => console.log(projPk, projectPk), [projectPk, projPk]);
 
   const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } =
     useGetLocations();
@@ -157,20 +121,6 @@ export const SetAreasModal = ({
     setLocationData,
   ]);
 
-  const [fixed, setFixed] = useState(false);
-
-  const handleScroll = () => {
-    const offset = window.scrollY;
-    setFixed(offset < 200);
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
       <ModalOverlay />
@@ -184,14 +134,6 @@ export const SetAreasModal = ({
 
           <ModalBody>
             <>
-              {/* <FormControl>
-                                <Input type="hidden" {...register('projectPk')} value={projectPk} />
-                            </FormControl>
-                            <FormControl>
-                                <Input type="hidden" {...register('areas')}
-                                    value={locationData}
-                                />
-                            </FormControl> */}
               {!locationsLoading && (
                 <Grid
                   gridTemplateColumns={"repeat(2, 1fr)"}
@@ -210,7 +152,7 @@ export const SetAreasModal = ({
                       <AreaCheckAndMaps
                         title="DBCA Districts"
                         areas={dbcaDistricts}
-                        required
+                        // required
                         selectedAreas={selectedDistricts}
                         setSelectedAreas={setSelectedDistricts}
                       />
@@ -228,7 +170,7 @@ export const SetAreasModal = ({
                       <AreaCheckAndMaps
                         title="IMCRAs"
                         areas={imcra}
-                        required
+                        // required
                         selectedAreas={selectedImcras}
                         setSelectedAreas={setSelectedImcras}
                       />
@@ -246,7 +188,7 @@ export const SetAreasModal = ({
                       <AreaCheckAndMaps
                         title="DBCA Regions"
                         areas={dbcaRegions}
-                        required
+                        // required
                         selectedAreas={selectedRegions}
                         setSelectedAreas={setSelectedRegions}
                       />
@@ -264,7 +206,7 @@ export const SetAreasModal = ({
                       <AreaCheckAndMaps
                         title="Natural Resource Management Regions"
                         areas={nrm}
-                        required
+                        // required
                         selectedAreas={selectedNrms}
                         setSelectedAreas={setSelectedNrms}
                       />
@@ -281,11 +223,7 @@ export const SetAreasModal = ({
                         _hover={{
                           background:
                             colorMode === "light" ? "blue.400" : "blue.500",
-                        }} // onClick={() => {
-                        //     console.log('Here is the location data'
-                        //     )
-                        //     console.log(locationData)
-                        // }}
+                        }}
                         rightIcon={<IoIosCreate />}
                         isDisabled={!projectPk || locationData.length < 1}
                         onClick={() =>
@@ -306,91 +244,22 @@ export const SetAreasModal = ({
                     alignItems={"center"}
                     w={"100%"}
                   >
-                    {" "}
                     {ibra && (
                       <AreaCheckAndMaps
                         title="IBRAs"
                         areas={ibra}
-                        required
+                        // required
                         selectedAreas={selectedIbras}
                         setSelectedAreas={setSelectedIbras}
                       />
                     )}
-                  </Center>{" "}
+                  </Center>
                 </Grid>
               )}
             </>
           </ModalBody>
-          {/* <ModalFooter>
-                        <Grid
-                            gridTemplateColumns={"repeat(2, 1fr)"}
-                            gridGap={4}
-                        >
-                            <Button
-                                colorScheme="gray"
-                                onClick={onClose}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                colorScheme="green"
-                                isLoading={setAreasMutation.isLoading}
-                                type="submit"
-                                ml={3}
-                            >
-                                Set Areas
-                            </Button>
-                        </Grid>
-                    </ModalFooter> */}
         </ModalContent>
       </Flex>
     </Modal>
   );
 };
-
-// <Box
-// position="sticky"
-// top={"120px"} // Adjust the top value if needed
-// overflow={"hidden"}
-// h={"700px"} // Set the height of the image container
-// // bg={"red"}
-// rounded={"2xl"}
-// >
-// <Text
-//   // color={"white"}
-//   // zIndex={999}
-//   fontWeight={"bold"}
-//   my={2}
-//   // ml={2}
-//   textAlign={"center"}
-// >
-//   Map in development
-// </Text>
-// {/* <Skeleton
-//         // position="sticky"
-//         // top={"125px"} // Adjust the top value if needed
-//         // overflow={'hidden'}
-//         // h={'500px'} // Set the height of the image container
-//         // bg={"red"}
-//         rounded={"2xl"}
-//     > */}
-// <Box
-//   position="sticky"
-//   // top={"105px"} // Adjust the top value if needed
-//   overflow={"hidden"}
-//   // h={'500px'} // Set the height of the image container
-//   bg={colorMode === "light" ? "gray.200" : "gray.600"}
-//   w={"100%"}
-//   h={"500px"}
-//   // h={"100%"}
-//   rounded={"2xl"}
-// >
-//   {/* <Image
-//             src="/soon.jpg"
-//             objectFit={'cover'}
-//             w={"100%"}
-//             h={"100%"}
-//         /> */}
-// </Box>
-// {/* </Skeleton> */}
-// </Box>

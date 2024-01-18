@@ -44,24 +44,10 @@ export const CommentSection = ({ documentID, userData }: Props) => {
   };
 
   useEffect(() => {
-    // if (documentCommentsLoading) {
-    //   setIsRepainting(true);
-
-    // }
     if (!documentCommentsLoading && isRepainting) {
       setIsRepainting(false);
     }
   }, [documentCommentsLoading, isRepainting]);
-
-  // useEffect(() => {
-  //   if (!documentCommentsLoading) {
-  //     console.log("COMMENT DATA:", documentCommentsData);
-  //   }
-  // }, [documentCommentsLoading, documentCommentsData]);
-
-  // useEffect(() => {
-  //   console.log(userData);
-  // });
 
   const branches = useBranches();
   const businessAreas = useBusinessAreas();
@@ -136,19 +122,3 @@ export const CommentSection = ({ documentID, userData }: Props) => {
     </Box>
   );
 };
-
-// <AnimatePresence>
-// <Grid gridTemplateColumns={"repeat(1,1fr)"}>
-//     {data.map((u: any, i: number) => (
-//         <motion.div
-//             key={i}
-//             initial={{ y: -10, opacity: 0 }}
-//             animate={{ y: 0, opacity: 1 }}
-//             exit={{ y: 10, opacity: 0 }}
-//             transition={{ duration: 0.5, delay: (i + 1) / 10 }}
-//             style={{
-//                 height: "100%",
-//                 animation: "oscillate 8s ease-in-out infinite",
-//             }}
-//         >
-//           </motion.div>

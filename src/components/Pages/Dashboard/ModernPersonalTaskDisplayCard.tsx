@@ -26,22 +26,17 @@ import {
 } from "../../../lib/api";
 import { motion } from "framer-motion";
 import { CloseIcon } from "@chakra-ui/icons";
-import { unset } from "lodash";
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
-import { HiDocumentCheck } from "react-icons/hi2";
 import { FaUser } from "react-icons/fa";
 
 export const ModernPersonalTaskDisplayCard = ({
   pk,
   creator,
-  user,
   project,
   document,
 
   name,
   description,
-  notes,
-  status,
   task_type,
   date_assigned,
 }: ITaskDisplayCard) => {
@@ -104,7 +99,7 @@ export const ModernPersonalTaskDisplayCard = ({
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
-  const addToast = (data: any) => {
+  const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
@@ -124,7 +119,7 @@ export const ModernPersonalTaskDisplayCard = ({
         });
       },
       // Success handling based on API-file-declared interface
-      onSuccess: (data) => {
+      onSuccess: () => {
         setIsAnimating(true);
 
         if (toastIdRef.current) {
@@ -184,7 +179,7 @@ export const ModernPersonalTaskDisplayCard = ({
       });
     },
     // Success handling based on API-file-declared interface
-    onSuccess: (data) => {
+    onSuccess: () => {
       setIsAnimating(true);
 
       if (toastIdRef.current) {
@@ -296,12 +291,6 @@ export const ModernPersonalTaskDisplayCard = ({
           pt={task_type === "assigned" ? 6 : 0}
           p={4}
         >
-          {/* <Text
-                        fontSize="sm" fontWeight="bold"
-                        color={colorMode === "light" ? "gray.600" : "gray.300"}
-                    >
-                        {name}
-                    </Text> */}
           <ExtractedHTMLTitle
             htmlContent={`<p>${name}</p>`}
             color={colorMode === "light" ? "blue.500" : "blue.300"}
@@ -329,12 +318,6 @@ export const ModernPersonalTaskDisplayCard = ({
           // px={10}
           px={4}
         >
-          {/* <Tag
-                        size={"md"}
-                        py={2}
-                    >
-                        {status.toUpperCase()}
-                    </Tag> */}
           {isHovered && task_type === "personal" && (
             <Flex justifyContent={"flex-end"} width={"100%"}>
               <Button
@@ -401,8 +384,3 @@ export const ModernPersonalTaskDisplayCard = ({
     </motion.div>
   );
 };
-
-// {task_type === "assigned" && (
-//     <Text fontSize="sm" ml={1}>  {formattedDate} by {`${creator?.first_name} ${creator?.last_name}`}
-//     </Text>
-// )}

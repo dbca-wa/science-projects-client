@@ -16,9 +16,7 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { BsGripVertical } from "react-icons/bs";
 import { ProjectUserDetails } from "./ProjectUserDetails";
-import { useEffect, useState } from "react";
 import { IImageData, IUserData, IUserMe } from "../../../types";
 import { FaCrown } from "react-icons/fa";
 import { DraggableProvided } from "react-beautiful-dnd"; // Import DraggableProvided
@@ -55,7 +53,7 @@ export const TeamMember = ({
   role,
   image,
   time_allocation,
-  position,
+  // position,
   username,
   usersCount,
   project_id,
@@ -63,17 +61,9 @@ export const TeamMember = ({
   draggableProps,
   dragHandleProps,
   backgroundColor, // Accept backgroundColor prop
-  draggingUser,
-}: // isDragging, // Receive isDragging prop
-
-ITeamMember) => {
+}: ITeamMember) => {
   // Define your styles for the dragged state
   const { colorMode } = useColorMode();
-
-  useEffect(() => {
-    if (isCurrentlyDragging === true)
-      console.log(`${name} dragging: ${isCurrentlyDragging}`);
-  }, [isCurrentlyDragging]);
 
   const roleColors: { [key: string]: { bg: string; color: string } } = {
     "Research Scientist": { bg: "green.700", color: "white" },
@@ -126,27 +116,8 @@ ITeamMember) => {
     onClose: onUserClose,
   } = useDisclosure();
 
-  // useEffect(() => {
-  //     if (isCurrentlyDragging) {
-  //         setBackgroundColor("blue.500")
-  //     } else {
-  //         // When dragging stops (transition from true to false), flash green and reset to default
-  //         setBackgroundColor("green.500");
-
-  //         // After 1 second, reset the background color to default
-  //         const timer = setTimeout(() => {
-  //             setBackgroundColor(undefined);
-  //         }, 1000);
-
-  //         // Clear the timer when component unmounts
-  //         return () => clearTimeout(timer);
-  //     }
-
-  // }, [isCurrentlyDragging])
-
   const draggedStyles = {
     background: "blue.500",
-    //  colorMode === "light" ? "blue.500" : "blue.500",
     scale: 1.1,
     borderRadius: "10px",
     cursor: "grabbing",
@@ -172,7 +143,7 @@ ITeamMember) => {
               is_leader={is_leader}
               leader_pk={leader_pk}
               role={role}
-              position={position}
+              // position={position}
               shortCode={short_code}
               time_allocation={time_allocation}
               usersCount={usersCount}
@@ -191,10 +162,7 @@ ITeamMember) => {
         style={isCurrentlyDragging ? draggedStyles : {}}
         scale={isCurrentlyDragging ? 1.1 : 1}
         borderRadius={isCurrentlyDragging ? "10px" : "0px"}
-        bg={
-          isCurrentlyDragging ? "blue.500" : backgroundColor
-          // isCurrentlyDragging ? "blue.500" : colorMode === "light" ? "white" : "gray.800"
-        }
+        bg={isCurrentlyDragging ? "blue.500" : backgroundColor}
         justifyContent={"space-between"}
         _hover={{
           boxShadow:
@@ -210,11 +178,6 @@ ITeamMember) => {
         <Flex p={4}>
           <Box pos={"relative"}>
             <Avatar
-              // src={
-              //     image?.file ? image.file :
-              //         image?.old_file ? image.old_file :
-              //             undefined
-              // }
               mt={1}
               size={"lg"}
               src={
@@ -283,20 +246,3 @@ ITeamMember) => {
     </>
   );
 };
-
-{
-  /* Right Section
-                <Box
-                    userSelect={"none"}
-                    right={0}
-                    h={20}
-                    // cursor={isGrabbed ? "grabbing" : "grab"}
-                    p={4}
-                    flex={1}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="flex-end"
-                >
-                    {<BsGripVertical />}
-                </Box> */
-}

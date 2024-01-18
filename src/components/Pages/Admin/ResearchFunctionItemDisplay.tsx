@@ -12,24 +12,17 @@ import {
   FormControl,
   FormLabel,
   Grid,
-  HStack,
-  Input,
-  InputGroup,
-  InputLeftAddon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   Text,
-  Textarea,
   VStack,
   useColorMode,
   useDisclosure,
@@ -39,7 +32,6 @@ import { IResearchFunction } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { FaSign } from "react-icons/fa";
 import {
   deleteResearchFunction,
   updateResearchFunction,
@@ -62,13 +54,9 @@ export const ResearchFunctionItemDisplay = ({
   leader,
 }: IResearchFunction) => {
   const { register, handleSubmit, watch } = useForm<IResearchFunction>();
-  // const nameData = watch("name");
   const [nameData, setNameData] = useState(name);
   const [descriptionData, setDescriptionData] = useState(description);
   const [associationData, setAssociationData] = useState(association);
-
-  // const descriptionData = watch("description");
-  // const associationData = watch("association");
   const [isChecked, setIsChecked] = useState(is_active);
 
   const activeData = watch("is_active");
@@ -94,13 +82,11 @@ export const ResearchFunctionItemDisplay = ({
     onClose: onUserClose,
   } = useDisclosure();
   const drawerFunction = () => {
-    console.log(`${userData?.first_name} clicked`);
     onUserOpen();
   };
 
   const updateMutation = useMutation(updateResearchFunction, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Updated",
@@ -110,21 +96,16 @@ export const ResearchFunctionItemDisplay = ({
       queryClient.invalidateQueries(["researchFunctions"]);
     },
     onError: () => {
-      // console.log("error")
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
     },
-    onMutate: () => {
-      // console.log("attempting update private")
-    },
   });
 
   const deleteMutation = useMutation(deleteResearchFunction, {
     onSuccess: () => {
-      // console.log("success")
       toast({
         status: "success",
         title: "Deleted",
@@ -133,16 +114,9 @@ export const ResearchFunctionItemDisplay = ({
       onDeleteModalClose();
       queryClient.invalidateQueries(["researchFunctions"]);
     },
-    onError: () => {
-      // console.log("error")
-    },
-    onMutate: () => {
-      // console.log("mutation")
-    },
   });
 
   const deleteButtonClick = () => {
-    // console.log("deleted")
     deleteMutation.mutate(pk);
   };
 
@@ -177,23 +151,7 @@ export const ResearchFunctionItemDisplay = ({
         borderWidth={1}
       >
         <TextButtonFlex name={name} onClick={onUpdateModalOpen} />
-        {/* <Flex justifyContent="flex-start"
-                            ml={4}
-                            alignItems={"center"}
-                        >
-                            <Button
-                                variant={"link"}
-                                colorScheme="blue"
-                                onClick={onUpdateModalOpen}
-                            >
-                                {name ?? ""}
-                            </Button>
-
-                        </Flex> */}
-        <Flex
-          alignItems={"center"}
-          // bg={"red"}
-        >
+        <Flex alignItems={"center"}>
           <Center ml={3.5}>
             {isChecked === true ? <FcOk /> : <FcCancel />}
           </Center>
@@ -203,18 +161,6 @@ export const ResearchFunctionItemDisplay = ({
             name={`${userData.first_name} ${userData.last_name}` ?? ""}
             onClick={drawerFunction}
           />
-
-          {/* <Button
-            variant={"link"}
-            color={"white"}
-            background={colorMode === "light" ? "blue.500" : "blue.600"}
-            _hover={{
-              background: colorMode === "light" ? "blue.400" : "blue.500",
-            }}
-            onClick={drawerFunction}
-          >
-            {userData.first_name} {userData.last_name}
-          </Button> */}
         </Flex>
         <Flex justifyContent="flex-end" alignItems={"center"}>
           <Menu>
@@ -309,20 +255,6 @@ export const ResearchFunctionItemDisplay = ({
               id="update-form"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
-              {/* <FormControl>
-                <FormLabel>Name</FormLabel>
-                <InputGroup>
-                  <Input
-                    autoFocus
-                    autoComplete="off"
-                    {...register("name", { required: true })}
-                    required
-                    type="text"
-                    defaultValue={name} // Prefill
-                  />
-                </InputGroup>
-              </FormControl> */}
-
               <UnboundStatefulEditor
                 title="Research Function Name"
                 helperText={"Name of Research Function"}
@@ -354,22 +286,7 @@ export const ResearchFunctionItemDisplay = ({
                 setValueFunction={setAssociationData}
                 setValueAsPlainText={true}
               />
-              {/* <FormControl>
-                <FormLabel>Description</FormLabel>
-                <Input
-                  autoComplete="off"
-                  {...register("description", { required: true })}
-                  defaultValue={description} // Prefill
-                />
-              </FormControl> */}
-              {/* <FormControl>
-                <FormLabel>Association</FormLabel>
-                <Input
-                  autoComplete="off"
-                  {...register("association", { required: true })}
-                  defaultValue={association} // Prefill
-                />
-              </FormControl> */}
+
               <FormControl>
                 <UserSearchDropdown
                   {...register("leader", { required: true })}
@@ -380,7 +297,7 @@ export const ResearchFunctionItemDisplay = ({
                   label="Leader"
                   placeholder="Search for a user..."
                   isEditable
-                  helperText={<>The leader of the Research Function</>}
+                  helperText={"The leader of the Research Function"}
                 />
               </FormControl>
               <FormControl>
