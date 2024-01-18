@@ -20,15 +20,15 @@ import { ImCross } from "react-icons/im";
 
 interface Props {
   section:
-    | "cover"
-    | "rear_cover"
-    | "sdchart"
-    | "service_delivery"
-    | "research"
-    | "partnerships"
-    | "collaborations"
-    | "student_projects"
-    | "publications";
+  | "cover"
+  | "rear_cover"
+  | "sdchart"
+  | "service_delivery"
+  | "research"
+  | "partnerships"
+  | "collaborations"
+  | "student_projects"
+  | "publications";
   helperText?: string;
   reportMediaData: any;
   reportPk: number;
@@ -219,6 +219,8 @@ export const ReportMediaChanger = ({
 
   return (
     <Box
+      // bg={"red"}
+      height={"400px"}
       pos={"relative"}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -245,7 +247,7 @@ export const ReportMediaChanger = ({
         {({ getRootProps, getInputProps, acceptedFiles }) => (
           <Box
             {...getRootProps()}
-            h={72}
+            h={"400px"}
             width={"100%"}
             background={colorMode === "light" ? "gray.100" : "gray.700"}
             border={"1px dashed"}
@@ -256,7 +258,7 @@ export const ReportMediaChanger = ({
               !isError &&
               currentImage !== null &&
               acceptedFiles[0] instanceof File) ||
-            currentImage !== null ? (
+              currentImage !== null ? (
               <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
                 <Box
                   pos={"absolute"}
@@ -277,13 +279,13 @@ export const ReportMediaChanger = ({
                     rounded={"lg"}
                     src={
                       acceptedFiles &&
-                      !isError &&
-                      currentImage !== null &&
-                      acceptedFiles[0] instanceof File
+                        !isError &&
+                        currentImage !== null &&
+                        acceptedFiles[0] instanceof File
                         ? URL.createObjectURL(acceptedFiles[0])
                         : currentImage && currentImage !== null
-                        ? `${baseUrl}${currentImage}`
-                        : undefined
+                          ? `${baseUrl}${currentImage}`
+                          : undefined
                     }
                     objectFit={"cover"}
                     w={"100%"}
@@ -337,9 +339,9 @@ export const ReportMediaChanger = ({
                         // isIndeterminate
                         size={"xs"}
                         value={uploadProgress}
-                        // hasStripe
-                        // animation={"step-start"}
-                        //
+                      // hasStripe
+                      // animation={"step-start"}
+                      //
                       />
                     </Box>
                   </Center>
