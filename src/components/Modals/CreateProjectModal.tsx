@@ -34,7 +34,6 @@ import {
   MutationError,
   ProjectCreationMutationSuccess,
   createProject,
-  spawnNewEmptyDocument,
 } from "../../lib/api";
 import { useNavigate } from "react-router-dom";
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
@@ -159,22 +158,22 @@ export const CreateProjectModal = ({
       // Close the modal
       if (onClose) {
         onClose();
-        if (
-          !projectType.includes("Student") &&
-          !projectType.includes("External")
-        )
-          await spawnNewEmptyDocument({ projectPk: data.pk, kind: data.kind });
-        else {
-          if (projectType.includes("Student")) {
-            console.log("Spawn document for Student here");
-          } else {
-            console.log("Spawn document for External here");
-          }
-        }
-
-        queryClient.refetchQueries([`projects`]);
-        navigate(`/projects/${data.pk}`);
       }
+      // if (
+      //   !projectType.includes("Student") &&
+      //   !projectType.includes("External")
+      // ) {await spawnNewEmptyDocument({ projectPk: data.pk, kind: data.kind });}
+      // else {
+      //   if (projectType.includes("Student")) {
+      //     console.log("Spawn document for Student here");
+      //   } else {
+      //     console.log("Spawn document for External here");
+      //   }
+      // }
+
+      queryClient.refetchQueries([`projects`]);
+      navigate(`/projects/${data.pk}`);
+
     },
     // Error handling based on API-file-declared interface
     onError: (error) => {
@@ -219,12 +218,12 @@ export const CreateProjectModal = ({
               projectType === "Core Function"
                 ? "red.500"
                 : projectType === "Science Project"
-                ? "green.500"
-                : projectType === "Student Project"
-                ? "blue.500"
-                : projectType === "External Project"
-                ? "gray.500"
-                : "gray.500"
+                  ? "green.500"
+                  : projectType === "Student Project"
+                    ? "blue.500"
+                    : projectType === "External Project"
+                      ? "gray.500"
+                      : "gray.500"
             }
             mr={3}
           >
@@ -261,10 +260,10 @@ export const CreateProjectModal = ({
                   projectType === "Core Function"
                     ? "core_function"
                     : projectType === "Student Project"
-                    ? "student"
-                    : projectType === "Science Project"
-                    ? "science"
-                    : "external"
+                      ? "student"
+                      : projectType === "Science Project"
+                        ? "science"
+                        : "external"
                 }
                 nextClick={goToDetailsTab}
                 currentYear={currentYear}
@@ -288,7 +287,7 @@ export const CreateProjectModal = ({
             </TabPanel>
             <TabPanel>
               {projectType.includes("External") ||
-              projectType.includes("Student") ? (
+                projectType.includes("Student") ? (
                 <ProjectLocationSection
                   locationFilled={locationFilled}
                   locationData={locationData}
