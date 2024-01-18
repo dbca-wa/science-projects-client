@@ -46,15 +46,15 @@ export const ProjectExternalSection = ({
       budget.length > 0 &&
       collaborationWith.length > 0
     ) {
-      console.log(externalData);
+      // console.log(externalData);
       setExternalFilled(true);
     } else {
-      console.log(
-        externalDescription.length,
-        budget.length,
-        aims.length,
-        collaborationWith.length
-      );
+      // console.log(
+      //   externalDescription.length,
+      //   budget.length,
+      //   aims.length,
+      //   collaborationWith.length
+      // );
       setExternalFilled(false);
     }
   }, [
@@ -73,7 +73,7 @@ export const ProjectExternalSection = ({
       <UnboundStatefulEditor
         title="Collaboration With"
         placeholder="Enter collaborating entities..."
-        helperText={"The entity/s this project is in collaboration with"}
+        helperText={"The entity/s this project is in collaboration with, separated by commas"}
         showToolbar={false}
         showTitle={true}
         isRequired={true}
@@ -85,7 +85,7 @@ export const ProjectExternalSection = ({
       <UnboundStatefulEditor
         title="Budget"
         placeholder="The estimated operating budget in dollars..."
-        helperText={"The entity/s this project is in collaboration with"}
+        helperText={"The estimated budget for the project in dollars"}
         showToolbar={false}
         showTitle={true}
         isRequired={true}
@@ -133,8 +133,8 @@ export const ProjectExternalSection = ({
             }}
             isDisabled={!externalFilled}
             onClick={() => {
-              console.log("Here is the external data");
-              console.log(externalData);
+              // console.log("Here is the external data");
+              // console.log(externalData);
               createClick();
             }}
             rightIcon={<IoIosCreate />}

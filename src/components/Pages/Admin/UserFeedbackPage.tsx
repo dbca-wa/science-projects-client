@@ -12,7 +12,7 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { ChatUser } from "../Chat/ChatUser";
 import { useBusinessAreas } from "@/lib/hooks/useBusinessAreas";
 import { useBranches } from "@/lib/hooks/useBranches";
@@ -26,12 +26,6 @@ export const UserFeedbackPage = () => {
   const { feedbackData, feedbackLoading } = useGetUserFeedback();
   const { baData } = useBusinessAreas();
   const { branchesData } = useBranches();
-
-  useEffect(() => {
-    if (!feedbackLoading) {
-      console.log(feedbackData);
-    }
-  }, [feedbackData, feedbackLoading]);
 
   const statusDict = {
     new: "New",
@@ -152,10 +146,10 @@ export const UserFeedbackPage = () => {
                           item.status === "new"
                             ? "red.600"
                             : item.status === "fixed"
-                            ? "green.600"
-                            : item.status === "logged"
-                            ? "blue.600"
-                            : "orange.600"
+                              ? "green.600"
+                              : item.status === "logged"
+                                ? "blue.600"
+                                : "orange.600"
                         }
                         color={"white"}
                       >
@@ -170,6 +164,7 @@ export const UserFeedbackPage = () => {
                       w={"50%"}
                     >
                       <Select
+                        background={colorMode === "light" ? "gray.50" : undefined}
                         onChange={(e) =>
                           onChangeStatus({
                             pk: item.id,
@@ -177,6 +172,8 @@ export const UserFeedbackPage = () => {
                           })
                         }
                         value={item.status}
+                        w={"135px"}
+                        textAlign={"center"}
                       >
                         {Object.entries(statusDict).map(([key, value]) => (
                           <option key={key} value={key}>

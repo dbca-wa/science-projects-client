@@ -1842,7 +1842,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
 
     const choices = ["concept", "projectplan", "progressreport", "studentreport", "projectclosure"]
     if (!choices.includes(kind)) {
-        console.log("returning")
+        console.log(`returning as choice is ${kind}`)
         return;
     }
     // else {
