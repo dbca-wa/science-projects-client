@@ -211,7 +211,7 @@ export const ReportItemDisplay = ({
         width="100%"
         p={3}
         borderWidth={1}
-        // bg={"red"}
+      // bg={"red"}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
           <TextButtonFlex name={`${year}` ?? ""} onClick={onUpdateModalOpen} />
@@ -522,7 +522,7 @@ export const ReportItemDisplay = ({
                         <Box key={key}>
                           {(
                             (updateMutation.error as AxiosError).response.data[
-                              key
+                            key
                             ] as string[]
                           ).map((errorMessage, index) => (
                             <Text key={`${key}-${index}`} color="red.500">

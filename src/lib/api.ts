@@ -1,6 +1,6 @@
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import {  QueryFunctionContext } from "@tanstack/react-query";
+import { QueryFunctionContext } from "@tanstack/react-query";
 import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
 import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
 
@@ -295,20 +295,13 @@ getTeamLead
 
 export const getFullUser = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
-    // if (pk !== 0)
-    // {
-    const res = instance.get(`users/${pk}`).then(res => {
-        // console.log(res.data)
-        return res.data
-    })
-    return res;
-
-    // }
-    // else {
-    //     return {
-
-    //     }
-    // }
+    if (pk !== undefined && pk !== null) {
+        const res = instance.get(`users/${pk}`).then(res => {
+            return res.data
+        })
+        return res;
+    }
+    else return null;
 }
 
 
@@ -1079,7 +1072,7 @@ export const updateProjectDetails = async ({
     if (selectedImageUrl == null) {
         newFormData.append('selectedImageUrl', 'delete')
     }
-    
+
     if (status !== undefined) {
         newFormData.append('status', status);
     }
@@ -1851,7 +1844,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
     if (!choices.includes(kind)) {
         console.log("returning")
         return;
-    } 
+    }
     // else {
     //     console.log(
     //         "valid choice"
