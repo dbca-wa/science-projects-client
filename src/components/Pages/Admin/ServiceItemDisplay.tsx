@@ -8,7 +8,9 @@ import {
   DrawerOverlay,
   Flex,
   FormControl,
+  FormLabel,
   Grid,
+  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -38,7 +40,7 @@ import {
 import { useState } from "react";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
-import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
+// import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 export const ServiceItemDisplay = ({
   pk,
@@ -136,7 +138,7 @@ export const ServiceItemDisplay = ({
         width="100%"
         p={3}
         borderWidth={1}
-        // gridColumnGap={8}
+      // gridColumnGap={8}
       >
         <TextButtonFlex name={name} onClick={onUpdateModalOpen} />
         <Flex>
@@ -237,7 +239,7 @@ export const ServiceItemDisplay = ({
               id="update-form"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
-              <UnboundStatefulEditor
+              {/* <UnboundStatefulEditor
                 title="Service Name"
                 helperText={"Name of Service"}
                 showToolbar={false}
@@ -246,8 +248,17 @@ export const ServiceItemDisplay = ({
                 value={nameData}
                 setValueFunction={setNameData}
                 setValueAsPlainText={true}
-              />
-
+              /> */}
+              <FormControl>
+                <FormLabel>Service Name</FormLabel>
+                <Input
+                  autoFocus
+                  autoComplete="off"
+                  value={nameData}
+                  onChange={(e) => setNameData(e.target.value)}
+                // {...register("name", { required: true })}
+                />
+              </FormControl>
               <FormControl>
                 <UserSearchDropdown
                   {...register("director", { required: true })}

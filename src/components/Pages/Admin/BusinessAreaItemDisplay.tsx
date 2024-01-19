@@ -11,6 +11,7 @@ import {
   FormLabel,
   Grid,
   Image,
+  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -284,7 +285,7 @@ export const BusinessAreaItemDisplay = ({
         width="100%"
         p={3}
         borderWidth={1}
-        // bg={"red"}
+      // bg={"red"}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
           {name ? (
@@ -294,8 +295,8 @@ export const BusinessAreaItemDisplay = ({
                   image instanceof File
                     ? `${apiEndpoint}${image.name}` // Use the image directly for File
                     : image?.file
-                    ? `${apiEndpoint}${image.file}`
-                    : NoImageFile
+                      ? `${apiEndpoint}${image.file}`
+                      : NoImageFile
                 }
                 width={"100%"}
                 height={"100%"}
@@ -435,7 +436,18 @@ export const BusinessAreaItemDisplay = ({
               id="update-form"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
-              <UnboundStatefulEditor
+              <FormControl>
+                <FormLabel>Name</FormLabel>
+                <Input
+                  autoFocus
+                  autoComplete="off"
+                  value={nameData}
+                  onChange={(e) => setNameData(e.target.value)}
+                // {...register("name", { required: true })}
+                />
+              </FormControl>
+
+              {/* <UnboundStatefulEditor
                 title="Business Area Name"
                 helperText={"Name of Business Area"}
                 showToolbar={false}
@@ -444,7 +456,7 @@ export const BusinessAreaItemDisplay = ({
                 value={nameData}
                 setValueFunction={setNameData}
                 setValueAsPlainText={false}
-              />
+              /> */}
               <UnboundStatefulEditor
                 title="Introduction"
                 helperText={"A description of the Business Area"}
