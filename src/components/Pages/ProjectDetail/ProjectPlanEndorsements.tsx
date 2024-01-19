@@ -140,12 +140,12 @@ export const ProjectPlanEndorsements = ({
             rounded={"lg"}
             p={6}
             w={"100%"}
-            // gridRowGap={2}
+          // gridRowGap={2}
           >
             {/* Title */}
             <Box mb={4}>
               <Text fontWeight={"bold"} fontSize={"xl"}>
-                Involvement & Endorsements
+                Endorsements
               </Text>
             </Box>
 
@@ -320,7 +320,7 @@ export const ProjectPlanEndorsements = ({
               rounded={"xl"}
               roundedTop={0}
               borderTop={0}
-              // roundedBottom={0}
+            // roundedBottom={0}
             >
               {/* {involvesAnimalsValue === true &&
                             ( */}
@@ -333,7 +333,7 @@ export const ProjectPlanEndorsements = ({
                   <Text
                     fontWeight={"semibold"}
 
-                    // color={involvesAnimalsValue ? "black" : "gray.500"}
+                  // color={involvesAnimalsValue ? "black" : "gray.500"}
                   >
                     Animal Ethics Committee Endorsement Required?
                   </Text>
@@ -360,10 +360,10 @@ export const ProjectPlanEndorsements = ({
                             aecEndReqValue === true && ( */}
               <Flex
                 alignItems={"center"}
-                // mb={3}
-                // w={"100%"}
-                // ml={8}
-                // mt={2}
+              // mb={3}
+              // w={"100%"}
+              // ml={8}
+              // mt={2}
               >
                 <Box flex={1}>
                   <Text
@@ -373,8 +373,8 @@ export const ProjectPlanEndorsements = ({
                           ? "black"
                           : "gray.500"
                         : aecEndReqValue
-                        ? "white"
-                        : "gray.500"
+                          ? "white"
+                          : "gray.500"
                     }
                   >
                     Animal Ethics Committee's Endorsement
@@ -419,8 +419,8 @@ export const ProjectPlanEndorsements = ({
                             ? "black"
                             : "gray.500"
                           : aecEndReqValue
-                          ? "white"
-                          : "gray.500"
+                            ? "white"
+                            : "gray.500"
                       }
                     >
                       Current Approval PDF
@@ -456,12 +456,11 @@ export const ProjectPlanEndorsements = ({
                             }
                           >
                             {document?.endorsements?.aec_pdf?.file
-                              ? `${
-                                  document.endorsements.aec_pdf.file
-                                    .split("/")
-                                    .pop()
-                                    .split(".")[0]
-                                }.pdf`
+                              ? `${document.endorsements.aec_pdf.file
+                                .split("/")
+                                .pop()
+                                .split(".")[0]
+                              }.pdf`
                               : "No File"}
                             {/* {baseApi}{document?.endorsements?.aec_pdf?.file} */}
                           </Text>

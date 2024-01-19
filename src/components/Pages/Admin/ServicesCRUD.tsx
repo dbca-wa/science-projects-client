@@ -159,7 +159,7 @@ export const ServicesCRUD = () => {
                 <Text as="b">Service</Text>
               </Flex>
               <Flex>
-                <Text as="b">Director</Text>
+                <Text as="b">Executive Director</Text>
               </Flex>
               <Flex justifyContent="flex-end" mr={2}>
                 <Text as="b">Change</Text>
@@ -226,7 +226,7 @@ export const ServicesCRUD = () => {
                         <Box key={key}>
                           {(
                             (mutation.error as AxiosError).response.data[
-                              key
+                            key
                             ] as string[]
                           ).map((errorMessage, index) => (
                             <Text key={`${key}-${index}`} color="red.500">

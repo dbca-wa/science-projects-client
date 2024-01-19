@@ -164,7 +164,7 @@ export const ProjectDetailsSection = ({
               </Select>
             </InputGroup>
             <FormHelperText
-              color={colorMode === "light" ? "gray.500" : "gray.400"}
+            // color={colorMode === "light" ? "gray.500" : "gray.400"}
             >
               The Business Area / Program that this project belongs to.
             </FormHelperText>
@@ -214,7 +214,7 @@ export const ProjectDetailsSection = ({
               </Select>
             </InputGroup>
             <FormHelperText
-              color={colorMode === "light" ? "gray.500" : "gray.400"}
+            // color={colorMode === "light" ? "gray.500" : "gray.400"}
             >
               The DBCA service that this project delivers outputs to.
             </FormHelperText>
@@ -261,7 +261,7 @@ export const ProjectDetailsSection = ({
               </Select>
             </InputGroup>
             <FormHelperText
-              color={colorMode === "light" ? "gray.500" : "gray.400"}
+            // color={colorMode === "light" ? "gray.500" : "gray.400"}
             >
               The Research Function this project mainly contributes to.
             </FormHelperText>
@@ -274,7 +274,7 @@ export const ProjectDetailsSection = ({
               endDate={endDate}
               setStartDate={setStartDate}
               setEndDate={setEndDate}
-              helperText="This can be tentative and adjusted from project settings later"
+              helperText="These dates can be tentative and adjusted from project settings later"
             />
           </FormControl>
 
