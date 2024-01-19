@@ -1,19 +1,11 @@
 
 /* Text */
 
-.editor-italics-light {
-    font-style: italic;
-    color: #333;
-}
-
-.editor-italics-dark {
-  font-style: italic;
-  color: aquamarine;
-}
 
 .editor-bold-light {
     font-weight: bold;
     color: black;
+
 }
 
 
@@ -29,19 +21,6 @@
 .editor-underline-dark {
   text-decoration: underline;
   color: orange;
-}
-
-
-.editor-strikethrough-light {
-    text-decoration: line-through;
-        color: #333;
-
-}
-
-.editor-strikethrough-dark {
-  text-decoration: line-through;
-      color: #eee;
-
 }
 
 .editor-underline-strikethrough-light {
@@ -309,40 +288,63 @@
   padding: 0;
   margin: 0;
   list-style-position: inside;
+  /* display: flex; */
+  /* flex-direction: column; */
 }
+
 
 .editor-li-dark, .editor-li-light {
-  display: flex;
-  /* align-items: center; */
+  /* display:flex; */
+  box-sizing: border-box;
 }
 
+.editor-italics-light {
+  font-style: italic;
+  color: #333;
+  /* display: inline-block; */
+
+}
+
+.editor-italics-dark {
+font-style: italic;
+color: aquamarine;
+/* flex: 0 0 auto; */
+/* background-color: blue; */
+/* height: 100%; */
+/* white-space: pre-wrap; */
+
+/* display: inline-block; */
+}
+
+
+/* 
 ul.editor-ul1 .editor-li-dark::before, ul.editor-ul1 .editor-li-light::before {
-  content: '\2022'; /* Unicode character for bullet point */
+  content: '\2022'; 
   font-size: 1.25em;
   margin-top: 0px;
   margin-right: 12.5px;
   display: inline-block;
+flex-direction: row;
   vertical-align: middle;
   line-height: 1;
 }
 ul.editor-ul2 .editor-li-dark::before, ul.editor-ul2 .editor-li-light::before {
-  content: '\006F'; /* Unicode character for donut bullet point */
+  content: '\006F'; 
   font-size: 0.9em;
   margin-top: 3px;
-  /* margin-right: 12.5px; */
   display: inline-block;
   vertical-align: middle;
   line-height: 1;
 }
 ul.editor-ul3 .editor-li-dark::before, ul.editor-ul3 .editor-li-light::before {
-  content: '\25A0'; /* Unicode character for square bullet point */
+  content: '\25A0'; 
   font-size: 0.5em;
   margin-top: 7px;
   margin-right: 12.5px;
   display: inline-block;
   vertical-align: middle;
   line-height: 1;
-}
+} */
 
 ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item::before {
   content: none;
@@ -356,21 +358,28 @@ ul.editor-ul3 {
   margin-left: 20px;
 }
 
-ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item,
-ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item li.editor-li-dark.editor-nested-list-item::before {
-  content: none;
+
+ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item li.editor-li-dark.editor-nested-list-item,
+ul.editor-ul1 > li.editor-li-light.editor-nested-list-item li.editor-li-light.editor-nested-list-item
+{
+  color: "pink";
+  margin-right: 10px;
 }
 
-/* ul.editor-ul1 > li.editor-li-light.editor-nested-list-item, */
 ul.editor-ul1 > li.editor-li-light.editor-nested-list-item li.editor-li-light.editor-nested-list-item::before,
 ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item li.editor-li-dark.editor-nested-list-item::before,
 ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item::before,
 ul.editor-ul1 > li.editor-li-light.editor-nested-list-item::before,
 ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item > ul::before,
-ul.editor-ul1 > li.editor-li-light.editor-nested-list-item > ul::before {
+ul.editor-ul1 > li.editor-li-light.editor-nested-list-item > ul::before 
+{
   content: none;
 }
 
+ul.editor-ul1 {
+  max-width: "100%"; 
+  word-wrap: break-word;
+}
 
 .editor-h1-light {
   font-size: 30px;
@@ -884,4 +893,17 @@ ul.editor-ul1 > li.editor-li-light.editor-nested-list-item > ul::before {
 }
 .table-action-button-dark:hover {
   background-color: #ddd;
+}
+
+
+.editor-strikethrough-light {
+  text-decoration: line-through;
+      color: #333;
+
+}
+
+.editor-strikethrough-dark {
+text-decoration: line-through;
+    color: #eee;
+
 }
