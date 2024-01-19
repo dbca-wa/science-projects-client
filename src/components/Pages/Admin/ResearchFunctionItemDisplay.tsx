@@ -12,6 +12,7 @@ import {
   FormControl,
   FormLabel,
   Grid,
+  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -255,7 +256,17 @@ export const ResearchFunctionItemDisplay = ({
               id="update-form"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
-              <UnboundStatefulEditor
+              <FormControl>
+                <FormLabel>Research Function Name</FormLabel>
+                <Input
+                  autoFocus
+                  autoComplete="off"
+                  value={nameData}
+                  onChange={(e) => setNameData(e.target.value)}
+                // {...register("name", { required: true })}
+                />
+              </FormControl>
+              {/* <UnboundStatefulEditor
                 title="Research Function Name"
                 helperText={"Name of Research Function"}
                 showToolbar={false}
@@ -264,7 +275,7 @@ export const ResearchFunctionItemDisplay = ({
                 value={nameData}
                 setValueFunction={setNameData}
                 setValueAsPlainText={true}
-              />
+              /> */}
               <UnboundStatefulEditor
                 title="Description"
                 helperText={"A description of the Function"}
@@ -317,7 +328,7 @@ export const ResearchFunctionItemDisplay = ({
                     <Box key={key}>
                       {(
                         (updateMutation.error as AxiosError).response.data[
-                          key
+                        key
                         ] as string[]
                       ).map((errorMessage, index) => (
                         <Text key={`${key}-${index}`} color="red.500">
