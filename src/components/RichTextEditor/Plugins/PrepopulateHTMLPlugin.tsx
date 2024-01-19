@@ -42,6 +42,18 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
     return text?.replace(/&nbsp;/g, "");
   };
 
+  // const removePreWrap = (text: string): string => {
+  //   // Remove 'style="white-space: pre-wrap;"' from a span
+  //   const regex =
+  //     /<span[^>]*\sstyle\s*=\s*["'][^"']*white-space:\s*pre-wrap;[^"']*["'][^>]*>/g;
+  //   return text.replace(regex, (match) =>
+  //     match.replace(
+  //       /style\s*=\s*["'][^"']*white-space:\s*pre-wrap;[^"']*["']\s*/g,
+  //       ""
+  //     )
+  //   );
+  // };
+
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     editor.update(() => {
@@ -51,7 +63,7 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
         const tableData = JSON.parse(match);
         return generateHtmlTable(tableData);
       });
-
+      // replacedData = removePreWrap(replacedData);
       // Parse the replaced data
       const parser = new DOMParser();
       const dom = parser.parseFromString(replacedData, "text/html");
