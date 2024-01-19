@@ -222,8 +222,8 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
           user?.image?.file
             ? user.image.file
             : user?.image?.old_file
-            ? user.image.old_file
-            : undefined
+              ? user.image.old_file
+              : undefined
         }
       />
       <Box
@@ -242,22 +242,20 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
                   ? "blue.500"
                   : "blue.300"
                 : colorMode === "light"
-                ? "green.500"
-                : "green.300"
+                  ? "green.500"
+                  : "green.300"
               : colorMode === "light"
-              ? "gray.500"
-              : "gray.400"
+                ? "gray.500"
+                : "gray.400"
           }
         >
-          {`${user.first_name === "None" ? user.username : user.first_name} ${
-            user.last_name === "None" ? "" : user.last_name
-          } ${
-            user.is_staff
+          {`${user.first_name === "None" ? user.username : user.first_name} ${user.last_name === "None" ? "" : user.last_name
+            } ${user.is_staff
               ? user.is_superuser
                 ? "(Admin)"
                 : "(Staff)"
               : "(External)"
-          }`}
+            }`}
         </Text>
       </Box>
     </Flex>
@@ -307,22 +305,20 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
                 ? "blue.500"
                 : "blue.400"
               : colorMode === "light"
-              ? "green.500"
-              : "green.400"
+                ? "green.500"
+                : "green.400"
             : colorMode === "dark"
-            ? "gray.200"
-            : "gray.500"
+              ? "gray.200"
+              : "gray.500"
         }
       >
-        {`${user.first_name === "None" ? user.username : user.first_name} ${
-          user.last_name === "None" ? "" : user.last_name
-        } ${
-          user.is_staff
+        {`${user.first_name === "None" ? user.username : user.first_name} ${user.last_name === "None" ? "" : user.last_name
+          } ${user.is_staff
             ? user.is_superuser
               ? "(Admin)"
               : "(Staff)"
             : "(External)"
-        }`}
+          }`}
       </Text>
 
       <IconButton

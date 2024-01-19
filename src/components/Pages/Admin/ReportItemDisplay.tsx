@@ -258,7 +258,9 @@ export const ReportItemDisplay = ({
             <MenuList>
               <MenuItem onClick={onUpdateModalOpen}>Edit</MenuItem>
               <MenuItem onClick={onUpdateMediaModalOpen}>Edit Media</MenuItem>
-              <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
+              {userData?.pk === 101073 ? (
+                <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
+              ) : null}
             </MenuList>
           </Menu>
           {/* </Button> */}
@@ -268,7 +270,7 @@ export const ReportItemDisplay = ({
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-          <ModalHeader>Delete Division</ModalHeader>
+          <ModalHeader>Delete Report</ModalHeader>
           <ModalBody>
             <Box>
               <Text fontSize="lg" fontWeight="semibold">

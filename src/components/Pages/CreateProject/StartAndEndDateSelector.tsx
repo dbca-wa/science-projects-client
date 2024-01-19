@@ -1,4 +1,4 @@
-import { Box, Grid, Text, useColorMode } from "@chakra-ui/react";
+import { Box, FormHelperText, Grid, Text, useColorMode } from "@chakra-ui/react";
 import { DatePicker } from "./DatePicker";
 
 interface Props {
@@ -16,7 +16,7 @@ export const StartAndEndDateSelector = ({
   setEndDate,
   helperText,
 }: Props) => {
-  const { colorMode } = useColorMode();
+  // const { colorMode } = useColorMode();
   return (
     <Box mb={4}>
       <Grid
@@ -50,12 +50,12 @@ export const StartAndEndDateSelector = ({
             The end date can't come before the start date!
           </Text>
         ) : (
-          <Text
+          <FormHelperText
             fontSize={"14px"}
-            color={colorMode === "light" ? "gray.600" : "gray.400"}
+          // color={colorMode === "light" ? "gray.600" : "gray.400"}
           >
             {helperText}
-          </Text>
+          </FormHelperText>
         )}
       </Box>
     </Box>
