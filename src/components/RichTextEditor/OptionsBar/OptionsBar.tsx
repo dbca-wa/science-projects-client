@@ -15,6 +15,7 @@ interface IOptionsBarProps {
 
   writeable_document_kind?: EditorSections | null;
   writeable_document_pk?: number | null;
+  details_pk?: number | null;
   wordLimit: number;
   limitCanBePassed: boolean;
 
@@ -35,6 +36,7 @@ interface IOptionsBarProps {
 
 export const OptionsBar = ({
   // editor,
+  details_pk,
   displayData,
   editorType,
   isUpdate,
@@ -72,9 +74,8 @@ export const OptionsBar = ({
           <Grid
             px={10}
             py={4}
-            gridTemplateColumns={`repeat(${
-              userData?.is_superuser ? 3 : 2
-            }, 1fr)`}
+            gridTemplateColumns={`repeat(${userData?.is_superuser ? 3 : 2
+              }, 1fr)`}
             // width={"100%"}
             gridColumnGap={2}
           >
@@ -92,6 +93,7 @@ export const OptionsBar = ({
               canSave={canSave}
               writeable_document_pk={writeable_document_pk}
               writeable_document_kind={writeable_document_kind}
+              details_pk={details_pk}
               setIsEditorOpen={setIsEditorOpen}
               isUpdate={isUpdate}
               editorType={editorType}

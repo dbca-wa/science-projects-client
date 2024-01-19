@@ -1010,6 +1010,13 @@ export interface IEditProject {
     departmentalService: number;
     researchFunction: number;
     businessArea: number;
+
+    externalDescription?: string;
+    aims?: string;
+    budget?: string;
+    collaborationWith?: string;
+    level?: string;
+    organisation?: string;
 }
 
 export const updateProjectDetails = async ({
@@ -1028,6 +1035,9 @@ export const updateProjectDetails = async ({
     departmentalService,
     researchFunction,
     businessArea,
+
+    externalDescription,
+    aims, budget, collaborationWith, level, organisation,
 }: IEditProject) => {
     console.log('editing')
     console.log('keywords:', keywords)
@@ -1127,6 +1137,36 @@ export const updateProjectDetails = async ({
     if (businessArea !== undefined) {
         newFormData.append('business_area', businessArea.toString());
     }
+
+
+    if (externalDescription !== undefined && externalDescription.length > 0) {
+        newFormData.append('externalDescription', externalDescription.toString());
+    }
+
+    if (aims !== undefined && aims.length > 0) {
+        newFormData.append('aims', aims.toString());
+    }
+
+
+    if (budget !== undefined && budget.length > 0) {
+        newFormData.append('budget', budget.toString());
+
+    }
+
+
+    if (collaborationWith !== undefined && collaborationWith.length > 0) {
+        newFormData.append('collaborationWith', collaborationWith.toString());
+
+    }
+
+    if (level !== undefined && level.length > 0) {
+        newFormData.append('level', level.toString());
+    }
+
+    if (organisation !== undefined && organisation.length > 0) {
+        newFormData.append('organisation', organisation.toString());
+    }
+
 
 
     console.log(newFormData);
@@ -1602,6 +1642,7 @@ export interface IHTMLSave {
     document_pk: null | number;
     writeable_document_kind: null | EditorSections;
     writeable_document_pk: null | number;
+    details_pk: number | null;
     section: null | EditorSubsections;
     softRefetch?: () => void;
     setIsEditorOpen?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -1610,7 +1651,7 @@ export interface IHTMLSave {
 
 // Also have this handle directors message, research intro etc. (annual report)
 export const saveHtmlToDB = async (
-    { editorType, htmlData, project_pk, document_pk, writeable_document_kind, writeable_document_pk, section, isUpdate, canSave }: IHTMLSave) => {
+    { editorType, htmlData, details_pk, project_pk, document_pk, writeable_document_kind, writeable_document_pk, section, isUpdate, canSave }: IHTMLSave) => {
 
     const urlType = isUpdate ? instance.put : instance.post;
 
@@ -1630,16 +1671,47 @@ export const saveHtmlToDB = async (
             params = {
                 "description": htmlData,
             }
-        }
-        return urlType(
-            `projects/${project_pk}`,
-            params,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+            return urlType(
+                `projects/${project_pk}`,
+                params,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            ).then(res => res.data);
+
+            // EXTERNAL PROJECTS
+        } else if (section === "externalAims") {
+            params = {
+                "aims": htmlData,
             }
-        ).then(res => res.data);
+            return urlType(
+                `projects/external_project_details/${details_pk}`,
+                params,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            ).then(res => res.data);
+
+        } else if (section === "externalDescription") {
+            params = {
+                "description": htmlData,
+            }
+            return urlType(
+                `projects/external_project_details/${details_pk}`,
+                params,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            ).then(res => res.data);
+
+        }
+
 
     }
     else if (editorType === "ProjectDocument") {

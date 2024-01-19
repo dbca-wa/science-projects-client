@@ -49,6 +49,7 @@ interface Props {
   isUpdate: boolean;
   writeable_document_kind?: EditorSections | null;
   writeable_document_pk?: number | null;
+  details_pk?: number | null;
 
   editorText: string;
   setEditorText: React.Dispatch<React.SetStateAction<string>>;
@@ -76,6 +77,7 @@ export const EditableSRTE = ({
   writeable_document_kind,
   writeable_document_pk,
   initialConfig,
+  details_pk,
   editorRef,
   data,
   editorText,
@@ -182,7 +184,7 @@ export const EditableSRTE = ({
                       outline: "none",
                     }}
 
-                    // autoFocus
+                  // autoFocus
                   />
                 </Box>
               </Box>
@@ -214,6 +216,7 @@ export const EditableSRTE = ({
 
         <Box>
           <OptionsBar
+            details_pk={details_pk}
             editorType={editorType}
             displayData={displayData}
             editorText={editorText}
@@ -232,7 +235,7 @@ export const EditableSRTE = ({
             setCanSave={setCanSave}
             editorIsOpen={isEditorOpen}
             setIsEditorOpen={setIsEditorOpen}
-            // setDisplayData={setDisplayData}
+          // setDisplayData={setDisplayData}
           />
         </Box>
         {shouldShowTree ? <TreeViewPlugin /> : null}

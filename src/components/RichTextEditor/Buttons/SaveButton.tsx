@@ -18,6 +18,7 @@ export const SaveButton = ({
   isUpdate,
   writeable_document_kind,
   writeable_document_pk,
+  details_pk,
   softRefetch,
   setIsEditorOpen,
   canSave,
@@ -80,6 +81,7 @@ export const SaveButton = ({
       canRunFunction={canSave}
       onClick={() =>
         saveToDB({
+          details_pk,
           editorType,
           htmlData,
           project_pk,
