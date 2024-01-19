@@ -23,6 +23,7 @@ interface IProps {
   titleTextSize?: string;
   section: EditorSubsections;
   project_pk?: number;
+  details_pk?: number;
   document_pk?: number;
   writeable_document_kind?: EditorSections | null;
   writeable_document_pk?: number | null;
@@ -43,6 +44,7 @@ export const RichTextEditor = ({
   isUpdate,
   writeable_document_kind,
   writeable_document_pk,
+  details_pk,
   wordLimit,
   limitCanBePassed,
 }: IProps) => {
@@ -204,12 +206,12 @@ export const RichTextEditor = ({
       <Flex
         bg={
           colorMode === "light"
-            ? section === "description"
+            ? section === "description" || section === "externalAims" || section === "externalDescription"
               ? "gray.200"
               : "gray.100"
-            : section === "description"
-            ? "gray.800"
-            : "gray.700"
+            : section === "description" || section === "externalAims" || section === "externalDescription"
+              ? "gray.800"
+              : "gray.700"
         }
         // roundedTop={"8px"}
         roundedTop={20}
@@ -257,8 +259,8 @@ export const RichTextEditor = ({
               ? "whiteAlpha.600"
               : "whiteAlpha.400"
             : isEditorOpen
-            ? "blackAlpha.500"
-            : "blackAlpha.400"
+              ? "blackAlpha.500"
+              : "blackAlpha.400"
         }
       >
         {isEditorOpen ? (
@@ -275,6 +277,7 @@ export const RichTextEditor = ({
             isUpdate={isUpdate}
             writeable_document_kind={writeable_document_kind}
             writeable_document_pk={writeable_document_pk}
+            details_pk={details_pk}
             displayData={displayData}
             editorText={editorText}
             setEditorText={setEditorText}
@@ -303,13 +306,13 @@ export const RichTextEditor = ({
             // editorText={editorText}
             // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-            // setShouldShowTree={setShouldShowTree}
-            // isEditorOpen={isEditorOpen}
-            // setIsEditorOpen={setIsEditorOpen}
-            // setDisplayData={setDisplayData}
-            // textEditorName={
-            //   section === "description" ? "Description" : undefined
-            // }
+          // setShouldShowTree={setShouldShowTree}
+          // isEditorOpen={isEditorOpen}
+          // setIsEditorOpen={setIsEditorOpen}
+          // setDisplayData={setDisplayData}
+          // textEditorName={
+          //   section === "description" ? "Description" : undefined
+          // }
           />
         )}
       </Box>

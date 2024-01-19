@@ -113,11 +113,10 @@ export const UnboundStatefulEditor = ({
         <Box
           pos={"relative"}
           w={"100%"}
-          roundedBottom={20}
+          rounded={20}
           //   boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
           boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
           bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
-          roundedTop={20}
           zIndex={2}
         >
           <SimpleStatefulRTE

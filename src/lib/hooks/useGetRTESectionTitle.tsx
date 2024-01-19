@@ -101,6 +101,12 @@ export const useGetRTESectionTitle = (section: string) => {
       case "publications":
         setSectionText("Publications");
         break;
+      case "externalDescription":
+        setSectionText("External Description");
+        break;
+      case "externalAims":
+        setSectionText("External Aims");
+        break;
       default:
         setSectionText("Scientific Outputs");
     }
