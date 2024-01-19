@@ -194,193 +194,6 @@
   transform: rotate(45deg);
   border-width: 0 2px 2px 0;
 }
-.editor-nested-list-item {
-  list-style-type: none;
-}
-.editor-nested-list-item:before,
-.editor-nested-list-item:after {
-  display: none;
-}
-
-
-
-
-.editor-ol-light {
-  font-size: 14px;
-  padding: 0;
-  margin: 0;
-  margin-left: 16px;
-  color: #333;
-}
-
-.editor-ol-dark {
-  font-size: 14px;
-  padding: 0;
-  margin: 0;
-  margin-left: 16px;
-  color: #eee;
-}
-
-.editor-ul-light {
-  font-size: 14px;
-  padding: 0;
-  margin: 0;
-  margin-left: 16px;
-  margin-bottom: 20px;
-  color: #333;
-  list-style-position: inside;
-
-}
-
-
-.editor-ul-dark {
-  font-size: 14px;
-  padding: 0;
-  margin: 0;
-  margin-left: 16px;
-  margin-bottom: 20px;
-  color: #eee;
-  list-style-position: inside;
-
-}
-
-.editor-li-light {
-/* display: flex; */
-  font-size: 14px;
-  padding: 0;
-  margin: 0;
-  margin-bottom: 4px;
-  margin-left: 22px;
-  color: #333;
-
-}
-
-.editor-li-dark {
-/* display: flex; */
-  font-size: 14px;
-  padding: 0;
-  margin: 0;
-  margin-bottom: 4px;
-  margin-left: 22px;
-  /* color: #723; */
-  color: #eee;
-
-}
-
-
-
-
-/* Style for ordered list container */
-.editor-ol1,
-.editor-ol2,
-.editor-ol3 {
-  padding: 0;
-  margin: 0;
-  list-style-position: inside;
-}
-
-
-
-/* Style for ordered list container */
-.editor-ul1,
-.editor-ul2,
-.editor-ul3 {
-  padding: 0;
-  margin: 0;
-  list-style-position: inside;
-  /* display: flex; */
-  /* flex-direction: column; */
-}
-
-
-.editor-li-dark, .editor-li-light {
-  /* display:flex; */
-  box-sizing: border-box;
-}
-
-.editor-italics-light {
-  font-style: italic;
-  color: #333;
-  /* display: inline-block; */
-
-}
-
-.editor-italics-dark {
-font-style: italic;
-color: aquamarine;
-/* flex: 0 0 auto; */
-/* background-color: blue; */
-/* height: 100%; */
-/* white-space: pre-wrap; */
-
-/* display: inline-block; */
-}
-
-
-/* 
-ul.editor-ul1 .editor-li-dark::before, ul.editor-ul1 .editor-li-light::before {
-  content: '\2022'; 
-  font-size: 1.25em;
-  margin-top: 0px;
-  margin-right: 12.5px;
-  display: inline-block;
-flex-direction: row;
-  vertical-align: middle;
-  line-height: 1;
-}
-ul.editor-ul2 .editor-li-dark::before, ul.editor-ul2 .editor-li-light::before {
-  content: '\006F'; 
-  font-size: 0.9em;
-  margin-top: 3px;
-  display: inline-block;
-  vertical-align: middle;
-  line-height: 1;
-}
-ul.editor-ul3 .editor-li-dark::before, ul.editor-ul3 .editor-li-light::before {
-  content: '\25A0'; 
-  font-size: 0.5em;
-  margin-top: 7px;
-  margin-right: 12.5px;
-  display: inline-block;
-  vertical-align: middle;
-  line-height: 1;
-} */
-
-ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item::before {
-  content: none;
-}
-
-ul.editor-ul2 {
-  margin-left: 20px;
-}
-
-ul.editor-ul3 {
-  margin-left: 20px;
-}
-
-
-ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item li.editor-li-dark.editor-nested-list-item,
-ul.editor-ul1 > li.editor-li-light.editor-nested-list-item li.editor-li-light.editor-nested-list-item
-{
-  color: "pink";
-  margin-right: 10px;
-}
-
-ul.editor-ul1 > li.editor-li-light.editor-nested-list-item li.editor-li-light.editor-nested-list-item::before,
-ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item li.editor-li-dark.editor-nested-list-item::before,
-ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item::before,
-ul.editor-ul1 > li.editor-li-light.editor-nested-list-item::before,
-ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item > ul::before,
-ul.editor-ul1 > li.editor-li-light.editor-nested-list-item > ul::before 
-{
-  content: none;
-}
-
-ul.editor-ul1 {
-  max-width: "100%"; 
-  word-wrap: break-word;
-}
-
 .editor-h1-light {
   font-size: 30px;
 
@@ -907,3 +720,248 @@ text-decoration: line-through;
     color: #eee;
 
 }
+
+
+ul {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  /* list-style-type: none; */
+}
+
+ul li {
+  /* background-color: red; */
+  /* display: inline-block; */
+  list-style-position: outside;
+}
+
+/* .editor-list-ul {
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+}
+
+.editor-listitem {
+  margin: 8px 32px 8px 32px;
+}
+
+.editor-nested-listitem {
+  list-style-type: none;
+} */
+
+
+.editor-nested-list-item {
+  list-style-type: none;
+}
+.editor-nested-list-item:before,
+.editor-nested-list-item:after {
+  display: none;
+}
+
+
+.editor-ol-light {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  color: #333;
+}
+
+.editor-ol-dark {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  color: #eee;
+}
+
+.editor-ul-light {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  margin-bottom: 20px;
+  color: #333;
+  list-style-position: inside;
+
+}
+
+
+.editor-ul-dark {
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-left: 16px;
+  margin-bottom: 20px;
+  color: #eee;
+  list-style-position: inside;
+
+}
+
+.editor-li-light {
+/* display: flex; */
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 4px;
+  margin-left: 22px;
+  color: #333;
+
+}
+
+.editor-li-dark {
+/* display: flex; */
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 4px;
+  margin-left: 22px;
+  /* color: #723; */
+  color: #eee;
+
+}
+
+
+
+
+/* Style for ordered list container */
+.editor-ol1,
+.editor-ol2,
+.editor-ol3 {
+  padding: 0;
+  margin: 0;
+  list-style-position: outside;
+}
+
+
+
+/* Style for ordered list container */
+.editor-ul1,
+.editor-ul2,
+.editor-ul3 {
+  padding: 0;
+  margin: 0;
+  list-style-position: outside;
+}
+
+
+
+.editor-italics-light {
+  font-style: italic;
+  color: #333;
+
+}
+
+.editor-italics-dark {
+font-style: italic;
+color: aquamarine;
+}
+
+
+ul.editor-ul2, ol.editor-ol2 {
+  margin-left: 15px;
+}
+
+ul.editor-ul3, ol.editor-ol3 {
+  margin-left: 5px;
+}
+
+ul.editor-ul1 li::marker {
+  font-weight: bold; 
+}ul.editor-ul2 li::marker {
+  font-weight: bold; 
+}
+ul.editor-ul3 li::marker {
+  font-weight: bold; 
+}
+
+ol.editor-ol1 li {
+  /* background-color: red; */
+  margin-left: 15px;  
+  padding-left: 10px;
+}
+ol.editor-ol1 li::marker {
+  font-weight: bold; 
+}
+ol.editor-ol2 li {
+  /* background-color: red; */
+  margin-left: 15px;  
+  padding-left: 6px;
+}
+
+ol.editor-ol2 li::marker {
+  font-weight: bold; 
+}
+
+
+ol.editor-ol3 li {
+  /* background-color: red; */
+  margin-left: 15px;  
+  padding-left: 6px;
+}
+
+ol.editor-ol3 li::marker {
+  font-weight: bold; 
+}
+
+
+ol.editor-ol1 li::after {
+  background-color: orange;
+  /* margin-left: 15px; */
+}
+
+
+/* ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item li.editor-li-dark.editor-nested-list-item,
+ul.editor-ul1 > li.editor-li-light.editor-nested-list-item li.editor-li-light.editor-nested-list-item
+{
+  color: "pink";
+  margin-right: 10px;
+} */
+
+/* 
+ul.editor-ul1 .editor-li-dark::before, ul.editor-ul1 .editor-li-light::before {
+  content: '\2022'; 
+  font-size: 1.25em;
+  margin-top: 0px;
+  margin-right: 12.5px;
+  display: inline-block;
+flex-direction: row;
+  vertical-align: middle;
+  line-height: 1;
+}
+ul.editor-ul2 .editor-li-dark::before, ul.editor-ul2 .editor-li-light::before {
+  content: '\006F'; 
+  font-size: 0.9em;
+  margin-top: 3px;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}
+ul.editor-ul3 .editor-li-dark::before, ul.editor-ul3 .editor-li-light::before {
+  content: '\25A0'; 
+  font-size: 0.5em;
+  margin-top: 7px;
+  margin-right: 12.5px;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+} */
+
+
+
+/* ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item::before {
+  content: none;
+} */
+
+/* ul.editor-ul1 > li.editor-li-light.editor-nested-list-item li.editor-li-light.editor-nested-list-item::before,
+ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item li.editor-li-dark.editor-nested-list-item::before,
+ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item::before,
+ul.editor-ul1 > li.editor-li-light.editor-nested-list-item::before,
+ul.editor-ul1 > li.editor-li-dark.editor-nested-list-item > ul::before,
+ul.editor-ul1 > li.editor-li-light.editor-nested-list-item > ul::before 
+{
+  content: none;
+} */
+
+
