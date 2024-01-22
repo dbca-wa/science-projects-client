@@ -187,7 +187,7 @@ export const ProgressReportContents = ({
               >
                 {years.map((year) => (
                   <option key={year} value={year}>
-                    {year}
+                    {`FY ${year - 1} - ${String(year).slice(2)}`}
                   </option>
                 ))}
               </Select>

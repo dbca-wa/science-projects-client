@@ -208,7 +208,7 @@ export const CreateStudentReportModal = ({
                           .map((freeReportYear, index: number) => {
                             return (
                               <option key={index} value={freeReportYear.year}>
-                                {freeReportYear.year}
+                                {`FY ${freeReportYear.year - 1} - ${String(freeReportYear.year).slice(2)}`}
                               </option>
                             );
                           })}

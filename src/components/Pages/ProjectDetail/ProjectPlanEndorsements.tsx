@@ -170,6 +170,8 @@ export const ProjectPlanEndorsements = ({
                   </Text>
                 </Box>
                 <Checkbox
+                  borderColor={"blue.500"}
+
                   defaultChecked={bmEndRequired}
                   mr={3}
                   {...register("bmEndorsementRequired", {
@@ -246,6 +248,7 @@ export const ProjectPlanEndorsements = ({
                   </Text>
                 </Box>
                 <Checkbox
+                  borderColor={"blue.500"}
                   defaultChecked={hcEndRequired}
                   mr={3}
                   // onChange={handleTogglePlantsInvolved}
@@ -344,6 +347,8 @@ export const ProjectPlanEndorsements = ({
                   alignItems={"center"}
                 >
                   <Checkbox
+                    borderColor={"blue.500"}
+
                     defaultChecked={aecEndRequired}
                     mr={3}
                     // onChange={handleTogglePlantsInvolved}

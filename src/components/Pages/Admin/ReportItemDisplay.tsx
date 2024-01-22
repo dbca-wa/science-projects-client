@@ -30,6 +30,7 @@ import {
   UnorderedList,
   ListItem,
   useColorMode,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { IReport } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -46,6 +47,7 @@ import { useUser } from "../../../lib/hooks/useUser";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { TextButtonFlex } from "../../TextButtonFlex";
 import { ReportMediaChanger } from "./ReportMediaChanger";
+import { useState } from "react";
 
 export const ReportItemDisplay = ({
   pk,
@@ -171,6 +173,8 @@ export const ReportItemDisplay = ({
 
   const { userData } = useUser();
 
+  const [deleteText, setDeleteText] = useState("")
+
   return !creatorLoading && creatorData ? (
     <>
       <Drawer
@@ -258,7 +262,7 @@ export const ReportItemDisplay = ({
             <MenuList>
               <MenuItem onClick={onUpdateModalOpen}>Edit</MenuItem>
               <MenuItem onClick={onUpdateMediaModalOpen}>Edit Media</MenuItem>
-              {userData?.pk === 101073 ? (
+              {userData?.is_superuser ? (
                 <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
               ) : null}
             </MenuList>
@@ -297,6 +301,11 @@ export const ReportItemDisplay = ({
                   </ListItem>
                 </UnorderedList>
               </Center>
+              <FormControl>
+
+                <Input onChange={(e) => setDeleteText(e.target.value)} />
+                <FormHelperText>Type "delete" in the box to continue</FormHelperText>
+              </FormControl>
             </Box>
           </ModalBody>
           <ModalFooter justifyContent="flex-end">
@@ -307,6 +316,7 @@ export const ReportItemDisplay = ({
               <Button
                 onClick={deleteBtnClicked}
                 color={"white"}
+                isDisabled={deleteText !== "delete"}
                 background={colorMode === "light" ? "red.500" : "red.600"}
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",

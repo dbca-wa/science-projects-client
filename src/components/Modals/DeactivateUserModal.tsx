@@ -166,7 +166,7 @@ export const DeactivateUserModal = ({
       <ModalOverlay />
       <Flex as={"form"} onSubmit={handleSubmit(onSubmit)}>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-          <ModalHeader>Delete User?</ModalHeader>
+          <ModalHeader>Deactivate User?</ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
