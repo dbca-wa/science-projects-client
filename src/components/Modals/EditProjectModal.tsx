@@ -29,10 +29,12 @@ import {
   IBusinessArea,
   IDepartmentalService,
   IExtendedProjectDetails,
+  IExternalProjectDetails,
   IResearchFunction,
   ISimpleLocationData,
   ISmallResearchFunction,
   ISmallService,
+  IStudentProjectDetails,
   ProjectImage,
 } from "../../types";
 import { useForm } from "react-hook-form";
@@ -144,12 +146,12 @@ export const EditProjectModal = ({
   // id/pk
   const [projectTitle, setProjectTitle] = useState(currentTitle);
 
-  const [aims, setAims] = useState(details?.external?.aims);
-  const [externalDescription, setExternalDescription] = useState(details?.external?.description);
-  const [budget, setBudget] = useState(details?.external?.budget);
-  const [collaborationWith, setCollaborationWith] = useState(details?.external?.collaboration_with);
-  const [organisation, setOrganisation] = useState(details?.student?.organisation)
-  const [level, setLevel] = useState(details?.student?.level)
+  const [aims, setAims] = useState((details?.external as IExternalProjectDetails)?.aims);
+  const [externalDescription, setExternalDescription] = useState((details?.external as IExternalProjectDetails)?.description);
+  const [budget, setBudget] = useState((details?.external as IExternalProjectDetails)?.budget);
+  const [collaborationWith, setCollaborationWith] = useState((details?.external as IExternalProjectDetails)?.collaboration_with);
+  const [organisation, setOrganisation] = useState((details?.student as IStudentProjectDetails)?.organisation)
+  const [level, setLevel] = useState((details?.student as IStudentProjectDetails)?.level)
   const [hoveredTitle, setHoveredTitle] = useState(false);
   const titleBorderColor = `${colorMode === "light"
     ? hoveredTitle
@@ -207,7 +209,7 @@ export const EditProjectModal = ({
     ) {
       setCanUpdate(false);
     } else {
-      if (details?.external?.description) {
+      if ((details?.external as IExternalProjectDetails)?.description) {
         // HANDLE EXTERNAL FIELDS
         const parser = new DOMParser();
         const descriptionDoc = parser.parseFromString(externalDescription, "text/html");
@@ -230,7 +232,7 @@ export const EditProjectModal = ({
         }
       }
       else if (
-        details?.student?.level
+        (details?.student as IStudentProjectDetails)?.level
       ) {
         // HANDLE STUDENT FIELDS
         const parser = new DOMParser();
@@ -345,7 +347,7 @@ export const EditProjectModal = ({
                     setValueFunction={setProjectTitle}
                     setValueAsPlainText={false}
                   />
-                  {details?.external.aims ? (
+                  {(details?.external as IExternalProjectDetails).aims ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={2} mt={2} pb={2}>
                       <UnboundStatefulEditor
                         title="Description"
@@ -374,7 +376,7 @@ export const EditProjectModal = ({
 
                     </Grid>
 
-                  ) : details?.student?.organisation ?
+                  ) : (details?.student as IStudentProjectDetails)?.organisation ?
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={2} mt={2} pb={2}>
                       <UnboundStatefulEditor
                         title="Organisation"
@@ -419,7 +421,7 @@ export const EditProjectModal = ({
                     preExistingTags={keywords}
                   />
 
-                  {details?.external.aims ? (
+                  {(details?.external as IExternalProjectDetails).aims ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={2} mt={2} pb={2}>
                       <UnboundStatefulEditor
                         title="Aims"
@@ -447,7 +449,7 @@ export const EditProjectModal = ({
                       />
                     </Grid>
 
-                  ) : details?.student?.level ?
+                  ) : (details?.student as IStudentProjectDetails)?.level ?
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={2} mt={6} pb={6}>
                       <FormControl isRequired userSelect={"none"}>
                         <FormLabel

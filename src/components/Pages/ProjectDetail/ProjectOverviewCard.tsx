@@ -22,10 +22,12 @@ import { HiOutlineExternalLink } from "react-icons/hi";
 import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
 import {
   IExtendedProjectDetails,
+  IExternalProjectDetails,
   IProjectAreas,
   IProjectData,
   IProjectDocuments,
   IProjectMember,
+  IStudentProjectDetails,
 } from "../../../types";
 import {
   FaEdit,
@@ -35,7 +37,7 @@ import {
   FaTrash,
   FaUserFriends,
 } from "react-icons/fa";
-import { AiFillDollarCircle } from "react-icons/ai";
+// import { AiFillDollarCircle } from "react-icons/ai";
 
 import { GiMaterialsScience } from "react-icons/gi";
 import { MdScience } from "react-icons/md";
@@ -629,14 +631,14 @@ export const ProjectOverviewCard = ({
                     <CgOrganisation />
                   </Box>
                   <Text ml={3}>
-                    {details?.student?.organisation ?
-                      `${details?.student?.organisation[0]?.toUpperCase()}${details?.student?.organisation.slice(1)}` : null}</Text>
+                    {(details?.student as IStudentProjectDetails)?.organisation ?
+                      `${(details?.student as IStudentProjectDetails)?.organisation[0]?.toUpperCase()}${(details?.student as IStudentProjectDetails)?.organisation.slice(1)}` : null}</Text>
                 </Flex>
                 <Flex alignItems="center">
                   <Box fontSize="22px">
                     <FaGraduationCap />
                   </Box>
-                  <Text ml={3}>{details?.student?.level ? levelToString(details?.student?.level) : null}</Text>
+                  <Text ml={3}>{(details?.student as IStudentProjectDetails)?.level ? levelToString((details?.student as IStudentProjectDetails)?.level) : null}</Text>
                 </Flex>
               </Grid>
               )
@@ -654,7 +656,7 @@ export const ProjectOverviewCard = ({
                     <VscOrganization />
                   </Box>
                   <Text ml={3}>
-                    {details?.external?.collaboration_with ? `${details?.external?.collaboration_with}` : null}
+                    {(details?.external as IExternalProjectDetails)?.collaboration_with ? `${(details?.external as IExternalProjectDetails)?.collaboration_with}` : null}
                   </Text>
                 </Flex>
 
@@ -663,7 +665,7 @@ export const ProjectOverviewCard = ({
                     <FaSackDollar />
                   </Box>
                   <Text ml={3}>
-                    {details?.external?.budget ? `${details?.external?.budget}` : null}
+                    {(details?.external as IExternalProjectDetails)?.budget ? `${(details?.external as IExternalProjectDetails)?.budget}` : null}
                   </Text>
                 </Flex>
 
@@ -954,16 +956,16 @@ export const ProjectOverviewCard = ({
 
                         /> */}
 
-            {details?.external?.aims ? (
+            {(details?.external as IExternalProjectDetails)?.aims ? (
               <>
                 <RichTextEditor
                   // wordLimit={500}
                   limitCanBePassed={false}
                   canEdit={userInTeam || me?.userData?.is_superuser}
                   editorType="ProjectDetail"
-                  data={details?.external?.description}
+                  data={(details?.external as IExternalProjectDetails)?.description}
                   project_pk={baseInformation.id}
-                  details_pk={details?.external?.id}
+                  details_pk={(details?.external as IExternalProjectDetails)?.id}
                   section={"externalDescription"}
                   isUpdate={true}
                   titleTextSize={"20px"}
@@ -974,8 +976,8 @@ export const ProjectOverviewCard = ({
                   limitCanBePassed={false}
                   canEdit={userInTeam || me?.userData?.is_superuser}
                   editorType="ProjectDetail"
-                  data={details?.external?.aims}
-                  details_pk={details?.external?.id}
+                  data={(details?.external as IExternalProjectDetails)?.aims}
+                  details_pk={(details?.external as IExternalProjectDetails)?.id}
                   project_pk={baseInformation.id}
                   section={"externalAims"}
                   isUpdate={true}
