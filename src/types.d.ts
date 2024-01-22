@@ -109,7 +109,7 @@ export interface IProfile {
 }
 
 
-// PROJECT DETAILS ============================================================================
+// PROJECT DETAILS =============================================================================
 
 interface ISmallUser {
     id: number;
