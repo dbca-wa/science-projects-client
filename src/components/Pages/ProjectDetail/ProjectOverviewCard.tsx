@@ -482,6 +482,37 @@ export const ProjectOverviewCard = ({
             overflow={"hidden"}
             position={"relative"}
           >
+            <Box pos={"absolute"} right={3} top={3}>
+              <Tag
+                fontWeight={"semibold"}
+                color={"white"}
+                ml={3}
+                textAlign={"center"}
+                justifyContent={"center"}
+                p={"10px"}
+                size={"sm"}
+                bgColor={
+                  baseInformation?.kind === "core_function"
+                    ? "red.600"
+                    : baseInformation?.kind === "science"
+                      ? "green.500"
+                      : baseInformation?.kind === "student"
+                        ? "blue.400"
+                        : "gray.400"
+                }
+              >
+                {
+                  baseInformation?.kind === "core_function"
+                    ? "CF"
+                    : baseInformation?.kind === "external"
+                      ? "EXT"
+                      : baseInformation?.kind === "science"
+                        ? "SP"
+                        : "STP" //Student
+                }
+                -{baseInformation?.year}-{baseInformation?.number}
+              </Tag>
+            </Box>
             <Image
               src={baseInformation?.image?.file ? imageUrl : noImage}
               objectFit={"cover"}

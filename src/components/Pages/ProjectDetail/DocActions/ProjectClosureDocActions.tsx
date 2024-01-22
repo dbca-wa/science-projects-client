@@ -56,7 +56,7 @@ export const ProjectClosureDocActions = ({
   refetchData,
   setToLastTab,
 }: // , projectPk
-IConceptDocumentActions) => {
+  IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
 
   // useEffect(() => {
@@ -105,6 +105,19 @@ IConceptDocumentActions) => {
     onOpen: onS3SendbackModalOpen,
     onClose: onS3SendbackModalClose,
   } = useDisclosure();
+
+  const {
+    isOpen: isS1ReopenModalOpen,
+    onOpen: onS1ReopenModalOpen,
+    onClose: onS1ReopenModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isS2ReopenModalOpen,
+    onOpen: onS2ReopenModalOpen,
+    onClose: onS2ReopenModalClose,
+  } = useDisclosure();
+
 
   const {
     isOpen: isS3ReopenModalOpen,
@@ -256,9 +269,8 @@ IConceptDocumentActions) => {
         toast.update(toastIdRef.current, {
           title: "Could Not Generate PDF",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -371,7 +383,7 @@ IConceptDocumentActions) => {
               </Box>
               <Grid
                 pt={2}
-                // gridGap={2}
+              // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -390,19 +402,19 @@ IConceptDocumentActions) => {
                           ? "green.500"
                           : "green.600"
                         : projectClosureData.document.status === "inapproval"
-                        ? colorMode === "light"
-                          ? "blue.500"
-                          : "blue.600"
-                        : projectClosureData.document.status === "inreview"
-                        ? colorMode === "light"
-                          ? "orange.500"
-                          : "orange.600"
-                        : projectClosureData.document.status === "revising"
-                        ? "orange.500"
-                        : // New
-                        colorMode === "light"
-                        ? "red.500"
-                        : "red.600"
+                          ? colorMode === "light"
+                            ? "blue.500"
+                            : "blue.600"
+                          : projectClosureData.document.status === "inreview"
+                            ? colorMode === "light"
+                              ? "orange.500"
+                              : "orange.600"
+                            : projectClosureData.document.status === "revising"
+                              ? "orange.500"
+                              : // New
+                              colorMode === "light"
+                                ? "red.500"
+                                : "red.600"
                     }
                     color={"white"}
                     size={"md"}
@@ -410,12 +422,12 @@ IConceptDocumentActions) => {
                     {projectClosureData.document.status === "inapproval"
                       ? "Approval Requested"
                       : projectClosureData.document.status === "approved"
-                      ? "Approved"
-                      : projectClosureData.document.status === "inreview"
-                      ? "Review Requested"
-                      : projectClosureData.document.status === "revising"
-                      ? "Revising"
-                      : "New Document"}
+                        ? "Approved"
+                        : projectClosureData.document.status === "inreview"
+                          ? "Review Requested"
+                          : projectClosureData.document.status === "revising"
+                            ? "Revising"
+                            : "New Document"}
                   </Tag>
                 </Flex>
                 <Flex
@@ -576,9 +588,9 @@ IConceptDocumentActions) => {
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-                // gridGap={2}
-                // pt={4}
-                // pos={"relative"}
+              // gridGap={2}
+              // pt={4}
+              // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -619,28 +631,44 @@ IConceptDocumentActions) => {
                   <Grid
                     justifyContent={"flex-end"}
                     w={"100%"}
-                    mt={
-                      projectClosureData?.document
-                        ?.business_area_lead_approval_granted
-                        ? 0
-                        : 3
-                    }
+                    mt={1}
                     gridTemplateColumns={"repeat(1, 1fr)"}
                   >
-                    {projectClosureData?.document
-                      ?.business_area_lead_approval_granted === false &&
-                      projectClosureData?.document
-                        ?.project_lead_approval_granted === true &&
-                      (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk) && (
-                        <Center justifyContent={"flex-end"}>
-                          <ProjectClosureActionModal
+                    <ProjectClosureActionModal
+                      userData={userData}
+                      action={"reopen"}
+                      refetchData={refetchData}
+                      baData={baData}
+                      isOpen={isS1ReopenModalOpen}
+                      onClose={onS1ReopenModalClose}
+                      projectClosurePk={projectClosureData?.pk}
+                      documentPk={
+                        projectClosureData?.document?.pk
+                          ? projectClosureData?.document?.pk
+                          : projectClosureData?.document?.id
+                      }
+                      stage={1}
+                      projectData={projectClosureData?.document?.project}
+                    />
+                    <Flex
+                      justifyContent={"flex-end"}
+                      w={"100%"}
+                      mt={
+                        projectClosureData?.document?.project?.status === "completed" ? 3 :
+                          projectClosureData?.document?.business_area_lead_approval_granted
+                            ? 0
+                            : 3
+                      }
+                    >
+                      {projectClosureData?.document?.project?.status === "completed" && (
+                        <>
+                          {/* <ProjectClosureActionModal
                             userData={userData}
+                            action={"reopen"}
                             refetchData={refetchData}
                             baData={baData}
-                            isOpen={isS1RecallModalOpen}
-                            onClose={onS1RecallModalClose}
-                            action={"recall"}
+                            isOpen={isS1ReopenModalOpen}
+                            onClose={onS1ReopenModalClose}
                             projectClosurePk={projectClosureData?.pk}
                             documentPk={
                               projectClosureData?.document?.pk
@@ -649,123 +677,174 @@ IConceptDocumentActions) => {
                             }
                             stage={1}
                             projectData={projectClosureData?.document?.project}
-                          />
+                          /> */}
                           <Button
                             color={"white"}
                             background={
-                              colorMode === "light" ? "blue.500" : "blue.600"
+                              colorMode === "light"
+                                ? "orange.500"
+                                : "orange.600"
                             }
                             _hover={{
                               background:
-                                colorMode === "light" ? "blue.400" : "blue.500",
+                                colorMode === "light"
+                                  ? "orange.400"
+                                  : "orange.500",
                             }}
                             size={"sm"}
-                            onClick={onS1RecallModalOpen}
+                            onClick={onS1ReopenModalOpen}
+                          // mr={3}
                           >
-                            Recall Approval
+                            Reopen Project
                           </Button>
-                        </Center>
+
+                        </>
                       )}
 
-                    {/* {
-                                                            all_documents?.progress_reports.length < 1
-                                                            && ( */}
 
-                    {projectClosureData?.document
-                      ?.business_area_lead_approval_granted === false &&
-                      (projectClosureData?.document?.id ||
-                        projectClosureData?.document?.pk) &&
-                      projectClosureData?.document
-                        ?.project_lead_approval_granted === false &&
-                      (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk) && (
-                        <Center justifyContent={"flex-end"}>
-                          <>
-                            <DeleteDocumentModal
-                              key={keyForDeleteDocumentModal}
-                              projectPk={
-                                projectClosureData?.document?.project?.pk
-                                  ? projectClosureData?.document?.project?.pk
-                                  : projectClosureData?.document?.project?.id
-                              }
-                              documentPk={
-                                projectClosureData?.document?.pk
-                                  ? projectClosureData?.document?.pk
-                                  : projectClosureData?.document?.id
-                              }
-                              documentKind="projectclosure"
-                              onClose={onCloseDeleteDocumentModal}
-                              isOpen={isDeleteDocumentModalOpen}
-                              onDeleteSuccess={() => {
-                                setStatusIfRequired(
-                                  projectClosureData?.document?.project?.pk
-                                    ? projectClosureData?.document?.project?.pk
-                                    : projectClosureData?.document?.project?.id,
-                                  "updating"
-                                );
-                              }}
-                              refetchData={refetchData}
-                              setToLastTab={setToLastTab}
-                            />
-                            <Button
-                              color={"white"}
-                              background={
-                                colorMode === "light" ? "red.500" : "red.600"
-                              }
-                              _hover={{
-                                background:
-                                  colorMode === "light" ? "red.400" : "red.500",
-                              }}
-                              size={"sm"}
-                              onClick={() => {
-                                // console.log(docPk);
-                                onOpenDeleteDocumentModal();
-                              }}
-                              mr={2}
-                            >
-                              Delete Document
-                            </Button>
-                          </>
+                      {projectClosureData?.document
+                        ?.business_area_lead_approval_granted === false &&
+                        projectClosureData?.document
+                          ?.project_lead_approval_granted === true &&
+                        (userData?.is_superuser ||
+                          userData?.pk === leaderMember?.user?.pk) && (
                           <>
                             <ProjectClosureActionModal
                               userData={userData}
                               refetchData={refetchData}
                               baData={baData}
-                              isOpen={isS1ApprovalModalOpen}
-                              onClose={onS1ApprovalModalClose}
-                              action={"approve"}
-                              stage={1}
+                              isOpen={isS1RecallModalOpen}
+                              onClose={onS1RecallModalClose}
+                              action={"recall"}
                               projectClosurePk={projectClosureData?.pk}
                               documentPk={
                                 projectClosureData?.document?.pk
                                   ? projectClosureData?.document?.pk
                                   : projectClosureData?.document?.id
                               }
-                              projectData={
-                                projectClosureData?.document?.project
-                              }
+                              stage={1}
+                              projectData={projectClosureData?.document?.project}
                             />
+
                             <Button
+                              ml={3}
                               color={"white"}
                               background={
-                                colorMode === "light"
-                                  ? "green.500"
-                                  : "green.600"
+                                colorMode === "light" ? "blue.500" : "blue.600"
                               }
                               _hover={{
                                 background:
-                                  colorMode === "light"
-                                    ? "green.400"
-                                    : "green.500",
+                                  colorMode === "light" ? "blue.400" : "blue.500",
                               }}
                               size={"sm"}
-                              onClick={onS1ApprovalModalOpen}
+                              onClick={onS1RecallModalOpen}
                             >
-                              Approve
+                              Recall
                             </Button>
                           </>
-                        </Center>
-                      )}
+                        )
+                      }
+
+
+
+                      {projectClosureData?.document
+                        ?.business_area_lead_approval_granted === false &&
+                        (projectClosureData?.document?.id ||
+                          projectClosureData?.document?.pk) &&
+                        projectClosureData?.document
+                          ?.project_lead_approval_granted === false &&
+                        (userData?.is_superuser ||
+                          userData?.pk === leaderMember?.user?.pk) && (
+                          <Center justifyContent={"flex-end"}>
+                            <>
+                              <DeleteDocumentModal
+                                key={keyForDeleteDocumentModal}
+                                projectPk={
+                                  projectClosureData?.document?.project?.pk
+                                    ? projectClosureData?.document?.project?.pk
+                                    : projectClosureData?.document?.project?.id
+                                }
+                                documentPk={
+                                  projectClosureData?.document?.pk
+                                    ? projectClosureData?.document?.pk
+                                    : projectClosureData?.document?.id
+                                }
+                                documentKind="projectclosure"
+                                onClose={onCloseDeleteDocumentModal}
+                                isOpen={isDeleteDocumentModalOpen}
+                                onDeleteSuccess={() => {
+                                  setStatusIfRequired(
+                                    projectClosureData?.document?.project?.pk
+                                      ? projectClosureData?.document?.project?.pk
+                                      : projectClosureData?.document?.project?.id,
+                                    "updating"
+                                  );
+                                }}
+                                refetchData={refetchData}
+                                setToLastTab={setToLastTab}
+                              />
+                              <Button
+                                color={"white"}
+                                background={
+                                  colorMode === "light" ? "red.500" : "red.600"
+                                }
+                                _hover={{
+                                  background:
+                                    colorMode === "light" ? "red.400" : "red.500",
+                                }}
+                                size={"sm"}
+                                onClick={() => {
+                                  // console.log(docPk);
+                                  onOpenDeleteDocumentModal();
+                                }}
+                                mr={2}
+                                ml={3}
+                              >
+                                Delete Document
+                              </Button>
+                            </>
+                            <>
+                              <ProjectClosureActionModal
+                                userData={userData}
+                                refetchData={refetchData}
+                                baData={baData}
+                                isOpen={isS1ApprovalModalOpen}
+                                onClose={onS1ApprovalModalClose}
+                                action={"approve"}
+                                stage={1}
+                                projectClosurePk={projectClosureData?.pk}
+                                documentPk={
+                                  projectClosureData?.document?.pk
+                                    ? projectClosureData?.document?.pk
+                                    : projectClosureData?.document?.id
+                                }
+                                projectData={
+                                  projectClosureData?.document?.project
+                                }
+                              />
+                              <Button
+                                color={"white"}
+                                background={
+                                  colorMode === "light"
+                                    ? "green.500"
+                                    : "green.600"
+                                }
+                                _hover={{
+                                  background:
+                                    colorMode === "light"
+                                      ? "green.400"
+                                      : "green.500",
+                                }}
+                                size={"sm"}
+                                onClick={onS1ApprovalModalOpen}
+                              >
+                                Submit
+                              </Button>
+                            </>
+                          </Center>
+                        )}
+                    </Flex>
+
                   </Grid>
                 </Grid>
 
@@ -777,7 +856,7 @@ IConceptDocumentActions) => {
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
+                // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -813,61 +892,116 @@ IConceptDocumentActions) => {
                     justifyContent={"flex-end"}
                     w={"100%"}
                     mt={
-                      projectClosureData?.document
-                        ?.project_lead_approval_granted &&
-                      projectClosureData?.document
-                        ?.directorate_approval_granted === false
-                        ? 3
-                        : 0
+                      projectClosureData?.document?.project?.status === "completed" ? 3 :
+                        projectClosureData?.document?.directorate_approval_granted
+                          ? 0
+                          : 3
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
+                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
+                    <ProjectClosureActionModal
+                      userData={userData}
+                      action={"reopen"}
+                      refetchData={refetchData}
+                      baData={baData}
+                      isOpen={isS2ReopenModalOpen}
+                      onClose={onS2ReopenModalClose}
+                      projectClosurePk={projectClosureData?.pk}
+                      documentPk={
+                        projectClosureData?.document?.pk
+                          ? projectClosureData?.document?.pk
+                          : projectClosureData?.document?.id
+                      }
+                      stage={2}
+                      projectData={projectClosureData?.document?.project}
+                    />
                     {projectClosureData?.document
                       ?.project_lead_approval_granted &&
                       projectClosureData?.document
                         ?.business_area_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === baLead?.pk) && (
-                        <Center
-                        // justifyContent={"flex-start"}
-                        // ml={4}
-                        >
-                          <ProjectClosureActionModal
-                            userData={userData}
-                            refetchData={refetchData}
-                            action={"send_back"}
-                            baData={baData}
-                            isOpen={isS2SendbackModalOpen}
-                            onClose={onS2SendbackModalClose}
-                            projectClosurePk={projectClosureData?.pk}
-                            documentPk={
-                              projectClosureData?.document?.pk
-                                ? projectClosureData?.document?.pk
-                                : projectClosureData?.document?.id
-                            }
-                            stage={2}
-                            projectData={projectClosureData?.document?.project}
-                          />
-                          <Button
-                            color={"white"}
-                            background={
+                        userData?.pk === baLead?.pk) ? (
+                      <Center
+                      // justifyContent={"flex-start"}
+                      // ml={4}
+                      >
+                        <ProjectClosureActionModal
+                          userData={userData}
+                          refetchData={refetchData}
+                          action={"send_back"}
+                          baData={baData}
+                          isOpen={isS2SendbackModalOpen}
+                          onClose={onS2SendbackModalClose}
+                          projectClosurePk={projectClosureData?.pk}
+                          documentPk={
+                            projectClosureData?.document?.pk
+                              ? projectClosureData?.document?.pk
+                              : projectClosureData?.document?.id
+                          }
+                          stage={2}
+                          projectData={projectClosureData?.document?.project}
+                        />
+
+                        {/* <Button
+                          color={"white"}
+                          background={
+                            colorMode === "light"
+                              ? "orange.500"
+                              : "orange.600"
+                          }
+                          _hover={{
+                            background:
                               colorMode === "light"
-                                ? "orange.500"
-                                : "orange.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light"
-                                  ? "orange.400"
-                                  : "orange.500",
-                            }}
-                            size={"sm"}
-                            onClick={onS2SendbackModalOpen}
-                          >
-                            Send Back
-                          </Button>
-                        </Center>
-                      )}
+                                ? "orange.400"
+                                : "orange.500",
+                          }}
+                          size={"sm"}
+                          onClick={onS2ReopenModalOpen}
+                          mr={4}
+                        >
+                          Reopen Project
+                        </Button> */}
+
+                        <Button
+                          color={"white"}
+                          background={
+                            colorMode === "light"
+                              ? "orange.500"
+                              : "orange.600"
+                          }
+                          _hover={{
+                            background:
+                              colorMode === "light"
+                                ? "orange.400"
+                                : "orange.500",
+                          }}
+                          size={"sm"}
+                          onClick={onS2SendbackModalOpen}
+                        >
+                          Send Back
+                        </Button>
+                      </Center>) : (
+                      projectClosureData?.document?.project?.status === "completed" ? <Button
+                        color={"white"}
+                        background={
+                          colorMode === "light"
+                            ? "orange.500"
+                            : "orange.600"
+                        }
+                        _hover={{
+                          background:
+                            colorMode === "light"
+                              ? "orange.400"
+                              : "orange.500",
+                        }}
+                        size={"sm"}
+                        onClick={onS2ReopenModalOpen}
+                        mr={0}
+                      >
+                        Reopen Project
+                      </Button>
+                        : null
+                    )}
 
                     {projectClosureData?.document
                       ?.business_area_lead_approval_granted &&
@@ -1002,12 +1136,46 @@ IConceptDocumentActions) => {
                     justifyContent={"flex-end"}
                     w={"100%"}
                     mt={
-                      projectClosureData?.document
-                        ?.business_area_lead_approval_granted
-                        ? 3
-                        : 0
+                      3
                     }
                   >
+                    <ProjectClosureActionModal
+                      userData={userData}
+                      action={"reopen"}
+                      refetchData={refetchData}
+                      baData={baData}
+                      isOpen={isS3ReopenModalOpen}
+                      onClose={onS3ReopenModalClose}
+                      projectClosurePk={projectClosureData?.pk}
+                      documentPk={
+                        projectClosureData?.document?.pk
+                          ? projectClosureData?.document?.pk
+                          : projectClosureData?.document?.id
+                      }
+                      stage={3}
+                      projectData={projectClosureData?.document?.project}
+                    />
+                    {projectClosureData?.document?.project?.status === "completed" ? <Button
+                      color={"white"}
+                      background={
+                        colorMode === "light"
+                          ? "orange.500"
+                          : "orange.600"
+                      }
+                      _hover={{
+                        background:
+                          colorMode === "light"
+                            ? "orange.400"
+                            : "orange.500",
+                      }}
+                      size={"sm"}
+                      onClick={onS3ReopenModalOpen}
+                      ml={2}
+                    >
+                      Reopen Project
+                    </Button> : null}
+
+
                     {projectClosureData?.document
                       ?.business_area_lead_approval_granted &&
                       projectClosureData?.document
@@ -1088,7 +1256,7 @@ IConceptDocumentActions) => {
                           >
                             Recall Approval
                           </Button>
-
+                          {/* 
                           <ProjectClosureActionModal
                             userData={userData}
                             action={"reopen"}
@@ -1121,17 +1289,10 @@ IConceptDocumentActions) => {
                             }}
                             size={"sm"}
                             onClick={onS3ReopenModalOpen}
-                            // onClick={
-                            //     () => openProjectFunc(
-                            //         {
-                            //             pk: projectClosureData?.document?.project?.id ? projectClosureData.document.project.id : projectClosureData.document.project.pk,
-                            //         }
-                            //     )
-                            // }
                             ml={2}
                           >
                             Reopen Project
-                          </Button>
+                          </Button> */}
                         </Center>
                       )}
 
@@ -1193,8 +1354,8 @@ IConceptDocumentActions) => {
                 >
                   <Box
                     alignSelf={"center"}
-                    // bg={"red"}
-                    // justifyContent={""}
+                  // bg={"red"}
+                  // justifyContent={""}
                   >
                     <Text fontWeight={"semibold"}>PDF</Text>
                   </Box>

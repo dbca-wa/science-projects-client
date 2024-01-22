@@ -65,7 +65,7 @@ export const BusinessAreaItemDisplay = ({
     onClose: onDeleteModalClose,
   } = useDisclosure();
   const {
-    isOpen: isUpdateaModalOpen,
+    isOpen: isUpdateModalOpen,
     onOpen: onUpdateModalOpen,
     onClose: onUpdateModalClose,
   } = useDisclosure();
@@ -401,7 +401,7 @@ export const BusinessAreaItemDisplay = ({
         </ModalContent>
       </Modal>
       <Modal
-        isOpen={isUpdateaModalOpen}
+        isOpen={isUpdateModalOpen}
         onClose={onUpdateModalClose}
         size={"4xl"}
         scrollBehavior="outside"
@@ -493,7 +493,7 @@ export const BusinessAreaItemDisplay = ({
               <FormControl mt={3} ml={2}>
                 <UserSearchDropdown
                   {...register("leader", { required: true })}
-                  onlyInternal={false}
+                  onlyInternal={true}
                   isRequired={true}
                   setUserFunction={setSelectedLeader}
                   preselectedUserPk={leader}
@@ -507,7 +507,7 @@ export const BusinessAreaItemDisplay = ({
               <FormControl ml={2}>
                 <UserSearchDropdown
                   {...register("finance_admin", { required: true })}
-                  onlyInternal={false}
+                  onlyInternal={true}
                   isRequired={true}
                   setUserFunction={setSelectedFinanceAdmin}
                   preselectedUserPk={finance_admin}
@@ -520,7 +520,7 @@ export const BusinessAreaItemDisplay = ({
               <FormControl ml={2}>
                 <UserSearchDropdown
                   {...register("data_custodian", { required: true })}
-                  onlyInternal={false}
+                  onlyInternal={true}
                   isRequired={true}
                   setUserFunction={setSelectedDataCustodian}
                   preselectedUserPk={data_custodian}

@@ -262,9 +262,8 @@ export const ProjectPlanDocActions = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Generate PDF",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -348,7 +347,7 @@ export const ProjectPlanDocActions = ({
               </Box>
               <Grid
                 pt={2}
-                // gridGap={2}
+              // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -367,19 +366,19 @@ export const ProjectPlanDocActions = ({
                           ? "green.500"
                           : "green.600"
                         : projectPlanData.document.status === "inapproval"
-                        ? colorMode === "light"
-                          ? "blue.500"
-                          : "blue.600"
-                        : projectPlanData.document.status === "inreview"
-                        ? colorMode === "light"
-                          ? "orange.500"
-                          : "orange.600"
-                        : projectPlanData.document.status === "revising"
-                        ? "orange.500"
-                        : // New
-                        colorMode === "light"
-                        ? "red.500"
-                        : "red.600"
+                          ? colorMode === "light"
+                            ? "blue.500"
+                            : "blue.600"
+                          : projectPlanData.document.status === "inreview"
+                            ? colorMode === "light"
+                              ? "orange.500"
+                              : "orange.600"
+                            : projectPlanData.document.status === "revising"
+                              ? "orange.500"
+                              : // New
+                              colorMode === "light"
+                                ? "red.500"
+                                : "red.600"
                     }
                     color={"white"}
                     size={"md"}
@@ -387,12 +386,12 @@ export const ProjectPlanDocActions = ({
                     {projectPlanData.document.status === "inapproval"
                       ? "Approval Requested"
                       : projectPlanData.document.status === "approved"
-                      ? "Approved"
-                      : projectPlanData.document.status === "inreview"
-                      ? "Review Requested"
-                      : projectPlanData.document.status === "revising"
-                      ? "Revising"
-                      : "New Document"}
+                        ? "Approved"
+                        : projectPlanData.document.status === "inreview"
+                          ? "Review Requested"
+                          : projectPlanData.document.status === "revising"
+                            ? "Revising"
+                            : "New Document"}
                   </Tag>
                 </Flex>
                 <Flex
@@ -553,9 +552,9 @@ export const ProjectPlanDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-                // gridGap={2}
-                // pt={4}
-                // pos={"relative"}
+              // gridGap={2}
+              // pt={4}
+              // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -639,7 +638,7 @@ export const ProjectPlanDocActions = ({
                             size={"sm"}
                             onClick={onS1RecallModalOpen}
                           >
-                            Recall Approval
+                            Recall
                           </Button>
                         </Center>
                       )}
@@ -765,7 +764,7 @@ export const ProjectPlanDocActions = ({
                               size={"sm"}
                               onClick={onS1ApprovalModalOpen}
                             >
-                              Approve
+                              Submit
                             </Button>
                           )}
                         </Center>
@@ -781,7 +780,7 @@ export const ProjectPlanDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
+                // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -819,12 +818,12 @@ export const ProjectPlanDocActions = ({
                     mt={
                       projectPlanData?.document
                         ?.project_lead_approval_granted &&
-                      projectPlanData?.document
-                        ?.directorate_approval_granted === false
+                        projectPlanData?.document
+                          ?.directorate_approval_granted === false
                         ? 3
                         : 0
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
+                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {projectPlanData?.document?.project_lead_approval_granted &&
                       projectPlanData?.document
@@ -1060,7 +1059,7 @@ export const ProjectPlanDocActions = ({
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           {all_documents?.progress_reports.length >=
-                          1 ? null : (
+                            1 ? null : (
                             <>
                               <ProjectPlanActionModal
                                 userData={userData}
@@ -1100,7 +1099,7 @@ export const ProjectPlanDocActions = ({
                           )}
                           {projectPlanData?.document?.project?.status ===
                             "pending" ||
-                          all_documents?.progress_reports?.length < 1 ? (
+                            all_documents?.progress_reports?.length < 1 ? (
                             <>
                               <CreateProgressReportModal
                                 projectPk={
@@ -1202,8 +1201,8 @@ export const ProjectPlanDocActions = ({
                 >
                   <Box
                     alignSelf={"center"}
-                    // bg={"red"}
-                    // justifyContent={""}
+                  // bg={"red"}
+                  // justifyContent={""}
                   >
                     <Text fontWeight={"semibold"}>PDF</Text>
                   </Box>
