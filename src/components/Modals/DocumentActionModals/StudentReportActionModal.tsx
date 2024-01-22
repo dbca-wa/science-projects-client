@@ -34,7 +34,7 @@ import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers"
 
 interface Props {
   userData: IUserMe;
-  action: "approve" | "recall" | "send_back";
+  action: "approve" | "recall" | "send_back" | "reopen";
   stage: number;
   documentPk: number;
   studentReportPk: number;
@@ -90,13 +90,12 @@ export const StudentReportActionModal = ({
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${
-          action === "approve"
-            ? "Approving"
-            : action === "recall"
+        title: `${action === "approve"
+          ? "Approving"
+          : action === "recall"
             ? "Recalling"
             : "Sending Back"
-        }`,
+          }`,
         position: "top-right",
       });
     },
@@ -104,13 +103,12 @@ export const StudentReportActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${
-            action === "approve"
-              ? "Approved"
-              : action === "recall"
+          description: `Document ${action === "approve"
+            ? "Approved"
+            : action === "recall"
               ? "Recalled"
               : "Sent Back"
-          }`,
+            }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -131,13 +129,12 @@ export const StudentReportActionModal = ({
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${
-            action === "approve"
-              ? "Approve"
-              : action === "recall"
+          title: `Could Not ${action === "approve"
+            ? "Approve"
+            : action === "recall"
               ? "Recall"
               : "Send Back"
-          } student Report`,
+            } student Report`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -160,7 +157,7 @@ export const StudentReportActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-      // isCentered={true}
+    // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -169,10 +166,12 @@ export const StudentReportActionModal = ({
       >
         <ModalHeader>
           {action === "approve"
-            ? "Approve"
+            ? stage === 1 ? "Submit" : "Approve"
             : action === "recall"
-            ? "Recall"
-            : "Send Back"}{" "}
+              ? "Recall" :
+              action === "reopen" ?
+                "Reopen"
+                : "Send Back"}{" "}
           Document?
         </ModalHeader>
         <ModalCloseButton />
@@ -208,13 +207,13 @@ export const StudentReportActionModal = ({
                   <Text fontWeight={"bold"}>Stage 1</Text>
                   <br />
                   <Text>
-                    In your capacity as Project Lead, would you like to {action}{" "}
+                    In your capacity as Project Lead, would you like to {action === "approve" ? "submit" : action}{" "}
                     this student report?
                   </Text>
                   <br />
                   <Text>
                     {action === "approve"
-                      ? "This will send an email to the Business Area Lead for approval and the document will be locked until the Business Area lead has reviewed the document."
+                      ? "This will send an email to the Business Area Lead for approval."
                       : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been recalled from your approval."}
                   </Text>
 
@@ -229,7 +228,7 @@ export const StudentReportActionModal = ({
                       ({baLead.first_name} {baLead.last_name} - {baLead.email})
                     </strong>{" "}
                     alerting them that you have{" "}
-                    {action === "approve" ? "approved" : "recalled"} this
+                    {action === "approve" ? "submitted" : "recalled"} this
                     document?
                   </Checkbox>
                 </Box>
@@ -244,10 +243,10 @@ export const StudentReportActionModal = ({
                   <br />
                   <Text>
                     {action === "approve"
-                      ? "This will send an email to members of the Directorate for approval and the document will be locked until the Directorate has reviewed the document."
+                      ? "This will send an email to members of the Directorate for approval."
                       : action === "recall"
-                      ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
-                      : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
+                        ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
+                        : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
                   </Text>
 
                   <Box
@@ -300,8 +299,8 @@ export const StudentReportActionModal = ({
                     {action === "approve"
                       ? "This will provide final approval for this student report, adding it to the Annual Report."
                       : action === "recall"
-                      ? "This will return the approval status from 'Granted' to 'Required'."
-                      : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been sent back for revision."}
+                        ? "This will return the approval status from 'Granted' to 'Required'."
+                        : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been sent back for revision."}
                   </Text>
 
                   {action === "send_back" && (
@@ -355,10 +354,10 @@ export const StudentReportActionModal = ({
             }}
           >
             {action === "approve"
-              ? "Approve"
+              ? stage === 1 ? "Submit" : "Approve"
               : action === "recall"
-              ? "Recall"
-              : "Send Back"}
+                ? "Recall"
+                : "Send Back"}
           </Button>
         </ModalFooter>
       </ModalContent>

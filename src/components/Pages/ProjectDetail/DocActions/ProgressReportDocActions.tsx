@@ -54,8 +54,8 @@ export const ProgressReportDocActions = ({
   callSameData,
   setToLastTab,
 }: // setSelectedProgressReport, setSelectedYear,
-// , projectPk
-IProgressDocumentActions) => {
+  // , projectPk
+  IProgressDocumentActions) => {
   const { colorMode } = useColorMode();
 
   const {
@@ -265,9 +265,8 @@ IProgressDocumentActions) => {
         toast.update(toastIdRef.current, {
           title: "Could Not Generate PDF",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -351,7 +350,7 @@ IProgressDocumentActions) => {
               </Box>
               <Grid
                 pt={2}
-                // gridGap={2}
+              // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -370,19 +369,19 @@ IProgressDocumentActions) => {
                           ? "green.500"
                           : "green.600"
                         : progressReportData.document.status === "inapproval"
-                        ? colorMode === "light"
-                          ? "blue.500"
-                          : "blue.600"
-                        : progressReportData.document.status === "inreview"
-                        ? colorMode === "light"
-                          ? "orange.500"
-                          : "orange.600"
-                        : progressReportData.document.status === "revising"
-                        ? "orange.500"
-                        : // New
-                        colorMode === "light"
-                        ? "red.500"
-                        : "red.600"
+                          ? colorMode === "light"
+                            ? "blue.500"
+                            : "blue.600"
+                          : progressReportData.document.status === "inreview"
+                            ? colorMode === "light"
+                              ? "orange.500"
+                              : "orange.600"
+                            : progressReportData.document.status === "revising"
+                              ? "orange.500"
+                              : // New
+                              colorMode === "light"
+                                ? "red.500"
+                                : "red.600"
                     }
                     color={"white"}
                     size={"md"}
@@ -390,12 +389,12 @@ IProgressDocumentActions) => {
                     {progressReportData.document.status === "inapproval"
                       ? "Approval Requested"
                       : progressReportData.document.status === "approved"
-                      ? "Approved"
-                      : progressReportData.document.status === "inreview"
-                      ? "Review Requested"
-                      : progressReportData.document.status === "revising"
-                      ? "Revising"
-                      : "New Document"}
+                        ? "Approved"
+                        : progressReportData.document.status === "inreview"
+                          ? "Review Requested"
+                          : progressReportData.document.status === "revising"
+                            ? "Revising"
+                            : "New Document"}
                   </Tag>
                 </Flex>
                 <Flex
@@ -556,9 +555,9 @@ IProgressDocumentActions) => {
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-                // gridGap={2}
-                // pt={4}
-                // pos={"relative"}
+              // gridGap={2}
+              // pt={4}
+              // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -639,7 +638,7 @@ IProgressDocumentActions) => {
                             size={"sm"}
                             onClick={onS1RecallModalOpen}
                           >
-                            Recall Approval
+                            Recall
                           </Button>
                         </Center>
                       )}
@@ -724,7 +723,7 @@ IProgressDocumentActions) => {
                             size={"sm"}
                             onClick={onS1ApprovalModalOpen}
                           >
-                            Approve
+                            Submit
                           </Button>
                         </Center>
                       )}
@@ -739,7 +738,7 @@ IProgressDocumentActions) => {
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
+                // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -781,7 +780,7 @@ IProgressDocumentActions) => {
                         ? 3
                         : 0
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
+                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {progressReportData?.document
                       ?.project_lead_approval_granted &&
@@ -1092,8 +1091,8 @@ IProgressDocumentActions) => {
                 >
                   <Box
                     alignSelf={"center"}
-                    // bg={"red"}
-                    // justifyContent={""}
+                  // bg={"red"}
+                  // justifyContent={""}
                   >
                     <Text fontWeight={"semibold"}>PDF</Text>
                   </Box>

@@ -34,7 +34,7 @@ import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers"
 
 interface Props {
   userData: IUserMe;
-  action: "approve" | "recall" | "send_back";
+  action: "approve" | "recall" | "send_back" | "reopen";
   stage: number;
   documentPk: number;
   progressReportPk: number;
@@ -92,13 +92,12 @@ export const ProgressReportActionModal = ({
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${
-          action === "approve"
-            ? "Approving"
-            : action === "recall"
+        title: `${action === "approve"
+          ? "Approving"
+          : action === "recall"
             ? "Recalling"
             : "Sending Back"
-        }`,
+          }`,
         position: "top-right",
       });
     },
@@ -106,13 +105,12 @@ export const ProgressReportActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${
-            action === "approve"
-              ? "Approved"
-              : action === "recall"
+          description: `Document ${action === "approve"
+            ? "Approved"
+            : action === "recall"
               ? "Recalled"
               : "Sent Back"
-          }`,
+            }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -135,13 +133,12 @@ export const ProgressReportActionModal = ({
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${
-            action === "approve"
-              ? "Approve"
-              : action === "recall"
+          title: `Could Not ${action === "approve"
+            ? "Approve"
+            : action === "recall"
               ? "Recall"
               : "Send Back"
-          } Progress Report`,
+            } Progress Report`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -164,7 +161,7 @@ export const ProgressReportActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-      // isCentered={true}
+    // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -173,10 +170,12 @@ export const ProgressReportActionModal = ({
       >
         <ModalHeader>
           {action === "approve"
-            ? "Approve"
+            ? stage === 1 ? "Submit" : "Approve"
             : action === "recall"
-            ? "Recall"
-            : "Send Back"}{" "}
+              ? "Recall" :
+              action === "reopen" ?
+                "Reopen"
+                : "Send Back"}{" "}
           Document?
         </ModalHeader>
         <ModalCloseButton />
@@ -212,13 +211,13 @@ export const ProgressReportActionModal = ({
                   <Text fontWeight={"bold"}>Stage 1</Text>
                   <br />
                   <Text>
-                    In your capacity as Project Lead, would you like to {action}{" "}
+                    In your capacity as Project Lead, would you like to {action === "approve" ? "submit" : action}{" "}
                     this progress report?
                   </Text>
                   <br />
                   <Text>
                     {action === "approve"
-                      ? "This will send an email to the Business Area Lead for approval and the document will be locked until the Business Area lead has reviewed the document."
+                      ? "This will send an email to the Business Area Lead for approval."
                       : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been recalled from your approval."}
                   </Text>
 
@@ -233,7 +232,7 @@ export const ProgressReportActionModal = ({
                       ({baLead.first_name} {baLead.last_name} - {baLead.email})
                     </strong>{" "}
                     alerting them that you have{" "}
-                    {action === "approve" ? "approved" : "recalled"} this
+                    {action === "approve" ? "submitted" : "recalled"} this
                     document?
                   </Checkbox>
                 </Box>
@@ -242,16 +241,15 @@ export const ProgressReportActionModal = ({
                   <Text fontWeight={"bold"}>Stage 2</Text>
                   <br />
                   <Text>
-                    In your capacity as Business Area Lead, would you like to{" "}
-                    {action} this progress report?
+                    In your capacity as Business Area Lead, would you like to {action} this document?
                   </Text>
                   <br />
                   <Text>
                     {action === "approve"
-                      ? "This will send an email to members of the Directorate for approval and the document will be locked until the Directorate has reviewed the document."
+                      ? "This will send an email to members of the Directorate for approval."
                       : action === "recall"
-                      ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
-                      : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
+                        ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
+                        : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
                   </Text>
 
                   <Box
@@ -291,16 +289,16 @@ export const ProgressReportActionModal = ({
                   <Text fontWeight={"bold"}>Stage 3</Text>
                   <br />
                   <Text>
-                    In your capacity as Directorate, would you like to {action}{" "}
+                    In your capacity as Directorate, would you like to {action}
                     this progress report?
                   </Text>
                   <br />
                   <Text>
                     {action === "approve"
-                      ? "This will provide final approval for this progress report, adding it to the Annual Report."
+                      ? "This will provide final approval for this progress report, adding it to the projects in the Annual Report."
                       : action === "recall"
-                      ? "This will return the approval status from 'Granted' to 'Required'."
-                      : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been sent back for revision."}
+                        ? "This will return the approval status from 'Granted' to 'Required'."
+                        : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been sent back for revision."}
                   </Text>
 
                   {action === "send_back" && (
@@ -359,10 +357,10 @@ export const ProgressReportActionModal = ({
             }}
           >
             {action === "approve"
-              ? "Approve"
+              ? stage === 1 ? "Submit" : "Approve"
               : action === "recall"
-              ? "Recall"
-              : "Send Back"}
+                ? "Recall"
+                : "Send Back"}
           </Button>
         </ModalFooter>
       </ModalContent>

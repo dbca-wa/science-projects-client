@@ -57,7 +57,7 @@ export const ConceptPlanDocActions = ({
   conceptPlanData,
   refetchData,
 }: // , projectPk
-IConceptDocumentActions) => {
+  IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
 
   const {
@@ -243,9 +243,8 @@ IConceptDocumentActions) => {
         toast.update(toastIdRef.current, {
           title: "Could Not Generate PDF",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -290,9 +289,8 @@ IConceptDocumentActions) => {
         toast.update(toastIdRef.current, {
           title: "Could Not Spawn Project Plan",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -380,7 +378,7 @@ IConceptDocumentActions) => {
               </Box>
               <Grid
                 pt={2}
-                // gridGap={2}
+              // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -399,19 +397,19 @@ IConceptDocumentActions) => {
                           ? "green.500"
                           : "green.600"
                         : conceptPlanData.document.status === "inapproval"
-                        ? colorMode === "light"
-                          ? "blue.500"
-                          : "blue.600"
-                        : conceptPlanData.document.status === "inreview"
-                        ? colorMode === "light"
-                          ? "orange.500"
-                          : "orange.600"
-                        : conceptPlanData.document.status === "revising"
-                        ? "orange.500"
-                        : // New
-                        colorMode === "light"
-                        ? "red.500"
-                        : "red.600"
+                          ? colorMode === "light"
+                            ? "blue.500"
+                            : "blue.600"
+                          : conceptPlanData.document.status === "inreview"
+                            ? colorMode === "light"
+                              ? "orange.500"
+                              : "orange.600"
+                            : conceptPlanData.document.status === "revising"
+                              ? "orange.500"
+                              : // New
+                              colorMode === "light"
+                                ? "red.500"
+                                : "red.600"
                     }
                     color={"white"}
                     size={"md"}
@@ -419,12 +417,12 @@ IConceptDocumentActions) => {
                     {conceptPlanData.document.status === "inapproval"
                       ? "Approval Requested"
                       : conceptPlanData.document.status === "approved"
-                      ? "Approved"
-                      : conceptPlanData.document.status === "inreview"
-                      ? "Review Requested"
-                      : conceptPlanData.document.status === "revising"
-                      ? "Revising"
-                      : "New Document"}
+                        ? "Approved"
+                        : conceptPlanData.document.status === "inreview"
+                          ? "Review Requested"
+                          : conceptPlanData.document.status === "revising"
+                            ? "Revising"
+                            : "New Document"}
                   </Tag>
                 </Flex>
                 <Flex
@@ -656,7 +654,7 @@ IConceptDocumentActions) => {
                             size={"sm"}
                             onClick={onS1RecallModalOpen}
                           >
-                            Recall Approval
+                            Recall Submission
                           </Button>
                         </Center>
                       )}
@@ -700,7 +698,7 @@ IConceptDocumentActions) => {
                             size={"sm"}
                             onClick={onS1ApprovalModalOpen}
                           >
-                            Approve
+                            Submit
                           </Button>
                         </Center>
                       )}
@@ -715,7 +713,7 @@ IConceptDocumentActions) => {
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
+                // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -753,12 +751,12 @@ IConceptDocumentActions) => {
                     mt={
                       conceptPlanData?.document
                         ?.project_lead_approval_granted &&
-                      conceptPlanData?.document
-                        ?.directorate_approval_granted === false
+                        conceptPlanData?.document
+                          ?.directorate_approval_granted === false
                         ? 3
                         : 0
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
+                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {conceptPlanData?.document?.project_lead_approval_granted &&
                       conceptPlanData?.document
@@ -1103,8 +1101,8 @@ IConceptDocumentActions) => {
                 >
                   <Box
                     alignSelf={"center"}
-                    // bg={"red"}
-                    // justifyContent={""}
+                  // bg={"red"}
+                  // justifyContent={""}
                   >
                     <Text fontWeight={"semibold"}>PDF</Text>
                   </Box>
@@ -1204,40 +1202,40 @@ IConceptDocumentActions) => {
           </Grid>
         </>
       ) : // <Spinner/>
-      baLoading === false && baData === undefined ? (
-        <Grid
-          my={4}
-          gridTemplateColumns={"repeat(1, 1fr)"}
-          justifyContent={"center"}
-        >
-          <Text textAlign={"center"} fontWeight={"semibold"}>
-            Document Actions cannot be displayed as this project has no business
-            area.
-          </Text>
-          <Text textAlign={"center"} fontWeight={"semibold"}>
-            Please set a business area for this project from the project
-            settings.
-          </Text>
-        </Grid>
-      ) : actionsReady && !leaderMember ? (
-        <Grid
-          my={4}
-          gridTemplateColumns={"repeat(1, 1fr)"}
-          justifyContent={"center"}
-        >
-          <Text textAlign={"center"} fontWeight={"semibold"}>
-            This project has no members/leader so document actions are not shown
-            here.
-          </Text>
-          <Text textAlign={"center"} fontWeight={"semibold"}>
-            Please add members to adjust document actions.
-          </Text>
-        </Grid>
-      ) : (
-        <Center>
-          <Spinner />
-        </Center>
-      )}
+        baLoading === false && baData === undefined ? (
+          <Grid
+            my={4}
+            gridTemplateColumns={"repeat(1, 1fr)"}
+            justifyContent={"center"}
+          >
+            <Text textAlign={"center"} fontWeight={"semibold"}>
+              Document Actions cannot be displayed as this project has no business
+              area.
+            </Text>
+            <Text textAlign={"center"} fontWeight={"semibold"}>
+              Please set a business area for this project from the project
+              settings.
+            </Text>
+          </Grid>
+        ) : actionsReady && !leaderMember ? (
+          <Grid
+            my={4}
+            gridTemplateColumns={"repeat(1, 1fr)"}
+            justifyContent={"center"}
+          >
+            <Text textAlign={"center"} fontWeight={"semibold"}>
+              This project has no members/leader so document actions are not shown
+              here.
+            </Text>
+            <Text textAlign={"center"} fontWeight={"semibold"}>
+              Please add members to adjust document actions.
+            </Text>
+          </Grid>
+        ) : (
+          <Center>
+            <Spinner />
+          </Center>
+        )}
     </>
   );
 };
