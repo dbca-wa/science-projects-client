@@ -24,10 +24,10 @@ export const useGetRTESectionTitle = (section: string) => {
         setSectionText("Strategic Context");
         break;
       case "staff_time_allocation":
-        setSectionText("Staff Time Allocation");
+        setSectionText("Staff Time Allocation (FTE)");
         break;
       case "budget":
-        setSectionText("Indicative Operating Budget");
+        setSectionText("Indicative Operating Budget ($)");
         break;
       case "knowledge_transfer":
         setSectionText("Knowledge Transfer");

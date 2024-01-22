@@ -311,7 +311,7 @@ export const ProjectDetailsSection = ({
               label="Data Custodian"
               placeholder="Search for a data custodian"
               helperText={
-                "The data custodian (SPP E25) responsible for data management, publishing, and metadata documentation on the data catalogue"
+                "The data custodian is responsible for data management, publishing, and metadata documentation on the data catalogue"
               }
             />
           </Box>

@@ -146,7 +146,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
         <Accordion
           // defaultIndex={defaultIndex}
           defaultIndex={[0]}
-          // allowMultiple
+        // allowMultiple
         >
           {pendingProjectDocumentDataLoading ? (
             // null
@@ -179,9 +179,33 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                   <Box as="span" flex="1" textAlign="left">
                     My Tasks
                   </Box>
+                  {/* <Box
+                    display="flex"
+                    justifyContent={"flex-end"}
+                    alignItems="center"
+                    minWidth="100%"
+                    py={4}
+                  > */}
+                  <Button
+                    bg={colorMode === "dark" ? "green.500" : "green.400"}
+                    _hover={{
+                      bg: colorMode === "dark" ? "green.400" : "green.300",
+                    }}
+                    variant="solid"
+                    px={3} // Adjust the padding to your preference
+                    mr={6}
+                    display="flex"
+                    alignItems="center"
+                    onClick={handleAddTaskClick}
+                    color="white"
+                    size={"sm"}
+                  >
+                    Add Quick Task
+                  </Button>
+                  {/* </Box> */}
                   {combinedData?.length +
                     pendingProjectDocumentData?.all?.length >=
-                  1 ? (
+                    1 ? (
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
@@ -200,9 +224,10 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                 </AccordionButton>
 
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+
                   {combinedData?.length +
                     pendingProjectDocumentData?.all?.length >=
-                  1 ? (
+                    1 ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                       {combinedData.map(
                         (task: ITaskDisplayCard, index: number) => {
@@ -218,43 +243,43 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                       {!(
                         pendingProjectDocumentDataLoading &&
                         pendingProjectDocumentData?.team?.length +
-                          pendingProjectDocumentData?.lead?.length +
-                          pendingProjectDocumentData?.ba?.length +
-                          pendingProjectDocumentData?.directorate?.length >=
-                          1
+                        pendingProjectDocumentData?.lead?.length +
+                        pendingProjectDocumentData?.ba?.length +
+                        pendingProjectDocumentData?.directorate?.length >=
+                        1
                       )
                         ? [
-                            ...pendingProjectDocumentData.team.map(
-                              (document) => ({
-                                document,
-                                inputKind: "team_member",
-                              })
-                            ),
-                            ...pendingProjectDocumentData.lead.map(
-                              (document) => ({
-                                document,
-                                inputKind: "project_lead",
-                              })
-                            ),
-                            ...pendingProjectDocumentData.ba.map(
-                              (document) => ({
-                                document,
-                                inputKind: "business_area_lead",
-                              })
-                            ),
-                            ...pendingProjectDocumentData.directorate.map(
-                              (document) => ({
-                                document,
-                                inputKind: "directorate",
-                              })
-                            ),
-                          ]?.map(({ document, inputKind }, index: number) => (
-                            <TraditionalDocumentTaskDisplay
-                              key={index}
-                              document={document}
-                              inputKind={inputKind}
-                            />
-                          ))
+                          ...pendingProjectDocumentData.team.map(
+                            (document) => ({
+                              document,
+                              inputKind: "team_member",
+                            })
+                          ),
+                          ...pendingProjectDocumentData.lead.map(
+                            (document) => ({
+                              document,
+                              inputKind: "project_lead",
+                            })
+                          ),
+                          ...pendingProjectDocumentData.ba.map(
+                            (document) => ({
+                              document,
+                              inputKind: "business_area_lead",
+                            })
+                          ),
+                          ...pendingProjectDocumentData.directorate.map(
+                            (document) => ({
+                              document,
+                              inputKind: "directorate",
+                            })
+                          ),
+                        ]?.map(({ document, inputKind }, index: number) => (
+                          <TraditionalDocumentTaskDisplay
+                            key={index}
+                            document={document}
+                            inputKind={inputKind}
+                          />
+                        ))
                         : null}
                     </Grid>
                   ) : (
@@ -269,30 +294,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                     </Center>
                   )}
 
-                  <Box
-                    display="flex"
-                    justifyContent={"flex-end"}
-                    alignItems="center"
-                    minWidth="100%"
-                    py={4}
-                  >
-                    <Button
-                      bg={colorMode === "dark" ? "green.500" : "green.400"}
-                      _hover={{
-                        bg: colorMode === "dark" ? "green.400" : "green.300",
-                      }}
-                      variant="solid"
-                      px={3} // Adjust the padding to your preference
-                      mr={0}
-                      display="flex"
-                      alignItems="center"
-                      onClick={handleAddTaskClick}
-                      color="white"
-                      size={"sm"}
-                    >
-                      Add Quick Task
-                    </Button>
-                  </Box>
+
                 </AccordionPanel>
               </AccordionItem>
             </motion.div>
@@ -302,11 +304,11 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
             me?.userData?.is_biometrician ||
             me?.userData?.is_herbarium_curator ||
             me?.userData?.is_superuser) ===
-          false ? null : pendingEndorsementsDataLoading ? (
-            <Center my={4}>
-              <Spinner />
-            </Center>
-          ) : (
+            false ? null : pendingEndorsementsDataLoading ? (
+              <Center my={4}>
+                <Spinner />
+              </Center>
+            ) : (
             <motion.div
               initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
               animate={{ opacity: pendingEndorsementsDataLoading ? 0 : 1 }}
@@ -317,7 +319,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                   colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
                 }
                 borderBottom={"none"}
-                // borderTop={"none"}
+              // borderTop={"none"}
               >
                 <AccordionButton
                   bg={colorMode === "light" ? "gray.200" : "gray.700"}
@@ -335,7 +337,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                   {pendingEndorsementsData?.aec?.length +
                     pendingEndorsementsData?.bm?.length +
                     pendingEndorsementsData?.hc?.length >
-                  1 ? (
+                    1 ? (
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
@@ -358,43 +360,43 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                   {pendingEndorsementsData?.aec?.length +
                     pendingEndorsementsData?.bm?.length +
                     pendingEndorsementsData?.hc?.length >=
-                  1 ? (
+                    1 ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                       {!pendingEndorsementsDataLoading &&
-                      pendingEndorsementsData?.aec?.length >= 1
+                        pendingEndorsementsData?.aec?.length >= 1
                         ? pendingEndorsementsData?.aec?.map(
-                            (document: IMainDoc, index: number) => (
-                              <TraditionalEndorsementTaskDisplay
-                                key={index}
-                                document={document}
-                                endorsementKind={"animalEthics"}
-                              />
-                            )
+                          (document: IMainDoc, index: number) => (
+                            <TraditionalEndorsementTaskDisplay
+                              key={index}
+                              document={document}
+                              endorsementKind={"animalEthics"}
+                            />
                           )
+                        )
                         : null}
                       {!pendingEndorsementsDataLoading &&
-                      pendingEndorsementsData?.hc?.length >= 1
+                        pendingEndorsementsData?.hc?.length >= 1
                         ? pendingEndorsementsData?.hc?.map(
-                            (document: IMainDoc, index: number) => (
-                              <TraditionalEndorsementTaskDisplay
-                                key={index}
-                                document={document}
-                                endorsementKind={"herbarium"}
-                              />
-                            )
+                          (document: IMainDoc, index: number) => (
+                            <TraditionalEndorsementTaskDisplay
+                              key={index}
+                              document={document}
+                              endorsementKind={"herbarium"}
+                            />
                           )
+                        )
                         : null}
                       {!pendingEndorsementsDataLoading &&
-                      pendingEndorsementsData?.bm?.length >= 1
+                        pendingEndorsementsData?.bm?.length >= 1
                         ? pendingEndorsementsData?.bm?.map(
-                            (document: IMainDoc, index: number) => (
-                              <TraditionalEndorsementTaskDisplay
-                                key={index}
-                                document={document}
-                                endorsementKind={"biometrician"}
-                              />
-                            )
+                          (document: IMainDoc, index: number) => (
+                            <TraditionalEndorsementTaskDisplay
+                              key={index}
+                              document={document}
+                              endorsementKind={"biometrician"}
+                            />
                           )
+                        )
                         : null}
                     </Grid>
                   ) : (
@@ -516,10 +518,10 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                               project?.kind === "core_function"
                                 ? "red.600"
                                 : project?.kind === "science"
-                                ? "green.600"
-                                : project?.kind === "student"
-                                ? "blue.600"
-                                : "gray.600"
+                                  ? "green.600"
+                                  : project?.kind === "student"
+                                    ? "blue.600"
+                                    : "gray.600"
                             }
                             mr={3}
                             alignItems={"center"}
@@ -544,10 +546,10 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                               {project?.kind === "core_function"
                                 ? `Core Function`
                                 : project?.kind === "science"
-                                ? `Science`
-                                : project?.kind === "student"
-                                ? `Student`
-                                : `External`}
+                                  ? `Science`
+                                  : project?.kind === "student"
+                                    ? `Student`
+                                    : `External`}
                             </Text>
                           </Box>
                           <Divider
