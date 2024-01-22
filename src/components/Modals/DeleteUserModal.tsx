@@ -180,10 +180,11 @@ export const DeleteUserModal = ({
             <Center mt={4}>
               <UnorderedList>
                 <ListItem>
-                  They will be removed from projects they are on
+                  They will be removed from all projects
                 </ListItem>
+                <ListItem>Any projects they were leading will require a new project lead</ListItem>
+
                 <ListItem>Their comments will be deleted</ListItem>
-                <ListItem>Projects they started will have no leader</ListItem>
               </UnorderedList>
             </Center>
             <FormControl my={2} mb={4} userSelect="none">
