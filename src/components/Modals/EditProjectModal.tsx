@@ -15,12 +15,14 @@ import {
   Grid,
   Button,
   FormLabel,
+  Text,
   VisuallyHiddenInput,
   FormHelperText,
   Box,
   Select,
   InputLeftAddon,
   Icon,
+  Center,
 } from "@chakra-ui/react";
 import { IEditProject, updateProjectDetails } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
@@ -49,6 +51,7 @@ import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateS
 import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
 import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
 import { HiAcademicCap } from "react-icons/hi";
+import { FaArrowLeft } from "react-icons/fa";
 
 interface Props {
   // thisUser: IUserMe;
@@ -88,8 +91,6 @@ export const EditProjectModal = ({
   refetchData,
 }: Props) => {
   const { colorMode } = useColorMode();
-
-
 
   const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } =
     useGetLocations();
@@ -146,21 +147,34 @@ export const EditProjectModal = ({
   // id/pk
   const [projectTitle, setProjectTitle] = useState(currentTitle);
 
-  const [aims, setAims] = useState((details?.external as IExternalProjectDetails)?.aims);
-  const [externalDescription, setExternalDescription] = useState((details?.external as IExternalProjectDetails)?.description);
-  const [budget, setBudget] = useState((details?.external as IExternalProjectDetails)?.budget);
-  const [collaborationWith, setCollaborationWith] = useState((details?.external as IExternalProjectDetails)?.collaboration_with);
-  const [organisation, setOrganisation] = useState((details?.student as IStudentProjectDetails)?.organisation)
-  const [level, setLevel] = useState((details?.student as IStudentProjectDetails)?.level)
+  const [aims, setAims] = useState(
+    (details?.external as IExternalProjectDetails)?.aims
+  );
+  const [externalDescription, setExternalDescription] = useState(
+    (details?.external as IExternalProjectDetails)?.description
+  );
+  const [budget, setBudget] = useState(
+    (details?.external as IExternalProjectDetails)?.budget
+  );
+  const [collaborationWith, setCollaborationWith] = useState(
+    (details?.external as IExternalProjectDetails)?.collaboration_with
+  );
+  const [organisation, setOrganisation] = useState(
+    (details?.student as IStudentProjectDetails)?.organisation
+  );
+  const [level, setLevel] = useState(
+    (details?.student as IStudentProjectDetails)?.level
+  );
   const [hoveredTitle, setHoveredTitle] = useState(false);
-  const titleBorderColor = `${colorMode === "light"
-    ? hoveredTitle
-      ? "blackAlpha.300"
-      : "blackAlpha.200"
-    : hoveredTitle
+  const titleBorderColor = `${
+    colorMode === "light"
+      ? hoveredTitle
+        ? "blackAlpha.300"
+        : "blackAlpha.200"
+      : hoveredTitle
       ? "whiteAlpha.400"
       : "whiteAlpha.300"
-    }`;
+  }`;
 
   const [keywords, setKeywords] = useState(currentKeywords);
   const [startDate, setStartDate] = useState(currentDates[0]);
@@ -212,13 +226,19 @@ export const EditProjectModal = ({
       if ((details?.external as IExternalProjectDetails)?.description) {
         // HANDLE EXTERNAL FIELDS
         const parser = new DOMParser();
-        const descriptionDoc = parser.parseFromString(externalDescription, "text/html");
+        const descriptionDoc = parser.parseFromString(
+          externalDescription,
+          "text/html"
+        );
         const descriptionContent = descriptionDoc.body.textContent;
         const aimsDoc = parser.parseFromString(aims, "text/html");
         const aimsContent = aimsDoc.body.textContent;
-        const collaborationDoc = parser.parseFromString(collaborationWith, "text/html");
+        const collaborationDoc = parser.parseFromString(
+          collaborationWith,
+          "text/html"
+        );
         const collaborationContent = collaborationDoc.body.textContent;
-        console.log({ budget, collaborationContent, aims, descriptionContent })
+        console.log({ budget, collaborationContent, aims, descriptionContent });
 
         if (
           descriptionContent.length > 0 &&
@@ -230,15 +250,19 @@ export const EditProjectModal = ({
         } else {
           setCanUpdate(false);
         }
-      }
-      else if (
-        (details?.student as IStudentProjectDetails)?.level
-      ) {
+      } else if ((details?.student as IStudentProjectDetails)?.level) {
         // HANDLE STUDENT FIELDS
         const parser = new DOMParser();
-        const organisationDoc = parser.parseFromString(organisation, "text/html");
+        const organisationDoc = parser.parseFromString(
+          organisation,
+          "text/html"
+        );
         const organisationContent = organisationDoc.body.textContent;
-        console.log({ level, organisation, "length": organisationContent.length })
+        console.log({
+          level,
+          organisation,
+          length: organisationContent.length,
+        });
 
         if (level && organisationContent.length > 0) {
           setCanUpdate(true);
@@ -250,7 +274,13 @@ export const EditProjectModal = ({
       }
     }
   }, [
-    aims, budget, collaborationWith, organisation, level, externalDescription, details,
+    aims,
+    budget,
+    collaborationWith,
+    organisation,
+    level,
+    externalDescription,
+    details,
     projectTitle,
     keywords,
     startDate,
@@ -324,7 +354,20 @@ export const EditProjectModal = ({
         <ModalOverlay />
         <Flex>
           <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-            <ModalHeader>Edit Project?</ModalHeader>
+            <ModalHeader>
+              <Flex
+                alignItems={"center"}
+                w={"100%"}
+                justifyContent={"flex-start"}
+              >
+                <Center cursor={"pointer"} pr={4} onClick={onClose}>
+                  <Box mr={3}>
+                    <FaArrowLeft />
+                  </Box>
+                  <Text>Go Back</Text>
+                </Center>
+              </Flex>
+            </ModalHeader>
             <ModalCloseButton />
 
             <ModalBody>
@@ -348,12 +391,18 @@ export const EditProjectModal = ({
                     setValueAsPlainText={false}
                   />
                   {(details?.external as IExternalProjectDetails).aims ? (
-                    <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={2} mt={2} pb={2}>
+                    <Grid
+                      gridTemplateColumns={"repeat(1, 1fr)"}
+                      gridGap={2}
+                      mt={2}
+                      pb={2}
+                    >
                       <UnboundStatefulEditor
                         title="Description"
                         isRequired={true}
-
-                        helperText={"Description specific to this external project."}
+                        helperText={
+                          "Description specific to this external project."
+                        }
                         showToolbar={true}
                         showTitle={true}
                         value={externalDescription}
@@ -363,21 +412,25 @@ export const EditProjectModal = ({
                       <UnboundStatefulEditor
                         title="Collaboration With"
                         isRequired={true}
-
                         placeholder="Enter collaborating entities..."
-                        helperText={"The entity/s this project is in collaboration with, separated by commas"}
+                        helperText={
+                          "The entity/s this project is in collaboration with, separated by commas"
+                        }
                         showToolbar={false}
                         showTitle={true}
                         value={collaborationWith}
                         setValueFunction={setCollaborationWith}
                         setValueAsPlainText={true}
                       />
-
-
                     </Grid>
-
-                  ) : (details?.student as IStudentProjectDetails)?.organisation ?
-                    <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={2} mt={2} pb={2}>
+                  ) : (details?.student as IStudentProjectDetails)
+                      ?.organisation ? (
+                    <Grid
+                      gridTemplateColumns={"repeat(1, 1fr)"}
+                      gridGap={2}
+                      mt={2}
+                      pb={2}
+                    >
                       <UnboundStatefulEditor
                         title="Organisation"
                         placeholder="Enter the academic organisation..."
@@ -389,10 +442,8 @@ export const EditProjectModal = ({
                         setValueFunction={setOrganisation}
                         setValueAsPlainText={true}
                       />
-
-
                     </Grid>
-                    : null}
+                  ) : null}
 
                   <Box w={"100%"} h={"100%"} mt={2} mx={2}>
                     <StartAndEndDateSelector
@@ -422,11 +473,15 @@ export const EditProjectModal = ({
                   />
 
                   {(details?.external as IExternalProjectDetails).aims ? (
-                    <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={2} mt={2} pb={2}>
+                    <Grid
+                      gridTemplateColumns={"repeat(1, 1fr)"}
+                      gridGap={2}
+                      mt={2}
+                      pb={2}
+                    >
                       <UnboundStatefulEditor
                         title="Aims"
                         value={aims}
-
                         allowInsertButton
                         helperText={"List out the aims of your project."}
                         showToolbar={true}
@@ -438,9 +493,10 @@ export const EditProjectModal = ({
                       <UnboundStatefulEditor
                         title="Budget"
                         isRequired={true}
-
                         placeholder="The estimated operating budget in dollars..."
-                        helperText={"The estimated budget for the project in dollars"}
+                        helperText={
+                          "The estimated budget for the project in dollars"
+                        }
                         showToolbar={false}
                         showTitle={true}
                         value={budget}
@@ -448,9 +504,13 @@ export const EditProjectModal = ({
                         setValueAsPlainText={true}
                       />
                     </Grid>
-
-                  ) : (details?.student as IStudentProjectDetails)?.level ?
-                    <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={2} mt={6} pb={6}>
+                  ) : (details?.student as IStudentProjectDetails)?.level ? (
+                    <Grid
+                      gridTemplateColumns={"repeat(1, 1fr)"}
+                      gridGap={2}
+                      mt={6}
+                      pb={6}
+                    >
                       <FormControl isRequired userSelect={"none"}>
                         <FormLabel
                           onMouseEnter={() => setHoveredTitle(true)}
@@ -461,14 +521,18 @@ export const EditProjectModal = ({
                         <InputGroup>
                           <InputLeftAddon
                             left={0}
-                            bg={colorMode === "light" ? "gray.100" : "whiteAlpha.300"}
+                            bg={
+                              colorMode === "light"
+                                ? "gray.100"
+                                : "whiteAlpha.300"
+                            }
                             px={4}
                             zIndex={1}
                             borderColor={titleBorderColor}
                             borderTopRightRadius={"none"}
                             borderBottomRightRadius={"none"}
                             borderRight={"none"}
-                          // boxSize={10}
+                            // boxSize={10}
                           >
                             <Icon as={HiAcademicCap} boxSize={5} />
                           </InputLeftAddon>
@@ -503,10 +567,8 @@ export const EditProjectModal = ({
                           The level of the student and the project
                         </FormHelperText>
                       </FormControl>
-
                     </Grid>
-                    : null}
-
+                  ) : null}
 
                   <Box py={2}>
                     <UserSearchDropdown
@@ -707,7 +769,6 @@ export const EditProjectModal = ({
                           setSelectedAreas={setLocationData}
                         />
                       )}
-                      {/* <Flex flexDir={"column"}> */}
 
                       {imcra && imcra.length > 0 && (
                         <AreaCheckAndMaps

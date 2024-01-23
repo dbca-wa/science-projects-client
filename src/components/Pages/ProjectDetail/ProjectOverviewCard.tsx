@@ -84,10 +84,9 @@ export const ProjectOverviewCard = ({
   documents,
   setToLastTab,
 }: IProjectOverviewCardProps) => {
-
   useEffect(() => {
-    console.log(details)
-  }, [details])
+    console.log(details);
+  }, [details]);
   const {
     isOpen: isEditProjectDetailModalOpen,
     onClose: onEditProjectDetailModalClose,
@@ -240,15 +239,14 @@ export const ProjectOverviewCard = ({
 
   // const editorKey = selectedYear.toString() + colorMode;
 
-
   const kindDictionary: {
     [key: string]: { label: string; color: string };
   }[] = [
-      { external: { label: "External", color: "gray.500" } },
-      { science: { label: "Science", color: "green.500" } },
-      { student: { label: "Student", color: "blue.500" } },
-      { core_function: { label: "Core Function", color: "red.500" } },
-    ];
+    { external: { label: "External", color: "gray.500" } },
+    { science: { label: "Science", color: "green.500" } },
+    { student: { label: "Student", color: "blue.500" } },
+    { core_function: { label: "Core Function", color: "red.500" } },
+  ];
 
   const getKindValue = (kind: string): { label: string; color: string } => {
     const matchedStatus = kindDictionary.find((item) => kind in item);
@@ -260,17 +258,17 @@ export const ProjectOverviewCard = ({
   const statusDictionary: {
     [key: string]: { label: string; color: string };
   }[] = [
-      { new: { label: "New", color: "gray.500" } },
-      { pending: { label: "Pending Project Plan", color: "yellow.500" } },
-      { active: { label: "Active (Approved)", color: "green.500" } },
-      { updating: { label: "Update Requested", color: "red.500" } },
-      { closure_requested: { label: "Closure Requested", color: "red.500" } },
-      { closing: { label: "Closure Pending Final Update", color: "red.500" } },
-      { final_update: { label: "Final Update Requested", color: "red.500" } },
-      { completed: { label: "Completed and Closed", color: "blue.500" } },
-      { terminated: { label: "Terminated and Closed", color: "gray.800" } },
-      { suspended: { label: "Suspended", color: "gray.500" } },
-    ];
+    { new: { label: "New", color: "gray.500" } },
+    { pending: { label: "Pending Project Plan", color: "yellow.500" } },
+    { active: { label: "Active (Approved)", color: "green.500" } },
+    { updating: { label: "Update Requested", color: "red.500" } },
+    { closure_requested: { label: "Closure Requested", color: "red.500" } },
+    { closing: { label: "Closure Pending Final Update", color: "red.500" } },
+    { final_update: { label: "Final Update Requested", color: "red.500" } },
+    { completed: { label: "Completed and Closed", color: "blue.500" } },
+    { terminated: { label: "Terminated and Closed", color: "gray.800" } },
+    { suspended: { label: "Suspended", color: "gray.500" } },
+  ];
 
   const getStatusValue = (status: string): { label: string; color: string } => {
     const matchedStatus = statusDictionary.find((item) => status in item);
@@ -310,7 +308,9 @@ export const ProjectOverviewCard = ({
   useEffect(() => {
     if (baseInformation) {
       const { label, color } = getStatusValue(baseInformation?.status);
-      const { label: kindLabel, color: kindColor } = getKindValue(baseInformation?.kind);
+      const { label: kindLabel, color: kindColor } = getKindValue(
+        baseInformation?.kind
+      );
       setStatusValue(label);
       setStatusColor(color);
       setKindValue(kindLabel);
@@ -320,20 +320,19 @@ export const ProjectOverviewCard = ({
 
   // useEffect(() => console.log(documents), [documents])
 
-
   const levelToString = (level: string) => {
     const levelDic = {
-      "pd": "Post-Doc",
-      "phd": "PhD",
-      "msc": "MSc",
-      "honours": "BSc Honours",
-      "fourth_year": "Fourth Year",
-      "third_year": "Third Year",
-      "undergrad": "Undergradate",
-    }
+      pd: "Post-Doc",
+      phd: "PhD",
+      msc: "MSc",
+      honours: "BSc Honours",
+      fourth_year: "Fourth Year",
+      third_year: "Third Year",
+      undergrad: "Undergradate",
+    };
 
-    return levelDic[level]
-  }
+    return levelDic[level];
+  };
 
   return (
     <>
@@ -341,77 +340,77 @@ export const ProjectOverviewCard = ({
         userIsLeader ||
         userIsBaLead ||
         me?.userData?.business_area?.name === "Directorate") && (
-          <>
-            <EditProjectModal
-              projectPk={
-                baseInformation?.pk ? baseInformation.pk : baseInformation.id
-              }
-              details={details}
-              currentImage={baseInformation?.image}
-              currentBa={baseInformation?.business_area}
-              currentResearchFunction={details?.base?.research_function}
-              currentService={details?.base?.service}
-              currentDates={[
-                baseInformation?.start_date,
-                baseInformation?.end_date,
-              ]}
-              currentKeywords={[baseInformation?.keywords]}
-              currentTitle={baseInformation?.title}
-              currentAreas={location?.areas ? location.areas : []}
-              currentDataCustodian={details?.base?.data_custodian?.id}
-              isOpen={isEditModalOpen}
-              onClose={onCloseEditModal}
-              refetchData={refetchData}
-            />
-            <ProjectClosureModal
-              projectPk={
-                baseInformation?.pk ? baseInformation.pk : baseInformation.id
-              }
-              isOpen={isClosureModalOpen}
-              onClose={onCloseClosureModal}
-              refetchData={refetchData}
-              setToLastTab={setToLastTab}
-            />
-            <ProjectReopenModal
-              projectPk={
-                baseInformation?.pk ? baseInformation.pk : baseInformation.id
-              }
-              isOpen={isReopenModalOpen}
-              onClose={onCloseReopenModal}
-              refetchData={refetchData}
-            />
-            {baseInformation?.kind !== "external" &&
-              baseInformation?.kind !== "student" && (
-                <CreateProgressReportModal
-                  projectPk={
-                    baseInformation?.pk ? baseInformation.pk : baseInformation.id
-                  }
-                  documentKind={"progressreport"}
-                  refetchData={refetchData}
-                  isOpen={isCreateProgressReportModalOpen}
-                  onClose={onCloseCreateProgressReportModal}
-                />
-              )}
-            {baseInformation?.kind === "student" && (
-              <CreateStudentReportModal
+        <>
+          <EditProjectModal
+            projectPk={
+              baseInformation?.pk ? baseInformation.pk : baseInformation.id
+            }
+            details={details}
+            currentImage={baseInformation?.image}
+            currentBa={baseInformation?.business_area}
+            currentResearchFunction={details?.base?.research_function}
+            currentService={details?.base?.service}
+            currentDates={[
+              baseInformation?.start_date,
+              baseInformation?.end_date,
+            ]}
+            currentKeywords={[baseInformation?.keywords]}
+            currentTitle={baseInformation?.title}
+            currentAreas={location?.areas ? location.areas : []}
+            currentDataCustodian={details?.base?.data_custodian?.id}
+            isOpen={isEditModalOpen}
+            onClose={onCloseEditModal}
+            refetchData={refetchData}
+          />
+          <ProjectClosureModal
+            projectPk={
+              baseInformation?.pk ? baseInformation.pk : baseInformation.id
+            }
+            isOpen={isClosureModalOpen}
+            onClose={onCloseClosureModal}
+            refetchData={refetchData}
+            setToLastTab={setToLastTab}
+          />
+          <ProjectReopenModal
+            projectPk={
+              baseInformation?.pk ? baseInformation.pk : baseInformation.id
+            }
+            isOpen={isReopenModalOpen}
+            onClose={onCloseReopenModal}
+            refetchData={refetchData}
+          />
+          {baseInformation?.kind !== "external" &&
+            baseInformation?.kind !== "student" && (
+              <CreateProgressReportModal
                 projectPk={
                   baseInformation?.pk ? baseInformation.pk : baseInformation.id
                 }
-                documentKind={"studentreport"}
+                documentKind={"progressreport"}
                 refetchData={refetchData}
-                isOpen={isCreateStudentReportModalOpen}
-                onClose={onCloseCreateStudentReportModal}
+                isOpen={isCreateProgressReportModalOpen}
+                onClose={onCloseCreateProgressReportModal}
               />
             )}
-            <DeleteProjectModal
+          {baseInformation?.kind === "student" && (
+            <CreateStudentReportModal
               projectPk={
                 baseInformation?.pk ? baseInformation.pk : baseInformation.id
               }
-              isOpen={isDeleteModalOpen}
-              onClose={onCloseDeleteModal}
+              documentKind={"studentreport"}
+              refetchData={refetchData}
+              isOpen={isCreateStudentReportModalOpen}
+              onClose={onCloseCreateStudentReportModal}
             />
-          </>
-        )}
+          )}
+          <DeleteProjectModal
+            projectPk={
+              baseInformation?.pk ? baseInformation.pk : baseInformation.id
+            }
+            isOpen={isDeleteModalOpen}
+            onClose={onCloseDeleteModal}
+          />
+        </>
+      )}
 
       <Box
         minH={"100px"}
@@ -424,18 +423,18 @@ export const ProjectOverviewCard = ({
           userIsLeader ||
           userIsBaLead ||
           me?.userData?.business_area?.name === "Directorate") && (
-            <Flex
-              // justifyContent={"flex-end"}
-              mt={6}
-              width={"100%"}
-              // right={10}
-              pr={14}
-              pl={6}
-              zIndex={1}
-              pos={"absolute"}
-              flexDir={"column"}
-            >
-              {/* <Flex
+          <Flex
+            // justifyContent={"flex-end"}
+            mt={6}
+            width={"100%"}
+            // right={10}
+            pr={14}
+            pl={6}
+            zIndex={1}
+            pos={"absolute"}
+            flexDir={"column"}
+          >
+            {/* <Flex
                             // bg={"pink"}
                             justifyContent={"flex-end"}
                             right={0}
@@ -460,8 +459,8 @@ export const ProjectOverviewCard = ({
                                 Delete
                             </Button>
                         </Flex> */}
-            </Flex>
-          )}
+          </Flex>
+        )}
         <Grid
           p={4}
           pt={6}
@@ -497,20 +496,20 @@ export const ProjectOverviewCard = ({
                   baseInformation?.kind === "core_function"
                     ? "red.600"
                     : baseInformation?.kind === "science"
-                      ? "green.500"
-                      : baseInformation?.kind === "student"
-                        ? "blue.400"
-                        : "gray.400"
+                    ? "green.500"
+                    : baseInformation?.kind === "student"
+                    ? "blue.400"
+                    : "gray.400"
                 }
               >
                 {
                   baseInformation?.kind === "core_function"
                     ? "CF"
                     : baseInformation?.kind === "external"
-                      ? "EXT"
-                      : baseInformation?.kind === "science"
-                        ? "SP"
-                        : "STP" //Student
+                    ? "EXT"
+                    : baseInformation?.kind === "science"
+                    ? "SP"
+                    : "STP" //Student
                 }
                 -{baseInformation?.year}-{baseInformation?.number}
               </Tag>
@@ -541,9 +540,10 @@ export const ProjectOverviewCard = ({
                 textAlign={"left"}
                 onClick={() =>
                   navigate(
-                    `/projects/${baseInformation.pk !== undefined
-                      ? baseInformation.pk
-                      : baseInformation.id
+                    `/projects/${
+                      baseInformation.pk !== undefined
+                        ? baseInformation.pk
+                        : baseInformation.id
                     }`
                   )
                 }
@@ -603,7 +603,6 @@ export const ProjectOverviewCard = ({
                 </Tag>
                 <Tag
                   ml={3}
-
                   size={"sm"}
                   textAlign={"center"}
                   justifyContent={"center"}
@@ -613,14 +612,11 @@ export const ProjectOverviewCard = ({
                 >
                   {statusValue}
                 </Tag>
-
               </Flex>
-
             </Flex>
 
-
-            {baseInformation?.kind === "student" ?
-              (<Grid
+            {baseInformation?.kind === "student" ? (
+              <Grid
                 w={"100%"}
                 gridTemplateColumns={"repeat(1, 1fr)"}
                 gridGap={4}
@@ -631,21 +627,32 @@ export const ProjectOverviewCard = ({
                     <CgOrganisation />
                   </Box>
                   <Text ml={3}>
-                    {(details?.student as IStudentProjectDetails)?.organisation ?
-                      `${(details?.student as IStudentProjectDetails)?.organisation[0]?.toUpperCase()}${(details?.student as IStudentProjectDetails)?.organisation.slice(1)}` : null}</Text>
+                    {(details?.student as IStudentProjectDetails)?.organisation
+                      ? `${(
+                          details?.student as IStudentProjectDetails
+                        )?.organisation[0]?.toUpperCase()}${(
+                          details?.student as IStudentProjectDetails
+                        )?.organisation.slice(1)}`
+                      : null}
+                  </Text>
                 </Flex>
                 <Flex alignItems="center">
                   <Box fontSize="22px">
                     <FaGraduationCap />
                   </Box>
-                  <Text ml={3}>{(details?.student as IStudentProjectDetails)?.level ? levelToString((details?.student as IStudentProjectDetails)?.level) : null}</Text>
+                  <Text ml={3}>
+                    {(details?.student as IStudentProjectDetails)?.level
+                      ? levelToString(
+                          (details?.student as IStudentProjectDetails)?.level
+                        )
+                      : null}
+                  </Text>
                 </Flex>
               </Grid>
-              )
-              : null}
+            ) : null}
 
-            {baseInformation?.kind === "external" ?
-              (<Grid
+            {baseInformation?.kind === "external" ? (
+              <Grid
                 w={"100%"}
                 gridTemplateColumns={"repeat(1, 1fr)"}
                 gridGap={4}
@@ -656,7 +663,13 @@ export const ProjectOverviewCard = ({
                     <VscOrganization />
                   </Box>
                   <Text ml={3}>
-                    {(details?.external as IExternalProjectDetails)?.collaboration_with ? `${(details?.external as IExternalProjectDetails)?.collaboration_with}` : null}
+                    {(details?.external as IExternalProjectDetails)
+                      ?.collaboration_with
+                      ? `${
+                          (details?.external as IExternalProjectDetails)
+                            ?.collaboration_with
+                        }`
+                      : null}
                   </Text>
                 </Flex>
 
@@ -665,14 +678,15 @@ export const ProjectOverviewCard = ({
                     <FaSackDollar />
                   </Box>
                   <Text ml={3}>
-                    {(details?.external as IExternalProjectDetails)?.budget ? `${(details?.external as IExternalProjectDetails)?.budget}` : null}
+                    {(details?.external as IExternalProjectDetails)?.budget
+                      ? `${
+                          (details?.external as IExternalProjectDetails)?.budget
+                        }`
+                      : null}
                   </Text>
                 </Flex>
-
-
               </Grid>
-              )
-              : null}
+            ) : null}
 
             <Box pt={2} pb={5} display="flex" alignItems="center">
               <Box fontSize="22px">
@@ -718,20 +732,20 @@ export const ProjectOverviewCard = ({
                 templateColumns={
                   layout === "traditional"
                     ? {
-                      base: "repeat(1, 1fr)",
-                      sm: "repeat(2, 1fr)",
-                      md: "repeat(3, 1fr)",
-                      lg: "repeat(2, 1fr)",
-                      "1200px": "repeat(3, 1fr)",
-                      xl: "repeat(4, 1fr)",
-                    }
+                        base: "repeat(1, 1fr)",
+                        sm: "repeat(2, 1fr)",
+                        md: "repeat(3, 1fr)",
+                        lg: "repeat(2, 1fr)",
+                        "1200px": "repeat(3, 1fr)",
+                        xl: "repeat(4, 1fr)",
+                      }
                     : {
-                      base: "repeat(1, 1fr)",
-                      sm: "repeat(2, 1fr)",
-                      md: "repeat(3, 1fr)",
-                      lg: "repeat(4, 1fr)",
-                      xl: "repeat(6, 1fr)",
-                    }
+                        base: "repeat(1, 1fr)",
+                        sm: "repeat(2, 1fr)",
+                        md: "repeat(3, 1fr)",
+                        lg: "repeat(4, 1fr)",
+                        xl: "repeat(6, 1fr)",
+                      }
                 }
                 // gridTemplateRows={"28px"}
                 gap={4}
@@ -762,12 +776,12 @@ export const ProjectOverviewCard = ({
           right={0}
           zIndex={-1}
           px={6}
-        //   gridTemplateColumns={"repeat(2, 1fr)"}
+          //   gridTemplateColumns={"repeat(2, 1fr)"}
         >
           {me?.userData?.is_superuser ||
-            userIsLeader ||
-            userIsBaLead ||
-            me?.userData?.business_area?.name === "Directorate" ? (
+          userIsLeader ||
+          userIsBaLead ||
+          me?.userData?.business_area?.name === "Directorate" ? (
             <Flex
             //   justifyContent={"space-between"}
             // flex={1}
@@ -809,7 +823,7 @@ export const ProjectOverviewCard = ({
                   <MenuItem onClick={onOpenEditModal}>
                     <Flex
                       alignItems={"center"}
-                    // color={"red"}
+                      // color={"red"}
                     >
                       <Box mr={2}>
                         <FaEdit />
@@ -823,7 +837,7 @@ export const ProjectOverviewCard = ({
                     <MenuItem onClick={onOpenCreateStudentReportModal}>
                       <Flex
                         alignItems={"center"}
-                      // color={"red"}
+                        // color={"red"}
                       >
                         <Box mr={2}>
                           <FaLockOpen />
@@ -848,7 +862,7 @@ export const ProjectOverviewCard = ({
                       >
                         <Flex
                           alignItems={"center"}
-                        // color={"red"}
+                          // color={"red"}
                         >
                           <Box mr={2}>
                             <IoCreate />
@@ -868,7 +882,7 @@ export const ProjectOverviewCard = ({
                   >
                     <Flex
                       alignItems={"center"}
-                    // color={"red"}
+                      // color={"red"}
                     >
                       <Box mr={2}>
                         {documents?.project_closure?.document ? (
@@ -887,19 +901,21 @@ export const ProjectOverviewCard = ({
                       </Box>
                     </Flex>
                   </MenuItem>
-                  <MenuItem onClick={onOpenDeleteModal}>
-                    <Flex
-                      alignItems={"center"}
-                    // color={"red"}
-                    >
-                      <Box mr={2}>
-                        <FaTrash />
-                      </Box>
-                      <Box>
-                        <Text>Delete</Text>
-                      </Box>
-                    </Flex>
-                  </MenuItem>
+                  {me?.userData?.is_superuser ? (
+                    <MenuItem onClick={onOpenDeleteModal}>
+                      <Flex
+                        alignItems={"center"}
+                        // color={"red"}
+                      >
+                        <Box mr={2}>
+                          <FaTrash />
+                        </Box>
+                        <Box>
+                          <Text>Delete</Text>
+                        </Box>
+                      </Flex>
+                    </MenuItem>
+                  ) : null}
                 </MenuList>
               </Menu>
             </Flex>
@@ -963,9 +979,13 @@ export const ProjectOverviewCard = ({
                   limitCanBePassed={false}
                   canEdit={userInTeam || me?.userData?.is_superuser}
                   editorType="ProjectDetail"
-                  data={(details?.external as IExternalProjectDetails)?.description}
+                  data={
+                    (details?.external as IExternalProjectDetails)?.description
+                  }
                   project_pk={baseInformation.id}
-                  details_pk={(details?.external as IExternalProjectDetails)?.id}
+                  details_pk={
+                    (details?.external as IExternalProjectDetails)?.id
+                  }
                   section={"externalDescription"}
                   isUpdate={true}
                   titleTextSize={"20px"}
@@ -977,7 +997,9 @@ export const ProjectOverviewCard = ({
                   canEdit={userInTeam || me?.userData?.is_superuser}
                   editorType="ProjectDetail"
                   data={(details?.external as IExternalProjectDetails)?.aims}
-                  details_pk={(details?.external as IExternalProjectDetails)?.id}
+                  details_pk={
+                    (details?.external as IExternalProjectDetails)?.id
+                  }
                   project_pk={baseInformation.id}
                   section={"externalAims"}
                   isUpdate={true}
@@ -985,19 +1007,20 @@ export const ProjectOverviewCard = ({
                   key={`externalAims${colorMode}`} // Change the key to force a re-render
                 />
               </>
-            ) : (<RichTextEditor
-              // wordLimit={500}
-              limitCanBePassed={false}
-              canEdit={userInTeam || me?.userData?.is_superuser}
-              editorType="ProjectDetail"
-              data={baseInformation.description}
-              project_pk={baseInformation.id}
-              section={"description"}
-              isUpdate={true}
-              titleTextSize={"20px"}
-              key={`description${colorMode}`} // Change the key to force a re-render
-            />)}
-
+            ) : (
+              <RichTextEditor
+                // wordLimit={500}
+                limitCanBePassed={false}
+                canEdit={userInTeam || me?.userData?.is_superuser}
+                editorType="ProjectDetail"
+                data={baseInformation.description}
+                project_pk={baseInformation.id}
+                section={"description"}
+                isUpdate={true}
+                titleTextSize={"20px"}
+                key={`description${colorMode}`} // Change the key to force a re-render
+              />
+            )}
           </Box>
 
           <Flex pt={6} justifyContent={"right"}>
@@ -1006,10 +1029,10 @@ export const ProjectOverviewCard = ({
                 baseInformation.kind === "student"
                   ? "Student Project"
                   : baseInformation.kind === "external"
-                    ? "External Project"
-                    : baseInformation.kind === "science"
-                      ? "Science Project"
-                      : "Core Function"
+                  ? "External Project"
+                  : baseInformation.kind === "science"
+                  ? "Science Project"
+                  : "Core Function"
               }
               isOpen={isEditProjectDetailModalOpen}
               onClose={onEditProjectDetailModalClose}
@@ -1017,10 +1040,10 @@ export const ProjectOverviewCard = ({
                 baseInformation.kind === "student"
                   ? RiBook3Fill
                   : baseInformation.kind === "external"
-                    ? FaUserFriends
-                    : baseInformation.kind === "science"
-                      ? MdScience
-                      : GiMaterialsScience
+                  ? FaUserFriends
+                  : baseInformation.kind === "science"
+                  ? MdScience
+                  : GiMaterialsScience
               }
               baseInformation={baseInformation}
               details={details}

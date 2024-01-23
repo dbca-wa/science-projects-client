@@ -173,7 +173,7 @@ export const ReportItemDisplay = ({
 
   const { userData } = useUser();
 
-  const [deleteText, setDeleteText] = useState("")
+  const [deleteText, setDeleteText] = useState("");
 
   return !creatorLoading && creatorData ? (
     <>
@@ -215,7 +215,7 @@ export const ReportItemDisplay = ({
         width="100%"
         p={3}
         borderWidth={1}
-      // bg={"red"}
+        // bg={"red"}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
           <TextButtonFlex name={`${year}` ?? ""} onClick={onUpdateModalOpen} />
@@ -302,9 +302,10 @@ export const ReportItemDisplay = ({
                 </UnorderedList>
               </Center>
               <FormControl>
-
                 <Input onChange={(e) => setDeleteText(e.target.value)} />
-                <FormHelperText>Type "delete" in the box to continue</FormHelperText>
+                <FormHelperText>
+                  Type "delete" in the box to continue
+                </FormHelperText>
               </FormControl>
             </Box>
           </ModalBody>
@@ -334,7 +335,7 @@ export const ReportItemDisplay = ({
         <Modal
           isOpen={isUpdateMediaModalOpen}
           onClose={onUpdateMediaModalClose}
-          size={"full"}
+          size={"6xl"}
         >
           <ModalOverlay />
 
@@ -343,18 +344,19 @@ export const ReportItemDisplay = ({
               bg={colorMode === "light" ? "gray.100" : "gray.800"}
               p={4}
               pb={16}
-              w={"100%"}
-              h={"100%"}
+              // w={"100%"}
+              // h={"100%"}
               pos={"relative"}
             >
               <ModalHeader>Update {reportData?.year} Report Media</ModalHeader>
               <ModalCloseButton />
 
               <Grid
-                h={"100%"}
+                // h={"100%"}
                 gridTemplateColumns={{
-                  base: "repeat(3, 1fr)",
-                  xl: "repeat(4, 1fr)",
+                  base: "repeat(1, 1fr)",
+                  lg: "repeat(2, 1fr)",
+                  xl: "repeat(3, 1fr)",
                 }}
                 mt={4}
                 gap={8}
@@ -431,9 +433,8 @@ export const ReportItemDisplay = ({
       <Modal
         isOpen={isUpdateModalOpen}
         onClose={onUpdateModalClose}
-        // size={"full"}
+        size={"6xl"}
         // scrollBehavior="inside"
-        size={"full"}
       >
         <ModalOverlay />
         <ModalBody>
@@ -534,7 +535,7 @@ export const ReportItemDisplay = ({
                         <Box key={key}>
                           {(
                             (updateMutation.error as AxiosError).response.data[
-                            key
+                              key
                             ] as string[]
                           ).map((errorMessage, index) => (
                             <Text key={`${key}-${index}`} color="red.500">

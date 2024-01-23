@@ -12,6 +12,7 @@ import {
   useColorMode,
   Grid,
   Button,
+  Box,
 } from "@chakra-ui/react";
 import { ISetProjectAreas, setProjectAreas } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
@@ -122,7 +123,7 @@ export const SetAreasModal = ({
   ]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
+    <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
       <ModalOverlay />
       <Flex
         as={"form"}
@@ -140,11 +141,11 @@ export const SetAreasModal = ({
                   gridColumnGap={4}
                   px={4}
                 >
-                  <Center
+                  <Box
                     display={"flex"}
-                    justifyContent={"center"}
-                    alignContent={"center"}
-                    alignItems={"center"}
+                    // justifyContent={"center"}
+                    // alignContent={"center"}
+                    // alignItems={"center"}
                     w={"100%"}
                   >
                     {" "}
@@ -157,12 +158,12 @@ export const SetAreasModal = ({
                         setSelectedAreas={setSelectedDistricts}
                       />
                     )}
-                  </Center>
-                  <Center
+                  </Box>
+                  <Box
                     display={"flex"}
-                    justifyContent={"center"}
-                    alignContent={"center"}
-                    alignItems={"center"}
+                    // justifyContent={"center"}
+                    // alignContent={"center"}
+                    // alignItems={"center"}
                     w={"100%"}
                   >
                     {" "}
@@ -175,13 +176,14 @@ export const SetAreasModal = ({
                         setSelectedAreas={setSelectedImcras}
                       />
                     )}
-                  </Center>
-                  <Center
+                  </Box>
+                  <Box
                     display={"flex"}
-                    justifyContent={"center"}
-                    alignContent={"center"}
-                    alignItems={"center"}
+                    // justifyContent={"center"}
+                    // alignContent={"center"}
+                    // alignItems={"center"}
                     w={"100%"}
+                    mt={2}
                   >
                     {" "}
                     {dbcaRegions && (
@@ -193,13 +195,15 @@ export const SetAreasModal = ({
                         setSelectedAreas={setSelectedRegions}
                       />
                     )}
-                  </Center>
-                  <Center
+                  </Box>
+
+                  <Box
                     display={"flex"}
                     flexDir={"column"}
-                    justifyContent={"center"}
-                    alignContent={"center"}
-                    alignItems={"center"}
+                    mt={2}
+                    // justifyContent={"center"}
+                    // alignContent={"center"}
+                    // alignItems={"center"}
                     w={"100%"}
                   >
                     {nrm && (
@@ -211,37 +215,12 @@ export const SetAreasModal = ({
                         setSelectedAreas={setSelectedNrms}
                       />
                     )}
-                    <Flex w={"100%"} justifyContent={"flex-end"}>
-                      <Button onClick={onClose}>Cancel</Button>
-                      <Button
-                        ml={3}
-                        // type="submit"
-                        color={"white"}
-                        background={
-                          colorMode === "light" ? "blue.500" : "blue.600"
-                        }
-                        _hover={{
-                          background:
-                            colorMode === "light" ? "blue.400" : "blue.500",
-                        }}
-                        rightIcon={<IoIosCreate />}
-                        isDisabled={!projectPk || locationData.length < 1}
-                        onClick={() =>
-                          setAreas({
-                            projectPk: Number(projectPk),
-                            areas: locationData,
-                          })
-                        }
-                      >
-                        Set Areas
-                      </Button>
-                    </Flex>
-                  </Center>
-                  <Center
+                  </Box>
+                  <Box
                     display={"flex"}
-                    justifyContent={"center"}
-                    alignContent={"center"}
-                    alignItems={"center"}
+                    // justifyContent={"center"}
+                    // alignContent={"center"}
+                    // alignItems={"center"}
                     w={"100%"}
                   >
                     {ibra && (
@@ -253,7 +232,32 @@ export const SetAreasModal = ({
                         setSelectedAreas={setSelectedIbras}
                       />
                     )}
-                  </Center>
+                  </Box>
+                  <Flex w={"100%"} justifyContent={"flex-end"} mt={4}>
+                    <Button onClick={onClose}>Cancel</Button>
+                    <Button
+                      ml={3}
+                      // type="submit"
+                      color={"white"}
+                      background={
+                        colorMode === "light" ? "blue.500" : "blue.600"
+                      }
+                      _hover={{
+                        background:
+                          colorMode === "light" ? "blue.400" : "blue.500",
+                      }}
+                      rightIcon={<IoIosCreate />}
+                      isDisabled={!projectPk || locationData.length < 1}
+                      onClick={() =>
+                        setAreas({
+                          projectPk: Number(projectPk),
+                          areas: locationData,
+                        })
+                      }
+                    >
+                      Set Areas
+                    </Button>
+                  </Flex>
                 </Grid>
               )}
             </>

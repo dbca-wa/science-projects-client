@@ -20,6 +20,7 @@ interface INewProjectCard {
   description: string;
   bulletPoints: string[];
   colorScheme: string;
+  color?: string;
   buttonIcon: IconType;
 }
 
@@ -27,6 +28,7 @@ export const NewProjectCard = ({
   title,
   description,
   bulletPoints,
+  color,
   colorScheme,
   buttonIcon,
 }: INewProjectCard) => {
@@ -96,9 +98,10 @@ export const NewProjectCard = ({
           rounded={"xl"}
           pos={"relative"}
           p={4}
-          bg={
-            colorMode === "light" ? `${colorScheme}.500` : `${colorScheme}.600`
-          }
+          // bg={
+          //   colorMode === "light" ? `${colorScheme}.500` : `${colorScheme}.600`
+          // }
+          background={color ? color : undefined}
           color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.800"}
           style={{
             transform: "translateZ(0)",
