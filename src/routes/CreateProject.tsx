@@ -12,6 +12,10 @@ import { RiBook3Fill } from "react-icons/ri";
 import { FaUserFriends } from "react-icons/fa";
 
 export const CreateProject = () => {
+  // #1E5456 Dark Green
+  // #FFC530
+  // #01A7B2
+  // #2A6096 Blue
   const creationData = [
     {
       title: "Science Project",
@@ -23,6 +27,7 @@ export const CreateProject = () => {
       ],
       colorScheme: "green",
       buttonIcon: MdScience,
+      color: "#2A6096",
     },
     {
       title: "Core Function",
@@ -35,6 +40,7 @@ export const CreateProject = () => {
       ],
       colorScheme: "red",
       buttonIcon: GiMaterialsScience,
+      color: "#01A7B2",
     },
 
     {
@@ -47,6 +53,7 @@ export const CreateProject = () => {
       ],
       colorScheme: "blue",
       buttonIcon: RiBook3Fill,
+      color: "#FFC530",
     },
     {
       title: "External Partnership",
@@ -58,6 +65,7 @@ export const CreateProject = () => {
       ],
       colorScheme: "gray",
       buttonIcon: FaUserFriends,
+      color: "#1E5456",
     },
   ];
   const { colorMode } = useColorMode();
@@ -120,6 +128,7 @@ export const CreateProject = () => {
                     buttonIcon={item.buttonIcon}
                     bulletPoints={item.bulletPoints}
                     colorScheme={item.colorScheme}
+                    color={item.color}
                   />
                 </motion.div>
               </GridItem>
