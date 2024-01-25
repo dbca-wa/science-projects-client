@@ -121,11 +121,7 @@ interface ISmallProject {
     title: string;
 }
 
-interface ISmallResearchFunction {
-    id?: number;
-    pk?: numer;
-    name: string;
-}
+
 interface ISmallService {
     id?: number;
     pk?: numer;
@@ -142,7 +138,6 @@ interface IBaseProjectDetails {
     site_custodian: ISmallUser | null;
     owner: ISmallUser;
     project: ISmallProject;
-    research_function: ISmallResearchFunction | null;
     service: ISmallService | null;
 }
 
@@ -517,18 +512,6 @@ interface IBusinessArea {
 //  date_created: Date;     // Converter needed?
 // last_modified: Date;
 
-// RESEARCH FUNCTION ============================================================================
-
-
-interface IResearchFunction {
-    pk?: number;
-    old_id?: number;
-    name: string;
-    description: string;
-    association: string; // What program this research funciton belongs to
-    leader: number;
-    is_active: boolean; // Whether Research Function is still active
-}
 
 // SERVICE ============================================================================
 
@@ -640,8 +623,8 @@ export interface IReportCreation {
     pk?: number;
     created_at?: Date;
     updated_at?: Date | null;
-    date_open: Date | null;
-    date_closed: Date | null;
+    // date_open: Date | null;
+    // date_closed: Date | null;
     year: number;
 
     creator?: number;

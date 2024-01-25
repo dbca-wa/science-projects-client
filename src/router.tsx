@@ -21,7 +21,6 @@ import { DivisionsCRUD } from "./components/Pages/Admin/DivisionsCRUD";
 import { ServicesCRUD } from "./components/Pages/Admin/ServicesCRUD";
 import { ReportsCRUD } from "./components/Pages/Admin/ReportsCRUD";
 import { BusinessAreasCRUD } from "./components/Pages/Admin/BusinessAreasCRUD";
-import { ResearchFunctionsCRUD } from "./components/Pages/Admin/ResearchFunctionsCRUD";
 import { LocationsCRUD } from "./components/Pages/Admin/LocationsCRUD";
 import { AddressesCRUD } from "./components/Pages/Admin/AddressesCRUD";
 import { BranchesCRUD } from "./components/Pages/Admin/BranchesCRUD";
@@ -78,16 +77,6 @@ export const router = createBrowserRouter([
           <ContentWrapper>
             <AdminOnlyPage>
               <BusinessAreasCRUD />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/researchfunctions",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <ResearchFunctionsCRUD />
             </AdminOnlyPage>
           </ContentWrapper>
         ),

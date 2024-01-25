@@ -33,7 +33,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import theme from "../../theme";
 
 // Icon imports
-import { GiArchiveResearch, GiHamburgerMenu } from "react-icons/gi";
+import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdDocument } from "react-icons/io";
 import { AiFillProject } from "react-icons/ai";
 import { BsFillPeopleFill } from "react-icons/bs";
@@ -56,6 +56,7 @@ import {
 import { GoOrganization } from "react-icons/go";
 import { FcApproval, FcDataBackup } from "react-icons/fc";
 import { VscFeedback } from "react-icons/vsc";
+import { HiDocumentPlus } from "react-icons/hi2";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -173,6 +174,10 @@ const AdminMenuContents = () => {
     console.log("Dumping data...");
   };
 
+  const handleNewReportCycle = () => {
+    console.log("Handling new report cycle...")
+  }
+
   const handleBatchApproveReports = () => {
     console.log("Batch approving...");
   };
@@ -180,7 +185,7 @@ const AdminMenuContents = () => {
   return (
     <>
       <MenuGroup
-        title="CRUD"
+        title="Manage"
         fontSize={"12px"}
         color={"gray.500"}
         textAlign={"center"}
@@ -191,7 +196,7 @@ const AdminMenuContents = () => {
           }}
         >
           {<FaAddressCard />}
-          <Text ml={2}>Manage Addresses</Text>
+          <Text ml={2}>Addresses</Text>
         </MenuItem>
 
         <MenuItem
@@ -200,7 +205,7 @@ const AdminMenuContents = () => {
           }}
         >
           {<RiOrganizationChart />}
-          <Text ml={2}>Manage Branches</Text>
+          <Text ml={2}>Branches</Text>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -208,7 +213,7 @@ const AdminMenuContents = () => {
           }}
         >
           {<ImBriefcase />}
-          <Text ml={2}>Manage Business Areas</Text>
+          <Text ml={2}>Business Areas</Text>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -216,7 +221,7 @@ const AdminMenuContents = () => {
           }}
         >
           {<GoOrganization />}
-          <Text ml={2}>Manage Divisions</Text>
+          <Text ml={2}>Divisions</Text>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -224,7 +229,7 @@ const AdminMenuContents = () => {
           }}
         >
           {<FaLocationArrow />}
-          <Text ml={2}>Manage Locations</Text>
+          <Text ml={2}>Locations</Text>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -232,28 +237,26 @@ const AdminMenuContents = () => {
           }}
         >
           {<MdManageHistory />}
-          <Text ml={2}>Manage Reports</Text>
+          <Text ml={2}>Report Info</Text>
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            navigate("/crud/researchfunctions");
-          }}
-        >
-          {<GiArchiveResearch />}
-          <Text ml={2}>Manage Research Functions</Text>
-        </MenuItem>
+
         <MenuItem
           onClick={() => {
             navigate("/crud/services");
           }}
         >
           {<MdOutlineSettingsSuggest />}
-          <Text ml={2}>Manage Services</Text>
+          <Text ml={2}>Services</Text>
+        </MenuItem>
+
+        <MenuItem onClick={() => navigate("/crud/feedback")}>
+          {<VscFeedback />}
+          <Text ml={2}>View Feedback</Text>
         </MenuItem>
       </MenuGroup>
 
       <MenuGroup
-        title="OTHER"
+        title="Actions"
         fontSize={"12px"}
         color={"gray.500"}
         textAlign={"center"}
@@ -262,14 +265,15 @@ const AdminMenuContents = () => {
           {<FcDataBackup />}
           <Text ml={2}>Dump Data</Text>
         </MenuItem>
+        <MenuItem onClick={handleNewReportCycle}>
+          {<HiDocumentPlus />}
+          <Text ml={2}>Open Annual Report Cycle</Text>
+        </MenuItem>
         <MenuItem onClick={handleBatchApproveReports}>
           {<FcApproval />}
           <Text ml={2}>Batch Approve Reports</Text>
         </MenuItem>
-        <MenuItem onClick={() => navigate("/crud/feedback")}>
-          {<VscFeedback />}
-          <Text ml={2}>View Feedback</Text>
-        </MenuItem>
+
       </MenuGroup>
     </>
   );

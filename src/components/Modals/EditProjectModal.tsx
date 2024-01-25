@@ -32,16 +32,13 @@ import {
   IDepartmentalService,
   IExtendedProjectDetails,
   IExternalProjectDetails,
-  IResearchFunction,
   ISimpleLocationData,
-  ISmallResearchFunction,
   ISmallService,
   IStudentProjectDetails,
   ProjectImage,
 } from "../../types";
 import { useForm } from "react-hook-form";
 import TagInput from "../Pages/CreateProject/TagInput";
-import { useResearchFunctions } from "../../lib/hooks/useResearchFunctions";
 import { useDepartmentalServices } from "../../lib/hooks/useDepartmentalServices";
 import { useBusinessAreas } from "../../lib/hooks/useBusinessAreas";
 import { useGetLocations } from "../../lib/hooks/useGetLocations";
@@ -61,7 +58,6 @@ interface Props {
   currentKeywords: string[];
   currentDates: Date[];
   currentBa: IBusinessArea;
-  currentResearchFunction: ISmallResearchFunction;
   currentService: ISmallService;
   currentDataCustodian: number;
   details: IExtendedProjectDetails | null | undefined;
@@ -81,7 +77,6 @@ export const EditProjectModal = ({
   currentDates,
   currentBa,
   currentService,
-  currentResearchFunction,
   currentAreas,
   currentImage,
   currentDataCustodian,
@@ -129,21 +124,6 @@ export const EditProjectModal = ({
     }
   }, [dsLoading, servicesDataFromAPI, dsSet]);
 
-  const [researchFunctionsList, setResearchFunctionsList] = useState<
-    IResearchFunction[]
-  >([]);
-  const { rfData: researchFunctionsFromAPI, rfLoading } =
-    useResearchFunctions();
-  const [rfSet, setRfSet] = useState(false);
-  useEffect(() => {
-    if (!rfLoading && rfSet === false) {
-      const alphabetisedRF = [...researchFunctionsFromAPI];
-      alphabetisedRF.sort((a, b) => a.name.localeCompare(b.name));
-      setResearchFunctionsList(alphabetisedRF);
-      setRfSet(true);
-    }
-  }, [rfLoading, researchFunctionsFromAPI, rfSet]);
-
   // id/pk
   const [projectTitle, setProjectTitle] = useState(currentTitle);
 
@@ -166,15 +146,14 @@ export const EditProjectModal = ({
     (details?.student as IStudentProjectDetails)?.level
   );
   const [hoveredTitle, setHoveredTitle] = useState(false);
-  const titleBorderColor = `${
-    colorMode === "light"
+  const titleBorderColor = `${colorMode === "light"
       ? hoveredTitle
         ? "blackAlpha.300"
         : "blackAlpha.200"
       : hoveredTitle
-      ? "whiteAlpha.400"
-      : "whiteAlpha.300"
-  }`;
+        ? "whiteAlpha.400"
+        : "whiteAlpha.300"
+    }`;
 
   const [keywords, setKeywords] = useState(currentKeywords);
   const [startDate, setStartDate] = useState(currentDates[0]);
@@ -183,9 +162,6 @@ export const EditProjectModal = ({
   const [service, setService] = useState<ISmallService | IDepartmentalService>(
     currentService
   );
-  const [researchFunction, setResearchFunction] = useState<
-    IResearchFunction | ISmallResearchFunction
-  >(currentResearchFunction);
   const [dataCustodian, setDataCustodian] = useState(currentDataCustodian);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -287,7 +263,6 @@ export const EditProjectModal = ({
     endDate,
     businessArea,
     service,
-    researchFunction,
     dataCustodian,
     locationData,
     selectedFile,
@@ -424,7 +399,7 @@ export const EditProjectModal = ({
                       />
                     </Grid>
                   ) : (details?.student as IStudentProjectDetails)
-                      ?.organisation ? (
+                    ?.organisation ? (
                     <Grid
                       gridTemplateColumns={"repeat(1, 1fr)"}
                       gridGap={2}
@@ -532,7 +507,7 @@ export const EditProjectModal = ({
                             borderTopRightRadius={"none"}
                             borderBottomRightRadius={"none"}
                             borderRight={"none"}
-                            // boxSize={10}
+                          // boxSize={10}
                           >
                             <Icon as={HiAcademicCap} boxSize={5} />
                           </InputLeftAddon>
@@ -638,62 +613,7 @@ export const EditProjectModal = ({
                         </FormHelperText>
                       </FormControl>
 
-                      <FormControl
-                        // isRequired
-                        mb={4}
-                      >
-                        <FormLabel>Research Function</FormLabel>
-                        <InputGroup>
-                          <Select
-                            variant="filled"
-                            placeholder="Select a Research Function"
-                            onChange={(event) => {
-                              const pkVal = event.target.value;
-                              const relatedRF = researchFunctionsList.find(
-                                (rf) => Number(rf.pk) === Number(pkVal)
-                              );
 
-                              console.log(event.target.value);
-                              console.log(relatedRF);
-                              if (relatedRF !== undefined) {
-                                setResearchFunction(relatedRF);
-                              }
-                            }}
-                            value={researchFunction?.pk}
-                          >
-                            {researchFunctionsList?.map((rf, index) => {
-                              const checkIsHtml = (data: string) => {
-                                // Regular expression to check for HTML tags
-                                const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-
-                                // Check if the string contains any HTML tags
-                                return htmlRegex.test(data);
-                              };
-
-                              const isHtml = checkIsHtml(rf.name);
-                              let rfName = rf?.name;
-                              if (isHtml === true) {
-                                const parser = new DOMParser();
-                                const dom = parser.parseFromString(
-                                  rf.name,
-                                  "text/html"
-                                );
-                                const content = dom.body.textContent;
-                                rfName = content;
-                              }
-                              return (
-                                <option key={index} value={rf.pk}>
-                                  {rfName}
-                                </option>
-                              );
-                            })}
-                          </Select>
-                        </InputGroup>
-                        <FormHelperText>
-                          The Research Function this project mainly contributes
-                          to.
-                        </FormHelperText>
-                      </FormControl>
 
                       <FormControl mb={4}>
                         <FormLabel>Departmental Service</FormLabel>
@@ -837,7 +757,6 @@ export const EditProjectModal = ({
                       startDate: startDate,
                       endDate: endDate,
                       departmentalService: service?.pk,
-                      researchFunction: researchFunction?.pk,
                       businessArea: businessArea?.pk,
                       locations: locationData,
                       selectedImageUrl: selectedImageUrl,
