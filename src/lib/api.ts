@@ -1,7 +1,7 @@
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
 import { QueryFunctionContext } from "@tanstack/react-query";
-import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IResearchFunction, ISearchTerm, ISimpleLocationData, OrganisedLocationData, ProgressReportSection, ProjectClosureSection, ProjectPlanSection, ProjectSection, StudentReportSection } from "../types";
+import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData } from "../types";
 import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
 
 // INSTANCE SETUP ==================================================================
@@ -890,7 +890,6 @@ export interface ICreateProjectDetails {
     dataCustodian: number;
     supervisingScientist: number;
     departmentalService: number;
-    researchFunction: number;
     businessArea: number;
     startDate: Date;
     endDate: Date;
@@ -943,9 +942,7 @@ export const createProject = async ({ baseInformationData, detailsData, location
     }
 
     formData.append('businessArea', detailsData.businessArea.toString());
-    if (detailsData.researchFunction) {
-        formData.append('researchFunction', detailsData.researchFunction.toString());
-    }
+
     if (detailsData.departmentalService) {
         formData.append('departmentalService', detailsData.departmentalService.toString());
     }
@@ -1008,7 +1005,6 @@ export interface IEditProject {
     endDate: Date;
     dataCustodian: number;
     departmentalService: number;
-    researchFunction: number;
     businessArea: number;
 
     externalDescription?: string;
@@ -1033,7 +1029,6 @@ export const updateProjectDetails = async ({
     status,
     dataCustodian,
     departmentalService,
-    researchFunction,
     businessArea,
 
     externalDescription,
@@ -1041,22 +1036,6 @@ export const updateProjectDetails = async ({
 }: IEditProject) => {
     console.log('editing')
     console.log('keywords:', keywords)
-
-    // const data = {
-    //     'pk': projectPk,
-    //     'title': title,
-
-    //     ...(description !== undefined && { 'description': description }),
-    //     ...(image !== undefined && { 'image': image }),
-    //     ...(status !== undefined && { 'status': status }),
-    //     ...(dataCustodian !== undefined && { 'data_custodian': dataCustodian }),
-
-    //     'keywords': keywords,
-    //     'dates': dates,
-    //     'service': departmentalService,
-    //     'research_function': researchFunction,
-    //     'business_area': businessArea,
-    // }
 
 
 
@@ -1117,21 +1096,9 @@ export const updateProjectDetails = async ({
 
     }
 
-    // if (dates !== undefined && dates.length > 0) {
-    //     console.log(dates)
-    //     dates.forEach((date, index) => {
-    //         const dateFormatted = new Date(date);
-    //         newFormData.append('dates', dateFormatted.toISOString());
-    //     });
-    //     // toISOString()
-    // }
 
     if (departmentalService !== undefined) {
         newFormData.append('service', departmentalService.toString());
-    }
-
-    if (researchFunction !== undefined) {
-        newFormData.append('research_function', researchFunction.toString());
     }
 
     if (businessArea !== undefined) {
@@ -2372,9 +2339,9 @@ export const getFullReport = async ({ queryKey }: QueryFunctionContext) => {
 
 
 
-export const createReport = async (formData: IReport) => {
+export const createReport = async (formData: IReportCreation) => {
 
-    const { year, date_open, date_closed, ...otherData } = formData;
+    const { year, ...otherData } = formData;
 
 
     const formatDate = (date) => {
@@ -2384,8 +2351,13 @@ export const createReport = async (formData: IReport) => {
         return `${year}-${month}-${day}`;
     };
 
-    const formattedDateOpen = formatDate(date_open);
-    const formattedDateClosed = formatDate(date_closed);
+    const generateDates = (year: number) => {
+        const startDate = new Date(year - 1, 6, 1); // July 1st of the prior year
+        const endDate = new Date(year, 5, 30); // June 30th of the current year
+        return [formatDate(startDate), formatDate(endDate)];
+    }
+
+    const [formattedDateOpen, formattedDateClosed] = generateDates(year);
 
     // Include the year in the data
     const dataToSend = {
@@ -2395,7 +2367,6 @@ export const createReport = async (formData: IReport) => {
         ...otherData,
     };
 
-
     return instance.post(
         "documents/reports", dataToSend
     ).then(res => {
@@ -2403,6 +2374,7 @@ export const createReport = async (formData: IReport) => {
     }
     );
 }
+
 
 export const updateReportMedia = async (formData: IReport) => {
     console.log(formData);
@@ -2808,46 +2780,6 @@ export const updateLocation = async (formData: IAddLocationForm) => {
 export const deleteLocation = async (pk: number) => {
     return instance.delete(
         `locations/${pk}`
-    ).then(res => {
-        return res.data;
-    }
-    );
-}
-
-
-//  RESEARCH FUNCTIONS ===========================================================
-
-
-export const getAllResearchFunctions = async () => {
-    const res = instance.get(`projects/research_functions`
-    ).then(res => {
-        return res.data
-    })
-    return res;
-}
-
-export const createResearchFunction = async (formData: IResearchFunction) => {
-    console.log(formData);
-    return instance.post(
-        "projects/research_functions", formData
-    ).then(res => {
-        return res.data;
-    }
-    );
-}
-
-export const updateResearchFunction = async (formData: IResearchFunction) => {
-    return instance.put(
-        `projects/research_functions/${formData.pk}`, formData
-    ).then(res => {
-        return res.data;
-    }
-    );
-}
-
-export const deleteResearchFunction = async (pk: number) => {
-    return instance.delete(
-        `projects/research_functions/${pk}`
     ).then(res => {
         return res.data;
     }

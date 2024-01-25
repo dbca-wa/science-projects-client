@@ -15,11 +15,9 @@ import { useEffect, useState } from "react";
 
 import "react-calendar/dist/Calendar.css";
 import "../../../styles/modalscrollbar.css";
-import { useResearchFunctions } from "../../../lib/hooks/useResearchFunctions";
 import {
   IBusinessArea,
   IDepartmentalService,
-  IResearchFunction,
 } from "../../../types";
 import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
 import { useDepartmentalServices } from "../../../lib/hooks/useDepartmentalServices";
@@ -50,8 +48,6 @@ export const ProjectDetailsSection = ({
   const [selectedBusinessArea, setSelectedBusinessArea] = useState<number>(0);
   const [selectedDepartmentalService, setSelectedDepartmentalService] =
     useState<number>(0);
-  const [selectedResearchFunction, setSelectedResearchFunction] =
-    useState<number>(0);
 
   const [selectedSupervisingScientist, setSelectedSupervisingScientist] =
     useState<number>();
@@ -65,7 +61,6 @@ export const ProjectDetailsSection = ({
     if (
       selectedBusinessArea &&
       // && selectedDepartmentalService
-      // && selectedResearchFunction
       selectedSupervisingScientist &&
       selectedDataCustodian &&
       startDate &&
@@ -81,30 +76,17 @@ export const ProjectDetailsSection = ({
     endDate,
     selectedDataCustodian,
     selectedSupervisingScientist,
-    selectedResearchFunction,
     selectedDepartmentalService,
     selectedBusinessArea,
     setProjectDetailsFilled,
   ]);
 
-  const [researchFunctionsList, setResearchFunctionsList] = useState<
-    IResearchFunction[]
-  >([]);
   const [businessAreaList, setBusinessAreaList] = useState<IBusinessArea[]>([]);
   const [servicesList, setServicesList] = useState<IDepartmentalService[]>([]);
 
-  const { rfData: researchFunctionsFromAPI, rfLoading } =
-    useResearchFunctions();
   const { baData: businessAreaDataFromAPI, baLoading } = useBusinessAreas();
   const { dsData: servicesDataFromAPI, dsLoading } = useDepartmentalServices();
 
-  useEffect(() => {
-    if (!rfLoading) {
-      const alphabetisedRF = [...researchFunctionsFromAPI];
-      alphabetisedRF.sort((a, b) => a.name.localeCompare(b.name));
-      setResearchFunctionsList(alphabetisedRF);
-    }
-  }, [rfLoading, researchFunctionsFromAPI]);
 
   useEffect(() => {
     if (!baLoading) {
@@ -124,52 +106,8 @@ export const ProjectDetailsSection = ({
 
   return (
     <>
-      <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
+      <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={8} px={24}>
         <Box>
-          <FormControl isRequired mb={4}>
-            <FormLabel>Business Area</FormLabel>
-
-            <InputGroup>
-              <Select
-                variant="filled"
-                placeholder="Select a Business Area"
-                onChange={(event) =>
-                  setSelectedBusinessArea(parseInt(event.target.value))
-                }
-                value={selectedBusinessArea}
-              >
-                {businessAreaList.map((ba, index) => {
-                  const checkIsHtml = (data: string) => {
-                    // Regular expression to check for HTML tags
-                    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-
-                    // Check if the string contains any HTML tags
-                    return htmlRegex.test(data);
-                  };
-
-                  const isHtml = checkIsHtml(ba.name);
-                  let baName = ba.name;
-                  if (isHtml === true) {
-                    const parser = new DOMParser();
-                    const dom = parser.parseFromString(ba.name, "text/html");
-                    const content = dom.body.textContent;
-                    baName = content;
-                  }
-                  return (
-                    <option key={index} value={ba.pk}>
-                      {baName}
-                    </option>
-                  );
-                })}
-              </Select>
-            </InputGroup>
-            <FormHelperText
-            // color={colorMode === "light" ? "gray.500" : "gray.400"}
-            >
-              The Business Area / Program that this project belongs to.
-            </FormHelperText>
-          </FormControl>
-
           <FormControl
             // isRequired
             mb={4}
@@ -220,21 +158,19 @@ export const ProjectDetailsSection = ({
             </FormHelperText>
           </FormControl>
 
-          <FormControl
-            // isRequired
-            mb={4}
-          >
-            <FormLabel>Research Function</FormLabel>
+          <FormControl isRequired mb={4}>
+            <FormLabel>Business Area</FormLabel>
+
             <InputGroup>
               <Select
                 variant="filled"
-                placeholder="Select a Research Function"
+                placeholder="Select a Business Area"
                 onChange={(event) =>
-                  setSelectedResearchFunction(parseInt(event.target.value))
+                  setSelectedBusinessArea(parseInt(event.target.value))
                 }
-                value={selectedResearchFunction}
+                value={selectedBusinessArea}
               >
-                {researchFunctionsList?.map((rf, index) => {
+                {businessAreaList.map((ba, index) => {
                   const checkIsHtml = (data: string) => {
                     // Regular expression to check for HTML tags
                     const htmlRegex = /<\/?[a-z][\s\S]*>/i;
@@ -243,18 +179,17 @@ export const ProjectDetailsSection = ({
                     return htmlRegex.test(data);
                   };
 
-                  const isHtml = checkIsHtml(rf.name);
-                  let rfName = rf?.name;
+                  const isHtml = checkIsHtml(ba.name);
+                  let baName = ba.name;
                   if (isHtml === true) {
                     const parser = new DOMParser();
-                    const dom = parser.parseFromString(rf.name, "text/html");
+                    const dom = parser.parseFromString(ba.name, "text/html");
                     const content = dom.body.textContent;
-                    rfName = content;
+                    baName = content;
                   }
-
                   return (
-                    <option key={index} value={rf?.pk}>
-                      {rfName}
+                    <option key={index} value={ba.pk}>
+                      {baName}
                     </option>
                   );
                 })}
@@ -263,9 +198,11 @@ export const ProjectDetailsSection = ({
             <FormHelperText
             // color={colorMode === "light" ? "gray.500" : "gray.400"}
             >
-              The Research Function this project mainly contributes to.
+              The Business Area / Program that this project belongs to.
             </FormHelperText>
           </FormControl>
+
+
         </Box>
         <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
           <FormControl>
@@ -278,43 +215,46 @@ export const ProjectDetailsSection = ({
             />
           </FormControl>
 
-          <Box mb={4}>
-            <UserSearchDropdown
-              isRequired={true}
-              setUserFunction={setSelectedSupervisingScientist}
-              preselectedUserPk={thisUser}
-              label={
-                projectType !== "Student Project"
-                  ? "Research Scientist"
-                  : "Supervising Scientist"
-              }
-              placeholder={
-                projectType === "Student Project"
-                  ? "Search for a Supervising Scientist"
-                  : "Search for a Research Scientist"
-              }
-              helperText={
-                projectType === "Student Project"
-                  ? "The supervising scientist."
-                  : "Research Scientist (Project Leader)"
-              }
-            />
-          </Box>
+          <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
+            <Box mb={4}>
+              <UserSearchDropdown
+                isRequired={true}
+                setUserFunction={setSelectedSupervisingScientist}
+                preselectedUserPk={thisUser}
+                label={
+                  projectType !== "Student Project"
+                    ? "Research Scientist"
+                    : "Supervising Scientist"
+                }
+                placeholder={
+                  projectType === "Student Project"
+                    ? "Search for a Supervising Scientist"
+                    : "Search for a Research Scientist"
+                }
+                helperText={
+                  projectType === "Student Project"
+                    ? "The supervising scientist."
+                    : "Research Scientist (Project Leader)"
+                }
+              />
+            </Box>
 
-          <Box mb={4}>
-            <UserSearchDropdown
-              isRequired={true}
-              setUserFunction={setSelectedDataCustodian}
-              // preselectedUserPk={selectedDataCustodian}
-              preselectedUserPk={thisUser}
-              isEditable={true}
-              label="Data Custodian"
-              placeholder="Search for a data custodian"
-              helperText={
-                "The data custodian is responsible for data management, publishing, and metadata documentation on the data catalogue"
-              }
-            />
-          </Box>
+            <Box mb={4}>
+              <UserSearchDropdown
+                isRequired={true}
+                setUserFunction={setSelectedDataCustodian}
+                // preselectedUserPk={selectedDataCustodian}
+                preselectedUserPk={thisUser}
+                isEditable={true}
+                label="Data Custodian"
+                placeholder="Search for a data custodian"
+                helperText={
+                  "The data custodian is responsible for data management, publishing, and metadata documentation on the data catalogue"
+                }
+              />
+            </Box>
+          </Grid>
+
         </Grid>
       </Grid>
 
@@ -334,7 +274,6 @@ export const ProjectDetailsSection = ({
             if (projectDetailsFilled) {
               nextClick({
                 businessArea: selectedBusinessArea,
-                researchFunction: selectedResearchFunction,
                 departmentalService: selectedDepartmentalService,
                 dataCustodian: selectedDataCustodian,
                 supervisingScientist: selectedSupervisingScientist,

@@ -15,7 +15,6 @@ import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 import { FaAddressCard, FaLocationArrow } from "react-icons/fa";
 import { FcApproval, FcDataBackup } from "react-icons/fc";
-import { GiArchiveResearch } from "react-icons/gi";
 import { GoOrganization } from "react-icons/go";
 import { ImBriefcase } from "react-icons/im";
 import { MdManageHistory, MdOutlineSettingsSuggest } from "react-icons/md";
@@ -139,13 +138,6 @@ const crudAdminActions = [
     description: "CRUD operations for Business Areas",
     reactIcon: ImBriefcase,
     route: "/crud/businessareas",
-  },
-
-  {
-    name: "Manage Research Functions",
-    description: "CRUD operations for Research Functions",
-    reactIcon: GiArchiveResearch,
-    route: "/crud/researchfunctions",
   },
   {
     name: "Manage Services",

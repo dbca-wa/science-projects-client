@@ -39,7 +39,7 @@ import { useForm } from "react-hook-form";
 import { deleteReport, updateReport } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
-import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
+// import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
 import { AxiosError } from "axios";
 import { useGetFullReport } from "../../../lib/hooks/useGetFullReport";
 import { useGetReportMedia } from "../../../lib/hooks/useGetReportMedia";
@@ -52,8 +52,8 @@ import { useState } from "react";
 export const ReportItemDisplay = ({
   pk,
   year,
-  date_closed,
-  date_open,
+  // date_closed,
+  // date_open,
   creator,
   modifier,
 }: IReport) => {
@@ -93,14 +93,14 @@ export const ReportItemDisplay = ({
 
   const queryClient = useQueryClient();
 
-  const formattedDateOpen = useFormattedDate(date_open);
-  const formattedDateClosed = useFormattedDate(date_closed);
+  // const formattedDateOpen = useFormattedDate(date_open);
+  // const formattedDateClosed = useFormattedDate(date_closed);
 
-  const partsOpen = formattedDateOpen.split("@");
-  const firstPartDateOpen = partsOpen[0]?.trim();
+  // const partsOpen = formattedDateOpen.split("@");
+  // const firstPartDateOpen = partsOpen[0]?.trim();
 
-  const partsClosed = formattedDateClosed.split("@");
-  const firstPartDateClosed = partsClosed[0]?.trim();
+  // const partsClosed = formattedDateClosed.split("@");
+  // const firstPartDateClosed = partsClosed[0]?.trim();
 
   const { userLoading: modifierLoading, userData: modifierData } =
     useFullUserByPk(modifier);
@@ -211,16 +211,17 @@ export const ReportItemDisplay = ({
       )}
 
       <Grid
-        gridTemplateColumns="1fr 2fr 2fr 3fr 3fr 1fr"
+        gridTemplateColumns="2fr 3fr 3fr 1fr"
         width="100%"
         p={3}
         borderWidth={1}
-        // bg={"red"}
+      // bg={"red"}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
-          <TextButtonFlex name={`${year}` ?? ""} onClick={onUpdateModalOpen} />
+          <TextButtonFlex name={`FY ${year - 1} - ${String(year).slice(2)}` ?? ""} onClick={onUpdateModalOpen} />
         </Flex>
-        <Grid alignItems={"center"}>
+
+        {/* <Grid alignItems={"center"}>
           <Box>
             <Text>{firstPartDateOpen}</Text>
           </Box>
@@ -229,7 +230,7 @@ export const ReportItemDisplay = ({
           <Box>
             <Text>{firstPartDateClosed}</Text>
           </Box>
-        </Grid>
+        </Grid> */}
         <TextButtonFlex
           name={`${creatorData.first_name} ${creatorData.last_name}`}
           onClick={creatorDrawerFunction}
@@ -434,7 +435,7 @@ export const ReportItemDisplay = ({
         isOpen={isUpdateModalOpen}
         onClose={onUpdateModalClose}
         size={"6xl"}
-        // scrollBehavior="inside"
+      // scrollBehavior="inside"
       >
         <ModalOverlay />
         <ModalBody>
@@ -535,7 +536,7 @@ export const ReportItemDisplay = ({
                         <Box key={key}>
                           {(
                             (updateMutation.error as AxiosError).response.data[
-                              key
+                            key
                             ] as string[]
                           ).map((errorMessage, index) => (
                             <Text key={`${key}-${index}`} color="red.500">
