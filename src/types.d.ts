@@ -415,7 +415,7 @@ export interface ITaskDisplayCard {
     pk: number;
     creator: ITaskUser;
     user: ITaskUser;
-    project: ITaskProject;
+    // project: ITaskProject;
     document: ITaskDocument;
 
     name: string;
