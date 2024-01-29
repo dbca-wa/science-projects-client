@@ -1,5 +1,5 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
-import { useProjectSearchContext } from "@/lib/hooks/ProjectSearchContext";
+// import { useProjectSearchContext } from "@/lib/hooks/ProjectSearchContext";
 import { IMainDoc } from "@/types";
 import {
   Box,
@@ -13,13 +13,14 @@ import {
 import { HiDocumentCheck } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import { useBoxShadow } from "@/lib/hooks/useBoxShadow";
+import { useEffect } from "react";
 
 interface IProps {
   inputKind:
-    | "team_member"
-    | "project_lead"
-    | "business_area_lead"
-    | "directorate";
+  | "team_member"
+  | "project_lead"
+  | "business_area_lead"
+  | "directorate";
   document: IMainDoc;
 }
 
@@ -27,9 +28,10 @@ export const TraditionalDocumentTaskDisplay = ({
   inputKind,
   document,
 }: IProps) => {
+  useEffect(() => { console.log(document) }, [document])
   const { colorMode } = useColorMode();
   const navigate = useNavigate();
-  const { isOnProjectsPage } = useProjectSearchContext();
+  // const { isOnProjectsPage } = useProjectSearchContext();
 
   const goToProjectDocument = (pk: number | undefined, document: IMainDoc) => {
     let urlkind = "";
@@ -47,9 +49,11 @@ export const TraditionalDocumentTaskDisplay = ({
 
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
-    } else if (isOnProjectsPage) {
-      navigate(`${pk}/${urlkind}`);
-    } else {
+    }
+    // else if (isOnProjectsPage) {
+    //   navigate(`${pk}/${urlkind}`);
+    // }
+    else {
       navigate(`projects/${pk}/${urlkind}`);
     }
   };
@@ -155,13 +159,12 @@ export const TraditionalDocumentTaskDisplay = ({
         </Flex>
         <Flex>
           <Text
-            color={`${
-              inputKind === "directorate"
-                ? "red"
-                : inputKind === "business_area_lead"
-                ? "orange"
+            color={`${inputKind === "directorate"
+              ? "red"
+              : inputKind === "business_area_lead"
+                ? "blue"
                 : "green"
-            }.600`}
+              }.600`}
             fontWeight={"semibold"}
             fontSize={"small"}
             mr={1}
@@ -172,8 +175,8 @@ export const TraditionalDocumentTaskDisplay = ({
             {inputKind === "team_member"
               ? "Input required"
               : `Determine if the ${formattedDocumentKind(
-                  document?.kind
-                )} for this project is satisfactory`}
+                document?.kind
+              )} for this project is satisfactory`}
           </Text>
         </Flex>
       </Grid>

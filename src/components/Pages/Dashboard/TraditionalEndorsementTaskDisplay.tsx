@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { FaBiohazard, FaShieldDog } from "react-icons/fa6";
 import { PiPlantFill } from "react-icons/pi";
 import { useBoxShadow } from "@/lib/hooks/useBoxShadow";
+import { useEffect } from "react";
 
 interface IProps {
   endorsementKind: "animalEthics" | "biometrician" | "herbarium";
@@ -23,6 +24,9 @@ export const TraditionalEndorsementTaskDisplay = ({
   endorsementKind,
   document,
 }: IProps) => {
+
+
+
   const { colorMode } = useColorMode();
   const navigate = useNavigate();
   const { isOnProjectsPage } = useProjectSearchContext();
@@ -103,12 +107,12 @@ export const TraditionalEndorsementTaskDisplay = ({
                   ? "blue.600"
                   : "blue.200"
                 : endorsementKind === "biometrician"
-                ? colorMode === "light"
-                  ? "red.600"
-                  : "red.200"
-                : colorMode === "light"
-                ? "green.600"
-                : "green.200"
+                  ? colorMode === "light"
+                    ? "red.600"
+                    : "red.200"
+                  : colorMode === "light"
+                    ? "green.600"
+                    : "green.200"
             }
             mr={3}
             boxSize={5}
@@ -159,10 +163,10 @@ export const TraditionalEndorsementTaskDisplay = ({
             {endorsementKind === "animalEthics"
               ? "Upload the Animal Ethics Committee Approval form (PDF) to provide AEC approval"
               : endorsementKind === "biometrician"
-              ? "Provide Biometrician Approval"
-              : endorsementKind === "herbarium"
-              ? "Provide Hermarium Curator Approval"
-              : `Provide ${endorsementKind} approval`}
+                ? "Provide Biometrician Approval"
+                : endorsementKind === "herbarium"
+                  ? "Provide Hermarium Curator Approval"
+                  : `Provide ${endorsementKind} approval`}
           </Text>
         </Flex>
       </Flex>

@@ -20,7 +20,7 @@ import { FcHighPriority, FcOk } from "react-icons/fc";
 import { AiFillProject } from "react-icons/ai";
 import { useGetMyTasks } from "../../../lib/hooks/useGetMyTasks";
 import { useGetMyProjects } from "../../../lib/hooks/useGetMyProjects";
-import { IProjectData, IMainDoc, ITaskDisplayCard } from "../../../types";
+import { IProjectData, IMainDoc, ITaskDisplayCard, IProjectPlan } from "../../../types";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
@@ -48,6 +48,11 @@ interface Props {
   onAddTaskOpen: () => void;
 }
 
+interface IMiniEndorsement {
+  pk: number;
+  project_plan: IProjectPlan;
+}
+
 export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
   const { taskData, tasksLoading } = useGetMyTasks();
   const [taskDataState, setTaskDataState] = useState<ITaskFromAPI | null>(null); // Replace 'null' with initial data or a loading state if required
@@ -69,6 +74,12 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
 
   const { pendingEndorsementsData, pendingEndorsementsDataLoading } =
     useGetEndorsementsPendingMyAction();
+
+  useEffect(() => {
+    if (!pendingProjectDocumentDataLoading || !pendingEndorsementsDataLoading) {
+      console.log({ pendingProjectDocumentData, pendingEndorsementsData })
+    }
+  }, [pendingProjectDocumentData, pendingProjectDocumentDataLoading, pendingEndorsementsData, pendingEndorsementsDataLoading,])
 
   const { colorMode } = useColorMode();
   const me = useUser();
@@ -365,10 +376,10 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                       {!pendingEndorsementsDataLoading &&
                         pendingEndorsementsData?.aec?.length >= 1
                         ? pendingEndorsementsData?.aec?.map(
-                          (document: IMainDoc, index: number) => (
+                          (endorsement: IMiniEndorsement, index: number) => (
                             <TraditionalEndorsementTaskDisplay
                               key={index}
-                              document={document}
+                              document={endorsement?.project_plan?.document}
                               endorsementKind={"animalEthics"}
                             />
                           )
@@ -377,10 +388,10 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                       {!pendingEndorsementsDataLoading &&
                         pendingEndorsementsData?.hc?.length >= 1
                         ? pendingEndorsementsData?.hc?.map(
-                          (document: IMainDoc, index: number) => (
+                          (endorsement: IMiniEndorsement, index: number) => (
                             <TraditionalEndorsementTaskDisplay
                               key={index}
-                              document={document}
+                              document={endorsement?.project_plan?.document}
                               endorsementKind={"herbarium"}
                             />
                           )
@@ -389,10 +400,10 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
                       {!pendingEndorsementsDataLoading &&
                         pendingEndorsementsData?.bm?.length >= 1
                         ? pendingEndorsementsData?.bm?.map(
-                          (document: IMainDoc, index: number) => (
+                          (endorsement: IMiniEndorsement, index: number) => (
                             <TraditionalEndorsementTaskDisplay
                               key={index}
-                              document={document}
+                              document={endorsement?.project_plan?.document}
                               endorsementKind={"biometrician"}
                             />
                           )
