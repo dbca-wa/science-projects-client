@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import { FaBiohazard, FaShieldDog } from "react-icons/fa6";
 import { PiPlantFill } from "react-icons/pi";
 import { useBoxShadow } from "@/lib/hooks/useBoxShadow";
-import { useEffect } from "react";
 
 interface IProps {
   endorsementKind: "animalEthics" | "biometrician" | "herbarium";

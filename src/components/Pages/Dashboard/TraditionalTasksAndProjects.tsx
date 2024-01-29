@@ -20,7 +20,7 @@ import { FcHighPriority, FcOk } from "react-icons/fc";
 import { AiFillProject } from "react-icons/ai";
 import { useGetMyTasks } from "../../../lib/hooks/useGetMyTasks";
 import { useGetMyProjects } from "../../../lib/hooks/useGetMyProjects";
-import { IProjectData, IMainDoc, ITaskDisplayCard, IProjectPlan } from "../../../types";
+import { IProjectData, ITaskDisplayCard, IProjectPlan } from "../../../types";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
@@ -157,7 +157,7 @@ export const TraditionalTasksAndProjects = ({ onAddTaskOpen }: Props) => {
         <Accordion
           // defaultIndex={defaultIndex}
           defaultIndex={[0]}
-        // allowMultiple
+          allowMultiple
         >
           {pendingProjectDocumentDataLoading ? (
             // null

@@ -193,8 +193,8 @@ export const TraditionalPersonalTaskDisplay = ({ task }: Props) => {
                 ? "red.600"
                 : "red.200"
               : colorMode === "light"
-              ? "blue.600"
-              : "blue.200"
+                ? "blue.600"
+                : "blue.200"
           }
           mr={3}
           alignItems={"center"}
@@ -223,8 +223,8 @@ export const TraditionalPersonalTaskDisplay = ({ task }: Props) => {
             fontWeight={"bold"}
             cursor={"pointer"}
             onClick={() => {
-              if (task?.project?.pk) {
-                goToProject(task.project.pk);
+              if (task?.document?.project?.pk) {
+                goToProject(task.document?.project.pk);
               }
             }}
           >
