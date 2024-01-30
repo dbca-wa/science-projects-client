@@ -347,10 +347,10 @@ const convertFirstLevel = (text: string) => {
         });
       });
 
-      console.log("DOM AFTER LOGIC");
+      // console.log("DOM AFTER LOGIC");
       return dom.body.innerHTML;
     } else {
-      console.log("DOM UNCHANGED");
+      // console.log("DOM UNCHANGED");
       return domString;
     }
   };
@@ -742,7 +742,7 @@ const handlePastedWordOrderedList = (replacedData: string) => {
     return false; // Exclude if it doesn't match the pattern
   });
 
-  console.log(level2pTags);
+  // console.log(level2pTags);
   level2pTags.forEach((i) => console.log(i.innerText));
 
   // 2. Once found, transform into lis
@@ -824,7 +824,7 @@ const handlePastedWordOrderedList = (replacedData: string) => {
     }
   );
 
-  console.log("ROGUE LI Initial", rogueLiFirstElement);
+  // console.log("ROGUE LI Initial", rogueLiFirstElement);
 
   const liGroups = [];
   rogueLiFirstElement.forEach((li) => {
@@ -843,7 +843,7 @@ const handlePastedWordOrderedList = (replacedData: string) => {
     console.log(group);
     liGroups.push(group);
   });
-  console.log("ROGUE LI Groups", liGroups);
+  // console.log("ROGUE LI Groups", liGroups);
 
   // 4. Now with 3rd level and second levels as lis,
   // Find consecutive lis and group them as uls, then as an li
@@ -877,7 +877,7 @@ const handlePastedWordOrderedList = (replacedData: string) => {
   const numeralPTags = Array.from(dom.querySelectorAll("p")).filter((pTag) => {
     return /^[0-9]+\.\s/.test(pTag.innerText);
   });
-  console.log("NUMERAL PTAGS", numeralPTags);
+  // console.log("NUMERAL PTAGS", numeralPTags);
 
   const finalLiGroups = [];
   const processed = [];
@@ -990,13 +990,13 @@ const handlePastedWordOrderedList = (replacedData: string) => {
     });
   });
 
-  console.log("Handled Dom", dom);
+  // console.log("Handled Dom", dom);
 
   return dom.body.innerHTML;
 };
 
 const handlePastedWordList = (text: string, colorMode: string) => {
-  console.log("RUNNING");
+  // console.log("RUNNING");
   const levelTwoFinishedString = convertSecondLevel(text, colorMode);
   const levelThreeFinishedString = convertThirdLevel(levelTwoFinishedString);
   const levelOneFinishedString = convertFirstLevel(levelThreeFinishedString);
@@ -1012,60 +1012,290 @@ function $insertDataTransferForRichText(
 ): void {
   //   const htmlString = dataTransfer.getData("application/x-lexical-editor");
   const htmlString = dataTransfer.getData("text/html");
-
+  // console.log(htmlString)
   const removeHTMLSpace = (text: string) => {
     return text.replace(/&nbsp;/g, "");
   };
 
-  //   Testing out nested lists.
-  // •	Level 1 (1)
-  // o	Level 2 (1: 1-1)
-  // 	Level 3 (1: 2-1)
-  // 	Level 3 (2: 2-1)
-  // o	Level 2 (2: 1-1)
-  // 	Level 3 (1: 2-2)
-  // 	Level 3 (2: 2-2)
-  // 	Level 3 (3: 2-2)
-  // o	Level 2 (3: 1-1)
-  // 	Level 3 (1: 2-3)
-  // 	Level 3 (2: 2-3)
-  // •	Level 1 (2)
-  // o	Level 2 (1: 1-2)
-  // o	Level 2 (2: 1-2)
-  // •	Level 1 (3)
-  // o	Level 2 (1:1-3)
-  // 	Level 3 (1: 2-1)
-  // 	Level 3 (2: 2-1)
-  // o	Level 2 (2:1-3)
-
   if (htmlString) {
     try {
       const withoutWhite = removeHTMLSpace(htmlString);
+      let levelOneFinishedString = handlePastedWordList(withoutWhite, colorMode)
+      levelOneFinishedString = handlePastedWordOrderedList(levelOneFinishedString);
 
+      const handleWordWithClasses = (text: string, colorMode: string) => {
+
+        function wrapNodesInList(start: Element, end: Element, listType: 'ul' | 'ol') {
+          const ulElement = document.createElement(listType);
+
+          // Iterate over nodes between start and end
+          let currentNode = start;
+          const processed = []
+          const levelOnes = []
+          const levelTwos = []
+          const levelThrees = []
+          const levelOnesNumbered = []
+          const levelTwosNumnbered = []
+          const levelThreesNumbered = []
+          while (currentNode !== end.nextElementSibling) {
+            processed.push(currentNode)
+            if (currentNode.getAttribute('style').includes('level2') && currentNode.getAttribute('style').includes('mso-list:l1')) {
+              levelTwos.push(currentNode)
+            } else if (currentNode.getAttribute('style').includes('level3') && currentNode.getAttribute('style').includes('mso-list:l1')) {
+              levelThrees.push(currentNode)
+
+            } else if (currentNode.getAttribute('style').includes('level1') && currentNode.getAttribute('style').includes('mso-list:l1')) {
+              levelOnes.push(currentNode)
+            }
+            // console.log('STYLE OF NODE\n\n\n\n', currentNode.getAttribute('style'))
+
+            // const listItem = document.createElement('li');
+            // listItem.innerHTML = currentNode.innerHTML;
+            // listItem.style.cssText = currentNode.getAttribute('style');
+            // listItem.className = currentNode.className;
+
+            // const clone = currentNode.cloneNode(true);
+            // ulElement.appendChild(clone);
+            // ulElement.appendChild(listItem);
+            // currentNode.remove();
+            currentNode = currentNode?.nextElementSibling;
+          }
+
+          console.log("TWOS", levelTwos)
+
+
+
+
+
+          // levelOnes.forEach((one) => {
+
+          // })
+
+          levelThrees.forEach((three) => {
+            const liItem = dom.createElement('li')
+            const ulItem = dom.createElement('ul')
+
+            const processed = []
+            let currentThree = three;
+            while (!processed.includes(currentThree) && currentThree !== null && (currentThree as Element).getAttribute('style').includes('level3')) {
+              processed.push(currentThree)
+              const threeItem = dom.createElement('li')
+              threeItem.innerHTML = (currentThree as Element).innerHTML;
+              ulItem.append(threeItem)
+              if (
+                currentThree.nextElementSibling !== null
+                && levelThrees.includes(currentThree.nextElementSibling)) {
+                currentThree = currentThree?.nextElementSibling;
+              }
+            }
+            liItem.append(ulItem);
+            (processed[0] as Element).replaceWith(liItem)
+
+            processed.forEach((i, ind) => { if (ind !== 0) { (i as Element).remove() } })
+          })
+
+          // check rogue lis
+          const rogueThreeLis = Array.from(dom.querySelectorAll('li'))
+
+          // Check if next element following two is a three, if not, convert on the spot and append
+          // This fixes skipped p tags that dont have any level 3s
+          const toReplace = []
+          const replacementData = []
+          levelTwos.forEach((two) => {
+            const nextSibling = (two as Element)?.nextElementSibling;
+            if (nextSibling === null || !nextSibling.getAttribute('style')?.includes('level3')) {
+              const li = dom.createElement('li');
+              li.innerText = (two as HTMLParagraphElement).innerText;
+              replacementData.push(li);
+              toReplace.push(two);
+              // nextSibling = nextInLine;
+            }
+          })
+
+          toReplace.forEach((replaceme, index) => {
+            (replaceme as Element).replaceWith(replacementData[index]);
+          })
+
+          // check if previous sibling is in twos, if it is, convert to li and append the 
+          rogueThreeLis.forEach((rogue) => {
+            if (levelTwos.includes(rogue.previousElementSibling)) {
+              const previous = rogue.previousElementSibling;
+
+              const text = (previous as HTMLParagraphElement).innerText;
+              const newLi = dom.createElement('li');
+              newLi.innerText = text;
+              previous.replaceWith(newLi);
+              // const wrapperLi = dom.createElement('li');
+              // const wrapperUl = dom.createElement('ul');
+              // const clone = rogue.cloneNode(true);
+              // wrapperUl.append(clone)
+              // wrapperLi.append(wrapperUl);
+              // rogue.replaceWith(wrapperLi);
+            }
+          })
+
+          const rogueTwoLis = Array.from(dom.querySelectorAll('li')).filter((li) => li.parentElement.tagName !== 'UL')
+          console.log("ROGUE TWOS", rogueTwoLis)
+
+          const twoWrapper = dom.createElement('li')
+          const twoUl = dom.createElement('ul')
+          rogueTwoLis.forEach((rogue) => {
+            const clone = rogue.cloneNode(true)
+            twoUl.append(clone)
+          })
+          twoWrapper.append(twoUl)
+          rogueTwoLis.forEach((rogue, index) => {
+            if (index === 0) {
+              rogue.replaceWith(twoWrapper)
+            } else {
+              rogue.remove()
+            }
+          })
+
+          // Change remaining p tags in levelOnes to lis
+          levelOnes.forEach((one) => {
+            const text = (one as HTMLParagraphElement).innerText;
+            const li = dom.createElement('li')
+            li.innerText = text;
+            (one as Element).replaceWith(li)
+          })
+
+          // wrap rogue lis in a ul
+          const rogues = Array.from(dom.querySelectorAll('li')).filter((li) => li.parentElement.tagName !== 'UL')
+          const wrapper = dom.createElement('ul')
+          rogues.forEach((rogue) => {
+            const clone = rogue.cloneNode(true);
+            wrapper.append(clone);
+          })
+          rogues.forEach((rogue, index) => {
+            if (index === 0) {
+              rogue.replaceWith(wrapper)
+            } else {
+              rogue.remove();
+            }
+          })
+
+          // Remove special characters
+          const containsSpecial = Array.from(dom.querySelectorAll('li')).filter((li) => {
+            if (li.firstChild.textContent === "·" || li.firstChild.textContent === "o" || li.firstChild.textContent === "§") {
+              li.firstChild.remove()
+            }
+          })
+
+          const startsWithSpecial = Array.from(dom.querySelectorAll('li')).filter((li) => {
+            const firstChild = li.firstChild;
+            if ((firstChild as Element).tagName === "BR") {
+              firstChild.remove()
+            }
+            const spans = Array.from((li as Element).querySelectorAll('span'))
+            // console.log("SPANS", spans)
+            if (spans.length >= 1) {
+              spans.forEach((s) => {
+                if (s.innerText.startsWith('§')) {
+                  const newSpan = dom.createElement('span');
+                  newSpan.innerText = s.innerText.slice(2);
+                  s.replaceWith(newSpan)
+
+                }
+              })
+            }
+
+          })
+
+
+
+        }
+
+
+        let newDomString = text;
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(newDomString, 'text/html');
+
+        const listStartItems = Array.from(dom.querySelectorAll("p.MsoListParagraphCxSpFirst"))
+        const listMiddleItems = Array.from(dom.querySelectorAll("p.MsoListParagraphCxSpMiddle"))
+        const listEndItems = Array.from(dom.querySelectorAll("p.MsoListParagraphCxSpLast"))
+
+        listStartItems.forEach((start, index) => {
+          console.log(start.getAttribute('style'))
+          if (start.getAttribute('style').includes('mso-list:l1')) {
+            console.log("UL AREA\n\n")
+            // Get the end list item
+            const end = listEndItems[index]
+
+            // Wrap nodes in between in an ul
+            wrapNodesInList(start, end, 'ul');
+
+          } else if (start.getAttribute('style').includes('mso-list:l0')) {
+            console.log("OL AREA\n\n")
+            // Get the end list item
+            const end = listEndItems[index]
+            // wrapNodesInList(start, end, 'ul')
+
+            // Wrap nodes in between in an ol
+            // wrapNodesInOrdered//List(start, end, 'ol');
+
+          }
+        })
+        console.log({ listStartItems, listMiddleItems, listEndItems })
+
+        return dom.body.innerHTML;
+      }
+
+
+      levelOneFinishedString = handleWordWithClasses(levelOneFinishedString, colorMode);
+      // console.log("STRING")
+      // console.log("STRING", levelOneFinishedString)
       const parser = new DOMParser();
-      const dom = parser.parseFromString(withoutWhite, "text/html");
+      const dom = parser.parseFromString(levelOneFinishedString, "text/html");
+      console.log(dom)
+
       const nodes = $generateNodesFromDOM(editor, dom);
+      console.log(nodes)
 
-      const newHTMLDom = customGenerateHTMLFromNodes(nodes, colorMode);
-      let newDomString = handlePastedWordList(
-        newHTMLDom.body.innerHTML,
-        colorMode
-      );
-      newDomString = handlePastedWordOrderedList(newDomString);
-      const newDom = parser.parseFromString(newDomString, "text/html");
 
-      const newNodes = $generateNodesFromDOM(editor, newDom);
+      // console.log(levelTwoFinishedString);
+      // console.log(levelThreeFinishedString);
+      // console.log(levelOneFinishedString);
 
-      console.log(newDom);
-      console.log(newNodes);
 
-      return $insertGeneratedNodes(editor, newNodes, selection);
+      return $insertGeneratedNodes(editor, nodes, selection);
     } catch (e) {
       // Fail silently.
       console.log("ERROR", e);
     }
   }
 }
+
+// // For each item in the dom's body, check its class. 
+// const pTags = Array.from(dom.querySelectorAll('p'));
+// console.log(pTags)
+
+
+
+// // clone and remove any styles
+// const newList: HTMLParagraphElement[] = []
+// pTags.forEach((p) => {
+
+//   const newNode = p.cloneNode(true);
+//   (newNode as HTMLParagraphElement).style.cssText = ""
+//   // p.replaceWith(newNode);
+//   newList.push(newNode as HTMLParagraphElement);
+// })
+
+// console.log(newList)
+// newList.forEach((p)=> {
+//   // If the class is MsoNormal, ignore
+//   if (p.classList.contains('MsoNormal')) {
+//     // 
+//   } else if (p.classList.contains('MsoListParagraphCxSpFirst')) {
+
+//   } else if (MsoListParagraphCxSpMiddle) {
+
+//   } else if (MsoListParagraphCxSpLast) {
+
+//   }
+
+// })
 
 function onPasteForRichText(
   colorMode: string,
@@ -1110,7 +1340,7 @@ export const CustomPastePlugin = () => {
         const { clipboardData } = e;
         if (clipboardData && clipboardData.getData) {
           const selection = $getSelection();
-          console.log(selection);
+          // console.log(selection);
           if (clipboardData !== null && $INTERNAL_isPointSelection(selection)) {
             onPasteForRichText(colorMode, e, editor);
 
@@ -1126,140 +1356,147 @@ export const CustomPastePlugin = () => {
   return null;
 };
 
-const customGenerateHTMLFromNodes = (
-  nodes: LexicalNode[],
-  colorMode: string
-) => {
-  const generateTheme = (colorMode) => {
-    return {
-      quote: "editor-quote",
-      ltr: "ltr",
-      rtl: "rtl",
-      paragraph: colorMode === "light" ? "editor-p-light" : "editor-p-dark",
-      span: colorMode === "light" ? "editor-p-light" : "editor-p-dark",
-      heading: {
-        h1: colorMode === "light" ? "editor-h1-light" : "editor-h1-dark",
-        h2: colorMode === "light" ? "editor-h2-light" : "editor-h2-dark",
-        h3: colorMode === "light" ? "editor-h3-light" : "editor-h3-dark",
-      },
-      list: {
-        ul: colorMode === "light" ? "editor-ul-light" : "editor-ul-dark",
-        ol: colorMode === "light" ? "editor-ol-light" : "editor-ol-dark",
-        listitem: colorMode === "light" ? "editor-li-light" : "editor-li-dark",
-        listitemChecked: "editor-list-item-checked",
-        listitemUnchecked: "editor-list-item-unchecked",
-        nested: {
-          listitem: "editor-nested-list-item",
-        },
-        // Handling styling for each level of list nesting (1st is default styling)
-        ulDepth: ["editor-ul1", "editor-ul2", "editor-ul3"],
-        olDepth: ["editor-ol1", "editor-ol2", "editor-ol3"],
-      },
-      text: {
-        bold: colorMode === "light" ? "editor-bold-light" : "editor-bold-dark",
-        italic:
-          colorMode === "light"
-            ? "editor-italics-light"
-            : "editor-italics-dark",
-        underline:
-          colorMode === "light"
-            ? "editor-underline-light"
-            : "editor-underline-dark",
-        strikethrough:
-          colorMode === "light"
-            ? "editor-textStrikethrough-light"
-            : "editor-textStrikethrough-dark",
-        subscript:
-          colorMode === "light"
-            ? "editor-textSubscript-light"
-            : "editor-textSubscript-dark",
-        underlineStrikethrough:
-          colorMode === "light"
-            ? "editor-textUnderlineStrikethrough-light"
-            : "editor-textUnderlineStrikethrough-dark",
-      },
-      table: colorMode === "light" ? "table-light" : "table-dark",
-      tableAddColumns:
-        colorMode === "light"
-          ? "table-add-columns-light"
-          : "table-add-columns-dark",
-      tableAddRows:
-        colorMode === "light" ? "table-add-rows-light" : "table-add-rows-dark",
-      tableCell: colorMode === "light" ? "table-cell-light" : "table-cell-dark",
-      tableCellActionButton:
-        colorMode === "light"
-          ? "table-action-button-light"
-          : "table-action-button-dark",
-      tableCellActionButtonContainer:
-        colorMode === "light"
-          ? "table-action-button-container-light"
-          : "table-action-button-container-dark",
-      tableCellEditing:
-        colorMode === "light"
-          ? "table-cell-editing-light"
-          : "table-cell-editing-dark",
-      tableCellHeader:
-        colorMode === "light"
-          ? "table-cell-header-light"
-          : "table-cell-header-dark",
-      tableCellPrimarySelected:
-        colorMode === "light"
-          ? "table-cell-primary-selected-light"
-          : "table-cell-primary-selected-dark",
-      tableCellResizer:
-        colorMode === "light"
-          ? "table-cell-resizer-light"
-          : "table-cell-resizer-dark",
-      tableCellSelected:
-        colorMode === "light"
-          ? "table-cell-selected-light"
-          : "table-cell-selected-dark",
-      tableCellSortedIndicator:
-        colorMode === "light"
-          ? "table-cell-sorted-indicator-light"
-          : "table-cell-sorted-indicator-dark",
-      tableResizeRuler:
-        colorMode === "light"
-          ? "table-cell-resize-ruler-light"
-          : "table-cell-resize-ruler-dark",
-      tableSelected:
-        colorMode === "light" ? "table-selected-light" : "table-selected-dark",
-      tableSelection:
-        colorMode === "light"
-          ? "table-selection-light"
-          : "table-selection-dark",
-    };
-  };
-  // Catch errors that occur during Lexical updates
-  const onError = (error: Error) => {
-    console.log(error);
-  };
+// const customGenerateHTMLFromNodes = (
+//   domGeneratedFromPastedContent: Document,
+//   nodes: LexicalNode[],
+//   colorMode: string
+// ) => {
+//   const generateTheme = (colorMode) => {
+//     return {
+//       quote: "editor-quote",
+//       ltr: "ltr",
+//       rtl: "rtl",
+//       paragraph: colorMode === "light" ? "editor-p-light" : "editor-p-dark",
+//       span: colorMode === "light" ? "editor-p-light" : "editor-p-dark",
+//       heading: {
+//         h1: colorMode === "light" ? "editor-h1-light" : "editor-h1-dark",
+//         h2: colorMode === "light" ? "editor-h2-light" : "editor-h2-dark",
+//         h3: colorMode === "light" ? "editor-h3-light" : "editor-h3-dark",
+//       },
+//       list: {
+//         ul: colorMode === "light" ? "editor-ul-light" : "editor-ul-dark",
+//         ol: colorMode === "light" ? "editor-ol-light" : "editor-ol-dark",
+//         listitem: colorMode === "light" ? "editor-li-light" : "editor-li-dark",
+//         listitemChecked: "editor-list-item-checked",
+//         listitemUnchecked: "editor-list-item-unchecked",
+//         nested: {
+//           listitem: "editor-nested-list-item",
+//         },
+//         // Handling styling for each level of list nesting (1st is default styling)
+//         ulDepth: ["editor-ul1", "editor-ul2", "editor-ul3"],
+//         olDepth: ["editor-ol1", "editor-ol2", "editor-ol3"],
+//       },
+//       text: {
+//         bold: colorMode === "light" ? "editor-bold-light" : "editor-bold-dark",
+//         italic:
+//           colorMode === "light"
+//             ? "editor-italics-light"
+//             : "editor-italics-dark",
+//         underline:
+//           colorMode === "light"
+//             ? "editor-underline-light"
+//             : "editor-underline-dark",
+//         strikethrough:
+//           colorMode === "light"
+//             ? "editor-textStrikethrough-light"
+//             : "editor-textStrikethrough-dark",
+//         subscript:
+//           colorMode === "light"
+//             ? "editor-textSubscript-light"
+//             : "editor-textSubscript-dark",
+//         underlineStrikethrough:
+//           colorMode === "light"
+//             ? "editor-textUnderlineStrikethrough-light"
+//             : "editor-textUnderlineStrikethrough-dark",
+//       },
+//       table: colorMode === "light" ? "table-light" : "table-dark",
+//       tableAddColumns:
+//         colorMode === "light"
+//           ? "table-add-columns-light"
+//           : "table-add-columns-dark",
+//       tableAddRows:
+//         colorMode === "light" ? "table-add-rows-light" : "table-add-rows-dark",
+//       tableCell: colorMode === "light" ? "table-cell-light" : "table-cell-dark",
+//       tableCellActionButton:
+//         colorMode === "light"
+//           ? "table-action-button-light"
+//           : "table-action-button-dark",
+//       tableCellActionButtonContainer:
+//         colorMode === "light"
+//           ? "table-action-button-container-light"
+//           : "table-action-button-container-dark",
+//       tableCellEditing:
+//         colorMode === "light"
+//           ? "table-cell-editing-light"
+//           : "table-cell-editing-dark",
+//       tableCellHeader:
+//         colorMode === "light"
+//           ? "table-cell-header-light"
+//           : "table-cell-header-dark",
+//       tableCellPrimarySelected:
+//         colorMode === "light"
+//           ? "table-cell-primary-selected-light"
+//           : "table-cell-primary-selected-dark",
+//       tableCellResizer:
+//         colorMode === "light"
+//           ? "table-cell-resizer-light"
+//           : "table-cell-resizer-dark",
+//       tableCellSelected:
+//         colorMode === "light"
+//           ? "table-cell-selected-light"
+//           : "table-cell-selected-dark",
+//       tableCellSortedIndicator:
+//         colorMode === "light"
+//           ? "table-cell-sorted-indicator-light"
+//           : "table-cell-sorted-indicator-dark",
+//       tableResizeRuler:
+//         colorMode === "light"
+//           ? "table-cell-resize-ruler-light"
+//           : "table-cell-resize-ruler-dark",
+//       tableSelected:
+//         colorMode === "light" ? "table-selected-light" : "table-selected-dark",
+//       tableSelection:
+//         colorMode === "light"
+//           ? "table-selection-light"
+//           : "table-selection-dark",
+//     };
+//   };
+//   // Catch errors that occur during Lexical updates
+//   const onError = (error: Error) => {
+//     console.log(error);
+//   };
 
-  // Generate the theme based on the current colorMode
-  const theme = generateTheme(colorMode);
-  //   console.log("NODES", nodes);
-  const initialConfig = {
-    namespace: "Annual Report Document Editor",
-    editable: true,
-    theme,
-    onError,
-    nodes: [ListNode, ListItemNode, TableCellNode, TableNode, TableRowNode],
-  };
-  const parser = new DOMParser();
-  const dom = parser.parseFromString("", "text/html");
+//   // Generate the theme based on the current colorMode
+//   const theme = generateTheme(colorMode);
+//   //   console.log("NODES", nodes);
+//   const initialConfig = {
+//     namespace: "Annual Report Document Editor",
+//     editable: true,
+//     theme,
+//     onError,
+//     nodes: [ListNode, ListItemNode, TableCellNode, TableNode, TableRowNode],
+//   };
 
-  const editor = null;
-  nodes.forEach((n) => {
-    const domItem = n.createDOM(initialConfig, editor);
-    const span = dom.createElement("span");
-    span.style.cssText = "white-space: pre-wrap;";
+//   const editor = null;
+//   nodes.forEach((node) => {
 
-    span.innerText = n.getTextContent();
-    domItem.append(span);
-    if (domItem && (domItem as Element).tagName === "P") {
-      domItem.dir = "ltr";
-    }
-    dom.body.append(domItem);
-  });
-  return dom;
-};
+//   })
+
+//   // const parser = new DOMParser();
+//   // const dom = parser.parseFromString("", "text/html");
+
+//   // const editor = null;
+//   // nodes.forEach((n) => {
+//   //   const domItem = n.createDOM(initialConfig, editor);
+//   //   const span = dom.createElement("span");
+//   //   span.style.cssText = "white-space: pre-wrap;";
+
+//   //   span.innerText = n.getTextContent();
+//   //   domItem.append(span);
+//   //   if (domItem && (domItem as Element).tagName === "P") {
+//   //     domItem.dir = "ltr";
+//   //   }
+//   //   dom.body.append(domItem);
+//   // });
+//   return domGeneratedFromPastedContent;
+// };
