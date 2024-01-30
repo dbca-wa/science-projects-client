@@ -57,6 +57,44 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
   }, [location.state]);
 
   const { taskData, tasksLoading } = useGetMyTasks();
+  useEffect(() => {
+    if (!tasksLoading && taskData) {
+      // Function to sort tasks based on status
+      const sortTasksByStatus = (tasks) => {
+        return tasks.sort((a, b) => {
+          if (a.status === "done") return 1;
+          if (a.status === "inprogress" && b.status !== "done") return -1;
+          return 0;
+        });
+      };
+
+      // Check if data is available and then sort tasks
+      const sortedTaskData = taskData
+        ? {
+            done: sortTasksByStatus(
+              taskData.filter((task) => task.status === "done")
+            ),
+            todo: sortTasksByStatus(
+              taskData.filter((task) => task.status === "todo")
+            ),
+            inprogress: sortTasksByStatus(
+              taskData.filter((task) => task.status === "inprogress")
+            ),
+          }
+        : null;
+
+      // Set the state with the correct type
+      setCombinedData(sortedTaskData);
+    }
+  }, [tasksLoading, taskData]);
+
+  interface ICombinedData {
+    todo: [];
+    inprogress: [];
+    done: [];
+  }
+  const [combinedData, setCombinedData] = useState<ICombinedData | null>(null);
+
   const { pendingProjectDocumentData, pendingProjectDocumentDataLoading } =
     useGetDocumentsPendingMyAction();
   const { pendingEndorsementsData, pendingEndorsementsDataLoading } =
@@ -127,7 +165,7 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
             {
               <Center ml={2}>
                 <Box sx={countCircleStyling}>
-                  {tasksLoading === false
+                  {tasksLoading === false && combinedData !== null
                     ? (pendingEndorsementsDataLoading === false
                         ? pendingEndorsementsData.aec.length +
                           pendingEndorsementsData.bm.length +
@@ -136,7 +174,8 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
                       (pendingProjectDocumentDataLoading === false
                         ? pendingProjectDocumentData.all.length
                         : 0) +
-                      (taskData.inprogress.length + taskData.todo.length)
+                      (combinedData.inprogress.length +
+                        combinedData.todo.length)
                     : 0}
                 </Box>
               </Center>
@@ -191,10 +230,11 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
             <Quote />
             <Box mt={1}>
               {tasksLoading === false &&
+              combinedData !== null &&
               pendingEndorsementsDataLoading === false &&
               pendingProjectDocumentDataLoading === false ? (
                 <MyTasksSection
-                  personalTaskData={taskData}
+                  personalTaskData={combinedData}
                   personalTaskDataLoading={tasksLoading}
                   endorsementTaskData={pendingEndorsementsData}
                   endorsementTaskDataLoading={pendingEndorsementsDataLoading}
