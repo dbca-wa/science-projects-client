@@ -32,7 +32,7 @@ import { FaUser } from "react-icons/fa";
 export const ModernPersonalTaskDisplayCard = ({
   pk,
   creator,
-  project,
+  // project,
   document,
 
   name,
@@ -86,14 +86,11 @@ export const ModernPersonalTaskDisplayCard = ({
   const navigate = useNavigate();
 
   const handleProjectTaskCardClick = () => {
-    if (project) {
-      if (document) {
-        navigate(`projects/${project.pk}`);
-        // Handle logic for opening the doc via a link
-        // navigate(`projects/${project.pk}?docToOpen=${document.pk}`)
-      } else {
-        navigate(`projects/${project.pk}`);
-      }
+    if (document) {
+      navigate(`projects/${document?.project?.pk}`);
+      // Handle logic for opening the doc via a link
+      // navigate(`projects/${project.pk}?docToOpen=${document.pk}`)
+
     }
   };
 
@@ -261,11 +258,11 @@ export const ModernPersonalTaskDisplayCard = ({
             <Box rounded="lg" overflow="hidden" w="100px" h="69px">
               <Image
                 src={
-                  project?.image?.file
-                    ? project.image.file
-                    : project?.image?.old_file
-                    ? project.image.old_file
-                    : NoImageFile
+                  document?.project?.image?.file
+                    ? document?.project.image.file
+                    : document?.project?.image?.old_file
+                      ? document?.project.image.old_file
+                      : NoImageFile
                 }
                 width={"100%"}
                 height={"100%"}
@@ -274,9 +271,9 @@ export const ModernPersonalTaskDisplayCard = ({
             </Box>
             <Flex ml={2} flexDir="column" w="100%">
               <Text fontSize="md" fontWeight="semibold">
-                {project.title.length >= 30
-                  ? `${project.title.slice(0, 30)}...`
-                  : project.title}
+                {document?.project.title.length >= 30
+                  ? `${document?.project.title.slice(0, 30)}...`
+                  : document?.project.title}
               </Text>
               <Text flex={1} fontSize="xs">
                 {formattedDate} by {creator.first_name} {creator.last_name}
@@ -339,8 +336,8 @@ export const ModernPersonalTaskDisplayCard = ({
                 bottom={0}
                 right={1.5}
                 px={1}
-                // bg={"red"}
-                // justifyContent={"center"}
+              // bg={"red"}
+              // justifyContent={"center"}
               >
                 <Flex>
                   <Center
@@ -351,8 +348,8 @@ export const ModernPersonalTaskDisplayCard = ({
                     boxSize={5}
                     w={"20px"}
 
-                    // w={"100%"}
-                    // bg={"orange"}
+                  // w={"100%"}
+                  // bg={"orange"}
                   >
                     <FaUser />
                   </Center>
