@@ -179,6 +179,35 @@ interface IAECPDF {
 }
 
 
+interface ISmallProj {
+    pk: number;
+    kind: string;
+    title: string;
+}
+
+interface ISmallDoc {
+    pk: number;
+    project: ISmallProj;
+}
+
+interface IEndorsementProjectPlan {
+    pk: number;
+    document: ISmallDoc;
+    aims: string;
+    knowledge_transfer: string;
+    listed_references: string;
+    operating_budget:  string;
+    operating_budget_external:  string;
+    outcome: string;
+    related_projects: string;
+}
+
+interface ITaskEndorsement {
+    pk: number;
+    project_plan: IEndorsementProjectPlan;
+}
+
+
 interface IEndorsement {
     pk: number;
     project_plan: number;
