@@ -6,8 +6,6 @@ import {
   LexicalNode,
   TextNode,
 } from "lexical";
-import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { ListItemNode, ListNode } from "@lexical/list";
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -20,9 +18,9 @@ import {
   createCommand,
 } from "lexical";
 
-import { useEffect } from "react";
-import { $generateNodesFromDOM } from "@lexical/html";
 import { useColorMode } from "@chakra-ui/react";
+import { $generateNodesFromDOM } from "@lexical/html";
+import { useEffect } from "react";
 
 export interface BaseSerializedNode {
   children?: Array<BaseSerializedNode>;
@@ -1020,32 +1018,39 @@ function $insertDataTransferForRichText(
   if (htmlString) {
     try {
       const withoutWhite = removeHTMLSpace(htmlString);
-      let levelOneFinishedString = handlePastedWordList(withoutWhite, colorMode)
-      levelOneFinishedString = handlePastedWordOrderedList(levelOneFinishedString);
+      let levelOneFinishedString = handlePastedWordList(
+        withoutWhite,
+        colorMode
+      );
+      levelOneFinishedString = handlePastedWordOrderedList(
+        levelOneFinishedString
+      );
 
-      const handleWordWithClasses = (text: string, colorMode: string) => {
-
-        function wrapNodesInList(start: Element, end: Element, listType: 'ul' | 'ol') {
-          const ulElement = document.createElement(listType);
-
+      const handleWordWithClassesS1 = (text: string, colorMode: string) => {
+        function wrapNodesInList(start: Element, end: Element) {
           // Iterate over nodes between start and end
           let currentNode = start;
-          const processed = []
-          const levelOnes = []
-          const levelTwos = []
-          const levelThrees = []
-          const levelOnesNumbered = []
-          const levelTwosNumnbered = []
-          const levelThreesNumbered = []
+          const processed = [];
+          const levelOnes = [];
+          const levelTwos = [];
+          const levelThrees = [];
           while (currentNode !== end.nextElementSibling) {
-            processed.push(currentNode)
-            if (currentNode.getAttribute('style').includes('level2') && currentNode.getAttribute('style').includes('mso-list:l1')) {
-              levelTwos.push(currentNode)
-            } else if (currentNode.getAttribute('style').includes('level3') && currentNode.getAttribute('style').includes('mso-list:l1')) {
-              levelThrees.push(currentNode)
-
-            } else if (currentNode.getAttribute('style').includes('level1') && currentNode.getAttribute('style').includes('mso-list:l1')) {
-              levelOnes.push(currentNode)
+            processed.push(currentNode);
+            if (
+              currentNode.getAttribute("style").includes("level2") &&
+              currentNode.getAttribute("style").includes("mso-list:l1")
+            ) {
+              levelTwos.push(currentNode);
+            } else if (
+              currentNode.getAttribute("style").includes("level3") &&
+              currentNode.getAttribute("style").includes("mso-list:l1")
+            ) {
+              levelThrees.push(currentNode);
+            } else if (
+              currentNode.getAttribute("style").includes("level1") &&
+              currentNode.getAttribute("style").includes("mso-list:l1")
+            ) {
+              levelOnes.push(currentNode);
             }
             // console.log('STYLE OF NODE\n\n\n\n', currentNode.getAttribute('style'))
 
@@ -1061,68 +1066,76 @@ function $insertDataTransferForRichText(
             currentNode = currentNode?.nextElementSibling;
           }
 
-          console.log("TWOS", levelTwos)
-
-
-
-
+          // console.log("TWOS", levelTwos);
 
           // levelOnes.forEach((one) => {
 
           // })
 
           levelThrees.forEach((three) => {
-            const liItem = dom.createElement('li')
-            const ulItem = dom.createElement('ul')
+            const liItem = dom.createElement("li");
+            const ulItem = dom.createElement("ul");
 
-            const processed = []
+            const processed = [];
             let currentThree = three;
-            while (!processed.includes(currentThree) && currentThree !== null && (currentThree as Element).getAttribute('style').includes('level3')) {
-              processed.push(currentThree)
-              const threeItem = dom.createElement('li')
+            while (
+              !processed.includes(currentThree) &&
+              currentThree !== null &&
+              (currentThree as Element).getAttribute("style").includes("level3")
+            ) {
+              processed.push(currentThree);
+              const threeItem = dom.createElement("li");
               threeItem.innerHTML = (currentThree as Element).innerHTML;
-              ulItem.append(threeItem)
+              ulItem.append(threeItem);
               if (
-                currentThree.nextElementSibling !== null
-                && levelThrees.includes(currentThree.nextElementSibling)) {
+                currentThree.nextElementSibling !== null &&
+                levelThrees.includes(currentThree.nextElementSibling)
+              ) {
                 currentThree = currentThree?.nextElementSibling;
               }
             }
             liItem.append(ulItem);
-            (processed[0] as Element).replaceWith(liItem)
+            (processed[0] as Element).replaceWith(liItem);
 
-            processed.forEach((i, ind) => { if (ind !== 0) { (i as Element).remove() } })
-          })
+            processed.forEach((i, ind) => {
+              if (ind !== 0) {
+                (i as Element).remove();
+              }
+            });
+          });
 
           // check rogue lis
-          const rogueThreeLis = Array.from(dom.querySelectorAll('li'))
+          const rogueThreeLis = Array.from(dom.querySelectorAll("li"));
 
           // Check if next element following two is a three, if not, convert on the spot and append
           // This fixes skipped p tags that dont have any level 3s
-          const toReplace = []
-          const replacementData = []
+          const toReplace = [];
+          const replacementData = [];
           levelTwos.forEach((two) => {
             const nextSibling = (two as Element)?.nextElementSibling;
-            if (nextSibling === null || !nextSibling.getAttribute('style')?.includes('level3')) {
-              const li = dom.createElement('li');
+            if (
+              nextSibling === null ||
+              !nextSibling.getAttribute("style")?.includes("level3")
+            ) {
+              const li = dom.createElement("li");
               li.innerText = (two as HTMLParagraphElement).innerText;
               replacementData.push(li);
               toReplace.push(two);
               // nextSibling = nextInLine;
             }
-          })
+          });
 
           toReplace.forEach((replaceme, index) => {
             (replaceme as Element).replaceWith(replacementData[index]);
-          })
+          });
 
-          // check if previous sibling is in twos, if it is, convert to li and append the 
+          // check if previous sibling is in twos, if it is, convert to li and append the
           rogueThreeLis.forEach((rogue) => {
             if (levelTwos.includes(rogue.previousElementSibling)) {
               const previous = rogue.previousElementSibling;
 
               const text = (previous as HTMLParagraphElement).innerText;
-              const newLi = dom.createElement('li');
+              const newLi = dom.createElement("li");
               newLi.innerText = text;
               previous.replaceWith(newLi);
               // const wrapperLi = dom.createElement('li');
@@ -1132,131 +1145,429 @@ function $insertDataTransferForRichText(
               // wrapperLi.append(wrapperUl);
               // rogue.replaceWith(wrapperLi);
             }
-          })
+          });
 
-          const rogueTwoLis = Array.from(dom.querySelectorAll('li')).filter((li) => li.parentElement.tagName !== 'UL')
-          console.log("ROGUE TWOS", rogueTwoLis)
+          const rogueTwoLis = Array.from(dom.querySelectorAll("li")).filter(
+            (li) => li.parentElement.tagName !== "UL"
+          );
+          // console.log("ROGUE TWOS", rogueTwoLis);
 
-          const twoWrapper = dom.createElement('li')
-          const twoUl = dom.createElement('ul')
+          const twoWrapper = dom.createElement("li");
+          const twoUl = dom.createElement("ul");
           rogueTwoLis.forEach((rogue) => {
-            const clone = rogue.cloneNode(true)
-            twoUl.append(clone)
-          })
-          twoWrapper.append(twoUl)
+            const clone = rogue.cloneNode(true);
+            twoUl.append(clone);
+          });
+          twoWrapper.append(twoUl);
           rogueTwoLis.forEach((rogue, index) => {
             if (index === 0) {
-              rogue.replaceWith(twoWrapper)
+              rogue.replaceWith(twoWrapper);
             } else {
-              rogue.remove()
+              rogue.remove();
             }
-          })
+          });
 
           // Change remaining p tags in levelOnes to lis
           levelOnes.forEach((one) => {
             const text = (one as HTMLParagraphElement).innerText;
-            const li = dom.createElement('li')
+            const li = dom.createElement("li");
             li.innerText = text;
-            (one as Element).replaceWith(li)
-          })
+            (one as Element).replaceWith(li);
+          });
 
           // wrap rogue lis in a ul
-          const rogues = Array.from(dom.querySelectorAll('li')).filter((li) => li.parentElement.tagName !== 'UL')
-          const wrapper = dom.createElement('ul')
+          const rogues = Array.from(dom.querySelectorAll("li")).filter(
+            (li) => li.parentElement.tagName !== "UL"
+          );
+          const wrapper = dom.createElement("ul");
           rogues.forEach((rogue) => {
             const clone = rogue.cloneNode(true);
             wrapper.append(clone);
-          })
+          });
           rogues.forEach((rogue, index) => {
             if (index === 0) {
-              rogue.replaceWith(wrapper)
+              rogue.replaceWith(wrapper);
             } else {
               rogue.remove();
             }
-          })
+          });
 
           // Remove special characters
-          const containsSpecial = Array.from(dom.querySelectorAll('li')).filter((li) => {
-            if (li.firstChild.textContent === "·" || li.firstChild.textContent === "o" || li.firstChild.textContent === "§") {
-              li.firstChild.remove()
+          const containsSpecial = Array.from(dom.querySelectorAll("li")).filter(
+            (li) => {
+              if (
+                li.firstChild.textContent === "·" ||
+                li.firstChild.textContent === "o" ||
+                li.firstChild.textContent === "§"
+              ) {
+                li.firstChild.remove();
+              }
             }
-          })
+          );
 
-          const startsWithSpecial = Array.from(dom.querySelectorAll('li')).filter((li) => {
+          const startsWithSpecial = Array.from(
+            dom.querySelectorAll("li")
+          ).filter((li) => {
             const firstChild = li.firstChild;
             if ((firstChild as Element).tagName === "BR") {
-              firstChild.remove()
+              firstChild.remove();
             }
-            const spans = Array.from((li as Element).querySelectorAll('span'))
+            const spans = Array.from((li as Element).querySelectorAll("span"));
             // console.log("SPANS", spans)
             if (spans.length >= 1) {
               spans.forEach((s) => {
-                if (s.innerText.startsWith('§')) {
-                  const newSpan = dom.createElement('span');
+                if (s.innerText.startsWith("§")) {
+                  const newSpan = dom.createElement("span");
                   newSpan.innerText = s.innerText.slice(2);
-                  s.replaceWith(newSpan)
-
+                  s.replaceWith(newSpan);
                 }
-              })
+              });
             }
-
-          })
-
-
-
+          });
         }
-
 
         let newDomString = text;
         const parser = new DOMParser();
-        const dom = parser.parseFromString(newDomString, 'text/html');
+        const dom = parser.parseFromString(newDomString, "text/html");
 
-        const listStartItems = Array.from(dom.querySelectorAll("p.MsoListParagraphCxSpFirst"))
-        const listMiddleItems = Array.from(dom.querySelectorAll("p.MsoListParagraphCxSpMiddle"))
-        const listEndItems = Array.from(dom.querySelectorAll("p.MsoListParagraphCxSpLast"))
+        const listStartItems = Array.from(
+          dom.querySelectorAll("p.MsoListParagraphCxSpFirst")
+        );
+        const listMiddleItems = Array.from(
+          dom.querySelectorAll("p.MsoListParagraphCxSpMiddle")
+        );
+        const listEndItems = Array.from(
+          dom.querySelectorAll("p.MsoListParagraphCxSpLast")
+        );
+
+        // console.log("OLD DOM: ", dom);
 
         listStartItems.forEach((start, index) => {
-          console.log(start.getAttribute('style'))
-          if (start.getAttribute('style').includes('mso-list:l1')) {
-            console.log("UL AREA\n\n")
-            // Get the end list item
-            const end = listEndItems[index]
-
-            // Wrap nodes in between in an ul
-            wrapNodesInList(start, end, 'ul');
-
-          } else if (start.getAttribute('style').includes('mso-list:l0')) {
-            console.log("OL AREA\n\n")
-            // Get the end list item
-            const end = listEndItems[index]
-            // wrapNodesInList(start, end, 'ul')
-
-            // Wrap nodes in between in an ol
-            // wrapNodesInOrdered//List(start, end, 'ol');
-
+          if (start.getAttribute("style").includes("mso-list:l1")) {
+            const end = listEndItems[index];
+            wrapNodesInList(start, end);
           }
-        })
-        console.log({ listStartItems, listMiddleItems, listEndItems })
+        });
+
+        // console.log("DOM AFTER: ", dom);
+
+        // const listNumberedStartItems = Array.from(
+        //   dom.querySelectorAll("p.MsoListParagraphCxSpFirst")
+        // );
+
+        // const listMiddleNumberedItems = Array.from(
+        //   dom.querySelectorAll("p.MsoListParagraphCxSpMiddle")
+        // );
+        // const listEndNumberedItems = Array.from(
+        //   dom.querySelectorAll("p.MsoListParagraphCxSpLast")
+        // );
+
+        // console.log({
+        //   listNumberedStartItems,
+        //   listMiddleNumberedItems,
+        //   listEndNumberedItems,
+        // });
+
+        // listNumberedStartItems.forEach((start, index) => {
+        //   if (start.getAttribute("style").includes("mso-list:l0")) {
+        //     const end = listEndNumberedItems[index];
+        //     wrapNodesInOrderedList(start, end);
+        //   }
+        // });
+
+        // console.log({ listStartItems, listMiddleItems, listEndItems });
 
         return dom.body.innerHTML;
-      }
+      };
 
+      levelOneFinishedString = handleWordWithClassesS1(
+        levelOneFinishedString,
+        colorMode
+      );
 
-      levelOneFinishedString = handleWordWithClasses(levelOneFinishedString, colorMode);
+      const handleWordWithClassesS2 = (text: string, colorMode: string) => {
+        const removeBreaks = () => {
+          const olLis = dom.querySelectorAll("li");
+          console.log("RUN");
+          olLis.forEach((li) => {
+            console.log("SADHBNJIASB, ", li);
+            const brElements = Array.from(li.querySelectorAll("br"));
+            brElements.forEach((br) => {
+              br.remove();
+            });
+          });
+        };
+
+        const removeMSOIgnores = () => {
+          console.log("DOM BEFORE SPANNAGE, ", dom);
+          const spans = dom.querySelectorAll("span");
+
+          console.log("RUN1");
+          spans.forEach((span) => {
+            console.log("SPAN: ", span);
+            if (span.getAttribute("style")?.includes("mso-list:Ignore")) {
+              console.log("TO REMOVE", span);
+              span.remove();
+            }
+          });
+
+          const lis = dom.querySelectorAll("li");
+
+          lis.forEach((li) => {
+            const textContent = li.innerText.trim();
+
+            // Check if the li text content starts with a number followed by a period and whitespace
+            if (/^\d+/.test(textContent)) {
+              const newTextContent = textContent.replace(/^\d+\./, ""); // Replace the matched part
+              li.innerText = newTextContent;
+            }
+
+            const firstChild = li.firstChild;
+            // Check if the first child is a text node and starts with a lowercase letter followed by a period
+            if (
+              firstChild &&
+              firstChild.nodeType === 3 &&
+              /^[a-z]\./i.test(firstChild.nodeValue)
+            ) {
+              const trimmedContent = firstChild.nodeValue.slice(2).trim(); // Remove the first two characters
+              firstChild.nodeValue = trimmedContent;
+
+              // Check if the modified textContent still contains nested lists
+              if (li.childNodes.length > 1) {
+                // Restore nested lists by appending the corresponding elements
+                const nestedLists = Array.from(li.childNodes).slice(1);
+                nestedLists.forEach((nestedList) => {
+                  li.appendChild(nestedList);
+                });
+              }
+            }
+          });
+        };
+
+        function wrapNodesInOrderedList(start: Element, end: Element) {
+          // Iterate over nodes between start and end
+          let currentNode = start;
+          const processed = [];
+          const levelOnesNumbered = [];
+          const levelTwosNumbered = [];
+          const levelThreesNumbered = [];
+          while (currentNode !== end.nextElementSibling) {
+            processed.push(currentNode);
+            if (
+              currentNode.getAttribute("style").includes("level2") &&
+              currentNode.getAttribute("style").includes("mso-list:l0")
+            ) {
+              levelTwosNumbered.push(currentNode);
+            } else if (
+              currentNode.getAttribute("style").includes("level3") &&
+              currentNode.getAttribute("style").includes("mso-list:l0")
+            ) {
+              levelThreesNumbered.push(currentNode);
+            } else if (
+              currentNode.getAttribute("style").includes("level1") &&
+              currentNode.getAttribute("style").includes("mso-list:l0")
+            ) {
+              levelOnesNumbered.push(currentNode);
+            }
+
+            currentNode = currentNode?.nextElementSibling;
+          }
+
+          console.log({
+            levelOnesNumbered,
+            levelTwosNumbered,
+            levelThreesNumbered,
+          });
+
+          levelThreesNumbered.forEach((three) => {
+            const liItem = dom.createElement("li");
+            const olItem = dom.createElement("ol");
+
+            const processed = [];
+            let currentThree = three;
+            while (
+              !processed.includes(currentThree) &&
+              currentThree !== null &&
+              (currentThree as Element).getAttribute("style").includes("level3")
+            ) {
+              processed.push(currentThree);
+              const threeItem = dom.createElement("li");
+              threeItem.innerHTML = (currentThree as Element).innerHTML;
+              olItem.append(threeItem);
+              if (
+                currentThree.nextElementSibling !== null &&
+                levelThreesNumbered.includes(currentThree.nextElementSibling)
+              ) {
+                currentThree = currentThree?.nextElementSibling;
+              }
+            }
+            liItem.append(olItem);
+            (processed[0] as Element).replaceWith(liItem);
+
+            processed.forEach((i, ind) => {
+              if (ind !== 0) {
+                (i as Element).remove();
+              }
+            });
+          });
+
+          // check rogue lis
+          const rogueThreeNumberedLis = Array.from(dom.querySelectorAll("li"));
+
+          // Check if next element following two is a three, if not, convert on the spot and append
+          // This fixes skipped p tags that dont have any level 3s
+          const toReplaceNumbered = [];
+          const replacementNumberedData = [];
+          levelTwosNumbered.forEach((two) => {
+            const nextSibling = (two as Element)?.nextElementSibling;
+            if (
+              nextSibling === null ||
+              !nextSibling.getAttribute("style")?.includes("level3")
+            ) {
+              const li = dom.createElement("li");
+              li.innerText = (two as HTMLParagraphElement).innerText;
+              replacementNumberedData.push(li);
+              toReplaceNumbered.push(two);
+              // nextSibling = nextInLine;
+            }
+          });
+
+          toReplaceNumbered.forEach((replaceme, index) => {
+            (replaceme as Element).replaceWith(replacementNumberedData[index]);
+          });
+
+          // check if previous sibling is in twos, if it is, convert to li and append the
+          rogueThreeNumberedLis.forEach((rogue) => {
+            if (levelTwosNumbered.includes(rogue.previousElementSibling)) {
+              const previous = rogue.previousElementSibling;
+
+              const text = (previous as HTMLParagraphElement).innerText;
+              const newLi = dom.createElement("li");
+              newLi.innerText = text;
+              previous.replaceWith(newLi);
+            }
+          });
+
+          const rogueTwoNumberedLis = Array.from(
+            dom.querySelectorAll("li")
+          ).filter((li) => li.parentElement.tagName !== "UL");
+          console.log("ROGUE TWOS", rogueTwoNumberedLis);
+
+          const processedTwos = [];
+          const groups = [];
+          rogueTwoNumberedLis.forEach((rogue) => {
+            // create a group which will include the list of consecutive level twos
+            const group = [];
+
+            // create a while loop that will iterate over each rogue to find consecutive rogues and add them to the group
+            let currentElement: Element = rogue;
+            while (
+              (currentElement !== null &&
+                !processedTwos.includes(currentElement) &&
+                currentElement?.tagName === "LI") ||
+              currentElement?.tagName === "li"
+            ) {
+              processedTwos.push(currentElement);
+              group.push(currentElement);
+              currentElement = currentElement.nextElementSibling as Element;
+            }
+
+            groups.push(group);
+          });
+
+          groups.forEach((groupOfLis) => {
+            const twoOLWrapper = dom.createElement("li");
+            const twoOl = dom.createElement("ol");
+
+            (groupOfLis as Element[]).forEach((li, index) => {
+              const clone = li.cloneNode(true);
+              twoOl.append(clone as HTMLLIElement);
+            });
+            twoOLWrapper.append(twoOl);
+            (groupOfLis as Element[]).forEach((li, index) => {
+              if (index === 0) {
+                li.replaceWith(twoOLWrapper);
+              } else {
+                li.remove();
+              }
+            });
+          });
+
+          // Change remaining p tags in levelOnes to lis
+          levelOnesNumbered.forEach((one) => {
+            const text = (one as HTMLParagraphElement).innerText;
+            const li = dom.createElement("li");
+            li.innerText = text;
+            (one as Element).replaceWith(li);
+          });
+
+          // wrap rogue lis in a ul
+          const roguesOl = Array.from(dom.querySelectorAll("li")).filter(
+            (li) =>
+              li.parentElement.tagName !== "UL" &&
+              li.parentElement.tagName !== "OL"
+          );
+          const wrapperOl = dom.createElement("ol");
+          roguesOl.forEach((rogue) => {
+            const clone = rogue.cloneNode(true);
+            wrapperOl.append(clone);
+          });
+          roguesOl.forEach((rogue, index) => {
+            if (index === 0) {
+              rogue.replaceWith(wrapperOl);
+            } else {
+              rogue.remove();
+            }
+          });
+
+          removeBreaks();
+          removeMSOIgnores();
+        }
+
+        let newDomString = text;
+        const parser = new DOMParser();
+        const dom = parser.parseFromString(newDomString, "text/html");
+
+        const listStartItems = Array.from(
+          dom.querySelectorAll("p.MsoListParagraphCxSpFirst")
+        );
+        const listMiddleItems = Array.from(
+          dom.querySelectorAll("p.MsoListParagraphCxSpMiddle")
+        );
+        const listEndItems = Array.from(
+          dom.querySelectorAll("p.MsoListParagraphCxSpLast")
+        );
+
+        console.log("OLD DOM: ", dom);
+
+        listStartItems.forEach((start, index) => {
+          if (start.getAttribute("style").includes("mso-list:l0")) {
+            const end = listEndItems[index];
+            wrapNodesInOrderedList(start, end);
+          }
+        });
+
+        console.log("DOM AFTER: ", dom);
+
+        return dom.body.innerHTML;
+      };
+
+      levelOneFinishedString = handleWordWithClassesS2(
+        levelOneFinishedString,
+        colorMode
+      );
       // console.log("STRING")
       // console.log("STRING", levelOneFinishedString)
       const parser = new DOMParser();
       const dom = parser.parseFromString(levelOneFinishedString, "text/html");
-      console.log(dom)
+      console.log(dom);
 
       const nodes = $generateNodesFromDOM(editor, dom);
-      console.log(nodes)
-
+      console.log(nodes);
 
       // console.log(levelTwoFinishedString);
       // console.log(levelThreeFinishedString);
       // console.log(levelOneFinishedString);
-
 
       return $insertGeneratedNodes(editor, nodes, selection);
     } catch (e) {
@@ -1266,11 +1577,9 @@ function $insertDataTransferForRichText(
   }
 }
 
-// // For each item in the dom's body, check its class. 
+// // For each item in the dom's body, check its class.
 // const pTags = Array.from(dom.querySelectorAll('p'));
 // console.log(pTags)
-
-
 
 // // clone and remove any styles
 // const newList: HTMLParagraphElement[] = []
@@ -1286,7 +1595,7 @@ function $insertDataTransferForRichText(
 // newList.forEach((p)=> {
 //   // If the class is MsoNormal, ignore
 //   if (p.classList.contains('MsoNormal')) {
-//     // 
+//     //
 //   } else if (p.classList.contains('MsoListParagraphCxSpFirst')) {
 
 //   } else if (MsoListParagraphCxSpMiddle) {
