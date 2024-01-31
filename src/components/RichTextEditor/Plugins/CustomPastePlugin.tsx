@@ -1249,34 +1249,6 @@ function $insertDataTransferForRichText(
           }
         });
 
-        // console.log("DOM AFTER: ", dom);
-
-        // const listNumberedStartItems = Array.from(
-        //   dom.querySelectorAll("p.MsoListParagraphCxSpFirst")
-        // );
-
-        // const listMiddleNumberedItems = Array.from(
-        //   dom.querySelectorAll("p.MsoListParagraphCxSpMiddle")
-        // );
-        // const listEndNumberedItems = Array.from(
-        //   dom.querySelectorAll("p.MsoListParagraphCxSpLast")
-        // );
-
-        // console.log({
-        //   listNumberedStartItems,
-        //   listMiddleNumberedItems,
-        //   listEndNumberedItems,
-        // });
-
-        // listNumberedStartItems.forEach((start, index) => {
-        //   if (start.getAttribute("style").includes("mso-list:l0")) {
-        //     const end = listEndNumberedItems[index];
-        //     wrapNodesInOrderedList(start, end);
-        //   }
-        // });
-
-        // console.log({ listStartItems, listMiddleItems, listEndItems });
-
         return dom.body.innerHTML;
       };
 
@@ -1576,35 +1548,6 @@ function $insertDataTransferForRichText(
     }
   }
 }
-
-// // For each item in the dom's body, check its class.
-// const pTags = Array.from(dom.querySelectorAll('p'));
-// console.log(pTags)
-
-// // clone and remove any styles
-// const newList: HTMLParagraphElement[] = []
-// pTags.forEach((p) => {
-
-//   const newNode = p.cloneNode(true);
-//   (newNode as HTMLParagraphElement).style.cssText = ""
-//   // p.replaceWith(newNode);
-//   newList.push(newNode as HTMLParagraphElement);
-// })
-
-// console.log(newList)
-// newList.forEach((p)=> {
-//   // If the class is MsoNormal, ignore
-//   if (p.classList.contains('MsoNormal')) {
-//     //
-//   } else if (p.classList.contains('MsoListParagraphCxSpFirst')) {
-
-//   } else if (MsoListParagraphCxSpMiddle) {
-
-//   } else if (MsoListParagraphCxSpLast) {
-
-//   }
-
-// })
 
 function onPasteForRichText(
   colorMode: string,
