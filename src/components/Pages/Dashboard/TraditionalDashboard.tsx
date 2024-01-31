@@ -13,19 +13,17 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
-import { Head } from "../../Base/Head";
 import { useCallback, useEffect, useState } from "react";
-import theme from "../../../theme";
 import { useUser } from "../../../lib/hooks/useUser";
+import theme from "../../../theme";
+import { Head } from "../../Base/Head";
+import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
 // import { IDashProps } from "../../../types";
-import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 import { UserFeedbackModal } from "@/components/Modals/UserFeedbackModal";
 import { FaDatabase } from "react-icons/fa";
-import { MdAddTask, MdScience } from "react-icons/md";
-import { GrCatalogOption } from "react-icons/gr";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
+import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 
 export const TraditionalDashboard = () => {
   const user = useUser();
