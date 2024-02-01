@@ -432,7 +432,7 @@ const OldHeader = () => {
                           </Flex>
                         </HStack>
 
-                        <Grid w={"100%"} py={2}>
+                        <Grid w={"100%"} py={2} zIndex={99}>
                           {/* Projects */}
                           <SidebarNavMenu
                             menuName="Projects"
@@ -469,7 +469,7 @@ const OldHeader = () => {
               </Box>
             </Box>
           ) : (
-            <Box flexGrow={1} justifyContent={"space-between"} display={"flex"}>
+            <Box flexGrow={1} justifyContent={"space-between"} display={"flex"} zIndex={99}>
               {/* Basic Navigation */}
               <HStack>
                 {/* Projects */}
