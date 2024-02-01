@@ -53,8 +53,8 @@ export const SidebarNavMenu = ({
         ? { bg: `${cScheme}.500` }
         : {}
       : cScheme
-      ? `${cScheme}.500`
-      : "transparent";
+        ? `${cScheme}.500`
+        : "transparent";
 
   const fontColorStyle =
     isHovered || isOpen
@@ -62,15 +62,15 @@ export const SidebarNavMenu = ({
         ? { color: fColor }
         : "white"
       : fColor
-      ? fColor
-      : "whiteAlpha.700";
+        ? fColor
+        : "whiteAlpha.700";
 
   return (
-    <Box zIndex={99999}>
+    <Box zIndex={99}>
       <Menu isOpen={isOpen}>
         <MenuButton
           colorScheme={cScheme}
-          zIndex={99999}
+          zIndex={99}
           bg={bgStyle}
           color={fontColorStyle}
           _hover={{

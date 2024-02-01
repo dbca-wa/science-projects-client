@@ -31,6 +31,7 @@ interface ChatUserProps {
 
   businessAreas: IBusinessArea[];
   branches: IBranch[];
+  usernameColour?: string;
 }
 
 export const ChatUser: React.FC<ChatUserProps> = React.memo(
@@ -47,6 +48,7 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
     businessAreas,
     branches,
     nameCentered,
+    usernameColour,
   }) => {
     const { colorMode } = useColorMode();
 
@@ -120,13 +122,15 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
                     pl={1}
                     mt={0}
                     color={
-                      otherUser
-                        ? colorMode === "light"
-                          ? "blue.500"
-                          : "blue.300"
-                        : colorMode === "light"
-                        ? "blackAlpha.700"
-                        : "whiteAlpha.800"
+                      usernameColour ? usernameColour :
+                        otherUser
+                          ? colorMode === "light"
+                            ? "blue.500"
+                            : "blue.300"
+                          : colorMode === "light"
+                            ? "blackAlpha.700"
+                            : "whiteAlpha.800"
+
                     }
                   >
                     {displayName}
@@ -137,7 +141,7 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
                   <Box
                     userSelect={"none"}
                     mt={"2px"}
-                    //   right={12} pos={"absolute"}
+                  //   right={12} pos={"absolute"}
                   >
                     <Text
                       alignItems={"center"}
