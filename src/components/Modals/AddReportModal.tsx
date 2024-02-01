@@ -1,9 +1,9 @@
 import { createReport } from "@/lib/api";
 import { IReportCreation } from "@/types";
-import { Box, Text, Button, FormControl, FormHelperText, FormLabel, Input, InputGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useToast, VStack, Grid } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormHelperText, FormLabel, Grid, Input, InputGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, VStack, useColorMode, useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 

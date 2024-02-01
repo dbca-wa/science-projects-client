@@ -18,6 +18,8 @@ import { PaginatorProject } from "../components/Pages/Projects/PaginatorProject"
 import { useNavigate } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
 import { SearchProjects } from "@/components/Navigation/SearchProjects";
+import { FaDownload } from "react-icons/fa";
+import { downloadProjectsCSV } from "@/lib/api";
 
 export const Projects = () => {
   const { colorMode } = useColorMode();
@@ -144,6 +146,21 @@ export const Projects = () => {
           justifyContent={"flex-end"}
           alignItems={"center"}
         >
+          <Button
+            mr={4}
+            variant={"solid"}
+            // colorScheme="green"
+            color={"white"}
+            background={colorMode === "light" ? "green.500" : "green.600"}
+            _hover={{
+              background: colorMode === "light" ? "green.400" : "green.500",
+            }}
+            onClick={() => downloadProjectsCSV()}
+            leftIcon={<FaDownload />}
+          >
+            CSV
+          </Button>
+
           <Button
             variant={"solid"}
             // colorScheme="green"
