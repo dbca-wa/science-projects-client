@@ -13,14 +13,17 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
-import { Head } from "../../Base/Head";
 import { useCallback, useEffect, useState } from "react";
-import theme from "../../../theme";
 import { useUser } from "../../../lib/hooks/useUser";
+import theme from "../../../theme";
+import { Head } from "../../Base/Head";
+import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
 // import { IDashProps } from "../../../types";
-import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 import { UserFeedbackModal } from "@/components/Modals/UserFeedbackModal";
+import { FaDatabase } from "react-icons/fa";
+import { FaCirclePlus } from "react-icons/fa6";
+import { TbWorldWww } from "react-icons/tb";
+import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 
 export const TraditionalDashboard = () => {
   const user = useUser();
@@ -31,6 +34,11 @@ export const TraditionalDashboard = () => {
   // const [annualReportText, setAnnualReportText] = useState("Annual Report");
   const [shouldConcat, setShouldConcat] = useState(false);
   // const [startDate, setStartDate] = useState<string>();
+
+  const handleAddTaskClick = () => {
+    // console.log("Clicked add button");
+    onAddTaskOpen();
+  };
 
   const handleResize = useCallback(() => {
     // 1150 = the breakpoint at which issues occur with text overlaying
@@ -164,13 +172,14 @@ export const TraditionalDashboard = () => {
         my={5}
         templateColumns={{
           base: "repeat(1, 1fr)",
-          md: "repeat(2, 1fr)",
-          lg: "repeat(2, 1fr)",
+          md: "repeat(3, 1fr)",
+          lg: "repeat(3, 1fr)",
           // xl: "repeat(3, 1fr)",
         }}
         gap={10}
       >
         <Button
+          leftIcon={<FaDatabase />}
           bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
           color={colorMode === "light" ? `white` : `whiteAlpha.900`}
           _hover={{
@@ -183,10 +192,11 @@ export const TraditionalDashboard = () => {
           {shouldConcat ? "Data" : "Data Catalogue"}
         </Button>
         <Button
-          bgColor={colorMode === "light" ? `green.500` : `green.600`}
+          leftIcon={<TbWorldWww />}
+          bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
           color={colorMode === "light" ? `white` : `whiteAlpha.900`}
           _hover={{
-            bg: colorMode === "light" ? `green.600` : `green.400`,
+            bg: colorMode === "light" ? `blue.600` : `blue.400`,
             color: colorMode === "light" ? `white` : `white`,
           }}
           as={"a"}
@@ -194,8 +204,22 @@ export const TraditionalDashboard = () => {
         >
           {shouldConcat ? "Scientific Sites" : "Scientific Site Register"}
         </Button>
+        <Button
+          leftIcon={<FaCirclePlus />}
+          bgColor={colorMode === "light" ? `green.500` : `green.600`}
+          color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+          _hover={{
+            bg: colorMode === "light" ? `green.600` : `green.400`,
+            color: colorMode === "light" ? `white` : `white`,
+          }}
+          onClick={handleAddTaskClick}
+        >
+          Add Quick Task
+        </Button>
       </Grid>
-      <TraditionalTasksAndProjects onAddTaskOpen={onAddTaskOpen} />
+      <TraditionalTasksAndProjects
+      // onAddTaskOpen={onAddTaskOpen}
+      />
 
       <Center mt={6}></Center>
     </>
