@@ -217,7 +217,7 @@ export const Projects = () => {
               }}
               // px={4}
               w={"100%"}
-              // bg={"red"}
+            // bg={"red"}
             >
               <Select
                 onChange={handleOnlySelectedProjectKindChange}
@@ -227,15 +227,15 @@ export const Projects = () => {
                 style={
                   colorMode === "light"
                     ? {
-                        color: "black",
-                        borderColor: "gray.100",
-                        caretColor: "black !important",
-                      }
+                      color: "black",
+                      borderColor: "gray.100",
+                      caretColor: "black !important",
+                    }
                     : {
-                        color: "white",
-                        borderColor: "white",
-                        caretColor: "black !important",
-                      }
+                      color: "white",
+                      borderColor: "white",
+                      caretColor: "black !important",
+                    }
                 }
               >
                 <option value={"All"}>All Kinds</option>
@@ -252,15 +252,15 @@ export const Projects = () => {
                 style={
                   colorMode === "light"
                     ? {
-                        color: "black",
-                        borderColor: "gray.100",
-                        caretColor: "black !important",
-                      }
+                      color: "black",
+                      borderColor: "gray.100",
+                      caretColor: "black !important",
+                    }
                     : {
-                        color: "white",
-                        borderColor: "white",
-                        caretColor: "black !important",
-                      }
+                      color: "white",
+                      borderColor: "white",
+                      caretColor: "black !important",
+                    }
                 }
               >
                 <option value={"All"}>All Statuses</option>
@@ -273,6 +273,7 @@ export const Projects = () => {
                 <option value={"completed"}>Completed and Closed</option>
                 <option value={"terminated"}>Terminated</option>
                 <option value={"suspended"}>Suspended</option>
+                <option value={"unknown"}>Unknown</option>
               </Select>
             </Grid>
           </Grid>
