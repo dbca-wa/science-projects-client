@@ -1,7 +1,7 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import { useProjectSearchContext } from "@/lib/hooks/ProjectSearchContext";
-import { IMainDoc } from "@/types";
-import { Box, Text, Flex, useColorMode, Center } from "@chakra-ui/react";
+import { ITaskEndorsement } from "@/types";
+import { Box, Center, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaBiohazard } from "react-icons/fa";
@@ -10,11 +10,11 @@ import { PiPlantFill } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
 
 interface IProps {
-  document: IMainDoc;
+  endorsement: ITaskEndorsement;
   kind: "aec" | "bm" | "hc";
 }
 export const ModernEndorsementTaskDisplayCard = ({
-  document,
+  endorsement,
   kind,
 }: IProps) => {
   const { colorMode } = useColorMode();
@@ -32,25 +32,42 @@ export const ModernEndorsementTaskDisplayCard = ({
   const { isOnProjectsPage } = useProjectSearchContext();
 
   const handleProjectTaskCardClick = () => {
-    goToProjectDocument(document?.project?.pk, document);
+    goToProjectDocument(
+      endorsement?.project_plan?.document?.project?.pk,
+      endorsement
+    );
   };
 
-  const goToProjectDocument = (pk: number | undefined, document: IMainDoc) => {
+  const goToProjectDocument = (
+    pk: number | undefined,
+    endorsement: ITaskEndorsement
+  ) => {
     let urlkind = "";
-    if (document?.kind === "progressreport") {
+    if (
+      endorsement?.project_plan?.document?.project?.kind === "progressreport"
+    ) {
       urlkind = "progress";
-    } else if (document?.kind === "projectclosure") {
+    } else if (
+      endorsement?.project_plan?.document?.project?.kind === "projectclosure"
+    ) {
       urlkind = "closure";
-    } else if (document?.kind === "studentreport") {
+    } else if (
+      endorsement?.project_plan?.document?.project?.kind === "studentreport"
+    ) {
       urlkind = "student";
-    } else if (document?.kind === "concept") {
+    } else if (
+      endorsement?.project_plan?.document?.project?.kind === "concept"
+    ) {
       urlkind = "concept";
-    } else if (document?.kind === "projectplan") {
+    } else if (
+      endorsement?.project_plan?.document?.project?.kind === "projectplan"
+    ) {
       urlkind = "project";
     }
 
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
+      console.log(endorsement?.project_plan?.document?.project?.pk);
     } else if (isOnProjectsPage) {
       navigate(`${pk}/${urlkind}`);
     } else {
@@ -89,7 +106,7 @@ export const ModernEndorsementTaskDisplayCard = ({
       >
         <Box w={"100%"}>
           <ExtractedHTMLTitle
-            htmlContent={document?.project?.title}
+            htmlContent={endorsement?.project_plan?.document?.project?.title}
             color={colorMode === "light" ? "blue.500" : "blue.300"}
             fontWeight={"semibold"}
           />
