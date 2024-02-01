@@ -3,6 +3,7 @@ import { IReportCreation } from "@/types";
 import { Box, Text, Button, FormControl, FormHelperText, FormLabel, Input, InputGroup, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode, useToast, VStack, Grid } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 
@@ -25,8 +26,9 @@ export const AddReportModal = ({
     //   toastIdRef.current = toast(data);
     // };
 
-    const yearData = watch("year");
+    const [thisYear, setThisYear] = useState(new Date().getFullYear());
 
+    const yearData = watch("year");
 
     const mutation = useMutation(createReport, {
         onSuccess: () => {
@@ -37,6 +39,7 @@ export const AddReportModal = ({
             });
             queryClient.invalidateQueries(["reports"]);
             reset();
+            onClose();
         },
         onError: (e: AxiosError) => {
             let errorDescription = "";
@@ -72,107 +75,111 @@ export const AddReportModal = ({
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size={"lg"}>
-            <ModalOverlay />
-            <ModalContent
-                color={colorMode === "light" ? "black" : "white"}
-                bg={colorMode === "light" ? "white" : "gray.800"}
-            >
-                <ModalHeader>Create Annual Report Info</ModalHeader>
-                <ModalCloseButton />
-
-                <ModalBody
-                // as="form"
-                // id="reportcreation-form"
-                // onSubmit={onSubmit}
+        thisYear ?
+            <Modal isOpen={isOpen} onClose={onClose} size={"lg"}>
+                <ModalOverlay />
+                <ModalContent
+                    color={colorMode === "light" ? "black" : "white"}
+                    bg={colorMode === "light" ? "white" : "gray.800"}
                 >
-                    <VStack
-                        spacing={10}
-                    // as="form" id="add-form" onSubmit={handleSubmit(onSubmit)}
+                    <ModalHeader>Create Annual Report Info</ModalHeader>
+                    <ModalCloseButton />
+
+                    <ModalBody
+                    // as="form"
+                    // id="reportcreation-form"
+                    // onSubmit={onSubmit}
                     >
-                        <FormControl isRequired>
-                            <FormLabel>Year</FormLabel>
-                            <InputGroup>
-                                <Input
-                                    autoFocus
-                                    autoComplete="off"
-                                    {...register("year", { required: true })}
-                                    defaultValue={new Date().getFullYear()}
-                                    required
-                                    type="number"
-                                />
-                            </InputGroup>
-                            <FormHelperText>
-                                The year for the report.
-                                e.g. Type 2023 for financial year 2022-23.
-                            </FormHelperText>
-                        </FormControl>
-
-                        {mutation.isError ? (
-                            <Box mt={4}>
-                                {Object.keys(
-                                    (mutation.error as AxiosError).response.data
-                                ).map((key) => (
-                                    <Box key={key}>
-                                        {(
-                                            (mutation.error as AxiosError).response.data[
-                                            key
-                                            ] as string[]
-                                        ).map((errorMessage, index) => (
-                                            <Text key={`${key}-${index}`} color="red.500">
-                                                {`${key}: ${errorMessage}`}
-                                            </Text>
-                                        ))}
-                                    </Box>
-                                ))}
-                            </Box>
-                        ) : null}
-                    </VStack>
-                </ModalBody>
-
-                <ModalFooter>
-                    <Grid gridTemplateColumns={"repeat(2, 1fr)"}>
-
-                        <Button
-                            // variant="ghost"
-                            mr={3}
-                            onClick={onClose}
+                        <VStack
+                            spacing={10}
+                        // as="form" id="add-form" onSubmit={handleSubmit(onSubmit)}
                         >
-                            Cancel
-                        </Button>
-                        <Button
-                            // form="add-form"
-                            // type="submit"
-                            isLoading={mutation.isLoading}
-                            color={"white"}
-                            background={colorMode === "light" ? "blue.500" : "blue.600"}
-                            _hover={{
-                                background: colorMode === "light" ? "blue.400" : "blue.500",
-                            }}
-                            // size="lg"
-                            width={"100%"}
-                            onClick={() => {
-                                onSubmit({
-                                    old_id: 1,
-                                    year: yearData,
-                                    //   date_open: new Date,
-                                    //   date_closed: endDate,
-                                    dm: "<p></p>",
-                                    publications: "<p></p>",
-                                    research_intro: "<p></p>",
-                                    service_delivery_intro: "<p></p>",
-                                    student_intro: "<p></p>",
-                                    seek_update: false,
-                                });
-                            }}
-                        >
-                            Create
-                        </Button>
+                            <FormControl isRequired>
+                                <FormLabel>Year</FormLabel>
+                                <InputGroup>
+                                    <Input
+                                        autoFocus
+                                        autoComplete="off"
+                                        defaultValue={thisYear}
+                                        onChange={(e) => setThisYear(Number(e.target.value))}
+                                        {...register("year", { required: true, value: thisYear },)}
+                                        required
+                                        type="number"
+                                    />
+                                </InputGroup>
+                                <FormHelperText>
+                                    The year for the report.
+                                    e.g. Type 2023 for financial year 2022-23.
+                                </FormHelperText>
+                            </FormControl>
 
-                    </Grid>
+                            {mutation.isError ? (
+                                <Box mt={4}>
+                                    {Object.keys(
+                                        (mutation.error as AxiosError).response.data
+                                    ).map((key) => (
+                                        <Box key={key}>
+                                            {(
+                                                (mutation.error as AxiosError).response.data[
+                                                key
+                                                ] as string[]
+                                            ).map((errorMessage, index) => (
+                                                <Text key={`${key}-${index}`} color="red.500">
+                                                    {`${key}: ${errorMessage}`}
+                                                </Text>
+                                            ))}
+                                        </Box>
+                                    ))}
+                                </Box>
+                            ) : null}
+                        </VStack>
+                    </ModalBody>
 
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                    <ModalFooter>
+                        <Grid gridTemplateColumns={"repeat(2, 1fr)"}>
+
+                            <Button
+                                // variant="ghost"
+                                mr={3}
+                                onClick={onClose}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                // form="add-form"
+                                // type="submit"
+                                isLoading={mutation.isLoading}
+                                color={"white"}
+                                background={colorMode === "light" ? "blue.500" : "blue.600"}
+                                _hover={{
+                                    background: colorMode === "light" ? "blue.400" : "blue.500",
+                                }}
+                                // size="lg"
+                                width={"100%"}
+                                onClick={() => {
+                                    onSubmit({
+                                        old_id: 1,
+                                        year: yearData,
+                                        //   date_open: new Date,
+                                        //   date_closed: endDate,
+                                        dm: "<p></p>",
+                                        publications: "<p></p>",
+                                        research_intro: "<p></p>",
+                                        service_delivery_intro: "<p></p>",
+                                        student_intro: "<p></p>",
+                                        seek_update: false,
+                                    });
+                                }}
+                                isDisabled={!yearData}
+                            >
+                                Create
+                            </Button>
+
+                        </Grid>
+
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+            : null
     );
 };
