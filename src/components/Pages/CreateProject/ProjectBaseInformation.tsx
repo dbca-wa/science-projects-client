@@ -135,6 +135,7 @@ export const ProjectBaseInformation = ({
             value={projectTitle}
             setValueFunction={setProjectTitle}
             setValueAsPlainText={false}
+            shouldFocus={true}
           />
 
           <TagInput setTagFunction={setKeywords} />
@@ -150,6 +151,7 @@ export const ProjectBaseInformation = ({
             value={projectSummary}
             setValueFunction={setProjectSummary}
             setValueAsPlainText={false}
+            shouldFocus={false}
           />
         </Box>
 
