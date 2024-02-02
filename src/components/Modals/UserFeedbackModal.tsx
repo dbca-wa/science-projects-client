@@ -14,16 +14,16 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Textarea,
   ToastId,
   useColorMode,
-  useToast,
+  useToast
 } from "@chakra-ui/react";
-import { IFeedback, IUserMe } from "../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useRef } from "react";
 import { createFeedbackItem } from "../../lib/api";
+import { IFeedback, IUserMe } from "../../types";
+import { FeedbackRichTextEditor } from "../RichTextEditor/Editors/FeedbackRichTextEditor";
 
 interface IUserInterface {
   userData: IUserMe;
@@ -48,7 +48,7 @@ export const UserFeedbackModal = ({
     register,
     handleSubmit,
     reset,
-    formState: { isDirty, isValid },
+    watch,
   } = useForm<IFeedback>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
@@ -100,13 +100,33 @@ export const UserFeedbackModal = ({
     feedbackCreationMutation.mutate(formData);
   };
 
+  const [text, setText] = useState("");
+  const [canSubmit, setCanSubmit] = useState(false);
+
+  useEffect(() => {
+    // console.log(text);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, "text/html");
+
+    const content = doc.body.textContent;
+    if (content.length > 0) {
+      setCanSubmit(true);
+    } else {
+      setCanSubmit(false)
+    }
+  }, [text])
+
+  const kindValue = watch("kind")
+  const statusValue = watch("status")
+  const userValue = watch("user")
+
   return (
     <Modal
       isOpen={isFeedbackModalOpen}
       onClose={onCloseFeedbackModal}
-      size={"xl"}
-      // scrollBehavior="inside"
-      // isCentered={true}
+      size={"3xl"}
+    // scrollBehavior="inside"
+    // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -147,14 +167,16 @@ export const UserFeedbackModal = ({
           </FormControl>
 
           <FormControl>
-            <FormLabel>Feedback/Request</FormLabel>
-            <InputGroup>
-              <Textarea
+
+            <FeedbackRichTextEditor
+              userData={user?.userData}
+              setText={setText}
+            />
+            {/* <Textarea
                 mt={2}
                 placeholder="What would you like to say..."
                 {...register("text", { required: true })}
-              />
-            </InputGroup>
+              /> */}
           </FormControl>
         </ModalBody>
 
@@ -167,14 +189,25 @@ export const UserFeedbackModal = ({
             Cancel
           </Button>
           <Button
-            form="feedback-form"
-            type="submit"
+            // form="feedback-form"
+            // type="submit"
+            // isDisabled={!isDirty || !isValid}
+
+
             isLoading={feedbackCreationMutation.isLoading}
-            isDisabled={!isDirty || !isValid}
+            isDisabled={!canSubmit}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{
               bg: colorMode === "dark" ? "green.400" : "green.300",
+            }}
+            onClick={() => {
+              onSubmitFeedbackCreation({
+                "user": userValue,
+                "kind": kindValue,
+                "status": statusValue,
+                "text": text,
+              })
             }}
           >
             Send Feedback
