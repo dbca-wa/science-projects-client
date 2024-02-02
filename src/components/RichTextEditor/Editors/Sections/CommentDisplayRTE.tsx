@@ -138,7 +138,7 @@ export const CommentDisplayRTE = ({
   const onError = (error: Error) => {
     console.log(error);
   };
-  const [theme, setTheme] = useState(generateTheme(colorMode));
+  const theme = generateTheme(colorMode);
 
   const displayDate = updated_at > created_at ? updated_at : created_at;
 

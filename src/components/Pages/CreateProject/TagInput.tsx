@@ -14,42 +14,62 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 
-const capitalizeFirstLetter = (text: string) => {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
 
 interface Props {
   setTagFunction: React.Dispatch<React.SetStateAction<string[]>>;
   preExistingTags?: string[];
 }
+
+
 const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
-  const [inputValue, setInputValue] = useState<string>("");
-  const [tags, setTags] = useState<string[]>([]);
-  useEffect(() => {
-    if (preExistingTags?.length >= 1) {
-      // console.log(preExistingTags.length, preExistingTags);
-      if (preExistingTags[0] === "") {
-        setTags([]);
-      } else {
-        setTags([...preExistingTags]);
-      }
-    }
-  }, []);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
+  // Helpers
+  const capitalizeFirstLetter = (text: string) => {
+    return text.charAt(0).toUpperCase() + text.slice(1);
   };
-
   const updateTags = (updatedTags: string[]) => {
     setTagFunction(updatedTags);
     setTags(updatedTags);
   };
 
-  // useEffect(() => {
-  //   if (tags) {
-  //     console.log(tags);
-  //   }
-  // }, [tags]);
+  const removeTag = (tag: string) => {
+    const updatedTags = tags.filter((t) => t !== tag);
+    updateTags(updatedTags);
+  };
+
+  // State and Use Effects
+  const [isInputActive, setInputActive] = useState<boolean>(false);
+
+  const [inputValue, setInputValue] = useState<string>("");
+  const [tags, setTags] = useState<string[]>([]);
+  useEffect(() => {
+    console.log(preExistingTags)
+    if (preExistingTags?.length >= 1) {
+      // console.log(preExistingTags.length, preExistingTags);
+      if (preExistingTags[0] === "") {
+        setTags([]);
+      } else {
+        const splitTags = preExistingTags[0].split(', ')
+        setTags([...splitTags]);
+      }
+    }
+  }, []);
+
+
+  // Funcs
+
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && isInputActive) {
+      // Prevent the default behavior of the Enter key
+      event.preventDefault();
+      addTags();
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  };
+
 
   const addTags = () => {
     const newTags = inputValue
@@ -64,27 +84,15 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
           )
       );
 
-    // console.log(newTags);
-
     if (newTags.length > 0) {
       const updatedTags = [...tags, ...newTags.map(capitalizeFirstLetter)];
       updateTags(updatedTags);
     }
 
-    // Clear after adding/detecting duplicate tags
     setInputValue("");
   };
 
-  const removeTag = (tag: string) => {
-    const updatedTags = tags.filter((t) => t !== tag);
-    updateTags(updatedTags);
-  };
-
-  useEffect(() => {
-    if (inputValue.includes(", ")) {
-      addTags();
-    }
-  }, [inputValue]);
+  // Variables
 
   const { colorMode } = useColorMode();
 
@@ -95,8 +103,10 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
         <Input
           value={inputValue}
           onChange={handleInputChange}
+          onKeyDown={handleInputKeyDown}
           placeholder="Add some keywords..."
-          onBlur={addTags}
+          onFocus={() => setInputActive(true)}
+          onBlur={() => setInputActive(false)}
         />
       </InputGroup>
       <FormHelperText color={colorMode === "light" ? "gray.500" : "gray.400"}>
@@ -130,7 +140,3 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
 };
 
 export default TagInput;
-
-// .split(', ')
-// .map((tag) => tag.trim())
-// .filter((tag) => tag !== '' && !tags.includes(tag));
