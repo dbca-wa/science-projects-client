@@ -25,6 +25,7 @@ interface IProps {
   value: string;
   setValueFunction: React.Dispatch<React.SetStateAction<string>>;
   allowInsertButton?: boolean;
+  shouldFocus?: boolean;
 }
 
 export const UnboundStatefulEditor = ({
@@ -38,6 +39,7 @@ export const UnboundStatefulEditor = ({
   isRequired,
   placeholder,
   allowInsertButton,
+  shouldFocus
 }: IProps) => {
   const { colorMode } = useColorMode();
 
@@ -127,6 +129,7 @@ export const UnboundStatefulEditor = ({
             value={value}
             setValueAsPlainText={setValueAsPlainText}
             setValueFunction={setValueFunction}
+            shouldFocus={shouldFocus ? shouldFocus : undefined}
           />
         </Box>
       </InputGroup>

@@ -14,6 +14,7 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { PrepopulateCommentDisplayPlugin } from "./../../Plugins/PrepopulateCommentDisplayPlugin";
+import { CustomFocusPlugin } from "../../Plugins/CustomFocusPlugin";
 
 interface Props {
   allowInsertButton?: boolean;
@@ -23,6 +24,7 @@ interface Props {
   value: string;
   setValueFunction: React.Dispatch<React.SetStateAction<string>>;
   initialConfig: InitialConfigType;
+  shouldFocus?: boolean;
   // editorRef: any;
 }
 
@@ -35,6 +37,7 @@ export const SimpleStatefulRTE = ({
   setValueAsPlainText,
   value,
   setValueFunction,
+  shouldFocus,
 }: Props) => {
   return (
     <>
@@ -60,7 +63,11 @@ export const SimpleStatefulRTE = ({
             });
           }}
         />
-        <PrepopulateCommentDisplayPlugin data={value} />
+
+        {value && value !== "" && (
+          <PrepopulateCommentDisplayPlugin data={value} />
+
+        )}
 
         {/* Text Area */}
         <RichTextPlugin
@@ -107,6 +114,8 @@ export const SimpleStatefulRTE = ({
 
         <ClearEditorPlugin />
         {/* <DataDisplayPlugin setDisplayData={setDisplayData} /> */}
+        {shouldFocus && (<CustomFocusPlugin shouldFocus={shouldFocus} />
+        )}
       </LexicalComposer>
     </>
   );
