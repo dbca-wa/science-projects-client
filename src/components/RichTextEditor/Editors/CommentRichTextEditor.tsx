@@ -102,7 +102,7 @@ export const CommentRichTextEditor = ({
   const onError = (error: Error) => {
     console.log(error);
   };
-  const [theme, setTheme] = useState(generateTheme(colorMode));
+  const theme = generateTheme(colorMode);
   // const [editorText, setEditorText] = useState<string | null>("");
 
   const distilled = useDistilledHtml(comment);
@@ -278,7 +278,7 @@ const UserContainer = ({ userData }: UserContainerProps) => {
               color={
                 colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
               }
-              // w={"100%"}
+            // w={"100%"}
             >
               {`${userData?.first_name} ${userData?.last_name}`}
             </Text>

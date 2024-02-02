@@ -30,7 +30,7 @@ export const UserFeedbackPage = () => {
             gridTemplateColumns={{
               base: "repeat(1, 1fr)",
               xl: "repeat(2, 1fr)",
-              "2xl": "repeat(4, 1fr)",
+              "2xl": "repeat(3, 1fr)",
             }}
             gridGap={4}
           >

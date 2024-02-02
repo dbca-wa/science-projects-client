@@ -718,11 +718,12 @@ export const ProjectOverviewCard = ({
             <Box
               // pb={4}
               display="flex"
-              alignItems="center"
+            // alignItems="center"
             >
-              <Box fontSize="22px">
+              <Box fontSize="22px" pt={4}>
                 <AiFillTag />
               </Box>
+
               <Grid
                 ml={3}
                 templateColumns={
@@ -733,14 +734,15 @@ export const ProjectOverviewCard = ({
                       md: "repeat(3, 1fr)",
                       lg: "repeat(2, 1fr)",
                       "1200px": "repeat(3, 1fr)",
-                      xl: "repeat(4, 1fr)",
+                      xl: "repeat(3, 1fr)",
+                      '2xl': "repeat(4, 1fr)",
                     }
                     : {
                       base: "repeat(1, 1fr)",
                       sm: "repeat(2, 1fr)",
                       md: "repeat(3, 1fr)",
-                      lg: "repeat(4, 1fr)",
-                      xl: "repeat(6, 1fr)",
+                      lg: "repeat(3, 1fr)",
+                      xl: "repeat(5, 1fr)",
                     }
                 }
                 // gridTemplateRows={"28px"}
