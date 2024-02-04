@@ -15,6 +15,8 @@ import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { PrepopulateCommentDisplayPlugin } from "./../../Plugins/PrepopulateCommentDisplayPlugin";
 import { CustomFocusPlugin } from "../../Plugins/CustomFocusPlugin";
+import { CLEAR_EDITOR_COMMAND } from "lexical";
+import { useEffect, useState } from "react";
 
 interface Props {
   allowInsertButton?: boolean;
@@ -39,6 +41,9 @@ export const SimpleStatefulRTE = ({
   setValueFunction,
   shouldFocus,
 }: Props) => {
+
+  const [firstRender, setFirstRender] = useState(true);
+
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -47,25 +52,29 @@ export const SimpleStatefulRTE = ({
         <ListPlugin />
         <OnChangePlugin
           onChange={(editorState, editor) => {
+
             editorState.read(() => {
               // const root = $getRoot();
               //   setEditorText(root.__cachedText);
-              const newHtml = $generateHtmlFromNodes(editor, null);
-              if (setValueAsPlainText === true) {
-                const parserA = new DOMParser();
-                const docA = parserA.parseFromString(newHtml, "text/html");
-                const contentA = docA.body.textContent;
-                // console.log(contentA);
-                setValueFunction(contentA);
+
+              if (setValueAsPlainText === true && value !== "") {
+                if (firstRender === false) {
+
+                  const text = $generateHtmlFromNodes(editor, null)
+                  const parser = new DOMParser()
+                  const doc = parser.parseFromString(text, 'text/html')
+                  setValueFunction(doc.body.innerText);
+                }
               } else {
+                const newHtml = $generateHtmlFromNodes(editor, null);
                 setValueFunction(newHtml);
               }
-            });
+            })
           }}
         />
 
         {value && value !== "" && (
-          <PrepopulateCommentDisplayPlugin data={value} />
+          <PrepopulateCommentDisplayPlugin data={value} setPopulationInProgress={setFirstRender} />
 
         )}
 

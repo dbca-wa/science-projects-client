@@ -73,7 +73,7 @@ export const ProjectClosureModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Project Closed`,
+          description: `Closure Requested`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -91,7 +91,7 @@ export const ProjectClosureModal = ({
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not close project`,
+          title: `Could Not Request Closure`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -267,7 +267,7 @@ export const ProjectClosureModal = ({
                 isDisabled={!closureReason || !outcomeValue || !projPk}
                 ml={3}
               >
-                Close Project
+                Request Closure
               </Button>
             </Grid>
           </ModalFooter>

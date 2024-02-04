@@ -57,6 +57,8 @@ import { GoOrganization } from "react-icons/go";
 import { FcApproval, FcDataBackup } from "react-icons/fc";
 import { VscFeedback } from "react-icons/vsc";
 import { HiDocumentPlus } from "react-icons/hi2";
+import { BatchApproveModal } from "../Modals/BatchApproveModal";
+import { BatchApproveOldModal } from "../Modals/BatchApproveOldModal";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -167,23 +169,18 @@ const UserMenuContents = () => {
   );
 };
 
-const AdminMenuContents = () => {
+
+interface AdminProps {
+  handleDataDump: () => void;
+  handleNewReportCycle: () => void;
+  handleBatchApproveReports: () => void;
+  handleBatchApproveOldReports: () => void;
+}
+const AdminMenuContents = ({ handleDataDump, handleNewReportCycle, handleBatchApproveReports, handleBatchApproveOldReports }: AdminProps) => {
   const navigate = useNavigate();
-
-  const handleDataDump = () => {
-    console.log("Dumping data...");
-  };
-
-  const handleNewReportCycle = () => {
-    console.log("Handling new report cycle...")
-  }
-
-  const handleBatchApproveReports = () => {
-    console.log("Batch approving...");
-  };
-
   return (
     <>
+
       <MenuGroup
         title="Manage"
         fontSize={"12px"}
@@ -273,6 +270,10 @@ const AdminMenuContents = () => {
           {<FcApproval />}
           <Text ml={2}>Batch Approve Reports</Text>
         </MenuItem>
+        <MenuItem onClick={handleBatchApproveOldReports}>
+          {<FcApproval />}
+          <Text ml={2}>Batch Approve Old Reports</Text>
+        </MenuItem>
 
       </MenuGroup>
     </>
@@ -281,6 +282,24 @@ const AdminMenuContents = () => {
 
 const OldHeader = () => {
   const navigate = useNavigate();
+  const { isOpen: isBatchApproveOpen, onClose: onBatchApproveClose, onOpen: onBatchApproveOpen } = useDisclosure();
+  const { isOpen: isBatchApproveOldOpen, onClose: onBatchApproveOldClose, onOpen: onBatchApproveOldOpen } = useDisclosure();
+
+  const handleDataDump = () => {
+    console.log("Dumping data...");
+  };
+
+  const handleNewReportCycle = () => {
+    console.log("Handling new report cycle...")
+  }
+
+  const handleBatchApproveReports = () => {
+    onBatchApproveOpen();
+  };
+
+  const handleBatchApproveOldReports = () => {
+    onBatchApproveOldOpen();
+  }
 
   const [shouldShowHamburger, setShouldShowHamburger] = useState(false);
   const [windowSizeValue, setWindowSizeValue] = useState<number>(480);
@@ -336,6 +355,15 @@ const OldHeader = () => {
   return (
     <Box>
       {/* Nav background */}
+      <BatchApproveModal
+        isOpen={isBatchApproveOpen}
+        onClose={onBatchApproveClose}
+      />
+      <BatchApproveOldModal
+        isOpen={isBatchApproveOldOpen}
+        onClose={onBatchApproveOldClose}
+      />
+
       <HStack
         bg={colorMode === "light" ? "blackAlpha.800" : "gray.900"}
         py={{
@@ -458,7 +486,12 @@ const OldHeader = () => {
                             <SidebarNavMenu
                               menuName="Admin"
                               leftIcon={<RiAdminFill />}
-                              children={<AdminMenuContents />}
+                              children={<AdminMenuContents
+                                handleDataDump={handleDataDump}
+                                handleNewReportCycle={handleNewReportCycle}
+                                handleBatchApproveReports={handleBatchApproveReports}
+                                handleBatchApproveOldReports={handleBatchApproveOldReports}
+                              />}
                             />
                           )}
                         </Grid>
@@ -485,7 +518,12 @@ const OldHeader = () => {
                 <NavMenu menuName="Reports" children={<ReportMenuContents />} />
 
                 {!userLoading && userData.is_superuser && (
-                  <NavMenu menuName="Admin" children={<AdminMenuContents />} />
+                  <NavMenu menuName="Admin" children={<AdminMenuContents
+                    handleDataDump={handleDataDump}
+                    handleNewReportCycle={handleNewReportCycle}
+                    handleBatchApproveReports={handleBatchApproveReports}
+                    handleBatchApproveOldReports={handleBatchApproveOldReports}
+                  />} />
                 )}
               </HStack>
 

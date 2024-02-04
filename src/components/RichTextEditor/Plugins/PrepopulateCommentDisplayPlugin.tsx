@@ -5,10 +5,11 @@ import { $generateNodesFromDOM } from "@lexical/html";
 import { $getRoot } from "lexical";
 interface HTMLPrepopulationProp {
   data: string;
+  setPopulationInProgress?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const PrepopulateCommentDisplayPlugin = ({
-  data,
+  data, setPopulationInProgress
 }: HTMLPrepopulationProp) => {
   const checkIsHtml = (data: string) => {
     // Regular expression to check for HTML tags
@@ -23,9 +24,17 @@ export const PrepopulateCommentDisplayPlugin = ({
   useEffect(() => {
     // console.log("IS Html:", isHtml);
     if (!isHtml) {
-      setFixedText(
-        `<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;">${data}</span></p>`
-      );
+      if (data === "") {
+        setFixedText(
+          `<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;"></span></p>`
+        );
+      } else {
+        setFixedText(
+          `<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;">${data}</span></p>`
+        );
+
+      }
+
     }
   }, [isHtml]);
 
@@ -36,10 +45,8 @@ export const PrepopulateCommentDisplayPlugin = ({
           `<tr>${row
             .map(
               (cell, colIndex) =>
-                `<${
-                  rowIndex === 0 || colIndex === 0 ? "th" : "td"
-                } class="table-cell-dark${
-                  rowIndex === 0 ? " table-cell-header-dark" : ""
+                `<${rowIndex === 0 || colIndex === 0 ? "th" : "td"
+                } class="table-cell-dark${rowIndex === 0 ? " table-cell-header-dark" : ""
                 }">${cell}</${rowIndex === 0 || colIndex === 0 ? "th" : "td"}>`
             )
             .join("")}</tr>`
@@ -126,6 +133,9 @@ export const PrepopulateCommentDisplayPlugin = ({
         });
         root.selectEnd();
       });
+      if (setPopulationInProgress) {
+        setPopulationInProgress(false);
+      }
     } else {
       setHasRendered(true);
     }

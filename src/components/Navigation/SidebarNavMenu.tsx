@@ -47,6 +47,10 @@ export const SidebarNavMenu = ({
     setIsOpen(false);
   };
 
+  const handleItemClick = () => {
+    setIsOpen(false);
+  }
+
   const bgStyle =
     isHovered || isOpen
       ? cScheme
@@ -120,6 +124,7 @@ export const SidebarNavMenu = ({
         <MenuList
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          onClick={handleItemClick}
           mt={"-7.5px"}
           w={"100%"}
           zIndex={99999}
