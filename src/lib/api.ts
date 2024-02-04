@@ -265,6 +265,17 @@ export const deleteUserAdmin = async ({ userPk }: AdminSwitchVar) => {
     return res;
 }
 
+export const batchApproveOLDProgressAndStudentReports = async () => {
+    const res = instance.post(`documents/batchapproveold`).then(res => { return res.data });
+    return res;
+}
+
+
+export const batchApproveProgressAndStudentReports = async () => {
+    const res = instance.post(`documents/batchapprove`).then(res => { return res.data });
+    return res;
+}
+
 export const deactivateUserAdmin = async ({ userPk }: AdminSwitchVar) => {
     const res = instance.post(`users/${userPk}/toggleactive`).then(res => { return res.data })
     return res;

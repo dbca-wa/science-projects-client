@@ -10,6 +10,7 @@ import {
   Icon,
   Divider,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
@@ -21,9 +22,95 @@ import { MdManageHistory, MdOutlineSettingsSuggest } from "react-icons/md";
 import { RiOrganizationChart } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { VscFeedback } from "react-icons/vsc";
+import { BatchApproveModal } from "@/components/Modals/BatchApproveModal";
 
 export const Admin = () => {
+
+  const { isOpen: isBatchApproveOpen, onClose: onBatchApproveClose, onOpen: onBatchApproveOpen } = useDisclosure();
+
   const { colorMode } = useColorMode();
+
+  const handleDataDump = () => {
+    console.log("Dumping data...");
+  };
+
+  const handleBatchApproveReports = () => {
+    onBatchApproveOpen();
+  };
+
+  const handleViewFeedback = () => {
+    console.log("viewing feedback");
+  };
+
+  const adminActions = [
+    {
+      name: "Dump Data",
+      description: "Dump db into zip file for migration",
+      reactIcon: FcDataBackup,
+      onClick: handleDataDump,
+    },
+    {
+      name: "Batch Approve Progress Reports",
+      description: "Approve all progress reports requesting approval",
+      reactIcon: FcApproval,
+      onClick: handleBatchApproveReports,
+    },
+    {
+      name: "View Feedback",
+      description: "View User Feedback",
+      reactIcon: VscFeedback,
+      onClick: handleViewFeedback,
+      route: "/crud/feedback",
+    },
+  ];
+
+  const crudAdminActions = [
+    {
+      name: "Manage Annual Reports",
+      description: "CRUD operations for Annaul Reports",
+      reactIcon: MdManageHistory,
+      route: "/crud/reports",
+    },
+    {
+      name: "Manage Business Areas",
+      description: "CRUD operations for Business Areas",
+      reactIcon: ImBriefcase,
+      route: "/crud/businessareas",
+    },
+    {
+      name: "Manage Services",
+      description: "CRUD operations for Services",
+      reactIcon: MdOutlineSettingsSuggest,
+      route: "/crud/services",
+    },
+    {
+      name: "Manage Divisions",
+      description: "CRUD operations for Divisions",
+      reactIcon: GoOrganization,
+      route: "/crud/divisions",
+    },
+    {
+      name: "Manage Locations",
+      description: "CRUD operations for Areas",
+      reactIcon: FaLocationArrow,
+      route: "/crud/locations",
+    },
+    {
+      name: "Manage Addresses",
+      description: "CRUD operations for Addresses",
+      reactIcon: FaAddressCard,
+      route: "/crud/addresses",
+    },
+    {
+      name: "Manage Branches",
+      description: "CRUD operations for Branches",
+      reactIcon: RiOrganizationChart,
+      route: "/crud/branches",
+    },
+  ];
+
+
+
 
   // Sort adminActions and crudAdminActions arrays alphabetically by name
   const sortedAdminActions = adminActions
@@ -35,6 +122,10 @@ export const Admin = () => {
 
   return (
     <>
+      <BatchApproveModal
+        isOpen={isBatchApproveOpen}
+        onClose={onBatchApproveClose}
+      />
       <Text
         my={3}
         fontWeight={"bold"}
@@ -92,85 +183,6 @@ export const Admin = () => {
   );
 };
 
-const handleDataDump = () => {
-  console.log("Dumping data...");
-};
-
-const handleBatchApproveReports = () => {
-  console.log("Batch approving...");
-};
-
-const handleViewFeedback = () => {
-  console.log("viewing feedback");
-};
-
-const adminActions = [
-  {
-    name: "Dump Data",
-    description: "Dump db into zip file for migration",
-    reactIcon: FcDataBackup,
-    onClick: handleDataDump,
-  },
-  {
-    name: "Batch Approve Progress Reports",
-    description: "Approve all progress reports requesting approval",
-    reactIcon: FcApproval,
-    onClick: handleBatchApproveReports,
-  },
-  {
-    name: "View Feedback",
-    description: "View User Feedback",
-    reactIcon: VscFeedback,
-    onClick: handleViewFeedback,
-    route: "/crud/feedback",
-  },
-];
-
-const crudAdminActions = [
-  {
-    name: "Manage Annual Reports",
-    description: "CRUD operations for Annaul Reports",
-    reactIcon: MdManageHistory,
-    route: "/crud/reports",
-  },
-  {
-    name: "Manage Business Areas",
-    description: "CRUD operations for Business Areas",
-    reactIcon: ImBriefcase,
-    route: "/crud/businessareas",
-  },
-  {
-    name: "Manage Services",
-    description: "CRUD operations for Services",
-    reactIcon: MdOutlineSettingsSuggest,
-    route: "/crud/services",
-  },
-  {
-    name: "Manage Divisions",
-    description: "CRUD operations for Divisions",
-    reactIcon: GoOrganization,
-    route: "/crud/divisions",
-  },
-  {
-    name: "Manage Locations",
-    description: "CRUD operations for Areas",
-    reactIcon: FaLocationArrow,
-    route: "/crud/locations",
-  },
-  {
-    name: "Manage Addresses",
-    description: "CRUD operations for Addresses",
-    reactIcon: FaAddressCard,
-    route: "/crud/addresses",
-  },
-  {
-    name: "Manage Branches",
-    description: "CRUD operations for Branches",
-    reactIcon: RiOrganizationChart,
-    route: "/crud/branches",
-  },
-];
-
 interface IAdminOptionBox {
   name: string;
   description: string;
@@ -219,6 +231,7 @@ const AdminOptionBox = ({
       initial="rest"
       style={{ perspective: 1000 }}
     >
+
       <Center
         // onMouseOver={() => setHovered(true)}
         // onMouseLeave={() => setHovered(false)}

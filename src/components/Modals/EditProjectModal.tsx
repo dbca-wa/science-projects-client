@@ -147,12 +147,12 @@ export const EditProjectModal = ({
   );
   const [hoveredTitle, setHoveredTitle] = useState(false);
   const titleBorderColor = `${colorMode === "light"
-      ? hoveredTitle
-        ? "blackAlpha.300"
-        : "blackAlpha.200"
-      : hoveredTitle
-        ? "whiteAlpha.400"
-        : "whiteAlpha.300"
+    ? hoveredTitle
+      ? "blackAlpha.300"
+      : "blackAlpha.200"
+    : hoveredTitle
+      ? "whiteAlpha.400"
+      : "whiteAlpha.300"
     }`;
 
   const [keywords, setKeywords] = useState(currentKeywords);
@@ -179,6 +179,10 @@ export const EditProjectModal = ({
     const tag = wrapper.querySelector("p, span");
     return tag ? tag.textContent : "";
   };
+
+  useEffect(() => {
+    console.log({ organisation, projectTitle })
+  }, [organisation, projectTitle])
 
   useEffect(() => {
     const plainTitle = getPlainTextFromHTML(projectTitle);

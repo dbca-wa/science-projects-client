@@ -47,21 +47,25 @@ export const NavMenu = ({
     setIsOpen(false);
   };
 
+  const handleItemClick = () => {
+    setIsOpen(false);
+  }
+
   const bgStyle = isHovered
     ? cScheme
       ? { bg: `${cScheme}.500` }
       : {}
     : cScheme
-    ? `${cScheme}.500`
-    : "transparent";
+      ? `${cScheme}.500`
+      : "transparent";
 
   const fontColorStyle = isHovered
     ? fColor
       ? { color: fColor }
       : "white"
     : fColor
-    ? fColor
-    : "whiteAlpha.700";
+      ? fColor
+      : "whiteAlpha.700";
 
   return (
     <Box onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
@@ -115,6 +119,7 @@ export const NavMenu = ({
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           mt={"-7.5px"}
+          onClick={handleItemClick}
         >
           {children}
         </MenuList>

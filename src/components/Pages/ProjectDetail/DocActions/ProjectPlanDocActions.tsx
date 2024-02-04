@@ -714,6 +714,7 @@ export const ProjectPlanDocActions = ({
                               >
                                 Delete Document
                               </Button>
+
                             </>
                           )}
 
@@ -767,8 +768,46 @@ export const ProjectPlanDocActions = ({
                               Submit
                             </Button>
                           )}
+
+
                         </Center>
                       )}
+
+                    {
+                      projectPlanData?.document
+                        ?.project_lead_approval_granted === true &&
+                        projectPlanData?.document
+                          ?.business_area_lead_approval_granted === true &&
+                        projectPlanData?.document
+                          ?.directorate_approval_granted === true &&
+                        all_documents?.progress_reports?.length < 1 &&
+                        (userData?.is_superuser || leaderMember?.user?.pk === userData?.pk) ?
+                        (
+                          <Flex justifyContent={"flex-end"}>
+                            <Button
+                              mt={3}
+                              color={"white"}
+                              background={
+                                colorMode === "light"
+                                  ? "orange.500"
+                                  : "orange.600"
+                              }
+                              _hover={{
+                                background:
+                                  colorMode === "light"
+                                    ? "orange.400"
+                                    : "orange.500",
+                              }}
+                              size={"sm"}
+                              onClick={
+                                onOpenCreateProgressReportModal
+                              }
+                              ml={2}
+                            >
+                              Create Progress Report
+                            </Button>
+                          </Flex>
+                        ) : null}
                   </Grid>
                 </Grid>
 
@@ -959,7 +998,56 @@ export const ProjectPlanDocActions = ({
                           </Button>
                         </Center>
                       )}
+
+
                   </Flex>
+                  {
+                    all_documents?.progress_reports?.length < 1 &&
+
+                      (userData?.is_superuser || projectPlanData?.document?.project?.business_area?.leader === userData?.pk) &&
+                      projectPlanData?.document
+                        ?.project_lead_approval_granted === true &&
+                      projectPlanData?.document
+                        ?.business_area_lead_approval_granted === true &&
+                      projectPlanData?.document
+                        ?.directorate_approval_granted === true ?
+                      (
+                        <Flex justifyContent={"flex-end"}>
+                          {/* <CreateProgressReportModal
+                          projectPk={
+                            projectPlanData?.document?.project?.pk
+                          }
+                          documentKind="progressreport"
+                          onClose={onCloseCreateProgressReportModal}
+                          isOpen={isCreateProgressReportModalOpen}
+                          refetchData={refetchData}
+                        /> */}
+
+                          <Button
+                            mt={3}
+                            color={"white"}
+                            background={
+                              colorMode === "light"
+                                ? "orange.500"
+                                : "orange.600"
+                            }
+                            _hover={{
+                              background:
+                                colorMode === "light"
+                                  ? "orange.400"
+                                  : "orange.500",
+                            }}
+                            size={"sm"}
+                            onClick={
+                              onOpenCreateProgressReportModal
+                            }
+                            ml={2}
+                          >
+                            Create Progress Report
+                          </Button>
+                        </Flex>
+                      ) : null}
+
                 </Grid>
 
                 {/* Directorate GRID */}
@@ -1097,49 +1185,55 @@ export const ProjectPlanDocActions = ({
                               </Button>
                             </>
                           )}
-                          {projectPlanData?.document?.project?.status ===
-                            "pending" ||
-                            all_documents?.progress_reports?.length < 1 ? (
-                            <>
-                              <CreateProgressReportModal
-                                projectPk={
-                                  projectPlanData?.document?.project?.pk
-                                }
-                                documentKind="progressreport"
-                                onClose={onCloseCreateProgressReportModal}
-                                isOpen={isCreateProgressReportModalOpen}
-                                refetchData={refetchData}
-                              />
+                          {(all_documents?.progress_reports?.length < 1)
+                            &&
+                            projectPlanData?.document
+                              ?.project_lead_approval_granted === true &&
+                            projectPlanData?.document
+                              ?.business_area_lead_approval_granted === true &&
+                            projectPlanData?.document
+                              ?.directorate_approval_granted === true
+                            ? (
+                              <>
+                                <CreateProgressReportModal
+                                  projectPk={
+                                    projectPlanData?.document?.project?.pk
+                                  }
+                                  documentKind="progressreport"
+                                  onClose={onCloseCreateProgressReportModal}
+                                  isOpen={isCreateProgressReportModalOpen}
+                                  refetchData={refetchData}
+                                />
 
-                              <Button
-                                color={"white"}
-                                background={
-                                  colorMode === "light"
-                                    ? "orange.500"
-                                    : "orange.600"
-                                }
-                                _hover={{
-                                  background:
+                                <Button
+                                  color={"white"}
+                                  background={
                                     colorMode === "light"
-                                      ? "orange.400"
-                                      : "orange.500",
-                                }}
-                                size={"sm"}
-                                onClick={
-                                  onOpenCreateProgressReportModal
-                                  // () => spawnProgressReport(
-                                  //     {
-                                  //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
-                                  //         kind: "progressreport"
-                                  //     }
-                                  // )
-                                }
-                                ml={2}
-                              >
-                                Create Progress Report
-                              </Button>
-                            </>
-                          ) : null}
+                                      ? "orange.500"
+                                      : "orange.600"
+                                  }
+                                  _hover={{
+                                    background:
+                                      colorMode === "light"
+                                        ? "orange.400"
+                                        : "orange.500",
+                                  }}
+                                  size={"sm"}
+                                  onClick={
+                                    onOpenCreateProgressReportModal
+                                    // () => spawnProgressReport(
+                                    //     {
+                                    //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
+                                    //         kind: "progressreport"
+                                    //     }
+                                    // )
+                                  }
+                                  ml={2}
+                                >
+                                  Create Progress Report
+                                </Button>
+                              </>
+                            ) : null}
                         </Center>
                       )}
 

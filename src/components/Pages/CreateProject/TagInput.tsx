@@ -106,7 +106,12 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
           onKeyDown={handleInputKeyDown}
           placeholder="Add some keywords..."
           onFocus={() => setInputActive(true)}
-          onBlur={() => setInputActive(false)}
+          onBlur={() => {
+            if (inputValue !== "") {
+              addTags();
+            }
+            setInputActive(false)
+          }}
         />
       </InputGroup>
       <FormHelperText color={colorMode === "light" ? "gray.500" : "gray.400"}>
