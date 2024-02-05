@@ -276,6 +276,16 @@ export const batchApproveProgressAndStudentReports = async () => {
     return res;
 }
 
+
+export interface INewCycle {
+    alsoUpdate: boolean;
+}
+
+export const openNewCycle = async ({ alsoUpdate }: INewCycle) => {
+    const res = instance.post(`documents/opennewcycle`, { 'update': alsoUpdate }).then(res => { return res.data });
+    return res;
+}
+
 export const deactivateUserAdmin = async ({ userPk }: AdminSwitchVar) => {
     const res = instance.post(`users/${userPk}/toggleactive`).then(res => { return res.data })
     return res;
