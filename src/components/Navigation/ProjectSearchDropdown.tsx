@@ -141,20 +141,20 @@ export const ProjectSearchDropdown = ({
         {selectedProject
           ? null
           : filteredItems.length > 0 && (
-              <Box pos="relative" w="100%">
-                <CustomMenu isOpen={filteredItems.length > 0 && isMenuOpen}>
-                  <CustomMenuList minWidth="100%">
-                    {filteredItems?.map((project) => (
-                      <CustomMenuItem
-                        key={project?.pk}
-                        onClick={() => handleSelectProject(project)}
-                        project={project}
-                      />
-                    ))}
-                  </CustomMenuList>
-                </CustomMenu>
-              </Box>
-            )}
+            <Box pos="relative" w="100%">
+              <CustomMenu isOpen={filteredItems.length > 0 && isMenuOpen}>
+                <CustomMenuList minWidth="100%">
+                  {filteredItems?.map((project) => (
+                    <CustomMenuItem
+                      key={project?.pk}
+                      onClick={() => handleSelectProject(project)}
+                      project={project}
+                    />
+                  ))}
+                </CustomMenuList>
+              </CustomMenu>
+            </Box>
+          )}
         <FormHelperText>{helperText}</FormHelperText>
       </FormControl>
     )
@@ -234,8 +234,8 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
               project?.image?.file
                 ? project.image?.file
                 : project.image?.old_file
-                ? project.image.old_file
-                : noImage
+                  ? project.image.old_file
+                  : noImage
             }
             onLoad={handleImageLoad}
           />
@@ -246,8 +246,8 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
             project?.image?.file
               ? project.image?.file
               : project.image?.old_file
-              ? project.image.old_file
-              : noImage
+                ? project.image.old_file
+                : noImage
           }
           onLoad={handleImageLoad}
         />
@@ -261,7 +261,7 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
         h="100%"
       >
         <ExtractedHTMLTitle
-          htmlContent={`${project.title}`}
+          htmlContent={`${project?.title}`}
           color={"green.500"}
         />
       </Box>
@@ -313,13 +313,13 @@ const SelectedProjectInput = ({
           project?.image?.file
             ? project.image?.file
             : project.image?.old_file
-            ? project.image.old_file
-            : noImage
+              ? project.image.old_file
+              : noImage
         }
       />
       <ExtractedHTMLTitle
         ml={2}
-        htmlContent={`${project.title}`}
+        htmlContent={`${project?.title}`}
         color={colorMode === "light" ? "green.500" : "green.400"}
       />
       <input

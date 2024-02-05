@@ -19,11 +19,11 @@ export const CreateProject = () => {
   const creationData = [
     {
       title: "Science Project",
-      description: "A project with a defined period of scientific activities.",
+      description: "A discrete body of DBCA-led scientific work with a defined period of activity.",
       bulletPoints: [
-        "Approval process to determine how it fits within Departmental strategy and priorities.",
-        "Formal Closure Process",
-        "Requires Annual Reporting",
+        "Requires approval through SPMS.",
+        "Requires annual progress reporting",
+        "Requires closure form to close",
       ],
       colorScheme: "green",
       buttonIcon: MdScience,
@@ -32,11 +32,11 @@ export const CreateProject = () => {
     {
       title: "Core Function",
       description:
-        "An ongoing science function with an indefinite period of activity.",
+        "An ongoing body of scientific work that supports biodiversity science, conservation and other business functions.",
       bulletPoints: [
-        "No approval process",
-        "Immediate closure process",
-        "Requires Annual Reporting",
+        "Requires prior approval by Executive Director or delegate",
+        "Requires annual progress reporting",
+        "Immediate closure without closure form",
       ],
       colorScheme: "red",
       buttonIcon: GiMaterialsScience,
@@ -45,11 +45,11 @@ export const CreateProject = () => {
 
     {
       title: "Student Project",
-      description: "Supervision of a tertiary student.",
+      description: "A project being undertaken by a student to attain a higher degree for which a DBCA staff member is a co-supervisor.",
       bulletPoints: [
-        "No formal approval process",
-        "Immediate closure without formal process",
-        "Requires Annual Reporting",
+        "Requires prior approval by Executive Director or delegate",
+        "Requires annual progress reporting",
+        "Immediate closure without closure form",
       ],
       colorScheme: "blue",
       buttonIcon: RiBook3Fill,
@@ -57,11 +57,11 @@ export const CreateProject = () => {
     },
     {
       title: "External Partnership",
-      description: "Participation in an externally managed project.",
+      description: "A formal collaborative scientific partnership with an external organisation or organisations.",
       bulletPoints: [
-        "No formal approval process",
-        "Immediate closure without formal process",
+        "Requires prior approval by Executive Director or delegate",
         "Project details automatically included in annual reporting",
+        "Immediate closure without closure form",
       ],
       colorScheme: "gray",
       buttonIcon: FaUserFriends,
@@ -89,7 +89,7 @@ export const CreateProject = () => {
         >
           <TypewriterText
             text={
-              "Projects differ by documentation structure, approval process, and reporting requirements. Make sure you choose the correct project type as you will not be able to change the project type after creation. If you need to change the project type, you need to have the project deleted by an admin and create a new project of the desired type."
+              "Projects differ by documentation structure, approval process, and reporting requirements. Make sure you choose the correct project type as you will not be able to change this after creation. If you need to change the project type, you will need to request that the project be deleted by an administrator and create a new project of the desired type. For further guidance on project types, refer to Corporate Guideline XX Science Implementation."
             }
           />
         </Box>
@@ -105,7 +105,7 @@ export const CreateProject = () => {
             // "1500px": "repeat(4, 1fr)",
             // "2xl": "repeat(4, 1fr)",
           }}
-          gap={6}
+          gap={8}
           userSelect={"none"}
         >
           {creationData.map((item, index) => {
