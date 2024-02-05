@@ -109,14 +109,14 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
     if (taskDataState && !tasksLoading) {
       // Filter and sort "assigned" tasks
       const sortedAssignedInprogress = taskDataState.inprogress
-        .filter((item) => item.task_type === "assigned")
+        ?.filter((item) => item.task_type === "assigned")
         .sort(
           (a, b) =>
             new Date(b.date_assigned).getTime() -
             new Date(a.date_assigned).getTime()
         );
       const sortedAssignedTodo = taskDataState.todo
-        .filter((item) => item.task_type === "assigned")
+        ?.filter((item) => item.task_type === "assigned")
         .sort(
           (a, b) =>
             new Date(b.date_assigned).getTime() -
@@ -125,14 +125,14 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
 
       // Filter and sort "personal" tasks
       const sortedPersonalInprogress = taskDataState.inprogress
-        .filter((item) => item.task_type === "personal")
+        ?.filter((item) => item.task_type === "personal")
         .sort(
           (a, b) =>
             new Date(b.date_assigned).getTime() -
             new Date(a.date_assigned).getTime()
         );
       const sortedPersonalTodo = taskDataState.todo
-        .filter((item) => item.task_type === "personal")
+        ?.filter((item) => item.task_type === "personal")
         .sort(
           (a, b) =>
             new Date(b.date_assigned).getTime() -
@@ -176,7 +176,7 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
         <Accordion
           // defaultIndex={defaultIndex}
           defaultIndex={[0]}
-          // allowMultiple
+        // allowMultiple
         >
           <AccordionItem
             borderColor={
@@ -199,10 +199,10 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                 My Tasks
               </Box>
               {!tasksLoading &&
-              !docsPendingStageOneInputLoading &&
-              !docsPendingStageTwoInputLoading &&
-              !docsPendingStageThreeInputLoading &&
-              combinedData?.length +
+                !docsPendingStageOneInputLoading &&
+                !docsPendingStageTwoInputLoading &&
+                !docsPendingStageThreeInputLoading &&
+                combinedData?.length +
                 docsPendingStageOneInput?.team?.length +
                 docsPendingStageOneInput?.lead?.length +
                 docsPendingStageTwoInput?.length +
@@ -242,7 +242,7 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                     <Spinner />
                   </Center>
                 ) : docsPendingStageOneInput?.team?.length +
-                    docsPendingStageOneInput?.lead?.length >=
+                  docsPendingStageOneInput?.lead?.length >=
                   1 ? (
                   [
                     ...docsPendingStageOneInput.team.map((document) => ({
@@ -300,10 +300,10 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
               </Grid>
 
               {combinedData?.length < 1 &&
-              docsPendingStageOneInput?.team.length < 1 &&
-              docsPendingStageOneInput?.lead.length < 1 &&
-              docsPendingStageTwoInput?.length < 1 &&
-              docsPendingStageThreeInput?.length < 1 ? (
+                docsPendingStageOneInput?.team.length < 1 &&
+                docsPendingStageOneInput?.lead.length < 1 &&
+                docsPendingStageTwoInput?.length < 1 &&
+                docsPendingStageThreeInput?.length < 1 ? (
                 <Center>
                   <Flex>
                     <Center pt={10}>
@@ -344,15 +344,15 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
           </AccordionItem>
 
           {me?.userData?.is_aec ||
-          me?.userData?.is_biometrician ||
-          me?.userData?.is_herbarium_curator ||
-          me?.userData?.is_superuser ? (
+            me?.userData?.is_biometrician ||
+            me?.userData?.is_herbarium_curator ||
+            me?.userData?.is_superuser ? (
             <AccordionItem
               borderColor={
                 colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
               }
               borderBottom={"none"}
-              // borderTop={"none"}
+            // borderTop={"none"}
             >
               <AccordionButton
                 bg={colorMode === "light" ? "gray.200" : "gray.700"}
@@ -368,10 +368,10 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                   Endorsement Tasks
                 </Box>
                 {pendingEndorsementsDataLoading ===
-                true ? null : pendingEndorsementsData?.aec?.length +
+                  true ? null : pendingEndorsementsData?.aec?.length +
                     pendingEndorsementsData?.bm?.length +
                     pendingEndorsementsData?.hc?.length >
-                  1 ? (
+                    1 ? (
                   <Box
                     display={"inline-flex"}
                     justifyContent={"center"}
@@ -395,45 +395,45 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                     <Spinner />
                   </Center>
                 ) : pendingEndorsementsData?.aec?.length +
-                    pendingEndorsementsData?.bm?.length +
-                    pendingEndorsementsData?.hc?.length >=
+                  pendingEndorsementsData?.bm?.length +
+                  pendingEndorsementsData?.hc?.length >=
                   1 ? (
                   <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                     {!pendingEndorsementsDataLoading &&
-                    pendingEndorsementsData?.aec?.length >= 1
+                      pendingEndorsementsData?.aec?.length >= 1
                       ? pendingEndorsementsData?.aec?.map(
-                          (document: IMainDoc, index: number) => (
-                            <TraditionalEndorsementTaskDisplay
-                              key={index}
-                              document={document}
-                              endorsementKind={"animalEthics"}
-                            />
-                          )
+                        (document: IMainDoc, index: number) => (
+                          <TraditionalEndorsementTaskDisplay
+                            key={index}
+                            document={document}
+                            endorsementKind={"animalEthics"}
+                          />
                         )
+                      )
                       : null}
                     {!pendingEndorsementsDataLoading &&
-                    pendingEndorsementsData?.hc?.length >= 1
+                      pendingEndorsementsData?.hc?.length >= 1
                       ? pendingEndorsementsData?.hc?.map(
-                          (document: IMainDoc, index: number) => (
-                            <TraditionalEndorsementTaskDisplay
-                              key={index}
-                              document={document}
-                              endorsementKind={"herbarium"}
-                            />
-                          )
+                        (document: IMainDoc, index: number) => (
+                          <TraditionalEndorsementTaskDisplay
+                            key={index}
+                            document={document}
+                            endorsementKind={"herbarium"}
+                          />
                         )
+                      )
                       : null}
                     {!pendingEndorsementsDataLoading &&
-                    pendingEndorsementsData?.bm?.length >= 1
+                      pendingEndorsementsData?.bm?.length >= 1
                       ? pendingEndorsementsData?.bm?.map(
-                          (document: IMainDoc, index: number) => (
-                            <TraditionalEndorsementTaskDisplay
-                              key={index}
-                              document={document}
-                              endorsementKind={"biometrician"}
-                            />
-                          )
+                        (document: IMainDoc, index: number) => (
+                          <TraditionalEndorsementTaskDisplay
+                            key={index}
+                            document={document}
+                            endorsementKind={"biometrician"}
+                          />
                         )
+                      )
                       : null}
                   </Grid>
                 ) : (
@@ -545,10 +545,10 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                             project?.kind === "core_function"
                               ? "red.600"
                               : project?.kind === "science"
-                              ? "green.600"
-                              : project?.kind === "student"
-                              ? "blue.600"
-                              : "gray.600"
+                                ? "green.600"
+                                : project?.kind === "student"
+                                  ? "blue.600"
+                                  : "gray.600"
                           }
                           mr={3}
                           alignItems={"center"}
@@ -572,10 +572,10 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                             {project?.kind === "core_function"
                               ? `Core Function`
                               : project?.kind === "science"
-                              ? `Science`
-                              : project?.kind === "student"
-                              ? `Student`
-                              : `External`}
+                                ? `Science`
+                                : project?.kind === "student"
+                                  ? `Student`
+                                  : `External`}
                           </Text>
                         </Box>
                         <Divider
@@ -585,7 +585,7 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                         />
 
                         <ExtractedHTMLTitle
-                          htmlContent={`${project.title}`}
+                          htmlContent={`${project?.title}`}
                           color={colorMode === "dark" ? "blue.200" : "blue.400"}
                           fontWeight={"bold"}
                           cursor={"pointer"}
