@@ -59,6 +59,7 @@ import { VscFeedback } from "react-icons/vsc";
 import { HiDocumentPlus } from "react-icons/hi2";
 import { BatchApproveModal } from "../Modals/BatchApproveModal";
 import { BatchApproveOldModal } from "../Modals/BatchApproveOldModal";
+import { NewCycleModal } from "../Modals/NewCycleModal";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -262,19 +263,20 @@ const AdminMenuContents = ({ handleDataDump, handleNewReportCycle, handleBatchAp
           {<FcDataBackup />}
           <Text ml={2}>Dump Data</Text>
         </MenuItem>
-        <MenuItem onClick={handleNewReportCycle}>
-          {<HiDocumentPlus />}
-          <Text ml={2}>Open Annual Report Cycle</Text>
+
+
+        <MenuItem onClick={handleBatchApproveOldReports}>
+          {<FcApproval />}
+          <Text ml={2}>Batch Approve Old Reports</Text>
         </MenuItem>
         <MenuItem onClick={handleBatchApproveReports}>
           {<FcApproval />}
           <Text ml={2}>Batch Approve Reports</Text>
         </MenuItem>
-        <MenuItem onClick={handleBatchApproveOldReports}>
-          {<FcApproval />}
-          <Text ml={2}>Batch Approve Old Reports</Text>
+        <MenuItem onClick={handleNewReportCycle}>
+          {<HiDocumentPlus />}
+          <Text ml={2}>Open Annual Report Cycle</Text>
         </MenuItem>
-
       </MenuGroup>
     </>
   );
@@ -284,6 +286,7 @@ const OldHeader = () => {
   const navigate = useNavigate();
   const { isOpen: isBatchApproveOpen, onClose: onBatchApproveClose, onOpen: onBatchApproveOpen } = useDisclosure();
   const { isOpen: isBatchApproveOldOpen, onClose: onBatchApproveOldClose, onOpen: onBatchApproveOldOpen } = useDisclosure();
+  const { isOpen: isNewCycleOpen, onClose: onNewCycleClose, onOpen: onNewCycleOpen } = useDisclosure();
 
   const handleDataDump = () => {
     console.log("Dumping data...");
@@ -291,6 +294,8 @@ const OldHeader = () => {
 
   const handleNewReportCycle = () => {
     console.log("Handling new report cycle...")
+    onNewCycleOpen();
+    // 'opennewcycle'
   }
 
   const handleBatchApproveReports = () => {
@@ -362,6 +367,10 @@ const OldHeader = () => {
       <BatchApproveOldModal
         isOpen={isBatchApproveOldOpen}
         onClose={onBatchApproveOldClose}
+      />
+      <NewCycleModal
+        isOpen={isNewCycleOpen}
+        onClose={onNewCycleClose}
       />
 
       <HStack
