@@ -1,3 +1,4 @@
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import {
   Box,
   Button,
@@ -29,21 +30,20 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { BusinessAreaImage, IBusinessArea } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdMoreVert } from "react-icons/md";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { MdMoreVert } from "react-icons/md";
 import { deleteBusinessArea, updateBusinessArea } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { UserProfile } from "../Users/UserProfile";
-import { useNoImage } from "../../../lib/hooks/useNoImage";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
+import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
+import { useNoImage } from "../../../lib/hooks/useNoImage";
+import { BusinessAreaImage, IBusinessArea } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
-import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import { StatefulMediaChanger } from "./StatefulMediaChanger";
+import { UserProfile } from "../Users/UserProfile";
 import useDistilledHtml from "./../../../lib/hooks/useDistilledHtml";
-import { useState } from "react";
+import { StatefulMediaChanger } from "./StatefulMediaChanger";
 
 export const BusinessAreaItemDisplay = ({
   pk,
@@ -139,7 +139,7 @@ export const BusinessAreaItemDisplay = ({
   };
 
   const onUpdateSubmit = (formData: IBusinessArea) => {
-    console.log(formData);
+    // console.log(formData);
 
     const {
       pk,
@@ -175,7 +175,7 @@ export const BusinessAreaItemDisplay = ({
     } else {
       console.log("WITH IMAGE:", payload);
     }
-    console.log(selectedImageUrl);
+    // console.log(selectedImageUrl);
 
     updateMutation.mutate(payload);
   };
@@ -196,15 +196,15 @@ export const BusinessAreaItemDisplay = ({
     onClose: onFinanceAdminClose,
   } = useDisclosure();
   const leaderDrawerFunction = () => {
-    console.log(`${leaderData?.first_name} clicked`);
+    // console.log(`${leaderData?.first_name} clicked`);
     onLeaderOpen();
   };
   const financeAdminDrawerFunction = () => {
-    console.log(`${financeAdminData?.first_name} clicked`);
+    // console.log(`${financeAdminData?.first_name} clicked`);
     onFinanceAdminOpen();
   };
   const dataCustodianDrawerFunction = () => {
-    console.log(`${dataCustodianData?.first_name} clicked`);
+    // console.log(`${dataCustodianData?.first_name} clicked`);
     onDataCustodianOpen();
   };
 
@@ -223,23 +223,27 @@ export const BusinessAreaItemDisplay = ({
   const [focusData, setFocusData] = useState(focus);
   const [introductionData, setIntroductionData] = useState(introduction);
 
-  return !leaderLoading && leaderData ? (
-    <>
-      <Drawer
-        isOpen={isLeaderOpen}
-        placement="right"
-        onClose={onLeaderClose}
-        size={"sm"} //by default is xs
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerBody>
-            <UserProfile pk={leader} />
-          </DrawerBody>
 
-          <DrawerFooter></DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+
+  return (
+    <>
+      {!leaderLoading && leaderData ? (
+        <Drawer
+          isOpen={isLeaderOpen}
+          placement="right"
+          onClose={onLeaderClose}
+          size={"sm"}
+        >
+          <DrawerOverlay />
+          <DrawerContent>
+            <DrawerBody>
+              <UserProfile pk={leader} />
+            </DrawerBody>
+            <DrawerFooter></DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      ) : null}
+
       {!dataCustodianLoading &&
         dataCustodianData !== null &&
         dataCustodianData !== undefined && (
@@ -313,13 +317,13 @@ export const BusinessAreaItemDisplay = ({
           onClick={onUpdateModalOpen}
         />
         <TextButtonFlex
-          name={`${leaderData.first_name} ${leaderData.last_name}`}
+          name={leaderData ? `${leaderData.first_name} ${leaderData.last_name}` : '-'}
           onClick={leaderDrawerFunction}
         />
 
         {!financeAdminLoading && financeAdminData ? (
           <TextButtonFlex
-            name={`${financeAdminData.first_name} ${financeAdminData.last_name}`}
+            name={financeAdminData ? `${financeAdminData.first_name} ${financeAdminData.last_name}` : '-'}
             onClick={financeAdminDrawerFunction}
           />
         ) : (
@@ -328,7 +332,7 @@ export const BusinessAreaItemDisplay = ({
 
         {!dataCustodianLoading && dataCustodianData ? (
           <TextButtonFlex
-            name={`${dataCustodianData.first_name} ${dataCustodianData.last_name}`}
+            name={dataCustodianData ? `${dataCustodianData.first_name} ${dataCustodianData.last_name}` : '-'}
             onClick={dataCustodianDrawerFunction}
           />
         ) : (
@@ -494,7 +498,7 @@ export const BusinessAreaItemDisplay = ({
                 <UserSearchDropdown
                   {...register("leader", { required: true })}
                   onlyInternal={true}
-                  isRequired={true}
+                  isRequired={false}
                   setUserFunction={setSelectedLeader}
                   preselectedUserPk={leader}
                   isEditable
@@ -508,7 +512,7 @@ export const BusinessAreaItemDisplay = ({
                 <UserSearchDropdown
                   {...register("finance_admin", { required: true })}
                   onlyInternal={true}
-                  isRequired={true}
+                  isRequired={false}
                   setUserFunction={setSelectedFinanceAdmin}
                   preselectedUserPk={finance_admin}
                   isEditable
@@ -521,7 +525,7 @@ export const BusinessAreaItemDisplay = ({
                 <UserSearchDropdown
                   {...register("data_custodian", { required: true })}
                   onlyInternal={true}
-                  isRequired={true}
+                  isRequired={false}
                   setUserFunction={setSelectedDataCustodian}
                   preselectedUserPk={data_custodian}
                   isEditable
@@ -577,5 +581,5 @@ export const BusinessAreaItemDisplay = ({
         </ModalBody>
       </Modal>
     </>
-  ) : null;
+  )
 };

@@ -1,47 +1,45 @@
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import {
-  Image,
-  Text,
   Box,
   Button,
+  Center,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   FormControl,
-  Input,
-  InputGroup,
-  VStack,
-  useDisclosure,
-  Center,
-  Spinner,
-  Grid,
-  DrawerOverlay,
-  DrawerCloseButton,
-  DrawerHeader,
-  FormLabel,
-  Textarea,
-  useToast,
   FormHelperText,
-  FormErrorMessage,
+  FormLabel,
+  Grid,
+  Input,
+  Spinner,
+  Text,
+  VStack,
   useColorMode,
+  useDisclosure,
+  useToast
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { BusinessAreaItemDisplay } from "./BusinessAreaItemDisplay";
 import { createBusinessArea, getAllBusinessAreas } from "../../../lib/api";
-import { useQueryClient } from "@tanstack/react-query";
 import { IBusinessArea } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
-import { useNoImage } from "../../../lib/hooks/useNoImage";
+import { BusinessAreaItemDisplay } from "./BusinessAreaItemDisplay";
+import { StatefulMediaChanger } from "./StatefulMediaChanger";
 
 export const BusinessAreasCRUD = () => {
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    reset,
+    // formState: { errors },
   } = useForm<IBusinessArea>();
   const toast = useToast();
   const {
@@ -49,6 +47,8 @@ export const BusinessAreasCRUD = () => {
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
+
+
 
   const queryClient = useQueryClient();
   const mutation = useMutation(createBusinessArea, {
@@ -59,6 +59,7 @@ export const BusinessAreasCRUD = () => {
         position: "top-right",
       });
       onAddClose();
+      clearFields();
       queryClient.invalidateQueries(["businessAreas"]);
     },
     onError: () => {
@@ -82,6 +83,7 @@ export const BusinessAreasCRUD = () => {
   // }, [isLoading, slices]);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [canSubmit, setCanSubmit] = useState(false);
 
   const [filteredSlices, setFilteredSlices] = useState<IBusinessArea[]>([]);
   const [countOfItems, setCountOfItems] = useState(0);
@@ -98,6 +100,7 @@ export const BusinessAreasCRUD = () => {
           .includes(searchTerm.toLowerCase());
         return nameMatch;
       });
+      // console.log(filtered)
 
       setFilteredSlices(filtered);
       setCountOfItems(filtered.length);
@@ -113,20 +116,41 @@ export const BusinessAreasCRUD = () => {
   }, [searchTerm, slices]);
 
   const nameData = watch("name");
-  const slugData = watch("slug");
-  const focusData = watch("focus");
-  const introductionData = watch("introduction");
+  // const slugData = watch("slug");
+  // const focusData = watch("focus");
+  const [focus, setFocus] = useState("");
+  const [introduction, setIntroduction] = useState("");
+  // const introductionData = watch("introduction");
   const imageData = watch("image");
   const [selectedLeader, setSelectedLeader] = useState<number>();
   const [selectedFinanceAdmin, setSelectedFinanceAdmin] = useState<number>();
   const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
 
+
+  const clearFields = () => {
+    reset();
+    setSelectedDataCustodian(undefined);
+    setSelectedFinanceAdmin(undefined);
+    setSelectedLeader(undefined);
+    setSelectedFile(null);
+    setSelectedImageUrl(null);
+  }
+
+  useEffect(() => {
+    if (introduction?.length >= 5 && focus?.length >= 5 && nameData?.length >= 5) {
+      setCanSubmit(true);
+    }
+    else {
+      setCanSubmit(false);
+    }
+  }, [nameData, focus, introduction])
+
   const onSubmitBusinessAreaCreation = (formData: IBusinessArea) => {
     const {
+      // old_id,
+      // slug,
       agency,
-      old_id,
       name,
-      slug,
       leader,
       data_custodian,
       finance_admin,
@@ -137,10 +161,10 @@ export const BusinessAreasCRUD = () => {
 
     // Create an object to pass as a single argument to mutation.mutate
     const payload = {
+      // old_id,
+      // slug,
       agency,
-      old_id,
       name,
-      slug,
       leader,
       data_custodian,
       finance_admin,
@@ -148,11 +172,9 @@ export const BusinessAreasCRUD = () => {
       introduction,
       image,
     };
-
+    console.log(payload)
     mutation.mutate(payload);
   };
-
-  const noImageLink = useNoImage();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>();
@@ -275,119 +297,71 @@ export const BusinessAreasCRUD = () => {
                     />
                     <FormHelperText>Name of the Business Area</FormHelperText>
                   </FormControl>
+                  <FormControl isRequired>
+
+                    <FormLabel>Focus</FormLabel>
+                    {/* <InputGroup>
+                      <Textarea
+                        {...register("focus", { required: true })}
+                        required
+                      />
+                    </InputGroup> */}
+
+
+                    <UnboundStatefulEditor
+                      title={"Focus"}
+                      showTitle={false}
+                      isRequired={false}
+                      showToolbar={true}
+
+                      setValueAsPlainText={false}
+                      value={focus}
+                      setValueFunction={setFocus}
+                    />
+                    <FormHelperText>
+                      Primary concerns of the Business Area
+                    </FormHelperText>
+                  </FormControl>
 
                   <FormControl isRequired>
-                    <FormLabel>Slug</FormLabel>
-                    <InputGroup>
-                      {/* <InputLeftAddon children={<FaSign />} /> */}
-                      <Input
-                        {...register("slug", { required: true })}
+                    <FormLabel>Introduction</FormLabel>
+                    {/* <InputGroup>
+                      <Textarea
+                        {...register("introduction", { required: true })}
                         required
-                        type="text"
-                        autoComplete="off"
                       />
-                    </InputGroup>
+                    </InputGroup> */}
+
+                    <UnboundStatefulEditor
+                      title={"Introduction"}
+                      showTitle={false}
+                      isRequired={false}
+                      showToolbar={true}
+
+                      setValueAsPlainText={false}
+                      value={introduction}
+                      setValueFunction={setIntroduction}
+                    />
                     <FormHelperText>
-                      Short text or acronym to quickly identify (e.g. BCS)
+                      A description of the Business Area
                     </FormHelperText>
                   </FormControl>
                   <FormControl isRequired>
-                    <Grid
-                      gridTemplateColumns={{ base: "3fr 10fr", md: "4fr 8fr" }}
-                      pos="relative"
-                      w="100%"
-                      h="100%"
-                    >
-                      <Box>
-                        <FormLabel>Image</FormLabel>
-                        <Center
-                          maxH={{ base: "200px", xl: "225px" }}
-                          bg="gray.50"
-                          mt={1}
-                          rounded="lg"
-                          overflow="hidden"
-                        >
-                          <Image
-                            objectFit="cover"
-                            src={
-                              (selectedFile !== null && selectedImageUrl) ||
-                              noImageLink
-                            }
-                            alt="Preview"
-                            userSelect="none"
-                            bg="gray.800"
-                            // onLoad={handleImageLoadSuccess}
-                            // onError={handleImageLoadError}
-                          />
-                        </Center>
-                      </Box>
-                      <FormControl ml={4} mt={10}>
-                        <InputGroup>
-                          <Grid gridGap={2} ml={4}>
-                            <FormControl>
-                              <Input
-                                autoComplete="off"
-                                {...register("image", { required: true })}
-                                alignItems={"center"}
-                                // type="file"
-                                // accept="image/*"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    setSelectedFile(file);
-                                    setSelectedImageUrl(
-                                      URL.createObjectURL(file)
-                                    );
-                                  }
-                                }}
-                                sx={{
-                                  "::file-selector-button": {
-                                    background:
-                                      colorMode === "light"
-                                        ? "gray.100"
-                                        : "gray.600",
-                                    borderRadius: "8px",
-                                    padding: "2px",
-                                    paddingX: "8px",
-                                    mt: "1px",
-                                    border: "1px solid",
-                                    borderColor:
-                                      colorMode === "light"
-                                        ? "gray.400"
-                                        : "gray.700",
-                                    outline: "none",
-                                    mr: "15px",
-                                    ml: "-16px",
-                                    cursor: "pointer",
-                                  },
-                                  pt: "3.5px",
-                                  color:
-                                    colorMode === "light"
-                                      ? "gray.800"
-                                      : "gray.200",
-                                }}
-                              />
-                            </FormControl>
-                            <FormHelperText>
-                              Select an image for the Business Area.
-                            </FormHelperText>
-                            {errors.image && (
-                              <FormErrorMessage>
-                                {errors.image.message}
-                              </FormErrorMessage>
-                            )}
-                          </Grid>
-                        </InputGroup>
-                      </FormControl>
-                    </Grid>
-
-                    {/* <FormHelperText>Select an image for the Business Area</FormHelperText> */}
+                    <StatefulMediaChanger
+                      helperText={
+                        "Upload an image that represents the Business Area."
+                      }
+                      selectedImageUrl={selectedImageUrl}
+                      setSelectedImageUrl={setSelectedImageUrl}
+                      selectedFile={selectedFile}
+                      setSelectedFile={setSelectedFile}
+                    />
                   </FormControl>
                   <FormControl>
                     <UserSearchDropdown
                       {...register("leader", { required: true })}
                       onlyInternal={false}
-                      isRequired={true}
+                      isRequired={false}
                       setUserFunction={setSelectedLeader}
                       label="Leader"
                       placeholder="Search for a user..."
@@ -399,7 +373,7 @@ export const BusinessAreasCRUD = () => {
                     <UserSearchDropdown
                       {...register("finance_admin", { required: true })}
                       onlyInternal={false}
-                      isRequired={true}
+                      isRequired={false}
                       setUserFunction={setSelectedFinanceAdmin}
                       label="Finance Admin"
                       placeholder="Search for a user..."
@@ -410,41 +384,33 @@ export const BusinessAreasCRUD = () => {
                     <UserSearchDropdown
                       {...register("data_custodian", { required: true })}
                       onlyInternal={false}
-                      isRequired={true}
+                      isRequired={false}
                       setUserFunction={setSelectedDataCustodian}
                       label="Data Custodian"
                       placeholder="Search for a user..."
                       helperText={"The data custodian of the Business Area"}
                     />
                   </FormControl>
-                  <FormControl isRequired>
-                    <FormLabel>Focus</FormLabel>
-                    <InputGroup>
-                      <Textarea
-                        {...register("focus", { required: true })}
-                        required
-                      />
-                    </InputGroup>
-                    <FormHelperText>
-                      Primary concerns of the Business Area
-                    </FormHelperText>
-                  </FormControl>
 
-                  <FormControl isRequired>
-                    <FormLabel>Introduction</FormLabel>
-                    <InputGroup>
-                      <Textarea
-                        {...register("introduction", { required: true })}
-                        required
-                      />
-                    </InputGroup>
-                    <FormHelperText>
-                      A description of the Business Area
-                    </FormHelperText>
-                  </FormControl>
 
                   {mutation.isError ? (
-                    <Text color={"red.500"}>Something went wrong</Text>
+                    <Box mt={4}>
+                      {Object.keys(
+                        (mutation.error as AxiosError)?.response?.data
+                      ).map((key) => (
+                        <Box key={key}>
+                          {(
+                            (mutation.error as AxiosError)?.response?.data[
+                            key
+                            ] as string[]
+                          ).map((errorMessage, index) => (
+                            <Text key={`${key}-${index}`} color="red.500">
+                              {`${key}: ${errorMessage}`}
+                            </Text>
+                          ))}
+                        </Box>
+                      ))}
+                    </Box>
                   ) : null}
                 </VStack>
               </DrawerBody>
@@ -452,6 +418,7 @@ export const BusinessAreasCRUD = () => {
                 <Button
                   // form="add-form"
                   // type="submit"
+                  isDisabled={!canSubmit}
                   isLoading={mutation.isLoading}
                   color={"white"}
                   background={colorMode === "light" ? "blue.500" : "blue.600"}
@@ -463,15 +430,13 @@ export const BusinessAreasCRUD = () => {
                   onClick={() => {
                     onSubmitBusinessAreaCreation({
                       agency: 1,
-                      old_id: 1,
                       name: nameData,
-                      slug: slugData,
+                      focus: focus,
+                      introduction: introduction,
+                      image: imageData,
                       leader: selectedLeader,
                       data_custodian: selectedDataCustodian,
                       finance_admin: selectedFinanceAdmin,
-                      focus: focusData,
-                      introduction: introductionData,
-                      image: imageData,
                     });
                   }}
                 >

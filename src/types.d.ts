@@ -196,8 +196,8 @@ interface IEndorsementProjectPlan {
     aims: string;
     knowledge_transfer: string;
     listed_references: string;
-    operating_budget:  string;
-    operating_budget_external:  string;
+    operating_budget: string;
+    operating_budget_external: string;
     outcome: string;
     related_projects: string;
 }
@@ -522,14 +522,14 @@ interface IBusinessArea {
     agency?: number;
     old_id?: number;
     pk?: number;
-    slug: string;
+    slug?: string;
     name: string;
     focus: string;
     introduction: string;
-    image: BusinessAreaImage | File;
-    leader: number;
-    finance_admin: number;
-    data_custodian: number;
+    image: BusinessAreaImage | File | null;
+    leader?: number;
+    finance_admin?: number;
+    data_custodian?: number;
 }
 
 // effective_from: Date;

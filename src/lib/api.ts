@@ -2549,9 +2549,9 @@ export const createBusinessArea = async (formData: IBusinessArea) => {
     if (formData.name !== undefined) {
         newFormData.append('name', formData.name);
     }
-    if (formData.slug !== undefined) {
-        newFormData.append('slug', formData.slug);
-    }
+    // if (formData.slug !== undefined) {
+    //     newFormData.append('slug', formData.slug);
+    // }
     if (formData.agency !== undefined) {
         newFormData.append('agency', formData.agency.toString());
     }
