@@ -271,9 +271,9 @@ export const ModernPersonalTaskDisplayCard = ({
             </Box>
             <Flex ml={2} flexDir="column" w="100%">
               <Text fontSize="md" fontWeight="semibold">
-                {document?.project.title.length >= 30
-                  ? `${document?.project.title.slice(0, 30)}...`
-                  : document?.project.title}
+                {document?.project?.title.length >= 30
+                  ? `${document?.project?.title.slice(0, 30)}...`
+                  : document?.project?.title}
               </Text>
               <Text flex={1} fontSize="xs">
                 {formattedDate} by {creator.first_name} {creator.last_name}

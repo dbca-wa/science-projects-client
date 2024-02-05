@@ -152,7 +152,7 @@ export const TraditionalEndorsementTaskDisplay = ({
 
       <Flex flexDir={"column"}>
         <ExtractedHTMLTitle
-          htmlContent={`${document?.project.title}`}
+          htmlContent={`${document?.project?.title}`}
           color={colorMode === "dark" ? "blue.200" : "blue.400"}
           fontWeight={"bold"}
           cursor={"pointer"}

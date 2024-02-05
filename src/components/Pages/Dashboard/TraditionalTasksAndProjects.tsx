@@ -68,16 +68,16 @@ export const TraditionalTasksAndProjects = () => {
       // Check if data is available and then sort tasks
       const sortedTaskData = taskData
         ? {
-            done: sortTasksByStatus(
-              taskData.filter((task) => task.status === "done")
-            ),
-            todo: sortTasksByStatus(
-              taskData.filter((task) => task.status === "todo")
-            ),
-            inprogress: sortTasksByStatus(
-              taskData.filter((task) => task.status === "inprogress")
-            ),
-          }
+          done: sortTasksByStatus(
+            taskData?.filter((task) => task.status === "done")
+          ),
+          todo: sortTasksByStatus(
+            taskData?.filter((task) => task.status === "todo")
+          ),
+          inprogress: sortTasksByStatus(
+            taskData?.filter((task) => task.status === "inprogress")
+          ),
+        }
         : null;
 
       setCombinedData([
@@ -147,7 +147,7 @@ export const TraditionalTasksAndProjects = () => {
                   {/* </Box> */}
                   {combinedData?.length +
                     pendingProjectDocumentData?.all?.length >=
-                  1 ? (
+                    1 ? (
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
@@ -168,7 +168,7 @@ export const TraditionalTasksAndProjects = () => {
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
                   {combinedData?.length +
                     pendingProjectDocumentData?.all?.length >=
-                  1 ? (
+                    1 ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                       {combinedData.map(
                         (task: ITaskDisplayCard, index: number) => {
@@ -184,43 +184,43 @@ export const TraditionalTasksAndProjects = () => {
                       {!(
                         pendingProjectDocumentDataLoading &&
                         pendingProjectDocumentData?.team?.length +
-                          pendingProjectDocumentData?.lead?.length +
-                          pendingProjectDocumentData?.ba?.length +
-                          pendingProjectDocumentData?.directorate?.length >=
-                          1
+                        pendingProjectDocumentData?.lead?.length +
+                        pendingProjectDocumentData?.ba?.length +
+                        pendingProjectDocumentData?.directorate?.length >=
+                        1
                       )
                         ? [
-                            ...pendingProjectDocumentData.team.map(
-                              (document) => ({
-                                document,
-                                inputKind: "team_member",
-                              })
-                            ),
-                            ...pendingProjectDocumentData.lead.map(
-                              (document) => ({
-                                document,
-                                inputKind: "project_lead",
-                              })
-                            ),
-                            ...pendingProjectDocumentData.ba.map(
-                              (document) => ({
-                                document,
-                                inputKind: "business_area_lead",
-                              })
-                            ),
-                            ...pendingProjectDocumentData.directorate.map(
-                              (document) => ({
-                                document,
-                                inputKind: "directorate",
-                              })
-                            ),
-                          ]?.map(({ document, inputKind }, index: number) => (
-                            <TraditionalDocumentTaskDisplay
-                              key={index}
-                              document={document}
-                              inputKind={inputKind}
-                            />
-                          ))
+                          ...pendingProjectDocumentData.team.map(
+                            (document) => ({
+                              document,
+                              inputKind: "team_member",
+                            })
+                          ),
+                          ...pendingProjectDocumentData.lead.map(
+                            (document) => ({
+                              document,
+                              inputKind: "project_lead",
+                            })
+                          ),
+                          ...pendingProjectDocumentData.ba.map(
+                            (document) => ({
+                              document,
+                              inputKind: "business_area_lead",
+                            })
+                          ),
+                          ...pendingProjectDocumentData.directorate.map(
+                            (document) => ({
+                              document,
+                              inputKind: "directorate",
+                            })
+                          ),
+                        ]?.map(({ document, inputKind }, index: number) => (
+                          <TraditionalDocumentTaskDisplay
+                            key={index}
+                            document={document}
+                            inputKind={inputKind}
+                          />
+                        ))
                         : null}
                     </Grid>
                   ) : (
@@ -243,11 +243,11 @@ export const TraditionalTasksAndProjects = () => {
             me?.userData?.is_biometrician ||
             me?.userData?.is_herbarium_curator ||
             me?.userData?.is_superuser) ===
-          false ? null : pendingEndorsementsDataLoading ? (
-            <Center my={4}>
-              <Spinner />
-            </Center>
-          ) : (
+            false ? null : pendingEndorsementsDataLoading ? (
+              <Center my={4}>
+                <Spinner />
+              </Center>
+            ) : (
             <motion.div
               initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
               animate={{ opacity: pendingEndorsementsDataLoading ? 0 : 1 }}
@@ -258,7 +258,7 @@ export const TraditionalTasksAndProjects = () => {
                   colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
                 }
                 borderBottom={"none"}
-                // borderTop={"none"}
+              // borderTop={"none"}
               >
                 <AccordionButton
                   bg={colorMode === "light" ? "gray.200" : "gray.700"}
@@ -276,7 +276,7 @@ export const TraditionalTasksAndProjects = () => {
                   {pendingEndorsementsData?.aec?.length +
                     pendingEndorsementsData?.bm?.length +
                     pendingEndorsementsData?.hc?.length >
-                  1 ? (
+                    1 ? (
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
@@ -299,43 +299,43 @@ export const TraditionalTasksAndProjects = () => {
                   {pendingEndorsementsData?.aec?.length +
                     pendingEndorsementsData?.bm?.length +
                     pendingEndorsementsData?.hc?.length >=
-                  1 ? (
+                    1 ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                       {!pendingEndorsementsDataLoading &&
-                      pendingEndorsementsData?.aec?.length >= 1
+                        pendingEndorsementsData?.aec?.length >= 1
                         ? pendingEndorsementsData?.aec?.map(
-                            (endorsement: IMiniEndorsement, index: number) => (
-                              <TraditionalEndorsementTaskDisplay
-                                key={index}
-                                document={endorsement?.project_plan?.document}
-                                endorsementKind={"animalEthics"}
-                              />
-                            )
+                          (endorsement: IMiniEndorsement, index: number) => (
+                            <TraditionalEndorsementTaskDisplay
+                              key={index}
+                              document={endorsement?.project_plan?.document}
+                              endorsementKind={"animalEthics"}
+                            />
                           )
+                        )
                         : null}
                       {!pendingEndorsementsDataLoading &&
-                      pendingEndorsementsData?.hc?.length >= 1
+                        pendingEndorsementsData?.hc?.length >= 1
                         ? pendingEndorsementsData?.hc?.map(
-                            (endorsement: IMiniEndorsement, index: number) => (
-                              <TraditionalEndorsementTaskDisplay
-                                key={index}
-                                document={endorsement?.project_plan?.document}
-                                endorsementKind={"herbarium"}
-                              />
-                            )
+                          (endorsement: IMiniEndorsement, index: number) => (
+                            <TraditionalEndorsementTaskDisplay
+                              key={index}
+                              document={endorsement?.project_plan?.document}
+                              endorsementKind={"herbarium"}
+                            />
                           )
+                        )
                         : null}
                       {!pendingEndorsementsDataLoading &&
-                      pendingEndorsementsData?.bm?.length >= 1
+                        pendingEndorsementsData?.bm?.length >= 1
                         ? pendingEndorsementsData?.bm?.map(
-                            (endorsement: IMiniEndorsement, index: number) => (
-                              <TraditionalEndorsementTaskDisplay
-                                key={index}
-                                document={endorsement?.project_plan?.document}
-                                endorsementKind={"biometrician"}
-                              />
-                            )
+                          (endorsement: IMiniEndorsement, index: number) => (
+                            <TraditionalEndorsementTaskDisplay
+                              key={index}
+                              document={endorsement?.project_plan?.document}
+                              endorsementKind={"biometrician"}
+                            />
                           )
+                        )
                         : null}
                     </Grid>
                   ) : (
@@ -457,10 +457,10 @@ export const TraditionalTasksAndProjects = () => {
                               project?.kind === "core_function"
                                 ? "red.600"
                                 : project?.kind === "science"
-                                ? "green.600"
-                                : project?.kind === "student"
-                                ? "blue.600"
-                                : "gray.600"
+                                  ? "green.600"
+                                  : project?.kind === "student"
+                                    ? "blue.600"
+                                    : "gray.600"
                             }
                             mr={3}
                             alignItems={"center"}
@@ -485,10 +485,10 @@ export const TraditionalTasksAndProjects = () => {
                               {project?.kind === "core_function"
                                 ? `Core Function`
                                 : project?.kind === "science"
-                                ? `Science`
-                                : project?.kind === "student"
-                                ? `Student`
-                                : `External`}
+                                  ? `Science`
+                                  : project?.kind === "student"
+                                    ? `Student`
+                                    : `External`}
                             </Text>
                           </Box>
                           <Divider
@@ -504,7 +504,7 @@ export const TraditionalTasksAndProjects = () => {
                                                                 /> */}
 
                           <ExtractedHTMLTitle
-                            htmlContent={`${project.title}`}
+                            htmlContent={`${project?.title}`}
                             color={
                               colorMode === "dark" ? "blue.200" : "blue.400"
                             }
