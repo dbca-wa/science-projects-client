@@ -25,6 +25,7 @@ import { LocationsCRUD } from "./components/Pages/Admin/LocationsCRUD";
 import { AddressesCRUD } from "./components/Pages/Admin/AddressesCRUD";
 import { BranchesCRUD } from "./components/Pages/Admin/BranchesCRUD";
 import { UserFeedbackPage } from "./components/Pages/Admin/UserFeedbackPage";
+import { TestEmailPage } from "./routes/TestEmailPage";
 
 export const router = createBrowserRouter([
   // Login
@@ -127,6 +128,17 @@ export const router = createBrowserRouter([
           <ContentWrapper>
             <AdminOnlyPage>
               <BranchesCRUD />
+            </AdminOnlyPage>
+          </ContentWrapper>
+        ),
+      },
+
+      {
+        path: "crud/emails",
+        element: (
+          <ContentWrapper>
+            <AdminOnlyPage>
+              <TestEmailPage />
             </AdminOnlyPage>
           </ContentWrapper>
         ),

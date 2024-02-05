@@ -223,6 +223,15 @@ const AdminMenuContents = ({ handleDataDump, handleNewReportCycle, handleBatchAp
         </MenuItem>
         <MenuItem
           onClick={() => {
+            navigate("/crud/emails");
+          }}
+        >
+          {<FaAddressCard />}
+          <Text ml={2}>Emails</Text>
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => {
             navigate("/crud/locations");
           }}
         >
