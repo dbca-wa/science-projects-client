@@ -3,6 +3,7 @@ import Cookie from 'js-cookie';
 import { QueryFunctionContext } from "@tanstack/react-query";
 import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData } from "../types";
 import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
+import TestEmail from "@/components/Emails/ReviewDocumentEmail";
 
 // INSTANCE SETUP ==================================================================
 
@@ -2850,3 +2851,23 @@ export const deleteDepartmentalService = async (pk: number) => {
 
 
 
+
+// EMAILS ==========================================================================
+
+// export const sendTestEmail = async () => {
+//     try {
+//         const data = await resend.sendEmail({
+//             from: "scienceprojects-noreply@dbca.wa.gov.au",
+//             to: "jarid.prince@dbca.wa.gov.au",
+//             subject: "Review Project (Title)",
+//             react: TestEmail(),
+//         })
+
+//         // Add curly brackets in parenthesis to add any props to pass to the react component (testemail)
+
+//         return NextResponse.json(data);
+//     } catch (error) {
+//         console.error(error);
+//         return NextResponse.json({ error })
+//     }
+// }

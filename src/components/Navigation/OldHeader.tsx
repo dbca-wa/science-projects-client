@@ -49,6 +49,7 @@ import { ToggleDarkMode } from "../ToggleDarkMode";
 import { useUser } from "../../lib/hooks/useUser";
 import { RiAdminFill, RiOrganizationChart } from "react-icons/ri";
 import {
+  MdEmail,
   MdManageHistory,
   MdOutlineAccessTimeFilled,
   MdOutlineSettingsSuggest,
@@ -226,7 +227,7 @@ const AdminMenuContents = ({ handleDataDump, handleNewReportCycle, handleBatchAp
             navigate("/crud/emails");
           }}
         >
-          {<FaAddressCard />}
+          {<MdEmail />}
           <Text ml={2}>Emails</Text>
         </MenuItem>
 

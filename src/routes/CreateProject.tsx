@@ -19,7 +19,7 @@ export const CreateProject = () => {
   const creationData = [
     {
       title: "Science Project",
-      description: "A discrete body of DBCA-led scientific work with a defined period of activity.",
+      description: "A discrete body of DBCA-led scientific work with a defined period of activity or an externally led science project with significant DBCA involvement.",
       bulletPoints: [
         "Requires approval through SPMS.",
         "Requires annual progress reporting",
