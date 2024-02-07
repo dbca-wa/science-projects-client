@@ -15,7 +15,7 @@ export const useGetRTESectionTitle = (section: string) => {
         setSectionText("Aims");
         break;
       case "outcome":
-        setSectionText("Expected Outcome");
+        setSectionText("Expected Outcomes");
         break;
       case "collaborations":
         setSectionText("Collaborations");
@@ -48,13 +48,13 @@ export const useGetRTESectionTitle = (section: string) => {
         setSectionText("Methodology");
         break;
       case "specimens":
-        setSectionText("No. of Specimens");
+        setSectionText("Number of Voucher Specimens");
         break;
       case "operating_budget":
-        setSectionText("Operating Budget");
+        setSectionText("Consolidated Funds");
         break;
       case "operating_budget_external":
-        setSectionText("External Budget");
+        setSectionText("External Funds");
         break;
       case "context":
         setSectionText("Context");
