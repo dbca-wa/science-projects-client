@@ -9,6 +9,7 @@ import {
   DrawerOverlay,
   Flex,
   FormControl,
+  FormHelperText,
   FormLabel,
   Grid,
   Image,
@@ -23,6 +24,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Select,
   Skeleton,
   Text,
   VStack,
@@ -33,23 +35,32 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FcOk } from "react-icons/fc";
+import { ImCross } from "react-icons/im";
 import { MdMoreVert } from "react-icons/md";
-import { deleteBusinessArea, updateBusinessArea } from "../../../lib/api";
+import {
+  activateBusinessArea,
+  deleteBusinessArea,
+  updateBusinessArea,
+} from "../../../lib/api";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
 import { useNoImage } from "../../../lib/hooks/useNoImage";
-import { BusinessAreaImage, IBusinessArea } from "../../../types";
+import { BusinessAreaImage, IBusinessArea, IDivision } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
 import { UserProfile } from "../Users/UserProfile";
 import useDistilledHtml from "./../../../lib/hooks/useDistilledHtml";
 import { StatefulMediaChanger } from "./StatefulMediaChanger";
+import { useGetDivisions } from "@/lib/hooks/useGetDivisions";
 
 export const BusinessAreaItemDisplay = ({
   pk,
   slug,
   name,
+  division,
   leader,
+  is_active,
   finance_admin,
   data_custodian,
   focus,
@@ -57,7 +68,6 @@ export const BusinessAreaItemDisplay = ({
   image,
 }: IBusinessArea) => {
   const { register, handleSubmit } = useForm<IBusinessArea>();
-
   const toast = useToast();
   const {
     isOpen: isDeleteModalOpen,
@@ -69,6 +79,13 @@ export const BusinessAreaItemDisplay = ({
     onOpen: onUpdateModalOpen,
     onClose: onUpdateModalClose,
   } = useDisclosure();
+
+  const {
+    isOpen: isActiveModalOpen,
+    onOpen: onActiveModalOpen,
+    onClose: onActiveModalClose,
+  } = useDisclosure();
+
   const queryClient = useQueryClient();
 
   const { userLoading: leaderLoading, userData: leaderData } =
@@ -138,12 +155,36 @@ export const BusinessAreaItemDisplay = ({
     deleteMutation.mutate(pk);
   };
 
+  const activateMutation = useMutation(activateBusinessArea, {
+    onSuccess: () => {
+      // console.log("success")
+      toast({
+        status: "success",
+        title: is_active ? "Deactivated" : "Activated",
+        position: "top-right",
+      });
+      onActiveModalClose();
+      queryClient.invalidateQueries(["businessAreas"]);
+    },
+    onError: () => {
+      // console.log("error")
+    },
+    onMutate: () => {
+      // console.log("mutation")
+    },
+  });
+
+  const activateButtonClicked = () => {
+    activateMutation.mutate(pk);
+  };
+
   const onUpdateSubmit = (formData: IBusinessArea) => {
     // console.log(formData);
 
     const {
       pk,
       agency,
+      is_active,
       old_id,
       name,
       slug,
@@ -158,6 +199,7 @@ export const BusinessAreaItemDisplay = ({
     const payload = {
       pk,
       agency,
+      is_active,
       old_id,
       name,
       slug,
@@ -223,7 +265,14 @@ export const BusinessAreaItemDisplay = ({
   const [focusData, setFocusData] = useState(focus);
   const [introductionData, setIntroductionData] = useState(introduction);
 
+  const { divsLoading, divsData } = useGetDivisions();
 
+  const defaultSelectedDivision = divsData?.find(
+    (div) => div.pk === division?.pk
+  );
+  const [baDivision, setBaDivision] = useState<IDivision>(
+    defaultSelectedDivision || {}
+  );
 
   return (
     <>
@@ -286,44 +335,69 @@ export const BusinessAreaItemDisplay = ({
 
       <Grid
         gridTemplateColumns="2fr 4fr 3fr 3fr 3fr 1fr"
+        // gridTemplateColumns="2fr 2fr 3fr 2fr 2fr 2fr 1fr"
         width="100%"
         p={3}
         borderWidth={1}
-      // bg={"red"}
+        // bg={"red"}
       >
-        <Flex justifyContent="flex-start" alignItems={"center"}>
+        <Flex
+          justifyContent="flex-start"
+          alignItems={"center"}
+          pos={"relative"}
+        >
           {name ? (
-            <Box rounded="lg" overflow="hidden" w="80px" h="69px">
+            <Box
+              rounded="lg"
+              // overflow="hidden"
+              w="80px"
+              h="69px"
+              pos={"relative"}
+            >
               <Image
                 src={
                   image instanceof File
                     ? `${apiEndpoint}${image.name}` // Use the image directly for File
                     : image?.file
-                      ? `${apiEndpoint}${image.file}`
-                      : NoImageFile
+                    ? `${apiEndpoint}${image.file}`
+                    : NoImageFile
                 }
+                rounded="lg"
                 width={"100%"}
                 height={"100%"}
                 objectFit={"cover"}
+                filter={!is_active ? "grayscale(100%)" : undefined}
               />
+              <Box pos={"absolute"} bottom={-1} right={-1} color={"red"}>
+                {is_active ? <FcOk size={"24px"} /> : <ImCross size={"18px"} />}
+              </Box>
             </Box>
           ) : (
             <Skeleton rounded="lg" overflow="hidden" w="80px" h="69px" />
           )}
         </Flex>
+        {/* <Box>{is_active ? "Active" : "Inactive"}</Box> */}
         <TextButtonFlex
           // name={name}
-          name={distlledTitle}
+          name={`${distlledTitle} ${!is_active ? "(Inactive)" : ""}`}
           onClick={onUpdateModalOpen}
         />
         <TextButtonFlex
-          name={leaderData ? `${leaderData.first_name} ${leaderData.last_name}` : '-'}
+          name={
+            leaderData
+              ? `${leaderData.first_name} ${leaderData.last_name}`
+              : "-"
+          }
           onClick={leaderDrawerFunction}
         />
 
         {!financeAdminLoading && financeAdminData ? (
           <TextButtonFlex
-            name={financeAdminData ? `${financeAdminData.first_name} ${financeAdminData.last_name}` : '-'}
+            name={
+              financeAdminData
+                ? `${financeAdminData.first_name} ${financeAdminData.last_name}`
+                : "-"
+            }
             onClick={financeAdminDrawerFunction}
           />
         ) : (
@@ -332,7 +406,11 @@ export const BusinessAreaItemDisplay = ({
 
         {!dataCustodianLoading && dataCustodianData ? (
           <TextButtonFlex
-            name={dataCustodianData ? `${dataCustodianData.first_name} ${dataCustodianData.last_name}` : '-'}
+            name={
+              dataCustodianData
+                ? `${dataCustodianData.first_name} ${dataCustodianData.last_name}`
+                : "-"
+            }
             onClick={dataCustodianDrawerFunction}
           />
         ) : (
@@ -358,12 +436,58 @@ export const BusinessAreaItemDisplay = ({
             </MenuButton>
             <MenuList>
               <MenuItem onClick={onUpdateModalOpen}>Edit</MenuItem>
+              <MenuItem onClick={onActiveModalOpen}>
+                Change Active Status
+              </MenuItem>
               <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
             </MenuList>
           </Menu>
           {/* </Button> */}
         </Flex>
       </Grid>
+      <Modal isOpen={isActiveModalOpen} onClose={onActiveModalClose}>
+        <ModalOverlay />
+        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+          <ModalHeader>
+            {is_active ? "Deactivate Business Area?" : "Activate Business Area"}
+          </ModalHeader>
+          <ModalBody>
+            <Box>
+              <Text fontSize="lg" fontWeight="semibold">
+                Are you sure you want to {is_active ? "deactivate" : "activate"}{" "}
+                this business area?
+              </Text>
+
+              <Text
+                fontSize="lg"
+                fontWeight="semibold"
+                color={"blue.500"}
+                mt={4}
+              >
+                "{name}"
+              </Text>
+            </Box>
+          </ModalBody>
+          <ModalFooter justifyContent="flex-end">
+            <Flex>
+              <Button onClick={onActiveModalClose} colorScheme={"gray"}>
+                No
+              </Button>
+              <Button
+                onClick={activateButtonClicked}
+                color={"white"}
+                background={colorMode === "light" ? "green.500" : "green.600"}
+                _hover={{
+                  background: colorMode === "light" ? "green.400" : "green.500",
+                }}
+                ml={3}
+              >
+                Yes
+              </Button>
+            </Flex>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
@@ -440,16 +564,42 @@ export const BusinessAreaItemDisplay = ({
               id="update-form"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
-              <FormControl>
+              <FormControl mb={2}>
                 <FormLabel>Name</FormLabel>
                 <Input
                   autoFocus
                   autoComplete="off"
                   value={nameData}
                   onChange={(e) => setNameData(e.target.value)}
-                // {...register("name", { required: true })}
+                  // {...register("name", { required: true })}
                 />
               </FormControl>
+
+              {!divsLoading && divsData ? (
+                <FormControl mb={2}>
+                  <FormLabel>Division</FormLabel>
+                  <Select
+                    value={baDivision?.pk}
+                    onChange={(e) => {
+                      const selectedDivision = divsData.find(
+                        (div) => div.pk === e.target.value
+                      );
+                      if (selectedDivision) {
+                        setBaDivision(selectedDivision);
+                      }
+                    }}
+                  >
+                    {divsData?.map((div) => (
+                      <option key={div.pk} value={div.pk}>
+                        {div.name}
+                      </option>
+                    ))}
+                  </Select>
+                  <FormHelperText>
+                    The division the business area belongs to
+                  </FormHelperText>
+                </FormControl>
+              ) : null}
 
               {/* <UnboundStatefulEditor
                 title="Business Area Name"
@@ -562,6 +712,7 @@ export const BusinessAreaItemDisplay = ({
                   onUpdateSubmit({
                     pk: pk,
                     agency: 1,
+                    is_active: is_active,
                     old_id: 1,
                     name: nameData,
                     slug: slug,
@@ -581,5 +732,5 @@ export const BusinessAreaItemDisplay = ({
         </ModalBody>
       </Modal>
     </>
-  )
+  );
 };

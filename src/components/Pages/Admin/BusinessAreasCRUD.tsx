@@ -21,7 +21,7 @@ import {
   VStack,
   useColorMode,
   useDisclosure,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -47,8 +47,6 @@ export const BusinessAreasCRUD = () => {
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
-
-
 
   const queryClient = useQueryClient();
   const mutation = useMutation(createBusinessArea, {
@@ -126,7 +124,6 @@ export const BusinessAreasCRUD = () => {
   const [selectedFinanceAdmin, setSelectedFinanceAdmin] = useState<number>();
   const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
 
-
   const clearFields = () => {
     reset();
     setSelectedDataCustodian(undefined);
@@ -134,22 +131,26 @@ export const BusinessAreasCRUD = () => {
     setSelectedLeader(undefined);
     setSelectedFile(null);
     setSelectedImageUrl(null);
-  }
+  };
 
   useEffect(() => {
-    if (introduction?.length >= 5 && focus?.length >= 5 && nameData?.length >= 5) {
+    if (
+      introduction?.length >= 5 &&
+      focus?.length >= 5 &&
+      nameData?.length >= 5
+    ) {
       setCanSubmit(true);
-    }
-    else {
+    } else {
       setCanSubmit(false);
     }
-  }, [nameData, focus, introduction])
+  }, [nameData, focus, introduction]);
 
   const onSubmitBusinessAreaCreation = (formData: IBusinessArea) => {
     const {
       // old_id,
       // slug,
       agency,
+      is_active,
       name,
       leader,
       data_custodian,
@@ -164,6 +165,7 @@ export const BusinessAreasCRUD = () => {
       // old_id,
       // slug,
       agency,
+      is_active,
       name,
       leader,
       data_custodian,
@@ -172,7 +174,7 @@ export const BusinessAreasCRUD = () => {
       introduction,
       image,
     };
-    console.log(payload)
+    console.log(payload);
     mutation.mutate(payload);
   };
 
@@ -219,6 +221,7 @@ export const BusinessAreasCRUD = () => {
               </Flex>
             </Flex>
             <Grid
+              // gridTemplateColumns="2fr 2fr 3fr 2fr 2fr 2fr 1fr"
               gridTemplateColumns="2fr 4fr 3fr 3fr 3fr 1fr"
               mt={4}
               width="100%"
@@ -229,6 +232,9 @@ export const BusinessAreasCRUD = () => {
               <Flex justifyContent="flex-start">
                 <Text as="b">Image</Text>
               </Flex>
+              {/* <Flex>
+                <Text as="b">Active</Text>
+              </Flex> */}
               <Flex>
                 <Text as="b">Business Area</Text>
               </Flex>
@@ -261,6 +267,7 @@ export const BusinessAreasCRUD = () => {
                 })
                 .map((s) => (
                   <BusinessAreaItemDisplay
+                    is_active={s.is_active}
                     key={s.pk}
                     pk={s.pk}
                     slug={s.slug}
@@ -298,7 +305,6 @@ export const BusinessAreasCRUD = () => {
                     <FormHelperText>Name of the Business Area</FormHelperText>
                   </FormControl>
                   <FormControl isRequired>
-
                     <FormLabel>Focus</FormLabel>
                     {/* <InputGroup>
                       <Textarea
@@ -307,13 +313,11 @@ export const BusinessAreasCRUD = () => {
                       />
                     </InputGroup> */}
 
-
                     <UnboundStatefulEditor
                       title={"Focus"}
                       showTitle={false}
                       isRequired={false}
                       showToolbar={true}
-
                       setValueAsPlainText={false}
                       value={focus}
                       setValueFunction={setFocus}
@@ -337,7 +341,6 @@ export const BusinessAreasCRUD = () => {
                       showTitle={false}
                       isRequired={false}
                       showToolbar={true}
-
                       setValueAsPlainText={false}
                       value={introduction}
                       setValueFunction={setIntroduction}
@@ -392,7 +395,6 @@ export const BusinessAreasCRUD = () => {
                     />
                   </FormControl>
 
-
                   {mutation.isError ? (
                     <Box mt={4}>
                       {Object.keys(
@@ -401,7 +403,7 @@ export const BusinessAreasCRUD = () => {
                         <Box key={key}>
                           {(
                             (mutation.error as AxiosError)?.response?.data[
-                            key
+                              key
                             ] as string[]
                           ).map((errorMessage, index) => (
                             <Text key={`${key}-${index}`} color="red.500">
@@ -430,6 +432,7 @@ export const BusinessAreasCRUD = () => {
                   onClick={() => {
                     onSubmitBusinessAreaCreation({
                       agency: 1,
+                      is_active: true,
                       name: nameData,
                       focus: focus,
                       introduction: introduction,
