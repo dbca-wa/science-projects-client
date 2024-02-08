@@ -156,8 +156,8 @@ export const TeamMemberDisplay = ({
                 image?.file
                   ? image.file
                   : image?.old_file
-                  ? image.old_file
-                  : undefined
+                    ? image.old_file
+                    : undefined
               }
               userSelect={"none"}
               onClick={onUserOpen}

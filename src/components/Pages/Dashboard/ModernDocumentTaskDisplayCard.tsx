@@ -56,7 +56,7 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
   const formattedDocumentKind = (docKind: string) => {
     // "conceptplan" | "projectplan" | "progressreport" | "studentreport" | "projectclosure"
     if (docKind === "studentreport") {
-      return "Student";
+      return "Student Report";
     } else if (docKind === "concept") {
       return "Concept Plan";
     } else if (docKind === "projectclosure") {
@@ -135,13 +135,12 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
         >
           <Text
             as={"span"}
-            color={`${
-              kind === "directorate"
+            color={`${kind === "directorate"
                 ? "red"
                 : kind === "ba_lead"
-                ? "orange"
-                : "green"
-            }.600`}
+                  ? "orange"
+                  : "green"
+              }.600`}
             fontWeight={"semibold"}
             fontSize={"small"}
             mr={1}
@@ -157,8 +156,8 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
             {kind === "team"
               ? "Input required"
               : `Determine if the ${formattedDocumentKind(
-                  document?.kind
-                )} for this project is satisfactory`}
+                document?.kind
+              )} for this project is satisfactory`}
           </Text>
         </Box>
 
@@ -167,8 +166,8 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
           bottom={2}
           right={1.5}
           px={1}
-          // bg={"red"}
-          // justifyContent={"center"}
+        // bg={"red"}
+        // justifyContent={"center"}
         >
           <Flex>
             <Center
@@ -179,8 +178,8 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
               boxSize={5}
               w={"20px"}
 
-              // w={"100%"}
-              // bg={"orange"}
+            // w={"100%"}
+            // bg={"orange"}
             >
               <HiDocumentCheck />
             </Center>
