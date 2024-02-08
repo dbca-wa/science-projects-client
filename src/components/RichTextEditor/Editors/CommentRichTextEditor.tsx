@@ -286,5 +286,51 @@ const UserContainer = ({ userData }: UserContainerProps) => {
         </Flex>
       </Flex>
     </Box>
-  ) : null;
+  ) : <Box
+    pl={3}
+    pt={2}
+    onClick={() => {
+      // If the editor is not focused, focus it.
+      editor.focus();
+    }}
+  >
+    <Flex
+      flexDir="row"
+      // color="gray.500"
+      sx={{ alignSelf: "flex-start" }}
+      mt={2}
+    >
+      <Avatar
+        size={"md"}
+        src={""}
+        mr={2}
+        userSelect={"none"}
+        style={{ pointerEvents: "none" }}
+        draggable={false}
+      />
+
+      <Flex
+        pl={1}
+        pr={0}
+        w={"100%"}
+        h={"100%"}
+        justifyContent={"space-between"}
+        paddingRight={"40px"}
+      >
+        <Box userSelect={"none"}>
+          <Text
+            fontWeight="bold"
+            pl={1}
+            mt={0}
+            color={
+              colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
+            }
+          // w={"100%"}
+          >
+            {`${userData?.first_name} ${userData?.last_name}`}
+          </Text>
+        </Box>
+      </Flex>
+    </Flex>
+  </Box>;
 };

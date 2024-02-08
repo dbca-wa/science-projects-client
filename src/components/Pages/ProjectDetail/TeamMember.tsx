@@ -184,15 +184,15 @@ export const TeamMember = ({
                 image?.file
                   ? `${baseURL}${image.file}`
                   : image?.old_file
-                  ? `${baseURL}${image.old_file}`
-                  : ""
+                    ? `${baseURL}${image.old_file}`
+                    : ""
               }
               userSelect={"none"}
               onClick={onUserOpen}
               cursor="pointer"
             />
             {is_leader && (
-              <Box pos={"absolute"} color={"yellow.300"} top={-1} right={"33%"}>
+              <Box pos={"absolute"} color={"yellow.300"} top={-1} right={"38%"}>
                 <FaCrown />
               </Box>
             )}
@@ -211,8 +211,8 @@ export const TeamMember = ({
                 isCurrentlyDragging
                   ? "white"
                   : colorMode === "light"
-                  ? "blue.500"
-                  : "blue.600"
+                    ? "blue.500"
+                    : "blue.600"
               }
               _hover={{
                 color: colorMode === "light" ? "blue.400" : "blue.500",

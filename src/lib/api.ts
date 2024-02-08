@@ -2863,20 +2863,16 @@ export const deleteDepartmentalService = async (pk: number) => {
 
 // EMAILS ==========================================================================
 
-// export const sendTestEmail = async () => {
-//     try {
-//         const data = await resend.sendEmail({
-//             from: "scienceprojects-noreply@dbca.wa.gov.au",
-//             to: "jarid.prince@dbca.wa.gov.au",
-//             subject: "Review Project (Title)",
-//             react: TestEmail(),
-//         })
+export interface ITestEmail {
 
-//         // Add curly brackets in parenthesis to add any props to pass to the react component (testemail)
+}
 
-//         return NextResponse.json(data);
-//     } catch (error) {
-//         console.error(error);
-//         return NextResponse.json({ error })
-//     }
-// }
+export const sendTestEmail = async () => {
+    return instance.post(
+        `documents/testemail`
+    ).then(res => {
+        return res.data;
+    }
+    );
+}
+
