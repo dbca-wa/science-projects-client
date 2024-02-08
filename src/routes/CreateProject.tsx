@@ -19,7 +19,8 @@ export const CreateProject = () => {
   const creationData = [
     {
       title: "Science Project",
-      description: "A discrete body of DBCA-led scientific work with a defined period of activity or an externally led science project with significant DBCA involvement.",
+      description:
+        "A discrete body of DBCA-led scientific work with a defined period of activity or an externally led science project with significant DBCA involvement.",
       bulletPoints: [
         "Requires approval through SPMS.",
         "Requires annual progress reporting",
@@ -45,7 +46,8 @@ export const CreateProject = () => {
 
     {
       title: "Student Project",
-      description: "A project being undertaken by a student to attain a higher degree for which a DBCA staff member is a co-supervisor.",
+      description:
+        "A project being undertaken by a student to attain a higher degree for which a DBCA staff member is a co-supervisor.",
       bulletPoints: [
         "Requires prior approval by Executive Director or delegate",
         "Requires annual progress reporting",
@@ -57,7 +59,8 @@ export const CreateProject = () => {
     },
     {
       title: "External Partnership",
-      description: "A formal collaborative scientific partnership with an external organisation or organisations.",
+      description:
+        "A formal collaborative scientific partnership with an external organisation or organisations.",
       bulletPoints: [
         "Requires prior approval by Executive Director or delegate",
         "Project details automatically included in annual reporting",
@@ -105,7 +108,7 @@ export const CreateProject = () => {
             // "1500px": "repeat(4, 1fr)",
             // "2xl": "repeat(4, 1fr)",
           }}
-          gap={8}
+          gap={12}
           userSelect={"none"}
         >
           {creationData.map((item, index) => {

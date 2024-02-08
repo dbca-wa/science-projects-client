@@ -523,6 +523,8 @@ interface IBusinessArea {
     old_id?: number;
     pk?: number;
     slug?: string;
+    division?: IDivision;
+    is_active: boolean;
     name: string;
     focus: string;
     introduction: string;

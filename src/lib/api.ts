@@ -280,10 +280,11 @@ export const batchApproveProgressAndStudentReports = async () => {
 
 export interface INewCycle {
     alsoUpdate: boolean;
+    shouldSendEmails: boolean;
 }
 
-export const openNewCycle = async ({ alsoUpdate }: INewCycle) => {
-    const res = instance.post(`documents/opennewcycle`, { 'update': alsoUpdate }).then(res => { return res.data });
+export const openNewCycle = async ({ alsoUpdate, shouldSendEmails }: INewCycle) => {
+    const res = instance.post(`documents/opennewcycle`, { 'update': alsoUpdate, 'send_emails': shouldSendEmails, }).then(res => { return res.data });
     return res;
 }
 
@@ -2680,6 +2681,14 @@ export const deleteBusinessArea = async (pk: number) => {
         return res.data;
     }
     );
+}
+
+export const activateBusinessArea = async (pk: number) => {
+    return instance.post(
+        `agencies/business_areas/setactive/${pk}`
+    ).then(res => {
+        return res.data
+    })
 }
 
 

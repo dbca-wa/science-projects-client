@@ -66,14 +66,6 @@ export const ProjectPlanContents = ({
         projectAreas={projectAreas}
       />
 
-      <ProjectPlanEndorsements
-        document={document}
-        userIsLeader={userIsLeader}
-        userData={userData}
-        refetchDocument={refetch}
-        // isProjectLeader={}
-      />
-
       <RichTextEditor
         canEdit={userInTeam || userData?.is_superuser}
         document_pk={document?.document?.pk}
@@ -137,6 +129,70 @@ export const ProjectPlanContents = ({
         section={"project_tasks"}
       />
 
+      <RichTextEditor
+        canEdit={userInTeam || userData?.is_superuser}
+        document_pk={document?.document?.pk}
+        project_pk={document?.document?.project?.pk}
+        writeable_document_kind={"Project Plan"}
+        writeable_document_pk={document?.pk}
+        isUpdate={true}
+        editorType="ProjectDocument"
+        key={`listed_references${editorKey}`} // Change the key to force a re-render
+        data={document?.listed_references}
+        section={"listed_references"}
+      />
+
+      <RichTextEditor
+        canEdit={userInTeam || userData?.is_superuser}
+        document_pk={document?.document?.pk}
+        project_pk={document?.document?.project?.pk}
+        writeable_document_kind={"Project Plan"}
+        writeable_document_pk={document?.pk}
+        isUpdate={true}
+        editorType="ProjectDocument"
+        key={`methodology${editorKey}`} // Change the key to force a re-render
+        data={document?.methodology}
+        section={"methodology"}
+      />
+      <RichTextEditor
+        canEdit={userInTeam || userData?.is_superuser}
+        document_pk={document?.document?.pk}
+        project_pk={document?.document?.project?.pk}
+        writeable_document_kind={"Project Plan"}
+        writeable_document_pk={document?.pk}
+        isUpdate={true}
+        editorType="ProjectDocument"
+        key={`no_specimens${editorKey}`} // Change the key to force a re-render
+        data={document?.endorsements?.no_specimens}
+        section={"specimens"}
+      />
+
+      <RichTextEditor
+        canEdit={userInTeam || userData?.is_superuser}
+        document_pk={document?.document?.pk}
+        project_pk={document?.document?.project?.pk}
+        writeable_document_kind={"Project Plan"}
+        writeable_document_pk={document?.pk}
+        isUpdate={true}
+        editorType="ProjectDocument"
+        key={`data_management${editorKey}`} // Change the key to force a re-render
+        data={document?.endorsements?.data_management}
+        section={"data_management"}
+      />
+
+      <RichTextEditor
+        canEdit={userInTeam || userData?.is_superuser}
+        document_pk={document?.document?.pk}
+        project_pk={document?.document?.project?.pk}
+        writeable_document_kind={"Project Plan"}
+        writeable_document_pk={document?.pk}
+        isUpdate={true}
+        editorType="ProjectDocument"
+        key={`related_projects${editorKey}`} // Change the key to force a re-render
+        data={document?.related_projects}
+        section={"related_projects"}
+      />
+
       <Box pb={6} mt={4}>
         <Text fontWeight={"bold"} fontSize={"2xl"}>
           Funding
@@ -169,79 +225,15 @@ export const ProjectPlanContents = ({
           />
         </Grid>
       </Box>
+      <ProjectPlanEndorsements
+        document={document}
+        userIsLeader={userIsLeader}
+        userData={userData}
+        refetchDocument={refetch}
+        // isProjectLeader={}
+      />
 
       <Box pb={6} mt={4}>
-        <Text fontWeight={"bold"} fontSize={"2xl"}>
-          Other
-        </Text>
-        <Grid
-          mt={4}
-          // gridRowGap={10}
-          gridTemplateColumns={"repeat(1, 1fr)"}
-        >
-          <RichTextEditor
-            canEdit={userInTeam || userData?.is_superuser}
-            document_pk={document?.document?.pk}
-            project_pk={document?.document?.project?.pk}
-            writeable_document_kind={"Project Plan"}
-            writeable_document_pk={document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            key={`related_projects${editorKey}`} // Change the key to force a re-render
-            data={document?.related_projects}
-            section={"related_projects"}
-          />
-          <RichTextEditor
-            canEdit={userInTeam || userData?.is_superuser}
-            document_pk={document?.document?.pk}
-            project_pk={document?.document?.project?.pk}
-            writeable_document_kind={"Project Plan"}
-            writeable_document_pk={document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            key={`listed_references${editorKey}`} // Change the key to force a re-render
-            data={document?.listed_references}
-            section={"listed_references"}
-          />
-
-          <RichTextEditor
-            canEdit={userInTeam || userData?.is_superuser}
-            document_pk={document?.document?.pk}
-            project_pk={document?.document?.project?.pk}
-            writeable_document_kind={"Project Plan"}
-            writeable_document_pk={document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            key={`data_management${editorKey}`} // Change the key to force a re-render
-            data={document?.endorsements?.data_management}
-            section={"data_management"}
-          />
-
-          <RichTextEditor
-            canEdit={userInTeam || userData?.is_superuser}
-            document_pk={document?.document?.pk}
-            project_pk={document?.document?.project?.pk}
-            writeable_document_kind={"Project Plan"}
-            writeable_document_pk={document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            key={`methodology${editorKey}`} // Change the key to force a re-render
-            data={document?.methodology}
-            section={"methodology"}
-          />
-          <RichTextEditor
-            canEdit={userInTeam || userData?.is_superuser}
-            document_pk={document?.document?.pk}
-            project_pk={document?.document?.project?.pk}
-            writeable_document_kind={"Project Plan"}
-            writeable_document_pk={document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            key={`no_specimens${editorKey}`} // Change the key to force a re-render
-            data={document?.endorsements?.no_specimens}
-            section={"specimens"}
-          />
-        </Grid>
         <CommentSection
           documentID={document?.document?.id}
           userData={userData}
