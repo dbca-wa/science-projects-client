@@ -32,7 +32,6 @@ export const DocumentApprovedEmail = () => {
               />
             </Section>
             <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mt-4 mx-0">
-              {/* Join <strong>{teamName}</strong> on <strong>Vercel</strong> */}
               Document Approved
             </Heading>
             <Text className="text-black text-[14px] leading-[24px]">

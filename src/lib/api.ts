@@ -2683,6 +2683,14 @@ export const deleteBusinessArea = async (pk: number) => {
     );
 }
 
+export const activateBusinessArea = async (pk: number) => {
+    return instance.post(
+        `agencies/business_areas/setactive/${pk}`
+    ).then(res => {
+        return res.data
+    })
+}
+
 
 // DIVISIONS ==========================================================================
 

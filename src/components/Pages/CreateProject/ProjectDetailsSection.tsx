@@ -15,10 +15,7 @@ import { useEffect, useState } from "react";
 
 import "react-calendar/dist/Calendar.css";
 import "../../../styles/modalscrollbar.css";
-import {
-  IBusinessArea,
-  IDepartmentalService,
-} from "../../../types";
+import { IBusinessArea, IDepartmentalService } from "../../../types";
 import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
 import { useDepartmentalServices } from "../../../lib/hooks/useDepartmentalServices";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
@@ -86,7 +83,6 @@ export const ProjectDetailsSection = ({
 
   const { baData: businessAreaDataFromAPI, baLoading } = useBusinessAreas();
   const { dsData: servicesDataFromAPI, dsLoading } = useDepartmentalServices();
-
 
   useEffect(() => {
     if (!baLoading) {
@@ -176,6 +172,7 @@ export const ProjectDetailsSection = ({
                     const htmlRegex = /<\/?[a-z][\s\S]*>/i;
 
                     // Check if the string contains any HTML tags
+
                     return htmlRegex.test(data);
                   };
 
@@ -187,11 +184,13 @@ export const ProjectDetailsSection = ({
                     const content = dom.body.textContent;
                     baName = content;
                   }
-                  return (
-                    <option key={index} value={ba.pk}>
-                      {baName}
-                    </option>
-                  );
+                  if (ba?.is_active) {
+                    return (
+                      <option key={index} value={ba.pk}>
+                        {baName}
+                      </option>
+                    );
+                  }
                 })}
               </Select>
             </InputGroup>
@@ -201,8 +200,6 @@ export const ProjectDetailsSection = ({
               The Business Area / Program that this project belongs to.
             </FormHelperText>
           </FormControl>
-
-
         </Box>
         <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
           <FormControl>
@@ -254,7 +251,6 @@ export const ProjectDetailsSection = ({
               />
             </Box>
           </Grid>
-
         </Grid>
       </Grid>
 
