@@ -27,7 +27,7 @@ import {
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  $INTERNAL_isPointSelection,
+  // $INTERNAL_isPointSelection,
   $createParagraphNode,
   $getSelection,
   $isParagraphNode,
@@ -289,7 +289,8 @@ export const RevisedRichTextToolbar = () =>
     const formatParagraph = () => {
       editor.update(() => {
         const selection = $getSelection();
-        if ($INTERNAL_isPointSelection(selection)) {
+        // if ($INTERNAL_isPointSelection(selection)) {
+        if (selection !== null) {
           $setBlocksType(selection, () => $createParagraphNode());
         }
       });
