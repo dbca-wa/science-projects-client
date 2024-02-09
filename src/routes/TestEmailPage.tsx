@@ -1,22 +1,24 @@
 import DocumentApprovedEmail from "@/components/Emails/DocumentApprovedEmail";
 import DocumentReadyForEditingEmail from "@/components/Emails/DocumentReadyForEditingEmail";
+import DocumentRecalledEmail from "@/components/Emails/DocumentRecalledEmail";
 import DocumentSentBackEmail from "@/components/Emails/DocumentSentBackEmail";
 import NewCycleOpenEmail from "@/components/Emails/NewCycleOpenEmail";
 import ProjectClosureEmail from "@/components/Emails/ProjectClosureEmail";
-import ReviewDocumentEmail from "@/components/Emails/ReviewDocumentEmail"
-import { sendTestEmail } from "@/lib/api";
-import { Box, Button, Flex, Grid, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react"
+import ReviewDocumentEmail from "@/components/Emails/ReviewDocumentEmail";
+import { IDocumentApproved, IDocumentReadyEmail, IDocumentRecalled, INewCycleEmail, IProjectClosureEmail, IReviewDocumentEmail, sendDocumentApprovedEmail, sendDocumentReadyEmail, sendDocumentRecalledEmail, sendDocumentSentBackEmail, sendNewReportingCycleOpenEmail, sendProjectClosureEmail, sendReviewProjectDocumentEmail } from "@/lib/api";
+import { Box, Button, Flex, Grid, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
+import { render } from "@react-email/render";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
-import { useForm } from "react-hook-form";
 
 interface IWrapper {
     children: React.ReactElement;
     templateName: string;
-    testEmailFunction: () => Promise<any>;
+    emailFunction: (props?: IReviewDocumentEmail | INewCycleEmail | IProjectClosureEmail | IDocumentReadyEmail | IDocumentApproved | IDocumentRecalled) => Promise<any>; // Allow props to be optional
+    props?: IReviewDocumentEmail | INewCycleEmail | IProjectClosureEmail | IDocumentReadyEmail | IDocumentApproved | IDocumentRecalled;
 }
 
-const EmailWrapper = ({ children, testEmailFunction, templateName }: IWrapper) => {
+const EmailWrapper = ({ children, emailFunction, templateName, props }: IWrapper) => {
 
     const { colorMode } = useColorMode();
     const queryClient = useQueryClient();
@@ -26,8 +28,14 @@ const EmailWrapper = ({ children, testEmailFunction, templateName }: IWrapper) =
     const addToast = (data) => {
         toastIdRef.current = toast(data);
     };
-    const mutation = useMutation(testEmailFunction, {
+    const mutation = useMutation(() => emailFunction(props ?? undefined), {
         onMutate: () => {
+            const html = render(children, {
+                pretty: true,
+            });
+
+            console.log(html);
+
             addToast({
                 status: "loading",
                 title: "Sending Email",
@@ -118,45 +126,86 @@ export const TestEmailPage = () => {
             >
                 <EmailWrapper
                     templateName={"Review Document"}
-                    testEmailFunction={sendTestEmail}
+                    emailFunction={sendReviewProjectDocumentEmail}
+                    props={{
+                        recipients_list: [101073],
+                        project_pk: 4,
+                        document_kind: "concept"
+                    }}
                 >
                     <ReviewDocumentEmail />
                 </EmailWrapper>
-                {/* 
+
                 <EmailWrapper
                     templateName={"New Reporting Cycle"}
-                    testEmailFunction={() => console.log("Sending email")}
+                    emailFunction={sendNewReportingCycleOpenEmail}
+                    props={{
+                        "financial_year": 2024,
+                        "include_projects_with_status_updating": false,
+                    }}
                 >
                     <NewCycleOpenEmail />
                 </EmailWrapper>
 
                 <EmailWrapper
                     templateName={"Project Closure"}
-                    testEmailFunction={() => console.log("Sending email")}
+                    emailFunction={sendProjectClosureEmail}
+                    props={{
+                        "project_pk": 20,
+                    }}
                 >
                     <ProjectClosureEmail />
                 </EmailWrapper>
 
                 <EmailWrapper
                     templateName={"Document Ready"}
-                    testEmailFunction={() => console.log("Sending email")}
+                    emailFunction={sendDocumentReadyEmail}
+                    props={{
+                        "recipients_list": [101073],
+                        "project_pk": 4,
+                        "document_kind": "concept"
+                    }}
                 >
                     <DocumentReadyForEditingEmail />
                 </EmailWrapper>
 
                 <EmailWrapper
                     templateName={"Document Sent Back"}
-                    testEmailFunction={() => console.log("Sending email")}
+                    emailFunction={sendDocumentSentBackEmail}
+                    props={{
+                        "stage": 3,
+                        "recipients_list": [101073],
+                        "project_pk": 4,
+                        "document_kind": "concept"
+                    }}
                 >
                     <DocumentSentBackEmail />
                 </EmailWrapper>
 
                 <EmailWrapper
                     templateName={"Document Approved"}
-                    testEmailFunction={() => console.log("Sending email")}
+                    emailFunction={sendDocumentApprovedEmail}
+                    props={{
+                        "recipients_list": [101073],
+                        "project_pk": 4,
+                        "document_kind": "concept"
+                    }}
                 >
                     <DocumentApprovedEmail />
-                </EmailWrapper> */}
+                </EmailWrapper>
+
+                <EmailWrapper
+                    templateName={"Document Recalled"}
+                    emailFunction={sendDocumentRecalledEmail}
+                    props={{
+                        "stage": 3,
+                        "recipients_list": [101073],
+                        "project_pk": 4,
+                        "document_kind": "concept"
+                    }}                >
+                    <DocumentRecalledEmail />
+                </EmailWrapper>
+
             </Grid>
 
         </Box>

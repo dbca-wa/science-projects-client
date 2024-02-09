@@ -25,7 +25,7 @@ export const DocumentApprovedEmail = () => {
             <Section className="mt-[32px]">
               <Img
                 src={`/dbca.jpg`}
-                width="120"
+                width="180"
                 height="107"
                 alt="DBCA"
                 className="my-0 mx-auto"
