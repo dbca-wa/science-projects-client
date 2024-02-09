@@ -14,7 +14,7 @@ import {
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  $INTERNAL_isPointSelection,
+  // $INTERNAL_isPointSelection,
   $createParagraphNode,
   $getSelection,
   $isParagraphNode,
@@ -56,16 +56,16 @@ interface ToolbarProps {
 const useToolbar = ({
   editor,
 }: ToolbarProps): [
-    boolean,
-    boolean,
-    boolean,
-    boolean,
-    boolean,
-    boolean,
-    // boolean,
-    boolean,
-    keyof typeof blockTypeToBlockName
-  ] => {
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  boolean,
+  // boolean,
+  boolean,
+  keyof typeof blockTypeToBlockName
+] => {
   const [isText, setIsText] = useState<boolean>(false);
   // const [isLink, setIsLink] = useState(false);
   const [isBold, setIsBold] = useState<boolean>(false);
@@ -152,9 +152,9 @@ const useToolbar = ({
           anchorNode.getKey() === "root"
             ? anchorNode
             : $findMatchingParent(anchorNode, (e) => {
-              const parent = e.getParent();
-              return parent !== null && $isRootOrShadowRoot(parent);
-            });
+                const parent = e.getParent();
+                return parent !== null && $isRootOrShadowRoot(parent);
+              });
 
         if (element === null) {
           element = anchorNode.getTopLevelElementOrThrow();
@@ -270,7 +270,8 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
   const formatParagraph = () => {
     editor.update(() => {
       const selection = $getSelection();
-      if ($INTERNAL_isPointSelection(selection)) {
+      // if ($INTERNAL_isPointSelection(selection))
+      if (selection !== null) {
         $setBlocksType(selection, () => $createParagraphNode());
       }
     });
@@ -486,18 +487,18 @@ interface ElementProps {
   formatBulletList: () => void;
   formatNumberList: () => void;
   blockType:
-  | "number"
-  | "code"
-  | "h1"
-  | "h2"
-  | "h3"
-  | "h4"
-  | "h5"
-  | "h6"
-  | "bullet"
-  | "check"
-  | "paragraph"
-  | "quote";
+    | "number"
+    | "code"
+    | "h1"
+    | "h2"
+    | "h3"
+    | "h4"
+    | "h5"
+    | "h6"
+    | "bullet"
+    | "check"
+    | "paragraph"
+    | "quote";
   allowInserts: boolean;
 }
 
@@ -599,7 +600,7 @@ const ElementSelector = ({
   return (
     <Menu
       isLazy
-    // placement="bottom"
+      // placement="bottom"
     >
       <MenuButton
         as={Button}
@@ -619,7 +620,7 @@ const ElementSelector = ({
         w={buttonWidth}
         minW={"200px"}
         pos={"absolute"}
-      // right={-500}
+        // right={-500}
       >
         <MenuItem
           onClick={formatParagraph}
