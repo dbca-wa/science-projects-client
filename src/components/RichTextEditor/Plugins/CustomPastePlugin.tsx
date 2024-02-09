@@ -9,7 +9,7 @@ import {
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
-  $INTERNAL_isPointSelection,
+  // $INTERNAL_isPointSelection,
   $getSelection,
   $isTextNode,
   $parseSerializedNode,
@@ -1563,7 +1563,7 @@ function onPasteForRichText(
         event instanceof InputEvent || event instanceof KeyboardEvent
           ? null
           : event.clipboardData;
-      if (clipboardData != null && $INTERNAL_isPointSelection(selection)) {
+      if (clipboardData != null && selection !== null) {
         $insertDataTransferForRichText(
           colorMode,
           clipboardData,
@@ -1593,7 +1593,11 @@ export const CustomPastePlugin = () => {
         if (clipboardData && clipboardData.getData) {
           const selection = $getSelection();
           // console.log(selection);
-          if (clipboardData !== null && $INTERNAL_isPointSelection(selection)) {
+          if (
+            clipboardData !== null &&
+            selection
+            // && $INTERNAL_isPointSelection(selection)
+          ) {
             onPasteForRichText(colorMode, e, editor);
 
             return true; // If this is false, the paste command will be considered
