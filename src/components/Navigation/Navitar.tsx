@@ -197,7 +197,7 @@ export const Navitar = ({
               }}
             >
               {<FaUserCircle />}
-              <Text ml={2}>My Divisional Profile</Text>
+              <Text ml={2}>My Public Profile</Text>
             </MenuItem>
             <MenuItem onClick={onLogOut}>
               {<FiLogOut />}

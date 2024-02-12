@@ -20,7 +20,11 @@ export const SideMenuButton = ({
   const [selected, setSelected] = useState<boolean>(false);
 
   useEffect(() => {
-    setSelected(selectedString.toLowerCase() === pageName.toLowerCase());
+    const cleanedSelectedString = selectedString
+      .toLowerCase()
+      .replace(/\s/g, "");
+    const cleanedPageName = pageName.toLowerCase().replace(/\s/g, "");
+    setSelected(cleanedSelectedString === cleanedPageName);
   }, [selectedString, pageName]);
 
   const isOver750 = useBreakpointValue({
@@ -37,6 +41,7 @@ export const SideMenuButton = ({
     <Box
       w={"100%"}
       p={2}
+      mb={4}
       // width={"100%"}
       bg={
         selected

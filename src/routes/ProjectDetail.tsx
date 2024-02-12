@@ -1,6 +1,6 @@
 // Route for displaying the Project Details of a given project.
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Tab,
   TabList,
@@ -9,6 +9,10 @@ import {
   Tabs,
   Spinner,
   Center,
+  Box,
+  Text,
+  Button,
+  useColorMode,
 } from "@chakra-ui/react";
 import { ProjectOverviewCard } from "../components/Pages/ProjectDetail/ProjectOverviewCard";
 import { ConceptPlanContents } from "../components/Pages/ProjectDetail/ConceptPlanContents";
@@ -38,6 +42,7 @@ export const ProjectDetail = ({
 }): React.ReactNode => {
   const { projectPk } = useParams();
   const { isLoading, projectData, refetch } = useProject(projectPk);
+  useEffect(() => console.log(isLoading, projectData));
 
   const [location, setLocation] = useState<IProjectAreas | null>();
   const [baseInformation, setBaseInformation] = useState<IProjectData | null>();
@@ -155,6 +160,9 @@ export const ProjectDetail = ({
     }
   }, [tabs, isInitialRender, selectedTab, selectedTabSet]);
 
+  const { colorMode } = useColorMode();
+  const navigate = useNavigate();
+
   return (
     <div
       key={
@@ -166,10 +174,41 @@ export const ProjectDetail = ({
       }
     >
       {isLoading || !documents || !distilledTitle ? (
-        <Center>
-          {/* <Head title={distilledTitle} /> */}
-          <Spinner />
-        </Center>
+        isLoading === false && projectData === undefined ? (
+          <Box
+            w={"100%"}
+            h={"100%"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            display={"flex"}
+            flexDir={"column"}
+            mt={10}
+          >
+            <Text fontWeight={"semibold"} fontSize={"2xl"}>
+              Sorry, a project with id "{projectPk}" does not exist.
+            </Text>
+            <Text mt={6}>
+              This project has either been deleted or never existed.
+            </Text>
+            <Box mt={8}>
+              <Button
+                color={"white"}
+                bg={colorMode === "light" ? "blue.500" : "blue.600"}
+                _hover={{
+                  bg: colorMode === "light" ? "blue.400" : "blue.500",
+                }}
+                onClick={() => navigate("/projects")}
+              >
+                Back to Projects
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Center>
+            {/* <Head title={distilledTitle} /> */}
+            <Spinner />
+          </Center>
+        )
       ) : (
         documents &&
         distilledTitle && (
