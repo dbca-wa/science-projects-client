@@ -6,6 +6,7 @@ import { Head } from "../components/Base/Head";
 import { SideMenuButton } from "../components/Pages/Account/SideMenuButton";
 import { ProfilePage } from "../components/Pages/Account/ProfilePage";
 import { AccountPageViewWrapper } from "../components/Wrappers/AccountPageViewWrapper";
+import { PublicProfilePage } from "@/components/Pages/Account/PublicProfilePage";
 
 export const AccountEdit = () => {
   const { colorMode } = useColorMode();
@@ -21,8 +22,11 @@ export const AccountEdit = () => {
   useEffect(() => {
     let content = null;
     switch (selected) {
-      case "profile":
+      case "spmsprofile":
         content = <ProfilePage />;
+        break;
+      case "publicprofile":
+        content = <PublicProfilePage />;
         break;
       // case "groups":
       //     content = <GroupsPage user={me} loading={loading} colorMode={colorMode} />;
@@ -60,9 +64,14 @@ export const AccountEdit = () => {
           minW={174}
         >
           <SideMenuButton
-            pageName={"Profile"}
+            pageName={"SPMS Profile"}
             selectedString={selected}
-            onClick={() => handleSidebarMenuClick("profile")}
+            onClick={() => handleSidebarMenuClick("spmsprofile")}
+          />
+          <SideMenuButton
+            pageName={"Public Profile"}
+            selectedString={selected}
+            onClick={() => handleSidebarMenuClick("publicprofile")}
           />
         </Box>
       </Flex>
