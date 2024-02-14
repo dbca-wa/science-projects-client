@@ -1,9 +1,10 @@
 // WIP tab contents for participating projects. Features some additional info and the projects via AnnualReportProjectDisplay
 
+import { ARProgressReportHandler } from "@/components/RichTextEditor/Editors/ARProgressReportHandler";
 import { useLatestYearsActiveProgressReports } from "@/lib/hooks/useLatestYearsActiveProgressReports";
+import { useUser } from "@/lib/hooks/useUser";
 import { Box, Center, Spinner, Text } from "@chakra-ui/react";
 import { useEffect } from "react";
-import { ProgressReportDisplay } from "./ProgressReportDisplay";
 
 interface IParticipatingProjectProps {
   dateOpen: Date | null;
@@ -27,6 +28,8 @@ export const ParticipatingProjectReports = ({
     }
   }, [latestProgressReportsLoading, latestProgressReportsData]);
 
+  const { userData, userLoading } = useUser();
+
   return (
     <Box>
       <Center my={4}>
@@ -39,21 +42,30 @@ export const ParticipatingProjectReports = ({
           <Spinner />
         </Center>
       ) : (
-        latestProgressReportsData?.map((report, index) => {
-          return (
-            <Box key={index}>
-              <ProgressReportDisplay
-                shouldAlternatePicture={index % 2 === 0}
-                document={report?.document}
-                pk={report?.pk}
-                year={report?.year}
-                progress_report={report?.progress}
-                project={report?.project}
-                report={report?.report}
-              />
-            </Box>
-          );
-        })
+        <Center>
+          {!userLoading &&
+            latestProgressReportsData?.map((report, index) => {
+              return (
+                <Box key={index}>
+                  <>
+                    <ARProgressReportHandler
+                      canEdit={
+                        userData?.is_superuser ||
+                        userData?.business_area?.name === "Directorate"
+                      }
+                      project={report?.project}
+                      document={report?.document}
+                      report={report}
+                      reportKind={
+                        report?.progress_report ? "student" : "ordinary"
+                      }
+                      shouldAlternatePicture={index % 2 === 0}
+                    />
+                  </>
+                </Box>
+              );
+            })}
+        </Center>
       )}
     </Box>
   );
