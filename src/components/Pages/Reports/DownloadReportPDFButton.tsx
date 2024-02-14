@@ -10,7 +10,7 @@ export const DownloadReportPDFButton = () => {
   const { colorMode } = useColorMode();
 
   const [isDownloadReportButtonDisabled, setIsDownloadReportButtonDisabled] =
-    useState(false);
+    useState(true);
 
   const toast = useToast();
   const [onMutateToastId, setOnMutateToastId] = useState<ToastId>();
