@@ -17,10 +17,11 @@ import { IReport } from "../types";
 import { Head } from "../components/Base/Head";
 import { getLatestReportingYear } from "../lib/api";
 import { useEffect, useState } from "react";
-import { ParticipatingProjects } from "../components/Pages/CurrentReport/ParticipatingProjects";
+import { ParticipatingProjectReports } from "../components/Pages/CurrentReport/ParticipatingProjectReports";
 import { ParticipatingStudentReports } from "../components/Pages/CurrentReport/ParticipatingStudentReports";
 import { AnnualReportDetails } from "../components/Pages/CurrentReport/AnnualReportDetails";
 import { AnnualReportMedia } from "../components/Pages/CurrentReport/AnnualReportMedia";
+import { LatestReportsNotYetApproved } from "@/components/Pages/CurrentReport/LatestReportsNotYetApproved";
 
 export const CurrentReport = () => {
   const [latestYear, setLatestYear] = useState<number | null>(null);
@@ -65,8 +66,6 @@ export const CurrentReport = () => {
     <>
       <Box>
         <Head title={financialYearString} />
-        <Text>WORK IN PROGRESS</Text>
-
         <Flex>
           <Text flex={1} fontSize={"2xl"} fontWeight={"bold"}>
             Annual Report ({financialYearString}){" "}
@@ -80,30 +79,34 @@ export const CurrentReport = () => {
         {thisReport !== null && thisReport !== undefined && (
           <Tabs>
             <TabList>
-              <Tab>SDS Chart</Tab>
-              <Tab>Participating Projects</Tab>
-              <Tab>Student Reports</Tab>
               <Tab>Details</Tab>
               <Tab>Media</Tab>
+              <Tab>Print Preview</Tab>
+              <Tab>Approved Progress Reports</Tab>
+              <Tab>Approved Student Reports</Tab>
+              <Tab>Unapproved Reports</Tab>
             </TabList>
             <TabPanels>
               <TabPanel>
-                <Text>SDS</Text>
+                <AnnualReportDetails />
               </TabPanel>
               <TabPanel>
-                <ParticipatingProjects
+                <AnnualReportMedia />
+              </TabPanel>
+              <TabPanel>
+                <Box>Print Preview</Box>
+              </TabPanel>
+              <TabPanel>
+                <ParticipatingProjectReports
                   dateOpen={thisReport?.date_open}
                   dateClosed={thisReport?.date_closed}
                 />
               </TabPanel>
               <TabPanel>
-                <ParticipatingStudentReports />3
+                <ParticipatingStudentReports />
               </TabPanel>
               <TabPanel>
-                <AnnualReportDetails />4
-              </TabPanel>
-              <TabPanel>
-                <AnnualReportMedia />5
+                <LatestReportsNotYetApproved />
               </TabPanel>
             </TabPanels>
           </Tabs>

@@ -1,11 +1,96 @@
 // Section to handle the current report's media files such as images for each section, sds chart etc.
 
-import { Box, Text } from "@chakra-ui/react";
+import { useGetLatestReportMedia } from "@/lib/hooks/useGetLatestReportMedia";
+import { Box, Center, Grid, Spinner } from "@chakra-ui/react";
+import { ReportMediaChanger } from "../Admin/ReportMediaChanger";
+import { useEffect } from "react";
 
 export const AnnualReportMedia = () => {
+  const { reportMediaData, refetchMedia } = useGetLatestReportMedia();
+  useEffect(() => console.log(reportMediaData));
+
   return (
     <Box>
-      <Text>AnnualReportMedia</Text>
+      {!reportMediaData ? (
+        <Center>
+          <Spinner />
+        </Center>
+      ) : (
+        <Grid
+          // h={"100%"}
+          gridTemplateColumns={{
+            base: "repeat(1, 1fr)",
+            lg: "repeat(2, 1fr)",
+            xl: "repeat(3, 1fr)",
+          }}
+          mt={4}
+          gap={8}
+          mx={6}
+        >
+          {/* <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"cover"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                /> */}
+
+          <ReportMediaChanger
+            reportMediaData={reportMediaData}
+            section={"sdchart"}
+            reportPk={reportMediaData[0]?.report?.id}
+            refetchData={refetchMedia}
+          />
+
+          <ReportMediaChanger
+            reportMediaData={reportMediaData}
+            section={"service_delivery"}
+            reportPk={reportMediaData[0]?.report?.id}
+            refetchData={refetchMedia}
+          />
+
+          <ReportMediaChanger
+            reportMediaData={reportMediaData}
+            section={"research"}
+            reportPk={reportMediaData[0]?.report?.id}
+            refetchData={refetchMedia}
+          />
+
+          <ReportMediaChanger
+            reportMediaData={reportMediaData}
+            section={"partnerships"}
+            reportPk={reportMediaData[0]?.report?.id}
+            refetchData={refetchMedia}
+          />
+
+          <ReportMediaChanger
+            reportMediaData={reportMediaData}
+            section={"collaborations"}
+            reportPk={reportMediaData[0]?.report?.id}
+            refetchData={refetchMedia}
+          />
+
+          <ReportMediaChanger
+            reportMediaData={reportMediaData}
+            section={"student_projects"}
+            reportPk={reportMediaData[0]?.report?.id}
+            refetchData={refetchMedia}
+          />
+
+          <ReportMediaChanger
+            reportMediaData={reportMediaData}
+            section={"publications"}
+            reportPk={reportMediaData[0]?.report?.id}
+            refetchData={refetchMedia}
+          />
+
+          {/* <ReportMediaChanger
+                  reportMediaData={reportMediaData}
+                  section={"rear_cover"}
+                  reportPk={pk}
+                  refetchData={refetchMedia}
+                /> */}
+        </Grid>
+      )}
     </Box>
   );
 };

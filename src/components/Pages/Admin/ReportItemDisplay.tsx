@@ -215,10 +215,13 @@ export const ReportItemDisplay = ({
         width="100%"
         p={3}
         borderWidth={1}
-      // bg={"red"}
+        // bg={"red"}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
-          <TextButtonFlex name={`FY ${year - 1} - ${String(year).slice(2)}` ?? ""} onClick={onUpdateModalOpen} />
+          <TextButtonFlex
+            name={`FY ${year - 1} - ${String(year).slice(2)}` ?? ""}
+            onClick={onUpdateModalOpen}
+          />
         </Flex>
 
         {/* <Grid alignItems={"center"}>
@@ -435,7 +438,7 @@ export const ReportItemDisplay = ({
         isOpen={isUpdateModalOpen}
         onClose={onUpdateModalClose}
         size={"6xl"}
-      // scrollBehavior="inside"
+        // scrollBehavior="inside"
       >
         <ModalOverlay />
         <ModalBody>
@@ -536,7 +539,7 @@ export const ReportItemDisplay = ({
                         <Box key={key}>
                           {(
                             (updateMutation.error as AxiosError).response.data[
-                            key
+                              key
                             ] as string[]
                           ).map((errorMessage, index) => (
                             <Text key={`${key}-${index}`} color="red.500">

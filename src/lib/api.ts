@@ -2273,6 +2273,14 @@ export const getReportMedia = async ({ queryKey }: QueryFunctionContext) => {
     return res;
 }
 
+export const getLatestReportMedia = async () => {
+    const res = instance.get(`medias/report_medias/latest/media`).then(res => {
+        // console.log(res.data)
+        return res.data
+    })
+    return res;
+}
+
 interface IReportMediaUploadProps {
     pk: number;
     file: File;
@@ -2357,6 +2365,18 @@ export const getFullReport = async ({ queryKey }: QueryFunctionContext) => {
     })
     return res;
 }
+
+
+export const getFullLatestReport = async () => {
+    // if (pk !== 0)
+    // {
+    const res = instance.get(`documents/reports/latest`).then(res => {
+        // console.log(res.data)
+        return res.data
+    })
+    return res;
+}
+
 
 
 
@@ -3007,5 +3027,20 @@ export const sendDocumentRecalledEmail = async ({ recipients_list, project_pk, d
     );
 }
 
+export const getLatestActiveStudentReports = async() => {
+    return instance.get(
+        `documents/latest_active_student_reports`,
+    ).then(res => res.data);
+}
 
+export const getLatestActiveProgressReports = async() => {
+    return instance.get(
+        `documents/latest_active_progress_reports`,
+    ).then(res => res.data);
+}
 
+export const getLatestUnapprovedReports = async() => {
+    return instance.get(
+        `documents/latest_inactive_reports`,
+    ).then(res => res.data);
+}

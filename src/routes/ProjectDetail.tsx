@@ -42,7 +42,6 @@ export const ProjectDetail = ({
 }): React.ReactNode => {
   const { projectPk } = useParams();
   const { isLoading, projectData, refetch } = useProject(projectPk);
-  useEffect(() => console.log(isLoading, projectData));
 
   const [location, setLocation] = useState<IProjectAreas | null>();
   const [baseInformation, setBaseInformation] = useState<IProjectData | null>();
@@ -82,8 +81,11 @@ export const ProjectDetail = ({
   // const [tabCount, setTabCount] = useState<number>(tabs.length);
 
   const setToSelectedTab = () => {
-    if (tabs.includes(selectedTab)) {
+    if (tabs?.includes(selectedTab)) {
+      console.log(`Tab setting to  ${selectedTab}`);
       setActiveTabIndex(tabs.indexOf(selectedTab));
+    } else {
+      console.log(`Tabs do not include ${selectedTab}`);
     }
   };
 
@@ -135,8 +137,12 @@ export const ProjectDetail = ({
 
     if (tabs.length !== count) {
       setTabs(tabData);
+      if (!isInitialRender) {
+        setActiveTabIndex(tabData.length - 1);
+      }
     }
   }, [
+    isInitialRender,
     documents?.concept_plan,
     documents?.progress_reports,
     documents?.student_reports,
@@ -148,17 +154,19 @@ export const ProjectDetail = ({
   ]);
 
   useEffect(() => {
-    if (isInitialRender) {
-      setIsInitialRender(false);
-    } else {
-      if (selectedTab && selectedTab !== "overview") {
-        if (selectedTabSet === false) {
-          setToSelectedTab();
-          setSelectedTabSet(true);
+    if (projectData && tabs?.length >= 2) {
+      if (isInitialRender) {
+        setIsInitialRender(false);
+      } else {
+        if (tabs.length >= 1 && selectedTabSet === false) {
+          if (selectedTab && selectedTab !== "overview") {
+            setToSelectedTab();
+            setSelectedTabSet(true);
+          }
         }
       }
     }
-  }, [tabs, isInitialRender, selectedTab, selectedTabSet]);
+  }, [projectData, tabs, isInitialRender, selectedTab, selectedTabSet]);
 
   const { colorMode } = useColorMode();
   const navigate = useNavigate();

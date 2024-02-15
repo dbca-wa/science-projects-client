@@ -78,6 +78,7 @@ export const DeleteDocumentModal = ({
       });
     },
     onSuccess: async () => {
+      setToLastTab(-1);
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -101,7 +102,6 @@ export const DeleteDocumentModal = ({
         await refetchData();
         onClose();
         console.log("deleting");
-        setToLastTab();
       }, 350);
     },
     onError: (error) => {
