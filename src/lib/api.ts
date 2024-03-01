@@ -957,9 +957,10 @@ export interface IProjectCreationVariables {
     locationData: number[];
     externalData: ICreateProjectExternalDetails;
     studentData: ICreateProjectStudentDetails;
+    isExternalSP?: boolean;
 }
 
-export const createProject = async ({ baseInformationData, detailsData, locationData, externalData, studentData }: IProjectCreationVariables) => {
+export const createProject = async ({ baseInformationData, detailsData, locationData, externalData, studentData, isExternalSP }: IProjectCreationVariables) => {
 
     // console.log(
     //     baseInformationData, detailsData, locationData, externalData, studentData
@@ -972,6 +973,10 @@ export const createProject = async ({ baseInformationData, detailsData, location
     formData.append('title', baseInformationData.title);
     formData.append('description', baseInformationData.description);
     formData.append('keywords', baseInformationData.keywords.join(', '));
+    if (isExternalSP) {
+        console.log(`Is External: ${isExternalSP}`)
+        formData.append('isExternalSP', isExternalSP.toString());
+    }
 
     if (baseInformationData.imageData !== null) {
         if (baseInformationData.imageData instanceof File) {
@@ -1018,6 +1023,8 @@ export const createProject = async ({ baseInformationData, detailsData, location
         formData.append('budget', externalData.budget);
         formData.append('collaborationWith', externalData.collaborationWith);
     }
+
+
 
     // console.log(formData);
 

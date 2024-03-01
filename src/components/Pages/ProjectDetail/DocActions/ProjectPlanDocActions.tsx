@@ -679,7 +679,7 @@ export const ProjectPlanDocActions = ({
                                                             documentPk={projectPlanData?.document?.pk ? projectPlanData?.document?.pk : projectPlanData?.document?.id}
                                                             projectData={projectPlanData?.document?.project}
                                                         /> */}
-                          {all_documents?.progress_reports.length < 1 && (
+                          {all_documents?.progress_reports.length < 1 && all_documents?.concept_plan && (
                             <>
                               <DeleteDocumentModal
                                 projectPk={
