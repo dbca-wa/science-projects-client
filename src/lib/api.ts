@@ -738,6 +738,19 @@ export const seekEndorsementAndSave = async ({
 }
 
 
+export const deleteAECPDFEndorsement = async (projectPlanPk: number) => {
+    return instance.post(
+        `documents/project_plans/${projectPlanPk}/delete_aec_endorsement_pdf`,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    ).then(res => res.data);
+}
+
+
+
 // export const setEndorsement = async (
 //     { projectPlanPk,
 //         aecEndorsementRequired, aecEndorsementProvided,

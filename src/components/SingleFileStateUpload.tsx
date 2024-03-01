@@ -6,7 +6,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dropzone from "react-dropzone";
 import { BsCloudArrowUp } from "react-icons/bs";
 import { FaFile, FaFilePdf } from "react-icons/fa";
@@ -73,6 +73,12 @@ export const FileDropzone = ({
     return interval;
   };
 
+  useEffect(() => {
+    if (!uploadedFile) {
+      setUploadProgress(0);
+    }
+  }, [uploadedFile])
+
   return (
     <Dropzone multiple={false} onDrop={onFileDrop}>
       {({
@@ -123,11 +129,10 @@ export const FileDropzone = ({
                   textAlign={"center"}
                 >{`Drag and drop a ${fileType} file.`}</Text>
               ) : (
-                <Text px={8} textAlign={"center"}>{`Drag and drop ${
-                  fileType === "image" ? "an" : "a"
-                } ${fileType} file${extraText}.`}</Text>
+                <Text px={8} textAlign={"center"}>{`Drag and drop ${fileType === "image" ? "an" : "a"
+                  } ${fileType} file${extraText}.`}</Text>
               )}
-              {!isError && acceptedFiles && acceptedFiles[0] ? (
+              {!isError && acceptedFiles && acceptedFiles[0] && uploadedFile ? (
                 <Flex
                   mt={4}
                   maxW={"80%"}
@@ -189,8 +194,8 @@ export const FileDropzone = ({
                       // isIndeterminate
                       size={"xs"}
                       value={uploadProgress}
-                      // hasStripe
-                      // animation={"step-start"}
+                    // hasStripe
+                    // animation={"step-start"}
                     />
                   </Box>
                 </Center>
