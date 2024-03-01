@@ -5,6 +5,7 @@ import {
   Checkbox,
   Flex,
   Grid,
+  Icon,
   Switch,
   Tag,
   Text,
@@ -20,6 +21,10 @@ import { SingleFileStateUpload } from "../../SingleFileStateUpload";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 
 import { BsFilePdfFill } from "react-icons/bs";
+// import { MdDeleteForever } from "react-icons/md";
+import { TiDelete } from "react-icons/ti";
+import { DeletePDFEndorsementModal } from "@/components/Modals/DeletePDFEndorsementModal";
+
 
 interface IEndorsementProps {
   document: IProjectPlan;
@@ -33,7 +38,15 @@ export const ProjectPlanEndorsements = ({
   userData,
   refetchDocument,
 }: IEndorsementProps) => {
-  const { register, watch } = useForm<ISpecialEndorsement>();
+
+
+  const { register, watch, setValue } = useForm<ISpecialEndorsement>();
+
+  const setToggleFalseAndRemoveFileVisual = () => {
+    setValue("aecEndorsementProvided", false);
+    setUploadedPDF(null);
+    setShouldSwitchBeChecked(false);
+  }
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const aecEndReqValue = watch("aecEndorsementRequired");
@@ -115,8 +128,20 @@ export const ProjectPlanEndorsements = ({
     }
   }, [uploadedPDF]);
 
+  const [pdfAreaHovered, setPdfAreaHovered] = useState(false);
+
+  const { isOpen: isDeletePDFEndorsementModalOpen, onOpen: onOpenDeletePDFEndorsementModal, onClose: onCloseDeletePDFEndorsementModal } = useDisclosure();
+
   return (
     <>
+      <DeletePDFEndorsementModal
+        projectPlanPk={document?.pk}
+        isOpen={isDeletePDFEndorsementModalOpen}
+        onClose={onCloseDeletePDFEndorsementModal}
+        setToggle={setToggleFalseAndRemoveFileVisual}
+        refetchEndorsements={refetchDocument}
+
+      />
       <SeekEndorsementModal
         projectPlanPk={document?.pk}
         // bmEndorsementRequired={bmEndRequiredValue}
@@ -399,7 +424,9 @@ export const ProjectPlanEndorsements = ({
                 </Flex>
               </Flex>
               {document?.endorsements?.aec_pdf?.file ? (
-                <Flex mb={3}>
+                <Flex mb={3}
+                  onMouseOver={() => setPdfAreaHovered(true)}
+                  onMouseLeave={() => setPdfAreaHovered(false)}>
                   <Box flex={1}>
                     <Text
                       color={
@@ -415,7 +442,10 @@ export const ProjectPlanEndorsements = ({
                       Current Approval PDF
                     </Text>
                   </Box>
-                  <Flex>
+                  <Flex
+                    onMouseOver={() => setPdfAreaHovered(true)}
+                    onMouseLeave={() => setPdfAreaHovered(false)}
+                  >
                     {document?.endorsements?.aec_pdf?.file ? (
                       <Flex
                         justifyContent={"flex-end"}
@@ -429,6 +459,7 @@ export const ProjectPlanEndorsements = ({
                           cursor: "pointer",
                           textDecoration: "underline",
                         }}
+
                       >
                         <Center
                           color={"red.500"}
@@ -437,7 +468,9 @@ export const ProjectPlanEndorsements = ({
                         >
                           <BsFilePdfFill />
                         </Center>
-                        <Center>
+                        <Center
+
+                        >
                           <Text
                             // variant={"link"}
                             color={
@@ -453,10 +486,35 @@ export const ProjectPlanEndorsements = ({
                               : "No File"}
                             {/* {baseApi}{document?.endorsements?.aec_pdf?.file} */}
                           </Text>
+
+
                         </Center>
+
                       </Flex>
                     ) : null}
                   </Flex>
+                  {document?.endorsements?.aec_pdf?.file && pdfAreaHovered && (
+                    <Center
+                      ml={6}
+                      mr={4}
+                      onClick={() => {
+                        console.log("HI");
+                        onOpenDeletePDFEndorsementModal();
+
+                      }}
+
+                    >
+                      <Icon
+                        _hover={{ boxSize: 10 }}
+                        pos={"absolute"}
+                        color={"red"}
+                        as={TiDelete}
+                        cursor={"pointer"}
+                        boxSize={8}
+
+                      />
+                    </Center>
+                  )}
                 </Flex>
               ) : null}
 
@@ -471,8 +529,6 @@ export const ProjectPlanEndorsements = ({
                 />
               ) : null}
 
-              {/* )
-                        } */}
             </Grid>
 
             <Flex pt={4} justifyContent={"flex-end"}>
