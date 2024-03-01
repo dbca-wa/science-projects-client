@@ -4,6 +4,13 @@ import { QueryFunctionContext } from "@tanstack/react-query";
 import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData } from "../types";
 import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
 import TestEmail from "@/components/Emails/ReviewDocumentEmail";
+import { IConceptPlanGenerationData } from "./hooks/useGetConceptPlanData";
+import ReactPDF from '@react-pdf/renderer';
+import html2pdf from 'html2pdf.js';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable'; // Import this if you want to use autotable for tabular data
+import styles from "@/styles/texteditor.css";
+
 
 // INSTANCE SETUP ==================================================================
 
@@ -679,11 +686,11 @@ export interface ISpecialEndorsement {
     aecEndorsementProvided: boolean;
 
 
-    herbariumEndorsementRequired: boolean;
-    herbariumEndorsementProvided: boolean;
+    // herbariumEndorsementRequired: boolean;
+    // herbariumEndorsementProvided: boolean;
 
-    bmEndorsementRequired: boolean;
-    bmEndorsementProvided: boolean;
+    // bmEndorsementRequired: boolean;
+    // bmEndorsementProvided: boolean;
 }
 
 
@@ -693,16 +700,16 @@ export const seekEndorsementAndSave = async ({
     shouldSendEmails,
 
     aecEndorsementRequired, aecEndorsementProvided, aecPDFFile,
-    herbariumEndorsementRequired, herbariumEndorsementProvided,
-    bmEndorsementRequired, bmEndorsementProvided
+    // herbariumEndorsementRequired, herbariumEndorsementProvided,
+    // bmEndorsementRequired, bmEndorsementProvided
 }: ISpecialEndorsement) => {
 
     console.log(aecPDFFile?.name)
     const formData = new FormData();
-    formData.append('bm_endorsement_required', bmEndorsementRequired.toString());
-    formData.append('bm_endorsement_provided', bmEndorsementProvided.toString());
-    formData.append('hc_endorsement_required', herbariumEndorsementRequired.toString());
-    formData.append('hc_endorsement_provided', herbariumEndorsementProvided.toString());
+    // formData.append('bm_endorsement_required', bmEndorsementRequired.toString());
+    // formData.append('bm_endorsement_provided', bmEndorsementProvided.toString());
+    // formData.append('hc_endorsement_required', herbariumEndorsementRequired.toString());
+    // formData.append('hc_endorsement_provided', herbariumEndorsementProvided.toString());
     formData.append('ae_endorsement_required', aecEndorsementRequired.toString());
     formData.append('ae_endorsement_provided', aecEndorsementRequired === false ? aecEndorsementRequired.toString() : aecEndorsementProvided.toString());
 
@@ -2879,8 +2886,6 @@ export const deleteDepartmentalService = async (pk: number) => {
 }
 
 
-
-
 // EMAILS ==========================================================================
 
 export interface IReviewDocumentEmail {
@@ -3003,6 +3008,23 @@ export const sendDocumentApprovedEmail = async ({ recipients_list, project_pk, d
 }
 
 
+
+export const sendConceptPlanEmail = async ({ recipients_list, project_pk, document_kind }: IDocumentApproved) => {
+    return instance.post(
+        `documents/concept_plan_email`,
+        {
+            "recipients_list": recipients_list,
+            "project_pk": project_pk,
+            "document_kind": document_kind,
+        }
+    ).then(res => {
+        return res.data;
+    }
+    );
+}
+
+
+
 export interface IDocumentRecalled {
     stage: number;
 
@@ -3027,20 +3049,143 @@ export const sendDocumentRecalledEmail = async ({ recipients_list, project_pk, d
     );
 }
 
-export const getLatestActiveStudentReports = async() => {
+export const getLatestActiveStudentReports = async () => {
     return instance.get(
         `documents/latest_active_student_reports`,
     ).then(res => res.data);
 }
 
-export const getLatestActiveProgressReports = async() => {
+export const getLatestActiveProgressReports = async () => {
     return instance.get(
         `documents/latest_active_progress_reports`,
     ).then(res => res.data);
 }
 
-export const getLatestUnapprovedReports = async() => {
+export const getLatestUnapprovedReports = async () => {
     return instance.get(
         `documents/latest_inactive_reports`,
     ).then(res => res.data);
+}
+
+
+export interface ISaveStudentReport {
+    mainDocumentId: number;
+    progressReportHtml: string;
+}
+
+export const updateStudentReportProgress = async ({ mainDocumentId, progressReportHtml }: ISaveStudentReport) => {
+    return instance.post(
+        `documents/student_reports/update_progress`,
+        {
+            "main_document_pk": mainDocumentId,
+            "html": progressReportHtml
+        }
+    )
+}
+
+export interface ISaveProgressReportSection {
+    section: "context" | "aims" | "progress" | "implications" | "future";
+    mainDocumentId: number;
+    htmlData: string;
+}
+
+export const updateProgressReportSection = async ({ mainDocumentId, htmlData, section }: ISaveProgressReportSection) => {
+    return instance.post(
+        `documents/progress_reports/update`,
+        {
+            "section": section,
+            "main_document_pk": mainDocumentId,
+            "html": htmlData
+        }
+    )
+}
+
+export interface IGeneratePDFProps {
+    reportId: number;
+    section: string;
+    businessArea?: number;
+}
+
+export const generateReportPDF = async ({ reportId, section, businessArea }: IGeneratePDFProps) => {
+
+    const options = {
+        "section": section,
+        "business_area": businessArea
+    }
+
+    return instance.post(
+        `documents/reports/${reportId}/generate_pdf`, options
+    )
+}
+
+
+
+// interface IPdfCreation {
+//     component: React.ReactElement; // collection of html strings to be embedded within the pdf with html to pdf
+// }
+
+// export const createPDFWithHTMLToPDF = async ({ component }: IPdfCreation): void => {
+//     ReactPDF.render(component, `${__dirname}/test.pdf`);
+
+//     try {
+//         const pdfBlob = await ReactPDF.renderToFile(component);
+
+//         // Create a download link for the user
+//         const downloadLink = document.createElement('a');
+//         downloadLink.href = URL.createObjectURL(pdfBlob);
+//         downloadLink.download = 'generated_pdf.pdf';
+//         downloadLink.click();
+//       } catch (error) {
+//         console.error('Error creating PDF:', error);
+//       }
+
+
+// };
+
+
+export const testFunction = async () => {
+    return {
+        "ok": true
+    }
+    // return instance.post(
+    //     `documents/concept_plan_email`,
+    //     {
+    //         "recipients_list": [101073],
+    //         "project_pk": 4,
+    //         "document_kind": "concept",
+    //     }
+    // ).then(res => {
+    //     return res.data;
+    // }
+    // );
+}
+
+// PDF GENERATION ==========================================================================
+
+export interface IConceptGenerationProps {
+    concept_plan_pk: number;
+    renderedHtmlString?: string;
+}
+
+export const getDataForConceptPlanGeneration = async (concept_plan_pk: number): Promise<IConceptPlanGenerationData> => {
+    return instance.post(
+        `documents/conceptplans/${concept_plan_pk}/get_concept_plan_data`, {
+        "concept_plan_pk": concept_plan_pk,
+    }
+    ).then(res => {
+        return res.data;
+    })
+
+}
+
+export interface IConceptPlanGen {
+    document_pk: number;
+}
+
+export const generateConceptPlan = async ({ document_pk }: IConceptPlanGen) => {
+    const res = await instance.post(
+        `documents/generate_concept_plan/${document_pk}`,
+    );
+    console.log(res.data);
+    return { res };
 }

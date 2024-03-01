@@ -18,6 +18,7 @@ export const TraditionalPageWrapper: React.FC<IPageWrapperProps> = ({
         lg: "15%",
       }}
       pb={20}
+    // minW={"250mm"}
     >
       {children}
     </Box>

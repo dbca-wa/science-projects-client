@@ -273,9 +273,11 @@ export const TraditionalTasksAndProjects = () => {
                   <Box as="span" flex="1" textAlign="left">
                     Endorsement Tasks
                   </Box>
-                  {pendingEndorsementsData?.aec?.length +
-                    pendingEndorsementsData?.bm?.length +
-                    pendingEndorsementsData?.hc?.length >
+                  {pendingEndorsementsData?.aec?.length
+                    // +
+                    //   pendingEndorsementsData?.bm?.length +
+                    //   pendingEndorsementsData?.hc?.length 
+                    >
                     1 ? (
                     <Box
                       display={"inline-flex"}
@@ -283,9 +285,11 @@ export const TraditionalTasksAndProjects = () => {
                       alignItems={"center"}
                     >
                       <Box mr={2}>
-                        {pendingEndorsementsData?.aec?.length +
-                          pendingEndorsementsData?.bm?.length +
-                          pendingEndorsementsData?.hc?.length}
+                        {pendingEndorsementsData?.aec?.length
+                          // +
+                          //   pendingEndorsementsData?.bm?.length +
+                          //   pendingEndorsementsData?.hc?.length
+                        }
                       </Box>
                       <FcHighPriority />
                     </Box>
@@ -296,9 +300,11 @@ export const TraditionalTasksAndProjects = () => {
                 </AccordionButton>
 
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
-                  {pendingEndorsementsData?.aec?.length +
-                    pendingEndorsementsData?.bm?.length +
-                    pendingEndorsementsData?.hc?.length >=
+                  {pendingEndorsementsData?.aec?.length
+                    // +
+                    //   pendingEndorsementsData?.bm?.length +
+                    //   pendingEndorsementsData?.hc?.length 
+                    >=
                     1 ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                       {!pendingEndorsementsDataLoading &&
@@ -313,7 +319,7 @@ export const TraditionalTasksAndProjects = () => {
                           )
                         )
                         : null}
-                      {!pendingEndorsementsDataLoading &&
+                      {/* {!pendingEndorsementsDataLoading &&
                         pendingEndorsementsData?.hc?.length >= 1
                         ? pendingEndorsementsData?.hc?.map(
                           (endorsement: IMiniEndorsement, index: number) => (
@@ -336,7 +342,7 @@ export const TraditionalTasksAndProjects = () => {
                             />
                           )
                         )
-                        : null}
+                        : null} */}
                     </Grid>
                   ) : (
                     <Center>

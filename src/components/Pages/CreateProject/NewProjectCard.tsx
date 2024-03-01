@@ -119,30 +119,33 @@ export const NewProjectCard = ({
           </Heading>
         </Box>
 
-        {/* DESCRIPTION */}
-        <Box
-          my={4}
-          py={4}
-          mx={2}
-          color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
-        >
-          <Text fontSize={"md"}>{description}</Text>
-        </Box>
+        <Box mx={8}>
+          {/* DESCRIPTION */}
+          <Box
+            my={4}
+            py={4}
+            mx={2}
+            color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
+          >
+            <Text fontSize={"md"}>{description}</Text>
+          </Box>
 
-        {/* INFO */}
-        <Box
-          mx={6}
-          pb={4}
-          color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
-          ml={10}
-        >
-          <UnorderedList>
-            {bulletPoints.map((point, index2) => (
-              <ListItem key={index2} fontSize={"sm"}>
-                {point}
-              </ListItem>
-            ))}
-          </UnorderedList>
+          {/* INFO */}
+          <Box
+            mx={6}
+            pb={4}
+            color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
+            ml={10}
+          >
+            <UnorderedList mt={-1}>
+              {bulletPoints.map((point, index2) => (
+                <ListItem key={index2} fontSize={"sm"}>
+                  {point}
+                </ListItem>
+              ))}
+            </UnorderedList>
+          </Box>
+
         </Box>
       </Box>
     </ParallaxTilt>

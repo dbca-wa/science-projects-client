@@ -39,7 +39,7 @@ import { AiFillProject } from "react-icons/ai";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { CgViewList } from "react-icons/cg";
 import { ImBriefcase, ImUsers } from "react-icons/im";
-import { FaAddressCard, FaLocationArrow, FaUserPlus } from "react-icons/fa";
+import { FaAddressCard, FaFilePdf, FaLocationArrow, FaUserPlus } from "react-icons/fa";
 
 import { Navitar } from "./Navitar";
 import { SidebarNavMenu } from "./SidebarNavMenu";
@@ -239,6 +239,16 @@ const AdminMenuContents = ({ handleDataDump, handleNewReportCycle, handleBatchAp
           {<FaLocationArrow />}
           <Text ml={2}>Locations</Text>
         </MenuItem>
+        <MenuItem
+          onClick={() => {
+            navigate("/crud/pdfs");
+          }}
+        >
+          {<FaFilePdf />}
+          <Text ml={2}>Pdfs</Text>
+        </MenuItem>
+
+
         <MenuItem
           onClick={() => {
             navigate("/crud/reports");

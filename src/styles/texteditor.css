@@ -373,7 +373,10 @@
   overflow-x: scroll;
   table-layout: fixed;
   /* width: max-content; */
+  justify-self: center;
+  align-self: center;
   width: 100%;
+  max-width: 190mm;
   margin: 30px 0;
 }
 .table-selection-light *::selection {
@@ -396,7 +399,8 @@
   outline: none;
 }
 
-.table-cell-dark p {
+.table-cell-light p {
+  text-wrap: balance;
   /* background: red; */
   color: black;
 }
