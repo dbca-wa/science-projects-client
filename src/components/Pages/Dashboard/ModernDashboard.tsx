@@ -71,16 +71,16 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
       // Check if data is available and then sort tasks
       const sortedTaskData = taskData
         ? {
-            done: sortTasksByStatus(
-              taskData.filter((task) => task.status === "done")
-            ),
-            todo: sortTasksByStatus(
-              taskData.filter((task) => task.status === "todo")
-            ),
-            inprogress: sortTasksByStatus(
-              taskData.filter((task) => task.status === "inprogress")
-            ),
-          }
+          done: sortTasksByStatus(
+            taskData.filter((task) => task.status === "done")
+          ),
+          todo: sortTasksByStatus(
+            taskData.filter((task) => task.status === "todo")
+          ),
+          inprogress: sortTasksByStatus(
+            taskData.filter((task) => task.status === "inprogress")
+          ),
+        }
         : null;
 
       // Set the state with the correct type
@@ -167,15 +167,16 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
                 <Box sx={countCircleStyling}>
                   {tasksLoading === false && combinedData !== null
                     ? (pendingEndorsementsDataLoading === false
-                        ? pendingEndorsementsData.aec.length +
-                          pendingEndorsementsData.bm.length +
-                          pendingEndorsementsData.hc.length
-                        : 0) +
-                      (pendingProjectDocumentDataLoading === false
-                        ? pendingProjectDocumentData.all.length
-                        : 0) +
-                      (combinedData.inprogress.length +
-                        combinedData.todo.length)
+                      ? pendingEndorsementsData.aec.length
+                      // +
+                      //   pendingEndorsementsData.bm.length +
+                      //   pendingEndorsementsData.hc.length
+                      : 0) +
+                    (pendingProjectDocumentDataLoading === false
+                      ? pendingProjectDocumentData.all.length
+                      : 0) +
+                    (combinedData.inprogress.length +
+                      combinedData.todo.length)
                     : 0}
                 </Box>
               </Center>
@@ -230,9 +231,9 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
             <Quote />
             <Box mt={1}>
               {tasksLoading === false &&
-              combinedData !== null &&
-              pendingEndorsementsDataLoading === false &&
-              pendingProjectDocumentDataLoading === false ? (
+                combinedData !== null &&
+                pendingEndorsementsDataLoading === false &&
+                pendingProjectDocumentDataLoading === false ? (
                 <MyTasksSection
                   personalTaskData={combinedData}
                   personalTaskDataLoading={tasksLoading}

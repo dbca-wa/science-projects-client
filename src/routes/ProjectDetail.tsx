@@ -127,11 +127,11 @@ export const ProjectDetail = ({
       documents?.concept_plan && "concept",
       documents?.project_plan && "project",
       documents?.progress_reports &&
-        documents.progress_reports.length > 0 &&
-        "progress",
+      documents.progress_reports.length > 0 &&
+      "progress",
       documents?.student_reports &&
-        documents.student_reports.length > 0 &&
-        "student",
+      documents.student_reports.length > 0 &&
+      "student",
       documents?.project_closure && "closure",
     ].filter(Boolean);
 

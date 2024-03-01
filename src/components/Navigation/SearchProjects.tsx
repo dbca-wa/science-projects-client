@@ -193,7 +193,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
               availableYears
                 .sort((a, b) => b - a) // Sort the array numerically
                 .map((year, index) => (
-                  <option key={index} value={year}>
+                  <option key={`${year}${index}`} value={year}>
                     {year}
                   </option>
                 ))}
@@ -218,7 +218,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
                   }
             }
           >
-            <option value={"All"} color={"black"}>
+            <option key={"All"} value={"All"} color={"black"}>
               All Business Areas
             </option>
             {orderedDivisionSlugs.flatMap((divSlug) => {
@@ -228,7 +228,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
                 .sort((a, b) => a.name.localeCompare(b.name));
 
               return divisionBusinessAreas.map((ba, index) => (
-                <option key={index} value={ba.pk}>
+                <option key={`${ba.name}${index}`} value={ba.pk}>
                   {ba?.division ? `[${ba?.division?.slug}] ` : ""}
                   {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
                   {ba.is_active ? "" : "(Inactive)"}

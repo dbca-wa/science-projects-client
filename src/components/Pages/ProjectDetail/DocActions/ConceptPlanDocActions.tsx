@@ -1,48 +1,48 @@
+import {
+  Box,
+  Button,
+  Center,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  DrawerOverlay,
+  Flex,
+  Grid,
+  Input,
+  Spinner,
+  Tag,
+  Text,
+  ToastId,
+  useColorMode,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
 import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+  IConceptPlanGen,
+  ISetProjectProps,
+  ISpawnDocument,
+  generateConceptPlan,
+  setProjectStatus,
+  spawnNewEmptyDocument
+} from "../../../../lib/api";
+import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
+import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
+import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
+import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
+import { useUser } from "../../../../lib/hooks/useUser";
 import {
   IConceptPlan,
   IProjectDocuments,
   IProjectMember,
 } from "../../../../types";
-import {
-  Box,
-  Text,
-  Flex,
-  Tag,
-  useColorMode,
-  Grid,
-  Button,
-  Center,
-  useDisclosure,
-  Spinner,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerBody,
-  DrawerFooter,
-  useToast,
-  ToastId,
-  Input,
-} from "@chakra-ui/react";
 import { ConceptPlanActionModal } from "../../../Modals/DocumentActionModals/ConceptPlanActionModal";
-import { useUser } from "../../../../lib/hooks/useUser";
-import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
-import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
-import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
 import { UserProfile } from "../../Users/UserProfile";
-import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import {
-  IDocGenerationProps,
-  generateProjectDocument,
-  downloadProjectDocument,
-  spawnNewEmptyDocument,
-  ISpawnDocument,
-  setProjectStatus,
-  ISetProjectProps,
-} from "../../../../lib/api";
-import { AxiosError } from "axios";
+import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface IConceptDocumentActions {
   conceptPlanData: IConceptPlan;
@@ -177,48 +177,54 @@ export const ConceptPlanDocActions = ({
   } = useDisclosure();
 
   const queryClient = useQueryClient();
-  const { register, handleSubmit } = useForm<IDocGenerationProps>();
+  const { register, handleSubmit } = useForm<IConceptDocumentActions>();
+  const { register: genRegister, handleSubmit: handleGenSubmit, watch: genWatch } = useForm<IConceptPlanGen>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
-  const projectPDFDownloadMutation = useMutation(downloadProjectDocument, {
-    onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Downloading PDF",
-        position: "top-right",
-      });
-    },
-    onSuccess: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Success",
-          description: `PDF Downloaded`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-    onError: (error: AxiosError) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Could Not Download PDF",
-          description: `${error?.response?.data}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-  });
+  const docPk = genWatch("document_pk");
 
-  const projectDocPDFGenerationMutation = useMutation(generateProjectDocument, {
+  // const projectPDFDownloadMutation = useMutation(downloadProjectDocument, {
+  //   onMutate: () => {
+  //     addToast({
+  //       status: "loading",
+  //       title: "Downloading PDF",
+  //       position: "top-right",
+  //     });
+  //   },
+  //   onSuccess: () => {
+  //     if (toastIdRef.current) {
+  //       toast.update(toastIdRef.current, {
+  //         title: "Success",
+  //         description: `PDF Downloaded`,
+  //         status: "success",
+  //         position: "top-right",
+  //         duration: 3000,
+  //         isClosable: true,
+  //       });
+  //     }
+  //   },
+  //   onError: (error: AxiosError) => {
+  //     if (toastIdRef.current) {
+  //       toast.update(toastIdRef.current, {
+  //         title: "Could Not Download PDF",
+  //         description: `${error?.response?.data}`,
+  //         status: "error",
+  //         position: "top-right",
+  //         duration: 3000,
+  //         isClosable: true,
+  //       });
+  //     }
+  //   },
+  // });
+
+
+  const apiEndpoint = useApiEndpoint();
+
+  const projectDocPDFGenerationMutation = useMutation(generateConceptPlan, {
     onMutate: () => {
       addToast({
         status: "loading",
@@ -226,7 +232,7 @@ export const ConceptPlanDocActions = ({
         position: "top-right",
       });
     },
-    onSuccess: () => {
+    onSuccess: (response: { res: AxiosResponse<any, any> }) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
@@ -236,6 +242,13 @@ export const ConceptPlanDocActions = ({
           duration: 3000,
           isClosable: true,
         });
+      }
+      // console.log(response);
+      // console.log(response.res)
+      const fileUrl = `${apiEndpoint}${response.res.data.file}`;
+
+      if (fileUrl) {
+        window.open(fileUrl, "_blank")
       }
     },
     onError: (error: AxiosError) => {
@@ -301,11 +314,12 @@ export const ConceptPlanDocActions = ({
     },
   });
 
-  const beginProjectDocPDFDownload = (formData: IDocGenerationProps) => {
-    projectPDFDownloadMutation.mutate(formData);
-  };
+  // const beginProjectDocPDFDownload = (formData: IDocGenerationProps) => {
+  //   projectPDFDownloadMutation.mutate(formData);
+  // };
 
-  const beginProjectDocPDFGeneration = (formData: IDocGenerationProps) => {
+  const beginProjectDocPDFGeneration = (formData: IConceptPlanGen) => {
+    console.log(formData)
     projectDocPDFGenerationMutation.mutate(formData);
   };
 
@@ -1108,26 +1122,8 @@ export const ConceptPlanDocActions = ({
                   </Box>
 
                   <Box>
-                    <Box
-                      as="form"
-                      id="pdf-generation-form"
-                      onSubmit={handleSubmit(beginProjectDocPDFGeneration)}
-                    >
-                      <Input
-                        type="hidden"
-                        {...register("docPk", {
-                          required: true,
-                          value: conceptPlanData?.document?.pk,
-                        })}
-                      />
-                      <Input
-                        type="hidden"
-                        {...register("kind", {
-                          required: true,
-                          value: conceptPlanData?.document?.kind,
-                        })}
-                      />
-                    </Box>
+
+                    {/* 
                     <Box
                       as="form"
                       id="pdf-download-form"
@@ -1140,7 +1136,7 @@ export const ConceptPlanDocActions = ({
                           value: conceptPlanData?.document?.pk,
                         })}
                       />
-                    </Box>
+                      </Box>
                     {
                       // conceptPlanData?.document?.pdf && (
 
@@ -1169,32 +1165,65 @@ export const ConceptPlanDocActions = ({
                         Download PDF
                       </Button>
                       // )
-                    }
+                    } */}
+                    <Box
+                      as="form"
+                      id="pdf-generation-form"
+                      onSubmit={handleGenSubmit(beginProjectDocPDFGeneration)}
 
-                    <Button
-                      size={"sm"}
-                      ml={2}
-                      variant={"solid"}
-                      color={"white"}
-                      background={
-                        colorMode === "light" ? "green.500" : "green.600"
-                      }
-                      _hover={{
-                        background:
-                          colorMode === "light" ? "green.400" : "green.500",
-                      }} // onClick={beginProjectDocPDFGeneration}
-                      isDisabled
-                      type="submit"
-                      form="pdf-generation-form"
-                      isLoading={
-                        // conceptPlanData?.document?.pdf_generation_in_progress
-                        // ||
-                        projectDocPDFGenerationMutation.isLoading
-                      }
-                      loadingText={"PDF Generation In Progress"}
+                    // (e) => {
+                    //   e.preventDefault();
+                    //   console.log("form is being submitted")
+                    //   console.log(docPk);
+                    // }}
                     >
-                      Generate PDF
-                    </Button>
+                      <Input
+                        type="hidden"
+                        {...genRegister("document_pk", {
+                          required: true,
+                          value: conceptPlanData.document.id,
+                        })}
+                      />
+
+                      <Button
+                        size={"sm"}
+                        ml={2}
+                        variant={"solid"}
+                        color={"white"}
+                        background={
+                          colorMode === "light" ? "green.500" : "green.600"
+                        }
+                        _hover={{
+                          background:
+                            colorMode === "light" ? "green.400" : "green.500",
+                        }}
+
+                        // const beginProjectDocPDFGeneration = () => {
+                        //   const main_doc_pk = conceptPlanData?.document?.id;
+                        //   if (main_doc_pk) {
+                        //     console.log("STARTING GEN with id ", main_doc_pk);
+                        //     projectDocPDFGenerationMutation.mutate({ "document_pk": main_doc_pk });
+                        //   }
+
+                        // };
+
+                        // onClick={beginProjectDocPDFGeneration}
+                        loadingText={"Generation In Progress"}
+                        isDisabled={
+                          projectDocPDFGenerationMutation.isLoading ||
+                          conceptPlanData?.document?.pdf_generation_in_progress
+                        }
+                        type="submit"
+                        form="pdf-generation-form"
+                        isLoading={
+                          projectDocPDFGenerationMutation.isLoading ||
+                          conceptPlanData?.document?.pdf_generation_in_progress
+                        }
+                      >
+                        Generate PDF
+                      </Button>
+                    </Box>
+
                   </Box>
                 </Flex>
               </Grid>

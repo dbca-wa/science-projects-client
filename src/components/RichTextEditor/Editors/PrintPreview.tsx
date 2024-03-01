@@ -1,45 +1,44 @@
+// The basic rich text editor component; does not allow sticky notes, emotes, etc.
+
 // React
 import { useEffect, useState } from "react";
 
 // Styles and Styling Components
-import { useColorMode } from "@chakra-ui/react";
+import { Box, useColorMode } from "@chakra-ui/react";
 
 import "../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { PREditor } from "./PREditor";
-import { IMainDoc, IProjectData, IProjectMember, IReport } from "@/types";
-
-export interface IProgressReportDisplayData {
-    pk: number;
-    aims: string;
-    context: string;
-    future: string;
-    implications: string;
-    progress: string;
-    year: number;
-    team_members: IProjectMember[];
-    report: IReport;
-    document: IMainDoc;
-    project: IProjectData;
-}
+import { EditorSections, EditorSubsections, EditorType } from "../../../types";
+import { DisplaySRTE } from "./Sections/DisplaySRTE";
 
 interface IProps {
     canEdit: boolean;
-    // report: IReport;
-    report: IProgressReportDisplayData;
-    shouldAlternatePicture: boolean;
+    data: string;
+    titleTextSize?: string;
+    section: EditorSubsections;
+    project_pk?: number;
+    details_pk?: number;
+    document_pk?: number;
+    writeable_document_kind?: EditorSections | null;
+    writeable_document_pk?: number | null;
+    editorType: EditorType;
+    isUpdate: boolean;
+    wordLimit?: number;
+    limitCanBePassed?: boolean;
 }
 
-export const ARProgressReportHandler = ({
-    canEdit,
-    report,
-    shouldAlternatePicture,
+export const PrintPreview = ({
+    data,
+    section,
 }: IProps) => {
-    useEffect(() => console.log(report))
+    const [shouldShowTree, setShouldShowTree] = useState(false);
     const { colorMode } = useColorMode();
+    const [canSave, setCanSave] = useState<boolean>(true);
+
+    // const [lastSelectedNode, setLastSelectedNode] = useState();
 
     const generateTheme = (colorMode) => {
         return {
@@ -141,75 +140,72 @@ export const ARProgressReportHandler = ({
                     : "table-selection-dark",
         };
     };
+
+    // Generate the theme based on the current colorMode
     const theme = generateTheme(colorMode);
 
+    // Catch errors that occur during Lexical updates
     const onError = (error: Error) => {
         console.log(error);
     };
 
+
     const initialConfig = {
-        namespace: `Progress Report Editor`,
+        namespace: "Annual Report Document Editor",
         editable: true,
         theme,
         onError,
         nodes: [ListNode, ListItemNode, TableCellNode, TableNode, TableRowNode],
     };
 
-    const uneditableInitialConfig = {
+    const uneditableInitialCOnfig = {
         ...initialConfig,
         editable: false,
-        theme: generateTheme(colorMode)
     };
 
-    // const [editorText, setEditorText] = useState<string | null>("");
-    const [isEditingContext, setIsEditingContext] = useState(false);
-    const [isEditingAims, setIsEditingAims] = useState(false);
-    const [isEditingProgress, setIsEditingProgress] = useState(false);
-    const [isEditingImplications, setIsEditingImplications] = useState(false);
-    const [isEditingFuture, setIsEditingFuture] = useState(false);
-    const [aimsDisplayData, setAimsDisplayData] = useState(report?.aims);
-    const [progressReportDisplayData, setProgressReportDisplayData] = useState(report?.progress);
-    const [managementImplicationsDisplayData, setManagementImplicationsDisplayData] = useState(report?.implications);
-    const [futureDirectionsDisplayData, setFutureDirectionsDisplayData] = useState(report?.future);
-    const [contextDisplayData, setContextDisplayData] = useState(report?.context);
 
-    return (<PREditor
-        key={`${colorMode}-${report?.pk}`}
-        canEdit={canEdit}
-        isEditingContext={isEditingContext}
-        setIsEditingContext={setIsEditingContext}
+    useEffect(() => {
+        if (data !== undefined && data !== null) {
+            setDisplayData(data);
+        }
+    }, []);
 
-        isEditingAims={isEditingAims}
-        setIsEditingAims={setIsEditingAims}
+    const [displayData, setDisplayData] = useState(data);
 
-        isEditingProgress={isEditingProgress}
-        setIsEditingProgress={setIsEditingProgress}
-        isEditingImplications={isEditingImplications}
-        setIsEditingImplications={setIsEditingImplications}
-        isEditingFuture={isEditingFuture}
-        setIsEditingFuture={setIsEditingFuture}
+    useEffect(() => {
+        // console.log("DISPLAY DATA:", displayData);
+        setPrepopulationData(displayData);
+    }, [displayData]);
 
-        shouldAlternatePicture={shouldAlternatePicture}
-        fullPRData={report}
+    const [prepopulationData, setPrepopulationData] = useState(displayData);
 
-        editableInitialConfig={initialConfig}
-        uneditableInitialConfig={uneditableInitialConfig}
-
-        aimsDisplayData={aimsDisplayData}
-        setAimsDisplayData={setAimsDisplayData}
-
-        progressReportDisplayData={progressReportDisplayData}
-        setProgressReportDisplayData={setProgressReportDisplayData}
-
-        contextDisplayData={contextDisplayData}
-        setContextDisplayData={setContextDisplayData}
-
-        managementImplicationsDisplayData={managementImplicationsDisplayData}
-        setManagementImplicationsDisplayData={setManagementImplicationsDisplayData}
-
-        futureDirectionsDisplayData={futureDirectionsDisplayData}
-        setFutureDirectionsDisplayData={setFutureDirectionsDisplayData}
-    />
+    const html = { __html: prepopulationData }
+    return (
+        <Box
+        >
+            <Box dangerouslySetInnerHTML={html} />
+            {/* <DisplaySRTE
+                key={prepopulationData}
+                initialConfig={uneditableInitialCOnfig}
+                // editorRef={editorRef}
+                data={prepopulationData}
+                section={section}
+                // project_pk={project_pk}
+                // document_pk={document_pk}
+                // editorType={editorType}
+                // isUpdate={isUpdate}
+                // displayData={displayData}
+                // editorText={editorText}
+                // setEditorText={setEditorText}
+                shouldShowTree={shouldShowTree}
+            // setShouldShowTree={setShouldShowTree}
+            // isEditorOpen={isEditorOpen}
+            // setIsEditorOpen={setIsEditorOpen}
+            // setDisplayData={setDisplayData}
+            // textEditorName={
+            //   section === "description" ? "Description" : undefined
+            // }
+            /> */}
+        </Box>
     );
 };
-

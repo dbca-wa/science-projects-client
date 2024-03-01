@@ -1,5 +1,7 @@
 // Route for handling information regarding the report for the year.
 
+import { AnnualReportPrintPreview } from "@/components/Pages/CurrentReport/AnnualReportPrintPreview";
+import { LatestReportsNotYetApproved } from "@/components/Pages/CurrentReport/LatestReportsNotYetApproved";
 import {
   Box,
   Flex,
@@ -12,16 +14,13 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
-import { DownloadReportPDFButton } from "../components/Pages/Reports/DownloadReportPDFButton";
-import { IReport } from "../types";
-import { Head } from "../components/Base/Head";
-import { getLatestReportingYear } from "../lib/api";
 import { useEffect, useState } from "react";
-import { ParticipatingProjectReports } from "../components/Pages/CurrentReport/ParticipatingProjectReports";
-import { ParticipatingStudentReports } from "../components/Pages/CurrentReport/ParticipatingStudentReports";
+import { Head } from "../components/Base/Head";
 import { AnnualReportDetails } from "../components/Pages/CurrentReport/AnnualReportDetails";
 import { AnnualReportMedia } from "../components/Pages/CurrentReport/AnnualReportMedia";
-import { LatestReportsNotYetApproved } from "@/components/Pages/CurrentReport/LatestReportsNotYetApproved";
+import { ParticipatingProjectReports } from "../components/Pages/CurrentReport/ParticipatingProjectReports";
+import { getLatestReportingYear } from "../lib/api";
+import { IReport } from "../types";
 
 export const CurrentReport = () => {
   const [latestYear, setLatestYear] = useState<number | null>(null);
@@ -60,6 +59,8 @@ export const CurrentReport = () => {
   const formattedYearBefore = yearBefore?.toString().substring(2);
   const financialYearString = `FY ${formattedYearBefore}-${formattedLatestYear}`;
 
+
+
   return isLoading ? (
     <Spinner />
   ) : (
@@ -67,24 +68,25 @@ export const CurrentReport = () => {
       <Box>
         <Head title={financialYearString} />
         <Flex>
-          <Text flex={1} fontSize={"2xl"} fontWeight={"bold"}>
+          <Text flex={1} fontSize={"2xl"} fontWeight={"bold"} pb={6}>
             Annual Report ({financialYearString}){" "}
           </Text>
 
-          <Flex justifyContent={"flex-end"} pb={6}>
-            <DownloadReportPDFButton />
-          </Flex>
+
         </Flex>
 
         {thisReport !== null && thisReport !== undefined && (
-          <Tabs>
+          <Tabs
+            isLazy
+            isFitted
+            variant={"enclosed"}
+          >
             <TabList>
               <Tab>Details</Tab>
               <Tab>Media</Tab>
-              <Tab>Print Preview</Tab>
               <Tab>Approved Progress Reports</Tab>
-              <Tab>Approved Student Reports</Tab>
-              <Tab>Unapproved Reports</Tab>
+              <Tab>Pending Reports</Tab>
+              <Tab>Print Preview</Tab>
             </TabList>
             <TabPanels>
               <TabPanel>
@@ -93,20 +95,16 @@ export const CurrentReport = () => {
               <TabPanel>
                 <AnnualReportMedia />
               </TabPanel>
+
               <TabPanel>
-                <Box>Print Preview</Box>
+                <ParticipatingProjectReports />
               </TabPanel>
-              <TabPanel>
-                <ParticipatingProjectReports
-                  dateOpen={thisReport?.date_open}
-                  dateClosed={thisReport?.date_closed}
-                />
-              </TabPanel>
-              <TabPanel>
-                <ParticipatingStudentReports />
-              </TabPanel>
+
               <TabPanel>
                 <LatestReportsNotYetApproved />
+              </TabPanel>
+              <TabPanel>
+                <AnnualReportPrintPreview thisReport={thisReport} />
               </TabPanel>
             </TabPanels>
           </Tabs>

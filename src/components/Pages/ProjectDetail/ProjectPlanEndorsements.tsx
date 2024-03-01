@@ -36,55 +36,59 @@ export const ProjectPlanEndorsements = ({
   const { register, watch } = useForm<ISpecialEndorsement>();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const hcEndReqValue = watch("herbariumEndorsementRequired");
   const aecEndReqValue = watch("aecEndorsementRequired");
-  const bmEndRequiredValue = watch("bmEndorsementRequired");
 
-  const hcEndProvidedValue = watch("herbariumEndorsementProvided");
+
   const aecEndProvidedValue = watch("aecEndorsementProvided");
-  const bmEndProvidedValue = watch("bmEndorsementProvided");
+
+  // const hcEndReqValue = watch("herbariumEndorsementRequired");
+  // const bmEndRequiredValue = watch("bmEndorsementRequired");
+  // const hcEndProvidedValue = watch("herbariumEndorsementProvided");
+  // const bmEndProvidedValue = watch("bmEndorsementProvided");
 
   const baseApi = useApiEndpoint();
 
   const aecEndRequired: boolean =
     document?.endorsements?.ae_endorsement_required;
-  const hcEndRequired: boolean =
-    document?.endorsements?.hc_endorsement_required;
 
-  const hcEndProvided: boolean =
-    document?.endorsements?.hc_endorsement_provided;
   const aecEndProvided: boolean =
     document?.endorsements?.ae_endorsement_provided;
 
-  const bmEndProvided: boolean =
-    document?.endorsements?.bm_endorsement_provided;
-  const bmEndRequired: boolean =
-    document?.endorsements?.bm_endorsement_required;
+  // const hcEndRequired: boolean =
+  //   document?.endorsements?.hc_endorsement_required;
 
-  const [userCanEditHCEndorsement, setUserCanEditHCEndorsement] =
-    useState(false);
-  const [userCanEditBMEndorsement, setUserCanEditBMEndorsement] =
-    useState(false);
+  // const hcEndProvided: boolean =
+  //   document?.endorsements?.hc_endorsement_provided;
+
+  // const bmEndProvided: boolean =
+  //   document?.endorsements?.bm_endorsement_provided;
+  // const bmEndRequired: boolean =
+  //   document?.endorsements?.bm_endorsement_required;
+
+  // const [userCanEditHCEndorsement, setUserCanEditHCEndorsement] =
+  //   useState(false);
+  // const [userCanEditBMEndorsement, setUserCanEditBMEndorsement] =
+  //   useState(false);
   const [userCanEditAECEndorsement, setUserCanEditAECEndorsement] =
     useState(false);
 
   const { colorMode } = useColorMode();
 
-  useEffect(() => {
-    if (userData?.is_superuser || userData?.is_herbarium_curator) {
-      setUserCanEditHCEndorsement(true);
-    } else {
-      setUserCanEditHCEndorsement(false);
-    }
-  }, [userData]);
+  // useEffect(() => {
+  //   if (userData?.is_superuser || userData?.is_herbarium_curator) {
+  //     setUserCanEditHCEndorsement(true);
+  //   } else {
+  //     setUserCanEditHCEndorsement(false);
+  //   }
+  // }, [userData]);
 
-  useEffect(() => {
-    if (userData?.is_superuser || userData?.is_biometrician) {
-      setUserCanEditBMEndorsement(true);
-    } else {
-      setUserCanEditBMEndorsement(false);
-    }
-  }, [userData]);
+  // useEffect(() => {
+  //   if (userData?.is_superuser || userData?.is_biometrician) {
+  //     setUserCanEditBMEndorsement(true);
+  //   } else {
+  //     setUserCanEditBMEndorsement(false);
+  //   }
+  // }, [userData]);
 
   useEffect(() => {
     if (userData?.is_superuser || userData?.is_aec) {
@@ -115,10 +119,10 @@ export const ProjectPlanEndorsements = ({
     <>
       <SeekEndorsementModal
         projectPlanPk={document?.pk}
-        bmEndorsementRequired={bmEndRequiredValue}
-        bmEndorsementProvided={bmEndProvidedValue}
-        herbariumEndorsementRequired={hcEndReqValue}
-        herbariumEndorsementProvided={hcEndProvidedValue}
+        // bmEndorsementRequired={bmEndRequiredValue}
+        // bmEndorsementProvided={bmEndProvidedValue}
+        // herbariumEndorsementRequired={hcEndReqValue}
+        // herbariumEndorsementProvided={hcEndProvidedValue}
         aecEndorsementRequired={aecEndReqValue}
         aecEndorsementProvided={shouldSwitchBeChecked}
         isOpen={isOpen}
@@ -149,8 +153,7 @@ export const ProjectPlanEndorsements = ({
               </Text>
             </Box>
 
-            {/* Biometrician */}
-            <Grid
+            {/* <Grid
               gridTemplateColumns={"repeat(1, 1fr)"}
               gridRowGap={4}
               alignItems={"center"}
@@ -227,7 +230,6 @@ export const ProjectPlanEndorsements = ({
               </Flex>
             </Grid>
 
-            {/* Plant Specimen Collection */}
             <Grid
               gridTemplateColumns={"repeat(1, 1fr)"}
               gridRowGap={4}
@@ -257,12 +259,7 @@ export const ProjectPlanEndorsements = ({
                   })}
                 />
               </Flex>
-              {/* 
-
-                            )
-                        } */}
-              {/* {
-                            hcEndReqValue === true && ( */}
+          
               <Flex alignItems={"center"}>
                 <Box>
                   <Text
@@ -307,9 +304,7 @@ export const ProjectPlanEndorsements = ({
                   )}
                 </Flex>
               </Flex>
-              {/* )
-                        } */}
-            </Grid>
+            </Grid> */}
 
             {/* Interaction with Animals */}
             <Grid
@@ -325,8 +320,6 @@ export const ProjectPlanEndorsements = ({
               borderTop={0}
             // roundedBottom={0}
             >
-              {/* {involvesAnimalsValue === true &&
-                            ( */}
               <Flex
                 // ml={8}
                 // mt={2}
@@ -358,17 +351,8 @@ export const ProjectPlanEndorsements = ({
                   />
                 </Box>
               </Flex>
-              {/* 
-                            )} */}
-
-              {/* {
-                            aecEndReqValue === true && ( */}
               <Flex
                 alignItems={"center"}
-              // mb={3}
-              // w={"100%"}
-              // ml={8}
-              // mt={2}
               >
                 <Box flex={1}>
                   <Text
@@ -501,10 +485,10 @@ export const ProjectPlanEndorsements = ({
                 }}
                 onClick={onOpen}
                 isDisabled={
-                  bmEndRequiredValue === undefined ||
-                  bmEndProvidedValue === undefined ||
-                  hcEndReqValue === undefined ||
-                  hcEndProvidedValue === undefined ||
+                  // bmEndRequiredValue === undefined ||
+                  // bmEndProvidedValue === undefined ||
+                  // hcEndReqValue === undefined ||
+                  // hcEndProvidedValue === undefined ||
                   aecEndReqValue === undefined ||
                   (aecEndProvided !== true && aecEndProvidedValue === undefined)
                 }

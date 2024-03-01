@@ -368,9 +368,11 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                   Endorsement Tasks
                 </Box>
                 {pendingEndorsementsDataLoading ===
-                  true ? null : pendingEndorsementsData?.aec?.length +
-                    pendingEndorsementsData?.bm?.length +
-                    pendingEndorsementsData?.hc?.length >
+                  true ? null : pendingEndorsementsData?.aec?.length
+                    // +
+                    //   pendingEndorsementsData?.bm?.length +
+                    //   pendingEndorsementsData?.hc?.length 
+                    >
                     1 ? (
                   <Box
                     display={"inline-flex"}
@@ -378,9 +380,11 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                     alignItems={"center"}
                   >
                     <Box mr={2}>
-                      {pendingEndorsementsData?.aec?.length +
-                        pendingEndorsementsData?.bm?.length +
-                        pendingEndorsementsData?.hc?.length}
+                      {pendingEndorsementsData?.aec?.length
+                        // +
+                        //   pendingEndorsementsData?.bm?.length +
+                        //   pendingEndorsementsData?.hc?.length
+                      }
                     </Box>
                     <FcHighPriority />
                   </Box>
@@ -394,9 +398,11 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                   <Center my={4}>
                     <Spinner />
                   </Center>
-                ) : pendingEndorsementsData?.aec?.length +
-                  pendingEndorsementsData?.bm?.length +
-                  pendingEndorsementsData?.hc?.length >=
+                ) : pendingEndorsementsData?.aec?.length
+                  // +
+                  //   pendingEndorsementsData?.bm?.length +
+                  //   pendingEndorsementsData?.hc?.length 
+                  >=
                   1 ? (
                   <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                     {!pendingEndorsementsDataLoading &&
@@ -411,7 +417,7 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                         )
                       )
                       : null}
-                    {!pendingEndorsementsDataLoading &&
+                    {/* {!pendingEndorsementsDataLoading &&
                       pendingEndorsementsData?.hc?.length >= 1
                       ? pendingEndorsementsData?.hc?.map(
                         (document: IMainDoc, index: number) => (
@@ -434,7 +440,7 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                           />
                         )
                       )
-                      : null}
+                      : null} */}
                   </Grid>
                 ) : (
                   <Center>
