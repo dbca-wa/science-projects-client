@@ -1409,7 +1409,7 @@ export const generateProjectDocument = async ({
 // export const spawnDocument = async({})
 
 
-export const handleDocumentAction = async ({ action, stage, documentPk }: IApproveDocument) => {
+export const handleDocumentAction = async ({ action, stage, documentPk, shouldSendEmail }: IApproveDocument) => {
 
     let url = ""
     if (action === "approve") {
@@ -1422,12 +1422,24 @@ export const handleDocumentAction = async ({ action, stage, documentPk }: IAppro
     } else if (action === "reopen") {
         url = `documents/actions/reopen`
     }
-    const params = {
-        "action": action,
-        "stage": stage,
-        "documentPk": documentPk,
-        // "conceptPlanPk": conceptPlanPk,
+
+    let params = {}
+    if (!shouldSendEmail) {
+        params = {
+            "action": action,
+            "stage": stage,
+            "documentPk": documentPk,
+            "shouldSendEmail": false,
+        }
+    } else {
+        params = {
+            "action": action,
+            "stage": stage,
+            "documentPk": documentPk,
+            "shouldSendEmail": true,
+        }
     }
+
     // console.log(params)
 
     return instance.post(

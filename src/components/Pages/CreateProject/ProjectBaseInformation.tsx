@@ -11,6 +11,7 @@ import {
   Grid,
   VisuallyHiddenInput,
   Flex,
+  Center,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
@@ -20,6 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { IUserData } from "../../../types";
 import { motion } from "framer-motion";
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
+import { StatefulMediaChanger } from "../Admin/StatefulMediaChanger";
 
 interface IProjectBaseInformationProps {
   projectKind: string;
@@ -54,6 +56,7 @@ export const ProjectBaseInformation = ({
   }, [baseInformationFilled]);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>("");
 
   const handleFileInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -98,7 +101,7 @@ export const ProjectBaseInformation = ({
 
   return (
     <>
-      <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridColumnGap={10}>
+      <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridColumnGap={10}>
         <Box>
           {/* HIDING PROJECT YEAR */}
           <InputGroup>
@@ -155,8 +158,18 @@ export const ProjectBaseInformation = ({
           />
         </Box>
 
-        <Box>
-          <FormControl my={4}>
+        <Box mb={4}>
+
+          <StatefulMediaChanger
+            helperText={
+              "Upload an image that represents the project."
+            }
+            selectedImageUrl={selectedImageUrl}
+            setSelectedImageUrl={setSelectedImageUrl}
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+          />
+          {/* <FormControl my={4}>
             <FormLabel>Image</FormLabel>
             <InputGroup>
               <Input
@@ -192,9 +205,10 @@ export const ProjectBaseInformation = ({
             >
               Upload an image that represents the project.
             </FormHelperText>
-          </FormControl>
-
-          <ImagePreview selectedFile={selectedFile} />
+          </FormControl> */}
+          {/* <Flex justifyContent={"left"} w={"100%"} >
+            <ImagePreview selectedFile={selectedFile} />
+          </Flex> */}
         </Box>
       </Grid>
 
