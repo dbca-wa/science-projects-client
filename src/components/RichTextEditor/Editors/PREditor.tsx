@@ -497,6 +497,7 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
 
                     {/* Text Area */}
                     <RichTextPlugin
+                        placeholder={<Text></Text>}
                         contentEditable={
                             <Box
                                 mt={4}
@@ -706,6 +707,8 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
 
                     {/* Text Area */}
                     <RichTextPlugin
+                        placeholder={<Text></Text>}
+
                         contentEditable={
                             <Box
                                 mt={4}
@@ -915,6 +918,8 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
 
                     {/* Text Area */}
                     <RichTextPlugin
+                        placeholder={<Text></Text>}
+
                         contentEditable={
                             <Box
                                 mt={4}
@@ -1124,6 +1129,8 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
 
                     {/* Text Area */}
                     <RichTextPlugin
+                        placeholder={<Text></Text>}
+
                         contentEditable={
                             <Box
                                 mt={4}
@@ -1334,6 +1341,7 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
 
                     {/* Text Area */}
                     <RichTextPlugin
+                        placeholder={<Text></Text>}
                         contentEditable={
                             <Box
                                 mt={4}

@@ -49,8 +49,8 @@ const SRProjDetails = ({ project, team_members }: ISRProjDetails) => {
 
     const getMembersByRole = (teamMembers, role) => {
         return Array.from(teamMembers)
-            .filter((member) => member.role === role)
-            .map((member) => `${member.user.first_name} ${member.user.last_name}`);
+            .filter((member: IProjectMember) => member.role === role)
+            .map((member: IProjectMember) => `${member.user.first_name} ${member.user.last_name}`);
     };
 
     const students = getMembersByRole(team_members, "student");
@@ -324,6 +324,8 @@ export const SREditor = ({ shouldAlternatePicture, fullSRData, initialConfig, is
 
                     {/* Text Area */}
                     <RichTextPlugin
+                        placeholder={<Text></Text>}
+
                         contentEditable={
                             <Box
                                 mt={4}
