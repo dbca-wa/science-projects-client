@@ -233,7 +233,7 @@ export const CreateProjectModal = ({
         setIsExternalSP={setIsExternalSP}
         mutationFunction={kickOffMutation}
       />
-      <Modal isOpen={isOpen} onClose={controlledClose} size={"full"}>
+      <Modal isOpen={isOpen} onClose={controlledClose} size={"6xl"}>
         <ModalOverlay />
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader display={"inline-flex"} alignItems={"center"}>

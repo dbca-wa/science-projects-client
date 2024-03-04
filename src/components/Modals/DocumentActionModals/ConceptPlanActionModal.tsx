@@ -226,7 +226,7 @@ export const ConceptPlanActionModal = ({
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
                     Send an email to the business area lead
-                    <strong>
+                    {" "}<strong>
                       ({baLead.first_name} {baLead.last_name} - {baLead.email})
                     </strong>{" "}
                     alerting them that you have{" "}

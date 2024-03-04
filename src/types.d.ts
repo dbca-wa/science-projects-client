@@ -418,6 +418,7 @@ interface IFeedback {
 }
 
 export interface IApproveDocument {
+    shouldSendEmail?: boolean;
     action: "approve" | "recall" | "send_back" | "reopen";
     stage: number; // 1-3
     documentPk: number;
