@@ -97,8 +97,6 @@ export const logOut = () => {
 
 }
 
-
-
 // USER CREATION ==============================================================
 
 export const getDoesUserWithEmailExist = async (email: string) => {
