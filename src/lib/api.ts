@@ -1,16 +1,9 @@
-import { IConceptPlanGen } from './api';
+import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
+import { QueryFunctionContext } from "@tanstack/react-query";
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import { QueryFunctionContext } from "@tanstack/react-query";
 import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData } from "../types";
-import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
-import TestEmail from "@/components/Emails/ReviewDocumentEmail";
 import { IConceptPlanGenerationData } from "./hooks/useGetConceptPlanData";
-import ReactPDF from '@react-pdf/renderer';
-import html2pdf from 'html2pdf.js';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable'; // Import this if you want to use autotable for tabular data
-import styles from "../styles/texteditor.css";
 
 
 // INSTANCE SETUP ==================================================================
