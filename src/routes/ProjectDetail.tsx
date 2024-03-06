@@ -171,6 +171,8 @@ export const ProjectDetail = ({
   const { colorMode } = useColorMode();
   const navigate = useNavigate();
 
+  // useEffect(() => console.log(documents))
+
   return (
     <div
       key={

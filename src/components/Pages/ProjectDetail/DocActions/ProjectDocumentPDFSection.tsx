@@ -1,0 +1,289 @@
+import { IDocGen, cancelProjectDocumentGeneration, generateProjectDocument } from "@/lib/api";
+import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
+import { IConceptPlan, IProgressReport, IProjectClosure, IProjectPlan, IStudentReport } from "@/types";
+import { Box, Text, Flex, ToastId, useColorMode, useToast, Button, Input } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
+import { motion } from "framer-motion";
+import { useRef } from "react";
+import { useForm } from "react-hook-form";
+import { BsStars } from "react-icons/bs";
+import { FaFileDownload } from "react-icons/fa";
+import { FcCancel } from "react-icons/fc";
+
+interface IPDFSectionProps {
+    data_document: IConceptPlan | IProjectPlan | IProgressReport | IStudentReport | IProjectClosure;
+    refetchData: () => void;
+}
+
+export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSectionProps) => {
+    const { register: genRegister, handleSubmit: handleGenSubmit } = useForm<IDocGen>();
+    const { register: cancelGenRegister, handleSubmit: handleCancelGenSubmit } = useForm<IDocGen>();
+    // const docPk = genWatch("document_pk");
+    // const cancelDocPk = cancelGenWatch("document_pk");
+    const apiEndpoint = useApiEndpoint();
+
+    const queryClient = useQueryClient();
+
+    const toast = useToast();
+    const toastIdRef = useRef<ToastId>();
+    const addToast = (data) => {
+        toastIdRef.current = toast(data);
+    };
+
+    const projectDocPDFGenerationMutation = useMutation(generateProjectDocument, {
+        onMutate: () => {
+            addToast({
+                status: "loading",
+                title: "Generating PDF",
+                position: "top-right",
+            });
+        },
+        onSuccess: (response: { res: AxiosResponse<any, any> }) => {
+            if (toastIdRef.current) {
+                toast.update(toastIdRef.current, {
+                    title: "Success",
+                    description: `PDF Generated`,
+                    status: "success",
+                    position: "top-right",
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+            // console.log(response);
+            // console.log(response.res)
+            const fileUrl = `${apiEndpoint}${response.res.data.file}`;
+
+            if (fileUrl) {
+                window.open(fileUrl, "_blank")
+            }
+
+            queryClient.invalidateQueries(["projects", data_document.document.project.pk]);
+
+            setTimeout(() => {
+                refetchData();
+            }, 1000);
+        },
+        onError: (error: AxiosError) => {
+            if (toastIdRef.current) {
+                toast.update(toastIdRef.current, {
+                    title: "Could Not Generate PDF",
+                    description: error?.response?.data
+                        ? `${error.response.status}: ${Object.values(error.response.data)[0]
+                        }`
+                        : "Error",
+                    status: "error",
+                    position: "top-right",
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+        },
+    });
+
+
+    const cancelDocGenerationMutation = useMutation(cancelProjectDocumentGeneration, {
+        onMutate: () => {
+            addToast({
+                status: "loading",
+                title: "Canceling Generation",
+                position: "top-right",
+            });
+        },
+        onSuccess: () => {
+            if (toastIdRef.current) {
+                toast.update(toastIdRef.current, {
+                    title: "Success",
+                    description: `Canceled`,
+                    status: "success",
+                    position: "top-right",
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+            queryClient.invalidateQueries(["projects", data_document.document.project.pk]);
+
+            setTimeout(() => {
+                refetchData();
+            }, 1000);
+        },
+        onError: (error: AxiosError) => {
+            if (toastIdRef.current) {
+                toast.update(toastIdRef.current, {
+                    title: "Could Not Cancel",
+                    description: error?.response?.data
+                        ? `${error.response.status}: ${Object.values(error.response.data)[0]
+                        }`
+                        : "Error",
+                    status: "error",
+                    position: "top-right",
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+        },
+    });
+
+    const beginCancelDocGen = (formData: IDocGen) => {
+        console.log(formData);
+        cancelDocGenerationMutation.mutate(formData);
+    }
+
+    const beginProjectDocPDFGeneration = (formData: IDocGen) => {
+        console.log(formData)
+        projectDocPDFGenerationMutation.mutate(formData);
+    };
+
+    const { colorMode } = useColorMode();
+
+    return (
+        <Flex
+            bg={colorMode === "light" ? "gray.100" : "gray.700"}
+            rounded={"2xl"}
+            p={4}
+            w={"100%"}
+            justifyContent={"space-between"}
+            border={"1px solid"}
+            borderColor={"gray.300"}
+            my={2}
+        >
+            <Box
+                alignSelf={"center"}
+            // bg={"red"}
+            // justifyContent={""}
+            >
+                <Text fontWeight={"semibold"}>PDF</Text>
+            </Box>
+
+            <Box>
+
+
+                <Box
+                    as="form"
+                    id="cancel-pdf-generation-form"
+                    onSubmit={handleCancelGenSubmit(beginCancelDocGen)}
+                >
+                    <Input
+                        type="hidden"
+                        {...cancelGenRegister("document_pk", {
+                            required: true,
+                            value: data_document.document.pk,
+                        })}
+                    />
+                </Box>
+
+                <Box
+                    as="form"
+                    id="pdf-generation-form"
+                    onSubmit={handleGenSubmit(beginProjectDocPDFGeneration)}
+                >
+                    <Input
+                        type="hidden"
+                        {...genRegister("document_pk", {
+                            required: true,
+                            value: data_document.document.pk,
+                        })}
+                    />
+                </Box>
+
+                {
+                    data_document?.document?.pdf_generation_in_progress ?
+                        <Button
+                            size={"sm"}
+                            ml={2}
+                            variant={"solid"}
+                            color={"white"}
+                            background={
+                                colorMode === "light" ? "gray.400" : "gray.500"
+                            }
+                            _hover={{
+                                background:
+                                    colorMode === "light" ? "gray.300" : "gray.400",
+                            }}
+                            loadingText={"Canceling"}
+                            isDisabled={
+                                cancelDocGenerationMutation.isLoading
+                            }
+                            type="submit"
+                            form="cancel-pdf-generation-form"
+                            isLoading={
+                                cancelDocGenerationMutation.isLoading
+                            }
+                        >
+                            <Box mr={2}><FcCancel /></Box>
+                            Cancel
+                        </Button> :
+                        data_document?.document?.pdf ?
+                            // <motion.div
+                            //     initial={{ y: -10, opacity: 0 }}
+                            //     animate={{ y: 0, opacity: 1 }}
+                            //     exit={{ y: 10, opacity: 0 }}
+                            //     transition={{
+                            //         duration: 0.7,
+                            //         delay: 1 / 7,
+                            //     }}
+                            //     style={{
+                            //         height: "100%",
+                            //         animation: "oscillate 8s ease-in-out infinite",
+                            //     }}
+                            // >
+                            <Button
+                                as={motion.div}
+                                initial={{ y: -10, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: 10, opacity: 0 }}
+                                sx={{ transitionDuration: 0.7, animationDelay: 1 }}
+                                size={"sm"}
+                                ml={2}
+                                variant={"solid"}
+                                color={"white"}
+                                background={
+                                    colorMode === "light" ? "blue.500" : "blue.600"
+                                }
+                                _hover={{
+                                    background:
+                                        colorMode === "light" ? "blue.400" : "blue.500",
+                                }}
+                                onClick={() => {
+                                    window.open(`${apiEndpoint}${data_document?.document?.pdf?.file}`, "_blank")
+                                }}
+                            >
+                                <Box mr={2}><FaFileDownload /></Box>
+                                Download PDF
+                            </Button>
+
+                            // </motion.div>
+                            : null
+                }
+                <Button
+                    size={"sm"}
+                    ml={2}
+                    variant={"solid"}
+                    color={"white"}
+                    background={
+                        colorMode === "light" ? "green.500" : "green.600"
+                    }
+                    _hover={{
+                        background:
+                            colorMode === "light" ? "green.400" : "green.500",
+                    }}
+                    loadingText={"Generation In Progress"}
+                    isDisabled={
+                        projectDocPDFGenerationMutation.isLoading ||
+                        data_document?.document?.pdf_generation_in_progress
+                    }
+                    type="submit"
+                    form="pdf-generation-form"
+                    isLoading={
+                        projectDocPDFGenerationMutation.isLoading ||
+                        data_document?.document?.pdf_generation_in_progress
+                    }
+                >
+                    <Box mr={2}><BsStars /></Box>
+
+                    Generate PDF
+                </Button>
+            </Box>
+        </Flex>
+    )
+}

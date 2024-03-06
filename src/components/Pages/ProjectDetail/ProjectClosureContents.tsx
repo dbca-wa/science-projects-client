@@ -95,9 +95,8 @@ export const ProjectClosureContents = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Set Closure Outcome",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -140,7 +139,7 @@ export const ProjectClosureContents = ({
         projectClosureData={document}
         refetchData={refetch}
         setToLastTab={setToLastTab}
-        // projectPk={projectPk}
+      // projectPk={projectPk}
       />
 
       <Flex

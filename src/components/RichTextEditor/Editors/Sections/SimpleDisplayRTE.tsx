@@ -37,8 +37,8 @@ export const SimpleDisplaySRTE = ({
         displayArea === "projectOverviewTitle"
           ? "editor-project-title-overview"
           : displayArea === "traditionalProjectTitle"
-          ? "editor-project-title-traditional"
-          : "editor-project-title-card",
+            ? "editor-project-title-traditional"
+            : "editor-project-title-card",
       span: colorMode === "light" ? "editor-p-light" : "editor-p-dark",
       text: {
         bold: colorMode === "light" ? "editor-bold-light" : "editor-bold-dark",

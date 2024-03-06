@@ -25,7 +25,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 
-import "@/styles/texteditor.css";
+import "../../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 

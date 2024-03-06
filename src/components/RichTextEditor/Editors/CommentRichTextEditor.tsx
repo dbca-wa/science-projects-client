@@ -1,34 +1,34 @@
 // Has mention and hashtag functionality
 
 import { IBranch, IBusinessArea, IUserData, IUserMe } from "@/types";
-import { Box, Flex, Text, useColorMode, Avatar } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { useState } from "react";
 
 // Lexical
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { $generateHtmlFromNodes } from "@lexical/html";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 
 // Lexical Plugins
+import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 
-import "../../../styles/texteditor.css";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import "../../../styles/texteditor.css";
 // import {
 //   $getRoot,
 // } from "lexical";
 
-import { ListItemNode, ListNode } from "@lexical/list";
-import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
-import MentionsPlugin, { MentionNode } from "../Plugins/MentionsPlugin";
-import { PostCommentButton } from "../Buttons/PostCommentButton";
 import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
+import { ListItemNode, ListNode } from "@lexical/list";
+import { PostCommentButton } from "../Buttons/PostCommentButton";
+import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
+import MentionsPlugin, { MentionNode } from "../Plugins/MentionsPlugin";
 // import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface Props {
@@ -49,7 +49,10 @@ export const CommentRichTextEditor = ({
   const { colorMode } = useColorMode();
   const [comment, setComment] = useState("");
 
+
   const usersImage = useServerImageUrl(userData?.image?.file);
+
+  // useEffect(() => console.log(userData, usersImage))
 
   const generateTheme = (colorMode) => {
     return {

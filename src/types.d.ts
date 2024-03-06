@@ -253,7 +253,13 @@ export interface IMainDoc {
     business_area_lead_approval_granted: boolean;
     directorate_approval_granted: boolean;
     pdf_generation_in_progress: boolean;
-    pdf: string;
+    pdf: IProjectDocPDF;
+}
+
+interface IProjectDocPDF {
+    file: string;
+    document?: number;
+    project?: number;
 }
 
 interface IConceptPlan {

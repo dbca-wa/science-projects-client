@@ -84,9 +84,9 @@ export const ProjectOverviewCard = ({
   documents,
   setToLastTab,
 }: IProjectOverviewCardProps) => {
-  useEffect(() => {
-    console.log(details);
-  }, [details]);
+  // useEffect(() => {
+  //   console.log(details);
+  // }, [details]);
   const {
     isOpen: isEditProjectDetailModalOpen,
     onClose: onEditProjectDetailModalClose,
