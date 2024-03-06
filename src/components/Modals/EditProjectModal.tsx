@@ -180,9 +180,9 @@ export const EditProjectModal = ({
     return tag ? tag.textContent : "";
   };
 
-  useEffect(() => {
-    console.log({ organisation, projectTitle })
-  }, [organisation, projectTitle])
+  // useEffect(() => {
+  //   console.log({ organisation, projectTitle })
+  // }, [organisation, projectTitle])
 
   useEffect(() => {
     const plainTitle = getPlainTextFromHTML(projectTitle);

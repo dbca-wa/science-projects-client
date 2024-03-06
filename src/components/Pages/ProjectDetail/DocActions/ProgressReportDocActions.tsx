@@ -1,43 +1,35 @@
-import { useEffect, useRef, useState } from "react";
-import { IProgressReport, IProjectMember } from "../../../../types";
 import {
   Box,
-  Text,
-  Flex,
-  Tag,
-  useColorMode,
-  Grid,
   Button,
   Center,
-  useDisclosure,
-  Spinner,
   Drawer,
-  DrawerOverlay,
-  DrawerContent,
   DrawerBody,
+  DrawerContent,
   DrawerFooter,
-  useToast,
-  ToastId,
-  Input,
+  DrawerOverlay,
+  Flex,
+  Grid,
+  Spinner,
+  Tag,
+  Text,
+  useColorMode,
+  useDisclosure
 } from "@chakra-ui/react";
-import { ProgressReportActionModal } from "../../../Modals/DocumentActionModals/ProgressReportActionModal";
-import { useUser } from "../../../../lib/hooks/useUser";
-import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
-import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
-import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { UserProfile } from "../../Users/UserProfile";
-import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
 import {
-  IDocGenerationProps,
-  generateProjectDocument,
-  downloadProjectDocument,
-  setProjectStatus,
   ISetProjectProps,
+  setProjectStatus
 } from "../../../../lib/api";
-import { AxiosError } from "axios";
+import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
+import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
+import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
+import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
+import { useUser } from "../../../../lib/hooks/useUser";
+import { IProgressReport, IProjectMember } from "../../../../types";
 import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
+import { ProgressReportActionModal } from "../../../Modals/DocumentActionModals/ProgressReportActionModal";
+import { UserProfile } from "../../Users/UserProfile";
+import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
 
 interface IProgressDocumentActions {
   progressReportData: IProgressReport;
@@ -137,6 +129,8 @@ export const ProgressReportDocActions = ({
 
   const [leaderMember, setLeaderMemeber] = useState<IProjectMember>();
 
+  // useEffect(() => console.log(progressReportData))
+
   useEffect(() => {
     if (
       actionsReady === false &&
@@ -187,13 +181,6 @@ export const ProgressReportDocActions = ({
     onClose: onCreatorClose,
   } = useDisclosure();
 
-  const { register, handleSubmit } = useForm<IDocGenerationProps>();
-  const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
-    toastIdRef.current = toast(data);
-  };
-
   const projectPk = progressReportData?.document?.project.pk;
 
   const setStatusIfRequired = () => {
@@ -206,84 +193,6 @@ export const ProgressReportDocActions = ({
     }
   };
 
-  const projectPDFDownloadMutation = useMutation(downloadProjectDocument, {
-    onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Downloading PDF",
-        position: "top-right",
-      });
-    },
-    onSuccess: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Success",
-          description: `PDF Downloaded`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-    onError: (error: AxiosError) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Could Not Download PDF",
-          description: `${error?.response?.data}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-  });
-
-  const projectDocPDFGenerationMutation = useMutation(generateProjectDocument, {
-    onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Generating PDF",
-        position: "top-right",
-      });
-    },
-    onSuccess: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Success",
-          description: `PDF Generated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-    onError: (error: AxiosError) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Could Not Generate PDF",
-          description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-  });
-
-  const beginProjectDocPDFDownload = (formData: IDocGenerationProps) => {
-    projectPDFDownloadMutation.mutate(formData);
-  };
-
-  const beginProjectDocPDFGeneration = (formData: IDocGenerationProps) => {
-    projectDocPDFGenerationMutation.mutate(formData);
-  };
 
   return (
     <>
@@ -1078,115 +987,9 @@ export const ProgressReportDocActions = ({
                 </Grid>
 
                 {/* PDF and email buttons */}
+                <ProjectDocumentPDFSection data_document={progressReportData} refetchData={refetchData} />
 
-                <Flex
-                  bg={colorMode === "light" ? "gray.100" : "gray.700"}
-                  rounded={"2xl"}
-                  p={4}
-                  w={"100%"}
-                  justifyContent={"space-between"}
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  my={2}
-                >
-                  <Box
-                    alignSelf={"center"}
-                  // bg={"red"}
-                  // justifyContent={""}
-                  >
-                    <Text fontWeight={"semibold"}>PDF</Text>
-                  </Box>
 
-                  <Box>
-                    <Box
-                      as="form"
-                      id="pdf-generation-form"
-                      onSubmit={handleSubmit(beginProjectDocPDFGeneration)}
-                    >
-                      <Input
-                        type="hidden"
-                        {...register("docPk", {
-                          required: true,
-                          value: progressReportData?.document?.pk,
-                        })}
-                      />
-                      <Input
-                        type="hidden"
-                        {...register("kind", {
-                          required: true,
-                          value: progressReportData?.document?.kind,
-                        })}
-                      />
-                    </Box>
-                    <Box
-                      as="form"
-                      id="pdf-download-form"
-                      onSubmit={handleSubmit(beginProjectDocPDFDownload)}
-                    >
-                      <Input
-                        type="hidden"
-                        {...register("docPk", {
-                          required: true,
-                          value: progressReportData?.document?.pk,
-                        })}
-                      />
-                    </Box>
-                    {
-                      // progressReportData?.document?.pdf && (
-
-                      <Button
-                        size={"sm"}
-                        ml={2}
-                        variant={"solid"}
-                        color={"white"}
-                        background={
-                          colorMode === "light" ? "blue.500" : "blue.600"
-                        }
-                        _hover={{
-                          background:
-                            colorMode === "light" ? "blue.400" : "blue.500",
-                        }} // onClick={beginProjectDocPDFGeneration}
-                        type="submit"
-                        form="pdf-download-form"
-                        isDisabled
-                        isLoading={
-                          // progressReportData?.document?.pdf_generation_in_progress
-                          // ||
-                          projectPDFDownloadMutation.isLoading
-                        }
-                        loadingText={"Downloading"}
-                      >
-                        Download PDF
-                      </Button>
-                      // )
-                    }
-
-                    <Button
-                      size={"sm"}
-                      ml={2}
-                      variant={"solid"}
-                      color={"white"}
-                      background={
-                        colorMode === "light" ? "green.500" : "green.600"
-                      }
-                      _hover={{
-                        background:
-                          colorMode === "light" ? "green.400" : "green.500",
-                      }} // onClick={beginProjectDocPDFGeneration}
-                      type="submit"
-                      form="pdf-generation-form"
-                      isDisabled
-                      isLoading={
-                        // progressReportData?.document?.pdf_generation_in_progress
-                        // ||
-                        projectDocPDFGenerationMutation.isLoading
-                      }
-                      loadingText={"PDF Generation In Progress"}
-                    >
-                      Generate PDF
-                    </Button>
-                  </Box>
-                </Flex>
               </Grid>
             </Box>
           </Grid>

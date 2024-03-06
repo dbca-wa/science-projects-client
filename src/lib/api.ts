@@ -1,3 +1,4 @@
+import { IConceptPlanGen } from './api';
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
 import { QueryFunctionContext } from "@tanstack/react-query";
@@ -9,7 +10,7 @@ import ReactPDF from '@react-pdf/renderer';
 import html2pdf from 'html2pdf.js';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'; // Import this if you want to use autotable for tabular data
-import styles from "@/styles/texteditor.css";
+import styles from "../styles/texteditor.css";
 
 
 // INSTANCE SETUP ==================================================================
@@ -1379,32 +1380,32 @@ export const downloadProjectDocument = async ({ docPk }: IDocGenerationProps) =>
     ).then(res => res.data);
 }
 
-export const generateProjectDocument = async ({
-    docPk,
-    kind,
-}: IDocGenerationProps) => {
-    if (docPk === undefined) return;
-    console.log(docPk);
-    const pk = Number(docPk);
-    const url = `documents/generateProjectDocument/${pk}`
-    const params = {
-        "kind": kind,
-    }
+// export const generateProjectDocument = async ({
+//     docPk,
+//     kind,
+// }: IDocGenerationProps) => {
+//     if (docPk === undefined) return;
+//     console.log(docPk);
+//     const pk = Number(docPk);
+//     const url = `documents/generateProjectDocument/${pk}`
+//     const params = {
+//         "kind": kind,
+//     }
 
-    instance.post(
-        url,
-        params,
-        {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        }
-    ).then(res => {
-        console.log(res.data);
-        return res.data;
-    });
+//     instance.post(
+//         url,
+//         params,
+//         {
+//             headers: {
+//                 'Content-Type': 'multipart/form-data',
+//             },
+//         }
+//     ).then(res => {
+//         console.log(res.data);
+//         return res.data;
+//     });
 
-}
+// }
 
 // export const spawnDocument = async({})
 
@@ -1976,8 +1977,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
             "outcome": "<p></p>",
             "collaborations": "<p></p>",
             "strategic_context": "<p></p>",
-            "staff_time_allocation": "<p></p>",
-            "budget": "<p></p>",
+            // table sections ommitted as on db
         }
     } else if (kind === "projectplan") {
         params = {
@@ -1990,8 +1990,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
             "project_tasks": "<p></p>",
             "listed_references": "<p></p>",
             "methodology": "<p></p>",
-            "operating_budget": "<p></p>",
-            "operating_budget_external": "<p></p>",
+            // table sections ommitted as on db
             "related_projects": "<p></p>",
         }
     } else if (kind === "studentreport") {
@@ -3210,13 +3209,79 @@ export const getDataForConceptPlanGeneration = async (concept_plan_pk: number): 
 
 }
 
-export interface IConceptPlanGen {
+export interface IDocGen {
     document_pk: number;
 }
 
-export const generateConceptPlan = async ({ document_pk }: IConceptPlanGen) => {
+// export const generateConceptPlan = async ({ document_pk }: IDocGen) => {
+//     const res = await instance.post(
+//         `documents/generate_concept_plan/${document_pk}`,
+//     );
+//     console.log(res.data);
+//     return { res };
+// }
+
+
+
+
+// import fs from 'fs/promises'
+
+// async function updateCSS() {
+//     try {
+//         // Read the content of "@/styles/texteditor.css"
+//         const cssFilePath = './src/styles/texteditor.css';
+//         const newCSSContent = await fs.readFile(cssFilePath, 'utf-8');
+
+//         // Write the content to the public folder
+//         const publicCSSFilePath = './public/texteditor.css';
+//         await fs.writeFile(publicCSSFilePath, newCSSContent, 'utf-8');
+
+//         console.log('CSS file updated successfully.');
+//     } catch (error) {
+//         console.error('Error updating CSS file:', error.message);
+//     }
+// }
+
+
+export const generateProjectDocument = async ({ document_pk }: IDocGen) => {
+
+    // // Run the updateCSS function
+    // await updateCSS();
+
+    // Use import.meta.url directly to get the base URL
+    const cssFileURL = '/texteditor.css'
+
+    // Import the CSS file using Vite's import function
+    const cssFileContents = await fetch(cssFileURL)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${cssFileURL}`);
+            }
+            return response.text();
+        })
+        .then(cssFileContent => {
+            console.log({ cssFileURL, cssFileContent });
+            // Send the object as JSON
+            const css_content = JSON.stringify(cssFileContent);
+            // You can send jsonString to your server using an HTTP request (e.g., fetch or axios)
+            console.log(css_content); // Log the JSON string for verification
+            return css_content
+        })
+
+
     const res = await instance.post(
-        `documents/generate_concept_plan/${document_pk}`,
+        `documents/generate_project_document/${document_pk}`,
+        { "css_content": cssFileContents }
+
+    );
+    console.log(res.data);
+    return { res };
+}
+
+
+export const cancelProjectDocumentGeneration = async ({ document_pk }: IDocGen) => {
+    const res = await instance.post(
+        `documents/cancel_doc_gen/${document_pk}`,
     );
     console.log(res.data);
     return { res };

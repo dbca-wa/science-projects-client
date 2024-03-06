@@ -310,10 +310,10 @@ export const ProgressReportContents = ({
             section={"future"}
           />
 
-          <CommentSection
-            documentID={selectedProgressReport?.document?.pk}
-            userData={userData}
-          />
+
+          {selectedProgressReport?.document && (
+            <CommentSection documentID={selectedProgressReport?.document?.pk} userData={userData} />
+          )}
         </motion.div>
       )}
     </>

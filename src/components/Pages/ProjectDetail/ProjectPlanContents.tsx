@@ -230,12 +230,12 @@ export const ProjectPlanContents = ({
         userIsLeader={userIsLeader}
         userData={userData}
         refetchDocument={refetch}
-        // isProjectLeader={}
+      // isProjectLeader={}
       />
 
       <Box pb={6} mt={4}>
         <CommentSection
-          documentID={document?.document?.id}
+          documentID={document?.document?.pk}
           userData={userData}
         />
       </Box>

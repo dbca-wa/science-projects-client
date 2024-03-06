@@ -253,8 +253,8 @@ export const StudentProgressReportDisplayEditor = ({
               ? "whiteAlpha.600"
               : "whiteAlpha.400"
             : isEditorOpen
-            ? "blackAlpha.500"
-            : "blackAlpha.400"
+              ? "blackAlpha.500"
+              : "blackAlpha.400"
         }
       >
         {/* Image, tag, title, scientits, student, academics */}
@@ -274,8 +274,7 @@ export const StudentProgressReportDisplayEditor = ({
                   cursor={"pointer"}
                   onClick={() =>
                     navigate(
-                      `/projects/${project?.pk}/${
-                        reportKind === "student" ? "student" : "progress"
+                      `/projects/${project?.pk}/${reportKind === "student" ? "student" : "progress"
                       }`
                     )
                   }
@@ -320,8 +319,7 @@ export const StudentProgressReportDisplayEditor = ({
                   cursor={"pointer"}
                   onClick={() =>
                     navigate(
-                      `/projects/${project?.pk}/${
-                        reportKind === "student" ? "student" : "progress"
+                      `/projects/${project?.pk}/${reportKind === "student" ? "student" : "progress"
                       }`
                     )
                   }
@@ -416,13 +414,13 @@ export const StudentProgressReportDisplayEditor = ({
             // editorText={editorText}
             // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-            // setShouldShowTree={setShouldShowTree}
-            // isEditorOpen={isEditorOpen}
-            // setIsEditorOpen={setIsEditorOpen}
-            // setDisplayData={setDisplayData}
-            // textEditorName={
-            //   section === "description" ? "Description" : undefined
-            // }
+          // setShouldShowTree={setShouldShowTree}
+          // isEditorOpen={isEditorOpen}
+          // setIsEditorOpen={setIsEditorOpen}
+          // setDisplayData={setDisplayData}
+          // textEditorName={
+          //   section === "description" ? "Description" : undefined
+          // }
           />
         )}
       </Box>

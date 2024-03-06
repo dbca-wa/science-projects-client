@@ -30,7 +30,7 @@ export const ConceptPlanContents = ({
   document,
   refetch,
 }: // setToLastTab,
-Props) => {
+  Props) => {
   const { colorMode } = useColorMode();
 
   const documentType = "conceptplan";
@@ -154,7 +154,11 @@ Props) => {
         writeable_document_pk={document?.pk}
       />
 
-      <CommentSection documentID={document?.document?.id} userData={userData} />
+      {document?.document && (
+        <CommentSection documentID={document?.document?.pk} userData={userData} />
+
+      )}
+
     </motion.div>
   );
 };
