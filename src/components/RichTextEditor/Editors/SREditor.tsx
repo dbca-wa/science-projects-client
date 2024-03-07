@@ -132,7 +132,7 @@ export const SREditor = ({ shouldAlternatePicture, fullSRData, initialConfig, is
     useEffect(() => {
         setAboveHeightSet(false);
         const calculateAboveContentHeight = () => {
-            const aboveContentElement = document.getElementById(`topContent_${fullSRData?.project?.pk}`);
+            const aboveContentElement = document.getElementById(`topContent_${fullSRData?.document?.project?.pk}`);
 
             if (aboveContentElement) {
                 const rect = aboveContentElement.getBoundingClientRect();
@@ -152,7 +152,7 @@ export const SREditor = ({ shouldAlternatePicture, fullSRData, initialConfig, is
         return () => {
             window.removeEventListener('resize', calculateAboveContentHeight);
         };
-    }, [displayData, isEditing, fullSRData?.project?.pk, initialConfig]);
+    }, [displayData, isEditing, fullSRData?.document?.project?.pk, initialConfig]);
 
 
     const queryClient = useQueryClient();
@@ -232,14 +232,14 @@ export const SREditor = ({ shouldAlternatePicture, fullSRData, initialConfig, is
 
 
                 <Flex
-                    id={`topContent_${fullSRData?.project?.pk}`}
+                    id={`topContent_${fullSRData?.document?.project?.pk}`}
                     pt={6} mx={8}
                 >
                     {!shouldAlternatePicture ? (
                         <>
                             <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
                                 <Image
-                                    src={fullSRData?.project?.image?.file}
+                                    src={fullSRData?.document?.project?.image?.file}
                                     w={"100%"}
                                     h={"100%"}
                                     objectFit={"cover"}
@@ -248,10 +248,10 @@ export const SREditor = ({ shouldAlternatePicture, fullSRData, initialConfig, is
                             <Box ml={4} flex={1}>
                                 <Box
                                     cursor={"pointer"}
-                                    onClick={() => navigate(`/projects/${fullSRData?.project?.pk}/student`)}
+                                    onClick={() => navigate(`/projects/${fullSRData?.document?.project?.pk}/student`)}
                                 >
                                     <ExtractedHTMLTitle
-                                        htmlContent={fullSRData?.project?.title}
+                                        htmlContent={fullSRData?.document?.project?.title}
                                         color={"blue.500"}
                                         fontWeight={"bold"}
                                         fontSize={"17px"}
@@ -260,7 +260,7 @@ export const SREditor = ({ shouldAlternatePicture, fullSRData, initialConfig, is
                                     />
                                 </Box>
 
-                                <SRProjDetails project={fullSRData?.project} team_members={fullSRData?.team_members} />
+                                <SRProjDetails project={fullSRData?.document?.project} team_members={fullSRData?.team_members} />
                             </Box>
                         </>
                     ) : (
@@ -270,12 +270,12 @@ export const SREditor = ({ shouldAlternatePicture, fullSRData, initialConfig, is
                                     cursor={"pointer"}
                                     onClick={() =>
                                         navigate(
-                                            `/projects/${fullSRData?.project?.pk}/student`
+                                            `/projects/${fullSRData?.document?.project?.pk}/student`
                                         )
                                     }
                                 >
                                     <ExtractedHTMLTitle
-                                        htmlContent={fullSRData?.project?.title}
+                                        htmlContent={fullSRData?.document?.project?.title}
                                         color={"blue.500"}
                                         fontWeight={"bold"}
                                         fontSize={"17px"}
@@ -284,12 +284,12 @@ export const SREditor = ({ shouldAlternatePicture, fullSRData, initialConfig, is
                                     />
                                 </Box>
 
-                                <SRProjDetails project={fullSRData?.project} team_members={fullSRData?.team_members} />
+                                <SRProjDetails project={fullSRData?.document?.project} team_members={fullSRData?.team_members} />
 
                             </Box>
                             <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
                                 <Image
-                                    src={fullSRData?.project?.image?.file}
+                                    src={fullSRData?.document?.project?.image?.file}
                                     w={"100%"}
                                     h={"100%"}
                                     objectFit={"cover"}

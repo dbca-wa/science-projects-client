@@ -2302,6 +2302,14 @@ export const getReportMedia = async ({ queryKey }: QueryFunctionContext) => {
     return res;
 }
 
+export const getAnnualReportPDF = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+    const res = instance.get(`documents/reports/pdf/${pk}`).then(res => {
+        return res.data
+    })
+    return res;
+}
+
 export const getLatestReportMedia = async () => {
     const res = instance.get(`medias/report_medias/latest/media`).then(res => {
         // console.log(res.data)

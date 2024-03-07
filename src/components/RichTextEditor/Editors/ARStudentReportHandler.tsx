@@ -15,7 +15,8 @@ import { SREditor } from "./SREditor";
 import { IMainDoc, IProjectData, IProjectMember, IReport } from "@/types";
 
 export interface IStudentReportDisplayData {
-  pk: number;
+  pk?: number;
+  id?: number;
   progress_report: string;
   year: number;
   team_members: IProjectMember[];
@@ -170,7 +171,7 @@ export const ARStudentReportHandler = ({
     (canEdit ?
       isEditing ?
         (<SREditor
-          key={`${colorMode}-${report?.pk}-editable`}
+          key={`${colorMode}-${report?.pk ? report.pk : report?.id}-editable`}
           canEdit={canEdit}
           setIsEditing={setIsEditing}
           isEditing={isEditing}
