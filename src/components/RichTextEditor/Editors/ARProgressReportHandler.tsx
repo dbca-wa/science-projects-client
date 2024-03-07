@@ -13,7 +13,8 @@ import { PREditor } from "./PREditor";
 import { IMainDoc, IProjectData, IProjectMember, IReport } from "@/types";
 
 export interface IProgressReportDisplayData {
-    pk: number;
+    pk?: number;
+    id?: number;
     aims: string;
     context: string;
     future: string;
@@ -174,7 +175,7 @@ export const ARProgressReportHandler = ({
     const [contextDisplayData, setContextDisplayData] = useState(report?.context);
 
     return (<PREditor
-        key={`${colorMode}-${report?.pk}`}
+        key={`${colorMode}-${report?.pk ? report.pk : report.id}`}
         canEdit={canEdit}
         isEditingContext={isEditingContext}
         setIsEditingContext={setIsEditingContext}

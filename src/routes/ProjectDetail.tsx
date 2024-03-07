@@ -71,6 +71,7 @@ export const ProjectDetail = ({
     }
   }, [isLoading, projectData]);
 
+  useEffect(() => console.log(documents), [documents])
   const me = useUser();
 
   // Refetch data on tab change and ensure falsy items are removed from the array

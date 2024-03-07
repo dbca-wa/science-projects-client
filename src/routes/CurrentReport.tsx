@@ -1,6 +1,6 @@
 // Route for handling information regarding the report for the year.
 
-import { AnnualReportPrintPreview } from "@/components/Pages/CurrentReport/AnnualReportPrintPreview";
+// import { AnnualReportPrintPreview } from "@/components/Pages/CurrentReport/AnnualReportPrintPreview";
 import { LatestReportsNotYetApproved } from "@/components/Pages/CurrentReport/LatestReportsNotYetApproved";
 import {
   Box,
@@ -21,6 +21,7 @@ import { AnnualReportMedia } from "../components/Pages/CurrentReport/AnnualRepor
 import { ParticipatingProjectReports } from "../components/Pages/CurrentReport/ParticipatingProjectReports";
 import { getLatestReportingYear } from "../lib/api";
 import { IReport } from "../types";
+import { PDFViewer } from "@/components/HTMLPDFs/PDFViewer";
 
 export const CurrentReport = () => {
   const [latestYear, setLatestYear] = useState<number | null>(null);
@@ -104,7 +105,8 @@ export const CurrentReport = () => {
                 <LatestReportsNotYetApproved />
               </TabPanel>
               <TabPanel>
-                <AnnualReportPrintPreview thisReport={thisReport} />
+                <PDFViewer thisReport={thisReport} />
+                {/* <AnnualReportPrintPreview thisReport={thisReport} /> */}
               </TabPanel>
             </TabPanels>
           </Tabs>

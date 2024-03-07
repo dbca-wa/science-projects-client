@@ -1,6 +1,6 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import { ISaveProgressReportSection, updateProgressReportSection } from "@/lib/api";
-import { IMainDoc, IProjectData, IProjectMember, IReport } from "@/types";
+import { IProjectData, IProjectMember } from "@/types";
 import { Box, Button, Flex, Icon, Image, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
@@ -76,6 +76,7 @@ interface IPRProjDetails {
 }
 const PRProjDetails = ({ project, team_members }: IPRProjDetails) => {
 
+
     const getOrderedTeam = (teamMembers) => {
         return Array.from(teamMembers)
             .sort((a: IProjectMember, b: IProjectMember) => {
@@ -129,6 +130,7 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
     const navigate = useNavigate();
     const { colorMode } = useColorMode();
 
+    useEffect(() => console.log(fullPRData))
 
     // const editorInstance = useLexicalComposerContext();
 
@@ -402,14 +404,14 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
             >
 
                 <Flex
-                    id={`topContent_${fullPRData?.project?.pk}`}
+                    id={`topContent_${fullPRData?.document?.project?.pk}`}
                     pt={6} mx={8}
                 >
                     {!shouldAlternatePicture ? (
                         <>
                             <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
                                 <Image
-                                    src={fullPRData?.project?.image?.file}
+                                    src={fullPRData?.document?.project?.image?.file}
                                     w={"100%"}
                                     h={"100%"}
                                     objectFit={"cover"}
@@ -418,10 +420,10 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
                             <Box ml={4} flex={1}>
                                 <Box
                                     cursor={"pointer"}
-                                    onClick={() => navigate(`/projects/${fullPRData?.project?.pk}/progress`)}
+                                    onClick={() => navigate(`/projects/${fullPRData?.document?.project?.pk}/progress`)}
                                 >
                                     <ExtractedHTMLTitle
-                                        htmlContent={fullPRData?.project?.title}
+                                        htmlContent={fullPRData?.document?.project?.title}
                                         color={"blue.500"}
                                         fontWeight={"bold"}
                                         fontSize={"17px"}
@@ -430,7 +432,7 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
                                     />
                                 </Box>
 
-                                <PRProjDetails project={fullPRData?.project} team_members={fullPRData?.team_members} />
+                                <PRProjDetails project={fullPRData?.document?.project} team_members={fullPRData?.team_members} />
                             </Box>
                         </>
                     ) : (
@@ -440,12 +442,12 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
                                     cursor={"pointer"}
                                     onClick={() =>
                                         navigate(
-                                            `/projects/${fullPRData?.project?.pk}/progress`
+                                            `/projects/${fullPRData?.document?.project?.pk}/progress`
                                         )
                                     }
                                 >
                                     <ExtractedHTMLTitle
-                                        htmlContent={fullPRData?.project?.title}
+                                        htmlContent={fullPRData?.document?.project?.title}
                                         color={"blue.500"}
                                         fontWeight={"bold"}
                                         fontSize={"17px"}
@@ -454,12 +456,12 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
                                     />
                                 </Box>
 
-                                <PRProjDetails project={fullPRData?.project} team_members={fullPRData?.team_members} />
+                                <PRProjDetails project={fullPRData?.document?.project} team_members={fullPRData?.team_members} />
 
                             </Box>
                             <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
                                 <Image
-                                    src={fullPRData?.project?.image?.file}
+                                    src={fullPRData?.document?.project?.image?.file}
                                     w={"100%"}
                                     h={"100%"}
                                     objectFit={"cover"}
