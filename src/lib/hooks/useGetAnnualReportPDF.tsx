@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAnnualReportPDF } from "../api";
+import { IAnnualReportPDFObject } from "@/types";
 
 export const useGetAnnualReportPDF = (pk: number) => {
     const { isLoading, data, refetch } = useQuery(
@@ -12,7 +13,7 @@ export const useGetAnnualReportPDF = (pk: number) => {
 
     return {
         pdfDocumentDataLoading: isLoading,
-        pdfDocumentData: data,
+        pdfDocumentData: data as IAnnualReportPDFObject,
         refetchPDF: refetch,
     };
 };

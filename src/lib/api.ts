@@ -3244,9 +3244,6 @@ export interface IDocGen {
 
 export const generateProjectDocument = async ({ document_pk }: IDocGen) => {
 
-    // // Run the updateCSS function
-    // await updateCSS();
-
     // Use import.meta.url directly to get the base URL
     const cssFileURL = '/texteditor.css'
 
@@ -3277,10 +3274,51 @@ export const generateProjectDocument = async ({ document_pk }: IDocGen) => {
     return { res };
 }
 
+export const generateAnnualReportPDF = async ({ document_pk }: IDocGen) => {
+
+    // Use import.meta.url directly to get the base URL
+    const cssFileURL = '/texteditor.css'
+
+    // Import the CSS file using Vite's import function
+    const cssFileContents = await fetch(cssFileURL)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${cssFileURL}`);
+            }
+            return response.text();
+        })
+        .then(cssFileContent => {
+            console.log({ cssFileURL, cssFileContent });
+            // Send the object as JSON
+            const css_content = JSON.stringify(cssFileContent);
+            // You can send jsonString to your server using an HTTP request (e.g., fetch or axios)
+            console.log(css_content); // Log the JSON string for verification
+            return css_content
+        })
+
+
+    const res = await instance.post(
+        `documents/reports/${document_pk}/generate_pdf`,
+        { "css_content": cssFileContents }
+
+    );
+    console.log(res.data);
+    return { res };
+}
+
+
 
 export const cancelProjectDocumentGeneration = async ({ document_pk }: IDocGen) => {
     const res = await instance.post(
         `documents/cancel_doc_gen/${document_pk}`,
+    );
+    console.log(res.data);
+    return { res };
+}
+
+export const cancelAnnualReportPDF = async ({ document_pk }: IDocGen) => {
+    const res = await instance.post(
+        `documents/reports/${document_pk}/cancel_doc_gen`,
     );
     console.log(res.data);
     return { res };

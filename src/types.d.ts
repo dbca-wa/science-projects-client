@@ -12,6 +12,21 @@ type StudentReportSection = "progress_report";
 type ProjectClosureSection = "reason" | "intended_outcome" | "knowledge_transfer" | "data_location" | "hardcopy_location" | "backup_location" | "scientific_outputs";
 
 
+export interface IAnnualReportPDFObject {
+    id: number;
+    file: string;
+    creator: number;
+    created_at: string;
+    updated_at: string;
+    pdf_data: string;
+    report: {
+        id: number;
+        pdf_generation_in_progress: boolean;
+        year: number;
+    }
+}
+
+
 export type EditorType = "ProjectDetail" | "ProjectDocument" | "AnnualReport" | "Comment";
 export type EditorSections =
     "Annual Report" |

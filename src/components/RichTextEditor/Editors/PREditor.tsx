@@ -130,8 +130,6 @@ export const PREditor = ({ shouldAlternatePicture, fullPRData,
     const navigate = useNavigate();
     const { colorMode } = useColorMode();
 
-    useEffect(() => console.log(fullPRData))
-
     // const editorInstance = useLexicalComposerContext();
 
     // useEffect(() => {
