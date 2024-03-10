@@ -2150,17 +2150,9 @@ export const downloadProjectsCSV = () => {
         {
             responseType: 'blob',
         }
-    ).then((res) => {
-        console.log(res);
-        const downloadUrl = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.setAttribute('download', 'projects.csv');
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(downloadUrl);
-    })
+    ).then((res) => res.data)
+
+
 }
 
 

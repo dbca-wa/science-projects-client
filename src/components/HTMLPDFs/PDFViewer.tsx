@@ -164,7 +164,7 @@ export const PDFViewer = ({ thisReport, refetchData }: Props) => {
         const dpi = 300;
         const heightMm = 297;
         const mmInInch = 25.4
-        // Amount in mm divided by 25.4 (conv fact for mm to inches) by dpi
+        // Pixels: Amount in mm divided by 25.4 (conv fact. for mm to inches) by dpi
         const pixels = (heightMm / mmInInch) * dpi;
         return pixels;
     }
@@ -178,7 +178,7 @@ export const PDFViewer = ({ thisReport, refetchData }: Props) => {
                     mb={4}
                 >
                     <Center>
-                        <Text>You may download this pdf or create a new one with more recent data.</Text>
+                        <Text>You may download this pdf or create a new one with more recent data in about 30 seconds.</Text>
 
                     </Center>
                     <Flex>
@@ -254,6 +254,7 @@ export const PDFViewer = ({ thisReport, refetchData }: Props) => {
                                             colorMode === "light" ? "blue.500" : "blue.600"
                                         }
                                         _hover={{
+                                            cursor: "pointer",
                                             background:
                                                 colorMode === "light" ? "blue.400" : "blue.500",
                                         }}
@@ -275,6 +276,7 @@ export const PDFViewer = ({ thisReport, refetchData }: Props) => {
                                 colorMode === "light" ? "green.500" : "green.600"
                             }
                             _hover={{
+                                cursor: "pointer",
                                 background:
                                     colorMode === "light" ? "green.400" : "green.500",
                             }}
@@ -303,7 +305,5 @@ export const PDFViewer = ({ thisReport, refetchData }: Props) => {
                     style={{ border: '1px solid black', borderRadius: "20px" }}
                 ></iframe>
             </Box>
-
-
     )
 }

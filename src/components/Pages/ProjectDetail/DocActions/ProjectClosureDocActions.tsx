@@ -1248,7 +1248,9 @@ export const ProjectClosureDocActions = ({
                 </Grid>
 
                 {/* PDF and email buttons */}
-                <ProjectDocumentPDFSection data_document={projectClosureData} refetchData={refetchData} />
+                {projectClosureData ?
+                  <ProjectDocumentPDFSection data_document={projectClosureData} refetchData={refetchData} />
+                  : null}
 
               </Grid>
             </Box>

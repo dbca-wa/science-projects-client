@@ -22,7 +22,6 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
     // const docPk = genWatch("document_pk");
     // const cancelDocPk = cancelGenWatch("document_pk");
     const apiEndpoint = useApiEndpoint();
-
     const queryClient = useQueryClient();
 
     const toast = useToast();
@@ -60,9 +59,9 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
 
             queryClient.invalidateQueries(["projects", data_document.document.project.pk]);
 
-            setTimeout(() => {
-                refetchData();
-            }, 1000);
+            // setTimeout(() => {
+            //     refetchData();
+            // }, 1000);
         },
         onError: (error: AxiosError) => {
             if (toastIdRef.current) {
@@ -103,9 +102,9 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
             }
             queryClient.invalidateQueries(["projects", data_document.document.project.pk]);
 
-            setTimeout(() => {
-                refetchData();
-            }, 1000);
+            // setTimeout(() => {
+            //     refetchData();
+            // }, 1000);
         },
         onError: (error: AxiosError) => {
             if (toastIdRef.current) {
@@ -134,6 +133,21 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
         projectDocPDFGenerationMutation.mutate(formData);
     };
 
+    const downloadPDF = () => {
+        {
+            try {
+                window.open(`${apiEndpoint}${data_document?.document?.pdf?.file}`, "_blank");
+            } catch (error) {
+                if (error instanceof DOMException) {
+                    window.open(`${data_document?.document?.pdf?.file}`, "_blank");
+                } else {
+                    // Handle other exceptions
+                    console.error("An error occurred while opening the window:", error);
+                }
+            }
+        }
+    }
+
     const { colorMode } = useColorMode();
 
     return (
@@ -155,9 +169,7 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
                 <Text fontWeight={"semibold"}>PDF</Text>
             </Box>
 
-            <Box>
-
-
+            <Flex>
                 <Box
                     as="form"
                     id="cancel-pdf-generation-form"
@@ -213,20 +225,7 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
                             <Box mr={2}><FcCancel /></Box>
                             Cancel
                         </Button> :
-                        data_document?.document?.pdf ?
-                            // <motion.div
-                            //     initial={{ y: -10, opacity: 0 }}
-                            //     animate={{ y: 0, opacity: 1 }}
-                            //     exit={{ y: 10, opacity: 0 }}
-                            //     transition={{
-                            //         duration: 0.7,
-                            //         delay: 1 / 7,
-                            //     }}
-                            //     style={{
-                            //         height: "100%",
-                            //         animation: "oscillate 8s ease-in-out infinite",
-                            //     }}
-                            // >
+                        data_document?.document?.pdf?.file ?
                             <Button
                                 as={motion.div}
                                 initial={{ y: -10, opacity: 0 }}
@@ -241,18 +240,15 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
                                     colorMode === "light" ? "blue.500" : "blue.600"
                                 }
                                 _hover={{
+                                    cursor: "pointer",
                                     background:
                                         colorMode === "light" ? "blue.400" : "blue.500",
                                 }}
-                                onClick={() => {
-                                    window.open(`${apiEndpoint}${data_document?.document?.pdf?.file}`, "_blank")
-                                }}
+                                onClick={() => downloadPDF()}
                             >
                                 <Box mr={2}><FaFileDownload /></Box>
                                 Download PDF
                             </Button>
-
-                            // </motion.div>
                             : null
                 }
                 <Button
@@ -283,7 +279,7 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
 
                     Generate PDF
                 </Button>
-            </Box>
+            </Flex>
         </Flex>
     )
 }
