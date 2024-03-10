@@ -11,6 +11,8 @@ import {
   Center,
   Button,
   Spinner,
+  useToast,
+  ToastId,
 } from "@chakra-ui/react";
 import { Head } from "../components/Base/Head";
 import { useProjectSearchContext } from "../lib/hooks/ProjectSearchContext";
@@ -20,6 +22,9 @@ import { IoMdAdd } from "react-icons/io";
 import { SearchProjects } from "@/components/Navigation/SearchProjects";
 import { FaDownload } from "react-icons/fa";
 import { downloadProjectsCSV } from "@/lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
+import { AxiosError, AxiosResponse } from "axios";
 
 export const Projects = () => {
   const { colorMode } = useColorMode();
@@ -122,6 +127,67 @@ export const Projects = () => {
   // const user = queryClient.getQueryData<IUserData>(["me"]);
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const toast = useToast();
+  const toastIdRef = useRef<ToastId>();
+  const addToast = (data) => {
+    toastIdRef.current = toast(data);
+  };
+
+
+
+  const downloadProjectCSVMutation = useMutation(downloadProjectsCSV, {
+    onMutate: () => {
+      addToast({
+        status: "loading",
+        title: "Generating Projects CSV",
+        position: "top-right",
+      });
+    },
+    onSuccess: (response: { res: AxiosResponse<any, any> } | Blob) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: `Projects CSV Downloaded`,
+          status: "success",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+        console.log(response)
+        const downloadUrl = window.URL.createObjectURL(response as Blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.setAttribute('download', 'projects.csv');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+      }
+    },
+    onError: (error: AxiosError) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Could Not Generate Projects CSV",
+          description: error?.response?.data
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
+            : "Error",
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  })
+
+  const runDownloadCSVMutation = () => {
+    // () => downloadProjectsCSV()
+    downloadProjectCSVMutation.mutate();
+  }
+
 
   return (
     <>
@@ -155,7 +221,7 @@ export const Projects = () => {
             _hover={{
               background: colorMode === "light" ? "green.400" : "green.500",
             }}
-            onClick={() => downloadProjectsCSV()}
+            onClick={runDownloadCSVMutation}
             leftIcon={<FaDownload />}
           >
             CSV
