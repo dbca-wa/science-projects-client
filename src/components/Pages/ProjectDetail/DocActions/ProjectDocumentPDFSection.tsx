@@ -151,81 +151,61 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
     const { colorMode } = useColorMode();
 
     return (
-        <Flex
-            bg={colorMode === "light" ? "gray.100" : "gray.700"}
-            rounded={"2xl"}
-            p={4}
-            w={"100%"}
-            justifyContent={"space-between"}
-            border={"1px solid"}
-            borderColor={"gray.300"}
-            my={2}
-        >
+        <>
+            {/* <Flex> */}
             <Box
-                alignSelf={"center"}
-            // bg={"red"}
-            // justifyContent={""}
+                as="form"
+                id="cancel-pdf-generation-form"
+                onSubmit={handleCancelGenSubmit(beginCancelDocGen)}
             >
-                <Text fontWeight={"semibold"}>PDF</Text>
+                <Input
+                    type="hidden"
+                    {...cancelGenRegister("document_pk", {
+                        required: true,
+                        value: data_document.document.pk,
+                    })}
+                />
             </Box>
 
-            <Flex>
+            <Box
+                as="form"
+                id="pdf-generation-form"
+                onSubmit={handleGenSubmit(beginProjectDocPDFGeneration)}
+            >
+                <Input
+                    type="hidden"
+                    {...genRegister("document_pk", {
+                        required: true,
+                        value: data_document.document.pk,
+                    })}
+                />
+            </Box>
+            <Flex
+                bg={colorMode === "light" ? "gray.100" : "gray.700"}
+                rounded={"2xl"}
+                p={4}
+                w={"100%"}
+                // justifyContent={"flex-end"}
+                border={"1px solid"}
+                borderColor={"gray.300"}
+                my={2}
+            >
                 <Box
-                    as="form"
-                    id="cancel-pdf-generation-form"
-                    onSubmit={handleCancelGenSubmit(beginCancelDocGen)}
+                    alignSelf={"center"}
+                // bg={"red"}
+                // justifyContent={""}
                 >
-                    <Input
-                        type="hidden"
-                        {...cancelGenRegister("document_pk", {
-                            required: true,
-                            value: data_document.document.pk,
-                        })}
-                    />
+                    <Text fontWeight={"semibold"}>PDF</Text>
                 </Box>
 
-                <Box
-                    as="form"
-                    id="pdf-generation-form"
-                    onSubmit={handleGenSubmit(beginProjectDocPDFGeneration)}
-                >
-                    <Input
-                        type="hidden"
-                        {...genRegister("document_pk", {
-                            required: true,
-                            value: data_document.document.pk,
-                        })}
-                    />
-                </Box>
 
-                {
-                    data_document?.document?.pdf_generation_in_progress ?
-                        <Button
-                            size={"sm"}
-                            ml={2}
-                            variant={"solid"}
-                            color={"white"}
-                            background={
-                                colorMode === "light" ? "gray.400" : "gray.500"
-                            }
-                            _hover={{
-                                background:
-                                    colorMode === "light" ? "gray.300" : "gray.400",
-                            }}
-                            loadingText={"Canceling"}
-                            isDisabled={
-                                cancelDocGenerationMutation.isLoading
-                            }
-                            type="submit"
-                            form="cancel-pdf-generation-form"
-                            isLoading={
-                                cancelDocGenerationMutation.isLoading
-                            }
-                        >
-                            <Box mr={2}><FcCancel /></Box>
-                            Cancel
-                        </Button> :
-                        data_document?.document?.pdf?.file ?
+                <Flex
+                    flex={1}
+                    justifyContent={"flex-end"}
+                    w={"100%"}
+                >
+                    {
+                        (data_document?.document?.pdf?.file && !projectDocPDFGenerationMutation.isLoading ?
                             <Button
                                 as={motion.div}
                                 initial={{ y: -10, opacity: 0 }}
@@ -249,37 +229,66 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
                                 <Box mr={2}><FaFileDownload /></Box>
                                 Download PDF
                             </Button>
-                            : null
-                }
-                <Button
-                    size={"sm"}
-                    ml={2}
-                    variant={"solid"}
-                    color={"white"}
-                    background={
-                        colorMode === "light" ? "green.500" : "green.600"
+                            :
+                            (projectDocPDFGenerationMutation.isLoading || data_document?.document?.pdf_generation_in_progress) ?
+                                <Button
+                                    size={"sm"}
+                                    ml={2}
+                                    variant={"solid"}
+                                    color={"white"}
+                                    background={
+                                        colorMode === "light" ? "gray.400" : "gray.500"
+                                    }
+                                    _hover={{
+                                        background:
+                                            colorMode === "light" ? "gray.300" : "gray.400",
+                                    }}
+                                    loadingText={"Canceling"}
+                                    isDisabled={
+                                        cancelDocGenerationMutation.isLoading
+                                    }
+                                    type="submit"
+                                    form="cancel-pdf-generation-form"
+                                    isLoading={
+                                        cancelDocGenerationMutation.isLoading
+                                    }
+                                >
+                                    <Box mr={2}><FcCancel /></Box>
+                                    Cancel
+                                </Button> : null
+                        )
                     }
-                    _hover={{
-                        background:
-                            colorMode === "light" ? "green.400" : "green.500",
-                    }}
-                    loadingText={"Generation In Progress"}
-                    isDisabled={
-                        projectDocPDFGenerationMutation.isLoading ||
-                        data_document?.document?.pdf_generation_in_progress
-                    }
-                    type="submit"
-                    form="pdf-generation-form"
-                    isLoading={
-                        projectDocPDFGenerationMutation.isLoading ||
-                        data_document?.document?.pdf_generation_in_progress
-                    }
-                >
-                    <Box mr={2}><BsStars /></Box>
 
-                    Generate PDF
-                </Button>
+                    <Button
+                        size={"sm"}
+                        ml={2}
+                        variant={"solid"}
+                        color={"white"}
+                        background={
+                            colorMode === "light" ? "green.500" : "green.600"
+                        }
+                        _hover={{
+                            background:
+                                colorMode === "light" ? "green.400" : "green.500",
+                        }}
+                        loadingText={"Generation In Progress"}
+                        isDisabled={
+                            projectDocPDFGenerationMutation.isLoading ||
+                            data_document?.document?.pdf_generation_in_progress
+                        }
+                        type="submit"
+                        form="pdf-generation-form"
+                        isLoading={
+                            projectDocPDFGenerationMutation.isLoading ||
+                            data_document?.document?.pdf_generation_in_progress
+                        }
+                    >
+                        <Box mr={2}><BsStars /></Box>
+                        Generate PDF
+                    </Button>
+                </Flex>
             </Flex>
-        </Flex>
+        </>
+
     )
 }

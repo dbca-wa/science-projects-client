@@ -178,7 +178,7 @@ export const PDFViewer = ({ thisReport, refetchData }: Props) => {
                     mb={4}
                 >
                     <Center>
-                        <Text>You may download this pdf or create a new one with more recent data in about 30 seconds.</Text>
+                        <Text>You may download this pdf or create a new one with more recent data in under 10 seconds.</Text>
 
                     </Center>
                     <Flex>
@@ -213,7 +213,9 @@ export const PDFViewer = ({ thisReport, refetchData }: Props) => {
                         </Box>
 
                         {
-                            pdfDocumentData?.report?.pdf_generation_in_progress ?
+                            annualReportPDFGenerationMutation.isLoading ||
+                                pdfDocumentData?.report?.pdf_generation_in_progress
+                                ?
                                 <Button
                                     size={"sm"}
                                     ml={2}

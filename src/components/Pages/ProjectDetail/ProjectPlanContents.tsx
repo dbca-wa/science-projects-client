@@ -1,6 +1,10 @@
 // Maps out the document provided to the rich text editor components for project plan documents.
 
 import { Box, Grid, Text, useColorMode } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
+import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
 import {
   IProjectAreas,
   IProjectDocuments,
@@ -9,12 +13,10 @@ import {
   IUserMe,
 } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { ProjectPlanDocActions } from "./DocActions/ProjectPlanDocActions";
-import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
-import { ProjectPlanEndorsements } from "./ProjectPlanEndorsements";
-import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
-import { motion } from "framer-motion";
 import { CommentSection } from "./CommentSection";
+import { ProjectPlanDocActions } from "./DocActions/ProjectPlanDocActions";
+import { MethodologyImage } from "./MethodologyImage";
+import { ProjectPlanEndorsements } from "./ProjectPlanEndorsements";
 
 interface Props {
   document: IProjectPlan | null;
@@ -36,13 +38,20 @@ export const ProjectPlanContents = ({
   projectAreas,
 }: Props) => {
   const { colorMode } = useColorMode();
-
+  useEffect(() => console.log(console.log(document)
+  ))
   const documentType = "projectplan";
   const editorKey = colorMode + documentType;
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
   const userIsLeader = useCheckUserIsTeamLeader(mePk, members);
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
+    document?.methodology_image?.file
+  );
+
 
   return (
     <motion.div
@@ -154,6 +163,21 @@ export const ProjectPlanContents = ({
         data={document?.methodology}
         section={"methodology"}
       />
+
+
+      {/* <MethodologyImageDisplay /> */}
+      <MethodologyImage
+        refetch={refetch}
+        document={document}
+        helperText={
+          "Upload an image for the methodology (Optional)"
+        }
+        selectedImageUrl={selectedImageUrl}
+        setSelectedImageUrl={setSelectedImageUrl}
+        selectedFile={selectedFile}
+        setSelectedFile={setSelectedFile}
+      />
+
       <RichTextEditor
         canEdit={userInTeam || userData?.is_superuser}
         document_pk={document?.document?.pk}

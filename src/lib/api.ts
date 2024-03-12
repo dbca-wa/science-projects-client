@@ -1732,9 +1732,8 @@ export const saveHtmlToDB = async (
             ).then(res => res.data);
 
         }
-
-
     }
+
     else if (editorType === "ProjectDocument") {
         const data = {
             "html": htmlData,
@@ -1784,8 +1783,56 @@ export const saveHtmlToDB = async (
         ).then(res => res.data);
 
     }
+}
 
+export interface IHandleMethodologyImage {
+    kind: string;
+    project_plan_pk: number;
 
+    file: string | File | null;
+}
+
+export const handleMethodologyImage = async ({ kind, project_plan_pk, file }: IHandleMethodologyImage) => {
+    if (kind === "update" || kind === "post") {
+        const newFormData = new FormData();
+        if (file !== null) {
+            console.log(file)
+            if (file instanceof File) {
+                console.log('is file')
+                newFormData.append('file', file);
+            } else if (typeof file === 'string') {
+                console.log('is string')
+                newFormData.append('file', file);
+            }
+        }
+        newFormData.append('pk', project_plan_pk.toString());
+
+        if (kind === "update") {
+            return instance.put(
+                `medias/methodology_photos/${project_plan_pk}`,
+                newFormData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            ).then(res => res.data);
+        } else if (kind === "post") {
+            return instance.post(
+                `medias/methodology_photos`,
+                newFormData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            ).then(res => res.data);
+        }
+    }
+    else if (kind === "delete") {
+        return instance.delete(
+            `medias/methodology_photos/${project_plan_pk}`).then(res => res.data);
+    }
 }
 
 

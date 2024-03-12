@@ -5,11 +5,12 @@ import { useLatestYearsActiveProgressReports } from "@/lib/hooks/useLatestYearsA
 import { useLatestYearsActiveStudentProjects } from "@/lib/hooks/useLatestYearsActiveStudentProjects";
 import { useUser } from "@/lib/hooks/useUser";
 import { Accordion, AccordionButton, AccordionItem, AccordionPanel, Box, Center, Spinner, Text, useColorMode } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { JSXElementConstructor, ReactElement, useEffect } from "react";
 import whitePaperBackground from "@/images/white-texture.jpg"
 import { RiBook3Fill } from "react-icons/ri";
 import { MdScience } from "react-icons/md";
 import { ARStudentReportHandler } from "@/components/RichTextEditor/Editors/ARStudentReportHandler";
+import { render } from "@react-email/render";
 
 
 export const ParticipatingProjectReports = () => {
@@ -17,6 +18,15 @@ export const ParticipatingProjectReports = () => {
   const { latestProgressReportsData, latestProgressReportsLoading } = useLatestYearsActiveProgressReports();
 
   const { latestStudentReportsData, latestStudentReportsLoading } = useLatestYearsActiveStudentProjects();
+
+  const getHTML = (children: ReactElement<any, string | JSXElementConstructor<any>>) => {
+    const html = render(children, {
+      pretty: true,
+    });
+
+    console.log(html);
+
+  }
 
   useEffect(() => {
     if (!latestProgressReportsLoading && !latestStudentReportsLoading) {

@@ -341,8 +341,8 @@ export const ProjectPlanEndorsements = ({
               borderColor={"gray.300"}
               p={4}
               rounded={"xl"}
-              roundedTop={0}
-              borderTop={0}
+            // roundedTop={0}
+            // borderTop={0}
             // roundedBottom={0}
             >
               <Flex

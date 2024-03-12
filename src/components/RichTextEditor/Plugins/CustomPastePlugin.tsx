@@ -82,6 +82,8 @@ export function $insertGeneratedNodes(
       selection,
     })
   ) {
+    console.log("NODES:")
+    console.log(nodes)
     selection.insertNodes(nodes);
   }
   return;
@@ -1034,7 +1036,7 @@ function $insertDataTransferForRichText(
           const levelOnes = [];
           const levelTwos = [];
           const levelThrees = [];
-          while (currentNode !== end.nextElementSibling) {
+          while (currentNode !== end.nextElementSibling && currentNode !== null) {
             processed.push(currentNode);
             if (
               currentNode.getAttribute("style").includes("level2") &&
@@ -1079,8 +1081,8 @@ function $insertDataTransferForRichText(
             const processed = [];
             let currentThree = three;
             while (
-              !processed.includes(currentThree) &&
               currentThree !== null &&
+              !processed.includes(currentThree) &&
               (currentThree as Element).getAttribute("style").includes("level3")
             ) {
               processed.push(currentThree);
