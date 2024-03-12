@@ -290,6 +290,18 @@ interface IConceptPlan {
     budget: string | null;
 }
 
+interface IMethodologyImage {
+    pk: number;
+    file: string;
+    project_plan: {
+        "id": number;
+    };
+    uploader: {
+        "id": number;
+        "username": string;
+    }
+}
+
 interface IProjectPlan {
     pk: number;
     document: IMainDoc;
@@ -303,6 +315,7 @@ interface IProjectPlan {
     operating_budget: string | null;
     operating_budget_external: string | null;
     methodology: string | null;
+    methodology_image: IMethodologyImage | null;
     project_tasks: string | null;
     related_projects: string | null;
     endorsements: IEndorsement;
