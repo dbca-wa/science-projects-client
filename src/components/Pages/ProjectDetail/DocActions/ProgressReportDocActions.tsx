@@ -987,7 +987,7 @@ export const ProgressReportDocActions = ({
                 </Grid>
 
                 {/* PDF and email buttons */}
-                <ProjectDocumentPDFSection data_document={progressReportData} refetchData={refetchData} />
+                <ProjectDocumentPDFSection data_document={progressReportData} refetchData={callSameData} />
 
 
               </Grid>
