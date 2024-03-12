@@ -263,7 +263,7 @@ export const ProjectDetail = ({
                     Project Plan
                   </Tab>
                 )}
-                {documents?.progress_reports &&
+                {!isLoading && documents?.progress_reports &&
                   documents.progress_reports.length !== 0 && (
                     <Tab
                       fontSize="sm"
@@ -275,7 +275,7 @@ export const ProjectDetail = ({
                       Progress Reports
                     </Tab>
                   )}
-                {documents?.student_reports &&
+                {!isLoading && documents?.student_reports &&
                   documents.student_reports.length !== 0 && (
                     <Tab
                       fontSize="sm"

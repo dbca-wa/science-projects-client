@@ -991,7 +991,7 @@ export const StudentReportDocActions = ({
                 </Grid>
 
                 {/* PDF and email buttons */}
-                <ProjectDocumentPDFSection data_document={studentReportData} refetchData={refetchData} />
+                <ProjectDocumentPDFSection data_document={studentReportData} refetchData={callSameData} />
 
               </Grid>
             </Box>

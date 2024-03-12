@@ -57,11 +57,11 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
                 window.open(fileUrl, "_blank")
             }
 
-            queryClient.invalidateQueries(["projects", data_document.document.project.pk]);
-
-            // setTimeout(() => {
-            //     refetchData();
-            // }, 1000);
+            console.log(data_document)
+            queryClient.invalidateQueries(["projects", data_document?.document?.project?.pk]);
+            setTimeout(() => {
+                refetchData();
+            }, 1000);
         },
         onError: (error: AxiosError) => {
             if (toastIdRef.current) {
@@ -101,10 +101,9 @@ export const ProjectDocumentPDFSection = ({ data_document, refetchData }: IPDFSe
                 });
             }
             queryClient.invalidateQueries(["projects", data_document.document.project.pk]);
-
-            // setTimeout(() => {
-            //     refetchData();
-            // }, 1000);
+            setTimeout(() => {
+                refetchData();
+            }, 1000);
         },
         onError: (error: AxiosError) => {
             if (toastIdRef.current) {
