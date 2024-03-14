@@ -1,4 +1,4 @@
-import { IDocGen, cancelAnnualReportPDF, cancelProjectDocumentGeneration, generateAnnualReportPDF, generateProjectDocument } from "@/lib/api";
+import { IDocGen, cancelAnnualReportPDF, generateAnnualReportPDF } from "@/lib/api";
 import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 import { useGetAnnualReportPDF } from "@/lib/hooks/useGetAnnualReportPDF";
 import { IReport } from "@/types";
@@ -14,10 +14,12 @@ import { FcCancel } from "react-icons/fc";
 
 interface Props {
     thisReport: IReport;
-    refetchData: () => void;
+    // refetchData: () => void;
 }
 
-export const PDFViewer = ({ thisReport, refetchData }: Props) => {
+export const PDFViewer = ({ thisReport,
+    // refetchData 
+}: Props) => {
 
     const { register: genRegister, handleSubmit: handleGenSubmit } = useForm<IDocGen>();
     const { register: cancelGenRegister, handleSubmit: handleCancelGenSubmit } = useForm<IDocGen>();
@@ -142,7 +144,7 @@ export const PDFViewer = ({ thisReport, refetchData }: Props) => {
 
     useEffect(() => {
         if (!pdfDocumentDataLoading) {
-            console.log(pdfDocumentData);
+            // console.log(pdfDocumentData);
             const binary = atob(pdfDocumentData?.pdf_data);
             const arrayBuffer = new ArrayBuffer(binary.length);
             const uint8Array = new Uint8Array(arrayBuffer);
@@ -154,7 +156,7 @@ export const PDFViewer = ({ thisReport, refetchData }: Props) => {
             const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
             const dataUrl = URL.createObjectURL(blob);
 
-            console.log(dataUrl);
+            // console.log(dataUrl);
             setBinaryPdfData(dataUrl);
 
         }
