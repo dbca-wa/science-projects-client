@@ -29,7 +29,7 @@ const buttonWidthVariants = {
     transition: { duration: 0.5 },
   },
   closed: {
-    width: "100%",
+    width: "50%",
     transition: { duration: 0.5 },
   },
 };
@@ -48,7 +48,7 @@ const textVariants = {
   closed: {
     opacity: 0,
     width: 0,
-    marginLeft: "3rem",
+    // marginLeft: "3rem",
     transition: {
       duration: 0,
     },
@@ -118,6 +118,7 @@ export const Sidebar = () => {
       animate={open ? "open" : "closed"}
       pos={"relative"}
       p={"1.25rem"}
+      px={open ? "1.25rem" : 4}
       pt={"0.5rem"}
       maxW={"12.5rem"}
       minH={"100vh"}
@@ -174,7 +175,13 @@ export const Sidebar = () => {
         </Button>
       </Flex>
 
-      <Grid pt={2} flexDirection={"column"} transitionDuration={"500ms"}>
+      <Grid
+        pt={2}
+        flexDirection={"column"}
+        justifyItems="center"
+        transitionDuration={"500ms"}
+
+      >
         {Menus.map((menu, index) => (
           <Box key={index} width={"100%"}>
             {menu.section && (
@@ -191,23 +198,25 @@ export const Sidebar = () => {
               initial={false}
               animate={buttonTransition}
               position={"relative"}
-              display="block"
+              display={"block"}
+              // display="inline-block"
               overflow={"hidden"}
               fontSize={"0.875rem"}
               lineHeight={"1.25rem"}
               borderRadius={"0.375rem"}
               cursor={"pointer"}
               mt={"0.5rem"}
-              variant={"unstyled"}
               p={"0.5rem"}
+              // px={open ? "1.25rem" : 0}
+              variant={"unstyled"}
               bg={
                 colorMode === "light"
                   ? activeMenu === menu.title
                     ? "blue.500"
                     : undefined
                   : activeMenu === menu.title
-                  ? "blue.500"
-                  : undefined
+                    ? "blue.500"
+                    : undefined
               }
               color={
                 colorMode === "light"
@@ -215,26 +224,26 @@ export const Sidebar = () => {
                     ? "white"
                     : "blackAlpha.800"
                   : activeMenu === menu.title
-                  ? "whiteAlpha.800"
-                  : "whiteAlpha.800"
+                    ? "whiteAlpha.800"
+                    : "whiteAlpha.800"
               }
               _hover={
                 colorMode === "light"
                   ? activeMenu === menu.title
                     ? {
-                        color: "white",
-                        bg: "blue.500",
-                      }
+                      color: "white",
+                      bg: "blue.500",
+                    }
                     : {
-                        color: "black",
-                        bg: "gray.100",
-                      }
+                      color: "black",
+                      bg: "gray.100",
+                    }
                   : activeMenu === menu.title
-                  ? {
+                    ? {
                       color: "whiteAlpha.800",
                       bg: "blue.400",
                     }
-                  : {
+                    : {
                       color: "whiteAlpha.800",
                       bg: "blue.400",
                     }

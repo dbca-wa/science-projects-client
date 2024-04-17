@@ -34,6 +34,7 @@ export const PDFViewer = ({ thisReport,
     };
     const annualReportPDFGenerationMutation = useMutation(generateAnnualReportPDF, {
         onMutate: () => {
+
             addToast({
                 status: "loading",
                 title: "Generating AR PDF",
@@ -41,6 +42,7 @@ export const PDFViewer = ({ thisReport,
             });
         },
         onSuccess: (response: { res: AxiosResponse<any, any> }) => {
+
             if (toastIdRef.current) {
                 toast.update(toastIdRef.current, {
                     title: "Success",
@@ -165,7 +167,7 @@ export const PDFViewer = ({ thisReport,
     const determineDPI = () => {
         const dpi = 300;
         const heightMm = 297;
-        const mmInInch = 25.4
+        const mmInInch = 25.4;
         // Pixels: Amount in mm divided by 25.4 (conv fact. for mm to inches) by dpi
         const pixels = (heightMm / mmInInch) * dpi;
         return pixels;
@@ -215,7 +217,8 @@ export const PDFViewer = ({ thisReport,
                         </Box>
 
                         {
-                            annualReportPDFGenerationMutation.isLoading ||
+                            annualReportPDFGenerationMutation.isLoading
+                                ||
                                 pdfDocumentData?.report?.pdf_generation_in_progress
                                 ?
                                 <Button
@@ -305,7 +308,7 @@ export const PDFViewer = ({ thisReport,
                     title="Annual Report PDF Viewer"
                     src={binaryPdfData}
                     width="100%"
-                    height={`${determineDPI()}px`}
+                    height={`${determineDPI() / 4}px`}
                     style={{ border: '1px solid black', borderRadius: "20px" }}
                 ></iframe>
             </Box>
