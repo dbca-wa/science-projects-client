@@ -1,3 +1,4 @@
+import { IUserMe } from "@/types";
 import {
   Body,
   Button,
@@ -6,7 +7,6 @@ import {
   Heading,
   Hr,
   Html,
-  Link,
   Preview,
   Section,
   Tailwind,
@@ -14,7 +14,12 @@ import {
   Img,
 } from "@react-email/components";
 
-export const ProjectClosureEmail = () => {
+interface Props {
+  userData: IUserMe;
+}
+
+
+export const ProjectClosureEmail = ({ userData }: Props) => {
   return (
     <Html>
       <Head />
@@ -38,7 +43,7 @@ export const ProjectClosureEmail = () => {
             </Heading>
             <Text className="text-black text-[14px] leading-[24px]">
               {/* Hello {username}, */}
-              Hello Jarid Prince,
+              Hello {userData?.first_name} {userData?.last_name},
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
               Closure of your project <strong>'Some Project'</strong> has been
@@ -63,7 +68,7 @@ export const ProjectClosureEmail = () => {
             <Text className="text-[#666666] text-[12px] leading-[24px]">
               This automated message was intended for{" "}
               <span className="text-black">
-                Jarid Prince
+                {userData?.first_name} {userData?.last_name}
                 {/* {username} */}
               </span>
               . If you believe this was sent by mistake, you can ignore this

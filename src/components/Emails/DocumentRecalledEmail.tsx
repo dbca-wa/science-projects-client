@@ -1,3 +1,4 @@
+import { IUserMe } from "@/types";
 import {
     Body,
     Button,
@@ -14,7 +15,11 @@ import {
     Text,
 } from "@react-email/components";
 
-export const DocumentRecalledEmail = () => {
+interface Props {
+    userData: IUserMe;
+}
+
+export const DocumentRecalledEmail = ({ userData }: Props) => {
     return (
         <Html>
             <Head />
@@ -37,18 +42,18 @@ export const DocumentRecalledEmail = () => {
                         </Heading>
                         <Text className="text-black text-[14px] leading-[24px]">
                             {/* Hello {username}, */}
-                            Hello Jarid Prince,
+                            Hello {userData?.first_name} {userData?.last_name},
                         </Text>
                         <Text className="text-black text-[14px] leading-[24px]">
                             {/* <strong>{invitedByUsername}</strong>  */}
-                            <strong>Rory McAuley</strong> (
+                            <strong>Jarid Prince</strong> (
                             <Link
                                 // href={`mailto:${invitedByEmail}`}
-                                href={`mailto:rory.mcauley@dbca.wa.gov.au`}
+                                href={`mailto:jarid.prince@dbca.wa.gov.au`}
                                 className="text-blue-600 no-underline"
                             >
                                 {/* {invitedByEmail} */}
-                                rory.mcauley@dbca.wa.gov.au
+                                jarid.prince@dbca.wa.gov.au
                             </Link>
                             ) has recalled a document from approval for project{" "}
                             <strong>'{"Some Project"}'</strong>.
@@ -71,7 +76,7 @@ export const DocumentRecalledEmail = () => {
                         <Text className="text-[#666666] text-[12px] leading-[24px]">
                             This automated message was intended for{" "}
                             <span className="text-black">
-                                Jarid Prince
+                                {userData?.first_name} {userData?.last_name}
                                 {/* {username} */}
                             </span>
                             . If you believe this was sent by mistake, you can ignore this

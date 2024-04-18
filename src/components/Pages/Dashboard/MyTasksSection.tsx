@@ -48,26 +48,26 @@ export const MyTasksSection = ({
   //   endorsementTaskDataLoading,
   documentTaskData,
 }: //   documentTaskDataLoading,
-ITaskSection) => {
+  ITaskSection) => {
   const { colorMode } = useColorMode();
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    // console.log({
-    //   personalTaskData,
-    //   endorsementTaskData,
-    //   documentTaskData,
-    // });
+    console.log({
+      personalTaskData,
+      endorsementTaskData,
+      documentTaskData,
+    });
     personalTaskData &&
       endorsementTaskData &&
       documentTaskData &&
       setTotal(
         personalTaskData?.todo?.length +
-          personalTaskData?.inprogress?.length +
-          endorsementTaskData.aec.length +
-          endorsementTaskData.bm.length +
-          endorsementTaskData.hc.length +
-          documentTaskData?.all?.length
+        personalTaskData?.inprogress?.length +
+        endorsementTaskData.aec.length +
+        // endorsementTaskData.bm.length +
+        // endorsementTaskData.hc.length +
+        documentTaskData?.all?.length
       );
   }, [personalTaskData, endorsementTaskData, documentTaskData]);
 
@@ -124,7 +124,7 @@ ITaskSection) => {
   ) : (
     <Flex flexDir={"column"} w={"100%"} h={"100%"}>
       {personalTaskData &&
-      [...personalTaskData.todo, ...personalTaskData.inprogress].length >= 1 ? (
+        [...personalTaskData.todo, ...personalTaskData.inprogress].length >= 1 ? (
         <>
           <Box position="relative" padding="10">
             <Divider />
@@ -188,15 +188,15 @@ ITaskSection) => {
       ) : null}
 
       {documentTaskData?.team &&
-      documentTaskData?.directorate &&
-      documentTaskData?.ba &&
-      documentTaskData?.lead &&
-      [
-        ...documentTaskData.team,
-        ...documentTaskData.lead,
-        ...documentTaskData.directorate,
-        ...documentTaskData.ba,
-      ].length >= 1 ? (
+        documentTaskData?.directorate &&
+        documentTaskData?.ba &&
+        documentTaskData?.lead &&
+        [
+          ...documentTaskData.team,
+          ...documentTaskData.lead,
+          ...documentTaskData.directorate,
+          ...documentTaskData.ba,
+        ].length >= 1 ? (
         <>
           <Box position="relative" padding="10">
             <Divider />
@@ -232,13 +232,13 @@ ITaskSection) => {
       ) : null}
 
       {endorsementTaskData?.aec &&
-      endorsementTaskData?.bm &&
-      endorsementTaskData?.hc &&
-      [
-        ...endorsementTaskData.aec,
-        ...endorsementTaskData.bm,
-        ...endorsementTaskData.hc,
-      ].length >= 1 ? (
+        endorsementTaskData?.bm &&
+        endorsementTaskData?.hc &&
+        [
+          ...endorsementTaskData.aec,
+          ...endorsementTaskData.bm,
+          ...endorsementTaskData.hc,
+        ].length >= 1 ? (
         <>
           <Box position="relative" padding="10">
             <Divider />

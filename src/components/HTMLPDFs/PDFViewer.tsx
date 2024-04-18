@@ -4,7 +4,7 @@ import { useGetAnnualReportPDF } from "@/lib/hooks/useGetAnnualReportPDF";
 import { IReport } from "@/types";
 import { Box, Button, Center, Flex, Input, Spinner, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -41,8 +41,7 @@ export const PDFViewer = ({ thisReport,
                 position: "top-right",
             });
         },
-        onSuccess: (response: { res: AxiosResponse<any, any> }) => {
-
+        onSuccess: () => {
             if (toastIdRef.current) {
                 toast.update(toastIdRef.current, {
                     title: "Success",
@@ -53,19 +52,7 @@ export const PDFViewer = ({ thisReport,
                     isClosable: true,
                 });
             }
-            // console.log(response);
-            // console.log(response.res)
-            // const fileUrl = `${apiEndpoint}${response.res.data.file}`;
-
-            // if (fileUrl) {
-            //     window.open(fileUrl, "_blank")
-            // }
-
             queryClient.invalidateQueries(["annualReportPDF", thisReport?.pk ? thisReport.pk : thisReport.id]);
-
-            // setTimeout(() => {
-            //     refetchData();
-            // }, 1000);
         },
         onError: (error: AxiosError) => {
             if (toastIdRef.current) {

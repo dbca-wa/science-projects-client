@@ -39,7 +39,7 @@ import { AiFillProject } from "react-icons/ai";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { CgViewList } from "react-icons/cg";
 import { ImBriefcase, ImUsers } from "react-icons/im";
-import { FaAddressCard, FaFilePdf, FaLocationArrow, FaUserPlus } from "react-icons/fa";
+import { FaAddressCard, FaLocationArrow, FaUserPlus } from "react-icons/fa";
 
 import { Navitar } from "./Navitar";
 import { SidebarNavMenu } from "./SidebarNavMenu";
@@ -53,9 +53,13 @@ import {
   MdManageHistory,
   MdOutlineAccessTimeFilled,
   MdOutlineSettingsSuggest,
+  MdVerifiedUser,
 } from "react-icons/md";
 import { GoOrganization } from "react-icons/go";
-import { FcApproval, FcDataBackup } from "react-icons/fc";
+import {
+  FcApproval,
+  // FcDataBackup
+} from "react-icons/fc";
 import { VscFeedback } from "react-icons/vsc";
 import { HiDocumentPlus } from "react-icons/hi2";
 import { BatchApproveModal } from "../Modals/BatchApproveModal";
@@ -178,7 +182,9 @@ interface AdminProps {
   handleBatchApproveReports: () => void;
   handleBatchApproveOldReports: () => void;
 }
-const AdminMenuContents = ({ handleDataDump, handleNewReportCycle, handleBatchApproveReports, handleBatchApproveOldReports }: AdminProps) => {
+const AdminMenuContents = ({
+  // handleDataDump, 
+  handleNewReportCycle, handleBatchApproveReports, handleBatchApproveOldReports }: AdminProps) => {
   const navigate = useNavigate();
   return (
     <>
@@ -241,16 +247,6 @@ const AdminMenuContents = ({ handleDataDump, handleNewReportCycle, handleBatchAp
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate("/crud/pdfs");
-          }}
-        >
-          {<FaFilePdf />}
-          <Text ml={2}>Pdfs</Text>
-        </MenuItem>
-
-
-        <MenuItem
-          onClick={() => {
             navigate("/crud/reports");
           }}
         >
@@ -279,14 +275,14 @@ const AdminMenuContents = ({ handleDataDump, handleNewReportCycle, handleBatchAp
         color={"gray.500"}
         textAlign={"center"}
       >
-        <MenuItem onClick={handleDataDump}>
+        {/* <MenuItem onClick={handleDataDump}>
           {<FcDataBackup />}
           <Text ml={2}>Dump Data</Text>
-        </MenuItem>
+        </MenuItem> */}
 
 
         <MenuItem onClick={handleBatchApproveOldReports}>
-          {<FcApproval />}
+          {<MdVerifiedUser />}
           <Text ml={2}>Batch Approve Old Reports</Text>
         </MenuItem>
         <MenuItem onClick={handleBatchApproveReports}>

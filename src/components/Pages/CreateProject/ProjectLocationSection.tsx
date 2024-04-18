@@ -6,7 +6,6 @@ import {
   Flex,
   Grid,
   useColorMode,
-  Center,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
@@ -83,7 +82,7 @@ export const ProjectLocationSection = ({
       {!locationsLoading && (
         <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridColumnGap={4} px={36}>
           {dbcaDistricts && dbcaDistricts.length > 0 && (
-            <Center
+            <Flex
               display={"flex"}
               justifyContent={"center"}
               alignContent={"center"}
@@ -97,13 +96,13 @@ export const ProjectLocationSection = ({
                 selectedAreas={selectedDistricts}
                 setSelectedAreas={setSelectedDistricts}
               />
-            </Center>
+            </Flex>
           )}
           {/* <Flex flexDir={"column"}> */}
           {/* <Flex flexDir={"column"}> */}
 
           {imcra && imcra.length > 0 && (
-            <Center
+            <Flex
               display={"flex"}
               justifyContent={"center"}
               alignContent={"center"}
@@ -117,10 +116,10 @@ export const ProjectLocationSection = ({
                 selectedAreas={selectedImcras}
                 setSelectedAreas={setSelectedImcras}
               />
-            </Center>
+            </Flex>
           )}
           {dbcaRegions && dbcaRegions.length > 0 && (
-            <Center
+            <Flex
               display={"flex"}
               justifyContent={"center"}
               alignContent={"center"}
@@ -134,7 +133,7 @@ export const ProjectLocationSection = ({
                 selectedAreas={selectedRegions}
                 setSelectedAreas={setSelectedRegions}
               />
-            </Center>
+            </Flex>
           )}
           {nrm && nrm.length > 0 && (
             <Flex
@@ -155,7 +154,7 @@ export const ProjectLocationSection = ({
             </Flex>
           )}
           {ibra && ibra.length > 0 && (
-            <Center
+            <Flex
               display={"flex"}
               justifyContent={"center"}
               alignContent={"center"}
@@ -169,15 +168,15 @@ export const ProjectLocationSection = ({
                 selectedAreas={selectedIbras}
                 setSelectedAreas={setSelectedIbras}
               />
-            </Center>
+            </Flex>
           )}
           <Flex
             w={"100%"}
             justifyContent={"flex-end"}
             pb={4}
             pt={10}
-            // pr={"200px"}
-            // bg={"red"}
+          // pr={"200px"}
+          // bg={"red"}
           >
             <Grid mr={4}>
               <></>
@@ -213,13 +212,13 @@ export const ProjectLocationSection = ({
                   }}
                   rightIcon={
                     projectType.includes("External") ||
-                    projectType.includes("Student") ? undefined : (
+                      projectType.includes("Student") ? undefined : (
                       <IoIosCreate />
                     )
                   }
                 >
                   {projectType.includes("External") ||
-                  projectType.includes("Student")
+                    projectType.includes("Student")
                     ? `Next`
                     : `Create`}
                 </Button>

@@ -26,7 +26,6 @@ import { AddressesCRUD } from "./components/Pages/Admin/AddressesCRUD";
 import { BranchesCRUD } from "./components/Pages/Admin/BranchesCRUD";
 import { UserFeedbackPage } from "./components/Pages/Admin/UserFeedbackPage";
 import { TestEmailPage } from "./routes/TestEmailPage";
-import { TestPDFGenerationPage } from "./routes/TestPDFGenerationPage";
 
 export const router = createBrowserRouter([
   // Login
@@ -140,18 +139,6 @@ export const router = createBrowserRouter([
           <ContentWrapper>
             <AdminOnlyPage>
               <TestEmailPage />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-
-
-      {
-        path: "crud/pdfs",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <TestPDFGenerationPage />
             </AdminOnlyPage>
           </ContentWrapper>
         ),
