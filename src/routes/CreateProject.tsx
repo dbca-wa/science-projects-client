@@ -104,9 +104,8 @@ export const CreateProject = () => {
           templateColumns={{
             base: "repeat(1, 1fr)",
             "768px": "repeat(2, 1fr)",
-            "1240px": layout === "modern" ? "repeat(4, 1fr)" : "repeat(2, 1fr)",
-            // "1500px": "repeat(4, 1fr)",
-            // "2xl": "repeat(4, 1fr)",
+            "1240px": layout === "modern" ? "repeat(2, 1fr)" : "repeat(2, 1fr)",
+            "2xl": "repeat(4, 1fr)",
           }}
           gap={12}
           userSelect={"none"}

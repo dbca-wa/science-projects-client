@@ -115,7 +115,7 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
         />
       </InputGroup>
       <FormHelperText color={colorMode === "light" ? "gray.500" : "gray.400"}>
-        Add some keywords as a comma-separated list. Press space after a comma
+        Add some keywords as a comma-separated list. Press space or enter after a comma
         to add the tag.
       </FormHelperText>
       <Flex flexWrap="wrap" gap={2} pt={3}>

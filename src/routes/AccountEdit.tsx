@@ -11,7 +11,7 @@ import { PublicProfilePage } from "@/components/Pages/Account/PublicProfilePage"
 export const AccountEdit = () => {
   const { colorMode } = useColorMode();
 
-  const [selected, setSelected] = useState("profile");
+  const [selected, setSelected] = useState("spmsprofile");
   const [pageViewChildren, setPageViewChildren] = useState<React.ReactNode>(
     <>Test</>
   );
@@ -48,8 +48,8 @@ export const AccountEdit = () => {
       <Flex
         h={"100%"}
         w={"100%"}
-        //
-        // bg={"yellow"}
+      //
+      // bg={"yellow"}
       >
         {/* Content */}
         <AccountPageViewWrapper children={pageViewChildren} />

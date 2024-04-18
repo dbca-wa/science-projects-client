@@ -29,7 +29,7 @@ const buttonWidthVariants = {
     transition: { duration: 0.5 },
   },
   closed: {
-    width: "50%",
+    width: "100%",
     transition: { duration: 0.5 },
   },
 };

@@ -20,18 +20,24 @@ import {
   sendProjectClosureEmail,
   sendReviewProjectDocumentEmail,
 } from "@/lib/api";
+import { useUser } from "@/lib/hooks/useUser";
 import {
   Box,
   Button,
+  Center,
   Flex,
   Grid,
+  Spinner,
   Text,
   ToastId,
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
 import { render } from "@react-email/render";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  //  useQueryClient 
+} from "@tanstack/react-query";
 import { useRef } from "react";
 
 interface IWrapper {
@@ -47,12 +53,12 @@ interface IWrapper {
       | IDocumentRecalled
   ) => Promise<any>; // Allow props to be optional
   props?:
-    | IReviewDocumentEmail
-    | INewCycleEmail
-    | IProjectClosureEmail
-    | IDocumentReadyEmail
-    | IDocumentApproved
-    | IDocumentRecalled;
+  | IReviewDocumentEmail
+  | INewCycleEmail
+  | IProjectClosureEmail
+  | IDocumentReadyEmail
+  | IDocumentApproved
+  | IDocumentRecalled;
 }
 
 const EmailWrapper = ({
@@ -62,7 +68,7 @@ const EmailWrapper = ({
   props,
 }: IWrapper) => {
   const { colorMode } = useColorMode();
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   // const { register, handleSubmit, reset } = useForm<ITestEmail>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
@@ -144,7 +150,7 @@ const EmailWrapper = ({
         border={"1px solid"}
         borderColor={"gray.300"}
         rounded={"xl"}
-        // bg={colorMode === "light" ? "gray.200" : "gray.700"}
+      // bg={colorMode === "light" ? "gray.200" : "gray.700"}
       >
         {children}
       </Box>
@@ -175,104 +181,113 @@ const EmailWrapper = ({
 };
 
 export const TestEmailPage = () => {
+  const { userLoading, userData } = useUser();
+
+
+
+
   return (
-    <Box>
-      <Text fontWeight={"bold"} fontSize={"xl"}>
-        See below for emails templates
-      </Text>
-      <Grid
-        pt={8}
-        gridTemplateColumns={{
-          base: "repeat(1, 1fr)",
-          lg: "repeat(2, 1fr)",
-          "2xl": "repeat(3, 1fr)",
-        }}
-        gridGap={4}
-        gridRowGap={8}
-      >
-        <EmailWrapper
-          templateName={"Review Document"}
-          emailFunction={sendReviewProjectDocumentEmail}
-          props={{
-            recipients_list: [101073],
-            project_pk: 4,
-            document_kind: "concept",
-          }}
-        >
-          <ReviewDocumentEmail />
-        </EmailWrapper>
+    (userLoading && !userData) ?
+      <Center><Spinner /></Center> : (
+        <Box>
+          <Text fontWeight={"bold"} fontSize={"xl"}>
+            See below for emails templates
+          </Text>
+          <Grid
+            pt={8}
+            gridTemplateColumns={{
+              base: "repeat(1, 1fr)",
+              lg: "repeat(2, 1fr)",
+              "2xl": "repeat(3, 1fr)",
+            }}
+            gridGap={4}
+            gridRowGap={8}
+          >
+            <EmailWrapper
+              templateName={"Review Document"}
+              emailFunction={sendReviewProjectDocumentEmail}
+              props={{
+                recipients_list: [101073],
+                project_pk: 4,
+                document_kind: "concept",
+              }}
+            >
+              <ReviewDocumentEmail userData={userData} />
+            </EmailWrapper>
 
-        <EmailWrapper
-          templateName={"New Reporting Cycle"}
-          emailFunction={sendNewReportingCycleOpenEmail}
-          props={{
-            financial_year: 2024,
-            include_projects_with_status_updating: false,
-          }}
-        >
-          <NewCycleOpenEmail />
-        </EmailWrapper>
+            <EmailWrapper
+              templateName={"New Reporting Cycle"}
+              emailFunction={sendNewReportingCycleOpenEmail}
+              props={{
+                financial_year: 2024,
+                include_projects_with_status_updating: false,
+              }}
+            >
+              <NewCycleOpenEmail userData={userData} />
+            </EmailWrapper>
 
-        <EmailWrapper
-          templateName={"Project Closure"}
-          emailFunction={sendProjectClosureEmail}
-          props={{
-            project_pk: 20,
-          }}
-        >
-          <ProjectClosureEmail />
-        </EmailWrapper>
+            <EmailWrapper
+              templateName={"Project Closure"}
+              emailFunction={sendProjectClosureEmail}
+              props={{
+                project_pk: 20,
+              }}
+            >
+              <ProjectClosureEmail userData={userData} />
+            </EmailWrapper>
 
-        <EmailWrapper
-          templateName={"Document Ready"}
-          emailFunction={sendDocumentReadyEmail}
-          props={{
-            recipients_list: [101073],
-            project_pk: 4,
-            document_kind: "concept",
-          }}
-        >
-          <DocumentReadyForEditingEmail />
-        </EmailWrapper>
+            <EmailWrapper
+              templateName={"Document Ready"}
+              emailFunction={sendDocumentReadyEmail}
+              props={{
+                recipients_list: [101073],
+                project_pk: 4,
+                document_kind: "concept",
+              }}
+            >
+              <DocumentReadyForEditingEmail userData={userData} />
+            </EmailWrapper>
 
-        <EmailWrapper
-          templateName={"Document Sent Back"}
-          emailFunction={sendDocumentSentBackEmail}
-          props={{
-            stage: 3,
-            recipients_list: [101073],
-            project_pk: 4,
-            document_kind: "concept",
-          }}
-        >
-          <DocumentSentBackEmail />
-        </EmailWrapper>
+            <EmailWrapper
+              templateName={"Document Sent Back"}
+              emailFunction={sendDocumentSentBackEmail}
+              props={{
+                stage: 3,
+                recipients_list: [101073],
+                project_pk: 4,
+                document_kind: "concept",
+              }}
+            >
+              <DocumentSentBackEmail userData={userData} />
+            </EmailWrapper>
 
-        <EmailWrapper
-          templateName={"Document Approved"}
-          emailFunction={sendDocumentApprovedEmail}
-          props={{
-            recipients_list: [101073],
-            project_pk: 4,
-            document_kind: "concept",
-          }}
-        >
-          <DocumentApprovedEmail />
-        </EmailWrapper>
+            <EmailWrapper
+              templateName={"Document Approved"}
+              emailFunction={sendDocumentApprovedEmail}
+              props={{
+                recipients_list: [101073],
+                project_pk: 4,
+                document_kind: "concept",
+              }}
+            >
+              <DocumentApprovedEmail userData={userData} />
+            </EmailWrapper>
 
-        <EmailWrapper
-          templateName={"Document Recalled"}
-          emailFunction={sendDocumentRecalledEmail}
-          props={{
-            stage: 3,
-            recipients_list: [101073],
-            project_pk: 4,
-            document_kind: "concept",
-          }}
-        >
-          <DocumentRecalledEmail />
-        </EmailWrapper>
-      </Grid>
-    </Box>
+            <EmailWrapper
+              templateName={"Document Recalled"}
+              emailFunction={sendDocumentRecalledEmail}
+              props={{
+                stage: 3,
+                recipients_list: [101073],
+                project_pk: 4,
+                document_kind: "concept",
+              }}
+            >
+              <DocumentRecalledEmail userData={userData} />
+            </EmailWrapper>
+          </Grid>
+        </Box>
+      )
+
   );
 };

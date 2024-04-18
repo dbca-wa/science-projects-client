@@ -1,3 +1,4 @@
+import { IUserMe } from "@/types";
 import {
   Body,
   Button,
@@ -13,7 +14,11 @@ import {
   Text,
 } from "@react-email/components";
 
-export const DocumentApprovedEmail = () => {
+interface Props {
+  userData: IUserMe;
+}
+
+export const DocumentApprovedEmail = ({ userData }: Props) => {
   return (
     <Html>
       <Head />
@@ -36,7 +41,7 @@ export const DocumentApprovedEmail = () => {
             </Heading>
             <Text className="text-black text-[14px] leading-[24px]">
               {/* Hello {username}, */}
-              Hello Jarid Prince,
+              Hello {userData?.first_name} {userData?.last_name},
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
               The directorate has just approved a document for{" "}
@@ -59,7 +64,7 @@ export const DocumentApprovedEmail = () => {
             <Text className="text-[#666666] text-[12px] leading-[24px]">
               This automated message was intended for{" "}
               <span className="text-black">
-                Jarid Prince
+                {userData?.first_name} {userData?.last_name}
                 {/* {username} */}
               </span>
               . If you believe this was sent by mistake, you can ignore this

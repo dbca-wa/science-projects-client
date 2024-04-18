@@ -18,15 +18,20 @@ import { FaAddressCard, FaLocationArrow } from "react-icons/fa";
 import { FcApproval, FcDataBackup } from "react-icons/fc";
 import { GoOrganization } from "react-icons/go";
 import { ImBriefcase } from "react-icons/im";
-import { MdManageHistory, MdOutlineSettingsSuggest } from "react-icons/md";
+import { MdEmail, MdManageHistory, MdOutlineSettingsSuggest, MdVerifiedUser } from "react-icons/md";
 import { RiOrganizationChart } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { VscFeedback } from "react-icons/vsc";
 import { BatchApproveModal } from "@/components/Modals/BatchApproveModal";
+import { BatchApproveOldModal } from "@/components/Modals/BatchApproveOldModal";
+import { HiDocumentPlus } from "react-icons/hi2";
+import { NewCycleModal } from "@/components/Modals/NewCycleModal";
 
 export const Admin = () => {
 
   const { isOpen: isBatchApproveOpen, onClose: onBatchApproveClose, onOpen: onBatchApproveOpen } = useDisclosure();
+  const { isOpen: isBatchApproveOldOpen, onClose: onBatchApproveOldClose, onOpen: onBatchApproveOldOpen } = useDisclosure();
+  const { isOpen: isNewCycleOpen, onClose: onNewCycleClose, onOpen: onNewCycleOpen } = useDisclosure();
 
   const { colorMode } = useColorMode();
 
@@ -38,74 +43,106 @@ export const Admin = () => {
     onBatchApproveOpen();
   };
 
-  const handleViewFeedback = () => {
-    console.log("viewing feedback");
-  };
+  const handleOpenReportCycle = () => {
+    onNewCycleOpen();
+  }
+
+  const handleBatchApproveOldReports = () => {
+    onBatchApproveOldOpen();
+  }
+
+  // const handleViewFeedback = () => {
+  //   console.log("viewing feedback");
+  // };
 
   const adminActions = [
+    // {
+    //   name: "Dump Data",
+    //   description: "Dump db into zip file for migration",
+    //   reactIcon: FcDataBackup,
+    //   onClick: handleDataDump,
+    // },
     {
-      name: "Dump Data",
-      description: "Dump db into zip file for migration",
-      reactIcon: FcDataBackup,
-      onClick: handleDataDump,
+      name: "Batch Approve Old Reports",
+      description: "Approve all progress reports requesting approval",
+      reactIcon: MdVerifiedUser,
+      onClick: handleBatchApproveOldReports,
     },
     {
-      name: "Batch Approve Progress Reports",
+      name: "Batch Approve Reports",
       description: "Approve all progress reports requesting approval",
       reactIcon: FcApproval,
       onClick: handleBatchApproveReports,
     },
     {
-      name: "View Feedback",
-      description: "View User Feedback",
-      reactIcon: VscFeedback,
-      onClick: handleViewFeedback,
-      route: "/crud/feedback",
+      name: "Open Annual Report Cycle",
+      description: "Approve all progress reports requesting approval",
+      reactIcon: HiDocumentPlus,
+      onClick: handleOpenReportCycle,
     },
+    // {
+    //   name: "View Feedback",
+    //   description: "View User Feedback",
+    //   reactIcon: VscFeedback,
+    //   onClick: handleViewFeedback,
+    //   route: "/crud/feedback",
+    // },
   ];
 
   const crudAdminActions = [
     {
-      name: "Manage Annual Reports",
+      name: "Annual Reports",
       description: "CRUD operations for Annaul Reports",
       reactIcon: MdManageHistory,
       route: "/crud/reports",
     },
     {
-      name: "Manage Business Areas",
+      name: "Business Areas",
       description: "CRUD operations for Business Areas",
       reactIcon: ImBriefcase,
       route: "/crud/businessareas",
     },
     {
-      name: "Manage Services",
+      name: "Services",
       description: "CRUD operations for Services",
       reactIcon: MdOutlineSettingsSuggest,
       route: "/crud/services",
     },
     {
-      name: "Manage Divisions",
+      name: "Divisions",
       description: "CRUD operations for Divisions",
       reactIcon: GoOrganization,
       route: "/crud/divisions",
     },
     {
-      name: "Manage Locations",
+      name: "Locations",
       description: "CRUD operations for Areas",
       reactIcon: FaLocationArrow,
       route: "/crud/locations",
     },
     {
-      name: "Manage Addresses",
+      name: "Addresses",
       description: "CRUD operations for Addresses",
       reactIcon: FaAddressCard,
       route: "/crud/addresses",
     },
     {
-      name: "Manage Branches",
+      name: "Branches",
       description: "CRUD operations for Branches",
       reactIcon: RiOrganizationChart,
       route: "/crud/branches",
+    },
+    {
+      name: "Feedback",
+      description: "Manage User Feedback",
+      reactIcon: VscFeedback,
+      route: "/crud/feedback",
+    },
+    {
+      name: "Emails",
+      description: "Manage Emails",
+      reactIcon: MdEmail,
+      route: "/crud/emails",
     },
   ];
 
@@ -126,13 +163,21 @@ export const Admin = () => {
         isOpen={isBatchApproveOpen}
         onClose={onBatchApproveClose}
       />
+      <BatchApproveOldModal
+        isOpen={isBatchApproveOldOpen}
+        onClose={onBatchApproveOldClose}
+      />
+      <NewCycleModal
+        isOpen={isNewCycleOpen}
+        onClose={onNewCycleClose}
+      />
       <Text
         my={3}
         fontWeight={"bold"}
         fontSize={"lg"}
         color={colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.700"}
       >
-        CRUD
+        Manage
       </Text>
       <Divider my={4} />
 
@@ -163,7 +208,7 @@ export const Admin = () => {
         fontSize={"lg"}
         color={colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.700"}
       >
-        OTHER
+        Actions
       </Text>
       <Divider my={4} />
 
