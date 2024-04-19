@@ -26,6 +26,7 @@ interface Props {
   refetch: () => void;
   setToLastTab: (tabToGoTo?: number) => void;
   projectAreas: IProjectAreas;
+  baseAPI: string;
 }
 
 export const ProjectPlanContents = ({
@@ -36,6 +37,7 @@ export const ProjectPlanContents = ({
   refetch,
   setToLastTab,
   projectAreas,
+  baseAPI
 }: Props) => {
   const { colorMode } = useColorMode();
   useEffect(() => console.log(console.log(document)
@@ -259,6 +261,7 @@ export const ProjectPlanContents = ({
 
       <Box pb={6} mt={4}>
         <CommentSection
+          baseAPI={baseAPI}
           documentID={document?.document?.pk}
           userData={userData}
         />

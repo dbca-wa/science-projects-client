@@ -30,6 +30,7 @@ import { TbWorldWww } from "react-icons/tb";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import useApiEndpoint from "../../lib/hooks/useApiEndpoint";
+import { useNoImage } from "@/lib/hooks/useNoImage";
 
 export const Navitar = ({
   isModern,
@@ -40,6 +41,7 @@ export const Navitar = ({
   const { userData } = useUser();
 
   const baseAPI = useApiEndpoint();
+  const noImage = useNoImage();
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -118,19 +120,20 @@ export const Navitar = ({
                     ? userData.first_name.length < 12
                       ? userData.first_name
                       : windowSize >= 1150
-                      ? userData.first_name
-                      : `${userData?.first_name.substring(0, 9)}...`
+                        ? userData.first_name
+                        : `${userData?.first_name.substring(0, 9)}...`
                     : userData.username)}
               </Text>
             ) : null}
             <Avatar
               size="sm"
               name={userData?.username}
-              src={`${baseAPI}${
-                userData?.image?.file
-                  ? userData.image.file
-                  : userData?.image?.old_file
-              }`}
+              src={
+                userData?.image ?
+                  userData.image?.file.startsWith("http") ?
+                    `${userData.image?.file}` : `${baseAPI}${userData.image?.file}` :
+                  userData.image?.old_file ? userData.image?.old_file : noImage
+              }
             ></Avatar>
             <Center
               color={

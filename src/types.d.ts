@@ -1,5 +1,14 @@
 import { LexicalEditor } from "lexical";
 import { ReactNode } from "react";
+import { AxiosError, AxiosResponse } from "axios";
+import {
+    IDocumentApproved,
+    IDocumentReadyEmail,
+    IDocumentRecalled,
+    INewCycleEmail,
+    IProjectClosureEmail,
+    IReviewDocumentEmail,
+} from "@/lib/api";
 
 // Editor ============================================================================
 
@@ -10,6 +19,34 @@ type ProjectPlanSection = "background" | "aims" | "outcome" | "knowledge_transfe
 type ProgressReportSection = "context" | "aims" | "progress" | "implications" | "future";
 type StudentReportSection = "progress_report";
 type ProjectClosureSection = "reason" | "intended_outcome" | "knowledge_transfer" | "data_location" | "hardcopy_location" | "backup_location" | "scientific_outputs";
+
+
+export interface IEmailModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    thisUser: IUserMe;
+    emailFunction: (
+        props?:
+            | IReviewDocumentEmail
+            | INewCycleEmail
+            | IProjectClosureEmail
+            | IDocumentReadyEmail
+            | IDocumentApproved
+            | IDocumentRecalled
+    ) => Promise<AxiosResponse | AxiosError>; // Allow props to be optional
+}
+
+export interface ISendSingleEmail {
+    fromUserPk: number;
+    fromUserEmail: string;
+    fromUserName: string;
+    toUserPk: number;
+    toUserEmail: string;
+    toUserName: string;
+    project?: number;
+    projectTitle?: string;
+    projectDocumentType?: string;
+}
 
 
 export interface IAnnualReportPDFObject {
@@ -118,7 +155,11 @@ export interface IPersonalInformation {
 }
 
 export interface IProfile {
-    image: any;
+    image: {
+        file: string;
+        user: IUserData;
+    };
+    // image: any;
     about: string;
     expertise: string;
 }
@@ -251,6 +292,20 @@ interface ProjectPDFData {
     document: IMainDoc;
     project: IProjectData;
 }
+
+
+export interface IReferencedDoc {
+    pk: number;
+    year?: number;
+}
+
+export interface IMidDoc {
+    pk: number;
+    project: ISmallProj;
+    kind: string;
+    referenced_doc: IReferencedDoc;
+}
+
 
 export interface IMainDoc {
     pk?: number;

@@ -58,6 +58,7 @@ export interface ICommentReaction {
 }
 
 interface Props {
+  baseAPI: string;
   commentPk: string | number;
   documentPk: string | number;
   refetchComments: () => void;
@@ -73,6 +74,7 @@ interface Props {
 }
 
 export const CommentDisplayRTE = ({
+  baseAPI,
   commentPk,
   documentPk,
   refetchComments,
@@ -314,6 +316,7 @@ export const CommentDisplayRTE = ({
                     </Box>
                     <Box pl={3} pt={2} pr={3}>
                       <ChatUser
+                        baseAPI={baseAPI}
                         otherUser={otherUser}
                         displayName={`${user?.first_name} ${user?.last_name}`}
                         avatarSrc={user?.image}

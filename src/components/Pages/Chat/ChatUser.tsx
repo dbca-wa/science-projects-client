@@ -18,6 +18,7 @@ import React from "react";
 import { UserProfile } from "../Users/UserProfile";
 
 interface ChatUserProps {
+  baseAPI: string;
   displayName: string;
   user: IUserData;
   otherUser: boolean;
@@ -36,6 +37,7 @@ interface ChatUserProps {
 
 export const ChatUser: React.FC<ChatUserProps> = React.memo(
   ({
+    baseAPI,
     displayName,
     avatarSrc,
     user,
@@ -92,9 +94,11 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
               <Avatar
                 size={iconSize ? iconSize : "md"}
                 src={
-                  avatarSrc?.file !== undefined && avatarSrc?.file !== null
-                    ? avatarSrc?.file
-                    : undefined
+                  avatarSrc?.file ?
+                    avatarSrc?.file.startsWith("http") ?
+                      `${avatarSrc?.file}` : `${baseAPI}${avatarSrc?.file}` :
+                    avatarSrc?.old_file ? avatarSrc?.old_file
+                      : undefined
                 }
                 name={displayName}
                 mr={2}

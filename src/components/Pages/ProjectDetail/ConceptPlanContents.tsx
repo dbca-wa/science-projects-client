@@ -18,7 +18,7 @@ interface Props {
   userData: IUserMe;
   members: IProjectMember[];
   document: IConceptPlan | null;
-
+  baseAPI: string;
   refetch: () => void;
   // setToLastTab: (tabToGoTo?: number) => void;
 }
@@ -29,6 +29,7 @@ export const ConceptPlanContents = ({
   all_documents,
   document,
   refetch,
+  baseAPI
 }: // setToLastTab,
   Props) => {
   const { colorMode } = useColorMode();
@@ -155,7 +156,9 @@ export const ConceptPlanContents = ({
       />
 
       {document?.document && (
-        <CommentSection documentID={document?.document?.pk} userData={userData} />
+        <CommentSection
+          baseAPI={baseAPI}
+          documentID={document?.document?.pk} userData={userData} />
 
       )}
 

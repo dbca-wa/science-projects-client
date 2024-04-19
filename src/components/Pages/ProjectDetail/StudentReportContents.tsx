@@ -30,6 +30,7 @@ interface Props {
   refetch: () => void;
   projectPk: number | string;
   setToLastTab: (tabToGoTo?: number) => void;
+  baseAPI: string;
 }
 
 export const StudentReportContents = ({
@@ -39,6 +40,7 @@ export const StudentReportContents = ({
   refetch,
   projectPk,
   setToLastTab,
+  baseAPI
 }: Props) => {
   // Handling years
   const { availableStudentYearsData } = useGetStudentReportAvailableReportYears(
@@ -246,6 +248,7 @@ export const StudentReportContents = ({
             section={"progress_report"}
           />
           <CommentSection
+            baseAPI={baseAPI}
             documentID={selectedStudentReport?.document?.pk}
             userData={userData}
           />

@@ -31,9 +31,11 @@ interface Props {
   members: IProjectMember[];
   refetch: () => void;
   setToLastTab: (tabToGoTo?: number) => void;
+  baseAPI: string;
 }
 
 export const ProjectClosureContents = ({
+  baseAPI,
   userData,
   members,
   all_documents,
@@ -247,7 +249,7 @@ export const ProjectClosureContents = ({
         data={document?.scientific_outputs}
         section={"scientific_outputs"}
       />
-      <CommentSection documentID={document?.pk} userData={userData} />
+      <CommentSection documentID={document?.pk} userData={userData} baseAPI={baseAPI} />
     </motion.div>
   );
 };

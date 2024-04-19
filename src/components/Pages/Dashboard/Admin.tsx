@@ -15,7 +15,10 @@ import {
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 import { FaAddressCard, FaLocationArrow } from "react-icons/fa";
-import { FcApproval, FcDataBackup } from "react-icons/fc";
+import {
+  FcApproval
+  // , FcDataBackup 
+} from "react-icons/fc";
 import { GoOrganization } from "react-icons/go";
 import { ImBriefcase } from "react-icons/im";
 import { MdEmail, MdManageHistory, MdOutlineSettingsSuggest, MdVerifiedUser } from "react-icons/md";
@@ -35,9 +38,9 @@ export const Admin = () => {
 
   const { colorMode } = useColorMode();
 
-  const handleDataDump = () => {
-    console.log("Dumping data...");
-  };
+  // const handleDataDump = () => {
+  //   console.log("Dumping data...");
+  // };
 
   const handleBatchApproveReports = () => {
     onBatchApproveOpen();
@@ -56,12 +59,6 @@ export const Admin = () => {
   // };
 
   const adminActions = [
-    // {
-    //   name: "Dump Data",
-    //   description: "Dump db into zip file for migration",
-    //   reactIcon: FcDataBackup,
-    //   onClick: handleDataDump,
-    // },
     {
       name: "Batch Approve Old Reports",
       description: "Approve all progress reports requesting approval",
@@ -80,13 +77,6 @@ export const Admin = () => {
       reactIcon: HiDocumentPlus,
       onClick: handleOpenReportCycle,
     },
-    // {
-    //   name: "View Feedback",
-    //   description: "View User Feedback",
-    //   reactIcon: VscFeedback,
-    //   onClick: handleViewFeedback,
-    //   route: "/crud/feedback",
-    // },
   ];
 
   const crudAdminActions = [
@@ -220,7 +210,7 @@ export const Admin = () => {
             description={action.description}
             onClick={action.onClick}
             reactIcon={action.reactIcon}
-            route={action.route}
+          // route={action.route}
           />
         ))}
       </Grid>

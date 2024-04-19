@@ -13,14 +13,14 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-
 interface Props {
   userData: IUserMe;
 }
 
 export const DocumentApprovedEmail = ({ userData }: Props) => {
+
   return (
-    <Html>
+    <Html >
       <Head />
       <Preview>SPMS: Document Approved</Preview>
       <Tailwind>
