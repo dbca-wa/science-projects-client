@@ -23,33 +23,39 @@ import { CloseIcon } from "@chakra-ui/icons";
 import { useUser } from "../../lib/hooks/useUser";
 import { useNoImage } from "../../lib/hooks/useNoImage";
 import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";
+import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface IProjectSearchDropdown {
   allProjects: boolean;
   isRequired: boolean;
   setProjectFunction: (setProjectPk: number) => void;
+  setProjectTitleFunction?: (setProjectTitle: string) => void;
   user: number;
   label: string;
   placeholder: string;
   helperText: string;
   preselectedProjectPk?: number;
   inputRef: React.RefObject<HTMLInputElement | null>;
-
+  autoFocus?: boolean;
+  isClosed?: boolean;
   // register: any;
 }
 
 export const ProjectSearchDropdown = ({
   isRequired,
   setProjectFunction,
+  setProjectTitleFunction,
   label,
   placeholder,
   helperText,
   preselectedProjectPk,
   inputRef,
+  autoFocus,
+  isClosed
 }: IProjectSearchDropdown) => {
   const [searchTerm, setSearchTerm] = useState(""); // Local state for search term
   const [filteredItems, setFilteredItems] = useState<IProjectData[]>([]); // Local state for filtered items
-  const [isMenuOpen, setIsMenuOpen] = useState(true); // Stores the menu open state
+  const [isMenuOpen, setIsMenuOpen] = useState(isClosed ? false : true); // Stores the menu open state
   const [selectedProject, setSelectedProject] = useState<IProjectData | null>(); // New state to store the selected name
 
   const { userLoading, userData } = useUser();
@@ -57,15 +63,23 @@ export const ProjectSearchDropdown = ({
   useEffect(() => {
     if (!userLoading) {
       if (preselectedProjectPk === undefined || preselectedProjectPk === null) {
-        getMyProjectsBasedOnSearchTerm(searchTerm, userData.pk)
-          .then((data) => {
-            console.log(data.projects);
-            setFilteredItems(data.projects);
-          })
-          .catch((error) => {
-            console.error("Error fetching users:", error);
-            setFilteredItems([]);
-          });
+        if (searchTerm) {
+          setIsMenuOpen(true);
+          getMyProjectsBasedOnSearchTerm(searchTerm, userData.pk)
+            .then((data) => {
+              console.log(data.projects);
+              setFilteredItems(data.projects);
+            })
+            .catch((error) => {
+              console.error("Error fetching users:", error);
+              setFilteredItems([]);
+            });
+        } else {
+          if (!selectedProject) {
+            handleClearProject();
+            setIsMenuOpen(isClosed ? false : true);
+          }
+        }
       } else {
         console.log("Preselected Project PK:", preselectedProjectPk);
         getFullProjectSimple(preselectedProjectPk)
@@ -73,22 +87,27 @@ export const ProjectSearchDropdown = ({
             console.log(projectData.project);
             setProjectFunction(projectData.project.pk);
             setIsMenuOpen(false);
-
             setSelectedProject(projectData.project);
             setSearchTerm(""); // Clear the search term when a user is selected
+            if (setProjectTitleFunction) {
+              setProjectTitleFunction(projectData.project.title);
+            }
           })
           .catch((error) => {
             console.error("Error fetching users:", error);
           });
       }
     }
-  }, [searchTerm, userLoading, userData, preselectedProjectPk]);
+  }, [searchTerm, userLoading, userData, preselectedProjectPk, isClosed]);
 
   const handleSelectProject = (project: IProjectData) => {
     setProjectFunction(project.pk);
     setIsMenuOpen(false);
     setSelectedProject(project); // Update the selected project
     setSearchTerm(""); // Clear the search term when a project is selected
+    if (setProjectTitleFunction) {
+      setProjectTitleFunction(project.title);
+    }
   };
 
   const handleClearProject = () => {
@@ -98,7 +117,11 @@ export const ProjectSearchDropdown = ({
 
     setProjectFunction(0); // Clear the selected project by setting the projectPk to 0 (or any value that represents no project)
     setSelectedProject(null); // Clear the selected project state
-    setIsMenuOpen(true); // Show the menu again when the project is cleared
+    setIsMenuOpen(false); // Show the menu again when the project is cleared
+    if (setProjectTitleFunction) {
+      setProjectTitleFunction("");
+    }
+
   };
 
   return (
@@ -133,7 +156,7 @@ export const ProjectSearchDropdown = ({
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder={placeholder}
               onFocus={() => setIsMenuOpen(true)}
-              autoFocus
+              autoFocus={autoFocus ? true : false}
             />
           </InputGroup>
         )}
@@ -207,65 +230,60 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
     setImageLoaded(true);
   };
   const noImage = useNoImage();
+  const serverUrl = useApiEndpoint();
 
   return project ? (
-    <Flex
-      as="button"
-      type="button"
-      w="100%"
-      textAlign="left"
-      p={2}
-      onClick={handleClick}
-      onMouseOver={() => setIsHovered(true)}
-      onMouseOut={() => setIsHovered(false)}
-      bg={isHovered ? "gray.200" : "transparent"}
-      alignItems="center"
-      {...rest}
-    >
-      {project?.image ? (
-        <Skeleton
-          isLoaded={imageLoaded}
-          startColor="gray.200"
-          endColor="gray.400"
-          rounded={"full"}
-        >
+    serverUrl ?
+      <Flex
+        as="button"
+        type="button"
+        w="100%"
+        textAlign="left"
+        p={2}
+        onClick={handleClick}
+        onMouseOver={() => setIsHovered(true)}
+        onMouseOut={() => setIsHovered(false)}
+        bg={isHovered ? "gray.200" : "transparent"}
+        alignItems="center"
+        {...rest}
+      >
+        {project?.image ? (
+          <Skeleton
+            isLoaded={imageLoaded}
+            startColor="gray.200"
+            endColor="gray.400"
+            rounded={"full"}
+          >
+            <Avatar
+              src={
+                project.image ?
+                  project.image?.file.startsWith("http") ?
+                    `${project.image?.file}` : `${serverUrl}${project.image?.file}` :
+                  noImage
+              }
+              onLoad={handleImageLoad}
+            />
+          </Skeleton>
+        ) : (
           <Avatar
-            src={
-              project?.image?.file
-                ? project.image?.file
-                : project.image?.old_file
-                  ? project.image.old_file
-                  : noImage
-            }
+            src={noImage}
             onLoad={handleImageLoad}
           />
-        </Skeleton>
-      ) : (
-        <Avatar
-          src={
-            project?.image?.file
-              ? project.image?.file
-              : project.image?.old_file
-                ? project.image.old_file
-                : noImage
-          }
-          onLoad={handleImageLoad}
-        />
-      )}
+        )}
 
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="start"
-        ml={3}
-        h="100%"
-      >
-        <ExtractedHTMLTitle
-          htmlContent={`${project?.title}`}
-          color={"green.500"}
-        />
-      </Box>
-    </Flex>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="start"
+          ml={3}
+          h="100%"
+        >
+          <ExtractedHTMLTitle
+            htmlContent={`${project?.title}`}
+            color={"green.500"}
+          />
+        </Box>
+      </Flex> : null
   ) : null;
 };
 
@@ -296,53 +314,64 @@ const SelectedProjectInput = ({
 
   const [projectPk, setProjectPk] = useState(project.pk);
   const { colorMode } = useColorMode();
+  const serverUrl = useApiEndpoint();
 
+  // useEffect(() => {
+  //   console.log(`proj image alone: ${project.image?.file}`)
+  //   console.log(`proj image with serverurl: ${serverUrl}${project.image?.file}`,)
+  // })
   return (
-    <Flex
-      align="center"
-      position="relative"
-      bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
-      borderRadius="md"
-      px={2}
-      py={1}
-      mr={2}
-    >
-      <Avatar
-        size="sm"
-        src={
-          project?.image?.file
-            ? project.image?.file
-            : project.image?.old_file
-              ? project.image.old_file
-              : noImage
-        }
-      />
-      <ExtractedHTMLTitle
-        ml={2}
-        htmlContent={`${project?.title}`}
-        color={colorMode === "light" ? "green.500" : "green.400"}
-      />
-      <input
-        // {...register("project", { required: true })}
-        value={projectPk}
-        onChange={() => {
-          setProjectPk(project.pk);
-        }}
-        hidden
-      />
-
-      {!isPreselected && (
-        <IconButton
-          aria-label="Clear selected user"
-          icon={<CloseIcon />}
-          size="xs"
-          position="absolute"
-          top="50%"
-          right={2}
-          transform="translateY(-50%)"
-          onClick={onClear}
+    serverUrl ? (
+      <Flex
+        align="center"
+        position="relative"
+        bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
+        borderRadius="md"
+        px={2}
+        py={1}
+        mr={2}
+      >
+        <Avatar
+          size="sm"
+          src={
+            project.image ?
+              project.image?.file.startsWith("http") ?
+                `${project.image?.file}` : `${serverUrl}${project.image?.file}` :
+              noImage
+            // project?.image?.file
+            //   ? project.image?.file
+            //   : project.image?.old_file
+            //     ? project.image.old_file
+            //     : noImage
+          }
         />
-      )}
-    </Flex>
+        <ExtractedHTMLTitle
+          ml={2}
+          htmlContent={`${project?.title}`}
+          color={colorMode === "light" ? "green.500" : "green.400"}
+        />
+        <input
+          // {...register("project", { required: true })}
+          value={projectPk}
+          onChange={() => {
+            setProjectPk(project.pk);
+          }}
+          hidden
+        />
+
+        {!isPreselected && (
+          <IconButton
+            aria-label="Clear selected user"
+            icon={<CloseIcon />}
+            size="xs"
+            position="absolute"
+            top="50%"
+            right={2}
+            transform="translateY(-50%)"
+            onClick={onClear}
+          />
+        )}
+      </Flex>
+    ) : null
   );
 };

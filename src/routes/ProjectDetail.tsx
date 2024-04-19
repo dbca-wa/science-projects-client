@@ -34,6 +34,7 @@ import { Head } from "../components/Base/Head";
 import { useUser } from "../lib/hooks/useUser";
 import { motion } from "framer-motion";
 // import { ProgressReportSelector } from "../components/Pages/ProjectDetail/ProgressReportSelector";
+import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 export const ProjectDetail = ({
   selectedTab,
@@ -173,246 +174,254 @@ export const ProjectDetail = ({
   const navigate = useNavigate();
 
   // useEffect(() => console.log(documents))
+  const baseAPI = useApiEndpoint();
 
   return (
-    <div
-      key={
-        (documents?.progress_reports?.length || 0) +
-        (documents?.student_reports?.length || 0) +
-        (documents?.concept_plan ? 1 : 0) +
-        (documents?.project_plan ? 1 : 0) +
-        (documents?.progress_reports?.length || 0)
-      }
-    >
-      {isLoading || !documents || !distilledTitle ? (
-        isLoading === false && projectData === undefined ? (
-          <Box
-            w={"100%"}
-            h={"100%"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            display={"flex"}
-            flexDir={"column"}
-            mt={10}
-          >
-            <Text fontWeight={"semibold"} fontSize={"2xl"}>
-              Sorry, a project with id "{projectPk}" does not exist.
-            </Text>
-            <Text mt={6}>
-              This project has either been deleted or never existed.
-            </Text>
-            <Box mt={8}>
-              <Button
-                color={"white"}
-                bg={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  bg: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
-                onClick={() => navigate("/projects")}
-              >
-                Back to Projects
-              </Button>
-            </Box>
-          </Box>
-        ) : (
-          <Center>
-            {/* <Head title={distilledTitle} /> */}
-            <Spinner />
-          </Center>
-        )
-      ) : (
-        documents &&
-        distilledTitle && (
-          <>
-            <Head title={distilledTitle} />
-            <Tabs
-              isLazy
-              isFitted
-              variant={"enclosed"}
-              // onChange={(index) => setTabIndex(index)}
-              onChange={(index) => {
-                refetch();
-                setActiveTabIndex(index);
-              }}
-              defaultIndex={activeTabIndex}
-              index={activeTabIndex}
+    (me?.userData && !me?.userLoading) ?
+      <div
+        key={
+          (documents?.progress_reports?.length || 0) +
+          (documents?.student_reports?.length || 0) +
+          (documents?.concept_plan ? 1 : 0) +
+          (documents?.project_plan ? 1 : 0) +
+          (documents?.progress_reports?.length || 0)
+        }
+      >
+        {isLoading || !documents || !distilledTitle ? (
+          isLoading === false && projectData === undefined ? (
+            <Box
+              w={"100%"}
+              h={"100%"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              display={"flex"}
+              flexDir={"column"}
+              mt={10}
             >
-              <TabList mb="1em">
-                <Tab
-                  fontSize="sm"
-                  value="overview"
-                  onClick={() => setActiveTabIndex(tabs.indexOf("overview"))}
+              <Text fontWeight={"semibold"} fontSize={"2xl"}>
+                Sorry, a project with id "{projectPk}" does not exist.
+              </Text>
+              <Text mt={6}>
+                This project has either been deleted or never existed.
+              </Text>
+              <Box mt={8}>
+                <Button
+                  color={"white"}
+                  bg={colorMode === "light" ? "blue.500" : "blue.600"}
+                  _hover={{
+                    bg: colorMode === "light" ? "blue.400" : "blue.500",
+                  }}
+                  onClick={() => navigate("/projects")}
                 >
-                  Overview
-                </Tab>
-                {documents?.concept_plan && (
+                  Back to Projects
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <Center>
+              {/* <Head title={distilledTitle} /> */}
+              <Spinner />
+            </Center>
+          )
+        ) : (
+          documents &&
+          distilledTitle && (
+            <>
+              <Head title={distilledTitle} />
+              <Tabs
+                isLazy
+                isFitted
+                variant={"enclosed"}
+                // onChange={(index) => setTabIndex(index)}
+                onChange={(index) => {
+                  refetch();
+                  setActiveTabIndex(index);
+                }}
+                defaultIndex={activeTabIndex}
+                index={activeTabIndex}
+              >
+                <TabList mb="1em">
                   <Tab
                     fontSize="sm"
-                    value="concept"
-                    onClick={() => setActiveTabIndex(tabs.indexOf("concept"))}
+                    value="overview"
+                    onClick={() => setActiveTabIndex(tabs.indexOf("overview"))}
                   >
-                    Concept Plan
+                    Overview
                   </Tab>
-                )}
-                {documents?.project_plan && (
-                  <Tab
-                    fontSize="sm"
-                    value="project"
-                    onClick={() => setActiveTabIndex(tabs.indexOf("project"))}
-                  >
-                    Project Plan
-                  </Tab>
-                )}
-                {!isLoading && documents?.progress_reports &&
-                  documents.progress_reports.length !== 0 && (
+                  {documents?.concept_plan && (
                     <Tab
                       fontSize="sm"
-                      value="progress"
-                      onClick={() =>
-                        setActiveTabIndex(tabs.indexOf("progress"))
-                      }
+                      value="concept"
+                      onClick={() => setActiveTabIndex(tabs.indexOf("concept"))}
                     >
-                      Progress Reports
+                      Concept Plan
                     </Tab>
                   )}
-                {!isLoading && documents?.student_reports &&
-                  documents.student_reports.length !== 0 && (
+                  {documents?.project_plan && (
                     <Tab
                       fontSize="sm"
-                      value="student"
-                      onClick={() => setActiveTabIndex(tabs.indexOf("student"))}
+                      value="project"
+                      onClick={() => setActiveTabIndex(tabs.indexOf("project"))}
                     >
-                      Student Reports
+                      Project Plan
                     </Tab>
                   )}
-                {documents?.project_closure && (
-                  <Tab
-                    fontSize="sm"
-                    value="closure"
-                    onClick={() => setActiveTabIndex(tabs.indexOf("closure"))}
-                  >
-                    Project Closure
-                  </Tab>
-                )}
-              </TabList>
-              <TabPanels>
-                {/* OVERVIEW */}
-                <TabPanel>
-                  {baseInformation ? (
-                    <motion.div
-                      initial={{ y: -10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: 10, opacity: 0 }}
-                      transition={{
-                        duration: 0.7,
-                        delay: 1 / 7,
-                      }}
-                      style={{
-                        height: "100%",
-                        animation: "oscillate 8s ease-in-out infinite",
-                        // backgroundColor: "pink"
-                      }}
-                    >
-                      <ProjectOverviewCard
-                        location={location}
-                        baseInformation={baseInformation}
-                        details={details}
-                        members={members}
-                        documents={documents}
-                        refetchData={refetch}
-                        setToLastTab={setToLastTab}
-                      />
-
-                      {/* <ManageTeam /> */}
-                      <ManageTeam
-                        // team={members}
-                        project_id={
-                          projectPk !== undefined ? Number(projectPk) : 0
+                  {!isLoading && documents?.progress_reports &&
+                    documents.progress_reports.length !== 0 && (
+                      <Tab
+                        fontSize="sm"
+                        value="progress"
+                        onClick={() =>
+                          setActiveTabIndex(tabs.indexOf("progress"))
                         }
-                      />
-                    </motion.div>
-                  ) : (
-                    <Spinner />
+                      >
+                        Progress Reports
+                      </Tab>
+                    )}
+                  {!isLoading && documents?.student_reports &&
+                    documents.student_reports.length !== 0 && (
+                      <Tab
+                        fontSize="sm"
+                        value="student"
+                        onClick={() => setActiveTabIndex(tabs.indexOf("student"))}
+                      >
+                        Student Reports
+                      </Tab>
+                    )}
+                  {documents?.project_closure && (
+                    <Tab
+                      fontSize="sm"
+                      value="closure"
+                      onClick={() => setActiveTabIndex(tabs.indexOf("closure"))}
+                    >
+                      Project Closure
+                    </Tab>
                   )}
-                </TabPanel>
-
-                {/* CONCEPT PLAN */}
-                {documents?.concept_plan && (
+                </TabList>
+                <TabPanels>
+                  {/* OVERVIEW */}
                   <TabPanel>
-                    <ConceptPlanContents
-                      userData={me?.userData}
-                      members={members}
-                      document={documents.concept_plan}
-                      all_documents={documents}
-                      refetch={refetch}
-                    />
-                  </TabPanel>
-                )}
+                    {baseInformation ? (
+                      <motion.div
+                        initial={{ y: -10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 10, opacity: 0 }}
+                        transition={{
+                          duration: 0.7,
+                          delay: 1 / 7,
+                        }}
+                        style={{
+                          height: "100%",
+                          animation: "oscillate 8s ease-in-out infinite",
+                          // backgroundColor: "pink"
+                        }}
+                      >
+                        <ProjectOverviewCard
+                          location={location}
+                          baseInformation={baseInformation}
+                          details={details}
+                          members={members}
+                          documents={documents}
+                          refetchData={refetch}
+                          setToLastTab={setToLastTab}
+                        />
 
-                {/* PROJECT PLAN */}
-                {documents?.project_plan && (
-                  <TabPanel>
-                    <ProjectPlanContents
-                      refetch={refetch}
-                      document={documents.project_plan}
-                      all_documents={documents}
-                      userData={me?.userData}
-                      members={members}
-                      setToLastTab={setToLastTab}
-                      projectAreas={location}
-                    />
+                        {/* <ManageTeam /> */}
+                        <ManageTeam
+                          // team={members}
+                          project_id={
+                            projectPk !== undefined ? Number(projectPk) : 0
+                          }
+                        />
+                      </motion.div>
+                    ) : (
+                      <Spinner />
+                    )}
                   </TabPanel>
-                )}
 
-                {/* PROGRESS REPORT */}
-                {documents?.progress_reports &&
-                  documents.progress_reports.length !== 0 && (
+                  {/* CONCEPT PLAN */}
+                  {documents?.concept_plan && (
                     <TabPanel>
-                      <ProgressReportContents
-                        documents={documents.progress_reports}
+                      <ConceptPlanContents
+                        baseAPI={baseAPI}
+                        userData={me?.userData}
+                        members={members}
+                        document={documents.concept_plan}
+                        all_documents={documents}
                         refetch={refetch}
+                      />
+                    </TabPanel>
+                  )}
+
+                  {/* PROJECT PLAN */}
+                  {documents?.project_plan && (
+                    <TabPanel>
+                      <ProjectPlanContents
+                        baseAPI={baseAPI}
+                        refetch={refetch}
+                        document={documents.project_plan}
                         all_documents={documents}
                         userData={me?.userData}
                         members={members}
                         setToLastTab={setToLastTab}
+                        projectAreas={location}
                       />
                     </TabPanel>
                   )}
 
-                {/* STUDENT REPORT */}
-                {documents?.student_reports &&
-                  documents.student_reports.length !== 0 &&
-                  projectPk && (
+                  {/* PROGRESS REPORT */}
+                  {documents?.progress_reports &&
+                    documents.progress_reports.length !== 0 && (
+                      <TabPanel>
+                        <ProgressReportContents
+                          baseAPI={baseAPI}
+                          documents={documents.progress_reports}
+                          refetch={refetch}
+                          all_documents={documents}
+                          userData={me?.userData}
+                          members={members}
+                          setToLastTab={setToLastTab}
+                        />
+                      </TabPanel>
+                    )}
+
+                  {/* STUDENT REPORT */}
+                  {documents?.student_reports &&
+                    documents.student_reports.length !== 0 &&
+                    projectPk && (
+                      <TabPanel>
+                        <StudentReportContents
+                          baseAPI={baseAPI}
+                          projectPk={projectPk}
+                          documents={documents.student_reports}
+                          refetch={refetch}
+                          userData={me?.userData}
+                          members={members}
+                          setToLastTab={setToLastTab}
+                        />
+                      </TabPanel>
+                    )}
+
+                  {/* PROJECT CLOSURE */}
+                  {documents?.project_closure && (
                     <TabPanel>
-                      <StudentReportContents
-                        projectPk={projectPk}
-                        documents={documents.student_reports}
-                        refetch={refetch}
+                      <ProjectClosureContents
+                        baseAPI={baseAPI}
+                        document={documents.project_closure}
                         userData={me?.userData}
                         members={members}
+                        all_documents={documents}
+                        refetch={refetch}
                         setToLastTab={setToLastTab}
                       />
                     </TabPanel>
                   )}
-
-                {/* PROJECT CLOSURE */}
-                {documents?.project_closure && (
-                  <TabPanel>
-                    <ProjectClosureContents
-                      document={documents.project_closure}
-                      userData={me?.userData}
-                      members={members}
-                      all_documents={documents}
-                      refetch={refetch}
-                      setToLastTab={setToLastTab}
-                    />
-                  </TabPanel>
-                )}
-              </TabPanels>
-            </Tabs>
-          </>
-        )
-      )}
-    </div>
+                </TabPanels>
+              </Tabs>
+            </>
+          )
+        )}
+      </div>
+      : null
   );
 };

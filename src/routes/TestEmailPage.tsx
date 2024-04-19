@@ -5,6 +5,7 @@ import DocumentSentBackEmail from "@/components/Emails/DocumentSentBackEmail";
 import NewCycleOpenEmail from "@/components/Emails/NewCycleOpenEmail";
 import ProjectClosureEmail from "@/components/Emails/ProjectClosureEmail";
 import ReviewDocumentEmail from "@/components/Emails/ReviewDocumentEmail";
+import { DocumentApprovedEmailModal } from "@/components/Modals/Emails/DocumentApprovedEmailModal";
 import {
   IDocumentApproved,
   IDocumentReadyEmail,
@@ -29,29 +30,24 @@ import {
   Grid,
   Spinner,
   Text,
-  ToastId,
+  // ToastId,
   useColorMode,
-  useToast,
+  useDisclosure,
+  // useToast,
 } from "@chakra-ui/react";
+import React, { ReactElement, createElement, useEffect, useRef, useState } from "react";
 import { render } from "@react-email/render";
-import {
-  useMutation,
-  //  useQueryClient 
-} from "@tanstack/react-query";
-import { useRef } from "react";
+import { DocumentRecalledEmailModal } from "@/components/Modals/Emails/DocumentRecalledEmailModal";
+// import {
+//   useMutation,
+//   //  useQueryClient 
+// } from "@tanstack/react-query";
+// import { useRef } from "react";
 
 interface IWrapper {
   children: React.ReactElement;
   templateName: string;
-  emailFunction: (
-    props?:
-      | IReviewDocumentEmail
-      | INewCycleEmail
-      | IProjectClosureEmail
-      | IDocumentReadyEmail
-      | IDocumentApproved
-      | IDocumentRecalled
-  ) => Promise<any>; // Allow props to be optional
+  openModalFunction: () => void;
   props?:
   | IReviewDocumentEmail
   | INewCycleEmail
@@ -63,61 +59,12 @@ interface IWrapper {
 
 const EmailWrapper = ({
   children,
-  emailFunction,
+  openModalFunction,
   templateName,
-  props,
 }: IWrapper) => {
   const { colorMode } = useColorMode();
-  // const queryClient = useQueryClient();
-  // const { register, handleSubmit, reset } = useForm<ITestEmail>();
-  const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
-    toastIdRef.current = toast(data);
-  };
-  const mutation = useMutation(() => emailFunction(props ?? undefined), {
-    onMutate: () => {
-      const html = render(children, {
-        pretty: true,
-      });
 
-      console.log(html);
-
-      addToast({
-        status: "loading",
-        title: "Sending Email",
-        position: "top-right",
-      });
-    },
-    onSuccess: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Success",
-          description: `Email Sent`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-    onError: (error) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Could Not Send Email",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-  });
-
-  const onSend = () => {
-    mutation.mutate();
-  };
+  const wrapperRef = useRef(null);
 
   return (
     <Box
@@ -147,6 +94,7 @@ const EmailWrapper = ({
       </Box>
 
       <Box
+        ref={wrapperRef}
         border={"1px solid"}
         borderColor={"gray.300"}
         rounded={"xl"}
@@ -171,7 +119,17 @@ const EmailWrapper = ({
           _hover={{
             bg: "blue.400",
           }}
-          onClick={onSend}
+          onClick={
+            () => {
+              const html = render(children, {
+                pretty: true,
+              });
+
+              console.log(html);
+
+              openModalFunction();
+            }
+          }
         >
           Send Test Email
         </Button>
@@ -182,14 +140,26 @@ const EmailWrapper = ({
 
 export const TestEmailPage = () => {
   const { userLoading, userData } = useUser();
-
-
+  const { isOpen: isDocumentApprovedModalOpen, onOpen: onDocumentApprovedModalOpen, onClose: onDocumentApprovedModalClose } = useDisclosure();
+  const { isOpen: isDocumentRecalledModalOpen, onOpen: onDocumentRecalledModalOpen, onClose: onDocumentRecalledModalClose } = useDisclosure();
 
 
   return (
     (userLoading && !userData) ?
       <Center><Spinner /></Center> : (
         <Box>
+          <DocumentApprovedEmailModal
+            isOpen={isDocumentApprovedModalOpen}
+            onClose={onDocumentApprovedModalClose}
+            emailFunction={sendDocumentApprovedEmail}
+            thisUser={userData}
+          />
+          <DocumentRecalledEmailModal
+            isOpen={isDocumentRecalledModalOpen}
+            onClose={onDocumentRecalledModalClose}
+            emailFunction={sendDocumentApprovedEmail}
+            thisUser={userData}
+          />
           <Text fontWeight={"bold"} fontSize={"xl"}>
             See below for emails templates
           </Text>
@@ -203,9 +173,9 @@ export const TestEmailPage = () => {
             gridGap={4}
             gridRowGap={8}
           >
-            <EmailWrapper
+            {/* <EmailWrapper
               templateName={"Review Document"}
-              emailFunction={sendReviewProjectDocumentEmail}
+              // emailFunction={onDocumentApprovedModalOpen}
               props={{
                 recipients_list: [101073],
                 project_pk: 4,
@@ -259,29 +229,20 @@ export const TestEmailPage = () => {
               }}
             >
               <DocumentSentBackEmail userData={userData} />
-            </EmailWrapper>
+            </EmailWrapper> */}
 
             <EmailWrapper
               templateName={"Document Approved"}
-              emailFunction={sendDocumentApprovedEmail}
-              props={{
-                recipients_list: [101073],
-                project_pk: 4,
-                document_kind: "concept",
-              }}
+              openModalFunction={onDocumentApprovedModalOpen}
             >
-              <DocumentApprovedEmail userData={userData} />
+              <DocumentApprovedEmail
+                userData={userData}
+              />
             </EmailWrapper>
 
             <EmailWrapper
               templateName={"Document Recalled"}
-              emailFunction={sendDocumentRecalledEmail}
-              props={{
-                stage: 3,
-                recipients_list: [101073],
-                project_pk: 4,
-                document_kind: "concept",
-              }}
+              openModalFunction={onDocumentRecalledModalOpen}
             >
               <DocumentRecalledEmail userData={userData} />
             </EmailWrapper>
@@ -291,3 +252,13 @@ export const TestEmailPage = () => {
 
   );
 };
+
+
+
+// emailFunction={sendDocumentRecalledEmail}
+// props={{
+//   stage: 3,
+//   recipients_list: [101073],
+//   project_pk: 4,
+//   document_kind: "concept",
+// }}

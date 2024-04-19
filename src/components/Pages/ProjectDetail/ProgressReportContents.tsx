@@ -29,6 +29,7 @@ import { CommentSection } from "./CommentSection";
 import { BsPlus } from "react-icons/bs";
 
 interface Props {
+  baseAPI: string;
   documents: IProgressReport[];
   all_documents: IProjectDocuments;
   userData: IUserMe;
@@ -38,6 +39,7 @@ interface Props {
 }
 
 export const ProgressReportContents = ({
+  baseAPI,
   userData,
   members,
   all_documents,
@@ -45,6 +47,7 @@ export const ProgressReportContents = ({
   refetch,
   setToLastTab,
 }: Props) => {
+  useEffect(() => console.log(userData))
   // Handling years
   const { availableProgressReportYearsData } =
     useGetProgressReportAvailableReportYears(
@@ -312,7 +315,11 @@ export const ProgressReportContents = ({
 
 
           {selectedProgressReport?.document && (
-            <CommentSection documentID={selectedProgressReport?.document?.pk} userData={userData} />
+            <CommentSection
+              baseAPI={baseAPI}
+              documentID={selectedProgressReport?.document?.pk}
+              userData={userData}
+            />
           )}
         </motion.div>
       )}

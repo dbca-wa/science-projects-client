@@ -24,7 +24,7 @@ import "../../../styles/texteditor.css";
 // } from "lexical";
 
 import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
-import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
+// import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { PostCommentButton } from "../Buttons/PostCommentButton";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
@@ -32,6 +32,7 @@ import MentionsPlugin, { MentionNode } from "../Plugins/MentionsPlugin";
 // import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface Props {
+  baseAPI: string;
   userData: IUserMe;
   documentId: number;
   refetchDocumentComments: () => void;
@@ -40,6 +41,7 @@ interface Props {
 }
 
 export const CommentRichTextEditor = ({
+  baseAPI,
   userData,
   documentId,
   refetchDocumentComments,
@@ -50,7 +52,7 @@ export const CommentRichTextEditor = ({
   const [comment, setComment] = useState("");
 
 
-  const usersImage = useServerImageUrl(userData?.image?.file);
+  // const usersImage = useServerImageUrl(userData?.image?.file);
 
   // useEffect(() => console.log(userData, usersImage))
 
@@ -172,7 +174,12 @@ export const CommentRichTextEditor = ({
                       /> */}
                     <UserContainer
                       userData={userData as IUserData}
-                      image={usersImage}
+                      baseAPI={baseAPI}
+                      // image={
+                      //   userData?.image?.file.startsWith("http") ?
+                      //     userData?.image?.file :
+                      //     `${baseAPI}${userData?.image?.file}`
+                      // }
                       businessAreas={businessAreas}
                       branches={branches}
                     />
@@ -230,18 +237,19 @@ export const CommentRichTextEditor = ({
 
 interface UserContainerProps {
   userData: IUserData;
+  baseAPI: string;
   image?: string;
   businessAreas?: IBusinessArea[];
   branches?: IBranch[];
 }
 
-const UserContainer = ({ userData }: UserContainerProps) => {
+const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
   const [editor] = useLexicalComposerContext();
 
   const { colorMode } = useColorMode();
-  const imageUrl = useServerImageUrl(userData?.image?.file);
+  // const imageUrl = useServerImageUrl(userData?.image?.file);
 
-  return userData?.image?.file ? (
+  return userData.image ? (
     <Box
       pl={3}
       pt={2}
@@ -258,7 +266,9 @@ const UserContainer = ({ userData }: UserContainerProps) => {
       >
         <Avatar
           size={"md"}
-          src={imageUrl}
+          src={userData?.image?.file.startsWith("http") ?
+            userData?.image?.file :
+            `${baseAPI}${userData?.image?.file}`}
           name={`${userData?.first_name} ${userData?.last_name}`}
           mr={2}
           userSelect={"none"}
@@ -289,51 +299,53 @@ const UserContainer = ({ userData }: UserContainerProps) => {
         </Flex>
       </Flex>
     </Box>
-  ) : <Box
-    pl={3}
-    pt={2}
-    onClick={() => {
-      // If the editor is not focused, focus it.
-      editor.focus();
-    }}
-  >
-    <Flex
-      flexDir="row"
-      // color="gray.500"
-      sx={{ alignSelf: "flex-start" }}
-      mt={2}
-    >
-      <Avatar
-        size={"md"}
-        src={""}
-        mr={2}
-        userSelect={"none"}
-        style={{ pointerEvents: "none" }}
-        draggable={false}
-      />
+  ) :
+    null
+  // <Box
+  //   pl={3}
+  //   pt={2}
+  //   onClick={() => {
+  //     // If the editor is not focused, focus it.
+  //     editor.focus();
+  //   }}
+  // >
+  //   <Flex
+  //     flexDir="row"
+  //     // color="gray.500"
+  //     sx={{ alignSelf: "flex-start" }}
+  //     mt={2}
+  //   >
+  //     <Avatar
+  //       size={"md"}
+  //       src={""}
+  //       mr={2}
+  //       userSelect={"none"}
+  //       style={{ pointerEvents: "none" }}
+  //       draggable={false}
+  //     />
 
-      <Flex
-        pl={1}
-        pr={0}
-        w={"100%"}
-        h={"100%"}
-        justifyContent={"space-between"}
-        paddingRight={"40px"}
-      >
-        <Box userSelect={"none"}>
-          <Text
-            fontWeight="bold"
-            pl={1}
-            mt={0}
-            color={
-              colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
-            }
-          // w={"100%"}
-          >
-            {`${userData?.first_name} ${userData?.last_name}`}
-          </Text>
-        </Box>
-      </Flex>
-    </Flex>
-  </Box>;
+  //     <Flex
+  //       pl={1}
+  //       pr={0}
+  //       w={"100%"}
+  //       h={"100%"}
+  //       justifyContent={"space-between"}
+  //       paddingRight={"40px"}
+  //     >
+  //       <Box userSelect={"none"}>
+  //         <Text
+  //           fontWeight="bold"
+  //           pl={1}
+  //           mt={0}
+  //           color={
+  //             colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
+  //           }
+  //         // w={"100%"}
+  //         >
+  //           {`${userData?.first_name} ${userData?.last_name}`}
+  //         </Text>
+  //       </Box>
+  //     </Flex>
+  //   </Flex>
+  // </Box>;
 };

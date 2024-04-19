@@ -23,7 +23,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 
-export const DocumentApprovedEmailModal = ({ isOpen, onClose, emailFunction, thisUser }: IEmailModalProps) => {
+export const DocumentRecalledEmailModal = ({ isOpen, onClose, emailFunction, thisUser }: IEmailModalProps) => {
 
     const [canSend, setCanSend] = useState(false);
     const [toUserEmail, setToUserEmail] = useState("");
@@ -130,7 +130,7 @@ export const DocumentApprovedEmailModal = ({ isOpen, onClose, emailFunction, thi
             {" "}
             <ModalOverlay />
             <ModalContent bg={colorMode === "light" ? "white" : "gray.800"} p={4}>
-                <ModalHeader mt={5}>Send Document Approved Email</ModalHeader>
+                <ModalHeader mt={5}>Send Document Recalled Email</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody mb={5}>
                     <Grid gridRowGap={4}>
@@ -201,6 +201,10 @@ export const DocumentApprovedEmailModal = ({ isOpen, onClose, emailFunction, thi
                             </>
                         ) : null}
                     </Grid>
+                    <Text fontSize={"xs"} color={"gray.500"}>
+                        Note: This will have no effect on the status of the chosen document
+                    </Text>
+
                 </ModalBody>
                 <ModalFooter>
                     <Flex>

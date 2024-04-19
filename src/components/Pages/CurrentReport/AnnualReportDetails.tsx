@@ -65,7 +65,10 @@ export const AnnualReportDetails = () => {
         </Center>
       ) : (
         <Center flexDir={"column"}>
-          <VStack p={6} spacing={6} w={`${A4Width}mm`}>
+          <VStack p={6} spacing={6}
+            //  w={`${A4Width}mm`}
+            w="100%"
+          >
             <input
               type="hidden"
               {...register("pk")}

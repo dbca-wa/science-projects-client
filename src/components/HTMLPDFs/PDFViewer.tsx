@@ -131,6 +131,27 @@ export const PDFViewer = ({ thisReport,
 
     const { colorMode } = useColorMode();
 
+    const [showRestartMessage, setShowRestartMessage] = useState(false);
+    const [generationTime, setGenerationTime] = useState(0);
+
+    useEffect(() => {
+        let timer;
+        if (pdfDocumentData?.report?.pdf_generation_in_progress === true || annualReportPDFGenerationMutation.isLoading) {
+            timer = setInterval(() => {
+                setGenerationTime(prevTime => prevTime + 1000); // Increase by 1 second (1000 milliseconds)
+                if (generationTime >= 30000) {
+                    setShowRestartMessage(true); // Show restart message after 30 seconds
+                }
+            }, 1000); // Run every second
+        } else {
+            clearInterval(timer); // Stop the timer when generation is not in progress
+            setGenerationTime(0); // Reset generation time
+            setShowRestartMessage(false); // Hide restart message
+        }
+
+        return () => clearInterval(timer); // Cleanup timer on component unmount or when pdf_generation_in_progress changes
+    }, [pdfDocumentData, generationTime, annualReportPDFGenerationMutation]);
+
     useEffect(() => {
         if (!pdfDocumentDataLoading) {
             // console.log(pdfDocumentData);
@@ -169,7 +190,14 @@ export const PDFViewer = ({ thisReport,
                     mb={4}
                 >
                     <Center>
-                        <Text>You may download this pdf or create a new one with more recent data in less than 30 seconds.</Text>
+                        <Text
+                            fontSize={"sm"}
+                        >
+                            {annualReportPDFGenerationMutation.isLoading || pdfDocumentData?.report?.pdf_generation_in_progress
+                                ? showRestartMessage ? "PDF Generating... It's been 30 seconds, maybe you should cancel and try again" : `PDF Generating...`
+                                : "You may download this pdf or create a new one with more recent data in less than 30 seconds."
+                            }
+                        </Text>
 
                     </Center>
                     <Flex>
@@ -204,9 +232,7 @@ export const PDFViewer = ({ thisReport,
                         </Box>
 
                         {
-                            annualReportPDFGenerationMutation.isLoading
-                                ||
-                                pdfDocumentData?.report?.pdf_generation_in_progress
+                            annualReportPDFGenerationMutation.isLoading || pdfDocumentData?.report?.pdf_generation_in_progress
                                 ?
                                 <Button
                                     size={"sm"}
@@ -276,14 +302,14 @@ export const PDFViewer = ({ thisReport,
                             }}
                             loadingText={"Generation In Progress"}
                             isDisabled={
-                                annualReportPDFGenerationMutation.isLoading ||
                                 pdfDocumentData?.report?.pdf_generation_in_progress
+                                || annualReportPDFGenerationMutation.isLoading
                             }
                             type="submit"
                             form="pdf-generation-form"
                             isLoading={
-                                annualReportPDFGenerationMutation.isLoading ||
                                 pdfDocumentData?.report?.pdf_generation_in_progress
+                                || annualReportPDFGenerationMutation.isLoading
                             }
                         >
                             <Box mr={2}><BsStars /></Box>
@@ -291,13 +317,25 @@ export const PDFViewer = ({ thisReport,
                         </Button>
                     </Flex>
                 </Flex>
-                <iframe
-                    title="Annual Report PDF Viewer"
-                    src={binaryPdfData}
-                    width="100%"
-                    height={`${determineDPI() / 4}px`}
-                    style={{ border: '1px solid black', borderRadius: "20px" }}
-                ></iframe>
+                {
+
+                    pdfDocumentData?.report?.pdf_generation_in_progress && !cancelDocGenerationMutation.isSuccess
+                        || annualReportPDFGenerationMutation.isLoading && !cancelDocGenerationMutation.isSuccess
+                        ?
+                        <Center
+                            mt={100}
+                        ><img src="/bouncing-ball.svg" alt="Loading..." width={"20%"} height={"20%"} /></Center>
+                        :
+                        <iframe
+                            title="Annual Report PDF Viewer"
+                            src={binaryPdfData}
+                            width="100%"
+                            height={`${determineDPI() / 4}px`}
+                            style={{ border: '1px solid black', borderRadius: "20px" }}
+                        ></iframe>
+
+                }
+
             </Box>
     )
 }

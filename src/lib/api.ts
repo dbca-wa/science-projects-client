@@ -317,7 +317,7 @@ getTeamLead
 
 export const getFullUser = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
-    if (pk !== undefined && pk !== null) {
+    if (pk !== undefined && pk !== null && pk !== 0) {
         const res = instance.get(`users/${pk}`).then(res => {
             return res.data
         })
@@ -374,7 +374,8 @@ export const getUsersBasedOnSearchTerm = async (searchTerm: string, page: number
 };
 
 
-export const getInternalUsersBasedOnSearchTerm = async (searchTerm: string, onlyInternal: boolean) => {
+export const getInternalUsersBasedOnSearchTerm = async (searchTerm: string, onlyInternal: boolean, projectPk?: number) => {
+
     try {
         let url = `users/smallsearch`;
 
@@ -382,8 +383,10 @@ export const getInternalUsersBasedOnSearchTerm = async (searchTerm: string, only
             url += `?searchTerm=${searchTerm}`;
         }
 
-        url += `&onlyInternal=${(onlyInternal === undefined || onlyInternal == false) ? "False" : "True"}`
-
+        url += `${searchTerm ? "&" : "?"}onlyInternal=${(onlyInternal === undefined || onlyInternal == false) ? "False" : "True"}`
+        if (projectPk) {
+            url += `${(searchTerm || onlyInternal) ? "&" : "?"}fromProject=${projectPk}`
+        }
         const response = await instance.get(url);
 
         const { users } = response.data;
@@ -3058,17 +3061,19 @@ export const sendDocumentSentBackEmail = async ({ recipients_list, project_pk, d
 export interface IDocumentApproved {
     recipients_list: number[]; // array of pks
     project_pk: number;
-    document_kind: string; //concept, projectplan, progressreport, studentreport,projectclosur
+    // document_kind: string; //concept, projectplan, progressreport, studentreport,projectclosur
 }
 
 
-export const sendDocumentApprovedEmail = async ({ recipients_list, project_pk, document_kind }: IDocumentApproved) => {
+export const sendDocumentApprovedEmail = async ({ recipients_list, project_pk,
+    // document_kind 
+}: IDocumentApproved) => {
     return instance.post(
         `documents/document_approved_email`,
         {
             "recipients_list": recipients_list,
             "project_pk": project_pk,
-            "document_kind": document_kind,
+            // "document_kind": document_kind,
         }
     ).then(res => {
         return res.data;

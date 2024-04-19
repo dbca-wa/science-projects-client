@@ -29,8 +29,9 @@ export interface IDocumentComment {
 interface Props {
   documentID: number;
   userData: IUserMe;
+  baseAPI: string;
 }
-export const CommentSection = ({ documentID, userData }: Props) => {
+export const CommentSection = ({ documentID, userData, baseAPI }: Props) => {
   const { colorMode } = useColorMode();
 
   const { documentCommentsLoading, documentCommentsData, refetchComments } =
@@ -52,6 +53,7 @@ export const CommentSection = ({ documentID, userData }: Props) => {
   const branches = useBranches();
   const businessAreas = useBusinessAreas();
 
+
   return (
     <Box
       bg={colorMode === "light" ? "gray.100" : "gray.700"}
@@ -64,6 +66,7 @@ export const CommentSection = ({ documentID, userData }: Props) => {
       </Text>
       <Box mb={2}>
         <CommentRichTextEditor
+          baseAPI={baseAPI}
           userData={userData}
           documentId={documentID}
           refetchDocumentComments={refetchInterceptedFunction}
@@ -96,6 +99,7 @@ export const CommentSection = ({ documentID, userData }: Props) => {
                     }}
                   >
                     <CommentDisplayRTE
+                      baseAPI={baseAPI}
                       refetchComments={refetchInterceptedFunction}
                       documentPk={documentID}
                       commentPk={comment?.pk}
