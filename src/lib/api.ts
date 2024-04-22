@@ -3061,7 +3061,7 @@ export const sendDocumentSentBackEmail = async ({ recipients_list, project_pk, d
 export interface IDocumentApproved {
     recipients_list: number[]; // array of pks
     project_pk: number;
-    // document_kind: string; //concept, projectplan, progressreport, studentreport,projectclosur
+    document_kind?: string; //concept, projectplan, progressreport, studentreport,projectclosur
 }
 
 
@@ -3122,6 +3122,20 @@ export const sendDocumentRecalledEmail = async ({ recipients_list, project_pk, d
     }
     );
 }
+
+
+// export const celeryStartTask = async () => {
+//     return instance.post(
+//         'documents/celery_start',
+//     ).then(res => res.data);
+// }
+
+// export const celeryStopTask = async () => {
+//     return instance.post(
+//         'documents/celery_stop',
+//     ).then(res => res.data);
+// }
+
 
 export const getLatestActiveStudentReports = async () => {
     return instance.get(

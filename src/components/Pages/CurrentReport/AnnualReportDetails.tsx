@@ -1,9 +1,9 @@
 // Incomplete section to handle the filling and viewing of the Annual Report Details
 
 import { RichTextEditor } from "@/components/RichTextEditor/Editors/RichTextEditor";
-import { updateReport } from "@/lib/api";
+// import { updateReport } from "@/lib/api";
 import { useGetFullLatestReport } from "@/lib/hooks/useGetFullLatestReport";
-import { useGetLatestReportMedia } from "@/lib/hooks/useGetLatestReportMedia";
+// import { useGetLatestReportMedia } from "@/lib/hooks/useGetLatestReportMedia";
 import { useUser } from "@/lib/hooks/useUser";
 import { IReport } from "@/types";
 import {
@@ -14,52 +14,52 @@ import {
   Spinner,
   VStack,
   useColorMode,
-  useToast,
+  // useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+// import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
 export const AnnualReportDetails = () => {
-  const toast = useToast();
+  // const toast = useToast();
   const { register } = useForm<IReport>();
 
   const { userData } = useUser();
   const { colorMode } = useColorMode();
   const documentType = "annualreport";
   const editorKey = colorMode + documentType;
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const { reportData, reportLoading } = useGetFullLatestReport();
 
-  const updateMutation = useMutation(updateReport, {
-    onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Updated",
-        position: "top-right",
-      });
-      queryClient.invalidateQueries(["reports"]);
-    },
-    onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
-    },
-  });
+  // const updateMutation = useMutation(updateReport, {
+  //   onSuccess: () => {
+  //     toast({
+  //       status: "success",
+  //       title: "Updated",
+  //       position: "top-right",
+  //     });
+  //     queryClient.invalidateQueries(["reports"]);
+  //   },
+  //   onError: () => {
+  //     toast({
+  //       status: "error",
+  //       title: "Failed",
+  //       position: "top-right",
+  //     });
+  //   },
+  // });
 
   // const onUpdateSubmit = (formData: IReport) => {
   //   // console.log(formData);
   //   updateMutation.mutate(formData);
   // };
 
-  const A4Width = 210; // in millimeters
-  const A4Height = A4Width * 1.414; // 1.414 is the aspect ratio of A4 paper (297 / 210)
+  // const A4Width = 210; // in millimeters
+  // const A4Height = A4Width * 1.414; // 1.414 is the aspect ratio of A4 paper (297 / 210)
 
   return (
     <Box>
-      {!reportData ? (
+      {reportLoading || !reportData ? (
         <Center>
           <Spinner />
         </Center>

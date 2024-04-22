@@ -1,7 +1,7 @@
 // Dropdown search component for users. Displays 5 users below the search box.
 
 import {
-    Avatar,
+    // Avatar,
     Box,
     Flex,
     FormControl,
@@ -10,18 +10,18 @@ import {
     IconButton,
     Input,
     InputGroup,
-    Skeleton,
+    // Skeleton,
     useColorMode,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { IProjectData } from "../../types";
+import { IMidDoc } from "../../types";
 import {
     getFullProjectSimple,
     getMyProjectsBasedOnSearchTerm,
 } from "../../lib/api";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useUser } from "../../lib/hooks/useUser";
-import { useNoImage } from "../../lib/hooks/useNoImage";
+// import { useNoImage } from "../../lib/hooks/useNoImage";
 import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";
 import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
@@ -58,9 +58,9 @@ export const ProjectDocumentDropdown = ({
     isClosed
 }: IProjectDocumentDropdown) => {
     const [searchTerm, setSearchTerm] = useState(""); // Local state for search term
-    const [filteredItems, setFilteredItems] = useState<IProjectData[]>([]); // Local state for filtered items
+    const [filteredItems, setFilteredItems] = useState<IMidDoc[]>(); // Local state for filtered items
     const [isMenuOpen, setIsMenuOpen] = useState(isClosed ? false : true); // Stores the menu open state
-    const [selectedProjectDocument, setSelectedProjectDocument] = useState<IProjectData | null>(); // New state to store the selected name
+    const [selectedProjectDocument, setSelectedProjectDocument] = useState<IMidDoc>(); // New state to store the selected name
 
     const { userLoading, userData } = useUser();
 
@@ -107,13 +107,13 @@ export const ProjectDocumentDropdown = ({
         }
     }, [searchTerm, userLoading, userData, preselectedProjectDocumentPk, isClosed]);
 
-    const handleSelectProject = (project: IProjectData) => {
-        setProjectDocumentTypeFunction(project.kind);
+    const handleSelectDocument = (document: IMidDoc) => {
+        setProjectDocumentTypeFunction(document.kind);
         setIsMenuOpen(false);
-        setSelectedProjectDocument(project); // Update the selected project
+        setSelectedProjectDocument(document); // Update the selected project
         setSearchTerm(""); // Clear the search term when a project is selected
         if (setDocTypePk) {
-            setDocTypePk(project.pk);
+            setDocTypePk(document.referenced_doc.pk);
         }
     };
 
@@ -147,8 +147,8 @@ export const ProjectDocumentDropdown = ({
                 <FormLabel>{label}</FormLabel>
                 {selectedProjectDocument ? (
                     <Box mb={2} color="blue.500">
-                        <SelectedProjectInput
-                            project={selectedProjectDocument}
+                        <SelectedDocumentInput
+                            document={selectedProjectDocument}
                             onClear={handleClearProject}
                             isPreselected={
                                 preselectedProjectDocumentPk !== null &&
@@ -177,11 +177,11 @@ export const ProjectDocumentDropdown = ({
                         <Box pos="relative" w="100%">
                             <CustomMenu isOpen={filteredItems.length > 0 && isMenuOpen}>
                                 <CustomMenuList minWidth="100%">
-                                    {filteredItems?.map((project) => (
+                                    {filteredItems?.map((document) => (
                                         <CustomMenuItem
-                                            key={project?.pk}
-                                            onClick={() => handleSelectProject(project)}
-                                            project={project}
+                                            key={document?.pk}
+                                            onClick={() => handleSelectDocument(document)}
+                                            document={document}
                                         />
                                     ))}
                                 </CustomMenuList>
@@ -203,7 +203,9 @@ interface CustomMenuProps {
 
 interface CustomMenuItemProps {
     onClick: () => void;
-    project: IProjectData;
+    document: IMidDoc
+    // | IProjectData
+    ;
 }
 
 interface CustomMenuListProps {
@@ -227,22 +229,22 @@ const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
     );
 };
 
-const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
+const CustomMenuItem = ({ onClick, document, ...rest }: CustomMenuItemProps) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const handleClick = () => {
         onClick();
     };
 
-    const [imageLoaded, setImageLoaded] = useState(false);
+    // const [imageLoaded, setImageLoaded] = useState(false);
 
-    const handleImageLoad = () => {
-        setImageLoaded(true);
-    };
-    const noImage = useNoImage();
+    // const handleImageLoad = () => {
+    //     setImageLoaded(true);
+    // };
+    // const noImage = useNoImage();
     const serverUrl = useApiEndpoint();
 
-    return project ? (
+    return document ? (
         serverUrl ?
             <Flex
                 as="button"
@@ -257,7 +259,7 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
                 alignItems="center"
                 {...rest}
             >
-                {project?.image ? (
+                {/* {document?.project?.image ? (
                     <Skeleton
                         isLoaded={imageLoaded}
                         startColor="gray.200"
@@ -266,9 +268,9 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
                     >
                         <Avatar
                             src={
-                                project.image ?
-                                    project.image?.file.startsWith("http") ?
-                                        `${project.image?.file}` : `${serverUrl}${project.image?.file}` :
+                                document?.project.image ?
+                                    document?.project.image?.file.startsWith("http") ?
+                                        `${document?.project.image?.file}` : `${serverUrl}${document?.project.image?.file}` :
                                     noImage
                             }
                             onLoad={handleImageLoad}
@@ -279,7 +281,7 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
                         src={noImage}
                         onLoad={handleImageLoad}
                     />
-                )}
+                )} */}
 
                 <Box
                     display="flex"
@@ -289,7 +291,7 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
                     h="100%"
                 >
                     <ExtractedHTMLTitle
-                        htmlContent={`${project?.title}`}
+                        htmlContent={`(${document?.kind}) ${document?.project?.title}`}
                         color={"green.500"}
                     />
                 </Box>
@@ -309,20 +311,20 @@ const CustomMenuList = ({
     );
 };
 
-interface SelectedProjectInputProps {
-    project: IProjectData;
+interface SelectedDocumentInputProps {
+    document: IMidDoc;
     onClear: () => void;
     isPreselected: boolean;
 }
 
-const SelectedProjectInput = ({
-    project,
+const SelectedDocumentInput = ({
+    document,
     onClear,
     isPreselected,
-}: SelectedProjectInputProps) => {
-    const noImage = useNoImage();
+}: SelectedDocumentInputProps) => {
+    // const noImage = useNoImage();
 
-    const [projectPk, setProjectPk] = useState(project.pk);
+    const [documentPk, setDocumentPk] = useState(document.pk);
     const { colorMode } = useColorMode();
     const serverUrl = useApiEndpoint();
 
@@ -341,30 +343,25 @@ const SelectedProjectInput = ({
                 py={1}
                 mr={2}
             >
-                <Avatar
+                {/* <Avatar
                     size="sm"
                     src={
-                        project.image ?
-                            project.image?.file.startsWith("http") ?
-                                `${project.image?.file}` : `${serverUrl}${project.image?.file}` :
+                        document?.project.image ?
+                            document?.project.image?.file.startsWith("http") ?
+                                `${document?.project.image?.file}` : `${serverUrl}${document?.project.image?.file}` :
                             noImage
-                        // project?.image?.file
-                        //   ? project.image?.file
-                        //   : project.image?.old_file
-                        //     ? project.image.old_file
-                        //     : noImage
                     }
-                />
+                /> */}
                 <ExtractedHTMLTitle
                     ml={2}
-                    htmlContent={`${project?.title}`}
+                    htmlContent={`(${document?.kind}) ${document?.project?.title}`}
                     color={colorMode === "light" ? "green.500" : "green.400"}
                 />
                 <input
                     // {...register("project", { required: true })}
-                    value={projectPk}
+                    value={documentPk}
                     onChange={() => {
-                        setProjectPk(project.pk);
+                        setDocumentPk(document?.pk);
                     }}
                     hidden
                 />

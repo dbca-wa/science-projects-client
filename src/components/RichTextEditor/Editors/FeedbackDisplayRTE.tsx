@@ -26,6 +26,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { MentionNode } from "../Plugins/MentionsPlugin";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import { PrepopulateCommentDisplayPlugin } from "../Plugins/PrepopulateCommentDisplayPlugin";
+import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface IFeedbackProps {
     baData: IBusinessArea[];
@@ -162,6 +163,9 @@ export const FeedbackDisplayRTE = ({ baData, branchesData, user, feedbackData }:
         nodes: [ListNode, ListItemNode, MentionNode],
     };
 
+    const baseAPI = useApiEndpoint();
+
+
     return (
         <LexicalComposer
             key={`${colorMode}-${theme}-${feedbackData?.id}`} // Add a key with the theme for re-rendering
@@ -193,6 +197,7 @@ export const FeedbackDisplayRTE = ({ baData, branchesData, user, feedbackData }:
                         pt={2}
                     >
                         <ChatUser
+                            baseAPI={baseAPI}
                             branches={branchesData}
                             businessAreas={baData}
                             user={user}

@@ -1,10 +1,10 @@
 import DocumentApprovedEmail from "@/components/Emails/DocumentApprovedEmail";
-import DocumentReadyForEditingEmail from "@/components/Emails/DocumentReadyForEditingEmail";
+// import DocumentReadyForEditingEmail from "@/components/Emails/DocumentReadyForEditingEmail";
 import DocumentRecalledEmail from "@/components/Emails/DocumentRecalledEmail";
-import DocumentSentBackEmail from "@/components/Emails/DocumentSentBackEmail";
-import NewCycleOpenEmail from "@/components/Emails/NewCycleOpenEmail";
-import ProjectClosureEmail from "@/components/Emails/ProjectClosureEmail";
-import ReviewDocumentEmail from "@/components/Emails/ReviewDocumentEmail";
+// import DocumentSentBackEmail from "@/components/Emails/DocumentSentBackEmail";
+// import NewCycleOpenEmail from "@/components/Emails/NewCycleOpenEmail";
+// import ProjectClosureEmail from "@/components/Emails/ProjectClosureEmail";
+// import ReviewDocumentEmail from "@/components/Emails/ReviewDocumentEmail";
 import { DocumentApprovedEmailModal } from "@/components/Modals/Emails/DocumentApprovedEmailModal";
 import {
   IDocumentApproved,
@@ -14,12 +14,12 @@ import {
   IProjectClosureEmail,
   IReviewDocumentEmail,
   sendDocumentApprovedEmail,
-  sendDocumentReadyEmail,
-  sendDocumentRecalledEmail,
-  sendDocumentSentBackEmail,
-  sendNewReportingCycleOpenEmail,
-  sendProjectClosureEmail,
-  sendReviewProjectDocumentEmail,
+  // sendDocumentReadyEmail,
+  // sendDocumentRecalledEmail,
+  // sendDocumentSentBackEmail,
+  // sendNewReportingCycleOpenEmail,
+  // sendProjectClosureEmail,
+  // sendReviewProjectDocumentEmail,
 } from "@/lib/api";
 import { useUser } from "@/lib/hooks/useUser";
 import {
@@ -35,7 +35,10 @@ import {
   useDisclosure,
   // useToast,
 } from "@chakra-ui/react";
-import React, { ReactElement, createElement, useEffect, useRef, useState } from "react";
+import React, {
+  useRef,
+  // useState, ReactElement, createElement, useEffect 
+} from "react";
 import { render } from "@react-email/render";
 import { DocumentRecalledEmailModal } from "@/components/Modals/Emails/DocumentRecalledEmailModal";
 // import {
