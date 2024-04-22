@@ -9,7 +9,7 @@ import {
     Hr,
     Html,
     Img,
-    Preview,
+    // Preview,
     Section,
     Tailwind,
     Text,
@@ -29,7 +29,9 @@ interface IProps {
 
 export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
 
-    const { conceptPlanData, conceptPlanDataLoading, refetchCPData } = useGetConceptPlanData(concept_plan_pk);
+    const { conceptPlanData, conceptPlanDataLoading,
+        // refetchCPData 
+    } = useGetConceptPlanData(concept_plan_pk);
 
     useEffect(() => {
         // if (!conceptPlanData) {

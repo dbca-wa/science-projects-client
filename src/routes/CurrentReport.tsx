@@ -22,6 +22,7 @@ import { ParticipatingProjectReports } from "../components/Pages/CurrentReport/P
 import { getLatestReportingYear } from "../lib/api";
 import { IReport } from "../types";
 import { PDFViewer } from "@/components/HTMLPDFs/PDFViewer";
+// import { CeleryTest } from "@/components/HTMLPDFs/CeleryTest";
 
 export const CurrentReport = () => {
   const [latestYear, setLatestYear] = useState<number | null>(null);
@@ -88,6 +89,7 @@ export const CurrentReport = () => {
               <Tab>Approved Progress Reports</Tab>
               <Tab>Pending Reports</Tab>
               <Tab>Print Preview</Tab>
+              {/* <Tab>Test</Tab> */}
             </TabList>
             <TabPanels>
               <TabPanel>
@@ -108,6 +110,9 @@ export const CurrentReport = () => {
                 <PDFViewer thisReport={thisReport} />
                 {/* <AnnualReportPrintPreview thisReport={thisReport} /> */}
               </TabPanel>
+              {/* <TabPanel>
+                <CeleryTest />
+              </TabPanel> */}
             </TabPanels>
           </Tabs>
         )}

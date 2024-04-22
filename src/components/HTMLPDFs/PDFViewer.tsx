@@ -315,6 +315,7 @@ export const PDFViewer = ({ thisReport,
                             <Box mr={2}><BsStars /></Box>
                             Generate New
                         </Button>
+
                     </Flex>
                 </Flex>
                 {
