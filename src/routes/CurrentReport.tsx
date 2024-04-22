@@ -96,7 +96,7 @@ export const CurrentReport = () => {
                 <AnnualReportDetails />
               </TabPanel>
               <TabPanel>
-                <AnnualReportMedia />
+                <AnnualReportMedia reportId={thisReport?.pk ? thisReport.pk : thisReport?.id} />
               </TabPanel>
 
               <TabPanel>
