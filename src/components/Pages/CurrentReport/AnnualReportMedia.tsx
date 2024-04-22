@@ -5,9 +5,16 @@ import { Box, Center, Grid, Spinner } from "@chakra-ui/react";
 import { ReportMediaChanger } from "../Admin/ReportMediaChanger";
 import { useEffect } from "react";
 
-export const AnnualReportMedia = () => {
+interface Props {
+  reportId?: number;
+}
+
+export const AnnualReportMedia = ({ reportId }: Props) => {
   const { reportMediaData, refetchMedia } = useGetLatestReportMedia();
-  useEffect(() => console.log(reportMediaData));
+  useEffect(() => {
+    console.log(reportMediaData);
+    console.log(reportId);
+  });
 
   return (
     <Box>
@@ -37,49 +44,49 @@ export const AnnualReportMedia = () => {
           <ReportMediaChanger
             reportMediaData={reportMediaData}
             section={"sdchart"}
-            reportPk={reportMediaData[0]?.report?.id}
+            reportPk={reportMediaData[0]?.report?.id ? reportMediaData[0]?.report?.id : reportId}
             refetchData={refetchMedia}
           />
 
           <ReportMediaChanger
             reportMediaData={reportMediaData}
             section={"service_delivery"}
-            reportPk={reportMediaData[0]?.report?.id}
+            reportPk={reportMediaData[0]?.report?.id ? reportMediaData[0]?.report?.id : reportId}
             refetchData={refetchMedia}
           />
 
           <ReportMediaChanger
             reportMediaData={reportMediaData}
             section={"research"}
-            reportPk={reportMediaData[0]?.report?.id}
+            reportPk={reportMediaData[0]?.report?.id ? reportMediaData[0]?.report?.id : reportId}
             refetchData={refetchMedia}
           />
 
           <ReportMediaChanger
             reportMediaData={reportMediaData}
             section={"partnerships"}
-            reportPk={reportMediaData[0]?.report?.id}
+            reportPk={reportMediaData[0]?.report?.id ? reportMediaData[0]?.report?.id : reportId}
             refetchData={refetchMedia}
           />
 
           <ReportMediaChanger
             reportMediaData={reportMediaData}
             section={"collaborations"}
-            reportPk={reportMediaData[0]?.report?.id}
+            reportPk={reportMediaData[0]?.report?.id ? reportMediaData[0]?.report?.id : reportId}
             refetchData={refetchMedia}
           />
 
           <ReportMediaChanger
             reportMediaData={reportMediaData}
             section={"student_projects"}
-            reportPk={reportMediaData[0]?.report?.id}
+            reportPk={reportMediaData[0]?.report?.id ? reportMediaData[0]?.report?.id : reportId}
             refetchData={refetchMedia}
           />
 
           <ReportMediaChanger
             reportMediaData={reportMediaData}
             section={"publications"}
-            reportPk={reportMediaData[0]?.report?.id}
+            reportPk={reportMediaData[0]?.report?.id ? reportMediaData[0]?.report?.id : reportId}
             refetchData={refetchMedia}
           />
 

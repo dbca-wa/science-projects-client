@@ -2,7 +2,7 @@ import { IDocGen, cancelAnnualReportPDF, generateAnnualReportPDF } from "@/lib/a
 import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 import { useGetAnnualReportPDF } from "@/lib/hooks/useGetAnnualReportPDF";
 import { IReport } from "@/types";
-import { Box, Button, Center, Flex, Input, Spinner, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Grid, Input, Spinner, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { motion } from "framer-motion";
@@ -153,8 +153,8 @@ export const PDFViewer = ({ thisReport,
     }, [pdfDocumentData, generationTime, annualReportPDFGenerationMutation]);
 
     useEffect(() => {
-        if (!pdfDocumentDataLoading) {
-            // console.log(pdfDocumentData);
+        if (!pdfDocumentDataLoading && pdfDocumentData !== undefined) {
+            console.log(pdfDocumentData);
             const binary = atob(pdfDocumentData?.pdf_data);
             const arrayBuffer = new ArrayBuffer(binary.length);
             const uint8Array = new Uint8Array(arrayBuffer);
@@ -182,144 +182,143 @@ export const PDFViewer = ({ thisReport,
     }
 
     return (
-        pdfDocumentDataLoading || !binaryPdfData ? <Center><Spinner /></Center> :
-            <Box>
-                <Flex
-                    alignContent={"center"}
-                    justifyContent={"space-between"}
-                    mb={4}
-                >
-                    <Center>
-                        <Text
-                            fontSize={"sm"}
-                        >
-                            {annualReportPDFGenerationMutation.isLoading || pdfDocumentData?.report?.pdf_generation_in_progress
-                                ? showRestartMessage ? "PDF Generating... It's been 30 seconds, maybe you should cancel and try again" : `PDF Generating...`
-                                : "You may download this pdf or create a new one with more recent data in less than 30 seconds."
-                            }
-                        </Text>
+        <Box>
+            <Flex
+                alignContent={"center"}
+                justifyContent={"space-between"}
+                mb={4}
+            >
+                <Center>
+                    <Text
+                        fontSize={"sm"}
+                    >
+                        {annualReportPDFGenerationMutation.isLoading || pdfDocumentData?.report?.pdf_generation_in_progress
+                            ? showRestartMessage ? "PDF Generating... It's been 30 seconds, maybe you should cancel and try again" : `PDF Generating...`
+                            : "You may download this pdf or create a new one with more recent data in less than 30 seconds."
+                        }
+                    </Text>
 
-                    </Center>
-                    <Flex>
+                </Center>
+                <Flex>
 
 
-                        <Box
-                            as="form"
-                            id="cancel-pdf-generation-form"
-                            onSubmit={handleCancelGenSubmit(beginCancelDocGen)}
-                        >
-                            <Input
-                                type="hidden"
-                                {...cancelGenRegister("document_pk", {
-                                    required: true,
-                                    value: thisReport?.pk ? thisReport.pk : thisReport?.id,
-                                })}
-                            />
-                        </Box>
+                    <Box
+                        as="form"
+                        id="cancel-pdf-generation-form"
+                        onSubmit={handleCancelGenSubmit(beginCancelDocGen)}
+                    >
+                        <Input
+                            type="hidden"
+                            {...cancelGenRegister("document_pk", {
+                                required: true,
+                                value: thisReport?.pk ? thisReport.pk : thisReport?.id,
+                            })}
+                        />
+                    </Box>
 
-                        <Box
-                            as="form"
-                            id="pdf-generation-form"
-                            onSubmit={handleGenSubmit(beginProjectDocPDFGeneration)}
-                        >
-                            <Input
-                                type="hidden"
-                                {...genRegister("document_pk", {
-                                    required: true,
-                                    value: thisReport?.pk ? thisReport.pk : thisReport?.id,
-                                })}
-                            />
-                        </Box>
+                    <Box
+                        as="form"
+                        id="pdf-generation-form"
+                        onSubmit={handleGenSubmit(beginProjectDocPDFGeneration)}
+                    >
+                        <Input
+                            type="hidden"
+                            {...genRegister("document_pk", {
+                                required: true,
+                                value: thisReport?.pk ? thisReport.pk : thisReport?.id,
+                            })}
+                        />
+                    </Box>
 
-                        {
-                            annualReportPDFGenerationMutation.isLoading || pdfDocumentData?.report?.pdf_generation_in_progress
-                                ?
+                    {
+                        annualReportPDFGenerationMutation.isLoading || pdfDocumentData?.report?.pdf_generation_in_progress
+                            ?
+                            <Button
+                                size={"sm"}
+                                ml={2}
+                                variant={"solid"}
+                                color={"white"}
+                                background={
+                                    colorMode === "light" ? "gray.400" : "gray.500"
+                                }
+                                _hover={{
+                                    background:
+                                        colorMode === "light" ? "gray.300" : "gray.400",
+                                }}
+                                loadingText={"Canceling"}
+                                isDisabled={
+                                    cancelDocGenerationMutation.isLoading
+                                }
+                                type="submit"
+                                form="cancel-pdf-generation-form"
+                                isLoading={
+                                    cancelDocGenerationMutation.isLoading
+                                }
+                            >
+                                <Box mr={2}><FcCancel /></Box>
+                                Cancel
+                            </Button> :
+                            pdfDocumentData?.pdf_data ?
                                 <Button
+                                    as={motion.div}
+                                    initial={{ y: -10, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    exit={{ y: 10, opacity: 0 }}
+                                    sx={{ transitionDuration: 0.7, animationDelay: 1 }}
                                     size={"sm"}
                                     ml={2}
                                     variant={"solid"}
                                     color={"white"}
                                     background={
-                                        colorMode === "light" ? "gray.400" : "gray.500"
+                                        colorMode === "light" ? "blue.500" : "blue.600"
                                     }
                                     _hover={{
+                                        cursor: "pointer",
                                         background:
-                                            colorMode === "light" ? "gray.300" : "gray.400",
+                                            colorMode === "light" ? "blue.400" : "blue.500",
                                     }}
-                                    loadingText={"Canceling"}
-                                    isDisabled={
-                                        cancelDocGenerationMutation.isLoading
-                                    }
-                                    type="submit"
-                                    form="cancel-pdf-generation-form"
-                                    isLoading={
-                                        cancelDocGenerationMutation.isLoading
-                                    }
+                                    onClick={() => {
+                                        window.open(`${apiEndpoint}${pdfDocumentData?.file}`, "_blank")
+                                    }}
                                 >
-                                    <Box mr={2}><FcCancel /></Box>
-                                    Cancel
-                                </Button> :
-                                pdfDocumentData?.pdf_data ?
-                                    <Button
-                                        as={motion.div}
-                                        initial={{ y: -10, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        exit={{ y: 10, opacity: 0 }}
-                                        sx={{ transitionDuration: 0.7, animationDelay: 1 }}
-                                        size={"sm"}
-                                        ml={2}
-                                        variant={"solid"}
-                                        color={"white"}
-                                        background={
-                                            colorMode === "light" ? "blue.500" : "blue.600"
-                                        }
-                                        _hover={{
-                                            cursor: "pointer",
-                                            background:
-                                                colorMode === "light" ? "blue.400" : "blue.500",
-                                        }}
-                                        onClick={() => {
-                                            window.open(`${apiEndpoint}${pdfDocumentData?.file}`, "_blank")
-                                        }}
-                                    >
-                                        <Box mr={2}><FaFileDownload /></Box>
-                                        Download PDF
-                                    </Button>
-                                    : null
+                                    <Box mr={2}><FaFileDownload /></Box>
+                                    Download PDF
+                                </Button>
+                                : null
+                    }
+                    <Button
+                        size={"sm"}
+                        ml={2}
+                        variant={"solid"}
+                        color={"white"}
+                        background={
+                            colorMode === "light" ? "green.500" : "green.600"
                         }
-                        <Button
-                            size={"sm"}
-                            ml={2}
-                            variant={"solid"}
-                            color={"white"}
-                            background={
-                                colorMode === "light" ? "green.500" : "green.600"
-                            }
-                            _hover={{
-                                cursor: "pointer",
-                                background:
-                                    colorMode === "light" ? "green.400" : "green.500",
-                            }}
-                            loadingText={"Generation In Progress"}
-                            isDisabled={
-                                pdfDocumentData?.report?.pdf_generation_in_progress
-                                || annualReportPDFGenerationMutation.isLoading
-                            }
-                            type="submit"
-                            form="pdf-generation-form"
-                            isLoading={
-                                pdfDocumentData?.report?.pdf_generation_in_progress
-                                || annualReportPDFGenerationMutation.isLoading
-                            }
-                        >
-                            <Box mr={2}><BsStars /></Box>
-                            Generate New
-                        </Button>
+                        _hover={{
+                            cursor: "pointer",
+                            background:
+                                colorMode === "light" ? "green.400" : "green.500",
+                        }}
+                        loadingText={"Generation In Progress"}
+                        isDisabled={
+                            pdfDocumentData?.report?.pdf_generation_in_progress
+                            || annualReportPDFGenerationMutation.isLoading
+                        }
+                        type="submit"
+                        form="pdf-generation-form"
+                        isLoading={
+                            pdfDocumentData?.report?.pdf_generation_in_progress
+                            || annualReportPDFGenerationMutation.isLoading
+                        }
+                    >
+                        <Box mr={2}><BsStars /></Box>
+                        Generate New
+                    </Button>
 
-                    </Flex>
                 </Flex>
-                {
-
+            </Flex>
+            {
+                pdfDocumentData !== undefined ?
                     pdfDocumentData?.report?.pdf_generation_in_progress && !cancelDocGenerationMutation.isSuccess
                         || annualReportPDFGenerationMutation.isLoading && !cancelDocGenerationMutation.isSuccess
                         ?
@@ -334,9 +333,14 @@ export const PDFViewer = ({ thisReport,
                             height={`${determineDPI() / 4}px`}
                             style={{ border: '1px solid black', borderRadius: "20px" }}
                         ></iframe>
+                    : <Center>
+                        <Grid>
+                            <Center><Text>There is no pdf.</Text></Center>
+                            <Center><Text>Click generate new to create one.</Text></Center>
+                        </Grid>
+                    </Center>
+            }
 
-                }
-
-            </Box>
+        </Box>
     )
 }
