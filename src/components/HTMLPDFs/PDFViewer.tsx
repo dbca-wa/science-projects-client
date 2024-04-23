@@ -318,26 +318,30 @@ export const PDFViewer = ({ thisReport,
                 </Flex>
             </Flex>
             {
-                pdfDocumentData !== undefined ?
-                    pdfDocumentData?.report?.pdf_generation_in_progress && !cancelDocGenerationMutation.isSuccess
-                        || annualReportPDFGenerationMutation.isLoading && !cancelDocGenerationMutation.isSuccess
-                        ?
-                        <Center
-                            mt={100}
-                        ><img src="/bouncing-ball.svg" alt="Loading..." width={"20%"} height={"20%"} /></Center>
-                        :
-                        <iframe
-                            title="Annual Report PDF Viewer"
-                            src={binaryPdfData}
-                            width="100%"
-                            height={`${determineDPI() / 4}px`}
-                            style={{ border: '1px solid black', borderRadius: "20px" }}
-                        ></iframe>
-                    : <Center>
-                        <Grid>
-                            <Center><Text>There is no pdf.</Text></Center>
-                            <Center><Text>Click generate new to create one.</Text></Center>
-                        </Grid>
+                !pdfDocumentDataLoading ?
+                    pdfDocumentData !== undefined ?
+                        pdfDocumentData?.report?.pdf_generation_in_progress && !cancelDocGenerationMutation.isSuccess
+                            || annualReportPDFGenerationMutation.isLoading && !cancelDocGenerationMutation.isSuccess
+                            ?
+                            <Center
+                                mt={100}
+                            ><img src="/bouncing-ball.svg" alt="Loading..." width={"20%"} height={"20%"} /></Center>
+                            :
+                            <iframe
+                                title="Annual Report PDF Viewer"
+                                src={binaryPdfData}
+                                width="100%"
+                                height={`${determineDPI() / 4}px`}
+                                style={{ border: '1px solid black', borderRadius: "20px" }}
+                            ></iframe>
+                        : <Center>
+                            <Grid>
+                                <Center><Text>There is no pdf.</Text></Center>
+                                <Center><Text>Click generate new to create one.</Text></Center>
+                            </Grid>
+                        </Center> :
+                    <Center mt={4}>
+                        <Spinner />
                     </Center>
             }
 
