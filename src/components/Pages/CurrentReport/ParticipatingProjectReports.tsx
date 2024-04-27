@@ -4,39 +4,50 @@ import { ARProgressReportHandler } from "@/components/RichTextEditor/Editors/ARP
 import { useLatestYearsActiveProgressReports } from "@/lib/hooks/useLatestYearsActiveProgressReports";
 import { useLatestYearsActiveStudentProjects } from "@/lib/hooks/useLatestYearsActiveStudentProjects";
 import { useUser } from "@/lib/hooks/useUser";
-import { Accordion, AccordionButton, AccordionItem, AccordionPanel, Box, Center, Spinner, Text, useColorMode } from "@chakra-ui/react";
-import { JSXElementConstructor, ReactElement, useEffect } from "react";
-import whitePaperBackground from "@/images/white-texture.jpg"
+import {
+  Accordion,
+  AccordionButton,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Center,
+  Spinner,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
+// import {
+// JSXElementConstructor, ReactElement,
+// useEffect } from "react";
+import whitePaperBackground from "@/images/white-texture.jpg";
 import { RiBook3Fill } from "react-icons/ri";
 import { MdScience } from "react-icons/md";
 import { ARStudentReportHandler } from "@/components/RichTextEditor/Editors/ARStudentReportHandler";
-import { render } from "@react-email/render";
-
+// import { render } from "@react-email/render";
 
 export const ParticipatingProjectReports = () => {
+  const { latestProgressReportsData, latestProgressReportsLoading } =
+    useLatestYearsActiveProgressReports();
 
-  const { latestProgressReportsData, latestProgressReportsLoading } = useLatestYearsActiveProgressReports();
+  const { latestStudentReportsData, latestStudentReportsLoading } =
+    useLatestYearsActiveStudentProjects();
 
-  const { latestStudentReportsData, latestStudentReportsLoading } = useLatestYearsActiveStudentProjects();
+  // const getHTML = (children: ReactElement<any, string | JSXElementConstructor<any>>) => {
+  //   const html = render(children, {
+  //     pretty: true,
+  //   });
 
-  const getHTML = (children: ReactElement<any, string | JSXElementConstructor<any>>) => {
-    const html = render(children, {
-      pretty: true,
-    });
+  //   console.log(html);
 
-    console.log(html);
+  // }
 
-  }
-
-  useEffect(() => {
-    if (!latestProgressReportsLoading && !latestStudentReportsLoading) {
-      console.log({
-        "student": latestStudentReportsData,
-        "other": latestProgressReportsData
-      })
-    }
-  }, [latestProgressReportsData, latestStudentReportsData, latestProgressReportsLoading, latestStudentReportsLoading])
-
+  // useEffect(() => {
+  //   if (!latestProgressReportsLoading && !latestStudentReportsLoading) {
+  //     console.log({
+  //       "student": latestStudentReportsData,
+  //       "other": latestProgressReportsData
+  //     })
+  //   }
+  // }, [latestProgressReportsData, latestStudentReportsData, latestProgressReportsLoading, latestStudentReportsLoading])
 
   const { userData, userLoading } = useUser();
   const A4Width = 210; // in millimeters
@@ -46,23 +57,29 @@ export const ParticipatingProjectReports = () => {
 
   return (
     <Box>
-
       {latestProgressReportsLoading || latestStudentReportsLoading ? (
         <Center>
           <Spinner />
         </Center>
       ) : (
-        <Box display={"flex"} flexDir={"column"} margin={"auto"} maxW={`${A4Width}mm`} minH={`${A4Height}mm`} py={4}
+        <Box
+          display={"flex"}
+          flexDir={"column"}
+          margin={"auto"}
+          maxW={`${A4Width}mm`}
+          minH={`${A4Height}mm`}
+          py={4}
           // bg={"orange"}
           position="relative"
-        // zIndex={1}
+          // zIndex={1}
         >
           <Box
             position="absolute"
             top="0"
             left="0"
             right="0"
-            bottom="0" minH={`${A4Height}mm`}
+            bottom="0"
+            minH={`${A4Height}mm`}
             backgroundImage={`url(${whitePaperBackground})`}
             backgroundSize="cover"
             backgroundPosition="center"
@@ -71,20 +88,16 @@ export const ParticipatingProjectReports = () => {
             opacity={0.25} // Set the opacity of the background image
             zIndex={0}
           />
-          {(latestStudentReportsData?.length + latestProgressReportsData?.length) < 1 ?
+          {latestStudentReportsData?.length +
+            latestProgressReportsData?.length <
+          1 ? (
             <Center>
-              <Text pos={"absolute"} top={10}>There are no approved reports for this year</Text>
-
+              <Text pos={"absolute"} top={10}>
+                There are no approved reports for this year
+              </Text>
             </Center>
-            :
-
-
-            <Accordion
-              defaultIndex={[1]}
-              allowMultiple
-              zIndex={2}
-              w={"100%"}
-            >
+          ) : (
+            <Accordion defaultIndex={[1]} allowMultiple zIndex={2} w={"100%"}>
               <AccordionItem
                 mt={-4}
                 borderColor={
@@ -112,43 +125,41 @@ export const ParticipatingProjectReports = () => {
                   alignItems={"center"}
                   justifyContent={"center"}
                 >
-                  <Center
-                    mb={4}
-                    mt={4}
-                    ml={6}
-                  >
-                    <Box display="flex" alignItems="center" justifyContent="center" width={8} height={8} mr={4}>
-                      <RiBook3Fill
-                        size={"lg"}
-                      />
+                  <Center mb={4} mt={4} ml={6}>
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      width={8}
+                      height={8}
+                      mr={4}
+                    >
+                      <RiBook3Fill size={"lg"} />
                     </Box>
                     <Text
-                      fontWeight={"bold"} fontSize={"xl"}
-                    // color={"black"}
+                      fontWeight={"bold"}
+                      fontSize={"xl"}
+                      // color={"black"}
                     >
                       Student Reports ({latestStudentReportsData?.length})
                     </Text>
                   </Center>
-
                 </AccordionButton>
-                <AccordionPanel
-                  py={4}
-                  mt={4}
-                >
+                <AccordionPanel py={4} mt={4}>
                   {!userLoading &&
                     latestStudentReportsData?.map((sr, index) => {
                       return (
-
-
                         <ARStudentReportHandler
                           key={`student${index}`}
-                          canEdit={userData?.is_superuser || userData?.business_area?.name === "Directorate"}
+                          canEdit={
+                            userData?.is_superuser ||
+                            userData?.business_area?.name === "Directorate"
+                          }
                           report={sr}
                           shouldAlternatePicture={index % 2 !== 0}
                         />
                       );
                     })}
-
                 </AccordionPanel>
               </AccordionItem>
 
@@ -179,59 +190,53 @@ export const ParticipatingProjectReports = () => {
                   alignItems={"center"}
                   justifyContent={"center"}
                 >
-                  <Center
-                    mb={4}
-                    mt={4}
-                    ml={6}
-                  >
-                    <Box display="flex" alignItems="center" justifyContent="center" width={8} height={8} mr={4}>
-                      <MdScience
-                        size={"lg"}
-                      />
+                  <Center mb={4} mt={4} ml={6}>
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      width={8}
+                      height={8}
+                      mr={4}
+                    >
+                      <MdScience size={"lg"} />
                     </Box>
                     <Text
-                      fontWeight={"bold"} fontSize={"xl"}
-                    // color={"black"}
+                      fontWeight={"bold"}
+                      fontSize={"xl"}
+                      // color={"black"}
                     >
                       Progress Reports ({latestProgressReportsData?.length})
                     </Text>
                   </Center>
-
-
                 </AccordionButton>
-                <AccordionPanel
-                  py={4}
-                  mt={4}
-                >
+                <AccordionPanel py={4} mt={4}>
                   {latestProgressReportsData &&
                     latestProgressReportsData?.map((pr, index) => {
                       return (
-
-
                         <ARProgressReportHandler
                           key={`ordinary${index}`}
-                          canEdit={userData?.is_superuser || userData?.business_area?.name === "Directorate"}
+                          canEdit={
+                            userData?.is_superuser ||
+                            userData?.business_area?.name === "Directorate"
+                          }
                           report={pr}
                           shouldAlternatePicture={index % 2 !== 0}
                         />
                       );
                     })}
-
                 </AccordionPanel>
               </AccordionItem>
             </Accordion>
-          }
+          )}
         </Box>
-
-      )
-      }
+      )}
     </Box>
   );
 };
 
-
-
-{/* // <Center>
+{
+  /* // <Center>
         //   {!userLoading &&
         //     latestProgressReportsData?.map((report, index) => {
         //       return (
@@ -254,4 +259,5 @@ export const ParticipatingProjectReports = () => {
         //         </Box>
         //       );
         //     })}
-        // </Center> */}
+        // </Center> */
+}
