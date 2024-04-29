@@ -3346,11 +3346,11 @@ export const generateAnnualReportPDF = async ({ document_pk }: IDocGen) => {
             return response.text();
         })
         .then(cssFileContent => {
-            console.log({ cssFileURL, cssFileContent });
+            // console.log({ cssFileURL, cssFileContent });
             // Send the object as JSON
             const css_content = JSON.stringify(cssFileContent);
             // You can send jsonString to your server using an HTTP request (e.g., fetch or axios)
-            console.log(css_content); // Log the JSON string for verification
+            // console.log(css_content); // Log the JSON string for verification
             return css_content
         })
 
@@ -3360,7 +3360,7 @@ export const generateAnnualReportPDF = async ({ document_pk }: IDocGen) => {
         { "css_content": cssFileContents }
 
     );
-    console.log(res.data);
+    // console.log(res.data);
     return { res };
 }
 
