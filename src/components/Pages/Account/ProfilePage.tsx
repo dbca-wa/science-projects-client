@@ -232,14 +232,14 @@ export const ProfilePage = () => {
                     ? me.title === "mr"
                       ? "Mr."
                       : me.title === "mrs"
-                      ? "Mrs."
-                      : me.title === "ms"
-                      ? "Ms."
-                      : me.title === "master"
-                      ? "Master"
-                      : me.title === "dr"
-                      ? "Dr."
-                      : "Bad Title"
+                        ? "Mrs."
+                        : me.title === "ms"
+                          ? "Ms."
+                          : me.title === "master"
+                            ? "Master"
+                            : me.title === "dr"
+                              ? "Dr."
+                              : "Bad Title"
                     : "--"}
                 </Text>
               </Flex>
@@ -399,8 +399,8 @@ export const ProfilePage = () => {
                   {!me.is_staff
                     ? "External"
                     : me?.agency?.name
-                    ? me.agency.name
-                    : NoDataText}
+                      ? me.agency.name
+                      : NoDataText}
                 </Text>
               </Flex>
               {me.is_staff && (
@@ -420,6 +420,16 @@ export const ProfilePage = () => {
                     <Text>
                       {me?.business_area?.name
                         ? me?.business_area?.name
+                        : NoDataText}
+                    </Text>
+                  </Flex>
+                  <Flex flexDir={"column"}>
+                    <Text color={subsectionTitleColor} fontSize={"sm"}>
+                      Affiliation
+                    </Text>
+                    <Text>
+                      {me?.affiliation
+                        ? me?.affiliation
                         : NoDataText}
                     </Text>
                   </Flex>
