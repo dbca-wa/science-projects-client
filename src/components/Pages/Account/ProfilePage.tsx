@@ -428,8 +428,8 @@ export const ProfilePage = () => {
                       Affiliation
                     </Text>
                     <Text>
-                      {me?.affiliation
-                        ? me?.affiliation
+                      {me?.business_area?.name
+                        ? me?.business_area?.name
                         : NoDataText}
                     </Text>
                   </Flex>
