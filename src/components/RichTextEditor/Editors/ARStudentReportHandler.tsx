@@ -37,7 +37,7 @@ export const ARStudentReportHandler = ({
   report,
   shouldAlternatePicture,
 }: IProps) => {
-  useEffect(() => console.log(report))
+  // useEffect(() => console.log(report))
   const { colorMode } = useColorMode();
 
   const generateTheme = (colorMode) => {
@@ -146,7 +146,6 @@ export const ARStudentReportHandler = ({
     console.log(error);
   };
 
-
   const initialConfig = {
     namespace: `Student Report Editor`,
     editable: true,
@@ -158,44 +157,30 @@ export const ARStudentReportHandler = ({
   const uneditableInitialConfig = {
     ...initialConfig,
     editable: false,
-    theme: generateTheme(colorMode)
+    theme: generateTheme(colorMode),
   };
 
   // const [editorText, setEditorText] = useState<string | null>("");
   const [isEditing, setIsEditing] = useState(false);
   const [displayData, setDisplayData] = useState(report?.progress_report);
 
-
-  return (
-
-    (canEdit ?
-      isEditing ?
-        (<SREditor
-          key={`${colorMode}-${report?.pk ? report.pk : report?.id}-editable`}
-          canEdit={canEdit}
-          setIsEditing={setIsEditing}
-          isEditing={isEditing}
-          shouldAlternatePicture={shouldAlternatePicture}
-          fullSRData={report}
-          initialConfig={initialConfig}
-          displayData={displayData}
-          setDisplayData={setDisplayData}
-        />)
-        : (<SREditor
-          key={`${colorMode}-${report?.pk}-uneditable`}
-          canEdit={canEdit}
-          setIsEditing={setIsEditing}
-          isEditing={isEditing}
-          shouldAlternatePicture={shouldAlternatePicture}
-          fullSRData={report}
-          initialConfig={uneditableInitialConfig}
-          displayData={displayData}
-          setDisplayData={setDisplayData}
-        />
-        )
-      : (<SREditor
+  return canEdit ? (
+    isEditing ? (
+      <SREditor
+        key={`${colorMode}-${report?.pk ? report.pk : report?.id}-editable`}
+        canEdit={canEdit}
+        setIsEditing={setIsEditing}
+        isEditing={isEditing}
+        shouldAlternatePicture={shouldAlternatePicture}
+        fullSRData={report}
+        initialConfig={initialConfig}
+        displayData={displayData}
+        setDisplayData={setDisplayData}
+      />
+    ) : (
+      <SREditor
         key={`${colorMode}-${report?.pk}-uneditable`}
-        canEdit={false}
+        canEdit={canEdit}
         setIsEditing={setIsEditing}
         isEditing={isEditing}
         shouldAlternatePicture={shouldAlternatePicture}
@@ -204,9 +189,19 @@ export const ARStudentReportHandler = ({
         displayData={displayData}
         setDisplayData={setDisplayData}
       />
-      )
     )
-
+  ) : (
+    <SREditor
+      key={`${colorMode}-${report?.pk}-uneditable`}
+      canEdit={false}
+      setIsEditing={setIsEditing}
+      isEditing={isEditing}
+      shouldAlternatePicture={shouldAlternatePicture}
+      fullSRData={report}
+      initialConfig={uneditableInitialConfig}
+      displayData={displayData}
+      setDisplayData={setDisplayData}
+    />
   );
 };
 
