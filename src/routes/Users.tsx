@@ -16,6 +16,7 @@ import {
   Stack,
   useColorMode,
   useDisclosure,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { CreateUserModal } from "../components/Modals/CreateUserModal";
@@ -132,6 +133,34 @@ export const Users = () => {
       });
     }
   };
+
+
+  const isXlOrLarger = useBreakpointValue({
+    base: false,
+    sm: false,
+    md: false,
+    lg: false,
+    xl: true,
+  });
+  const isLargerOrLarger = useBreakpointValue({
+    base: false,
+    sm: false,
+    md: false,
+    lg: true,
+    xl: true,
+  });
+  const isOver690 = useBreakpointValue({
+    false: true,
+    sm: false,
+    md: false,
+    over690: true,
+    mdlg: true,
+    lg: true,
+    xlg: true,
+  });
+
+
+
 
   const { layout } = useLayoutSwitcher();
 
@@ -250,9 +279,17 @@ export const Users = () => {
 
           <Grid
             templateColumns={{
-              base: "4fr 4fr 2.5fr",
-              lg: "4fr 4fr 2.5fr",
+              base: "1fr",
+              lg: "8fr 4fr",
+              xl: "4fr 4fr 2.5fr",
+              // base: "4fr 4fr 2.5fr",
+              // base: "4fr 4fr 2.5fr",
+              //   lg: "4fr 4fr 2.5fr",
             }}
+            // templateColumns={{
+            //   base: "4fr 4fr 2.5fr",
+            //   lg: "4fr 4fr 2.5fr",
+            // }}
             pt={0}
             pb={4}
             pl={6}
@@ -260,12 +297,34 @@ export const Users = () => {
             <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
               <Text as={"b"}>User</Text>
             </Box>
-            <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
-              <Text as={"b"}>Email</Text>
-            </Box>
-            <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
-              <Text as={"b"}>Business Area</Text>
-            </Box>
+            {isXlOrLarger ? (
+              <>
+                <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
+                  <Text as={"b"}>Email</Text>
+                </Box>
+
+                <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
+                  <Text as={"b"}>Business Area</Text>
+                </Box>
+              </>
+            ) : isLargerOrLarger ?
+              (
+                <>
+
+                  <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
+                    <Text as={"b"}>Email</Text>
+                  </Box>
+                </>
+              )
+              : !isOver690 ? (
+                <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
+                  <Text as={"b"}>Email</Text>
+                </Box>
+              )
+                : null}
+
+
+
           </Grid>
         </Grid>
 
