@@ -49,7 +49,7 @@ export const SidebarNavMenu = ({
 
   const handleItemClick = () => {
     setIsOpen(false);
-  }
+  };
 
   const bgStyle =
     isHovered || isOpen
@@ -57,8 +57,8 @@ export const SidebarNavMenu = ({
         ? { bg: `${cScheme}.500` }
         : {}
       : cScheme
-        ? `${cScheme}.500`
-        : "transparent";
+      ? `${cScheme}.500`
+      : "transparent";
 
   const fontColorStyle =
     isHovered || isOpen
@@ -66,15 +66,15 @@ export const SidebarNavMenu = ({
         ? { color: fColor }
         : "white"
       : fColor
-        ? fColor
-        : "whiteAlpha.700";
+      ? fColor
+      : "whiteAlpha.700";
 
   return (
-    <Box zIndex={99}>
+    <Box zIndex={isOpen ? 2 : 1}>
       <Menu isOpen={isOpen}>
         <MenuButton
           colorScheme={cScheme}
-          zIndex={99}
+          zIndex={isOpen ? 2 : 1}
           bg={bgStyle}
           color={fontColorStyle}
           _hover={{
@@ -127,7 +127,7 @@ export const SidebarNavMenu = ({
           onClick={handleItemClick}
           mt={"-7.5px"}
           w={"100%"}
-          zIndex={99999}
+          zIndex={isOpen ? 2 : 19}
         >
           {children}
         </MenuList>

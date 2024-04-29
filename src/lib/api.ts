@@ -294,7 +294,7 @@ export const deactivateUserAdmin = async ({ userPk }: AdminSwitchVar) => {
 
 export const getMe = async () => {
     const res = instance.get(`users/me`).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         return res.data
     })
     return res;
