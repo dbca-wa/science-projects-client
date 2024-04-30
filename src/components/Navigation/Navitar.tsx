@@ -96,9 +96,10 @@ export const Navitar = ({
   const { layout } = useLayoutSwitcher();
 
   return (
-    <Box userSelect={"none"}>
+    <Box userSelect={"none"} zIndex={isOpen ? 2 : 1}>
       <Menu isOpen={isOpen}>
         <MenuButton
+          zIndex={isOpen ? 2 : 1}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
@@ -120,8 +121,8 @@ export const Navitar = ({
                     ? userData.first_name.length < 12
                       ? userData.first_name
                       : windowSize >= 1150
-                        ? userData.first_name
-                        : `${userData?.first_name.substring(0, 9)}...`
+                      ? userData.first_name
+                      : `${userData?.first_name.substring(0, 9)}...`
                     : userData.username)}
               </Text>
             ) : null}
@@ -129,10 +130,13 @@ export const Navitar = ({
               size="sm"
               name={userData?.username}
               src={
-                userData?.image ?
-                  userData.image?.file.startsWith("http") ?
-                    `${userData.image?.file}` : `${baseAPI}${userData.image?.file}` :
-                  userData.image?.old_file ? userData.image?.old_file : noImage
+                userData?.image
+                  ? userData.image?.file.startsWith("http")
+                    ? `${userData.image?.file}`
+                    : `${baseAPI}${userData.image?.file}`
+                  : userData.image?.old_file
+                  ? userData.image?.old_file
+                  : noImage
               }
             ></Avatar>
             <Center
@@ -154,6 +158,7 @@ export const Navitar = ({
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           mt={"-7.5px"}
+          zIndex={isOpen ? 2 : 1}
         >
           {!isModern && (
             <MenuGroup
@@ -161,6 +166,7 @@ export const Navitar = ({
               fontSize={"12px"}
               color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
               textAlign={"center"}
+              zIndex={isOpen ? 2 : 1}
             >
               <Flex>
                 <ToggleLayout />
@@ -171,6 +177,7 @@ export const Navitar = ({
                 onClick={() => {
                   window.open("https://sdis.readthedocs.io", "_blank");
                 }}
+                zIndex={isOpen ? 2 : 1}
               >
                 {<SiReadthedocs />}
                 <Text ml={2}>User Manual</Text>
@@ -183,11 +190,13 @@ export const Navitar = ({
             fontSize={"12px"}
             color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
             textAlign={"center"}
+            zIndex={isOpen ? 2 : 1}
           >
             <MenuItem
               onClick={() => {
                 navigate("/users/me");
               }}
+              zIndex={isOpen ? 2 : 1}
             >
               {<FaUserCircle />}
               <Text ml={2}>
@@ -198,11 +207,12 @@ export const Navitar = ({
               onClick={() => {
                 window.open("https://sww.dpaw.wa.gov.au/", "_blank");
               }}
+              zIndex={isOpen ? 2 : 1}
             >
               {<FaUserCircle />}
               <Text ml={2}>My Public Profile</Text>
             </MenuItem>
-            <MenuItem onClick={onLogOut}>
+            <MenuItem onClick={onLogOut} zIndex={isOpen ? 2 : 1}>
               {<FiLogOut />}
               <Text ml={2}>Logout</Text>
             </MenuItem>
@@ -213,11 +223,13 @@ export const Navitar = ({
               fontSize={"12px"}
               color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
               textAlign={"center"}
+              zIndex={isOpen ? 2 : 1}
             >
               <MenuItem
                 onClick={() => {
                   window.open("https://data.dbca.wa.gov.au/", "_blank");
                 }}
+                zIndex={isOpen ? 2 : 1}
               >
                 {<FaBook />}
                 <Text ml={2}>Data Catalogue</Text>
@@ -229,6 +241,7 @@ export const Navitar = ({
                     "_blank"
                   );
                 }}
+                zIndex={isOpen ? 2 : 1}
               >
                 {<TbWorldWww />}
                 <Text ml={2}>Scientific Site Register</Text>
