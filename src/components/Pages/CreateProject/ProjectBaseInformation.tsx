@@ -1,27 +1,21 @@
 // Section to provide base information on a project before proceeding to the details and location
 
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import {
   Box,
   Button,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Input,
-  InputGroup,
-  Grid,
-  VisuallyHiddenInput,
   Flex,
-  Center,
+  Grid,
+  InputGroup,
+  VisuallyHiddenInput,
 } from "@chakra-ui/react";
+import { useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
-import TagInput from "./TagInput";
-import { ImagePreview } from "./ImagePreview";
-import { useQueryClient } from "@tanstack/react-query";
 import { IUserData } from "../../../types";
-import { motion } from "framer-motion";
-import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import { StatefulMediaChanger } from "../Admin/StatefulMediaChanger";
+import TagInput from "./TagInput";
 
 interface IProjectBaseInformationProps {
   projectKind: string;
@@ -58,14 +52,14 @@ export const ProjectBaseInformation = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>("");
 
-  const handleFileInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setSelectedFile(files[0]);
-    }
-  };
+  // const handleFileInputChange = (
+  //   event: React.ChangeEvent<HTMLInputElement>
+  // ) => {
+  //   const files = event.target.files;
+  //   if (files && files.length > 0) {
+  //     setSelectedFile(files[0]);
+  //   }
+  // };
 
   const queryClient = useQueryClient();
   const meData = queryClient.getQueryData<IUserData>(["me"]);
@@ -75,6 +69,22 @@ export const ProjectBaseInformation = ({
 
   const [projectSummary, setProjectSummary] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
+  const [titleLengthError, setTitleLengthError] = useState(false);
+  const BASE_SIZE_WITH_ONE_CHARACTER = 84;
+  const MAX_TITLE_LENGTH = BASE_SIZE_WITH_ONE_CHARACTER + 150;
+  const MIN_TITLE_LENGTH = BASE_SIZE_WITH_ONE_CHARACTER + 6;
+
+  useEffect(() => {
+    console.log(projectTitle.length);
+    if (projectTitle.length >= MAX_TITLE_LENGTH) {
+      setTitleLengthError(true);
+    } else if (projectTitle?.length < MIN_TITLE_LENGTH) {
+      setTitleLengthError(true);
+    } else {
+      setTitleLengthError(false);
+    }
+  }, [titleLengthError, projectTitle, MAX_TITLE_LENGTH, MIN_TITLE_LENGTH]);
+
   useEffect(() => {
     if (
       projectTitle !== "" &&
@@ -83,13 +93,15 @@ export const ProjectBaseInformation = ({
       // selectedFile !== null &&
       meData !== undefined &&
       meData.pk !== 0 &&
-      meData.pk !== undefined
+      meData.pk !== undefined &&
+      !titleLengthError
     ) {
       setBaseInformationFilled(true);
     } else {
       setBaseInformationFilled(false);
     }
   }, [
+    titleLengthError,
     currentYear,
     meData,
     projectTitle,
@@ -130,8 +142,13 @@ export const ProjectBaseInformation = ({
             title="Project Title"
             // allowInsertButton
             helperText={
-              "The project title with formatting if required (e.g. for taxonomic names)."
+              titleLengthError
+                ? projectTitle.length >= MAX_TITLE_LENGTH
+                  ? "That title is too long!"
+                  : "That title is too short" // if less than min
+                : "The project title with formatting if required (e.g. for taxonomic names)."
             }
+            helperTextColor={titleLengthError ? "red.500" : undefined}
             showToolbar={true}
             showTitle={true}
             isRequired={true}
@@ -159,11 +176,8 @@ export const ProjectBaseInformation = ({
         </Box>
 
         <Box mb={4}>
-
           <StatefulMediaChanger
-            helperText={
-              "Upload an image that represents the project."
-            }
+            helperText={"Upload an image that represents the project."}
             selectedImageUrl={selectedImageUrl}
             setSelectedImageUrl={setSelectedImageUrl}
             selectedFile={selectedFile}
