@@ -84,6 +84,13 @@ export interface CustomAxiosError extends AxiosError {
 
 // USER ============================================================================
 
+export interface IAffiliation {
+    pk: number;
+    created_at: Date;
+    updated_at: Data;
+    name: string;
+}
+
 export interface IUserData {
     pk: number;
     username: string;
@@ -97,10 +104,11 @@ export interface IUserData {
     business_area: IBusinessArea | undefined;
     role: string;
     branch: IBranch;
-    affiliation: string;
+    affiliation: IAffiliation;
     branches?: IBranch[];
     businessAreas?: IBusinessArea[];
 }
+
 
 export interface IUserMe {
     id?: number;
@@ -126,7 +134,7 @@ export interface IUserMe {
     is_herbarium_curator: boolean;
     image: IImageData;
     role: string | null;
-    affiliation: string;
+    affiliation: IAffiliation;
     branches?: IBranch[];
     businessAreas?: IBusinessArea[];
 }
