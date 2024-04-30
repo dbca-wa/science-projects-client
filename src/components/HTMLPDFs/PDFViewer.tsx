@@ -36,7 +36,7 @@ interface Props {
 export const PDFViewer = ({
   thisReport,
 }: // refetchData
-  Props) => {
+Props) => {
   const { register: genRegister, handleSubmit: handleGenSubmit } =
     useForm<IDocGen>();
   const { register: cancelGenRegister, handleSubmit: handleCancelGenSubmit } =
@@ -64,7 +64,7 @@ export const PDFViewer = ({
         if (toastIdRef.current) {
           toast.update(toastIdRef.current, {
             title: "Success",
-            description: `AR PDF Generated`,
+            description: `Annual Report PDF Generated`,
             status: "success",
             position: "top-right",
             duration: 3000,
@@ -81,8 +81,9 @@ export const PDFViewer = ({
           toast.update(toastIdRef.current, {
             title: "Could Not Generate AR PDF",
             description: error?.response?.data
-              ? `${error.response.status}: ${Object.values(error.response.data)[0]
-              }`
+              ? `${error.response.status}: ${
+                  Object.values(error.response.data)[0]
+                }`
               : "Error",
             status: "error",
             position: "top-right",
@@ -127,8 +128,9 @@ export const PDFViewer = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Cancel",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -214,7 +216,7 @@ export const PDFViewer = ({
         <Center>
           <Text fontSize={"sm"}>
             {annualReportPDFGenerationMutation.isLoading ||
-              pdfDocumentData?.report?.pdf_generation_in_progress
+            pdfDocumentData?.report?.pdf_generation_in_progress
               ? showRestartMessage
                 ? "PDF Generating... It's been 30 seconds, maybe you should cancel and try again"
                 : `PDF Generating...`
@@ -251,7 +253,7 @@ export const PDFViewer = ({
           </Box>
 
           {annualReportPDFGenerationMutation.isLoading ||
-            pdfDocumentData?.report?.pdf_generation_in_progress ? (
+          pdfDocumentData?.report?.pdf_generation_in_progress ? (
             <Button
               size={"sm"}
               ml={2}
@@ -331,8 +333,8 @@ export const PDFViewer = ({
         pdfDocumentData !== undefined ? (
           (pdfDocumentData?.report?.pdf_generation_in_progress &&
             !cancelDocGenerationMutation.isSuccess) ||
-            (annualReportPDFGenerationMutation.isLoading &&
-              !cancelDocGenerationMutation.isSuccess) ? (
+          (annualReportPDFGenerationMutation.isLoading &&
+            !cancelDocGenerationMutation.isSuccess) ? (
             <Center mt={100}>
               <img
                 src="/bouncing-ball.svg"
