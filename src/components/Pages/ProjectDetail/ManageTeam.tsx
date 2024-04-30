@@ -192,7 +192,8 @@ export const ManageTeam = ({
               userSelect={"none"}
             >
               Click and drag a user to re-arrange order (Leader only), or click
-              their name to adjust their details for this project.
+              their name to adjust their details for this project. To reassign
+              leader, click a user's name and promote them.
             </Text>
           </Box>
         </Grid>

@@ -29,9 +29,10 @@ import {
   updateMembership,
 } from "../../lib/api";
 import { useForm } from "react-hook-form";
-import { IBranch, IBusinessArea } from "../../types";
+import { IAffiliation, IBranch, IBusinessArea } from "../../types";
 import { useBusinessAreas } from "../../lib/hooks/useBusinessAreas";
 import { useBranches } from "../../lib/hooks/useBranches";
+import { useAffiliations } from "@/lib/hooks/useAffiliations";
 
 interface IEditMembershipModalProps {
   isOpen: boolean;
@@ -39,6 +40,7 @@ interface IEditMembershipModalProps {
   currentOrganisationData: string;
   currentBranchData: IBranch;
   currentBaData: IBusinessArea;
+  currentAffiliationData: IAffiliation;
   userId: number;
 }
 
@@ -47,6 +49,7 @@ export const EditMembershipModal = ({
   onClose,
   currentBranchData,
   currentBaData,
+  currentAffiliationData,
   userId,
 }: IEditMembershipModalProps) => {
   const { colorMode } = useColorMode();
@@ -59,6 +62,7 @@ export const EditMembershipModal = ({
 
   const { baLoading, baData } = useBusinessAreas();
   const { branchesLoading, branchesData } = useBranches();
+  const { affiliationsLoading, affiliationsData } = useAffiliations();
 
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
@@ -155,8 +159,9 @@ export const EditMembershipModal = ({
     userPk,
     branch,
     business_area,
+    affiliation,
   }: IMembershipUpdateVariables) => {
-    await mutation.mutateAsync({ userPk, branch, business_area });
+    await mutation.mutateAsync({ userPk, branch, business_area, affiliation });
   };
 
   return (
@@ -243,6 +248,30 @@ export const EditMembershipModal = ({
                           </option>
                         );
                       })}
+                    </Select>
+                  )}
+                </InputGroup>
+              </FormControl>
+
+              {/* Affiliation */}
+              <FormControl my={2} mb={4} userSelect={"none"}>
+                <FormLabel>Affiliation</FormLabel>
+                <InputGroup>
+                  {!affiliationsLoading && affiliationsData && (
+                    <Select
+                      placeholder={"Select an Affiliation"}
+                      defaultValue={currentAffiliationData?.pk || ""}
+                      {...register("affiliation")}
+                    >
+                      {affiliationsData.map(
+                        (aff: IAffiliation, index: number) => {
+                          return (
+                            <option key={index} value={aff.pk}>
+                              {aff.name}
+                            </option>
+                          );
+                        }
+                      )}
                     </Select>
                   )}
                 </InputGroup>
