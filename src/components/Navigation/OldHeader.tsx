@@ -175,7 +175,6 @@ const UserMenuContents = () => {
   );
 };
 
-
 interface AdminProps {
   handleDataDump: () => void;
   handleNewReportCycle: () => void;
@@ -183,12 +182,14 @@ interface AdminProps {
   handleBatchApproveOldReports: () => void;
 }
 const AdminMenuContents = ({
-  // handleDataDump, 
-  handleNewReportCycle, handleBatchApproveReports, handleBatchApproveOldReports }: AdminProps) => {
+  // handleDataDump,
+  handleNewReportCycle,
+  handleBatchApproveReports,
+  handleBatchApproveOldReports,
+}: AdminProps) => {
   const navigate = useNavigate();
   return (
     <>
-
       <MenuGroup
         title="Manage"
         fontSize={"12px"}
@@ -280,7 +281,6 @@ const AdminMenuContents = ({
           <Text ml={2}>Dump Data</Text>
         </MenuItem> */}
 
-
         <MenuItem onClick={handleBatchApproveOldReports}>
           {<MdVerifiedUser />}
           <Text ml={2}>Batch Approve Old Reports</Text>
@@ -300,19 +300,31 @@ const AdminMenuContents = ({
 
 const OldHeader = () => {
   const navigate = useNavigate();
-  const { isOpen: isBatchApproveOpen, onClose: onBatchApproveClose, onOpen: onBatchApproveOpen } = useDisclosure();
-  const { isOpen: isBatchApproveOldOpen, onClose: onBatchApproveOldClose, onOpen: onBatchApproveOldOpen } = useDisclosure();
-  const { isOpen: isNewCycleOpen, onClose: onNewCycleClose, onOpen: onNewCycleOpen } = useDisclosure();
+  const {
+    isOpen: isBatchApproveOpen,
+    onClose: onBatchApproveClose,
+    onOpen: onBatchApproveOpen,
+  } = useDisclosure();
+  const {
+    isOpen: isBatchApproveOldOpen,
+    onClose: onBatchApproveOldClose,
+    onOpen: onBatchApproveOldOpen,
+  } = useDisclosure();
+  const {
+    isOpen: isNewCycleOpen,
+    onClose: onNewCycleClose,
+    onOpen: onNewCycleOpen,
+  } = useDisclosure();
 
   const handleDataDump = () => {
     console.log("Dumping data...");
   };
 
   const handleNewReportCycle = () => {
-    console.log("Handling new report cycle...")
+    console.log("Handling new report cycle...");
     onNewCycleOpen();
     // 'opennewcycle'
-  }
+  };
 
   const handleBatchApproveReports = () => {
     onBatchApproveOpen();
@@ -320,7 +332,7 @@ const OldHeader = () => {
 
   const handleBatchApproveOldReports = () => {
     onBatchApproveOldOpen();
-  }
+  };
 
   const [shouldShowHamburger, setShouldShowHamburger] = useState(false);
   const [windowSizeValue, setWindowSizeValue] = useState<number>(480);
@@ -384,10 +396,7 @@ const OldHeader = () => {
         isOpen={isBatchApproveOldOpen}
         onClose={onBatchApproveOldClose}
       />
-      <NewCycleModal
-        isOpen={isNewCycleOpen}
-        onClose={onNewCycleClose}
-      />
+      <NewCycleModal isOpen={isNewCycleOpen} onClose={onNewCycleClose} />
 
       <HStack
         bg={colorMode === "light" ? "blackAlpha.800" : "gray.900"}
@@ -451,8 +460,8 @@ const OldHeader = () => {
                     </DrawerHeader>
                     <DrawerBody>
                       <VStack py={3}>
-                        <HStack w={"100%"}>
-                          <Flex
+                        <HStack w={"100%"} zIndex={60}>
+                          {/* <Flex
                             mr={"auto"}
                             justifyContent={"left"}
                             alignItems={"center"}
@@ -467,7 +476,7 @@ const OldHeader = () => {
                                 MENU
                               </Text>
                             </Center>
-                          </Flex>
+                          </Flex> */}
                           <Flex
                             ml={"auto"}
                             justifyContent={"right"}
@@ -485,7 +494,7 @@ const OldHeader = () => {
                           </Flex>
                         </HStack>
 
-                        <Grid w={"100%"} py={2} zIndex={99}>
+                        <Grid w={"100%"} py={2} zIndex={50}>
                           {/* Projects */}
                           <SidebarNavMenu
                             menuName="Projects"
@@ -511,12 +520,18 @@ const OldHeader = () => {
                             <SidebarNavMenu
                               menuName="Admin"
                               leftIcon={<RiAdminFill />}
-                              children={<AdminMenuContents
-                                handleDataDump={handleDataDump}
-                                handleNewReportCycle={handleNewReportCycle}
-                                handleBatchApproveReports={handleBatchApproveReports}
-                                handleBatchApproveOldReports={handleBatchApproveOldReports}
-                              />}
+                              children={
+                                <AdminMenuContents
+                                  handleDataDump={handleDataDump}
+                                  handleNewReportCycle={handleNewReportCycle}
+                                  handleBatchApproveReports={
+                                    handleBatchApproveReports
+                                  }
+                                  handleBatchApproveOldReports={
+                                    handleBatchApproveOldReports
+                                  }
+                                />
+                              }
                             />
                           )}
                         </Grid>
@@ -527,7 +542,12 @@ const OldHeader = () => {
               </Box>
             </Box>
           ) : (
-            <Box flexGrow={1} justifyContent={"space-between"} display={"flex"} zIndex={99}>
+            <Box
+              flexGrow={1}
+              justifyContent={"space-between"}
+              display={"flex"}
+              zIndex={99}
+            >
               {/* Basic Navigation */}
               <HStack>
                 {/* Projects */}
@@ -543,12 +563,19 @@ const OldHeader = () => {
                 <NavMenu menuName="Reports" children={<ReportMenuContents />} />
 
                 {!userLoading && userData.is_superuser && (
-                  <NavMenu menuName="Admin" children={<AdminMenuContents
-                    handleDataDump={handleDataDump}
-                    handleNewReportCycle={handleNewReportCycle}
-                    handleBatchApproveReports={handleBatchApproveReports}
-                    handleBatchApproveOldReports={handleBatchApproveOldReports}
-                  />} />
+                  <NavMenu
+                    menuName="Admin"
+                    children={
+                      <AdminMenuContents
+                        handleDataDump={handleDataDump}
+                        handleNewReportCycle={handleNewReportCycle}
+                        handleBatchApproveReports={handleBatchApproveReports}
+                        handleBatchApproveOldReports={
+                          handleBatchApproveOldReports
+                        }
+                      />
+                    }
+                  />
                 )}
               </HStack>
 
