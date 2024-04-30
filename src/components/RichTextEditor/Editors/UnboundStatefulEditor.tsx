@@ -26,6 +26,7 @@ interface IProps {
   setValueFunction: React.Dispatch<React.SetStateAction<string>>;
   allowInsertButton?: boolean;
   shouldFocus?: boolean;
+  helperTextColor?: string;
 }
 
 export const UnboundStatefulEditor = ({
@@ -39,7 +40,8 @@ export const UnboundStatefulEditor = ({
   isRequired,
   placeholder,
   allowInsertButton,
-  shouldFocus
+  shouldFocus,
+  helperTextColor,
 }: IProps) => {
   const { colorMode } = useColorMode();
 
@@ -133,7 +135,11 @@ export const UnboundStatefulEditor = ({
           />
         </Box>
       </InputGroup>
-      {helperText ? <FormHelperText ml={2}>{helperText}</FormHelperText> : null}
+      {helperText ? (
+        <FormHelperText ml={2} color={helperTextColor ?? helperTextColor}>
+          {helperText}
+        </FormHelperText>
+      ) : null}
     </FormControl>
   );
 };
