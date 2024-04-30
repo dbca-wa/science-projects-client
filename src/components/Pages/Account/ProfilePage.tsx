@@ -18,7 +18,7 @@ import { UserGridItem } from "../Users/UserGridItem";
 import { EditPersonalInformationModal } from "../../Modals/EditPersonalInformationModal";
 import { EditMembershipModal } from "../../Modals/EditMembershipModal";
 import { EditProfileModal } from "../../Modals/EditProfileModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
@@ -44,12 +44,12 @@ export const ProfilePage = () => {
   const baseAPI = useApiEndpoint();
 
   const { userLoading: loading, userData: me } = useUser();
-  // useEffect(() => {
-  //   if (!loading) {
-  //     console.log(me);
-  //   }
-  // }, [me, loading]);
-  const NoDataText = "Not Provided ON API";
+  useEffect(() => {
+    if (!loading) {
+      console.log(me);
+    }
+  }, [me, loading]);
+  const NoDataText = "--";
 
   const { colorMode } = useColorMode();
   const borderColor = colorMode === "light" ? "gray.300" : "gray.500";
@@ -109,6 +109,7 @@ export const ProfilePage = () => {
             currentOrganisationData={`${me?.agency?.pk}`}
             currentBranchData={me?.branch}
             currentBaData={me?.business_area}
+            currentAffiliationData={me?.affiliation}
             userId={me.pk}
             isOpen={isEditMembershipModalOpen}
             onClose={onCloseEditMembershipModal}
@@ -232,14 +233,14 @@ export const ProfilePage = () => {
                     ? me.title === "mr"
                       ? "Mr."
                       : me.title === "mrs"
-                        ? "Mrs."
-                        : me.title === "ms"
-                          ? "Ms."
-                          : me.title === "master"
-                            ? "Master"
-                            : me.title === "dr"
-                              ? "Dr."
-                              : "Bad Title"
+                      ? "Mrs."
+                      : me.title === "ms"
+                      ? "Ms."
+                      : me.title === "master"
+                      ? "Master"
+                      : me.title === "dr"
+                      ? "Dr."
+                      : "Bad Title"
                     : "--"}
                 </Text>
               </Flex>
@@ -399,8 +400,8 @@ export const ProfilePage = () => {
                   {!me.is_staff
                     ? "External"
                     : me?.agency?.name
-                      ? me.agency.name
-                      : NoDataText}
+                    ? me.agency.name
+                    : NoDataText}
                 </Text>
               </Flex>
               {me.is_staff && (
@@ -428,9 +429,7 @@ export const ProfilePage = () => {
                       Affiliation
                     </Text>
                     <Text>
-                      {me?.business_area?.name
-                        ? me?.business_area?.name
-                        : NoDataText}
+                      {me?.affiliation ? me.affiliation?.name : NoDataText}
                     </Text>
                   </Flex>
                 </>

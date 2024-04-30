@@ -544,15 +544,17 @@ export interface IMembershipUpdateVariables {
     userPk: string | number;
     branch: number;
     business_area: number;
+    affiliation: number;
 }
 
-export const updateMembership = async ({ userPk, branch, business_area }: IMembershipUpdateVariables) => {
-    console.log(userPk, branch, business_area)
+export const updateMembership = async ({ userPk, branch, business_area, affiliation }: IMembershipUpdateVariables) => {
+    console.log(userPk, branch, business_area, affiliation)
     const response = await instance.put(
         `users/${userPk}/membership`, {
         user_pk: userPk,
         branch_pk: branch,
         business_area: business_area,
+        affiliation: affiliation,
     }
     )
     return response.data
@@ -2560,6 +2562,13 @@ export const getBranchByPk = async ({ queryKey }: QueryFunctionContext) => {
     return res;
 }
 
+export const getAllAffiliations = async () => {
+    const res = instance.get(`agencies/affiliations`
+    ).then(res => {
+        return res.data
+    })
+    return res;
+}
 
 export const getAllBranches = async () => {
     const res = instance.get(`agencies/branches`
