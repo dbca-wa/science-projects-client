@@ -53,6 +53,7 @@ export const ProjectDetail = ({
 
   useEffect(() => {
     if (!isLoading && projectData) {
+      // console.log(projectData);
       setLocation(projectData.location);
       setBaseInformation(projectData.project);
       setDetails(projectData.details);
@@ -72,7 +73,7 @@ export const ProjectDetail = ({
     }
   }, [isLoading, projectData]);
 
-  useEffect(() => console.log(documents), [documents])
+  // useEffect(() => console.log(documents), [documents]);
   const me = useUser();
 
   // Refetch data on tab change and ensure falsy items are removed from the array
@@ -129,11 +130,11 @@ export const ProjectDetail = ({
       documents?.concept_plan && "concept",
       documents?.project_plan && "project",
       documents?.progress_reports &&
-      documents.progress_reports.length > 0 &&
-      "progress",
+        documents.progress_reports.length > 0 &&
+        "progress",
       documents?.student_reports &&
-      documents.student_reports.length > 0 &&
-      "student",
+        documents.student_reports.length > 0 &&
+        "student",
       documents?.project_closure && "closure",
     ].filter(Boolean);
 
@@ -176,252 +177,252 @@ export const ProjectDetail = ({
   // useEffect(() => console.log(documents))
   const baseAPI = useApiEndpoint();
 
-  return (
-    (me?.userData && !me?.userLoading) ?
-      <div
-        key={
-          (documents?.progress_reports?.length || 0) +
-          (documents?.student_reports?.length || 0) +
-          (documents?.concept_plan ? 1 : 0) +
-          (documents?.project_plan ? 1 : 0) +
-          (documents?.progress_reports?.length || 0)
-        }
-      >
-        {isLoading || !documents || !distilledTitle ? (
-          isLoading === false && projectData === undefined ? (
-            <Box
-              w={"100%"}
-              h={"100%"}
-              justifyContent={"center"}
-              alignItems={"center"}
-              display={"flex"}
-              flexDir={"column"}
-              mt={10}
-            >
-              <Text fontWeight={"semibold"} fontSize={"2xl"}>
-                Sorry, a project with id "{projectPk}" does not exist.
-              </Text>
-              <Text mt={6}>
-                This project has either been deleted or never existed.
-              </Text>
-              <Box mt={8}>
-                <Button
-                  color={"white"}
-                  bg={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    bg: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
-                  onClick={() => navigate("/projects")}
-                >
-                  Back to Projects
-                </Button>
-              </Box>
-            </Box>
-          ) : (
-            <Center>
-              {/* <Head title={distilledTitle} /> */}
-              <Spinner />
-            </Center>
-          )
-        ) : (
-          documents &&
-          distilledTitle && (
-            <>
-              <Head title={distilledTitle} />
-              <Tabs
-                isLazy
-                isFitted
-                variant={"enclosed"}
-                // onChange={(index) => setTabIndex(index)}
-                onChange={(index) => {
-                  refetch();
-                  setActiveTabIndex(index);
+  return me?.userData && !me?.userLoading ? (
+    <div
+      key={
+        (documents?.progress_reports?.length || 0) +
+        (documents?.student_reports?.length || 0) +
+        (documents?.concept_plan ? 1 : 0) +
+        (documents?.project_plan ? 1 : 0) +
+        (documents?.progress_reports?.length || 0)
+      }
+    >
+      {isLoading || !documents || !distilledTitle ? (
+        isLoading === false && projectData === undefined ? (
+          <Box
+            w={"100%"}
+            h={"100%"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            display={"flex"}
+            flexDir={"column"}
+            mt={10}
+          >
+            <Text fontWeight={"semibold"} fontSize={"2xl"}>
+              Sorry, a project with id "{projectPk}" does not exist.
+            </Text>
+            <Text mt={6}>
+              This project has either been deleted or never existed.
+            </Text>
+            <Box mt={8}>
+              <Button
+                color={"white"}
+                bg={colorMode === "light" ? "blue.500" : "blue.600"}
+                _hover={{
+                  bg: colorMode === "light" ? "blue.400" : "blue.500",
                 }}
-                defaultIndex={activeTabIndex}
-                index={activeTabIndex}
+                onClick={() => navigate("/projects")}
               >
-                <TabList mb="1em">
+                Back to Projects
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Center>
+            {/* <Head title={distilledTitle} /> */}
+            <Spinner />
+          </Center>
+        )
+      ) : (
+        documents &&
+        distilledTitle && (
+          <>
+            <Head title={distilledTitle} />
+            <Tabs
+              isLazy
+              isFitted
+              variant={"enclosed"}
+              // onChange={(index) => setTabIndex(index)}
+              onChange={(index) => {
+                refetch();
+                setActiveTabIndex(index);
+              }}
+              defaultIndex={activeTabIndex}
+              index={activeTabIndex}
+            >
+              <TabList mb="1em">
+                <Tab
+                  fontSize="sm"
+                  value="overview"
+                  onClick={() => setActiveTabIndex(tabs.indexOf("overview"))}
+                >
+                  Overview
+                </Tab>
+                {documents?.concept_plan && (
                   <Tab
                     fontSize="sm"
-                    value="overview"
-                    onClick={() => setActiveTabIndex(tabs.indexOf("overview"))}
+                    value="concept"
+                    onClick={() => setActiveTabIndex(tabs.indexOf("concept"))}
                   >
-                    Overview
+                    Concept Plan
                   </Tab>
-                  {documents?.concept_plan && (
+                )}
+                {documents?.project_plan && (
+                  <Tab
+                    fontSize="sm"
+                    value="project"
+                    onClick={() => setActiveTabIndex(tabs.indexOf("project"))}
+                  >
+                    Project Plan
+                  </Tab>
+                )}
+                {!isLoading &&
+                  documents?.progress_reports &&
+                  documents.progress_reports.length !== 0 && (
                     <Tab
                       fontSize="sm"
-                      value="concept"
-                      onClick={() => setActiveTabIndex(tabs.indexOf("concept"))}
+                      value="progress"
+                      onClick={() =>
+                        setActiveTabIndex(tabs.indexOf("progress"))
+                      }
                     >
-                      Concept Plan
+                      Progress Reports
                     </Tab>
                   )}
-                  {documents?.project_plan && (
+                {!isLoading &&
+                  documents?.student_reports &&
+                  documents.student_reports.length !== 0 && (
                     <Tab
                       fontSize="sm"
-                      value="project"
-                      onClick={() => setActiveTabIndex(tabs.indexOf("project"))}
+                      value="student"
+                      onClick={() => setActiveTabIndex(tabs.indexOf("student"))}
                     >
-                      Project Plan
+                      Student Reports
                     </Tab>
                   )}
-                  {!isLoading && documents?.progress_reports &&
-                    documents.progress_reports.length !== 0 && (
-                      <Tab
-                        fontSize="sm"
-                        value="progress"
-                        onClick={() =>
-                          setActiveTabIndex(tabs.indexOf("progress"))
+                {documents?.project_closure && (
+                  <Tab
+                    fontSize="sm"
+                    value="closure"
+                    onClick={() => setActiveTabIndex(tabs.indexOf("closure"))}
+                  >
+                    Project Closure
+                  </Tab>
+                )}
+              </TabList>
+              <TabPanels>
+                {/* OVERVIEW */}
+                <TabPanel>
+                  {baseInformation ? (
+                    <motion.div
+                      initial={{ y: -10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: 10, opacity: 0 }}
+                      transition={{
+                        duration: 0.7,
+                        delay: 1 / 7,
+                      }}
+                      style={{
+                        height: "100%",
+                        animation: "oscillate 8s ease-in-out infinite",
+                        // backgroundColor: "pink"
+                      }}
+                    >
+                      <ProjectOverviewCard
+                        location={location}
+                        baseInformation={baseInformation}
+                        details={details}
+                        members={members}
+                        documents={documents}
+                        refetchData={refetch}
+                        setToLastTab={setToLastTab}
+                      />
+
+                      {/* <ManageTeam /> */}
+                      <ManageTeam
+                        // team={members}
+                        project_id={
+                          projectPk !== undefined ? Number(projectPk) : 0
                         }
-                      >
-                        Progress Reports
-                      </Tab>
-                    )}
-                  {!isLoading && documents?.student_reports &&
-                    documents.student_reports.length !== 0 && (
-                      <Tab
-                        fontSize="sm"
-                        value="student"
-                        onClick={() => setActiveTabIndex(tabs.indexOf("student"))}
-                      >
-                        Student Reports
-                      </Tab>
-                    )}
-                  {documents?.project_closure && (
-                    <Tab
-                      fontSize="sm"
-                      value="closure"
-                      onClick={() => setActiveTabIndex(tabs.indexOf("closure"))}
-                    >
-                      Project Closure
-                    </Tab>
+                      />
+                    </motion.div>
+                  ) : (
+                    <Spinner />
                   )}
-                </TabList>
-                <TabPanels>
-                  {/* OVERVIEW */}
+                </TabPanel>
+
+                {/* CONCEPT PLAN */}
+                {documents?.concept_plan && (
                   <TabPanel>
-                    {baseInformation ? (
-                      <motion.div
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 10, opacity: 0 }}
-                        transition={{
-                          duration: 0.7,
-                          delay: 1 / 7,
-                        }}
-                        style={{
-                          height: "100%",
-                          animation: "oscillate 8s ease-in-out infinite",
-                          // backgroundColor: "pink"
-                        }}
-                      >
-                        <ProjectOverviewCard
-                          location={location}
-                          baseInformation={baseInformation}
-                          details={details}
-                          members={members}
-                          documents={documents}
-                          refetchData={refetch}
-                          setToLastTab={setToLastTab}
-                        />
-
-                        {/* <ManageTeam /> */}
-                        <ManageTeam
-                          // team={members}
-                          project_id={
-                            projectPk !== undefined ? Number(projectPk) : 0
-                          }
-                        />
-                      </motion.div>
-                    ) : (
-                      <Spinner />
-                    )}
+                    <ConceptPlanContents
+                      baseAPI={baseAPI}
+                      userData={me?.userData}
+                      members={members}
+                      document={documents.concept_plan}
+                      all_documents={documents}
+                      refetch={refetch}
+                    />
                   </TabPanel>
+                )}
 
-                  {/* CONCEPT PLAN */}
-                  {documents?.concept_plan && (
-                    <TabPanel>
-                      <ConceptPlanContents
-                        baseAPI={baseAPI}
-                        userData={me?.userData}
-                        members={members}
-                        document={documents.concept_plan}
-                        all_documents={documents}
-                        refetch={refetch}
-                      />
-                    </TabPanel>
-                  )}
+                {/* PROJECT PLAN */}
+                {documents?.project_plan && (
+                  <TabPanel>
+                    <ProjectPlanContents
+                      baseAPI={baseAPI}
+                      refetch={refetch}
+                      document={documents.project_plan}
+                      all_documents={documents}
+                      userData={me?.userData}
+                      members={members}
+                      setToLastTab={setToLastTab}
+                      projectAreas={location}
+                    />
+                  </TabPanel>
+                )}
 
-                  {/* PROJECT PLAN */}
-                  {documents?.project_plan && (
+                {/* PROGRESS REPORT */}
+                {documents?.progress_reports &&
+                  documents.progress_reports.length !== 0 && (
                     <TabPanel>
-                      <ProjectPlanContents
+                      <ProgressReportContents
                         baseAPI={baseAPI}
+                        documents={documents.progress_reports}
                         refetch={refetch}
-                        document={documents.project_plan}
                         all_documents={documents}
                         userData={me?.userData}
                         members={members}
                         setToLastTab={setToLastTab}
-                        projectAreas={location}
                       />
                     </TabPanel>
                   )}
 
-                  {/* PROGRESS REPORT */}
-                  {documents?.progress_reports &&
-                    documents.progress_reports.length !== 0 && (
-                      <TabPanel>
-                        <ProgressReportContents
-                          baseAPI={baseAPI}
-                          documents={documents.progress_reports}
-                          refetch={refetch}
-                          all_documents={documents}
-                          userData={me?.userData}
-                          members={members}
-                          setToLastTab={setToLastTab}
-                        />
-                      </TabPanel>
-                    )}
-
-                  {/* STUDENT REPORT */}
-                  {documents?.student_reports &&
-                    documents.student_reports.length !== 0 &&
-                    projectPk && (
-                      <TabPanel>
-                        <StudentReportContents
-                          baseAPI={baseAPI}
-                          projectPk={projectPk}
-                          documents={documents.student_reports}
-                          refetch={refetch}
-                          userData={me?.userData}
-                          members={members}
-                          setToLastTab={setToLastTab}
-                        />
-                      </TabPanel>
-                    )}
-
-                  {/* PROJECT CLOSURE */}
-                  {documents?.project_closure && (
+                {/* STUDENT REPORT */}
+                {documents?.student_reports &&
+                  documents.student_reports.length !== 0 &&
+                  projectPk && (
                     <TabPanel>
-                      <ProjectClosureContents
+                      <StudentReportContents
                         baseAPI={baseAPI}
-                        document={documents.project_closure}
+                        projectPk={projectPk}
+                        documents={documents.student_reports}
+                        refetch={refetch}
                         userData={me?.userData}
                         members={members}
-                        all_documents={documents}
-                        refetch={refetch}
                         setToLastTab={setToLastTab}
                       />
                     </TabPanel>
                   )}
-                </TabPanels>
-              </Tabs>
-            </>
-          )
-        )}
-      </div>
-      : null
-  );
+
+                {/* PROJECT CLOSURE */}
+                {documents?.project_closure && (
+                  <TabPanel>
+                    <ProjectClosureContents
+                      baseAPI={baseAPI}
+                      document={documents.project_closure}
+                      userData={me?.userData}
+                      members={members}
+                      all_documents={documents}
+                      refetch={refetch}
+                      setToLastTab={setToLastTab}
+                    />
+                  </TabPanel>
+                )}
+              </TabPanels>
+            </Tabs>
+          </>
+        )
+      )}
+    </div>
+  ) : null;
 };

@@ -21,6 +21,18 @@ type StudentReportSection = "progress_report";
 type ProjectClosureSection = "reason" | "intended_outcome" | "knowledge_transfer" | "data_location" | "hardcopy_location" | "backup_location" | "scientific_outputs";
 
 
+export interface IAffiliation {
+    pk?: number;
+    created_at?: Date;
+    updated_at?: Data;
+    name: string;
+}
+
+export interface IMergeAffiliation {
+    primaryAffiliation: IAffiliation; // or IAffiliation and extract pk
+    secondaryAffiliations: IAffiliation[]; // or IAffiliation and extract pk
+}
+
 export interface IEmailModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -84,12 +96,7 @@ export interface CustomAxiosError extends AxiosError {
 
 // USER ============================================================================
 
-export interface IAffiliation {
-    pk: number;
-    created_at: Date;
-    updated_at: Data;
-    name: string;
-}
+
 
 export interface IUserData {
     pk: number;
@@ -396,7 +403,8 @@ interface IProgressReport {
     aims: string | null;
     progress: string | null;
     implications: string | null;
-    future: string | null;
+    future: string | null; 
+    team_members: IProjectMember[];
 }
 
 interface IStudentReport {
@@ -440,6 +448,7 @@ interface IProjectMember {
     time_allocation: number;
     position: number;
     short_code: number | null;
+    affiliation: IAffiliation;
 }
 
 

@@ -23,6 +23,7 @@ import {
   InputLeftAddon,
   Icon,
   Center,
+  Input,
 } from "@chakra-ui/react";
 import { IEditProject, updateProjectDetails } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
@@ -94,6 +95,9 @@ export const EditProjectModal = ({
   );
 
   useEffect(() => {
+    console.log(details);
+  });
+  useEffect(() => {
     if (locationData.length === 0) {
       setLocationData(currentAreas.map((area) => area.pk));
     }
@@ -146,14 +150,15 @@ export const EditProjectModal = ({
     (details?.student as IStudentProjectDetails)?.level
   );
   const [hoveredTitle, setHoveredTitle] = useState(false);
-  const titleBorderColor = `${colorMode === "light"
-    ? hoveredTitle
-      ? "blackAlpha.300"
-      : "blackAlpha.200"
-    : hoveredTitle
+  const titleBorderColor = `${
+    colorMode === "light"
+      ? hoveredTitle
+        ? "blackAlpha.300"
+        : "blackAlpha.200"
+      : hoveredTitle
       ? "whiteAlpha.400"
       : "whiteAlpha.300"
-    }`;
+  }`;
 
   const [keywords, setKeywords] = useState(currentKeywords);
   const [startDate, setStartDate] = useState(currentDates[0]);
@@ -369,7 +374,7 @@ export const EditProjectModal = ({
                     setValueFunction={setProjectTitle}
                     setValueAsPlainText={false}
                   />
-                  {(details?.external as IExternalProjectDetails).aims ? (
+                  {(details?.external as IExternalProjectDetails)?.project ? (
                     <Grid
                       gridTemplateColumns={"repeat(1, 1fr)"}
                       gridGap={2}
@@ -388,6 +393,7 @@ export const EditProjectModal = ({
                         setValueFunction={setExternalDescription}
                         setValueAsPlainText={false}
                       />
+
                       <UnboundStatefulEditor
                         title="Collaboration With"
                         isRequired={true}
@@ -403,7 +409,7 @@ export const EditProjectModal = ({
                       />
                     </Grid>
                   ) : (details?.student as IStudentProjectDetails)
-                    ?.organisation ? (
+                      ?.organisation ? (
                     <Grid
                       gridTemplateColumns={"repeat(1, 1fr)"}
                       gridGap={2}
@@ -451,7 +457,7 @@ export const EditProjectModal = ({
                     preExistingTags={keywords}
                   />
 
-                  {(details?.external as IExternalProjectDetails).aims ? (
+                  {(details?.external as IExternalProjectDetails).project ? (
                     <Grid
                       gridTemplateColumns={"repeat(1, 1fr)"}
                       gridGap={2}
@@ -511,7 +517,7 @@ export const EditProjectModal = ({
                             borderTopRightRadius={"none"}
                             borderBottomRightRadius={"none"}
                             borderRight={"none"}
-                          // boxSize={10}
+                            // boxSize={10}
                           >
                             <Icon as={HiAcademicCap} boxSize={5} />
                           </InputLeftAddon>
@@ -616,8 +622,6 @@ export const EditProjectModal = ({
                           to.
                         </FormHelperText>
                       </FormControl>
-
-
 
                       <FormControl mb={4}>
                         <FormLabel>Departmental Service</FormLabel>
