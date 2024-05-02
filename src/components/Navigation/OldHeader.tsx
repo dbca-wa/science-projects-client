@@ -47,7 +47,7 @@ import { CreateUserModal } from "../Modals/CreateUserModal";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { useUser } from "../../lib/hooks/useUser";
-import { RiAdminFill, RiOrganizationChart } from "react-icons/ri";
+import { RiAdminFill, RiOrganizationChart, RiTeamFill } from "react-icons/ri";
 import {
   MdEmail,
   MdManageHistory,
@@ -203,6 +203,14 @@ const AdminMenuContents = ({
         >
           {<FaAddressCard />}
           <Text ml={2}>Addresses</Text>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            navigate("/crud/affiliations");
+          }}
+        >
+          {<RiTeamFill />}
+          <Text ml={2}>Affiliations</Text>
         </MenuItem>
 
         <MenuItem
