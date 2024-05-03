@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react";
 import Dropzone from "react-dropzone";
 import { BsCloudArrowUp } from "react-icons/bs";
 import { FaFile, FaFilePdf } from "react-icons/fa";
-import { TbPhotoFilled } from "react-icons/tb";
+import { TbPhoto } from "react-icons/tb";
 
 export interface IFileType {
   fileType: "pdf" | "image";
@@ -77,7 +77,7 @@ export const FileDropzone = ({
     if (!uploadedFile) {
       setUploadProgress(0);
     }
-  }, [uploadedFile])
+  }, [uploadedFile]);
 
   return (
     <Dropzone multiple={false} onDrop={onFileDrop}>
@@ -129,8 +129,9 @@ export const FileDropzone = ({
                   textAlign={"center"}
                 >{`Drag and drop a ${fileType} file.`}</Text>
               ) : (
-                <Text px={8} textAlign={"center"}>{`Drag and drop ${fileType === "image" ? "an" : "a"
-                  } ${fileType} file${extraText}.`}</Text>
+                <Text px={8} textAlign={"center"}>{`Drag and drop ${
+                  fileType === "image" ? "an" : "a"
+                } ${fileType} file${extraText}.`}</Text>
               )}
               {!isError && acceptedFiles && acceptedFiles[0] && uploadedFile ? (
                 <Flex
@@ -159,7 +160,7 @@ export const FileDropzone = ({
                       {fileType === "pdf" ? (
                         <FaFilePdf />
                       ) : fileType === "image" ? (
-                        <TbPhotoFilled />
+                        <TbPhoto />
                       ) : (
                         <FaFile />
                       )}
@@ -194,8 +195,8 @@ export const FileDropzone = ({
                       // isIndeterminate
                       size={"xs"}
                       value={uploadProgress}
-                    // hasStripe
-                    // animation={"step-start"}
+                      // hasStripe
+                      // animation={"step-start"}
                     />
                   </Box>
                 </Center>
