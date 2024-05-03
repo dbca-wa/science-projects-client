@@ -25,7 +25,6 @@ import { BsFilePdfFill } from "react-icons/bs";
 import { TiDelete } from "react-icons/ti";
 import { DeletePDFEndorsementModal } from "@/components/Modals/DeletePDFEndorsementModal";
 
-
 interface IEndorsementProps {
   document: IProjectPlan;
   userData: IUserMe;
@@ -38,19 +37,16 @@ export const ProjectPlanEndorsements = ({
   userData,
   refetchDocument,
 }: IEndorsementProps) => {
-
-
   const { register, watch, setValue } = useForm<ISpecialEndorsement>();
 
   const setToggleFalseAndRemoveFileVisual = () => {
     setValue("aecEndorsementProvided", false);
     setUploadedPDF(null);
     setShouldSwitchBeChecked(false);
-  }
+  };
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const aecEndReqValue = watch("aecEndorsementRequired");
-
 
   const aecEndProvidedValue = watch("aecEndorsementProvided");
 
@@ -130,7 +126,11 @@ export const ProjectPlanEndorsements = ({
 
   const [pdfAreaHovered, setPdfAreaHovered] = useState(false);
 
-  const { isOpen: isDeletePDFEndorsementModalOpen, onOpen: onOpenDeletePDFEndorsementModal, onClose: onCloseDeletePDFEndorsementModal } = useDisclosure();
+  const {
+    isOpen: isDeletePDFEndorsementModalOpen,
+    onOpen: onOpenDeletePDFEndorsementModal,
+    onClose: onCloseDeletePDFEndorsementModal,
+  } = useDisclosure();
 
   return (
     <>
@@ -140,7 +140,6 @@ export const ProjectPlanEndorsements = ({
         onClose={onCloseDeletePDFEndorsementModal}
         setToggle={setToggleFalseAndRemoveFileVisual}
         refetchEndorsements={refetchDocument}
-
       />
       <SeekEndorsementModal
         projectPlanPk={document?.pk}
@@ -169,7 +168,7 @@ export const ProjectPlanEndorsements = ({
             rounded={"lg"}
             p={6}
             w={"100%"}
-          // gridRowGap={2}
+            // gridRowGap={2}
           >
             {/* Title */}
             <Box mb={4}>
@@ -341,9 +340,9 @@ export const ProjectPlanEndorsements = ({
               borderColor={"gray.300"}
               p={4}
               rounded={"xl"}
-            // roundedTop={0}
-            // borderTop={0}
-            // roundedBottom={0}
+              // roundedTop={0}
+              // borderTop={0}
+              // roundedBottom={0}
             >
               <Flex
                 // ml={8}
@@ -354,7 +353,7 @@ export const ProjectPlanEndorsements = ({
                   <Text
                     fontWeight={"semibold"}
 
-                  // color={involvesAnimalsValue ? "black" : "gray.500"}
+                    // color={involvesAnimalsValue ? "black" : "gray.500"}
                   >
                     Animal Ethics Committee Endorsement Required?
                   </Text>
@@ -366,7 +365,6 @@ export const ProjectPlanEndorsements = ({
                 >
                   <Checkbox
                     borderColor={"blue.500"}
-
                     defaultChecked={aecEndRequired}
                     mr={3}
                     // onChange={handleTogglePlantsInvolved}
@@ -376,9 +374,7 @@ export const ProjectPlanEndorsements = ({
                   />
                 </Box>
               </Flex>
-              <Flex
-                alignItems={"center"}
-              >
+              <Flex alignItems={"center"}>
                 <Box flex={1}>
                   <Text
                     color={
@@ -387,8 +383,8 @@ export const ProjectPlanEndorsements = ({
                           ? "black"
                           : "gray.500"
                         : aecEndReqValue
-                          ? "white"
-                          : "gray.500"
+                        ? "white"
+                        : "gray.500"
                     }
                   >
                     Animal Ethics Committee's Endorsement
@@ -424,9 +420,11 @@ export const ProjectPlanEndorsements = ({
                 </Flex>
               </Flex>
               {document?.endorsements?.aec_pdf?.file ? (
-                <Flex mb={3}
+                <Flex
+                  mb={3}
                   onMouseOver={() => setPdfAreaHovered(true)}
-                  onMouseLeave={() => setPdfAreaHovered(false)}>
+                  onMouseLeave={() => setPdfAreaHovered(false)}
+                >
                   <Box flex={1}>
                     <Text
                       color={
@@ -435,8 +433,8 @@ export const ProjectPlanEndorsements = ({
                             ? "black"
                             : "gray.500"
                           : aecEndReqValue
-                            ? "white"
-                            : "gray.500"
+                          ? "white"
+                          : "gray.500"
                       }
                     >
                       Current Approval PDF
@@ -459,7 +457,6 @@ export const ProjectPlanEndorsements = ({
                           cursor: "pointer",
                           textDecoration: "underline",
                         }}
-
                       >
                         <Center
                           color={"red.500"}
@@ -468,9 +465,7 @@ export const ProjectPlanEndorsements = ({
                         >
                           <BsFilePdfFill />
                         </Center>
-                        <Center
-
-                        >
+                        <Center>
                           <Text
                             // variant={"link"}
                             color={
@@ -478,18 +473,16 @@ export const ProjectPlanEndorsements = ({
                             }
                           >
                             {document?.endorsements?.aec_pdf?.file
-                              ? `${document.endorsements.aec_pdf.file
-                                .split("/")
-                                .pop()
-                                .split(".")[0]
-                              }.pdf`
+                              ? `${
+                                  document.endorsements.aec_pdf.file
+                                    .split("/")
+                                    .pop()
+                                    .split(".")[0]
+                                }.pdf`
                               : "No File"}
                             {/* {baseApi}{document?.endorsements?.aec_pdf?.file} */}
                           </Text>
-
-
                         </Center>
-
                       </Flex>
                     ) : null}
                   </Flex>
@@ -500,9 +493,7 @@ export const ProjectPlanEndorsements = ({
                       onClick={() => {
                         console.log("HI");
                         onOpenDeletePDFEndorsementModal();
-
                       }}
-
                     >
                       <Icon
                         _hover={{ boxSize: 10 }}
@@ -511,7 +502,6 @@ export const ProjectPlanEndorsements = ({
                         as={TiDelete}
                         cursor={"pointer"}
                         boxSize={8}
-
                       />
                     </Center>
                   )}
@@ -528,7 +518,6 @@ export const ProjectPlanEndorsements = ({
                   extraText={" to provide your endorsement or update the file"}
                 />
               ) : null}
-
             </Grid>
 
             <Flex pt={4} justifyContent={"flex-end"}>
