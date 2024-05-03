@@ -16,13 +16,18 @@ import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 import { FaAddressCard, FaLocationArrow } from "react-icons/fa";
 import {
-  FcApproval
-  // , FcDataBackup 
+  FcApproval,
+  // , FcDataBackup
 } from "react-icons/fc";
 import { GoOrganization } from "react-icons/go";
 import { ImBriefcase } from "react-icons/im";
-import { MdEmail, MdManageHistory, MdOutlineSettingsSuggest, MdVerifiedUser } from "react-icons/md";
-import { RiOrganizationChart } from "react-icons/ri";
+import {
+  MdEmail,
+  MdManageHistory,
+  MdOutlineSettingsSuggest,
+  MdVerifiedUser,
+} from "react-icons/md";
+import { RiOrganizationChart, RiTeamFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { VscFeedback } from "react-icons/vsc";
 import { BatchApproveModal } from "@/components/Modals/BatchApproveModal";
@@ -31,10 +36,21 @@ import { HiDocumentPlus } from "react-icons/hi2";
 import { NewCycleModal } from "@/components/Modals/NewCycleModal";
 
 export const Admin = () => {
-
-  const { isOpen: isBatchApproveOpen, onClose: onBatchApproveClose, onOpen: onBatchApproveOpen } = useDisclosure();
-  const { isOpen: isBatchApproveOldOpen, onClose: onBatchApproveOldClose, onOpen: onBatchApproveOldOpen } = useDisclosure();
-  const { isOpen: isNewCycleOpen, onClose: onNewCycleClose, onOpen: onNewCycleOpen } = useDisclosure();
+  const {
+    isOpen: isBatchApproveOpen,
+    onClose: onBatchApproveClose,
+    onOpen: onBatchApproveOpen,
+  } = useDisclosure();
+  const {
+    isOpen: isBatchApproveOldOpen,
+    onClose: onBatchApproveOldClose,
+    onOpen: onBatchApproveOldOpen,
+  } = useDisclosure();
+  const {
+    isOpen: isNewCycleOpen,
+    onClose: onNewCycleClose,
+    onOpen: onNewCycleOpen,
+  } = useDisclosure();
 
   const { colorMode } = useColorMode();
 
@@ -48,11 +64,11 @@ export const Admin = () => {
 
   const handleOpenReportCycle = () => {
     onNewCycleOpen();
-  }
+  };
 
   const handleBatchApproveOldReports = () => {
     onBatchApproveOldOpen();
-  }
+  };
 
   // const handleViewFeedback = () => {
   //   console.log("viewing feedback");
@@ -117,6 +133,12 @@ export const Admin = () => {
       route: "/crud/addresses",
     },
     {
+      name: "Affiliations",
+      description: "CRUD operations for Affiliations",
+      reactIcon: RiTeamFill,
+      route: "/crud/affiliations",
+    },
+    {
       name: "Branches",
       description: "CRUD operations for Branches",
       reactIcon: RiOrganizationChart,
@@ -136,9 +158,6 @@ export const Admin = () => {
     },
   ];
 
-
-
-
   // Sort adminActions and crudAdminActions arrays alphabetically by name
   const sortedAdminActions = adminActions
     .slice()
@@ -157,10 +176,7 @@ export const Admin = () => {
         isOpen={isBatchApproveOldOpen}
         onClose={onBatchApproveOldClose}
       />
-      <NewCycleModal
-        isOpen={isNewCycleOpen}
-        onClose={onNewCycleClose}
-      />
+      <NewCycleModal isOpen={isNewCycleOpen} onClose={onNewCycleClose} />
       <Text
         my={3}
         fontWeight={"bold"}
@@ -210,7 +226,7 @@ export const Admin = () => {
             description={action.description}
             onClick={action.onClick}
             reactIcon={action.reactIcon}
-          // route={action.route}
+            // route={action.route}
           />
         ))}
       </Grid>
@@ -266,7 +282,6 @@ const AdminOptionBox = ({
       initial="rest"
       style={{ perspective: 1000 }}
     >
-
       <Center
         // onMouseOver={() => setHovered(true)}
         // onMouseLeave={() => setHovered(false)}

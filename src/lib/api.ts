@@ -2,7 +2,7 @@ import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/C
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData } from "../types";
+import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
 import { IConceptPlanGenerationData } from "./hooks/useGetConceptPlanData";
 
 
@@ -2562,13 +2562,6 @@ export const getBranchByPk = async ({ queryKey }: QueryFunctionContext) => {
     return res;
 }
 
-export const getAllAffiliations = async () => {
-    const res = instance.get(`agencies/affiliations`
-    ).then(res => {
-        return res.data
-    })
-    return res;
-}
 
 export const getAllBranches = async () => {
     const res = instance.get(`agencies/branches`
@@ -2577,7 +2570,6 @@ export const getAllBranches = async () => {
     })
     return res;
 }
-
 
 export const getBranchesBasedOnSearchTerm = async (searchTerm: string, page: number) => {
     try {
@@ -2620,6 +2612,76 @@ export const updateBranch = async (formData: IBranch) => {
 export const deleteBranch = async (pk: number) => {
     return instance.delete(
         `agencies/branches/${pk}`
+    ).then(res => {
+        return res.data;
+    }
+    );
+}
+
+// AFFILIATIONS ============================================================================
+
+export const getAffiliationByPk = async ({ queryKey }: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+    const res = instance.get(`agencies/affiliations/${pk}`)
+        .then(res => res.data);
+    return res;
+}
+
+
+export const getAllAffiliations = async () => {
+    const res = instance.get(`agencies/affiliations`
+    ).then(res => {
+        return res.data
+    })
+    return res;
+}
+
+export const getAffiliationsBasedOnSearchTerm = async (searchTerm: string, page: number) => {
+    try {
+        let url = `agencies/affiliations?page=${page}`;
+
+        if (searchTerm !== "") {
+            url += `&searchTerm=${searchTerm}`;
+        }
+
+        const response = await instance.get(url);
+
+        const { affiliations, total_results, total_pages } = response.data;
+        return { affiliations, total_results, total_pages };
+    } catch (error) {
+        console.error("Error fetching affiliations based on search term:", error);
+        throw error;
+    }
+};
+
+export const createAffiliation = async (formData: IAffiliation) => {
+    console.log(formData);
+    return instance.post(
+        "agencies/affiliations", formData
+    ).then(res => {
+        return res.data;
+    })
+}
+
+export const mergeAffiliations = async(formData:IMergeAffiliation) => {
+    console.log(formData)
+    return instance.post(
+        "agencies/affiliations/merge", formData
+    ).then(res => res.data)
+}
+
+export const updateAffiliation = async (formData: IAffiliation) => {
+    return instance.put(
+        `agencies/affiliations/${formData.pk}`, formData
+    ).then(res => {
+        return res.data;
+    }
+    );
+}
+
+export const deleteAffiliation = async (pk: number) => {
+    return instance.delete(
+        `agencies/affiliations/${pk}`
     ).then(res => {
         return res.data;
     }
