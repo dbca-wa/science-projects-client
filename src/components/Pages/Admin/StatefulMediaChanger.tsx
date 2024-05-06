@@ -1,14 +1,14 @@
-import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
-import { useNoImage } from "@/lib/hooks/useNoImage";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 import {
   Box,
   Center,
-  Grid,
-  Text,
-  Image,
-  useColorMode,
   Flex,
+  Grid,
+  Image,
   Progress,
+  Text,
+  useColorMode,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import Dropzone from "react-dropzone";

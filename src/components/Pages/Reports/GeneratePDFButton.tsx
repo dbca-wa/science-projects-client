@@ -11,7 +11,11 @@ interface IGenBtnProps {
 
 export const GeneratePDFButton = ({ report }: IGenBtnProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isGeneratePDFModalOpen, onClose: onGeneratePDFModalClose, onOpen: onGeneratePDFModalOpen } = useDisclosure();
+  const {
+    isOpen: isGeneratePDFModalOpen,
+    onClose: onGeneratePDFModalClose,
+    onOpen: onGeneratePDFModalOpen,
+  } = useDisclosure();
 
   return (
     <>
@@ -35,6 +39,5 @@ export const GeneratePDFButton = ({ report }: IGenBtnProps) => {
         Generate PDF
       </Button>
     </>
-
   );
 };

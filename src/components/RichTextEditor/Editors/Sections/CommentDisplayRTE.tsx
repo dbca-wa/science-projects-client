@@ -4,42 +4,42 @@ import { ChatUser } from "@/components/Pages/Chat/ChatUser";
 import { IBranch, IBusinessArea, IUserData } from "@/types";
 import {
   Box,
-  Flex,
-  useColorMode,
   Center,
+  Flex,
+  ToastId,
+  useColorMode,
   useDisclosure,
   useToast,
-  ToastId,
 } from "@chakra-ui/react";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BiSolidLike } from "react-icons/bi";
 
 // Lexical
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 
 // Lexical Plugins
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 
 import "../../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
-import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
-import { createCommentReaction } from "@/lib/api";
-import { useUser } from "@/lib/hooks/useUser";
-import { useFormattedDate } from "@/lib/hooks/useFormattedDate";
-import { PrepopulateCommentDisplayPlugin } from "../../Plugins/PrepopulateCommentDisplayPlugin";
-import { motion, useAnimation } from "framer-motion";
-import { ImCross } from "react-icons/im";
 import { DeleteCommentModal } from "@/components/Modals/DeleteCommentModal";
+import { createCommentReaction } from "@/lib/api";
+import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion, useAnimation } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { ImCross } from "react-icons/im";
+import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import { MentionNode } from "../../Plugins/MentionsPlugin";
+import { PrepopulateCommentDisplayPlugin } from "../../Plugins/PrepopulateCommentDisplayPlugin";
 
 export interface ICommentReaction {
   pk?: number;
@@ -47,14 +47,14 @@ export interface ICommentReaction {
   comment?: number | null;
   direct_message?: number | null;
   reaction:
-  | "thumbup"
-  | "thumbdown"
-  | "heart"
-  | "brokenheart"
-  | "hundred"
-  | "confused"
-  | "funny"
-  | "surprised";
+    | "thumbup"
+    | "thumbdown"
+    | "heart"
+    | "brokenheart"
+    | "hundred"
+    | "confused"
+    | "funny"
+    | "surprised";
 }
 
 interface Props {
@@ -197,7 +197,8 @@ export const CommentDisplayRTE = ({
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
-  const commentReactionMutation = useMutation(createCommentReaction, {
+  const commentReactionMutation = useMutation({
+    mutationFn: createCommentReaction,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -219,7 +220,9 @@ export const CommentDisplayRTE = ({
       reset();
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["documentComments", documentPk]);
+        queryClient.invalidateQueries({
+          queryKey: ["documentComments", documentPk],
+        });
         if (response.status === 204) {
           setLikeCount((prev) => prev - 1);
         } else if (response.status === 201) {

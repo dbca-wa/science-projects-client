@@ -1,9 +1,9 @@
 // A button to clear the rich text editor of all information
 
-import { FaTrashAlt } from "react-icons/fa";
-import { BaseOptionsButton } from "./BaseOptionsButton";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { CLEAR_EDITOR_COMMAND } from "lexical";
+import { FaTrashAlt } from "react-icons/fa";
+import { BaseOptionsButton } from "./BaseOptionsButton";
 
 interface Props {
   canClear: boolean;

@@ -10,18 +10,18 @@ import {
   Icon,
   useColorMode,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { AiOutlineLeft, AiOutlineFundProjectionScreen } from "react-icons/ai";
-import { TbLayoutGridAdd } from "react-icons/tb";
-import { ImUsers } from "react-icons/im";
 import { motion } from "framer-motion";
-import { useUpdatePage } from "../../lib/hooks/useUpdatePage";
+import { useEffect, useState } from "react";
+import { AiOutlineFundProjectionScreen, AiOutlineLeft } from "react-icons/ai";
 import { FiUserPlus } from "react-icons/fi";
 import { HiDocumentDuplicate } from "react-icons/hi";
-import { AnimatedToggleButton } from "./AnimatedToggleButton";
-import { ToggleLayout } from "../ToggleLayout";
-import { ToggleDarkMode } from "../ToggleDarkMode";
+import { ImUsers } from "react-icons/im";
 import { MdOutlineAccessTimeFilled } from "react-icons/md";
+import { TbLayoutGridAdd } from "react-icons/tb";
+import { useUpdatePage } from "../../lib/hooks/helper/useUpdatePage";
+import { ToggleDarkMode } from "../ToggleDarkMode";
+import { ToggleLayout } from "../ToggleLayout";
+import { AnimatedToggleButton } from "./AnimatedToggleButton";
 
 const buttonWidthVariants = {
   open: {
@@ -180,7 +180,6 @@ export const Sidebar = () => {
         flexDirection={"column"}
         justifyItems="center"
         transitionDuration={"500ms"}
-
       >
         {Menus.map((menu, index) => (
           <Box key={index} width={"100%"}>
@@ -231,22 +230,22 @@ export const Sidebar = () => {
                 colorMode === "light"
                   ? activeMenu === menu.title
                     ? {
-                      color: "white",
-                      bg: "blue.500",
-                    }
+                        color: "white",
+                        bg: "blue.500",
+                      }
                     : {
-                      color: "black",
-                      bg: "gray.100",
-                    }
+                        color: "black",
+                        bg: "gray.100",
+                      }
                   : activeMenu === menu.title
                     ? {
-                      color: "whiteAlpha.800",
-                      bg: "blue.400",
-                    }
+                        color: "whiteAlpha.800",
+                        bg: "blue.400",
+                      }
                     : {
-                      color: "whiteAlpha.800",
-                      bg: "blue.400",
-                    }
+                        color: "whiteAlpha.800",
+                        bg: "blue.400",
+                      }
               }
               onClick={() => {
                 setActiveMenu(menu.title);

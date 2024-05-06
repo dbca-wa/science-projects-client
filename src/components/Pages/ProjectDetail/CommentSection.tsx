@@ -1,4 +1,8 @@
-import { useGetDocumentComments } from "@/lib/hooks/useGetDocumentComments";
+import { CommentRichTextEditor } from "@/components/RichTextEditor/Editors/CommentRichTextEditor";
+import { CommentDisplayRTE } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
+import { useBranches } from "@/lib/hooks/tanstack/useBranches";
+import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
+import { useGetDocumentComments } from "@/lib/hooks/tanstack/useGetDocumentComments";
 import { IMainDoc, IUserData, IUserMe } from "@/types";
 import {
   Box,
@@ -9,12 +13,8 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { CommentRichTextEditor } from "@/components/RichTextEditor/Editors/CommentRichTextEditor";
-import { CommentDisplayRTE } from "@/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
 import { AnimatePresence, motion } from "framer-motion";
-import { useBranches } from "@/lib/hooks/useBranches";
-import { useBusinessAreas } from "@/lib/hooks/useBusinessAreas";
+import { useEffect, useState } from "react";
 
 export interface IDocumentComment {
   document: IMainDoc;
@@ -52,7 +52,6 @@ export const CommentSection = ({ documentID, userData, baseAPI }: Props) => {
 
   const branches = useBranches();
   const businessAreas = useBusinessAreas();
-
 
   return (
     <Box

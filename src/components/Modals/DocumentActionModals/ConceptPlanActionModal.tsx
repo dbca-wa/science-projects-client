@@ -29,8 +29,8 @@ import {
   IUserMe,
 } from "../../../types";
 import { handleDocumentAction } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { useDirectorateMembers } from "../../../lib/hooks/tanstack/useDirectorateMembers";
 
 interface Props {
   userData: IUserMe;
@@ -85,16 +85,18 @@ export const ConceptPlanActionModal = ({
     }
   };
 
-  const approveConceptPlanMutation = useMutation(handleDocumentAction, {
+  const approveConceptPlanMutation = useMutation({
+    mutationFn: handleDocumentAction,
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${action === "approve"
-          ? "Approving"
-          : action === "recall"
-            ? "Recalling"
-            : "Sending Back"
-          }`,
+        title: `${
+          action === "approve"
+            ? "Approving"
+            : action === "recall"
+              ? "Recalling"
+              : "Sending Back"
+        }`,
         position: "top-right",
       });
     },
@@ -102,12 +104,13 @@ export const ConceptPlanActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${action === "approve"
-            ? "Approved"
-            : action === "recall"
-              ? "Recalled"
-              : "Sent Back"
-            }`,
+          description: `Document ${
+            action === "approve"
+              ? "Approved"
+              : action === "recall"
+                ? "Recalled"
+                : "Sent Back"
+          }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -124,7 +127,9 @@ export const ConceptPlanActionModal = ({
         // if (setIsAnimating) {
         //     setIsAnimating(false)
         // }
-        queryClient.invalidateQueries(["projects", projectData?.pk]);
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectData?.pk],
+        });
 
         // queryClient.refetchQueries([`mytasks`])
       }, 350);
@@ -132,12 +137,13 @@ export const ConceptPlanActionModal = ({
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${action === "approve"
-            ? "Approve"
-            : action === "recall"
-              ? "Recall"
-              : "Send Back"
-            } Concept Plan`,
+          title: `Could Not ${
+            action === "approve"
+              ? "Approve"
+              : action === "recall"
+                ? "Recall"
+                : "Send Back"
+          } Concept Plan`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -160,7 +166,7 @@ export const ConceptPlanActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-    // isCentered={true}
+      // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -169,11 +175,13 @@ export const ConceptPlanActionModal = ({
       >
         <ModalHeader>
           {action === "approve"
-            ? stage === 1 ? "Submit" : "Approve"
+            ? stage === 1
+              ? "Submit"
+              : "Approve"
             : action === "recall"
-              ? "Recall" :
-              action === "reopen" ?
-                "Reopen"
+              ? "Recall"
+              : action === "reopen"
+                ? "Reopen"
                 : "Send Back"}{" "}
           Document?
         </ModalHeader>
@@ -209,8 +217,9 @@ export const ConceptPlanActionModal = ({
                   <Text fontWeight={"bold"}>Stage 1</Text>
                   <br />
                   <Text>
-                    {action === "approve" ? `In your capacity as Project Lead, would you like to submit this concept plan to the business area lead?` : `In your capacity as Project Lead, would you like to ${action} this concept plan?`}
-
+                    {action === "approve"
+                      ? `In your capacity as Project Lead, would you like to submit this concept plan to the business area lead?`
+                      : `In your capacity as Project Lead, would you like to ${action} this concept plan?`}
                   </Text>
                   <br />
                   <Text>
@@ -225,8 +234,8 @@ export const ConceptPlanActionModal = ({
                     isChecked={shouldSendEmail}
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
-                    Send an email to the business area lead
-                    {" "}<strong>
+                    Send an email to the business area lead{" "}
+                    <strong>
                       ({baLead.first_name} {baLead.last_name} - {baLead.email})
                     </strong>{" "}
                     alerting them that you have{" "}
@@ -344,7 +353,7 @@ export const ConceptPlanActionModal = ({
           <Button
             form="approval-form"
             type="submit"
-            isLoading={approveConceptPlanMutation.isLoading}
+            isLoading={approveConceptPlanMutation.isPending}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{

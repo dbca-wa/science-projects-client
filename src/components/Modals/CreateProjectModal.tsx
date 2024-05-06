@@ -19,7 +19,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRef, useState } from "react";
-import { useCurrentYear } from "../../lib/hooks/useCurrentYear";
+import { useCurrentYear } from "../../lib/hooks/helper/useCurrentYear";
 import { IconType } from "react-icons";
 import { ProjectDetailsSection } from "../Pages/CreateProject/ProjectDetailsSection";
 import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSection";
@@ -36,10 +36,10 @@ import {
   ProjectCreationMutationSuccess,
   createProject,
 } from "../../lib/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection";
-import { useUser } from "../../lib/hooks/useUser";
+import { useUser } from "../../lib/hooks/tanstack/useUser";
 import { ExternalInternalSPConfirmationModal } from "./ExternalInternalSPConfirmationModal";
 
 interface INewProjectModalProps {
@@ -109,8 +109,6 @@ export const CreateProjectModal = ({
     setActiveTabIndex(3);
   };
 
-
-
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
   const addToast = (data) => {
@@ -122,18 +120,15 @@ export const CreateProjectModal = ({
 
   const navigate = useNavigate();
 
-
   const { userData } = useUser();
-
 
   const {
     isOpen: isExternalOrInternalScienceConfirmationModalOpen,
     onOpen: onOpenExternalOrInternalScienceConfirmationModal,
-    onClose: onCloseExternalOrInternalScienceConfirmationModal
+    onClose: onCloseExternalOrInternalScienceConfirmationModal,
   } = useDisclosure();
 
   const [isExternalSP, setIsExternalSP] = useState(false);
-
 
   const kickOffMutation = () => {
     mutation.mutate({
@@ -150,8 +145,9 @@ export const CreateProjectModal = ({
     ProjectCreationMutationSuccess,
     MutationError,
     IProjectCreationVariables
-  >(createProject, {
+  >({
     // Start of mutation handling
+    mutationFn: createProject,
     onMutate: () => {
       addToast({
         title: "Creating project...",
@@ -189,7 +185,7 @@ export const CreateProjectModal = ({
       //   }
       // }
 
-      queryClient.refetchQueries([`projects`]);
+      queryClient.refetchQueries({ queryKey: [`projects`] });
       navigate(`/projects/${data.pk}`);
     },
     // Error handling based on API-file-declared interface
@@ -222,7 +218,6 @@ export const CreateProjectModal = ({
       }
     },
   });
-
 
   return (
     <>
@@ -311,7 +306,7 @@ export const CreateProjectModal = ({
               </TabPanel>
               <TabPanel>
                 {projectType.includes("External") ||
-                  projectType.includes("Student") ? (
+                projectType.includes("Student") ? (
                   <ProjectLocationSection
                     locationFilled={locationFilled}
                     locationData={locationData}
@@ -336,7 +331,9 @@ export const CreateProjectModal = ({
                     currentYear={currentYear}
                     colorMode={colorMode}
                     backClick={goBack}
-                    createClick={onOpenExternalOrInternalScienceConfirmationModal} // kickOffMutation
+                    createClick={
+                      onOpenExternalOrInternalScienceConfirmationModal
+                    } // kickOffMutation
                   />
                 )}
               </TabPanel>
@@ -372,6 +369,5 @@ export const CreateProjectModal = ({
         </ModalContent>
       </Modal>
     </>
-
   );
 };

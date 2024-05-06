@@ -3,11 +3,11 @@
 // Only the system, directorate or program leader can click the button again to enable editing.
 
 import { ToastId, useToast } from "@chakra-ui/react";
-import { useRef } from "react";
-import { BaseOptionsButton } from "./BaseOptionsButton";
-import { FaSave } from "react-icons/fa";
 import { useMutation } from "@tanstack/react-query";
+import { useRef } from "react";
+import { FaSave } from "react-icons/fa";
 import { IHTMLSave, saveHtmlToDB } from "../../../lib/api";
+import { BaseOptionsButton } from "./BaseOptionsButton";
 
 export const SaveButton = ({
   editorType,
@@ -29,7 +29,8 @@ export const SaveButton = ({
     toastIdRef.current = toast(data);
   };
 
-  const htmlSaveProjectMutation = useMutation(saveHtmlToDB, {
+  const htmlSaveProjectMutation = useMutation({
+    mutationFn: saveHtmlToDB,
     onMutate: () => {
       addToast({
         status: "loading",

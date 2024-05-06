@@ -1,13 +1,13 @@
 // A template for a RTE menu button - props fill out its icon, text and functionality
 
 import {
+  Box,
+  Button,
+  Icon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Icon,
-  Box,
-  Button,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { IconType } from "react-icons";

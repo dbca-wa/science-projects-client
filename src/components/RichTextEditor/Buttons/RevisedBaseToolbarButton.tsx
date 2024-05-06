@@ -1,7 +1,8 @@
 // A template for a RTE simple button - props fill out its icon, text and functionality
 
-import { Box, Text, Button, useColorMode } from "@chakra-ui/react";
+import { Box, Button, Text, useColorMode } from "@chakra-ui/react";
 import { ReactNode } from "react";
+import "../../../styles/texteditor.css";
 
 interface IBaseToolbarButtonProps {
   ariaLabel: string;
@@ -13,7 +14,6 @@ interface IBaseToolbarButtonProps {
 
   children: ReactNode;
 }
-import "../../../styles/texteditor.css";
 
 export const RevisedBaseToolbarButton = ({
   children,

@@ -49,7 +49,8 @@ export const DeleteCommentModal = ({
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
-  const deleteCommentMutation = useMutation(deleteCommentCall, {
+  const deleteCommentMutation = useMutation({
+    mutationFn: deleteCommentCall,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -69,7 +70,9 @@ export const DeleteCommentModal = ({
         });
         onDeleteSuccess && onDeleteSuccess();
       }
-      queryClient.invalidateQueries(["documentComments", documentPk]);
+      queryClient.invalidateQueries({
+        queryKey: ["documentComments", documentPk],
+      });
 
       setTimeout(async () => {
         await refetchData();
@@ -158,7 +161,7 @@ export const DeleteCommentModal = ({
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }}
-                isLoading={deleteCommentMutation.isLoading}
+                isLoading={deleteCommentMutation.isPending}
                 type="submit"
                 ml={3}
               >

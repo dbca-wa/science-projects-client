@@ -1,6 +1,9 @@
+import { useGetLocations } from "@/lib/hooks/tanstack/useGetLocations";
 import {
-  Center,
+  Box,
+  Button,
   Flex,
+  Grid,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -8,18 +11,14 @@ import {
   ModalHeader,
   ModalOverlay,
   ToastId,
-  useToast,
   useColorMode,
-  Grid,
-  Button,
-  Box,
+  useToast,
 } from "@chakra-ui/react";
-import { ISetProjectAreas, setProjectAreas } from "../../lib/api";
-import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useGetLocations } from "@/lib/hooks/useGetLocations";
-import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
+import { useEffect, useRef, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
+import { ISetProjectAreas, setProjectAreas } from "../../lib/api";
+import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 
 interface Props {
   projectPk: string | number;
@@ -47,7 +46,8 @@ export const SetAreasModal = ({
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
-  const setAreasMutation = useMutation(setProjectAreas, {
+  const setAreasMutation = useMutation({
+    mutationFn: setProjectAreas,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -69,7 +69,9 @@ export const SetAreasModal = ({
       }
 
       setTimeout(async () => {
-        queryClient.invalidateQueries(["projects", "areas", projectPk]);
+        queryClient.invalidateQueries({
+          queryKey: ["projects", "areas", projectPk],
+        });
         await refetchData();
         onClose();
         setToLastTab();

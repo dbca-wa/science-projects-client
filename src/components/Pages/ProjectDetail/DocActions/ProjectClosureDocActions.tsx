@@ -13,18 +13,15 @@ import {
   Tag,
   Text,
   useColorMode,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import {
-  ISetProjectProps,
-  setProjectStatus
-} from "../../../../lib/api";
-import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
-import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
-import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useUser } from "../../../../lib/hooks/useUser";
+import { ISetProjectProps, setProjectStatus } from "../../../../lib/api";
+import { useFormattedDate } from "../../../../lib/hooks/helper/useFormattedDate";
+import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea";
+import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
+import { useProjectTeam } from "../../../../lib/hooks/tanstack/useProjectTeam";
+import { useUser } from "../../../../lib/hooks/tanstack/useUser";
 import {
   IProjectClosure,
   IProjectDocuments,
@@ -48,7 +45,7 @@ export const ProjectClosureDocActions = ({
   refetchData,
   setToLastTab,
 }: // , projectPk
-  IConceptDocumentActions) => {
+IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
 
   // useEffect(() => {
@@ -109,7 +106,6 @@ export const ProjectClosureDocActions = ({
     onOpen: onS2ReopenModalOpen,
     onClose: onS2ReopenModalClose,
   } = useDisclosure();
-
 
   const {
     isOpen: isS3ReopenModalOpen,
@@ -194,7 +190,6 @@ export const ProjectClosureDocActions = ({
     onOpen: onCreatorOpen,
     onClose: onCreatorClose,
   } = useDisclosure();
-
 
   const {
     isOpen: isDeleteDocumentModalOpen,
@@ -290,7 +285,7 @@ export const ProjectClosureDocActions = ({
               </Box>
               <Grid
                 pt={2}
-              // gridGap={2}
+                // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -319,7 +314,7 @@ export const ProjectClosureDocActions = ({
                             : projectClosureData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                              colorMode === "light"
+                                colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -495,9 +490,9 @@ export const ProjectClosureDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-              // gridGap={2}
-              // pt={4}
-              // pos={"relative"}
+                // gridGap={2}
+                // pt={4}
+                // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -561,13 +556,17 @@ export const ProjectClosureDocActions = ({
                       justifyContent={"flex-end"}
                       w={"100%"}
                       mt={
-                        projectClosureData?.document?.project?.status === "completed" ? 3 :
-                          projectClosureData?.document?.business_area_lead_approval_granted
+                        projectClosureData?.document?.project?.status ===
+                        "completed"
+                          ? 3
+                          : projectClosureData?.document
+                                ?.business_area_lead_approval_granted
                             ? 0
                             : 3
                       }
                     >
-                      {projectClosureData?.document?.project?.status === "completed" && (
+                      {projectClosureData?.document?.project?.status ===
+                        "completed" && (
                         <>
                           {/* <ProjectClosureActionModal
                             userData={userData}
@@ -600,14 +599,12 @@ export const ProjectClosureDocActions = ({
                             }}
                             size={"sm"}
                             onClick={onS1ReopenModalOpen}
-                          // mr={3}
+                            // mr={3}
                           >
                             Reopen Project
                           </Button>
-
                         </>
                       )}
-
 
                       {projectClosureData?.document
                         ?.business_area_lead_approval_granted === false &&
@@ -630,7 +627,9 @@ export const ProjectClosureDocActions = ({
                                   : projectClosureData?.document?.id
                               }
                               stage={1}
-                              projectData={projectClosureData?.document?.project}
+                              projectData={
+                                projectClosureData?.document?.project
+                              }
                             />
 
                             <Button
@@ -641,7 +640,9 @@ export const ProjectClosureDocActions = ({
                               }
                               _hover={{
                                 background:
-                                  colorMode === "light" ? "blue.400" : "blue.500",
+                                  colorMode === "light"
+                                    ? "blue.400"
+                                    : "blue.500",
                               }}
                               size={"sm"}
                               onClick={onS1RecallModalOpen}
@@ -649,10 +650,7 @@ export const ProjectClosureDocActions = ({
                               Recall
                             </Button>
                           </>
-                        )
-                      }
-
-
+                        )}
 
                       {projectClosureData?.document
                         ?.business_area_lead_approval_granted === false &&
@@ -682,8 +680,10 @@ export const ProjectClosureDocActions = ({
                                 onDeleteSuccess={() => {
                                   setStatusIfRequired(
                                     projectClosureData?.document?.project?.pk
-                                      ? projectClosureData?.document?.project?.pk
-                                      : projectClosureData?.document?.project?.id,
+                                      ? projectClosureData?.document?.project
+                                          ?.pk
+                                      : projectClosureData?.document?.project
+                                          ?.id,
                                     "updating"
                                   );
                                 }}
@@ -697,7 +697,9 @@ export const ProjectClosureDocActions = ({
                                 }
                                 _hover={{
                                   background:
-                                    colorMode === "light" ? "red.400" : "red.500",
+                                    colorMode === "light"
+                                      ? "red.400"
+                                      : "red.500",
                                 }}
                                 size={"sm"}
                                 onClick={() => {
@@ -751,7 +753,6 @@ export const ProjectClosureDocActions = ({
                           </Center>
                         )}
                     </Flex>
-
                   </Grid>
                 </Grid>
 
@@ -763,7 +764,7 @@ export const ProjectClosureDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                // pos={"relative"}
+                  // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -799,12 +800,15 @@ export const ProjectClosureDocActions = ({
                     justifyContent={"flex-end"}
                     w={"100%"}
                     mt={
-                      projectClosureData?.document?.project?.status === "completed" ? 3 :
-                        projectClosureData?.document?.directorate_approval_granted
+                      projectClosureData?.document?.project?.status ===
+                      "completed"
+                        ? 3
+                        : projectClosureData?.document
+                              ?.directorate_approval_granted
                           ? 0
                           : 3
                     }
-                  // gridTemplateColumns={"repeat(2, 1fr)"}
+                    // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     <ProjectClosureActionModal
                       userData={userData}
@@ -824,10 +828,9 @@ export const ProjectClosureDocActions = ({
                     />
                     {projectClosureData?.document
                       ?.project_lead_approval_granted &&
-                      projectClosureData?.document
-                        ?.business_area_lead_approval_granted === false &&
-                      (userData?.is_superuser ||
-                        userData?.pk === baLead?.pk) ? (
+                    projectClosureData?.document
+                      ?.business_area_lead_approval_granted === false &&
+                    (userData?.is_superuser || userData?.pk === baLead?.pk) ? (
                       <Center
                       // justifyContent={"flex-start"}
                       // ml={4}
@@ -872,9 +875,7 @@ export const ProjectClosureDocActions = ({
                         <Button
                           color={"white"}
                           background={
-                            colorMode === "light"
-                              ? "orange.500"
-                              : "orange.600"
+                            colorMode === "light" ? "orange.500" : "orange.600"
                           }
                           _hover={{
                             background:
@@ -887,19 +888,17 @@ export const ProjectClosureDocActions = ({
                         >
                           Send Back
                         </Button>
-                      </Center>) : (
-                      projectClosureData?.document?.project?.status === "completed" ? <Button
+                      </Center>
+                    ) : projectClosureData?.document?.project?.status ===
+                      "completed" ? (
+                      <Button
                         color={"white"}
                         background={
-                          colorMode === "light"
-                            ? "orange.500"
-                            : "orange.600"
+                          colorMode === "light" ? "orange.500" : "orange.600"
                         }
                         _hover={{
                           background:
-                            colorMode === "light"
-                              ? "orange.400"
-                              : "orange.500",
+                            colorMode === "light" ? "orange.400" : "orange.500",
                         }}
                         size={"sm"}
                         onClick={onS2ReopenModalOpen}
@@ -907,8 +906,7 @@ export const ProjectClosureDocActions = ({
                       >
                         Reopen Project
                       </Button>
-                        : null
-                    )}
+                    ) : null}
 
                     {projectClosureData?.document
                       ?.business_area_lead_approval_granted &&
@@ -1039,13 +1037,7 @@ export const ProjectClosureDocActions = ({
                         : "Required"}
                     </Tag>
                   </Flex>
-                  <Flex
-                    justifyContent={"flex-end"}
-                    w={"100%"}
-                    mt={
-                      3
-                    }
-                  >
+                  <Flex justifyContent={"flex-end"} w={"100%"} mt={3}>
                     <ProjectClosureActionModal
                       userData={userData}
                       action={"reopen"}
@@ -1062,26 +1054,24 @@ export const ProjectClosureDocActions = ({
                       stage={3}
                       projectData={projectClosureData?.document?.project}
                     />
-                    {projectClosureData?.document?.project?.status === "completed" ? <Button
-                      color={"white"}
-                      background={
-                        colorMode === "light"
-                          ? "orange.500"
-                          : "orange.600"
-                      }
-                      _hover={{
-                        background:
-                          colorMode === "light"
-                            ? "orange.400"
-                            : "orange.500",
-                      }}
-                      size={"sm"}
-                      onClick={onS3ReopenModalOpen}
-                      ml={2}
-                    >
-                      Reopen Project
-                    </Button> : null}
-
+                    {projectClosureData?.document?.project?.status ===
+                    "completed" ? (
+                      <Button
+                        color={"white"}
+                        background={
+                          colorMode === "light" ? "orange.500" : "orange.600"
+                        }
+                        _hover={{
+                          background:
+                            colorMode === "light" ? "orange.400" : "orange.500",
+                        }}
+                        size={"sm"}
+                        onClick={onS3ReopenModalOpen}
+                        ml={2}
+                      >
+                        Reopen Project
+                      </Button>
+                    ) : null}
 
                     {projectClosureData?.document
                       ?.business_area_lead_approval_granted &&
@@ -1248,10 +1238,12 @@ export const ProjectClosureDocActions = ({
                 </Grid>
 
                 {/* PDF and email buttons */}
-                {projectClosureData ?
-                  <ProjectDocumentPDFSection data_document={projectClosureData} refetchData={refetchData} />
-                  : null}
-
+                {projectClosureData ? (
+                  <ProjectDocumentPDFSection
+                    data_document={projectClosureData}
+                    refetchData={refetchData}
+                  />
+                ) : null}
               </Grid>
             </Box>
           </Grid>

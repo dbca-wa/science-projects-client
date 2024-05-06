@@ -56,85 +56,83 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
     toastIdRef.current = toast(data);
   };
 
-  const batchApproveMutation = useMutation<MutationSuccess, MutationError>(
-    batchApproveProgressAndStudentReports,
-    {
-      // Start of mutation handling
-      onMutate: () => {
-        addToast({
-          title: "Batch Approving Progress and Student Reports...",
-          description: "One moment!",
-          status: "loading",
+  const batchApproveMutation = useMutation<MutationSuccess, MutationError>({
+    // Start of mutation handling
+    mutationFn: batchApproveProgressAndStudentReports,
+    onMutate: () => {
+      addToast({
+        title: "Batch Approving Progress and Student Reports...",
+        description: "One moment!",
+        status: "loading",
+        position: "top-right",
+        // duration: 3000
+      });
+    },
+    // Success handling based on API- file - declared interface
+    onSuccess: () => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: `Docs awaiting final approval belonging to most recent financial year have been batch approved.`,
+          status: "success",
           position: "top-right",
-          // duration: 3000
+          duration: 3000,
+          isClosable: true,
         });
-      },
-      // Success handling based on API- file - declared interface
-      onSuccess: () => {
-        if (toastIdRef.current) {
-          toast.update(toastIdRef.current, {
-            title: "Success",
-            description: `Docs awaiting final approval belonging to most recent financial year have been batch approved.`,
-            status: "success",
-            position: "top-right",
-            duration: 3000,
-            isClosable: true,
-          });
-        }
-        //  Close the modal
-        if (onClose) {
-          onClose();
-        }
-      },
-      // Error handling based on API - file - declared interface
-      onError: (error) => {
-        console.log(error);
-        let errorMessage = "An error occurred while batch approving"; // Default error message
+      }
+      //  Close the modal
+      if (onClose) {
+        onClose();
+      }
+    },
+    // Error handling based on API - file - declared interface
+    onError: (error) => {
+      console.log(error);
+      let errorMessage = "An error occurred while batch approving"; // Default error message
 
-        const collectErrors = (data, prefix = "") => {
-          if (typeof data === "string") {
-            return [data];
+      const collectErrors = (data, prefix = "") => {
+        if (typeof data === "string") {
+          return [data];
+        }
+
+        const errorMessages = [];
+
+        for (const key in data) {
+          if (Array.isArray(data[key])) {
+            const nestedErrors = collectErrors(data[key], `${prefix}${key}.`);
+            errorMessages.push(...nestedErrors);
+          } else if (typeof data[key] === "object") {
+            const nestedErrors = collectErrors(data[key], `${prefix}${key}.`);
+            errorMessages.push(...nestedErrors);
+          } else {
+            errorMessages.push(`${prefix}${key}: ${data[key]}`);
           }
-
-          const errorMessages = [];
-
-          for (const key in data) {
-            if (Array.isArray(data[key])) {
-              const nestedErrors = collectErrors(data[key], `${prefix}${key}.`);
-              errorMessages.push(...nestedErrors);
-            } else if (typeof data[key] === "object") {
-              const nestedErrors = collectErrors(data[key], `${prefix}${key}.`);
-              errorMessages.push(...nestedErrors);
-            } else {
-              errorMessages.push(`${prefix}${key}: ${data[key]}`);
-            }
-          }
-
-          return errorMessages;
-        };
-
-        if (error.response && error.response.data) {
-          const errorMessages = collectErrors(error.response.data);
-          if (errorMessages.length > 0) {
-            errorMessage = errorMessages.join("\n"); // Join errors with new lines
-          }
-        } else if (error.message) {
-          errorMessage = error.message; // Use the error message from the caught exception
         }
 
-        if (toastIdRef.current) {
-          toast.update(toastIdRef.current, {
-            title: "Update failed",
-            description: errorMessage,
-            status: "error",
-            position: "top-right",
-            duration: 3000,
-            isClosable: true,
-          });
+        return errorMessages;
+      };
+
+      if (error.response && error.response.data) {
+        const errorMessages = collectErrors(error.response.data);
+        if (errorMessages.length > 0) {
+          errorMessage = errorMessages.join("\n"); // Join errors with new lines
         }
-      },
-    }
-  );
+      } else if (error.message) {
+        errorMessage = error.message; // Use the error message from the caught exception
+      }
+
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Update failed",
+          description: errorMessage,
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
 
   const onSubmit = async () => {
     await batchApproveMutation.mutateAsync();
@@ -198,7 +196,7 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }} // isDisabled={!changesMade}
-                isLoading={batchApproveMutation.isLoading}
+                isLoading={batchApproveMutation.isPending}
                 onClick={() => onSubmit()}
                 ml={3}
               >

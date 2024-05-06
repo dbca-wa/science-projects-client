@@ -22,15 +22,15 @@ import { GoTriangleDown } from "react-icons/go";
 import { INavitar } from "../../types";
 import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { logOut } from "../../lib/api";
-import { useUser } from "../../lib/hooks/useUser";
-import { useLayoutSwitcher } from "../../lib/hooks/LayoutSwitcherContext";
+import { useUser } from "../../lib/hooks/tanstack/useUser";
+import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
 import { TbWorldWww } from "react-icons/tb";
 import { ToggleLayout } from "../ToggleLayout";
 import { ToggleDarkMode } from "../ToggleDarkMode";
-import useApiEndpoint from "../../lib/hooks/useApiEndpoint";
-import { useNoImage } from "@/lib/hooks/useNoImage";
+import useApiEndpoint from "../../lib/hooks/helper/useApiEndpoint";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 
 export const Navitar = ({
   isModern,
@@ -50,7 +50,8 @@ export const Navitar = ({
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
-  const mutation = useMutation(logOut, {
+  const mutation = useMutation({
+    mutationFn: logOut,
     onMutate: () => {
       // const toastID =
       addToast({
@@ -72,8 +73,8 @@ export const Navitar = ({
         });
       }
       // queryClient.refetchQueries(['me']);
-      queryClient.invalidateQueries(["me"]);
-      navigate("/login");
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+      navigate({ to: "/login" });
     },
   });
   const onLogOut = async () => {
@@ -121,8 +122,8 @@ export const Navitar = ({
                     ? userData.first_name.length < 12
                       ? userData.first_name
                       : windowSize >= 1150
-                      ? userData.first_name
-                      : `${userData?.first_name.substring(0, 9)}...`
+                        ? userData.first_name
+                        : `${userData?.first_name.substring(0, 9)}...`
                     : userData.username)}
               </Text>
             ) : null}
@@ -135,8 +136,8 @@ export const Navitar = ({
                     ? `${userData.image?.file}`
                     : `${baseAPI}${userData.image?.file}`
                   : userData.image?.old_file
-                  ? userData.image?.old_file
-                  : noImage
+                    ? userData.image?.old_file
+                    : noImage
               }
             ></Avatar>
             <Center
@@ -194,7 +195,7 @@ export const Navitar = ({
           >
             <MenuItem
               onClick={() => {
-                navigate("/users/me");
+                navigate({ to: "/users/me" });
               }}
               zIndex={isOpen ? 2 : 1}
             >

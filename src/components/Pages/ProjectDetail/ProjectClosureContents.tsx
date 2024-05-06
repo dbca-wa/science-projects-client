@@ -1,5 +1,6 @@
 // Maps out the document provided to the rich text editor components for project closure documents.
 
+import { setClosureOutcome } from "@/lib/api";
 import {
   Flex,
   Select,
@@ -8,6 +9,11 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import {
   IProjectClosure,
   IProjectDocuments,
@@ -15,14 +21,8 @@ import {
   IUserMe,
 } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { useRef, useState } from "react";
-import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
-import { ProjectClosureDocActions } from "./DocActions/ProjectClosureDocActions";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { motion } from "framer-motion";
 import { CommentSection } from "./CommentSection";
-import { setClosureOutcome } from "@/lib/api";
+import { ProjectClosureDocActions } from "./DocActions/ProjectClosureDocActions";
 
 interface Props {
   document: IProjectClosure | null;
@@ -67,7 +67,8 @@ export const ProjectClosureContents = ({
     toastIdRef.current = toast(data);
   };
 
-  const setClosureMutation = useMutation(setClosureOutcome, {
+  const setClosureMutation = useMutation({
+    mutationFn: setClosureOutcome,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -86,10 +87,9 @@ export const ProjectClosureContents = ({
           isClosable: true,
         });
       }
-      queryClient.invalidateQueries([
-        "projects",
-        document?.document?.project?.id,
-      ]);
+      queryClient.invalidateQueries({
+        queryKey: ["projects", document?.document?.project?.id],
+      });
       refetch();
     },
     onError: (error: AxiosError) => {
@@ -97,8 +97,9 @@ export const ProjectClosureContents = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Set Closure Outcome",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -141,7 +142,7 @@ export const ProjectClosureContents = ({
         projectClosureData={document}
         refetchData={refetch}
         setToLastTab={setToLastTab}
-      // projectPk={projectPk}
+        // projectPk={projectPk}
       />
 
       <Flex
@@ -249,7 +250,11 @@ export const ProjectClosureContents = ({
         data={document?.scientific_outputs}
         section={"scientific_outputs"}
       />
-      <CommentSection documentID={document?.pk} userData={userData} baseAPI={baseAPI} />
+      <CommentSection
+        documentID={document?.pk}
+        userData={userData}
+        baseAPI={baseAPI}
+      />
     </motion.div>
   );
 };

@@ -6,9 +6,9 @@ import { useState } from "react";
 // Styles and Styling Components
 import { Box, useColorMode } from "@chakra-ui/react";
 
-import "../../../styles/texteditor.css";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
+import "../../../styles/texteditor.css";
 import { EditorSubsections, EditorType } from "../../../types";
 import { SimpleEditableRTE } from "./Sections/SimpleEditableRTE";
 

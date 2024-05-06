@@ -1,28 +1,20 @@
 // The quote that displays on the dashboard
 
+import { useQuote } from "@/lib/hooks/tanstack/useQuote";
 import { Box, Flex, Spinner, Text, useColorMode } from "@chakra-ui/react";
-import { BsChatQuoteFill } from "react-icons/bs";
-import { IQuote } from "../types";
-import { useQuery } from "@tanstack/react-query";
-import { getQuote } from "../lib/api";
 import { motion, useAnimation } from "framer-motion";
 import { useEffect } from "react";
+import { BsChatQuoteFill } from "react-icons/bs";
 
 export const Quote = () => {
   const { colorMode } = useColorMode();
-  const { data: quote, isLoading: quotesLoading } = useQuery<IQuote>(
-    ["quote"],
-    getQuote,
-    {
-      refetchOnWindowFocus: false,
-    }
-  );
+  const { quote, quoteLoading } = useQuote();
 
   const textControls = useAnimation();
   const authorControls = useAnimation();
 
   useEffect(() => {
-    if (!quotesLoading) {
+    if (!quoteLoading) {
       const textArray = quote ? quote.text.split(" ") : [];
       textControls.start((i) => ({
         opacity: 1,
@@ -34,7 +26,7 @@ export const Quote = () => {
         transition: { delay: textArray.length * 0.025 + 0.5, duration: 1 },
       });
     }
-  }, [textControls, authorControls, quote, quotesLoading]);
+  }, [textControls, authorControls, quote, quoteLoading]);
 
   return (
     <Box
@@ -57,7 +49,7 @@ export const Quote = () => {
           <BsChatQuoteFill size={30} />
         </Box>
         <Flex width="100%" flexDir="column">
-          {!quotesLoading ? (
+          {!quoteLoading ? (
             <>
               <Text
                 color={

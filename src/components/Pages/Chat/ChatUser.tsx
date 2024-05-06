@@ -94,10 +94,12 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
               <Avatar
                 size={iconSize ? iconSize : "md"}
                 src={
-                  avatarSrc?.file ?
-                    avatarSrc?.file.startsWith("http") ?
-                      `${avatarSrc?.file}` : `${baseAPI}${avatarSrc?.file}` :
-                    avatarSrc?.old_file ? avatarSrc?.old_file
+                  avatarSrc?.file
+                    ? avatarSrc?.file.startsWith("http")
+                      ? `${avatarSrc?.file}`
+                      : `${baseAPI}${avatarSrc?.file}`
+                    : avatarSrc?.old_file
+                      ? avatarSrc?.old_file
                       : undefined
                 }
                 name={displayName}
@@ -126,15 +128,15 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
                     pl={1}
                     mt={0}
                     color={
-                      usernameColour ? usernameColour :
-                        otherUser
+                      usernameColour
+                        ? usernameColour
+                        : otherUser
                           ? colorMode === "light"
                             ? "blue.500"
                             : "blue.300"
                           : colorMode === "light"
                             ? "blackAlpha.700"
                             : "whiteAlpha.800"
-
                     }
                   >
                     {displayName}
@@ -145,7 +147,7 @@ export const ChatUser: React.FC<ChatUserProps> = React.memo(
                   <Box
                     userSelect={"none"}
                     mt={"2px"}
-                  //   right={12} pos={"absolute"}
+                    //   right={12} pos={"absolute"}
                   >
                     <Text
                       alignItems={"center"}

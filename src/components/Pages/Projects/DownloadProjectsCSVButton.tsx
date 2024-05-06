@@ -16,7 +16,8 @@ export const DownloadProjectsCSVButton = () => {
   const toast = useToast();
   const [onMutateToastId, setOnMutateToastId] = useState<ToastId>();
 
-  const downloadAllProjectsMutation = useMutation(downloadProjectsCSV, {
+  const downloadAllProjectsMutation = useMutation({
+    mutationFn: downloadProjectsCSV,
     onMutate: () => {
       setIsDownloadProjectsButtonDisabled(true);
       const toastId = toast({

@@ -15,7 +15,7 @@ import {
   ToastId,
   useColorMode,
   useDisclosure,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -25,13 +25,13 @@ import {
   ISpawnDocument,
   // generateConceptPlan,
   setProjectStatus,
-  spawnNewEmptyDocument
+  spawnNewEmptyDocument,
 } from "../../../../lib/api";
-import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
-import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
-import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useUser } from "../../../../lib/hooks/useUser";
+import { useFormattedDate } from "../../../../lib/hooks/helper/useFormattedDate";
+import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea";
+import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
+import { useProjectTeam } from "../../../../lib/hooks/tanstack/useProjectTeam";
+import { useUser } from "../../../../lib/hooks/tanstack/useUser";
 import {
   IConceptPlan,
   IProjectDocuments,
@@ -54,7 +54,7 @@ export const ConceptPlanDocActions = ({
   conceptPlanData,
   refetchData,
 }: // , projectPk
-  IConceptDocumentActions) => {
+IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
 
   const {
@@ -181,8 +181,8 @@ export const ConceptPlanDocActions = ({
     toastIdRef.current = toast(data);
   };
 
-
-  const spawnMutation = useMutation(spawnNewEmptyDocument, {
+  const spawnMutation = useMutation({
+    mutationFn: spawnNewEmptyDocument,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -208,7 +208,9 @@ export const ConceptPlanDocActions = ({
         status: "pending",
       };
       await setProjectStatus(updateData);
-      queryClient.invalidateQueries(["projects", updateData.projectId]);
+      queryClient.invalidateQueries({
+        queryKey: ["projects", updateData.projectId],
+      });
       refetchData();
     },
     onError: (error: AxiosError) => {
@@ -216,8 +218,9 @@ export const ConceptPlanDocActions = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Spawn Project Plan",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -297,7 +300,7 @@ export const ConceptPlanDocActions = ({
               </Box>
               <Grid
                 pt={2}
-              // gridGap={2}
+                // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -326,7 +329,7 @@ export const ConceptPlanDocActions = ({
                             : conceptPlanData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                              colorMode === "light"
+                                colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -632,7 +635,7 @@ export const ConceptPlanDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                // pos={"relative"}
+                  // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -670,12 +673,12 @@ export const ConceptPlanDocActions = ({
                     mt={
                       conceptPlanData?.document
                         ?.project_lead_approval_granted &&
-                        conceptPlanData?.document
-                          ?.directorate_approval_granted === false
+                      conceptPlanData?.document
+                        ?.directorate_approval_granted === false
                         ? 3
                         : 0
                     }
-                  // gridTemplateColumns={"repeat(2, 1fr)"}
+                    // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {conceptPlanData?.document?.project_lead_approval_granted &&
                       conceptPlanData?.document
@@ -1007,48 +1010,49 @@ export const ConceptPlanDocActions = ({
                 </Grid>
 
                 {/* PDF and email buttons */}
-                <ProjectDocumentPDFSection data_document={conceptPlanData} refetchData={refetchData} />
-
+                <ProjectDocumentPDFSection
+                  data_document={conceptPlanData}
+                  refetchData={refetchData}
+                />
               </Grid>
             </Box>
           </Grid>
         </>
-      )
-        : // <Spinner/>
-        baLoading === false && baData === undefined ? (
-          <Grid
-            my={4}
-            gridTemplateColumns={"repeat(1, 1fr)"}
-            justifyContent={"center"}
-          >
-            <Text textAlign={"center"} fontWeight={"semibold"}>
-              Document Actions cannot be displayed as this project has no business
-              area.
-            </Text>
-            <Text textAlign={"center"} fontWeight={"semibold"}>
-              Please set a business area for this project from the project
-              settings.
-            </Text>
-          </Grid>
-        ) : actionsReady && !leaderMember ? (
-          <Grid
-            my={4}
-            gridTemplateColumns={"repeat(1, 1fr)"}
-            justifyContent={"center"}
-          >
-            <Text textAlign={"center"} fontWeight={"semibold"}>
-              This project has no members/leader so document actions are not shown
-              here.
-            </Text>
-            <Text textAlign={"center"} fontWeight={"semibold"}>
-              Please add members to adjust document actions.
-            </Text>
-          </Grid>
-        ) : (
-          <Center>
-            <Spinner />
-          </Center>
-        )}
+      ) : // <Spinner/>
+      baLoading === false && baData === undefined ? (
+        <Grid
+          my={4}
+          gridTemplateColumns={"repeat(1, 1fr)"}
+          justifyContent={"center"}
+        >
+          <Text textAlign={"center"} fontWeight={"semibold"}>
+            Document Actions cannot be displayed as this project has no business
+            area.
+          </Text>
+          <Text textAlign={"center"} fontWeight={"semibold"}>
+            Please set a business area for this project from the project
+            settings.
+          </Text>
+        </Grid>
+      ) : actionsReady && !leaderMember ? (
+        <Grid
+          my={4}
+          gridTemplateColumns={"repeat(1, 1fr)"}
+          justifyContent={"center"}
+        >
+          <Text textAlign={"center"} fontWeight={"semibold"}>
+            This project has no members/leader so document actions are not shown
+            here.
+          </Text>
+          <Text textAlign={"center"} fontWeight={"semibold"}>
+            Please add members to adjust document actions.
+          </Text>
+        </Grid>
+      ) : (
+        <Center>
+          <Spinner />
+        </Center>
+      )}
     </>
   );
 };

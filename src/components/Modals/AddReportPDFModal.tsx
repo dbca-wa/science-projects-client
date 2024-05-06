@@ -17,9 +17,9 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "../../lib/hooks/useUser";
+import { useUser } from "../../lib/hooks/tanstack/useUser";
 import { addPDFToReport } from "../../lib/api";
-import { useGetARARsWithoputPDF } from "../../lib/hooks/useGetARARsWithoputPDF";
+import { useGetARARsWithoputPDF } from "../../lib/hooks/tanstack/useGetARARsWithoputPDF";
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
 
 interface Props {
@@ -61,7 +61,8 @@ export const AddReportPDFModal = ({
     }
   }, [reportsWithoutPDFLoading, reportsWithoutPDFData]);
 
-  const ararPDFAdditionMutation = useMutation(addPDFToReport, {
+  const ararPDFAdditionMutation = useMutation({
+    mutationFn: addPDFToReport,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -83,8 +84,8 @@ export const AddReportPDFModal = ({
       onAddPDFClose();
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["ararsWithoutPDFs"]);
-        queryClient.invalidateQueries(["ararsWithPDFs"]);
+        queryClient.invalidateQueries({ queryKey: ["ararsWithoutPDFs"] });
+        queryClient.invalidateQueries({ queryKey: ["ararsWithPDFs"] });
         refetchPDFs();
         refetchReportsWithoutPDFs();
       }, 350);
@@ -166,7 +167,7 @@ export const AddReportPDFModal = ({
             Cancel
           </Button>
           <Button
-            isLoading={ararPDFAdditionMutation.isLoading}
+            isLoading={ararPDFAdditionMutation.isPending}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{

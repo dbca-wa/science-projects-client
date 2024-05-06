@@ -51,7 +51,8 @@ export const AddPersonalTaskModal = ({
     toastIdRef.current = toast(data);
   };
 
-  const taskCreationMutation = useMutation(createPersonalTask, {
+  const taskCreationMutation = useMutation({
+    mutationFn: createPersonalTask,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -81,7 +82,7 @@ export const AddPersonalTaskModal = ({
         if (setIsAnimating) {
           setIsAnimating(false);
         }
-        queryClient.invalidateQueries(["mytasks"]);
+        queryClient.invalidateQueries({ queryKey: ["mytasks"] });
       }, 350);
     },
     onError: (error) => {
@@ -161,7 +162,7 @@ export const AddPersonalTaskModal = ({
           <Button
             form="taskcreation-form"
             type="submit"
-            isLoading={taskCreationMutation.isLoading}
+            isLoading={taskCreationMutation.isPending}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{

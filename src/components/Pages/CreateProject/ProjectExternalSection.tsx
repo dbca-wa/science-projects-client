@@ -1,11 +1,11 @@
 // Tab data for Project External Project info on the creation page.
 
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import { Button, Flex, Grid, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import "../../../styles/modalscrollbar.css";
 import { IoIosCreate } from "react-icons/io";
 import { ICreateProjectExternalDetails } from "../../../lib/api";
-import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
+import "../../../styles/modalscrollbar.css";
 
 interface IProjectExternalProps {
   externalFilled: boolean;
@@ -73,7 +73,9 @@ export const ProjectExternalSection = ({
       <UnboundStatefulEditor
         title="Collaboration With"
         placeholder="Enter collaborating entities..."
-        helperText={"The entity/s this project is in collaboration with, separated by commas"}
+        helperText={
+          "The entity/s this project is in collaboration with, separated by commas"
+        }
         showToolbar={false}
         showTitle={true}
         isRequired={true}

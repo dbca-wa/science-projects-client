@@ -41,10 +41,10 @@ export const BaseToggleOptionsButton = ({
                 : `${colorSchemeTwo}.500`
               : `${colorSchemeOne}.500` // For if colorSchemeTwo not provided
             : colorSchemeOne && colorSchemeTwo // For dark mode
-            ? currentState === false
-              ? `${colorSchemeOne}.600`
-              : `${colorSchemeTwo}.600`
-            : "gray.500" //default for if colorSchemeTwo not provided in dark mode
+              ? currentState === false
+                ? `${colorSchemeOne}.600`
+                : `${colorSchemeTwo}.600`
+              : "gray.500" //default for if colorSchemeTwo not provided in dark mode
         }
         color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.800"}
         _hover={

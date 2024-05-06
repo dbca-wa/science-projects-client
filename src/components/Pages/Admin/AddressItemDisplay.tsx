@@ -22,14 +22,14 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { IAddress, IBranch } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdMoreVert } from "react-icons/md";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { MdMoreVert } from "react-icons/md";
 import { deleteAddress, updateAddress } from "../../../lib/api";
+import { IAddress, IBranch } from "../../../types";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
-import { useState } from "react";
 
 export const AddressItemDisplay = ({
   pk,
@@ -65,7 +65,8 @@ export const AddressItemDisplay = ({
   const countryData = watch("country");
   const poboxData = watch("pobox");
 
-  const updateMutation = useMutation(updateAddress, {
+  const updateMutation = useMutation({
+    mutationFn: updateAddress,
     onSuccess: () => {
       toast({
         status: "success",
@@ -73,7 +74,7 @@ export const AddressItemDisplay = ({
         position: "top-right",
       });
       onUpdateModalClose();
-      queryClient.invalidateQueries(["addresses"]);
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
     },
     onError: () => {
       toast({
@@ -84,7 +85,8 @@ export const AddressItemDisplay = ({
     },
   });
 
-  const deleteMutation = useMutation(deleteAddress, {
+  const deleteMutation = useMutation({
+    mutationFn: deleteAddress,
     onSuccess: () => {
       // console.log("success")
       toast({
@@ -93,7 +95,7 @@ export const AddressItemDisplay = ({
         position: "top-right",
       });
       onDeleteModalClose();
-      queryClient.invalidateQueries(["addresses"]);
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
     },
   });
 
@@ -316,7 +318,7 @@ export const AddressItemDisplay = ({
                     pobox: poboxData,
                   });
                 }}
-                isLoading={updateMutation.isLoading}
+                isLoading={updateMutation.isPending}
                 color={"white"}
                 background={colorMode === "light" ? "blue.500" : "blue.600"}
                 _hover={{

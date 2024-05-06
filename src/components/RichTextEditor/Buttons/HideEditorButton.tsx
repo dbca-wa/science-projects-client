@@ -1,8 +1,8 @@
 // A button to control whether the editor is shown or the actual text of the editor, once saved.
 
 import { Box } from "@chakra-ui/react";
+import { AiFillEdit, AiFillEyeInvisible } from "react-icons/ai";
 import { BaseToggleOptionsButton } from "./BaseToggleOptionsButton";
-import { AiFillEyeInvisible, AiFillEdit } from "react-icons/ai";
 
 interface Props {
   setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;

@@ -13,18 +13,15 @@ import {
   Tag,
   Text,
   useColorMode,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import {
-  ISetProjectProps,
-  setProjectStatus
-} from "../../../../lib/api";
-import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
-import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
-import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useUser } from "../../../../lib/hooks/useUser";
+import { ISetProjectProps, setProjectStatus } from "../../../../lib/api";
+import { useFormattedDate } from "../../../../lib/hooks/helper/useFormattedDate";
+import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea";
+import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
+import { useProjectTeam } from "../../../../lib/hooks/tanstack/useProjectTeam";
+import { useUser } from "../../../../lib/hooks/tanstack/useUser";
 import { IProgressReport, IProjectMember } from "../../../../types";
 import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { ProgressReportActionModal } from "../../../Modals/DocumentActionModals/ProgressReportActionModal";
@@ -46,8 +43,8 @@ export const ProgressReportDocActions = ({
   callSameData,
   setToLastTab,
 }: // setSelectedProgressReport, setSelectedYear,
-  // , projectPk
-  IProgressDocumentActions) => {
+// , projectPk
+IProgressDocumentActions) => {
   const { colorMode } = useColorMode();
 
   const {
@@ -193,7 +190,6 @@ export const ProgressReportDocActions = ({
     }
   };
 
-
   return (
     <>
       {actionsReady && leaderMember ? (
@@ -259,7 +255,7 @@ export const ProgressReportDocActions = ({
               </Box>
               <Grid
                 pt={2}
-              // gridGap={2}
+                // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -288,7 +284,7 @@ export const ProgressReportDocActions = ({
                             : progressReportData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                              colorMode === "light"
+                                colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -464,9 +460,9 @@ export const ProgressReportDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-              // gridGap={2}
-              // pt={4}
-              // pos={"relative"}
+                // gridGap={2}
+                // pt={4}
+                // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -647,7 +643,7 @@ export const ProgressReportDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                // pos={"relative"}
+                  // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -689,7 +685,7 @@ export const ProgressReportDocActions = ({
                         ? 3
                         : 0
                     }
-                  // gridTemplateColumns={"repeat(2, 1fr)"}
+                    // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {progressReportData?.document
                       ?.project_lead_approval_granted &&
@@ -987,9 +983,10 @@ export const ProgressReportDocActions = ({
                 </Grid>
 
                 {/* PDF and email buttons */}
-                <ProjectDocumentPDFSection data_document={progressReportData} refetchData={callSameData} />
-
-
+                <ProjectDocumentPDFSection
+                  data_document={progressReportData}
+                  refetchData={callSameData}
+                />
               </Grid>
             </Box>
           </Grid>

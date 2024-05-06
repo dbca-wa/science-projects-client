@@ -16,7 +16,7 @@ import {
   Select,
   ToastId,
   useColorMode,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -44,19 +44,15 @@ export const UserFeedbackModal = ({
 }: Props) => {
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-  } = useForm<IFeedback>();
+  const { register, handleSubmit, reset, watch } = useForm<IFeedback>();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
 
-  const feedbackCreationMutation = useMutation(createFeedbackItem, {
+  const feedbackCreationMutation = useMutation({
+    mutationFn: createFeedbackItem,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -79,7 +75,7 @@ export const UserFeedbackModal = ({
       onCloseFeedbackModal();
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["feedback"]);
+        queryClient.invalidateQueries({ queryKey: ["feedback"] });
       }, 350);
     },
     onError: (error) => {
@@ -112,21 +108,21 @@ export const UserFeedbackModal = ({
     if (content.length > 0) {
       setCanSubmit(true);
     } else {
-      setCanSubmit(false)
+      setCanSubmit(false);
     }
-  }, [text])
+  }, [text]);
 
-  const kindValue = watch("kind")
-  const statusValue = watch("status")
-  const userValue = watch("user")
+  const kindValue = watch("kind");
+  const statusValue = watch("status");
+  const userValue = watch("user");
 
   return (
     <Modal
       isOpen={isFeedbackModalOpen}
       onClose={onCloseFeedbackModal}
       size={"3xl"}
-    // scrollBehavior="inside"
-    // isCentered={true}
+      // scrollBehavior="inside"
+      // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -167,7 +163,6 @@ export const UserFeedbackModal = ({
           </FormControl>
 
           <FormControl>
-
             <FeedbackRichTextEditor
               userData={user?.userData}
               setText={setText}
@@ -193,8 +188,7 @@ export const UserFeedbackModal = ({
             // type="submit"
             // isDisabled={!isDirty || !isValid}
 
-
-            isLoading={feedbackCreationMutation.isLoading}
+            isLoading={feedbackCreationMutation.isPending}
             isDisabled={!canSubmit}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
@@ -203,11 +197,11 @@ export const UserFeedbackModal = ({
             }}
             onClick={() => {
               onSubmitFeedbackCreation({
-                "user": userValue,
-                "kind": kindValue,
-                "status": statusValue,
-                "text": text,
-              })
+                user: userValue,
+                kind: kindValue,
+                status: statusValue,
+                text: text,
+              });
             }}
           >
             Send Feedback

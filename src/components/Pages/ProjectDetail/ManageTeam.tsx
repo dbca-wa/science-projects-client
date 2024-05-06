@@ -10,16 +10,16 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+import { useEffect, useState } from "react";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { BsGripVertical, BsPlus } from "react-icons/bs";
+import { updateTeamMemberPosition } from "../../../lib/api";
+import { useProjectTeam } from "../../../lib/hooks/tanstack/useProjectTeam";
+import { useUser } from "../../../lib/hooks/tanstack/useUser";
+import { IProjectMember } from "../../../types";
 import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
 import { TeamMember } from "./TeamMember";
-import { BsGripVertical, BsPlus } from "react-icons/bs";
-import { useEffect, useState } from "react";
-import { IProjectMember } from "../../../types";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { useUser } from "../../../lib/hooks/useUser";
 import { TeamMemberDisplay } from "./TeamMemberDisplay";
-import { updateTeamMemberPosition } from "../../../lib/api";
-import { useProjectTeam } from "../../../lib/hooks/useProjectTeam";
 
 interface Props {
   // team: IProjectMember[];
@@ -264,8 +264,8 @@ export const ManageTeam = ({
                                 currentlyDraggingIndex === index
                                   ? "white"
                                   : colorMode === "light"
-                                  ? "black"
-                                  : "gray.100"
+                                    ? "black"
+                                    : "gray.100"
                               }
                             >
                               {<BsGripVertical />}

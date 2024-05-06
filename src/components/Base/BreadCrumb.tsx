@@ -1,7 +1,7 @@
 // Component for displaying and quickly navigating related routes
 
 import { Flex, Button, useColorMode } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { IBreadCrumbProps } from "../../types";
 
 export const BreadCrumb = ({
@@ -28,7 +28,7 @@ export const BreadCrumb = ({
         <Flex>
           <Button
             onClick={() => {
-              navigate("/");
+              navigate({ to: "/" });
             }}
             variant={"link"}
             colorScheme="blue"
@@ -38,7 +38,7 @@ export const BreadCrumb = ({
           &nbsp;/&nbsp;
           <Button
             onClick={() => {
-              navigate(subDirOne.link);
+              navigate({ to: subDirOne.link });
             }}
             variant={"link"}
             colorScheme="blue"
@@ -50,7 +50,7 @@ export const BreadCrumb = ({
               &nbsp;/&nbsp;
               <Button
                 onClick={() => {
-                  navigate(subDirTwo.link);
+                  navigate({ to: subDirTwo.link });
                 }}
                 variant={"link"}
                 colorScheme="blue"
@@ -62,7 +62,7 @@ export const BreadCrumb = ({
                   &nbsp;/&nbsp;
                   <Button
                     onClick={() => {
-                      navigate(subDirThree.link);
+                      navigate({ to: subDirThree.link });
                     }}
                     variant={"link"}
                     colorScheme="blue"

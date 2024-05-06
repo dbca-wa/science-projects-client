@@ -53,7 +53,8 @@ export const ProjectReopenModal = ({
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
-  const reopenMutation = useMutation(openProjectCall, {
+  const reopenMutation = useMutation({
+    mutationFn: openProjectCall,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -77,7 +78,7 @@ export const ProjectReopenModal = ({
         // if (setIsAnimating) {
         //     setIsAnimating(false)
         // }
-        queryClient.invalidateQueries(["projects", projectPk]);
+        queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
         refetchData();
         onClose();
 
@@ -181,7 +182,7 @@ export const ProjectReopenModal = ({
                 _hover={{
                   background: colorMode === "light" ? "green.400" : "green.500",
                 }}
-                isLoading={reopenMutation.isLoading}
+                isLoading={reopenMutation.isPending}
                 type="submit"
                 ml={3}
               >

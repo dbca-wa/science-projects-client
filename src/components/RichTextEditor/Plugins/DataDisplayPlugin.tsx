@@ -1,6 +1,6 @@
+import { $generateHtmlFromNodes } from "@lexical/html";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useEffect } from "react";
-import { $generateHtmlFromNodes } from "@lexical/html";
 
 interface DataDisplayProps {
   setDisplayData: React.Dispatch<React.SetStateAction<string>>;

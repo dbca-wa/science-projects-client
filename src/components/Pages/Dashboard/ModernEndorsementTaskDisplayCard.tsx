@@ -1,13 +1,13 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
-import { useProjectSearchContext } from "@/lib/hooks/ProjectSearchContext";
+import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
 import { ITaskEndorsement } from "@/types";
 import { Box, Center, Flex, Text, useColorMode } from "@chakra-ui/react";
+import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaBiohazard } from "react-icons/fa";
 import { FaShieldDog } from "react-icons/fa6";
 import { PiPlantFill } from "react-icons/pi";
-import { useNavigate } from "react-router-dom";
 
 interface IProps {
   endorsement: ITaskEndorsement;
@@ -69,9 +69,9 @@ export const ModernEndorsementTaskDisplayCard = ({
       console.log("The Pk is undefined. Potentially use 'id' instead.");
       console.log(endorsement?.project_plan?.document?.project?.pk);
     } else if (isOnProjectsPage) {
-      navigate(`${pk}/${urlkind}`);
+      navigate({ to: `${pk}/${urlkind}` });
     } else {
-      navigate(`projects/${pk}/${urlkind}`);
+      navigate({ to: `projects/${pk}/${urlkind}` });
     }
   };
 
@@ -122,10 +122,10 @@ export const ModernEndorsementTaskDisplayCard = ({
             {kind === "aec"
               ? "Upload the Animal Ethics Committee Approval form (PDF) to provide AEC approval"
               : kind === "bm"
-              ? "Provide Biometrician Approval"
-              : kind === "hc"
-              ? "Provide Hermarium Curator Approval"
-              : `Provide ${kind} approval`}
+                ? "Provide Biometrician Approval"
+                : kind === "hc"
+                  ? "Provide Hermarium Curator Approval"
+                  : `Provide ${kind} approval`}
           </Text>
         </Box>
         <Box
@@ -150,12 +150,12 @@ export const ModernEndorsementTaskDisplayCard = ({
                       ? "blue.600"
                       : "blue.200"
                     : kind === "bm"
-                    ? colorMode === "light"
-                      ? "red.600"
-                      : "red.200"
-                    : colorMode === "light"
-                    ? "green.600"
-                    : "green.200"
+                      ? colorMode === "light"
+                        ? "red.600"
+                        : "red.200"
+                      : colorMode === "light"
+                        ? "green.600"
+                        : "green.200"
                 }
                 mt={0.5}
                 mr={2}
@@ -184,8 +184,8 @@ export const ModernEndorsementTaskDisplayCard = ({
                     kind === "aec"
                       ? "Animal Ethics Committee"
                       : kind === "bm"
-                      ? "Biometrician"
-                      : "Herbarium Curator"
+                        ? "Biometrician"
+                        : "Herbarium Curator"
                   }`}
                 </Text>
               </Box>

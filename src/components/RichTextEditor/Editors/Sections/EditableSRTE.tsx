@@ -4,34 +4,33 @@ import {
   InitialConfigType,
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
-import { OptionsBar } from "../../OptionsBar/OptionsBar";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $getRoot } from "lexical";
+import { OptionsBar } from "../../OptionsBar/OptionsBar";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 // import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
+import DraggableBlockPlugin from "@/components/RichTextEditor/Plugins/DraggableBlockPlugin";
+import { useGetRTESectionPlaceholder } from "@/lib/hooks/helper/useGetRTESectionPlaceholder";
+import { $generateHtmlFromNodes } from "@lexical/html";
+import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
+import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
+import React, { useEffect, useState } from "react";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
-import { useEffect, useState } from "react";
-import { $generateHtmlFromNodes } from "@lexical/html";
 import {
   EditorSections,
   EditorSubsections,
   EditorType,
 } from "../../../../types";
-import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
-import DraggableBlockPlugin from "@/components/RichTextEditor/Plugins/DraggableBlockPlugin";
-import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
-import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
-import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
-import React from "react";
+import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
+import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
 import { RevisedRichTextToolbar } from "../../Toolbar/RevisedRichTextToolbar";
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 // import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
@@ -184,7 +183,7 @@ export const EditableSRTE = ({
                       outline: "none",
                     }}
 
-                  // autoFocus
+                    // autoFocus
                   />
                 </Box>
               </Box>
@@ -235,7 +234,7 @@ export const EditableSRTE = ({
             setCanSave={setCanSave}
             editorIsOpen={isEditorOpen}
             setIsEditorOpen={setIsEditorOpen}
-          // setDisplayData={setDisplayData}
+            // setDisplayData={setDisplayData}
           />
         </Box>
         {shouldShowTree ? <TreeViewPlugin /> : null}

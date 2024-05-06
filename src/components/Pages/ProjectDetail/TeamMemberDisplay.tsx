@@ -16,9 +16,9 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { ProjectUserDetails } from "./ProjectUserDetails";
-import { IImageData } from "../../../types";
 import { FaCrown } from "react-icons/fa";
+import { IImageData } from "../../../types";
+import { ProjectUserDetails } from "./ProjectUserDetails";
 
 interface ITeamMember {
   user_id: number;

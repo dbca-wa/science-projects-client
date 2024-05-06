@@ -3,7 +3,7 @@
 // and previous pages of toolbar buttons.
 
 import { Button, Flex, Icon } from "@chakra-ui/react";
-import { FcPrevious, FcNext } from "react-icons/fc";
+import { FcNext, FcPrevious } from "react-icons/fc";
 
 interface IToolbarToggleBtnProps {
   page: number;

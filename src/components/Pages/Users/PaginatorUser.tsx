@@ -1,11 +1,11 @@
 // Paginator for displaying data for users on Users page
 
-import { Box, Button, Center, Flex, Grid, Spinner } from "@chakra-ui/react";
-import { UserGridItem } from "./UserGridItem";
-import { AnimatePresence, motion } from "framer-motion";
-import { useBranches } from "../../../lib/hooks/useBranches";
-import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
 import { IUserData } from "@/types";
+import { Box, Button, Center, Flex, Grid, Spinner } from "@chakra-ui/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useBranches } from "../../../lib/hooks/tanstack/useBranches";
+import { useBusinessAreas } from "../../../lib/hooks/tanstack/useBusinessAreas";
+import { UserGridItem } from "./UserGridItem";
 
 interface IPaginationProps {
   data: IUserData[];

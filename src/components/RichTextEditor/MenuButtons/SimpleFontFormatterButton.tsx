@@ -1,11 +1,11 @@
 // A dropdown menu button containing Strikethrough, Subscript, Superscript, and Clear Formatting Options
 
+import { useState } from "react";
+import { AiOutlineStrikethrough } from "react-icons/ai";
+import { BsTrash3 } from "react-icons/bs";
+import { MdSubscript, MdSuperscript } from "react-icons/md";
 import { RxLetterCaseCapitalize } from "react-icons/rx";
 import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton";
-import { AiOutlineStrikethrough } from "react-icons/ai";
-import { MdSubscript, MdSuperscript } from "react-icons/md";
-import { BsTrash3 } from "react-icons/bs";
-import { useState } from "react";
 // import { LexicalEditor } from "lexical";
 
 // interface Props {
@@ -33,12 +33,13 @@ export const SimpleFontFormatterButton = () =>
           currentTitle === "Strike" || currentTitle === "Strikethrough"
             ? AiOutlineStrikethrough
             : currentTitle === "Sub" || currentTitle === "Subscript"
-            ? MdSubscript
-            : currentTitle === "Super" || currentTitle === "Superscript"
-            ? MdSuperscript
-            : currentTitle === "Clear" || currentTitle === "Clear Formatting"
-            ? BsTrash3
-            : RxLetterCaseCapitalize
+              ? MdSubscript
+              : currentTitle === "Super" || currentTitle === "Superscript"
+                ? MdSuperscript
+                : currentTitle === "Clear" ||
+                    currentTitle === "Clear Formatting"
+                  ? BsTrash3
+                  : RxLetterCaseCapitalize
         }
         menuItems={[
           {

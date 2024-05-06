@@ -1,9 +1,9 @@
 // A button for underlining text
 
-import { FaUnderline } from "react-icons/fa";
-import { BaseToolbarButton } from "./BaseToolbarButton";
 import { useState } from "react";
+import { FaUnderline } from "react-icons/fa";
 import { IToolbarButton } from "../../../types";
+import { BaseToolbarButton } from "./BaseToolbarButton";
 
 export const UnderlineButton = ({ onClick }: IToolbarButton) => {
   const [isActive, setIsActive] = useState(false);

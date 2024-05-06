@@ -1,25 +1,25 @@
 // Display for a single user on the Users page (mapped over for each user on a grid). Also with drawer for more details.
 
 import {
-  Grid,
-  Flex,
-  Box,
-  Button,
-  Text,
-  BoxProps,
-  useBreakpointValue,
-  useDisclosure,
   Avatar,
-  useColorMode,
+  Box,
+  BoxProps,
+  Button,
   Drawer,
-  DrawerContent,
-  DrawerOverlay,
   DrawerBody,
+  DrawerContent,
   DrawerFooter,
+  DrawerOverlay,
+  Flex,
+  Grid,
+  Text,
+  useBreakpointValue,
+  useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
+import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
 import { IUserData } from "../../../types";
 import { UserProfile } from "./UserProfile";
-import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
 
 interface BoxContainerProps extends BoxProps {
   children: React.ReactNode;
@@ -188,13 +188,13 @@ export const UserGridItem = ({
                   ? isXlOrLarger
                     ? fullName
                     : fullName.length > 16
-                    ? `${fullName.substring(0, 10)}...`
-                    : fullName
+                      ? `${fullName.substring(0, 10)}...`
+                      : fullName
                   : isXlOrLarger
-                  ? fullName.startsWith("None")
-                    ? username
-                    : `${fullName}`
-                  : username}
+                    ? fullName.startsWith("None")
+                      ? username
+                      : `${fullName}`
+                    : username}
               </Button>
               <Text
                 fontSize={"sm"}
@@ -204,9 +204,9 @@ export const UserGridItem = ({
                       ? "orange.500"
                       : "blue.500"
                     : is_staff
-                    ? "green.500"
-                    : // External user
-                      "gray.500"
+                      ? "green.500"
+                      : // External user
+                        "gray.500"
                 }
               >
                 {
@@ -216,8 +216,8 @@ export const UserGridItem = ({
                       ? "Executive"
                       : "Admin"
                     : is_staff
-                    ? "Staff"
-                    : "External User"
+                      ? "Staff"
+                      : "External User"
                 }
                 {is_active === false && ` (Inactive)`}
               </Text>
@@ -234,7 +234,7 @@ export const UserGridItem = ({
                   fontSize={"xs"}
                   color={colorMode === "light" ? "gray.600" : "gray.300"}
                 >
-                  {affiliation ? affiliation : "No Affiliations"}
+                  {affiliation?.pk ? affiliation.name : "No Affiliations"}
                 </Text>
               )}
             </BoxContainer>
@@ -270,8 +270,8 @@ export const UserGridItem = ({
                 ? email.endsWith("email.com")
                   ? "(Not Provided)"
                   : email.length >= 15
-                  ? `${email.substring(0, 13)}...`
-                  : email
+                    ? `${email.substring(0, 13)}...`
+                    : email
                 : "-"}
             </Text>
           </Box>
@@ -291,8 +291,8 @@ export const UserGridItem = ({
                 ? email.endsWith("email.com")
                   ? "(Not Provided)"
                   : email.length >= 25
-                  ? `${email.substring(0, 20)}...`
-                  : email
+                    ? `${email.substring(0, 20)}...`
+                    : email
                 : "-"}
             </Text>
           </Box>

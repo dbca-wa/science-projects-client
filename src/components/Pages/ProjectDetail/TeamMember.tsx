@@ -1,5 +1,6 @@
 // Component for showing details regarding a team member. Dragging adjusts the position of the team member.
 
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import {
   Avatar,
   Box,
@@ -16,11 +17,10 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { ProjectUserDetails } from "./ProjectUserDetails";
-import { IImageData, IUserData, IUserMe } from "../../../types";
-import { FaCrown } from "react-icons/fa";
 import { DraggableProvided } from "react-beautiful-dnd"; // Import DraggableProvided
-import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
+import { FaCrown } from "react-icons/fa";
+import { IImageData, IUserData, IUserMe } from "../../../types";
+import { ProjectUserDetails } from "./ProjectUserDetails";
 
 interface ITeamMember {
   user_id: number;

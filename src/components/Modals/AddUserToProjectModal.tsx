@@ -39,7 +39,7 @@ import {
   useForm,
 } from "react-hook-form";
 import { INewMember, createTeamMember } from "../../lib/api";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useRouterState, useNavigate } from "@tanstack/react-router";
 import { CustomAxiosError } from "../../types";
 
 interface IAddUserToProjectModalProps {
@@ -106,7 +106,7 @@ export const AddUserToProjectModal = ({
     toastIdRef.current = toast(data);
   };
 
-  const location = useLocation();
+  const location = useRouterState().location;
 
   const navigate = useNavigate();
 
@@ -119,7 +119,8 @@ export const AddUserToProjectModal = ({
       timeAllocation: 0,
     },
   });
-  const membershipCreationMutation = useMutation(createTeamMember, {
+  const membershipCreationMutation = useMutation({
+    mutationFn: createTeamMember,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -142,14 +143,16 @@ export const AddUserToProjectModal = ({
       onClose();
 
       setTimeout(() => {
-        queryClient.invalidateQueries([
-          "projects",
-          preselectedProject !== undefined &&
-          preselectedProject !== null &&
-          preselectedProject !== 0
-            ? preselectedProject
-            : selectedProject,
-        ]);
+        queryClient.invalidateQueries({
+          queryKey: [
+            "projects",
+            preselectedProject !== undefined &&
+            preselectedProject !== null &&
+            preselectedProject !== 0
+              ? preselectedProject
+              : selectedProject,
+          ],
+        });
         refetchTeamData && refetchTeamData();
         if (!location.pathname.includes("project")) {
           navigate(

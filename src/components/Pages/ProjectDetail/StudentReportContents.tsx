@@ -11,17 +11,17 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { IProjectMember, IUserMe, IStudentReport } from "../../../types";
-import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { useEffect, useState } from "react";
-import { StudentReportDocActions } from "./DocActions/StudentReportDocActions";
 import { motion } from "framer-motion";
-import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
-import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
-import { useGetStudentReportAvailableReportYears } from "../../../lib/hooks/useGetStudentReportAvailableReportYears";
-import { getStudentReportForYear } from "../../../lib/api";
-import { CommentSection } from "./CommentSection";
+import { useEffect, useState } from "react";
 import { BsPlus } from "react-icons/bs";
+import { getStudentReportForYear } from "../../../lib/api";
+import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
+import { useGetStudentReportAvailableReportYears } from "../../../lib/hooks/tanstack/useGetStudentReportAvailableReportYears";
+import { IProjectMember, IStudentReport, IUserMe } from "../../../types";
+import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
+import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
+import { CommentSection } from "./CommentSection";
+import { StudentReportDocActions } from "./DocActions/StudentReportDocActions";
 
 interface Props {
   documents: IStudentReport[];
@@ -40,7 +40,7 @@ export const StudentReportContents = ({
   refetch,
   projectPk,
   setToLastTab,
-  baseAPI
+  baseAPI,
 }: Props) => {
   // Handling years
   const { availableStudentYearsData } = useGetStudentReportAvailableReportYears(

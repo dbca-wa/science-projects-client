@@ -21,6 +21,31 @@ type StudentReportSection = "progress_report";
 type ProjectClosureSection = "reason" | "intended_outcome" | "knowledge_transfer" | "data_location" | "hardcopy_location" | "backup_location" | "scientific_outputs";
 
 
+export interface IConceptPlanGenerationData {
+    project_pk: number;
+    document_pk: number;
+    concept_plan_data_pk: number;
+    document_tag: string;
+    project_title: string;
+    project_status: string;
+    business_area_name: string;
+    project_team: string[];
+    project_image: ProjectImage;
+    now: Date;
+    project_lead_approval_granted: boolean;
+    business_area_lead_approval_granted: boolean;
+    directorate_approval_granted: boolean;
+    background: string;
+    aims: string;
+    expected_outcomes: string;
+    collaborations: string;
+    strategic_context: string;
+    staff_time_allocation: string;
+    indicative_operating_budget: string;
+  }
+  
+
+
 export interface IAffiliation {
     pk?: number;
     created_at?: Date;

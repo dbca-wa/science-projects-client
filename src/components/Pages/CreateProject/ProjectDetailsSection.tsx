@@ -14,10 +14,10 @@ import {
 import { useEffect, useState } from "react";
 
 import "react-calendar/dist/Calendar.css";
+import { useBusinessAreas } from "../../../lib/hooks/tanstack/useBusinessAreas";
+import { useDepartmentalServices } from "../../../lib/hooks/tanstack/useDepartmentalServices";
 import "../../../styles/modalscrollbar.css";
 import { IBusinessArea, IDepartmentalService } from "../../../types";
-import { useBusinessAreas } from "../../../lib/hooks/useBusinessAreas";
-import { useDepartmentalServices } from "../../../lib/hooks/useDepartmentalServices";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { StartAndEndDateSelector } from "./StartAndEndDateSelector";
 
