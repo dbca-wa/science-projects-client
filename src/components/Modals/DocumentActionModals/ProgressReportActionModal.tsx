@@ -29,8 +29,8 @@ import {
   IUserMe,
 } from "../../../types";
 import { handleDocumentAction } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { useDirectorateMembers } from "../../../lib/hooks/tanstack/useDirectorateMembers";
 
 interface Props {
   userData: IUserMe;
@@ -88,16 +88,18 @@ export const ProgressReportActionModal = ({
     }
   };
 
-  const approveProgressReportMutation = useMutation(handleDocumentAction, {
+  const approveProgressReportMutation = useMutation({
+    mutationFn: handleDocumentAction,
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${action === "approve"
-          ? "Approving"
-          : action === "recall"
-            ? "Recalling"
-            : "Sending Back"
-          }`,
+        title: `${
+          action === "approve"
+            ? "Approving"
+            : action === "recall"
+              ? "Recalling"
+              : "Sending Back"
+        }`,
         position: "top-right",
       });
     },
@@ -105,12 +107,13 @@ export const ProgressReportActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${action === "approve"
-            ? "Approved"
-            : action === "recall"
-              ? "Recalled"
-              : "Sent Back"
-            }`,
+          description: `Document ${
+            action === "approve"
+              ? "Approved"
+              : action === "recall"
+                ? "Recalled"
+                : "Sent Back"
+          }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -127,18 +130,21 @@ export const ProgressReportActionModal = ({
       onClose();
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["projects", projectData?.pk]);
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectData?.pk],
+        });
       }, 350);
     },
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${action === "approve"
-            ? "Approve"
-            : action === "recall"
-              ? "Recall"
-              : "Send Back"
-            } Progress Report`,
+          title: `Could Not ${
+            action === "approve"
+              ? "Approve"
+              : action === "recall"
+                ? "Recall"
+                : "Send Back"
+          } Progress Report`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -161,7 +167,7 @@ export const ProgressReportActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-    // isCentered={true}
+      // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -170,11 +176,13 @@ export const ProgressReportActionModal = ({
       >
         <ModalHeader>
           {action === "approve"
-            ? stage === 1 ? "Submit" : "Approve"
+            ? stage === 1
+              ? "Submit"
+              : "Approve"
             : action === "recall"
-              ? "Recall" :
-              action === "reopen" ?
-                "Reopen"
+              ? "Recall"
+              : action === "reopen"
+                ? "Reopen"
                 : "Send Back"}{" "}
           Document?
         </ModalHeader>
@@ -211,8 +219,9 @@ export const ProgressReportActionModal = ({
                   <Text fontWeight={"bold"}>Stage 1</Text>
                   <br />
                   <Text>
-                    In your capacity as Project Lead, would you like to {action === "approve" ? "submit" : action}{" "}
-                    this progress report?
+                    In your capacity as Project Lead, would you like to{" "}
+                    {action === "approve" ? "submit" : action} this progress
+                    report?
                   </Text>
                   <br />
                   <Text>
@@ -241,7 +250,8 @@ export const ProgressReportActionModal = ({
                   <Text fontWeight={"bold"}>Stage 2</Text>
                   <br />
                   <Text>
-                    In your capacity as Business Area Lead, would you like to {action} this document?
+                    In your capacity as Business Area Lead, would you like to{" "}
+                    {action} this document?
                   </Text>
                   <br />
                   <Text>
@@ -349,7 +359,7 @@ export const ProgressReportActionModal = ({
           <Button
             form="approval-form"
             type="submit"
-            isLoading={approveProgressReportMutation.isLoading}
+            isLoading={approveProgressReportMutation.isPending}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{
@@ -357,7 +367,9 @@ export const ProgressReportActionModal = ({
             }}
           >
             {action === "approve"
-              ? stage === 1 ? "Submit" : "Approve"
+              ? stage === 1
+                ? "Submit"
+                : "Approve"
               : action === "recall"
                 ? "Recall"
                 : "Send Back"}

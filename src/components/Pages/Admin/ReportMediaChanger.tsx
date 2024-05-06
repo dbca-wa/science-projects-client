@@ -1,16 +1,16 @@
 import { deleteReportMediaImage, uploadReportMediaImage } from "@/lib/api";
-import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import {
   Box,
   Center,
-  Grid,
-  Text,
-  Image,
-  useColorMode,
   Flex,
+  Grid,
+  Image,
   Progress,
-  useToast,
+  Text,
   ToastId,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -20,15 +20,15 @@ import { ImCross } from "react-icons/im";
 
 interface Props {
   section:
-  | "cover"
-  | "rear_cover"
-  | "sdchart"
-  | "service_delivery"
-  | "research"
-  | "partnerships"
-  | "collaborations"
-  | "student_projects"
-  | "publications";
+    | "cover"
+    | "rear_cover"
+    | "sdchart"
+    | "service_delivery"
+    | "research"
+    | "partnerships"
+    | "collaborations"
+    | "student_projects"
+    | "publications";
   helperText?: string;
   reportMediaData: any;
   reportPk: number;
@@ -93,7 +93,8 @@ export const ReportMediaChanger = ({
     deleteImageMutation.mutate(data);
   };
 
-  const fileDropMutation = useMutation(uploadReportMediaImage, {
+  const fileDropMutation = useMutation({
+    mutationFn: uploadReportMediaImage,
     onMutate: (mutationData) => {
       setIsError(false);
       setIsUploading(true);
@@ -126,7 +127,9 @@ export const ReportMediaChanger = ({
         clearInterval(progressInterval);
         setUploadProgress(100);
 
-        queryClient.invalidateQueries(["reportMedia", mutationData.pk]);
+        queryClient.invalidateQueries({
+          queryKey: ["reportMedia", mutationData.pk],
+        });
 
         await refetchData();
       }, 350);
@@ -147,7 +150,8 @@ export const ReportMediaChanger = ({
     },
   });
 
-  const deleteImageMutation = useMutation(deleteReportMediaImage, {
+  const deleteImageMutation = useMutation({
+    mutationFn: deleteReportMediaImage,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -171,7 +175,7 @@ export const ReportMediaChanger = ({
       setUploadProgress(0);
 
       setTimeout(async () => {
-        queryClient.invalidateQueries(["reportMedia", reportPk]);
+        queryClient.invalidateQueries({ queryKey: ["reportMedia", reportPk] });
         await refetchData();
       }, 350);
     },
@@ -258,7 +262,7 @@ export const ReportMediaChanger = ({
               !isError &&
               currentImage !== null &&
               acceptedFiles[0] instanceof File) ||
-              currentImage !== null ? (
+            currentImage !== null ? (
               <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
                 <Box
                   pos={"absolute"}
@@ -279,9 +283,9 @@ export const ReportMediaChanger = ({
                     rounded={"lg"}
                     src={
                       acceptedFiles &&
-                        !isError &&
-                        currentImage !== null &&
-                        acceptedFiles[0] instanceof File
+                      !isError &&
+                      currentImage !== null &&
+                      acceptedFiles[0] instanceof File
                         ? URL.createObjectURL(acceptedFiles[0])
                         : currentImage && currentImage !== null
                           ? `${baseUrl}${currentImage}`
@@ -339,9 +343,9 @@ export const ReportMediaChanger = ({
                         // isIndeterminate
                         size={"xs"}
                         value={uploadProgress}
-                      // hasStripe
-                      // animation={"step-start"}
-                      //
+                        // hasStripe
+                        // animation={"step-start"}
+                        //
                       />
                     </Box>
                   </Center>

@@ -1,20 +1,19 @@
+import { useGetRTESectionPlaceholder } from "@/lib/hooks/helper/useGetRTESectionPlaceholder";
 import { Box, Spacer, Text } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
   InitialConfigType,
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
 import { EditorSubsections } from "../../../../types";
-import { useGetRTESectionPlaceholder } from "@/lib/hooks/useGetRTESectionPlaceholder";
-import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
-import React from "react";
+import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 
 interface Props {
   initialConfig: InitialConfigType;

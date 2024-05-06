@@ -1,10 +1,10 @@
 // Modern Breadcrumb component in header
 
 import { Button, Center, Flex, Icon, useColorMode } from "@chakra-ui/react";
-import { useUpdatePage } from "../../lib/hooks/useUpdatePage";
-import React from "react";
 import { motion } from "framer-motion";
+import React from "react";
 import { AiFillHome } from "react-icons/ai";
+import { useUpdatePage } from "../../lib/hooks/helper/useUpdatePage";
 
 export const ModernBreadcrumb = () => {
   const { currentPage, updatePageContext } = useUpdatePage();

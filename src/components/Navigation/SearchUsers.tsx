@@ -1,5 +1,7 @@
 // User Search component - works/appears on the Users page with UserSearchContext
 
+import { getAllBusinessAreas } from "@/lib/api";
+import { IBusinessArea } from "@/types";
 import {
   Flex,
   Input,
@@ -8,11 +10,9 @@ import {
   Select,
   useColorMode,
 } from "@chakra-ui/react";
-import { FiSearch } from "react-icons/fi";
-import { useUserSearchContext } from "../../lib/hooks/UserSearchContext";
 import { useEffect, useState } from "react";
-import { getAllBusinessAreas } from "@/lib/api";
-import { IBusinessArea } from "@/types";
+import { FiSearch } from "react-icons/fi";
+import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
 
 export const SearchUsers = () => {
   const {

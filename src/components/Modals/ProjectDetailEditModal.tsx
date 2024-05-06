@@ -16,7 +16,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useCurrentYear } from "../../lib/hooks/useCurrentYear";
+import { useCurrentYear } from "../../lib/hooks/helper/useCurrentYear";
 import { IconType } from "react-icons";
 import { ProjectDetailsSection } from "../Pages/CreateProject/ProjectDetailsSection";
 import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSection";
@@ -31,7 +31,7 @@ import {
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection";
 import { IExtendedProjectDetails, IProjectData } from "../../types";
-import { useUser } from "../../lib/hooks/useUser";
+import { useUser } from "../../lib/hooks/tanstack/useUser";
 
 interface IEditProjectDetailsProps {
   projectType: string;
@@ -67,14 +67,18 @@ export const ProjectDetailEditModal = ({
 
   const [baseInformationData, setBaseInformationData] =
     useState<ICreateProjectBaseInfo>({} as ICreateProjectBaseInfo);
+
   const [detailsData, setDetailsData] = useState<ICreateProjectDetails>(
     {} as ICreateProjectDetails
   );
+
   const [locationData, setLocationData] = useState([]);
+
   const [externalData, setExternalData] =
     useState<ICreateProjectExternalDetails>(
       {} as ICreateProjectExternalDetails
     );
+
   const [studentData, setStudentData] = useState<ICreateProjectStudentDetails>(
     {} as ICreateProjectStudentDetails
   );
@@ -130,12 +134,12 @@ export const ProjectDetailEditModal = ({
               projectType === "Core Function"
                 ? "red.500"
                 : projectType === "Science Project"
-                ? "green.500"
-                : projectType === "Student Project"
-                ? "blue.500"
-                : projectType === "External Project"
-                ? "gray.500"
-                : "gray.500"
+                  ? "green.500"
+                  : projectType === "Student Project"
+                    ? "blue.500"
+                    : projectType === "External Project"
+                      ? "gray.500"
+                      : "gray.500"
             }
             mr={3}
           >
@@ -166,10 +170,10 @@ export const ProjectDetailEditModal = ({
                   projectType === "Core Function"
                     ? "core_function"
                     : projectType === "Student Project"
-                    ? "student"
-                    : projectType === "Science Project"
-                    ? "science"
-                    : "external"
+                      ? "student"
+                      : projectType === "Science Project"
+                        ? "science"
+                        : "external"
                 }
                 nextClick={goToDetailsTab}
                 currentYear={currentYear}

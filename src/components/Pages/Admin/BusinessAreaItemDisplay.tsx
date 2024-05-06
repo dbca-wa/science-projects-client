@@ -43,16 +43,16 @@ import {
   deleteBusinessArea,
   updateBusinessArea,
 } from "../../../lib/api";
-import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { useNoImage } from "../../../lib/hooks/useNoImage";
+import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
 import { BusinessAreaImage, IBusinessArea, IDivision } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
 import { UserProfile } from "../Users/UserProfile";
-import useDistilledHtml from "./../../../lib/hooks/useDistilledHtml";
+import useDistilledHtml from "../../../lib/hooks/helper/useDistilledHtml";
 import { StatefulMediaChanger } from "./StatefulMediaChanger";
-import { useGetDivisions } from "@/lib/hooks/useGetDivisions";
+import { useGetDivisions } from "@/lib/hooks/tanstack/useGetDivisions";
 
 export const BusinessAreaItemDisplay = ({
   pk,
@@ -108,7 +108,8 @@ export const BusinessAreaItemDisplay = ({
   const distlledTitle = useDistilledHtml(name);
 
   // console.log(image.file)
-  const updateMutation = useMutation(updateBusinessArea, {
+  const updateMutation = useMutation({
+    mutationFn: updateBusinessArea,
     onSuccess: () => {
       // console.log("success")
       toast({
@@ -117,7 +118,7 @@ export const BusinessAreaItemDisplay = ({
         position: "top-right",
       });
       onUpdateModalClose();
-      queryClient.invalidateQueries(["businessAreas"]);
+      queryClient.invalidateQueries({ queryKey: ["businessAreas"] });
     },
     onError: () => {
       // console.log("error")
@@ -132,7 +133,8 @@ export const BusinessAreaItemDisplay = ({
     },
   });
 
-  const deleteMutation = useMutation(deleteBusinessArea, {
+  const deleteMutation = useMutation({
+    mutationFn: deleteBusinessArea,
     onSuccess: () => {
       // console.log("success")
       toast({
@@ -141,7 +143,7 @@ export const BusinessAreaItemDisplay = ({
         position: "top-right",
       });
       onDeleteModalClose();
-      queryClient.invalidateQueries(["businessAreas"]);
+      queryClient.invalidateQueries({ queryKey: ["businessAreas"] });
     },
     onError: () => {
       // console.log("error")
@@ -155,7 +157,8 @@ export const BusinessAreaItemDisplay = ({
     deleteMutation.mutate(pk);
   };
 
-  const activateMutation = useMutation(activateBusinessArea, {
+  const activateMutation = useMutation({
+    mutationFn: activateBusinessArea,
     onSuccess: () => {
       // console.log("success")
       toast({
@@ -164,7 +167,7 @@ export const BusinessAreaItemDisplay = ({
         position: "top-right",
       });
       onActiveModalClose();
-      queryClient.invalidateQueries(["businessAreas"]);
+      queryClient.invalidateQueries({ queryKey: ["businessAreas"] });
     },
     onError: () => {
       // console.log("error")
@@ -359,8 +362,8 @@ export const BusinessAreaItemDisplay = ({
                   image instanceof File
                     ? `${apiEndpoint}${image.name}` // Use the image directly for File
                     : image?.file
-                    ? `${apiEndpoint}${image.file}`
-                    : NoImageFile
+                      ? `${apiEndpoint}${image.file}`
+                      : NoImageFile
                 }
                 rounded="lg"
                 width={"100%"}
@@ -701,7 +704,7 @@ export const BusinessAreaItemDisplay = ({
               <Button
                 // form="update-form"
                 // type="submit"
-                isLoading={updateMutation.isLoading}
+                isLoading={updateMutation.isPending}
                 color={"white"}
                 background={colorMode === "light" ? "blue.500" : "blue.600"}
                 _hover={{

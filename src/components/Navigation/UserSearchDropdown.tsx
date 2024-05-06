@@ -1,5 +1,8 @@
 // Dropdown search component for users. Displays 5 users below the search box.
 
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import { CloseIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -20,12 +23,9 @@ import {
   useRef,
   useState,
 } from "react";
-import { IUserData } from "../../types";
 import { getInternalUsersBasedOnSearchTerm } from "../../lib/api";
-import { CloseIcon } from "@chakra-ui/icons";
-import { useFullUserByPk } from "../../lib/hooks/useFullUserByPk";
-import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
-import { useNoImage } from "@/lib/hooks/useNoImage";
+import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
+import { IUserData } from "../../types";
 
 interface IUserSearchDropdown {
   onlyInternal?: boolean;
@@ -58,7 +58,7 @@ export const UserSearchDropdown = forwardRef(
       preselectedUserPk,
       isEditable,
       projectPk,
-      isClosed
+      isClosed,
     }: IUserSearchDropdown,
     ref
   ) => {
@@ -95,7 +95,7 @@ export const UserSearchDropdown = forwardRef(
           setUserEmailFunction(userData.email);
         }
         if (setUserNameFunction) {
-          setUserNameFunction(`${userData.first_name} ${userData.last_name}`)
+          setUserNameFunction(`${userData.first_name} ${userData.last_name}`);
         }
         setIsMenuOpen(false);
         setSelectedUser(userData); // Update the selected user
@@ -109,7 +109,7 @@ export const UserSearchDropdown = forwardRef(
         setUserEmailFunction(user.email);
       }
       if (setUserNameFunction) {
-        setUserNameFunction(`${user.first_name} ${user.last_name}`)
+        setUserNameFunction(`${user.first_name} ${user.last_name}`);
       }
       setIsMenuOpen(false);
       setSelectedUser(user); // Update the selected user
@@ -129,7 +129,7 @@ export const UserSearchDropdown = forwardRef(
         setUserEmailFunction("");
       }
       if (setUserNameFunction) {
-        setUserNameFunction("")
+        setUserNameFunction("");
       }
       setSelectedUser(null); // Clear the selected user state
       setIsMenuOpen(isClosed ? false : true); // Show the menu again when the user is cleared
@@ -237,63 +237,67 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
 
   const serverUrl = useApiEndpoint();
   const noImage = useNoImage();
-  return (
-    serverUrl ?
-      (<Flex
-        as="button"
-        type="button"
-        w="100%"
-        textAlign="left"
-        p={2}
-        onClick={handleClick}
-        onMouseOver={() => setIsHovered(true)}
-        onMouseOut={() => setIsHovered(false)}
-        bg={isHovered ? "gray.200" : "transparent"}
+  return serverUrl ? (
+    <Flex
+      as="button"
+      type="button"
+      w="100%"
+      textAlign="left"
+      p={2}
+      onClick={handleClick}
+      onMouseOver={() => setIsHovered(true)}
+      onMouseOut={() => setIsHovered(false)}
+      bg={isHovered ? "gray.200" : "transparent"}
+      alignItems="center"
+      {...rest}
+    >
+      <Avatar
+        src={
+          user.image
+            ? user.image?.file.startsWith("http")
+              ? `${user.image?.file}`
+              : `${serverUrl}${user.image?.file}`
+            : user.image?.old_file
+              ? user.image?.old_file
+              : noImage
+        }
+      />
+      <Box
+        display="flex"
         alignItems="center"
-        {...rest}
+        justifyContent="start"
+        ml={3}
+        h="100%"
       >
-        <Avatar
-          src={
-            user.image ?
-              user.image?.file.startsWith("http") ?
-                `${user.image?.file}` : `${serverUrl}${user.image?.file}` :
-              user.image?.old_file ? user.image?.old_file : noImage}
-
-        />
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="start"
-          ml={3}
-          h="100%"
-        >
-          <Text
-            ml={2}
-            color={
-              user.is_staff
-                ? user.is_superuser
-                  ? colorMode === "light"
-                    ? "blue.500"
-                    : "blue.300"
-                  : colorMode === "light"
-                    ? "green.500"
-                    : "green.300"
+        <Text
+          ml={2}
+          color={
+            user.is_staff
+              ? user.is_superuser
+                ? colorMode === "light"
+                  ? "blue.500"
+                  : "blue.300"
                 : colorMode === "light"
-                  ? "gray.500"
-                  : "gray.400"
-            }
-          >
-            {`${user.first_name === "None" ? user.username : user.first_name} ${user.last_name === "None" ? "" : user.last_name
-              } ${user.is_staff
-                ? user.is_superuser
-                  ? "(Admin)"
-                  : "(Staff)"
-                : "(External)"
-              }`}
-          </Text>
-        </Box>
-      </Flex>) : null
-  );
+                  ? "green.500"
+                  : "green.300"
+              : colorMode === "light"
+                ? "gray.500"
+                : "gray.400"
+          }
+        >
+          {`${user.first_name === "None" ? user.username : user.first_name} ${
+            user.last_name === "None" ? "" : user.last_name
+          } ${
+            user.is_staff
+              ? user.is_superuser
+                ? "(Admin)"
+                : "(Staff)"
+              : "(External)"
+          }`}
+        </Text>
+      </Box>
+    </Flex>
+  ) : null;
 };
 
 const CustomMenuList = ({
@@ -318,63 +322,66 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
   const serverUrl = useApiEndpoint();
   const noImage = useNoImage();
 
-  return (
-    serverUrl ?
-      (<Flex
-        align="center"
-        position="relative"
-        bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
-        borderRadius="md"
-        px={2}
-        py={1}
-        mr={2}
+  return serverUrl ? (
+    <Flex
+      align="center"
+      position="relative"
+      bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
+      borderRadius="md"
+      px={2}
+      py={1}
+      mr={2}
+    >
+      <Avatar
+        size="sm"
+        src={
+          user.image
+            ? user.image?.file.startsWith("http")
+              ? `${user.image?.file}`
+              : `${serverUrl}${user.image?.file}`
+            : user.image?.old_file
+              ? user.image?.old_file
+              : noImage
+        }
+      />
+      <Text
+        ml={2}
+        color={
+          user.is_staff
+            ? user.is_superuser
+              ? colorMode === "light"
+                ? "blue.500"
+                : "blue.400"
+              : colorMode === "light"
+                ? "green.500"
+                : "green.400"
+            : colorMode === "dark"
+              ? "gray.200"
+              : "gray.500"
+        }
       >
-        <Avatar
-          size="sm"
-          src={
-            user.image ?
-              user.image?.file.startsWith("http") ?
-                `${user.image?.file}` : `${serverUrl}${user.image?.file}` :
-              user.image?.old_file ? user.image?.old_file : noImage
-          }
-        />
-        <Text
-          ml={2}
-          color={
-            user.is_staff
-              ? user.is_superuser
-                ? colorMode === "light"
-                  ? "blue.500"
-                  : "blue.400"
-                : colorMode === "light"
-                  ? "green.500"
-                  : "green.400"
-              : colorMode === "dark"
-                ? "gray.200"
-                : "gray.500"
-          }
-        >
-          {`${user.first_name === "None" ? user.username : user.first_name} ${user.last_name === "None" ? "" : user.last_name
-            } ${user.is_staff
-              ? user.is_superuser
-                ? "(Admin)"
-                : "(Staff)"
-              : "(External)"
-            }`}
-        </Text>
+        {`${user.first_name === "None" ? user.username : user.first_name} ${
+          user.last_name === "None" ? "" : user.last_name
+        } ${
+          user.is_staff
+            ? user.is_superuser
+              ? "(Admin)"
+              : "(Staff)"
+            : "(External)"
+        }`}
+      </Text>
 
-        <IconButton
-          tabIndex={-1}
-          aria-label="Clear selected user"
-          icon={<CloseIcon />}
-          size="xs"
-          position="absolute"
-          top="50%"
-          right={2}
-          transform="translateY(-50%)"
-          onClick={onClear}
-        />
-      </Flex>)
-      : null
-  );
+      <IconButton
+        tabIndex={-1}
+        aria-label="Clear selected user"
+        icon={<CloseIcon />}
+        size="xs"
+        position="absolute"
+        top="50%"
+        right={2}
+        transform="translateY(-50%)"
+        onClick={onClear}
+      />
+    </Flex>
+  ) : null;
 };

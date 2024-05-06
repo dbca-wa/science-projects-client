@@ -23,7 +23,7 @@ import "../../../styles/texteditor.css";
 //   $getRoot,
 // } from "lexical";
 
-import useDistilledHtml from "@/lib/hooks/useDistilledHtml";
+import useDistilledHtml from "@/lib/hooks/helper/useDistilledHtml";
 // import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { PostCommentButton } from "../Buttons/PostCommentButton";
@@ -50,7 +50,6 @@ export const CommentRichTextEditor = ({
 }: Props) => {
   const { colorMode } = useColorMode();
   const [comment, setComment] = useState("");
-
 
   // const usersImage = useServerImageUrl(userData?.image?.file);
 
@@ -266,9 +265,11 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
       >
         <Avatar
           size={"md"}
-          src={userData?.image?.file.startsWith("http") ?
-            userData?.image?.file :
-            `${baseAPI}${userData?.image?.file}`}
+          src={
+            userData?.image?.file.startsWith("http")
+              ? userData?.image?.file
+              : `${baseAPI}${userData?.image?.file}`
+          }
           name={`${userData?.first_name} ${userData?.last_name}`}
           mr={2}
           userSelect={"none"}
@@ -291,7 +292,7 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
               color={
                 colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
               }
-            // w={"100%"}
+              // w={"100%"}
             >
               {`${userData?.first_name} ${userData?.last_name}`}
             </Text>
@@ -299,8 +300,7 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
         </Flex>
       </Flex>
     </Box>
-  ) :
-    null
+  ) : null;
   // <Box
   //   pl={3}
   //   pt={2}

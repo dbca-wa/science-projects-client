@@ -9,13 +9,13 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { IProjectData } from "../../../types";
+import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
-import { useNoImage } from "../../../lib/hooks/useNoImage";
-import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
+import { useProjectSearchContext } from "../../../lib/hooks/helper/ProjectSearchContext";
+import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
+import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
+import { IProjectData } from "../../../types";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 
 export const ModernProjectCard = ({
@@ -73,9 +73,9 @@ export const ModernProjectCard = ({
   const goToProject = () => {
     if (isOnProjectsPage || window.location.pathname.endsWith("/projects")) {
       // Case where the search bar is hidden
-      navigate(`${pk}`);
+      navigate({ to: `${pk}` });
     } else {
-      navigate(`projects/${pk}`);
+      navigate({ to: `projects/${pk}` });
     }
   };
 
@@ -104,20 +104,20 @@ export const ModernProjectCard = ({
             kind === "core_function"
               ? "red.600"
               : kind === "science"
-              ? "green.500"
-              : kind === "student"
-              ? "blue.400"
-              : "gray.400"
+                ? "green.500"
+                : kind === "student"
+                  ? "blue.400"
+                  : "gray.400"
           }
         >
           {
             kind === "core_function"
               ? "CF"
               : kind === "external"
-              ? "EXT"
-              : kind === "science"
-              ? "SP"
-              : "STP" //Student
+                ? "EXT"
+                : kind === "science"
+                  ? "SP"
+                  : "STP" //Student
           }
           -{year}-{number}
         </Tag>

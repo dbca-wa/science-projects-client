@@ -29,8 +29,8 @@ import {
   IUserMe,
 } from "../../../types";
 import { handleDocumentAction } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { useDirectorateMembers } from "../../../lib/hooks/tanstack/useDirectorateMembers";
 
 interface Props {
   userData: IUserMe;
@@ -84,16 +84,18 @@ export const ProjectPlanActionModal = ({
     }
   };
 
-  const approveConceptPlanMutation = useMutation(handleDocumentAction, {
+  const approveConceptPlanMutation = useMutation({
+    mutationFn: handleDocumentAction,
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${action === "approve"
-          ? "Approving"
-          : action === "recall"
-            ? "Recalling"
-            : "Sending Back"
-          }`,
+        title: `${
+          action === "approve"
+            ? "Approving"
+            : action === "recall"
+              ? "Recalling"
+              : "Sending Back"
+        }`,
         position: "top-right",
       });
     },
@@ -101,12 +103,13 @@ export const ProjectPlanActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${action === "approve"
-            ? "Approved"
-            : action === "recall"
-              ? "Recalled"
-              : "Sent Back"
-            }`,
+          description: `Document ${
+            action === "approve"
+              ? "Approved"
+              : action === "recall"
+                ? "Recalled"
+                : "Sent Back"
+          }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -120,18 +123,21 @@ export const ProjectPlanActionModal = ({
       onClose();
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["projects", projectData?.pk]);
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectData?.pk],
+        });
       }, 350);
     },
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${action === "approve"
-            ? "Approve"
-            : action === "recall"
-              ? "Recall"
-              : "Send Back"
-            } Concept Plan`,
+          title: `Could Not ${
+            action === "approve"
+              ? "Approve"
+              : action === "recall"
+                ? "Recall"
+                : "Send Back"
+          } Concept Plan`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -162,11 +168,13 @@ export const ProjectPlanActionModal = ({
       >
         <ModalHeader>
           {action === "approve"
-            ? stage === 1 ? "Submit" : "Approve"
+            ? stage === 1
+              ? "Submit"
+              : "Approve"
             : action === "recall"
-              ? "Recall" :
-              action === "reopen" ?
-                "Reopen"
+              ? "Recall"
+              : action === "reopen"
+                ? "Reopen"
                 : "Send Back"}{" "}
           Document?
         </ModalHeader>
@@ -203,8 +211,9 @@ export const ProjectPlanActionModal = ({
                   <Text fontWeight={"bold"}>Stage 1</Text>
                   <br />
                   <Text>
-                    {action === "approve" ? `In your capacity as Project Lead, would you like to submit this project plan to the business area lead?` : `In your capacity as Project Lead, would you like to ${action} this project plan?`}
-
+                    {action === "approve"
+                      ? `In your capacity as Project Lead, would you like to submit this project plan to the business area lead?`
+                      : `In your capacity as Project Lead, would you like to ${action} this project plan?`}
                   </Text>
                   <br />
                   <Text>
@@ -219,12 +228,17 @@ export const ProjectPlanActionModal = ({
                     isChecked={shouldSendEmail}
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
-                    Send an email to the business area lead <strong>
+                    Send an email to the business area lead{" "}
+                    <strong>
                       ({baLead.first_name} {baLead.last_name} - {baLead.email})
                     </strong>{" "}
                     alerting them that you have{" "}
-                    {action === "approve" ? stage === 1 ? "submitted" : "approved" : "recalled"} this
-                    document?
+                    {action === "approve"
+                      ? stage === 1
+                        ? "submitted"
+                        : "approved"
+                      : "recalled"}{" "}
+                    this document?
                   </Checkbox>
                 </Box>
               ) : stage === 2 ? (
@@ -333,7 +347,7 @@ export const ProjectPlanActionModal = ({
           <Button
             form="approval-form"
             type="submit"
-            isLoading={approveConceptPlanMutation.isLoading}
+            isLoading={approveConceptPlanMutation.isPending}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{

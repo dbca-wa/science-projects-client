@@ -31,8 +31,8 @@ import {
   MutationSuccess,
   deactivateUserAdmin,
 } from "../../lib/api";
-import { useMutation } from "@tanstack/react-query";
-import { useUserSearchContext } from "../../lib/hooks/UserSearchContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
 
 interface IModalProps {
   isOpen: boolean;
@@ -69,6 +69,7 @@ export const DeactivateUserModal = ({
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
+  const queryClient = useQueryClient();
 
   const { register, handleSubmit } = useForm<AdminSwitchVar>();
 
@@ -76,8 +77,9 @@ export const DeactivateUserModal = ({
     MutationSuccess,
     MutationError,
     AdminSwitchVar
-  >(deactivateUserAdmin, {
+  >({
     // Start of mutation handling
+    mutationFn: deactivateUserAdmin,
     onMutate: () => {
       addToast({
         title: "Deactivating Account...",
@@ -105,6 +107,7 @@ export const DeactivateUserModal = ({
       if (onClose) {
         onClose();
       }
+      queryClient.invalidateQueries({ queryKey: ["users", userPk] });
       reFetch();
     },
     // Error handling based on API - file - declared interface
@@ -201,7 +204,7 @@ export const DeactivateUserModal = ({
               <Button
                 // isDisabled={!changesMade}
                 isDisabled={userIsSuper}
-                isLoading={deactivationMutation.isLoading}
+                isLoading={deactivationMutation.isPending}
                 type="submit"
                 color={"white"}
                 background={colorMode === "light" ? "red.500" : "red.600"}

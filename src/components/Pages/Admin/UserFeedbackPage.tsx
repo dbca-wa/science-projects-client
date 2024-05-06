@@ -1,21 +1,14 @@
 import { FeedbackDisplayRTE } from "@/components/RichTextEditor/Editors/FeedbackDisplayRTE";
-import { useBranches } from "@/lib/hooks/useBranches";
-import { useBusinessAreas } from "@/lib/hooks/useBusinessAreas";
-import { useGetUserFeedback } from "@/lib/hooks/useGetUserFeedback";
-import {
-  Center,
-  Flex,
-  Grid,
-  Spinner,
-  Text
-} from "@chakra-ui/react";
+import { useBranches } from "@/lib/hooks/tanstack/useBranches";
+import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
+import { useGetUserFeedback } from "@/lib/hooks/tanstack/useGetUserFeedback";
+import { Center, Flex, Grid, Spinner, Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
 export const UserFeedbackPage = () => {
   const { feedbackData, feedbackLoading } = useGetUserFeedback();
   const { baData } = useBusinessAreas();
   const { branchesData } = useBranches();
-
 
   return (
     <>

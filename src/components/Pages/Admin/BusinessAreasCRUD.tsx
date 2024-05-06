@@ -49,7 +49,8 @@ export const BusinessAreasCRUD = () => {
   } = useDisclosure();
 
   const queryClient = useQueryClient();
-  const mutation = useMutation(createBusinessArea, {
+  const mutation = useMutation({
+    mutationFn: createBusinessArea,
     onSuccess: () => {
       toast({
         status: "success",
@@ -58,7 +59,7 @@ export const BusinessAreasCRUD = () => {
       });
       onAddClose();
       clearFields();
-      queryClient.invalidateQueries(["businessAreas"]);
+      queryClient.invalidateQueries({ queryKey: ["businessAreas"] });
     },
     onError: () => {
       toast({
@@ -421,7 +422,7 @@ export const BusinessAreasCRUD = () => {
                   // form="add-form"
                   // type="submit"
                   isDisabled={!canSubmit}
-                  isLoading={mutation.isLoading}
+                  isLoading={mutation.isPending}
                   color={"white"}
                   background={colorMode === "light" ? "blue.500" : "blue.600"}
                   _hover={{

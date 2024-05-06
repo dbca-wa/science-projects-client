@@ -30,9 +30,9 @@ import {
 } from "../../lib/api";
 import { useForm } from "react-hook-form";
 import { IAffiliation, IBranch, IBusinessArea } from "../../types";
-import { useBusinessAreas } from "../../lib/hooks/useBusinessAreas";
-import { useBranches } from "../../lib/hooks/useBranches";
-import { useAffiliations } from "@/lib/hooks/useAffiliations";
+import { useBusinessAreas } from "../../lib/hooks/tanstack/useBusinessAreas";
+import { useBranches } from "../../lib/hooks/tanstack/useBranches";
+import { useAffiliations } from "@/lib/hooks/tanstack/useAffiliations";
 
 interface IEditMembershipModalProps {
   isOpen: boolean;
@@ -71,8 +71,9 @@ export const EditMembershipModal = ({
     IProfileUpdateSuccess,
     MutationError,
     IMembershipUpdateVariables
-  >(updateMembership, {
+  >({
     // Start of mutation handling
+    mutationFn: updateMembership,
     onMutate: () => {
       addToast({
         title: "Updating membership...",
@@ -84,8 +85,8 @@ export const EditMembershipModal = ({
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      queryClient.refetchQueries([`membership`, userId]);
-      queryClient.refetchQueries([`me`]);
+      queryClient.refetchQueries({ queryKey: [`membership`, userId] });
+      queryClient.refetchQueries({ queryKey: [`me`] });
 
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
@@ -280,7 +281,7 @@ export const EditMembershipModal = ({
           </ModalBody>
           <ModalFooter>
             <Button
-              isLoading={mutation.isLoading}
+              isLoading={mutation.isPending}
               type="submit"
               bgColor={colorMode === "light" ? `green.500` : `green.600`}
               color={colorMode === "light" ? `white` : `whiteAlpha.900`}

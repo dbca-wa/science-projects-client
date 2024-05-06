@@ -1,19 +1,19 @@
 // Handler for displaying card data for creation of new projects; core function etc.
 
 import {
-  Center,
-  Text,
   Box,
+  Center,
   Heading,
-  UnorderedList,
   ListItem,
-  useDisclosure,
+  Text,
+  UnorderedList,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
-import { CreateProjectModal } from "../../Modals/CreateProjectModal";
 import ParallaxTilt from "react-parallax-tilt";
+import { CreateProjectModal } from "../../Modals/CreateProjectModal";
 
 interface INewProjectCard {
   title: string;
@@ -145,7 +145,6 @@ export const NewProjectCard = ({
               ))}
             </UnorderedList>
           </Box>
-
         </Box>
       </Box>
     </ParallaxTilt>

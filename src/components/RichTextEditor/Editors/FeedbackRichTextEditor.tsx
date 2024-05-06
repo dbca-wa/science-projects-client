@@ -22,11 +22,11 @@ import "../../../styles/texteditor.css";
 //   $getRoot,
 // } from "lexical";
 
-import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
+import useServerImageUrl from "@/lib/hooks/helper/useServerImageUrl";
 import { ListItemNode, ListNode } from "@lexical/list";
+import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import MentionsPlugin, { MentionNode } from "../Plugins/MentionsPlugin";
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 // import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface Props {

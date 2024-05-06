@@ -51,9 +51,9 @@ import {
 } from "../../lib/api";
 import { useForm } from "react-hook-form";
 import { MdFax } from "react-icons/md";
-import { useFullUserByPk } from "../../lib/hooks/useFullUserByPk";
+import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
 import noImageLink from "/sad-face.png";
-import { useUserSearchContext } from "../../lib/hooks/UserSearchContext";
+import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
 
 interface IModalProps {
   isOpen: boolean;
@@ -101,8 +101,8 @@ export const EditUserDetailsModal = ({
         ? "blackAlpha.300"
         : "blackAlpha.200"
       : hoveredTitle
-      ? "whiteAlpha.400"
-      : "whiteAlpha.300"
+        ? "whiteAlpha.400"
+        : "whiteAlpha.300"
   }`;
 
   // // Regex for validity of phone variable
@@ -159,8 +159,9 @@ export const EditUserDetailsModal = ({
     MutationSuccess,
     MutationError,
     IFullUserUpdateVariables
-  >(adminUpdateUser, {
+  >({
     // Start of mutation handling
+    mutationFn: adminUpdateUser,
     onMutate: () => {
       addToast({
         title: "Updating membership...",
@@ -172,10 +173,10 @@ export const EditUserDetailsModal = ({
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      queryClient.refetchQueries([`user`, user.pk]);
-      queryClient.refetchQueries([`personalInfo`, user.pk]);
-      queryClient.refetchQueries([`membership`, user.pk]);
-      queryClient.refetchQueries([`profile`, user.pk]);
+      queryClient.refetchQueries({ queryKey: [`user`, user.pk] });
+      queryClient.refetchQueries({ queryKey: [`personalInfo`, user.pk] });
+      queryClient.refetchQueries({ queryKey: [`membership`, user.pk] });
+      queryClient.refetchQueries({ queryKey: [`profile`, user.pk] });
       reFetch();
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
@@ -526,11 +527,11 @@ export const EditUserDetailsModal = ({
                                         ? selectedImageUrl
                                         : noImageLink
                                       : activeOption === "upload" &&
-                                        selectedFile
-                                      ? URL.createObjectURL(selectedFile)
-                                      : userData?.image?.file
-                                      ? userData.image.file
-                                      : noImageLink
+                                          selectedFile
+                                        ? URL.createObjectURL(selectedFile)
+                                        : userData?.image?.file
+                                          ? userData.image.file
+                                          : noImageLink
                                   }
                                   alt="Preview"
                                   userSelect="none"
@@ -561,8 +562,8 @@ export const EditUserDetailsModal = ({
                                     activeOption === "url"
                                       ? "blue.500"
                                       : colorMode === "light"
-                                      ? "gray.200"
-                                      : "gray.700"
+                                        ? "gray.200"
+                                        : "gray.700"
                                   }
                                   color={
                                     colorMode === "light" ? "black" : "white"
@@ -590,8 +591,8 @@ export const EditUserDetailsModal = ({
                                     activeOption === "upload"
                                       ? "blue.500"
                                       : colorMode === "light"
-                                      ? "gray.200"
-                                      : "gray.700"
+                                        ? "gray.200"
+                                        : "gray.700"
                                   }
                                   color={"white"}
                                 >
@@ -727,7 +728,7 @@ export const EditUserDetailsModal = ({
               Cancel
             </Button>
             <Button
-              isLoading={fullMutation.isLoading}
+              isLoading={fullMutation.isPending}
               form="edit-details"
               type="submit"
               bgColor={colorMode === "light" ? `green.500` : `green.600`}

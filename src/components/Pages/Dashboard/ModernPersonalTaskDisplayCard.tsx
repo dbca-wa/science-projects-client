@@ -12,22 +12,22 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import { ITaskDisplayCard } from "../../../types";
 import { useEffect, useRef, useState } from "react";
+import { ITaskDisplayCard } from "../../../types";
 
-import NoImageFile from "/sad-face.gif";
-import { useNavigate } from "react-router-dom";
+import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
+import { CloseIcon } from "@chakra-ui/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { FaUser } from "react-icons/fa";
 import {
   MutationError,
   MutationSuccess,
   completeTask,
   deletePersonalTask,
 } from "../../../lib/api";
-import { motion } from "framer-motion";
-import { CloseIcon } from "@chakra-ui/icons";
-import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
-import { FaUser } from "react-icons/fa";
+import NoImageFile from "/sad-face.gif";
 
 export const ModernPersonalTaskDisplayCard = ({
   pk,
@@ -87,10 +87,9 @@ export const ModernPersonalTaskDisplayCard = ({
 
   const handleProjectTaskCardClick = () => {
     if (document) {
-      navigate(`projects/${document?.project?.pk}`);
+      navigate({ to: `projects/${document?.project?.pk}` });
       // Handle logic for opening the doc via a link
       // navigate(`projects/${project.pk}?docToOpen=${document.pk}`)
-
     }
   };
 
@@ -102,54 +101,52 @@ export const ModernPersonalTaskDisplayCard = ({
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<MutationSuccess, MutationError, { pk: number }>(
-    completeTask,
-    {
-      // Start of mutation handling
-      onMutate: () => {
-        addToast({
-          title: "Completing Task...",
-          description: "One moment!",
-          status: "loading",
+  const mutation = useMutation<MutationSuccess, MutationError, { pk: number }>({
+    // Start of mutation handling
+    mutationFn: completeTask,
+    onMutate: () => {
+      addToast({
+        title: "Completing Task...",
+        description: "One moment!",
+        status: "loading",
+        position: "top-right",
+        duration: 3000,
+      });
+    },
+    // Success handling based on API-file-declared interface
+    onSuccess: () => {
+      setIsAnimating(true);
+
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: `Task Completed`,
+          status: "success",
           position: "top-right",
           duration: 3000,
+          isClosable: true,
         });
-      },
-      // Success handling based on API-file-declared interface
-      onSuccess: () => {
-        setIsAnimating(true);
+      }
+      setTimeout(() => {
+        setIsAnimating(false);
 
-        if (toastIdRef.current) {
-          toast.update(toastIdRef.current, {
-            title: "Success",
-            description: `Task Completed`,
-            status: "success",
-            position: "top-right",
-            duration: 3000,
-            isClosable: true,
-          });
-        }
-        setTimeout(() => {
-          setIsAnimating(false);
-
-          queryClient.refetchQueries([`mytasks`]);
-        }, 350);
-      },
-      // Error handling based on API-file-declared interface
-      onError: (error) => {
-        if (toastIdRef.current) {
-          toast.update(toastIdRef.current, {
-            title: "Could Not Complete Task",
-            description: `${error}`,
-            status: "error",
-            position: "top-right",
-            duration: 3000,
-            isClosable: true,
-          });
-        }
-      },
-    }
-  );
+        queryClient.refetchQueries({ queryKey: [`mytasks`] });
+      }, 350);
+    },
+    // Error handling based on API-file-declared interface
+    onError: (error) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Could Not Complete Task",
+          description: `${error}`,
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
 
   const handleCompletion = (pk: number) => {
     mutation.mutate({ pk });
@@ -164,8 +161,9 @@ export const ModernPersonalTaskDisplayCard = ({
     MutationSuccess,
     MutationError,
     { pk: number }
-  >(deletePersonalTask, {
+  >({
     // Start of mutation handling
+    mutationFn: deletePersonalTask,
     onMutate: () => {
       addToast({
         title: "Deleting Task...",
@@ -192,7 +190,7 @@ export const ModernPersonalTaskDisplayCard = ({
       setTimeout(() => {
         setIsAnimating(false);
 
-        queryClient.refetchQueries([`mytasks`]);
+        queryClient.refetchQueries({ queryKey: [`mytasks`] });
       }, 350);
     },
     // Error handling based on API-file-declared interface
@@ -336,8 +334,8 @@ export const ModernPersonalTaskDisplayCard = ({
                 bottom={0}
                 right={1.5}
                 px={1}
-              // bg={"red"}
-              // justifyContent={"center"}
+                // bg={"red"}
+                // justifyContent={"center"}
               >
                 <Flex>
                   <Center
@@ -348,8 +346,8 @@ export const ModernPersonalTaskDisplayCard = ({
                     boxSize={5}
                     w={"20px"}
 
-                  // w={"100%"}
-                  // bg={"orange"}
+                    // w={"100%"}
+                    // bg={"orange"}
                   >
                     <FaUser />
                   </Center>

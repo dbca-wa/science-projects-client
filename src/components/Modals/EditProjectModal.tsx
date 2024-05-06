@@ -1,33 +1,38 @@
 import {
+  Box,
+  Button,
+  Center,
   Flex,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Grid,
+  Icon,
+  InputGroup,
+  InputLeftAddon,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
-  ToastId,
-  useToast,
-  useColorMode,
-  FormControl,
-  InputGroup,
-  ModalFooter,
-  Grid,
-  Button,
-  FormLabel,
-  Text,
-  VisuallyHiddenInput,
-  FormHelperText,
-  Box,
   Select,
-  InputLeftAddon,
-  Icon,
-  Center,
-  Input,
+  Text,
+  ToastId,
+  VisuallyHiddenInput,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
-import { IEditProject, updateProjectDetails } from "../../lib/api";
-import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaArrowLeft } from "react-icons/fa";
+import { HiAcademicCap } from "react-icons/hi";
+import { IEditProject, updateProjectDetails } from "../../lib/api";
+import { useBusinessAreas } from "../../lib/hooks/tanstack/useBusinessAreas";
+import { useDepartmentalServices } from "../../lib/hooks/tanstack/useDepartmentalServices";
+import { useGetLocations } from "../../lib/hooks/tanstack/useGetLocations";
 import {
   IBusinessArea,
   IDepartmentalService,
@@ -38,18 +43,12 @@ import {
   IStudentProjectDetails,
   ProjectImage,
 } from "../../types";
-import { useForm } from "react-hook-form";
-import TagInput from "../Pages/CreateProject/TagInput";
-import { useDepartmentalServices } from "../../lib/hooks/useDepartmentalServices";
-import { useBusinessAreas } from "../../lib/hooks/useBusinessAreas";
-import { useGetLocations } from "../../lib/hooks/useGetLocations";
-import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
-import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
-import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
 import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
-import { HiAcademicCap } from "react-icons/hi";
-import { FaArrowLeft } from "react-icons/fa";
+import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
+import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
+import TagInput from "../Pages/CreateProject/TagInput";
+import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
 
 interface Props {
   // thisUser: IUserMe;
@@ -156,8 +155,8 @@ export const EditProjectModal = ({
         ? "blackAlpha.300"
         : "blackAlpha.200"
       : hoveredTitle
-      ? "whiteAlpha.400"
-      : "whiteAlpha.300"
+        ? "whiteAlpha.400"
+        : "whiteAlpha.300"
   }`;
 
   const [keywords, setKeywords] = useState(currentKeywords);
@@ -292,7 +291,8 @@ export const EditProjectModal = ({
     await updateProjectMutation.mutate(formData);
   };
 
-  const updateProjectMutation = useMutation(updateProjectDetails, {
+  const updateProjectMutation = useMutation({
+    mutationFn: updateProjectDetails,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -313,7 +313,7 @@ export const EditProjectModal = ({
       }
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["projects", projectPk]);
+        queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
         refetchData();
         onClose();
       }, 350);
@@ -751,7 +751,7 @@ export const EditProjectModal = ({
                     background:
                       colorMode === "light" ? "green.400" : "green.500",
                   }}
-                  isLoading={updateProjectMutation.isLoading}
+                  isLoading={updateProjectMutation.isPending}
                   type="submit"
                   ml={3}
                   isDisabled={!canUpdate}

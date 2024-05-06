@@ -1,15 +1,15 @@
 // WIP
 
 import { useColorMode } from "@chakra-ui/react";
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useEffect } from "react";
-import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
 import {
   $getRoot,
   $getSelection,
   CLEAR_EDITOR_COMMAND,
   RangeSelection,
 } from "lexical";
+import { useEffect } from "react";
 
 export const DarkModePlugin = () => {
   const { colorMode } = useColorMode();

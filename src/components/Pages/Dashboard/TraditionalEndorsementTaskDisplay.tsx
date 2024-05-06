@@ -1,18 +1,18 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
-import { useProjectSearchContext } from "@/lib/hooks/ProjectSearchContext";
+import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
+import { useBoxShadow } from "@/lib/hooks/helper/useBoxShadow";
 import { IMainDoc } from "@/types";
 import {
   Box,
   Center,
-  Flex,
-  useColorMode,
-  Text,
   Divider,
+  Flex,
+  Text,
+  useColorMode,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { FaBiohazard, FaShieldDog } from "react-icons/fa6";
 import { PiPlantFill } from "react-icons/pi";
-import { useBoxShadow } from "@/lib/hooks/useBoxShadow";
 
 interface IProps {
   endorsementKind: "animalEthics" | "biometrician" | "herbarium";
@@ -23,9 +23,6 @@ export const TraditionalEndorsementTaskDisplay = ({
   endorsementKind,
   document,
 }: IProps) => {
-
-
-
   const { colorMode } = useColorMode();
   const navigate = useNavigate();
   const { isOnProjectsPage } = useProjectSearchContext();
@@ -47,9 +44,9 @@ export const TraditionalEndorsementTaskDisplay = ({
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else if (isOnProjectsPage) {
-      navigate(`${pk}/${urlkind}`);
+      navigate({ to: `${pk}/${urlkind}` });
     } else {
-      navigate(`projects/${pk}/${urlkind}`);
+      navigate({ to: `projects/${pk}/${urlkind}` });
     }
   };
 

@@ -3,45 +3,45 @@
 
 import {
   Avatar,
-  Image,
   Box,
   Button,
   Center,
   Flex,
+  FormControl,
+  FormHelperText,
   Grid,
   Icon,
+  Image,
+  Input,
+  InputGroup,
+  Select,
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
   Spacer,
   Spinner,
   Text,
-  useColorMode,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  FormControl,
-  InputGroup,
-  Select,
-  FormHelperText,
-  useToast,
   ToastId,
-  Input,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
-import { FiCopy } from "react-icons/fi";
-import { FcApproval } from "react-icons/fc";
-import { AiFillCloseCircle } from "react-icons/ai";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
-import { useCopyText } from "../../../lib/hooks/useCopyText";
-import { useUser } from "../../../lib/hooks/useUser";
+import { AiFillCloseCircle } from "react-icons/ai";
+import { FcApproval } from "react-icons/fc";
+import { FiCopy } from "react-icons/fi";
 import {
   RemoveUserMutationType,
   promoteUserToLeader,
   removeTeamMemberFromProject,
   updateProjectMember,
 } from "../../../lib/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useCopyText } from "../../../lib/hooks/helper/useCopyText";
+import { useFormattedDate } from "../../../lib/hooks/helper/useFormattedDate";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { useUser } from "../../../lib/hooks/tanstack/useUser";
 
 interface Props {
   pk: number;
@@ -177,7 +177,8 @@ export const ProjectUserDetails = ({
     updateMemberMutation.mutate(formData);
   };
 
-  const updateMemberMutation = useMutation(updateProjectMember, {
+  const updateMemberMutation = useMutation({
+    mutationFn: updateProjectMember,
     onMutate: () => {
       console.log("Updating Project Membership");
 
@@ -205,12 +206,12 @@ export const ProjectUserDetails = ({
         // async
         () => {
           // await
-          queryClient.invalidateQueries(["projects", project_id]);
+          queryClient.invalidateQueries({ queryKey: ["projects", project_id] });
 
           refetchTeamData && refetchTeamData();
           // const url =
           if (!location.pathname.includes("project")) {
-            navigate(`/projects/${project_id}`);
+            navigate({ to: `/projects/${project_id}` });
           } else {
             onClose();
           }
@@ -233,7 +234,8 @@ export const ProjectUserDetails = ({
     },
   });
 
-  const promoteUserMutation = useMutation(promoteUserToLeader, {
+  const promoteUserMutation = useMutation({
+    mutationFn: promoteUserToLeader,
     onMutate: () => {
       console.log("Promoting user");
 
@@ -261,12 +263,12 @@ export const ProjectUserDetails = ({
         // async
         () => {
           // await
-          queryClient.invalidateQueries(["projects", project_id]);
+          queryClient.invalidateQueries({ queryKey: ["projects", project_id] });
 
           refetchTeamData && refetchTeamData();
           // const url =
           if (!location.pathname.includes("project")) {
-            navigate(`/projects/${project_id}`);
+            navigate({ to: `/projects/${project_id}` });
           } else {
             onClose();
           }
@@ -289,7 +291,8 @@ export const ProjectUserDetails = ({
     },
   });
 
-  const removeUserMutation = useMutation(removeTeamMemberFromProject, {
+  const removeUserMutation = useMutation({
+    mutationFn: removeTeamMemberFromProject,
     onMutate: () => {
       console.log("Removing user");
 
@@ -319,12 +322,12 @@ export const ProjectUserDetails = ({
         // async
         () => {
           // await
-          queryClient.invalidateQueries(["projects", project_id]);
+          queryClient.invalidateQueries({ queryKey: ["projects", project_id] });
 
           refetchTeamData && refetchTeamData();
           // const url =
           if (!location.pathname.includes("project")) {
-            navigate(`/projects/${project_id}`);
+            navigate({ to: `/projects/${project_id}` });
           } else {
             // onClose();
           }
@@ -359,8 +362,8 @@ export const ProjectUserDetails = ({
             user?.image?.file
               ? user.image.file
               : user?.image?.old_file
-              ? user.image.old_file
-              : ""
+                ? user.image.old_file
+                : ""
           }
           size={"2xl"}
         />

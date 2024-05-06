@@ -1,20 +1,20 @@
+import { AddReportModal } from "@/components/Modals/AddReportModal";
 import {
-  Text,
   Box,
   Button,
-  Flex,
-  useDisclosure,
   Center,
-  Spinner,
+  Flex,
   Grid,
+  Spinner,
+  Text,
   useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { getAllReports } from "../../../lib/api";
 import { IReport } from "../../../types";
 import { ReportItemDisplay } from "./ReportItemDisplay";
-import { AddReportModal } from "@/components/Modals/AddReportModal";
 
 export const ReportsCRUD = () => {
   const {
@@ -119,10 +119,7 @@ export const ReportsCRUD = () => {
             </Grid>
           </Box>
 
-          <AddReportModal
-            isOpen={addIsOpen}
-            onClose={onAddClose}
-          />
+          <AddReportModal isOpen={addIsOpen} onClose={onAddClose} />
         </>
       )}
     </>

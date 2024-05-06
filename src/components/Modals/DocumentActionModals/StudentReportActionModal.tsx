@@ -29,8 +29,8 @@ import {
   IUserMe,
 } from "../../../types";
 import { handleDocumentAction } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { useDirectorateMembers } from "../../../lib/hooks/tanstack/useDirectorateMembers";
 
 interface Props {
   userData: IUserMe;
@@ -86,16 +86,18 @@ export const StudentReportActionModal = ({
     }
   };
 
-  const approveStudentReportMutation = useMutation(handleDocumentAction, {
+  const approveStudentReportMutation = useMutation({
+    mutationFn: handleDocumentAction,
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${action === "approve"
-          ? "Approving"
-          : action === "recall"
-            ? "Recalling"
-            : "Sending Back"
-          }`,
+        title: `${
+          action === "approve"
+            ? "Approving"
+            : action === "recall"
+              ? "Recalling"
+              : "Sending Back"
+        }`,
         position: "top-right",
       });
     },
@@ -103,12 +105,13 @@ export const StudentReportActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${action === "approve"
-            ? "Approved"
-            : action === "recall"
-              ? "Recalled"
-              : "Sent Back"
-            }`,
+          description: `Document ${
+            action === "approve"
+              ? "Approved"
+              : action === "recall"
+                ? "Recalled"
+                : "Sent Back"
+          }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -123,18 +126,21 @@ export const StudentReportActionModal = ({
       onClose();
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["projects", projectData?.pk]);
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectData?.pk],
+        });
       }, 350);
     },
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${action === "approve"
-            ? "Approve"
-            : action === "recall"
-              ? "Recall"
-              : "Send Back"
-            } student Report`,
+          title: `Could Not ${
+            action === "approve"
+              ? "Approve"
+              : action === "recall"
+                ? "Recall"
+                : "Send Back"
+          } student Report`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -157,7 +163,7 @@ export const StudentReportActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-    // isCentered={true}
+      // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -166,11 +172,13 @@ export const StudentReportActionModal = ({
       >
         <ModalHeader>
           {action === "approve"
-            ? stage === 1 ? "Submit" : "Approve"
+            ? stage === 1
+              ? "Submit"
+              : "Approve"
             : action === "recall"
-              ? "Recall" :
-              action === "reopen" ?
-                "Reopen"
+              ? "Recall"
+              : action === "reopen"
+                ? "Reopen"
                 : "Send Back"}{" "}
           Document?
         </ModalHeader>
@@ -207,8 +215,9 @@ export const StudentReportActionModal = ({
                   <Text fontWeight={"bold"}>Stage 1</Text>
                   <br />
                   <Text>
-                    In your capacity as Project Lead, would you like to {action === "approve" ? "submit" : action}{" "}
-                    this student report?
+                    In your capacity as Project Lead, would you like to{" "}
+                    {action === "approve" ? "submit" : action} this student
+                    report?
                   </Text>
                   <br />
                   <Text>
@@ -346,7 +355,7 @@ export const StudentReportActionModal = ({
           <Button
             form="approval-form"
             type="submit"
-            isLoading={approveStudentReportMutation.isLoading}
+            isLoading={approveStudentReportMutation.isPending}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{
@@ -354,7 +363,9 @@ export const StudentReportActionModal = ({
             }}
           >
             {action === "approve"
-              ? stage === 1 ? "Submit" : "Approve"
+              ? stage === 1
+                ? "Submit"
+                : "Approve"
               : action === "recall"
                 ? "Recall"
                 : "Send Back"}

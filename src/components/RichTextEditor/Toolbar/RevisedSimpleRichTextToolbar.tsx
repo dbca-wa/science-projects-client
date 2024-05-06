@@ -2,37 +2,37 @@
 
 import { Box, Flex, useColorMode, useDisclosure } from "@chakra-ui/react";
 
+import { InsertTableModal } from "@/components/Modals/RTEModals/InsertTableModal";
 import { useCallback, useEffect, useState } from "react";
-import { VerticalDivider } from "./VerticalDivider";
-import { RevisedBaseToolbarButton } from "../Buttons/RevisedBaseToolbarButton";
+import { FaBold, FaItalic, FaRedo, FaUnderline, FaUndo } from "react-icons/fa";
 import { ImClearFormatting } from "react-icons/im";
 import { MdSubscript, MdSuperscript } from "react-icons/md";
-import { FaBold, FaItalic, FaRedo, FaUnderline, FaUndo } from "react-icons/fa";
-import { InsertTableModal } from "@/components/Modals/RTEModals/InsertTableModal";
+import { RevisedBaseToolbarButton } from "../Buttons/RevisedBaseToolbarButton";
+import { VerticalDivider } from "./VerticalDivider";
 
 import {
-  CAN_REDO_COMMAND,
-  CAN_UNDO_COMMAND,
-  COMMAND_PRIORITY_CRITICAL,
+  $findMatchingParent,
+  $getNearestBlockElementAncestorOrThrow,
+  $getNearestNodeOfType,
+  mergeRegister,
+} from "@lexical/utils";
+import {
   // $INTERNAL_isPointSelection,
   $createParagraphNode,
   $getSelection,
   $isParagraphNode,
   $isRangeSelection,
+  $isRootOrShadowRoot,
   $isTextNode,
+  CAN_REDO_COMMAND,
+  CAN_UNDO_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
   FORMAT_TEXT_COMMAND,
   LexicalEditor,
   NodeKey,
   REDO_COMMAND,
   UNDO_COMMAND,
-  $isRootOrShadowRoot,
 } from "lexical";
-import {
-  mergeRegister,
-  $getNearestBlockElementAncestorOrThrow,
-  $findMatchingParent,
-  $getNearestNodeOfType,
-} from "@lexical/utils";
 
 import { getSelectedNode } from "@/lib/utils/getSelectedNode";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -64,7 +64,7 @@ const useToolbar = ({
   boolean,
   // boolean,
   boolean,
-  keyof typeof blockTypeToBlockName
+  keyof typeof blockTypeToBlockName,
 ] => {
   const [isText, setIsText] = useState<boolean>(false);
   // const [isLink, setIsLink] = useState(false);

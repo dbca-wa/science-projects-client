@@ -1,10 +1,10 @@
 // A paginator for the projects page
 
+import { IProjectData } from "@/types";
 import { Box, Button, Center, Flex, Grid, Spinner } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useLayoutSwitcher } from "../../../lib/hooks/helper/LayoutSwitcherContext";
 import { ModernProjectCard } from "./ModernProjectCard";
-import { useLayoutSwitcher } from "../../../lib/hooks/LayoutSwitcherContext";
-import { IProjectData } from "@/types";
 
 interface IPaginationProps {
   loading: boolean;
@@ -55,19 +55,19 @@ export const PaginatorProject = ({
               gridTemplateColumns={
                 layout === "modern"
                   ? {
-                    base: "repeat(1, 1fr)",
-                    "740px": "repeat(2, 1fr)",
-                    lg: "repeat(3, 1fr)",
-                    xl: "repeat(4, 1fr)",
-                    "3xl": "repeat(6, 1fr)",
-                  }
+                      base: "repeat(1, 1fr)",
+                      "740px": "repeat(2, 1fr)",
+                      lg: "repeat(3, 1fr)",
+                      xl: "repeat(4, 1fr)",
+                      "3xl": "repeat(6, 1fr)",
+                    }
                   : {
-                    base: "repeat(1, 1fr)",
-                    "740px": "repeat(2, 1fr)",
-                    lg: "repeat(2, 1fr)",
-                    xl: "repeat(3, 1fr)",
-                    "2xl": "repeat(4, 1fr)",
-                  }
+                      base: "repeat(1, 1fr)",
+                      "740px": "repeat(2, 1fr)",
+                      lg: "repeat(2, 1fr)",
+                      xl: "repeat(3, 1fr)",
+                      "2xl": "repeat(4, 1fr)",
+                    }
               }
               gridGap={8}
             >
@@ -118,8 +118,8 @@ export const PaginatorProject = ({
         mt={8}
         display="flex"
         justifyContent="center"
-      // bottom={0}
-      // bg={"red"}
+        // bottom={0}
+        // bg={"red"}
       >
         {/* Render the pagination buttons */}
         <Button

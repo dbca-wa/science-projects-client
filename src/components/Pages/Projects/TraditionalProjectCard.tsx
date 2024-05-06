@@ -9,9 +9,9 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
+import { Link } from "@tanstack/react-router";
 import { AiFillCalendar, AiFillTag } from "react-icons/ai";
-import { TbAlertOctagonFilled } from "react-icons/tb";
-import { Link } from "react-router-dom";
+import { TbAlertOctagon } from "react-icons/tb";
 import PlaceHolderImage from "../../../assets/no-image-placeholder.png";
 
 export interface IProjectCardProps {
@@ -100,7 +100,7 @@ export const TraditionalProjectCard = ({
           </Box>
           <Grid flexDir={"row"} templateColumns={"repeat(1, 1fr)"}>
             <Box pb={4} display="inline-flex" alignItems="center">
-              <TbAlertOctagonFilled />
+              <TbAlertOctagon />
               <Grid
                 gridTemplateColumns={{
                   base: "repeat(2, 1fr)",
@@ -115,10 +115,10 @@ export const TraditionalProjectCard = ({
                     projectTypeTag === "Core Function"
                       ? "blue.500"
                       : projectTypeTag === "Science"
-                      ? "green.500"
-                      : projectTypeTag === "Student"
-                      ? "blue.400"
-                      : "gray.400"
+                        ? "green.500"
+                        : projectTypeTag === "Student"
+                          ? "blue.400"
+                          : "gray.400"
                   }
                   textColor={"whiteAlpha.900"}
                   fontSize={"xs"}
@@ -134,10 +134,10 @@ export const TraditionalProjectCard = ({
                     statusTag === "Completed"
                       ? "green.800"
                       : statusTag === "Update Requested"
-                      ? "red.500"
-                      : statusTag === "Active"
-                      ? "green.300"
-                      : "gray.200"
+                        ? "red.500"
+                        : statusTag === "Active"
+                          ? "green.300"
+                          : "gray.200"
                   }
                   textColor={"whiteAlpha.900"}
                   fontSize={"xs"}

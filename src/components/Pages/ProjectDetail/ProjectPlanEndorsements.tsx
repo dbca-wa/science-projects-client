@@ -12,18 +12,18 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { IProjectPlan, IUserMe } from "../../../types";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ISpecialEndorsement } from "../../../lib/api";
+import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
+import { IProjectPlan, IUserMe } from "../../../types";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
 import { SingleFileStateUpload } from "../../SingleFileStateUpload";
-import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
 
 import { BsFilePdfFill } from "react-icons/bs";
 // import { MdDeleteForever } from "react-icons/md";
-import { TiDelete } from "react-icons/ti";
 import { DeletePDFEndorsementModal } from "@/components/Modals/DeletePDFEndorsementModal";
+import { TiDelete } from "react-icons/ti";
 
 interface IEndorsementProps {
   document: IProjectPlan;
@@ -383,8 +383,8 @@ export const ProjectPlanEndorsements = ({
                           ? "black"
                           : "gray.500"
                         : aecEndReqValue
-                        ? "white"
-                        : "gray.500"
+                          ? "white"
+                          : "gray.500"
                     }
                   >
                     Animal Ethics Committee's Endorsement
@@ -433,8 +433,8 @@ export const ProjectPlanEndorsements = ({
                             ? "black"
                             : "gray.500"
                           : aecEndReqValue
-                          ? "white"
-                          : "gray.500"
+                            ? "white"
+                            : "gray.500"
                       }
                     >
                       Current Approval PDF

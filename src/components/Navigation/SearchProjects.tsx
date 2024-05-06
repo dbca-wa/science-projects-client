@@ -1,5 +1,6 @@
 // Project search component - works/appears on the Users page with ProjectSearchContext
 
+import { IBusinessArea } from "@/types";
 import {
   Flex,
   Grid,
@@ -9,11 +10,10 @@ import {
   Select,
   useColorMode,
 } from "@chakra-ui/react";
-import { FiSearch } from "react-icons/fi";
 import { useEffect, useState } from "react";
-import { useProjectSearchContext } from "../../lib/hooks/ProjectSearchContext";
+import { FiSearch } from "react-icons/fi";
 import { getAllBusinessAreas, getAllProjectsYears } from "../../lib/api";
-import { IBusinessArea } from "@/types";
+import { useProjectSearchContext } from "../../lib/hooks/helper/ProjectSearchContext";
 
 interface IProps {
   orientation?: "vertical" | "horizontal";

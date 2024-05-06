@@ -1,44 +1,44 @@
 // Used to display the tasks and projects of a user in the traditional layout
 
 import {
-  AccordionPanel,
-  Box,
-  AccordionButton,
   Accordion,
+  AccordionButton,
   AccordionIcon,
   AccordionItem,
-  Flex,
-  Text,
-  Center,
+  AccordionPanel,
+  Box,
   Button,
-  Grid,
-  useColorMode,
-  Spinner,
+  Center,
   Divider,
+  Flex,
+  Grid,
+  Spinner,
+  Text,
+  useColorMode,
 } from "@chakra-ui/react";
-import { FcHighPriority, FcOk } from "react-icons/fc";
-import { AiFillProject } from "react-icons/ai";
-import { useGetMyTasks } from "../../../lib/hooks/useGetMyTasks";
-import { useGetMyProjects } from "../../../lib/hooks/useGetMyProjects";
-import { IProjectData, IMainDoc, ITaskDisplayCard } from "../../../types";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
+import { AiFillProject } from "react-icons/ai";
+import { FcHighPriority, FcOk } from "react-icons/fc";
+import { useProjectSearchContext } from "../../../lib/hooks/helper/ProjectSearchContext";
+import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
+import { useGetMyTasks } from "../../../lib/hooks/tanstack/useGetMyTasks";
+import { IMainDoc, IProjectData, ITaskDisplayCard } from "../../../types";
 import { TraditionalPersonalTaskDisplay } from "./TraditionalPersonalTaskDisplay";
 // import { useGetDocumentsPendingApproval } from "../../../lib/hooks/useGetDocumentsPendingApproval"
-import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
+import { useBoxShadow } from "@/lib/hooks/helper/useBoxShadow";
+import { useGetDocumentsPendingStageOneInput } from "@/lib/hooks/tanstack/useGetDocumentsPendingStageOneInput";
+import { useGetDocumentsPendingStageThreeInput } from "@/lib/hooks/tanstack/useGetDocumentsPendingStageThreeInput";
+import { useGetDocumentsPendingStageTwoInput } from "@/lib/hooks/tanstack/useGetDocumentsPendingStageTwoInput";
+import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/tanstack/useGetEndorsementsPendingMyAction";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { FaUserFriends } from "react-icons/fa";
-import { MdScience } from "react-icons/md";
 import { GiMaterialsScience } from "react-icons/gi";
+import { MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
-import { TraditionalEndorsementTaskDisplay } from "./TraditionalEndorsementTaskDisplay";
+import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 import { TraditionalDocumentTaskDisplay } from "./TraditionalDocumentTaskDisplay";
-import { useBoxShadow } from "@/lib/hooks/useBoxShadow";
-import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/useGetEndorsementsPendingMyAction";
-import { useGetDocumentsPendingStageOneInput } from "@/lib/hooks/useGetDocumentsPendingStageOneInput";
-import { useGetDocumentsPendingStageTwoInput } from "@/lib/hooks/useGetDocumentsPendingStageTwoInput";
-import { useGetDocumentsPendingStageThreeInput } from "@/lib/hooks/useGetDocumentsPendingStageThreeInput";
-import { useUser } from "@/lib/hooks/useUser";
+import { TraditionalEndorsementTaskDisplay } from "./TraditionalEndorsementTaskDisplay";
 
 interface ITaskFromAPI {
   todo: ITaskDisplayCard[];
@@ -157,9 +157,9 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else if (isOnProjectsPage) {
-      navigate(`${pk}`);
+      navigate({ to: `${pk}` });
     } else {
-      navigate(`projects/${pk}`);
+      navigate({ to: `projects/${pk}` });
     }
   };
 
@@ -176,7 +176,7 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
         <Accordion
           // defaultIndex={defaultIndex}
           defaultIndex={[0]}
-        // allowMultiple
+          // allowMultiple
         >
           <AccordionItem
             borderColor={
@@ -199,10 +199,10 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                 My Tasks
               </Box>
               {!tasksLoading &&
-                !docsPendingStageOneInputLoading &&
-                !docsPendingStageTwoInputLoading &&
-                !docsPendingStageThreeInputLoading &&
-                combinedData?.length +
+              !docsPendingStageOneInputLoading &&
+              !docsPendingStageTwoInputLoading &&
+              !docsPendingStageThreeInputLoading &&
+              combinedData?.length +
                 docsPendingStageOneInput?.team?.length +
                 docsPendingStageOneInput?.lead?.length +
                 docsPendingStageTwoInput?.length +
@@ -242,7 +242,7 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                     <Spinner />
                   </Center>
                 ) : docsPendingStageOneInput?.team?.length +
-                  docsPendingStageOneInput?.lead?.length >=
+                    docsPendingStageOneInput?.lead?.length >=
                   1 ? (
                   [
                     ...docsPendingStageOneInput.team.map((document) => ({
@@ -300,10 +300,10 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
               </Grid>
 
               {combinedData?.length < 1 &&
-                docsPendingStageOneInput?.team.length < 1 &&
-                docsPendingStageOneInput?.lead.length < 1 &&
-                docsPendingStageTwoInput?.length < 1 &&
-                docsPendingStageThreeInput?.length < 1 ? (
+              docsPendingStageOneInput?.team.length < 1 &&
+              docsPendingStageOneInput?.lead.length < 1 &&
+              docsPendingStageTwoInput?.length < 1 &&
+              docsPendingStageThreeInput?.length < 1 ? (
                 <Center>
                   <Flex>
                     <Center pt={10}>
@@ -344,15 +344,15 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
           </AccordionItem>
 
           {me?.userData?.is_aec ||
-            me?.userData?.is_biometrician ||
-            me?.userData?.is_herbarium_curator ||
-            me?.userData?.is_superuser ? (
+          me?.userData?.is_biometrician ||
+          me?.userData?.is_herbarium_curator ||
+          me?.userData?.is_superuser ? (
             <AccordionItem
               borderColor={
                 colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
               }
               borderBottom={"none"}
-            // borderTop={"none"}
+              // borderTop={"none"}
             >
               <AccordionButton
                 bg={colorMode === "light" ? "gray.200" : "gray.700"}
@@ -368,19 +368,19 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                   Endorsement Tasks
                 </Box>
                 {pendingEndorsementsDataLoading ===
-                  true ? null : pendingEndorsementsData?.aec?.length
-                    // +
-                    //   pendingEndorsementsData?.bm?.length +
-                    //   pendingEndorsementsData?.hc?.length 
-                    >
-                    1 ? (
+                true ? null : pendingEndorsementsData?.aec?.length >
+                  // +
+                  //   pendingEndorsementsData?.bm?.length +
+                  //   pendingEndorsementsData?.hc?.length
+                  1 ? (
                   <Box
                     display={"inline-flex"}
                     justifyContent={"center"}
                     alignItems={"center"}
                   >
                     <Box mr={2}>
-                      {pendingEndorsementsData?.aec?.length
+                      {
+                        pendingEndorsementsData?.aec?.length
                         // +
                         //   pendingEndorsementsData?.bm?.length +
                         //   pendingEndorsementsData?.hc?.length
@@ -398,24 +398,23 @@ export const TraditionalTasksAndProjectsSegmentedAPICalls = ({
                   <Center my={4}>
                     <Spinner />
                   </Center>
-                ) : pendingEndorsementsData?.aec?.length
+                ) : pendingEndorsementsData?.aec?.length >=
                   // +
                   //   pendingEndorsementsData?.bm?.length +
-                  //   pendingEndorsementsData?.hc?.length 
-                  >=
+                  //   pendingEndorsementsData?.hc?.length
                   1 ? (
                   <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                     {!pendingEndorsementsDataLoading &&
-                      pendingEndorsementsData?.aec?.length >= 1
+                    pendingEndorsementsData?.aec?.length >= 1
                       ? pendingEndorsementsData?.aec?.map(
-                        (document: IMainDoc, index: number) => (
-                          <TraditionalEndorsementTaskDisplay
-                            key={index}
-                            document={document}
-                            endorsementKind={"animalEthics"}
-                          />
+                          (document: IMainDoc, index: number) => (
+                            <TraditionalEndorsementTaskDisplay
+                              key={index}
+                              document={document}
+                              endorsementKind={"animalEthics"}
+                            />
+                          )
                         )
-                      )
                       : null}
                     {/* {!pendingEndorsementsDataLoading &&
                       pendingEndorsementsData?.hc?.length >= 1

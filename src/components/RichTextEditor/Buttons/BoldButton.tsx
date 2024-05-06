@@ -1,9 +1,9 @@
 // A button to bold or unbold text nodes
 
-import { FaBold } from "react-icons/fa";
-import { BaseToolbarButton } from "./BaseToolbarButton";
 import { useState } from "react";
+import { FaBold } from "react-icons/fa";
 import { IToolbarButton } from "../../../types";
+import { BaseToolbarButton } from "./BaseToolbarButton";
 
 export const BoldButton = ({ onClick, buttonIsOn }: IToolbarButton) => {
   const [isActive, setIsActive] = useState(buttonIsOn);

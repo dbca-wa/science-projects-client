@@ -28,16 +28,16 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { IDivision } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdMoreVert } from "react-icons/md";
-import { useForm } from "react-hook-form";
-import { deleteDivision, updateDivision } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { UserProfile } from "../Users/UserProfile";
-import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { MdMoreVert } from "react-icons/md";
+import { deleteDivision, updateDivision } from "../../../lib/api";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { IDivision } from "../../../types";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
+import { UserProfile } from "../Users/UserProfile";
 
 export const DivisionItemDisplay = ({
   pk,
@@ -71,7 +71,8 @@ export const DivisionItemDisplay = ({
   const [selectedApprover, setSelectedApprover] = useState<number>(approver);
   const slugData = watch("slug");
   const nameData = watch("name");
-  const updateMutation = useMutation(updateDivision, {
+  const updateMutation = useMutation({
+    mutationFn: updateDivision,
     onSuccess: () => {
       toast({
         status: "success",
@@ -79,7 +80,7 @@ export const DivisionItemDisplay = ({
         position: "top-right",
       });
       onUpdateModalClose();
-      queryClient.invalidateQueries(["divisions"]);
+      queryClient.invalidateQueries({ queryKey: ["divisions"] });
     },
     onError: () => {
       toast({
@@ -90,7 +91,8 @@ export const DivisionItemDisplay = ({
     },
   });
 
-  const deleteMutation = useMutation(deleteDivision, {
+  const deleteMutation = useMutation({
+    mutationFn: deleteDivision,
     onSuccess: () => {
       toast({
         status: "success",
@@ -98,7 +100,7 @@ export const DivisionItemDisplay = ({
         position: "top-right",
       });
       onDeleteModalClose();
-      queryClient.invalidateQueries(["divisions"]);
+      queryClient.invalidateQueries({ queryKey: ["divisions"] });
     },
   });
 
@@ -351,7 +353,7 @@ export const DivisionItemDisplay = ({
               <Button
                 // form="update-form"
                 // type="submit"
-                isLoading={updateMutation.isLoading}
+                isLoading={updateMutation.isPending}
                 color={"white"}
                 background={colorMode === "light" ? "blue.500" : "blue.600"}
                 _hover={{

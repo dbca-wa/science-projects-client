@@ -23,7 +23,7 @@ import {
 import { ISimplePkProp, deleteProjectCall } from "../../lib/api";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 
 interface Props {
@@ -46,7 +46,8 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
-  const deleteProjectMutation = useMutation(deleteProjectCall, {
+  const deleteProjectMutation = useMutation({
+    mutationFn: deleteProjectCall,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -67,7 +68,7 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
       }
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["projects", projectPk]);
+        queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
         navigate("/projects");
       }, 350);
     },
@@ -154,7 +155,7 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }}
-                isLoading={deleteProjectMutation.isLoading}
+                isLoading={deleteProjectMutation.isPending}
                 type="submit"
                 ml={3}
               >

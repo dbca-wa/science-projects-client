@@ -1,7 +1,7 @@
 // Adjust the text size in the rich text editor
 
-import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton";
 import { useState } from "react";
+import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton";
 
 // A Button for adjusting text size in px with a dropdown
 
