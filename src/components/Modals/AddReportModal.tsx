@@ -54,6 +54,7 @@ export const AddReportModal = ({ isOpen, onClose }: Props) => {
         position: "top-right",
       });
       queryClient.invalidateQueries({ queryKey: ["reports"] });
+      queryClient.invalidateQueries({ queryKey: ["latestReport"] });
       reset();
       onClose();
     },
