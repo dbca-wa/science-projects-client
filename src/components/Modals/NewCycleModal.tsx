@@ -20,7 +20,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import {
   INewCycle,
@@ -52,7 +52,7 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
     onClose();
   };
 
-  const [shouldIncludeUpdate, setShouldIncludeUpdate] = useState(false);
+  const [shouldIncludeUpdate, setShouldIncludeUpdate] = useState(true);
   const [shouldSendEmails, setShouldSendEmails] = useState(false);
 
   // Toast
@@ -61,6 +61,7 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
+  const queryClient = useQueryClient();
 
   const newCycleMutation = useMutation<
     MutationSuccess,
@@ -90,6 +91,11 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
           isClosable: true,
         });
       }
+      queryClient.invalidateQueries({
+        queryKey: ["latestUnapprovedProgressReports"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["latestProgressReports"] });
+      queryClient.invalidateQueries({ queryKey: ["latestStudentReports"] });
       //  Close the modal
       if (onClose) {
         onClose();

@@ -309,7 +309,9 @@ export const ProjectDocumentPDFSection = ({
             <Box mr={2}>
               <BsStars />
             </Box>
-            Generate PDF
+            {data_document?.document?.pdf?.file
+              ? "Generate New"
+              : "Generate PDF"}
           </Button>
         </Flex>
       </Flex>

@@ -93,7 +93,7 @@ export const ARProgressReportEditor = ({
 
   const { colorMode } = useColorMode();
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <>
@@ -131,10 +131,7 @@ export const ARProgressReportEditor = ({
                   />
                 </Box>
                 <Box ml={4} flex={1}>
-                  <Box
-                    cursor={"pointer"}
-                    onClick={() => navigate(`/projects/${project?.pk}/student`)}
-                  >
+                  <Box>
                     <ExtractedHTMLTitle
                       htmlContent={project?.title}
                       color={"blue.500"}
@@ -142,6 +139,14 @@ export const ARProgressReportEditor = ({
                       fontSize={"17px"}
                       // fontSize={"xs"}
                       noOfLines={4}
+                      cursor={"pointer"}
+                      onClick={() =>
+                        { 
+                          const url = `/projects/${project?.pk}/progress`;
+                          window.open(url, '_blank');
+                          // navigate(url);
+                        }
+                      }
                     />
                   </Box>
 
@@ -165,10 +170,7 @@ export const ARProgressReportEditor = ({
             ) : (
               <>
                 <Box mr={4} flex={1}>
-                  <Box
-                    cursor={"pointer"}
-                    onClick={() => navigate(`/projects/${project?.pk}/student`)}
-                  >
+                  <Box>
                     <ExtractedHTMLTitle
                       htmlContent={project?.title}
                       color={"blue.500"}
@@ -176,6 +178,14 @@ export const ARProgressReportEditor = ({
                       fontSize={"17px"}
                       // fontSize={"xs"}
                       noOfLines={4}
+                      cursor={"pointer"}
+                      onClick={() =>
+                        { 
+                          const url = `/projects/${project?.pk}/progress`;
+                          window.open(url, '_blank');
+                          // navigate(url);
+                        }
+                      }
                     />
                   </Box>
 
