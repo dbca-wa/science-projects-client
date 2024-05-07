@@ -21,7 +21,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import {
   MutationError,
@@ -56,6 +56,8 @@ export const BatchApproveOldModal = ({ isOpen, onClose }: IModalProps) => {
     toastIdRef.current = toast(data);
   };
 
+  const queryClient = useQueryClient();
+
   const batchApproveMutation = useMutation<MutationSuccess, MutationError>({
     // Start of mutation handling
     mutationFn: batchApproveOLDProgressAndStudentReports,
@@ -80,6 +82,12 @@ export const BatchApproveOldModal = ({ isOpen, onClose }: IModalProps) => {
           isClosable: true,
         });
       }
+      queryClient.invalidateQueries({
+        queryKey: ["latestUnapprovedProgressReports"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["latestProgressReports"] });
+      queryClient.invalidateQueries({ queryKey: ["latestStudentReports"] });
+
       //  Close the modal
       if (onClose) {
         onClose();
