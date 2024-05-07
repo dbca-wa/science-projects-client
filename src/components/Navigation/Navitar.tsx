@@ -22,7 +22,7 @@ import { GoTriangleDown } from "react-icons/go";
 import { INavitar } from "../../types";
 import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { logOut } from "../../lib/api";
 import { useUser } from "../../lib/hooks/tanstack/useUser";
 import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
@@ -74,7 +74,7 @@ export const Navitar = ({
       }
       // queryClient.refetchQueries(['me']);
       queryClient.invalidateQueries({ queryKey: ["me"] });
-      navigate({ to: "/login" });
+      navigate("/login");
     },
   });
   const onLogOut = async () => {
@@ -195,7 +195,7 @@ export const Navitar = ({
           >
             <MenuItem
               onClick={() => {
-                navigate({ to: "/users/me" });
+                navigate("/users/me");
               }}
               zIndex={isOpen ? 2 : 1}
             >

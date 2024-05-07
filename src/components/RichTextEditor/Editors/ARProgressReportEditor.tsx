@@ -18,8 +18,8 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
-import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import FloatingToolbarPlugin from "../Plugins/FloatingToolbarPlugin";
 import ListMaxIndentLevelPlugin from "../Plugins/ListMaxIndentLevelPlugin";
@@ -133,9 +133,7 @@ export const ARProgressReportEditor = ({
                 <Box ml={4} flex={1}>
                   <Box
                     cursor={"pointer"}
-                    onClick={() =>
-                      navigate({ to: `/projects/${project?.pk}/student` })
-                    }
+                    onClick={() => navigate(`/projects/${project?.pk}/student`)}
                   >
                     <ExtractedHTMLTitle
                       htmlContent={project?.title}
@@ -169,9 +167,7 @@ export const ARProgressReportEditor = ({
                 <Box mr={4} flex={1}>
                   <Box
                     cursor={"pointer"}
-                    onClick={() =>
-                      navigate({ to: `/projects/${project?.pk}/student` })
-                    }
+                    onClick={() => navigate(`/projects/${project?.pk}/student`)}
                   >
                     <ExtractedHTMLTitle
                       htmlContent={project?.title}

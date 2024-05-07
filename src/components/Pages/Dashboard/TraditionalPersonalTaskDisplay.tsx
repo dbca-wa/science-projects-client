@@ -15,7 +15,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { MdPriorityHigh } from "react-icons/md";
@@ -41,9 +41,9 @@ export const TraditionalPersonalTaskDisplay = ({ task }: Props) => {
 
   const goToProject = (pk: number) => {
     if (isOnProjectsPage) {
-      navigate({ to: `${pk}` });
+      navigate(`${pk}`);
     } else {
-      navigate({ to: `projects/${pk}` });
+      navigate(`projects/${pk}`);
     }
   };
   const toast = useToast();

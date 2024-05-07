@@ -10,7 +10,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { FaBiohazard, FaShieldDog } from "react-icons/fa6";
 import { PiPlantFill } from "react-icons/pi";
 
@@ -44,9 +44,9 @@ export const TraditionalEndorsementTaskDisplay = ({
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else if (isOnProjectsPage) {
-      navigate({ to: `${pk}/${urlkind}` });
+      navigate(`${pk}/${urlkind}`);
     } else {
-      navigate({ to: `projects/${pk}/${urlkind}` });
+      navigate(`projects/${pk}/${urlkind}`);
     }
   };
 

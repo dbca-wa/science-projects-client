@@ -18,7 +18,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { AiFillProject } from "react-icons/ai";
@@ -96,9 +96,9 @@ export const TraditionalTasksAndProjects = () => {
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else if (isOnProjectsPage) {
-      navigate({ to: `${pk}` });
+      navigate(`${pk}`);
     } else {
-      navigate({ to: `projects/${pk}` });
+      navigate(`projects/${pk}`);
     }
   };
 

@@ -3,10 +3,10 @@
 // or conditionally rendering components/running a useEffect.
 
 import { useEffect, useState } from "react";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const useUpdatePage = () => {
-  const location = useRouterState().location;
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState("");
 
   useEffect(() => {
@@ -21,9 +21,7 @@ export const useUpdatePage = () => {
 
   const updatePageContext = (page: string) => {
     if (page !== location.pathname) {
-      navigate({
-        to: page,
-      });
+      navigate(page);
     }
   };
 

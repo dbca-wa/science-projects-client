@@ -1,12 +1,7 @@
-import ReactDOM from "react-dom/client";
 import { createContext } from "react";
-import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
+import ReactDOM from "react-dom/client";
 
 // Custom Providers and theme
-import { LayoutSwitcherProvider } from "./lib/hooks/helper/LayoutSwitcherContext";
-import { UserSearchProvider } from "./lib/hooks/helper/UserSearchContext";
-import { ProjectSearchProvider } from "./lib/hooks/helper/ProjectSearchContext";
-import theme from "./theme";
 
 export const CurrentPageContext = createContext<{
   currentPage: string;
@@ -19,28 +14,36 @@ export const CurrentPageContext = createContext<{
 });
 
 // Router and Queries
+import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen";
+import { RouterProvider } from "react-router-dom";
+import { LayoutSwitcherProvider } from "./lib/hooks/helper/LayoutSwitcherContext";
+import { ProjectSearchProvider } from "./lib/hooks/helper/ProjectSearchContext";
+import { UserSearchProvider } from "./lib/hooks/helper/UserSearchContext";
+import { router } from "./router";
+import theme from "./theme";
+// import { RouterProvider, createRouter } from "react-router-dom";
+// import { routeTree } from "./routeTree.gen";
 
+// Tanstack query client config
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // Prevents uneccessary refretching of API
-      refetchOnWindowFocus: false, // default: true
-    },
+      retry: 2, retryDelay: 1000, refetchOnWindowFocus: false,     },
   },
 });
 
-const router = createRouter({ routeTree });
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-}
+// Tanstack router config and typing
+// const router = createRouter({ routeTree });
+// declare module "@tanstack/react-router" {
+//   interface Register {
+//     router: typeof router;
+//   }
+// }
 
 // Rendering
-const container = document.getElementById("root");
+const container = document.getElementById("app");
 if (!container) throw new Error("Failed to find the root element");
 const root = ReactDOM.createRoot(container);
 

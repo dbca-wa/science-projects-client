@@ -1,14 +1,14 @@
 // Modern Header
 
 import { Box, HStack } from "@chakra-ui/react";
-import { useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import theme from "../../theme";
 import { ModernBreadcrumb } from "./ModernBreadcrumb";
 import { Navitar } from "./Navitar";
 
 export const ModernHeader = () => {
-  const location = useRouterState().location;
+  const location = useLocation();
   const [shouldRenderUserSearch, setShouldRenderUserSearch] = useState(false);
   const [shouldRenderProjectSearch, setShouldRenderProjectSearch] =
     useState(false);

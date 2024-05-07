@@ -12,7 +12,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import {
   EditorSections,
   EditorSubsections,
@@ -273,11 +273,11 @@ export const StudentProgressReportDisplayEditor = ({
                 <Box
                   cursor={"pointer"}
                   onClick={() =>
-                    navigate({
-                      to: `/projects/${project?.pk}/${
+                    navigate(
+                      `/projects/${project?.pk}/${
                         reportKind === "student" ? "student" : "progress"
-                      }`,
-                    })
+                      }`
+                    )
                   }
                 >
                   <ExtractedHTMLTitle
@@ -319,11 +319,11 @@ export const StudentProgressReportDisplayEditor = ({
                 <Box
                   cursor={"pointer"}
                   onClick={() =>
-                    navigate({
-                      to: `/projects/${project?.pk}/${
+                    navigate(
+                      `/projects/${project?.pk}/${
                         reportKind === "student" ? "student" : "progress"
-                      }`,
-                    })
+                      }`
+                    )
                   }
                 >
                   <ExtractedHTMLTitle
