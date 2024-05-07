@@ -27,12 +27,8 @@ import {
 } from "@chakra-ui/react";
 
 // React, Settings, & Nav
-import {
-  useNavigate,
-  // useLocation,
-  useRouterState,
-} from "@tanstack/react-router";
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import theme from "../../theme";
 
 // Icon imports
@@ -78,7 +74,7 @@ const ProjectMenuContents = () => {
       >
         <MenuItem
           onClick={() => {
-            navigate({ to: "/projects/browse" });
+            navigate("/projects/browse");
           }}
         >
           {<CgBrowse />}
@@ -86,7 +82,7 @@ const ProjectMenuContents = () => {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate({ to: "/projects/add" });
+            navigate("/projects/add");
           }}
         >
           {<CgPlayListAdd />}
@@ -113,7 +109,7 @@ const ReportMenuContents = () => {
         {userData?.is_superuser ? (
           <MenuItem
             onClick={() => {
-              navigate({ to: "/reports/current" });
+              navigate("/reports/current");
             }}
           >
             <MdOutlineAccessTimeFilled />
@@ -125,7 +121,7 @@ const ReportMenuContents = () => {
 
         <MenuItem
           onClick={() => {
-            navigate({ to: "/reports" });
+            navigate("/reports");
           }}
         >
           {<CgViewList />}
@@ -159,7 +155,7 @@ const UserMenuContents = () => {
       >
         <MenuItem
           onClick={() => {
-            navigate({ to: "/users" });
+            navigate("/users");
           }}
         >
           {<ImUsers />}
@@ -198,7 +194,7 @@ const AdminMenuContents = ({
       >
         <MenuItem
           onClick={() => {
-            navigate({ to: "/crud/addresses" });
+            navigate("/crud/addresses");
           }}
         >
           {<FaAddressCard />}
@@ -206,7 +202,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate({ to: "/crud/affiliations" });
+            navigate("/crud/affiliations");
           }}
         >
           {<RiTeamFill />}
@@ -215,7 +211,7 @@ const AdminMenuContents = ({
 
         <MenuItem
           onClick={() => {
-            navigate({ to: "/crud/branches" });
+            navigate("/crud/branches");
           }}
         >
           {<RiOrganizationChart />}
@@ -223,7 +219,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate({ to: "/crud/businessareas" });
+            navigate("/crud/businessareas");
           }}
         >
           {<ImBriefcase />}
@@ -231,7 +227,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate({ to: "/crud/divisions" });
+            navigate("/crud/divisions");
           }}
         >
           {<GoOrganization />}
@@ -239,7 +235,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate({ to: "/crud/emails" });
+            navigate("/crud/emails");
           }}
         >
           {<MdEmail />}
@@ -248,7 +244,7 @@ const AdminMenuContents = ({
 
         <MenuItem
           onClick={() => {
-            navigate({ to: "/crud/locations" });
+            navigate("/crud/locations");
           }}
         >
           {<FaLocationArrow />}
@@ -256,7 +252,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate({ to: "/crud/reports" });
+            navigate("/crud/reports");
           }}
         >
           {<MdManageHistory />}
@@ -265,14 +261,14 @@ const AdminMenuContents = ({
 
         <MenuItem
           onClick={() => {
-            navigate({ to: "/crud/services" });
+            navigate("/crud/services");
           }}
         >
           {<MdOutlineSettingsSuggest />}
           <Text ml={2}>Services</Text>
         </MenuItem>
 
-        <MenuItem onClick={() => navigate({ to: "/crud/feedback" })}>
+        <MenuItem onClick={() => navigate("/crud/feedback")}>
           {<VscFeedback />}
           <Text ml={2}>View Feedback</Text>
         </MenuItem>
@@ -371,7 +367,7 @@ const OldHeader = () => {
   }, [theme.breakpoints.lg]);
 
   const { colorMode } = useColorMode();
-  const location = useRouterState().location;
+  const location = useLocation();
   const [shouldRenderUserSearch, setShouldRenderUserSearch] = useState(false);
   const [shouldRenderProjectSearch, setShouldRenderProjectSearch] =
     useState(false);
@@ -426,7 +422,7 @@ const OldHeader = () => {
               size={"md"}
               variant={"unstyled"}
               onClick={() => {
-                navigate({ to: "/" });
+                navigate("/");
               }}
             >
               <Text fontSize={18}>SPMS</Text>

@@ -30,12 +30,12 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
 import { $getRoot } from "lexical";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiFillEdit, AiFillEyeInvisible } from "react-icons/ai";
 import { FaSave } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import ListMaxIndentLevelPlugin from "../Plugins/ListMaxIndentLevelPlugin";
 import { PrepopulateHTMLPlugin } from "../Plugins/PrepopulateHTMLPlugin";
@@ -463,9 +463,9 @@ export const PREditor = ({
                 <Box
                   cursor={"pointer"}
                   onClick={() =>
-                    navigate({
-                      to: `/projects/${fullPRData?.document?.project?.pk}/progress`,
-                    })
+                    navigate(
+                      `/projects/${fullPRData?.document?.project?.pk}/progress`
+                    )
                   }
                 >
                   <ExtractedHTMLTitle
@@ -490,9 +490,9 @@ export const PREditor = ({
                 <Box
                   cursor={"pointer"}
                   onClick={() =>
-                    navigate({
-                      to: `/projects/${fullPRData?.document?.project?.pk}/progress`,
-                    })
+                    navigate(
+                      `/projects/${fullPRData?.document?.project?.pk}/progress`
+                    )
                   }
                 >
                   <ExtractedHTMLTitle

@@ -1,7 +1,7 @@
 // Component for adjusting the layout to Modern
 
-// import { Outlet } from "@tanstack/react-router";
-import { Outlet } from "@tanstack/react-router";
+// import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { Box, Spinner } from "@chakra-ui/react";
 import { motion } from "framer-motion";

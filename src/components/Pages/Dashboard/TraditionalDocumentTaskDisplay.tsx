@@ -11,7 +11,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { HiDocumentCheck } from "react-icons/hi2";
 
 interface IProps {
@@ -53,7 +53,7 @@ export const TraditionalDocumentTaskDisplay = ({
     //   navigate(`${pk}/${urlkind}`);
     // }
     else {
-      navigate({ to: `projects/${pk}/${urlkind}` });
+      navigate(`projects/${pk}/${urlkind}`);
     }
   };
 

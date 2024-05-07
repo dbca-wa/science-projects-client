@@ -16,7 +16,7 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
@@ -468,7 +468,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   onClick={
                     user.email === me.userData.email
                       ? () => {
-                          navigate({ to: "/users/me" });
+                          navigate("/users/me");
                         }
                       : onEditUserDetailsModalOpen
                   }

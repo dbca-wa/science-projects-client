@@ -50,52 +50,53 @@ Props) => {
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
-  const annualReportPDFGenerationMutation = useMutation(
-    generateAnnualReportPDF,
-    {
-      onMutate: () => {
-        addToast({
-          status: "loading",
-          title: "Generating AR PDF",
+  const annualReportPDFGenerationMutation = useMutation({
+    mutationFn: generateAnnualReportPDF,
+    onMutate: () => {
+      addToast({
+        status: "loading",
+        title: "Generating AR PDF",
+        position: "top-right",
+      });
+    },
+    onSuccess: () => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: `Annual Report PDF Generated`,
+          status: "success",
           position: "top-right",
+          duration: 3000,
+          isClosable: true,
         });
-      },
-      onSuccess: () => {
-        if (toastIdRef.current) {
-          toast.update(toastIdRef.current, {
-            title: "Success",
-            description: `Annual Report PDF Generated`,
-            status: "success",
-            position: "top-right",
-            duration: 3000,
-            isClosable: true,
-          });
-        }
-        queryClient.invalidateQueries({queryKey:[
+      }
+      queryClient.invalidateQueries({
+        queryKey: [
           "annualReportPDF",
           thisReport?.pk ? thisReport.pk : thisReport.id,
-        ]});
-      },
-      onError: (error: AxiosError) => {
-        if (toastIdRef.current) {
-          toast.update(toastIdRef.current, {
-            title: "Could Not Generate AR PDF",
-            description: error?.response?.data
-              ? `${error.response.status}: ${
-                  Object.values(error.response.data)[0]
-                }`
-              : "Error",
-            status: "error",
-            position: "top-right",
-            duration: 3000,
-            isClosable: true,
-          });
-        }
-      },
-    }
-  );
+        ],
+      });
+    },
+    onError: (error: AxiosError) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Could Not Generate AR PDF",
+          description: error?.response?.data
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
+            : "Error",
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
 
-  const cancelDocGenerationMutation = useMutation(cancelAnnualReportPDF, {
+  const cancelDocGenerationMutation = useMutation({
+    mutationFn: cancelAnnualReportPDF,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -114,10 +115,12 @@ Props) => {
           isClosable: true,
         });
       }
-      queryClient.invalidateQueries({queryKey:[
-        "annualReportPDF",
-        thisReport?.pk ? thisReport.pk : thisReport.id,
-      ]});
+      queryClient.invalidateQueries({
+        queryKey: [
+          "annualReportPDF",
+          thisReport?.pk ? thisReport.pk : thisReport.id,
+        ],
+      });
 
       // setTimeout(() => {
       //     refetchData();
@@ -165,7 +168,7 @@ Props) => {
     let timer;
     if (
       pdfDocumentData?.report?.pdf_generation_in_progress === true ||
-      annualReportPDFGenerationMutation.isLoading
+      annualReportPDFGenerationMutation.isPending
     ) {
       timer = setInterval(() => {
         setGenerationTime((prevTime) => prevTime + 1000); // Increase by 1 second (1000 milliseconds)
@@ -215,7 +218,7 @@ Props) => {
       <Flex alignContent={"center"} justifyContent={"space-between"} mb={4}>
         <Center>
           <Text fontSize={"sm"}>
-            {annualReportPDFGenerationMutation.isLoading ||
+            {annualReportPDFGenerationMutation.isPending ||
             pdfDocumentData?.report?.pdf_generation_in_progress
               ? showRestartMessage
                 ? "PDF Generating... It's been 30 seconds, maybe you should cancel and try again"
@@ -252,7 +255,7 @@ Props) => {
             />
           </Box>
 
-          {annualReportPDFGenerationMutation.isLoading ||
+          {annualReportPDFGenerationMutation.isPending ||
           pdfDocumentData?.report?.pdf_generation_in_progress ? (
             <Button
               size={"sm"}
@@ -264,10 +267,10 @@ Props) => {
                 background: colorMode === "light" ? "gray.300" : "gray.400",
               }}
               loadingText={"Canceling"}
-              isDisabled={cancelDocGenerationMutation.isLoading}
+              isDisabled={cancelDocGenerationMutation.isPending}
               type="submit"
               form="cancel-pdf-generation-form"
-              isLoading={cancelDocGenerationMutation.isLoading}
+              isLoading={cancelDocGenerationMutation.isPending}
             >
               <Box mr={2}>
                 <FcCancel />
@@ -313,13 +316,13 @@ Props) => {
             loadingText={"Generation In Progress"}
             isDisabled={
               pdfDocumentData?.report?.pdf_generation_in_progress ||
-              annualReportPDFGenerationMutation.isLoading
+              annualReportPDFGenerationMutation.isPending
             }
             type="submit"
             form="pdf-generation-form"
             isLoading={
               pdfDocumentData?.report?.pdf_generation_in_progress ||
-              annualReportPDFGenerationMutation.isLoading
+              annualReportPDFGenerationMutation.isPending
             }
           >
             <Box mr={2}>
@@ -333,7 +336,7 @@ Props) => {
         pdfDocumentData !== undefined ? (
           (pdfDocumentData?.report?.pdf_generation_in_progress &&
             !cancelDocGenerationMutation.isSuccess) ||
-          (annualReportPDFGenerationMutation.isLoading &&
+          (annualReportPDFGenerationMutation.isPending &&
             !cancelDocGenerationMutation.isSuccess) ? (
             <Center mt={100}>
               <img

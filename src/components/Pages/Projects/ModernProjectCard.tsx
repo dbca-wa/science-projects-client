@@ -9,9 +9,9 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "../../../lib/hooks/helper/ProjectSearchContext";
 import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
 import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
@@ -73,9 +73,9 @@ export const ModernProjectCard = ({
   const goToProject = () => {
     if (isOnProjectsPage || window.location.pathname.endsWith("/projects")) {
       // Case where the search bar is hidden
-      navigate({ to: `${pk}` });
+      navigate(`${pk}`);
     } else {
-      navigate({ to: `projects/${pk}` });
+      navigate(`projects/${pk}`);
     }
   };
 
