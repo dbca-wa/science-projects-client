@@ -13,6 +13,7 @@ import {
   Text,
   ToastId,
   useColorMode,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { $generateHtmlFromNodes } from "@lexical/html";
@@ -34,13 +35,15 @@ import { $getRoot } from "lexical";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiFillEdit, AiFillEyeInvisible } from "react-icons/ai";
-import { FaSave } from "react-icons/fa";
+import { FaSave, FaUndo } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import ListMaxIndentLevelPlugin from "../Plugins/ListMaxIndentLevelPlugin";
 import { PrepopulateHTMLPlugin } from "../Plugins/PrepopulateHTMLPlugin";
 import { RevisedRichTextToolbar } from "../Toolbar/RevisedRichTextToolbar";
 import { IProgressReportDisplayData } from "./ARProgressReportHandler";
+import { ApproveProgressReportModal } from "@/components/Modals/RTEModals/ApproveProgressReportModal";
+import { TiTick } from "react-icons/ti";
 
 interface IPREditorProps {
   // isEditing: boolean;
@@ -156,7 +159,7 @@ export const PREditor = ({
   setContextDisplayData,
   // key
 }: IPREditorProps) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { colorMode } = useColorMode();
 
   // const editorInstance = useLexicalComposerContext();
@@ -429,10 +432,24 @@ export const PREditor = ({
     uneditableInitialConfig,
   ]);
 
+
+  const {isOpen: isApproveProgressReportOpen, onOpen:onOpenApproveProgressReport, onClose: onCloseApproveProgressReport} = useDisclosure();
+  const [reportHovered, setReportHovered] = useState(false);
+  const [isActive, setIsActive] = useState(fullPRData?.document?.project?.status === "active");
+  useEffect(() => 
+    {setIsActive(fullPRData?.document?.project?.status === "active")}
+, [fullPRData]);
+
+
   return (
     <>
       {/* setIsEditing */}
-
+      <ApproveProgressReportModal 
+        isActive={isActive}
+        report={fullPRData} 
+        isOpen={isApproveProgressReportOpen} 
+        onClose={onCloseApproveProgressReport}      
+    />
       <Box
         mx={4}
         pos={"relative"}
@@ -443,7 +460,47 @@ export const PREditor = ({
           "0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.1)"
         }
         bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
+        onMouseOver={() => setReportHovered(true)}
+        onMouseOut={() => setReportHovered(false)}
       >
+        {reportHovered ? 
+             <Box pos={"absolute"} right={4} top={4}>
+                    <Button
+                        ml={2}
+                        bg={
+                          isActive ?
+                          colorMode === "light" ? `orange.500` : `orange.600`
+                          :
+                          colorMode === "light" ? `green.500` : `green.600`}
+                        color={
+                          colorMode === "light"
+                            ? "whiteAlpha.900"
+                            : "whiteAlpha.800"
+                        }
+                        _hover={
+                          colorMode === "light"
+                            ? {
+                                bg: isActive ? `orange.600` : `green.600`,
+                                color: `white`,
+                              }
+                            : {
+                                bg: isActive ? `orange.500` : `green.500`,
+                                color: `white`,
+                              }
+                        }
+                        minW={"32px"}
+                        minH={"32px"}
+                        maxW={"32px"}
+                        maxH={"32px"}
+                        rounded={"full"}
+                        data-tip="Click to edit"
+                        onClick={onOpenApproveProgressReport}
+                      >
+                        <Icon as={isActive ? FaUndo : TiTick } />
+                      </Button>
+             </Box>
+        : null}
+   
         <Flex
           id={`topContent_${fullPRData?.document?.project?.pk}`}
           pt={6}
@@ -460,14 +517,7 @@ export const PREditor = ({
                 />
               </Box>
               <Box ml={4} flex={1}>
-                <Box
-                  cursor={"pointer"}
-                  onClick={() =>
-                    navigate(
-                      `/projects/${fullPRData?.document?.project?.pk}/progress`
-                    )
-                  }
-                >
+                <Box>
                   <ExtractedHTMLTitle
                     htmlContent={fullPRData?.document?.project?.title}
                     color={"blue.500"}
@@ -475,6 +525,14 @@ export const PREditor = ({
                     fontSize={"17px"}
                     // fontSize={"xs"}
                     noOfLines={4}
+                    cursor={"pointer"}
+                    onClick={() =>
+                      {
+                        const url = `/projects/${fullPRData?.document?.project?.pk}/progress`
+                        window.open(url, '_blank');
+                        // navigate(url);
+                      }
+                    }
                   />
                 </Box>
 
@@ -487,20 +545,21 @@ export const PREditor = ({
           ) : (
             <>
               <Box mr={4} flex={1}>
-                <Box
-                  cursor={"pointer"}
-                  onClick={() =>
-                    navigate(
-                      `/projects/${fullPRData?.document?.project?.pk}/progress`
-                    )
-                  }
-                >
+                <Box>
                   <ExtractedHTMLTitle
                     htmlContent={fullPRData?.document?.project?.title}
                     color={"blue.500"}
                     fontWeight={"bold"}
                     fontSize={"17px"}
                     // fontSize={"xs"}
+                    cursor={"pointer"}
+                    onClick={() =>
+                      {
+                        const url = `/projects/${fullPRData?.document?.project?.pk}/progress`
+                        window.open(url, '_blank');
+                        // navigate(url);
+                      }
+                    }
                     noOfLines={4}
                   />
                 </Box>
