@@ -655,7 +655,7 @@ export const ProjectOverviewCard = ({
                         )?.organisation[0]?.toUpperCase()}${(
                           details?.student as IStudentProjectDetails
                         )?.organisation.slice(1)}`
-                      : null}
+                      : "No organisation listed"}
                   </Text>
                 </Flex>
                 <Flex alignItems="center">
@@ -667,7 +667,7 @@ export const ProjectOverviewCard = ({
                       ? levelToString(
                           (details?.student as IStudentProjectDetails)?.level
                         )
-                      : null}
+                      : "No level selected"}
                   </Text>
                 </Flex>
               </Grid>
