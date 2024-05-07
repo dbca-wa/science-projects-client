@@ -2,7 +2,7 @@ import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/C
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
+import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProgressReport, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
 import { IConceptPlanGenerationData } from "../types";
 
 
@@ -297,6 +297,27 @@ export const deactivateUserAdmin = async ({ userPk }: AdminSwitchVar) => {
 export const getMe = async () => {
     const res = instance.get(`users/me`).then(res => {
         // console.log(res.data)
+        return res.data
+    })
+    return res;
+}
+
+export interface IApproveProgressReport {
+    kind: "studentreport" | "progressreport";
+    isActive: number;
+    reportPk: number;
+    documentPk: number;
+}
+
+export const approveProgressReport = async ({isActive, kind, reportPk, documentPk}: IApproveProgressReport) => {
+    console.log({
+        kind,
+        reportPk,
+        documentPk, isActive,
+    })
+    const res = instance.post(`documents/actions/finalApproval`, {
+        kind, reportPk, documentPk, isActive: isActive.toString() === '1' ? true : false
+    }).then(res => {
         return res.data
     })
     return res;
