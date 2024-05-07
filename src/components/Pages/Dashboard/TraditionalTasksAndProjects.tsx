@@ -1,8 +1,8 @@
 // Used to display the tasks and projects of a user in the traditional layout
 
-import { useBoxShadow } from "@/lib/hooks/useBoxShadow";
-import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/useGetEndorsementsPendingMyAction";
-import { useUser } from "@/lib/hooks/useUser";
+import { useBoxShadow } from "@/lib/hooks/helper/useBoxShadow";
+import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/tanstack/useGetEndorsementsPendingMyAction";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
   Accordion,
   AccordionButton,
@@ -18,6 +18,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
+import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { AiFillProject } from "react-icons/ai";
@@ -26,11 +27,10 @@ import { FcHighPriority, FcOk } from "react-icons/fc";
 import { GiMaterialsScience } from "react-icons/gi";
 import { MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
-import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
-import { useGetDocumentsPendingMyAction } from "../../../lib/hooks/useGetDocumentsPendingMyAction";
-import { useGetMyProjects } from "../../../lib/hooks/useGetMyProjects";
-import { useGetMyTasks } from "../../../lib/hooks/useGetMyTasks";
+import { useProjectSearchContext } from "../../../lib/hooks/helper/ProjectSearchContext";
+import { useGetDocumentsPendingMyAction } from "../../../lib/hooks/tanstack/useGetDocumentsPendingMyAction";
+import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
+import { useGetMyTasks } from "../../../lib/hooks/tanstack/useGetMyTasks";
 import { IProjectData, IProjectPlan, ITaskDisplayCard } from "../../../types";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 import { TraditionalDocumentTaskDisplay } from "./TraditionalDocumentTaskDisplay";
@@ -68,16 +68,16 @@ export const TraditionalTasksAndProjects = () => {
       // Check if data is available and then sort tasks
       const sortedTaskData = taskData
         ? {
-          done: sortTasksByStatus(
-            taskData?.filter((task) => task.status === "done")
-          ),
-          todo: sortTasksByStatus(
-            taskData?.filter((task) => task.status === "todo")
-          ),
-          inprogress: sortTasksByStatus(
-            taskData?.filter((task) => task.status === "inprogress")
-          ),
-        }
+            done: sortTasksByStatus(
+              taskData?.filter((task) => task.status === "done")
+            ),
+            todo: sortTasksByStatus(
+              taskData?.filter((task) => task.status === "todo")
+            ),
+            inprogress: sortTasksByStatus(
+              taskData?.filter((task) => task.status === "inprogress")
+            ),
+          }
         : null;
 
       setCombinedData([
@@ -96,9 +96,9 @@ export const TraditionalTasksAndProjects = () => {
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else if (isOnProjectsPage) {
-      navigate(`${pk}`);
+      navigate({ to: `${pk}` });
     } else {
-      navigate(`projects/${pk}`);
+      navigate({ to: `projects/${pk}` });
     }
   };
 
@@ -147,7 +147,7 @@ export const TraditionalTasksAndProjects = () => {
                   {/* </Box> */}
                   {combinedData?.length +
                     pendingProjectDocumentData?.all?.length >=
-                    1 ? (
+                  1 ? (
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
@@ -168,7 +168,7 @@ export const TraditionalTasksAndProjects = () => {
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
                   {combinedData?.length +
                     pendingProjectDocumentData?.all?.length >=
-                    1 ? (
+                  1 ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                       {combinedData.map(
                         (task: ITaskDisplayCard, index: number) => {
@@ -184,43 +184,43 @@ export const TraditionalTasksAndProjects = () => {
                       {!(
                         pendingProjectDocumentDataLoading &&
                         pendingProjectDocumentData?.team?.length +
-                        pendingProjectDocumentData?.lead?.length +
-                        pendingProjectDocumentData?.ba?.length +
-                        pendingProjectDocumentData?.directorate?.length >=
-                        1
+                          pendingProjectDocumentData?.lead?.length +
+                          pendingProjectDocumentData?.ba?.length +
+                          pendingProjectDocumentData?.directorate?.length >=
+                          1
                       )
                         ? [
-                          ...pendingProjectDocumentData.team.map(
-                            (document) => ({
-                              document,
-                              inputKind: "team_member",
-                            })
-                          ),
-                          ...pendingProjectDocumentData.lead.map(
-                            (document) => ({
-                              document,
-                              inputKind: "project_lead",
-                            })
-                          ),
-                          ...pendingProjectDocumentData.ba.map(
-                            (document) => ({
-                              document,
-                              inputKind: "business_area_lead",
-                            })
-                          ),
-                          ...pendingProjectDocumentData.directorate.map(
-                            (document) => ({
-                              document,
-                              inputKind: "directorate",
-                            })
-                          ),
-                        ]?.map(({ document, inputKind }, index: number) => (
-                          <TraditionalDocumentTaskDisplay
-                            key={index}
-                            document={document}
-                            inputKind={inputKind}
-                          />
-                        ))
+                            ...pendingProjectDocumentData.team.map(
+                              (document) => ({
+                                document,
+                                inputKind: "team_member",
+                              })
+                            ),
+                            ...pendingProjectDocumentData.lead.map(
+                              (document) => ({
+                                document,
+                                inputKind: "project_lead",
+                              })
+                            ),
+                            ...pendingProjectDocumentData.ba.map(
+                              (document) => ({
+                                document,
+                                inputKind: "business_area_lead",
+                              })
+                            ),
+                            ...pendingProjectDocumentData.directorate.map(
+                              (document) => ({
+                                document,
+                                inputKind: "directorate",
+                              })
+                            ),
+                          ]?.map(({ document, inputKind }, index: number) => (
+                            <TraditionalDocumentTaskDisplay
+                              key={index}
+                              document={document}
+                              inputKind={inputKind}
+                            />
+                          ))
                         : null}
                     </Grid>
                   ) : (
@@ -243,11 +243,11 @@ export const TraditionalTasksAndProjects = () => {
             me?.userData?.is_biometrician ||
             me?.userData?.is_herbarium_curator ||
             me?.userData?.is_superuser) ===
-            false ? null : pendingEndorsementsDataLoading ? (
-              <Center my={4}>
-                <Spinner />
-              </Center>
-            ) : (
+          false ? null : pendingEndorsementsDataLoading ? (
+            <Center my={4}>
+              <Spinner />
+            </Center>
+          ) : (
             <motion.div
               initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
               animate={{ opacity: pendingEndorsementsDataLoading ? 0 : 1 }}
@@ -258,7 +258,7 @@ export const TraditionalTasksAndProjects = () => {
                   colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
                 }
                 borderBottom={"none"}
-              // borderTop={"none"}
+                // borderTop={"none"}
               >
                 <AccordionButton
                   bg={colorMode === "light" ? "gray.200" : "gray.700"}
@@ -273,19 +273,19 @@ export const TraditionalTasksAndProjects = () => {
                   <Box as="span" flex="1" textAlign="left">
                     Endorsement Tasks
                   </Box>
-                  {pendingEndorsementsData?.aec?.length
-                    // +
-                    //   pendingEndorsementsData?.bm?.length +
-                    //   pendingEndorsementsData?.hc?.length 
-                    >
-                    1 ? (
+                  {pendingEndorsementsData?.aec?.length >
+                  // +
+                  //   pendingEndorsementsData?.bm?.length +
+                  //   pendingEndorsementsData?.hc?.length
+                  1 ? (
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
                       alignItems={"center"}
                     >
                       <Box mr={2}>
-                        {pendingEndorsementsData?.aec?.length
+                        {
+                          pendingEndorsementsData?.aec?.length
                           // +
                           //   pendingEndorsementsData?.bm?.length +
                           //   pendingEndorsementsData?.hc?.length
@@ -300,24 +300,23 @@ export const TraditionalTasksAndProjects = () => {
                 </AccordionButton>
 
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
-                  {pendingEndorsementsData?.aec?.length
-                    // +
-                    //   pendingEndorsementsData?.bm?.length +
-                    //   pendingEndorsementsData?.hc?.length 
-                    >=
-                    1 ? (
+                  {pendingEndorsementsData?.aec?.length >=
+                  // +
+                  //   pendingEndorsementsData?.bm?.length +
+                  //   pendingEndorsementsData?.hc?.length
+                  1 ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
                       {!pendingEndorsementsDataLoading &&
-                        pendingEndorsementsData?.aec?.length >= 1
+                      pendingEndorsementsData?.aec?.length >= 1
                         ? pendingEndorsementsData?.aec?.map(
-                          (endorsement: IMiniEndorsement, index: number) => (
-                            <TraditionalEndorsementTaskDisplay
-                              key={index}
-                              document={endorsement?.project_plan?.document}
-                              endorsementKind={"animalEthics"}
-                            />
+                            (endorsement: IMiniEndorsement, index: number) => (
+                              <TraditionalEndorsementTaskDisplay
+                                key={index}
+                                document={endorsement?.project_plan?.document}
+                                endorsementKind={"animalEthics"}
+                              />
+                            )
                           )
-                        )
                         : null}
                       {/* {!pendingEndorsementsDataLoading &&
                         pendingEndorsementsData?.hc?.length >= 1

@@ -30,7 +30,6 @@ import {
   TextNode,
 } from "lexical";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 // import "@/styles/mentions.css";
@@ -350,8 +349,8 @@ const CustomMentionsTypeheadMenuItem = ({
         index === 1
           ? "8px 8px 0px 0px"
           : index === optionLength
-          ? "0px 0px 8px 8px"
-          : "8px"
+            ? "0px 0px 8px 8px"
+            : "8px"
       }
       border={0}
       backgroundColor={"#fff"}
@@ -387,8 +386,8 @@ const CustomMentionsTypeheadMenuItem = ({
             option.user?.image?.file
               ? option.user.image.file
               : option.user?.image?.old_file
-              ? option.user.image.old_file
-              : undefined
+                ? option.user.image.old_file
+                : undefined
           }
           h={"30px"}
           w={"30px"}

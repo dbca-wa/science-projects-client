@@ -1,11 +1,11 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
-import { useProjectSearchContext } from "@/lib/hooks/ProjectSearchContext";
+import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
 import { IMainDoc } from "@/types";
 import { Box, Text, Flex, useColorMode, Center } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { HiDocumentCheck } from "react-icons/hi2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 interface IProps {
   document: IMainDoc;
@@ -47,9 +47,9 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else if (isOnProjectsPage) {
-      navigate(`${pk}/${urlkind}`);
+      navigate({ to: `${pk}/${urlkind}` });
     } else {
-      navigate(`projects/${pk}/${urlkind}`);
+      navigate({ to: `projects/${pk}/${urlkind}` });
     }
   };
 
@@ -135,12 +135,13 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
         >
           <Text
             as={"span"}
-            color={`${kind === "directorate"
+            color={`${
+              kind === "directorate"
                 ? "red"
                 : kind === "ba_lead"
                   ? "orange"
                   : "green"
-              }.600`}
+            }.600`}
             fontWeight={"semibold"}
             fontSize={"small"}
             mr={1}
@@ -156,8 +157,8 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
             {kind === "team"
               ? "Input required"
               : `Determine if the ${formattedDocumentKind(
-                document?.kind
-              )} for this project is satisfactory`}
+                  document?.kind
+                )} for this project is satisfactory`}
           </Text>
         </Box>
 
@@ -166,8 +167,8 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
           bottom={2}
           right={1.5}
           px={1}
-        // bg={"red"}
-        // justifyContent={"center"}
+          // bg={"red"}
+          // justifyContent={"center"}
         >
           <Flex>
             <Center
@@ -178,8 +179,8 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
               boxSize={5}
               w={"20px"}
 
-            // w={"100%"}
-            // bg={"orange"}
+              // w={"100%"}
+              // bg={"orange"}
             >
               <HiDocumentCheck />
             </Center>

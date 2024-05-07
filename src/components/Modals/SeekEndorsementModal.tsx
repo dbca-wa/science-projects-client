@@ -64,7 +64,8 @@ export const SeekEndorsementModal = ({
   const [shouldSendEmails, setShouldSendEmails] = useState(false);
   // Mutation, query client, onsubmit, and api function
 
-  const seekEndorsementAndSaveMutation = useMutation(seekEndorsementAndSave, {
+  const seekEndorsementAndSaveMutation = useMutation({
+    mutationFn: seekEndorsementAndSave,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -129,19 +130,19 @@ export const SeekEndorsementModal = ({
               <Text fontWeight={"semibold"} fontSize={"lg"}>
                 {
                   // AEC not required or AEC required and given
-                  (aecEndorsementRequired === false ||
-                    (aecEndorsementRequired === true &&
-                      aecEndorsementProvided === true))
-                    //     &&
-                    // // Herb not required or herb required and given
-                    // (herbariumEndorsementRequired === false ||
-                    //   (herbariumEndorsementRequired === true &&
-                    //     herbariumEndorsementProvided === true)) &&
-                    // // Bio not required or bio required and given
-                    // (bmEndorsementRequired === false ||
-                    //   (bmEndorsementRequired === true &&
-                    //     bmEndorsementProvided === true))
-                    ? "As all required endorsements have been provided, no emails are necessary. You may still save."
+                  aecEndorsementRequired === false ||
+                  (aecEndorsementRequired === true &&
+                    aecEndorsementProvided === true)
+                    ? //     &&
+                      // // Herb not required or herb required and given
+                      // (herbariumEndorsementRequired === false ||
+                      //   (herbariumEndorsementRequired === true &&
+                      //     herbariumEndorsementProvided === true)) &&
+                      // // Bio not required or bio required and given
+                      // (bmEndorsementRequired === false ||
+                      //   (bmEndorsementRequired === true &&
+                      //     bmEndorsementProvided === true))
+                      "As all required endorsements have been provided, no emails are necessary. You may still save."
                     : "Also send notifications?"
                 }
               </Text>
@@ -151,8 +152,8 @@ export const SeekEndorsementModal = ({
                   isChecked={shouldSendEmails}
                   onChange={() => setShouldSendEmails(!shouldSendEmails)}
                   isDisabled={
-                    (!aecEndorsementRequired ||
-                      (aecEndorsementRequired && aecEndorsementProvided))
+                    !aecEndorsementRequired ||
+                    (aecEndorsementRequired && aecEndorsementProvided)
                     //    &&
                     // (!herbariumEndorsementRequired ||
                     //   (herbariumEndorsementRequired &&
@@ -260,7 +261,7 @@ export const SeekEndorsementModal = ({
                 _hover={{
                   background: colorMode === "light" ? "blue.400" : "blue.500",
                 }}
-                isLoading={seekEndorsementAndSaveMutation.isLoading}
+                isLoading={seekEndorsementAndSaveMutation.isPending}
                 // type="submit"
                 ml={3}
                 isDisabled={
@@ -279,32 +280,32 @@ export const SeekEndorsementModal = ({
                 onClick={() => {
                   aecPDFFile !== undefined
                     ? seekEndorsementAndSaveFunc({
-                      aecEndorsementRequired,
-                      aecEndorsementProvided,
-                      aecPDFFile,
-                      // herbariumEndorsementRequired,
-                      // herbariumEndorsementProvided,
-                      // bmEndorsementRequired,
-                      // bmEndorsementProvided,
-                      shouldSendEmails,
-                      projectPlanPk,
-                    })
+                        aecEndorsementRequired,
+                        aecEndorsementProvided,
+                        aecPDFFile,
+                        // herbariumEndorsementRequired,
+                        // herbariumEndorsementProvided,
+                        // bmEndorsementRequired,
+                        // bmEndorsementProvided,
+                        shouldSendEmails,
+                        projectPlanPk,
+                      })
                     : seekEndorsementAndSaveFunc({
-                      aecEndorsementRequired,
-                      aecEndorsementProvided,
-                      // herbariumEndorsementRequired,
-                      // herbariumEndorsementProvided,
-                      // bmEndorsementRequired,
-                      // bmEndorsementProvided,
-                      shouldSendEmails,
-                      projectPlanPk,
-                    });
+                        aecEndorsementRequired,
+                        aecEndorsementProvided,
+                        // herbariumEndorsementRequired,
+                        // herbariumEndorsementProvided,
+                        // bmEndorsementRequired,
+                        // bmEndorsementProvided,
+                        shouldSendEmails,
+                        projectPlanPk,
+                      });
                 }}
               >
                 {shouldSendEmails ? `Save and Send Emails` : `Save`}
               </Button>
             </Grid>
-            { }
+            {}
           </ModalFooter>
         </ModalContent>
       </Flex>

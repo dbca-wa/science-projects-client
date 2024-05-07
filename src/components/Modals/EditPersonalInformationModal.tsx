@@ -1,44 +1,43 @@
 // Modal component for editing a user's personal information
 
+import { usePersonalInfo } from "@/lib/hooks/tanstack/usePersonalInfo";
 import {
   Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  useColorMode,
-  Grid,
   FormControl,
-  FormLabel,
-  InputGroup,
-  InputLeftElement,
-  Input,
-  Icon,
-  Select,
-  InputLeftAddon,
-  useToast,
   FormErrorMessage,
+  FormLabel,
+  Grid,
+  Icon,
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  InputLeftElement,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
   ToastId,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { RiNumber1, RiNumber2 } from "react-icons/ri";
-import { GrMail } from "react-icons/gr";
-import { GiGraduateCap } from "react-icons/gi";
-import { AiFillPhone } from "react-icons/ai";
-import { MdFax } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { AiFillPhone } from "react-icons/ai";
+import { GiGraduateCap } from "react-icons/gi";
+import { GrMail } from "react-icons/gr";
+import { MdFax } from "react-icons/md";
+import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import {
-  IPIUpdateVariables,
   IPIUpdateError,
-  updatePersonalInformation,
   IPIUpdateSuccess,
-  getPersonalInformation,
+  IPIUpdateVariables,
+  updatePersonalInformation,
 } from "../../lib/api";
-import { IPersonalInformation } from "../../types";
 
 interface IEditPIModalProps {
   isOpen: boolean;
@@ -51,10 +50,7 @@ export const EditPersonalInformationModal = ({
   onClose,
   userId,
 }: IEditPIModalProps) => {
-  const { isLoading, data } = useQuery<IPersonalInformation>(
-    ["personalInfo", userId],
-    getPersonalInformation
-  );
+  const { isLoading, personalData: data } = usePersonalInfo(userId);
 
   // useEffect(() => {
   //   if (!isLoading)
@@ -72,8 +68,8 @@ export const EditPersonalInformationModal = ({
         ? "blackAlpha.300"
         : "blackAlpha.200"
       : hoveredTitle
-      ? "whiteAlpha.400"
-      : "whiteAlpha.300"
+        ? "whiteAlpha.400"
+        : "whiteAlpha.300"
   }`;
 
   const handleCloseModal = () => {
@@ -106,8 +102,9 @@ export const EditPersonalInformationModal = ({
     IPIUpdateSuccess,
     IPIUpdateError,
     IPIUpdateVariables
-  >(updatePersonalInformation, {
+  >({
     // Start of mutation handling
+    mutationFn: updatePersonalInformation,
     onMutate: () => {
       addToast({
         title: "Updating personal information...",
@@ -119,8 +116,8 @@ export const EditPersonalInformationModal = ({
     },
     // Success handling based on API-file-declared interface
     onSuccess: () => {
-      queryClient.refetchQueries([`personalInfo`, userId]);
-      queryClient.refetchQueries([`me`]);
+      queryClient.refetchQueries({ queryKey: [`personalInfo`, userId] });
+      queryClient.refetchQueries({ queryKey: [`me`] });
 
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
@@ -344,7 +341,7 @@ export const EditPersonalInformationModal = ({
           <ModalFooter>
             {/* <Flex mt={5} justifyContent="end"> */}
             <Button
-              isLoading={mutation.isLoading}
+              isLoading={mutation.isPending}
               type="submit"
               bgColor={colorMode === "light" ? `green.500` : `green.600`}
               color={colorMode === "light" ? `white` : `whiteAlpha.900`}

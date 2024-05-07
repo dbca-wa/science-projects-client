@@ -3,8 +3,8 @@ import {
   cancelAnnualReportPDF,
   generateAnnualReportPDF,
 } from "@/lib/api";
-import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
-import { useGetAnnualReportPDF } from "@/lib/hooks/useGetAnnualReportPDF";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { useGetAnnualReportPDF } from "@/lib/hooks/tanstack/useGetAnnualReportPDF";
 import { IReport } from "@/types";
 import {
   Box,
@@ -71,10 +71,10 @@ Props) => {
             isClosable: true,
           });
         }
-        queryClient.invalidateQueries([
+        queryClient.invalidateQueries({queryKey:[
           "annualReportPDF",
           thisReport?.pk ? thisReport.pk : thisReport.id,
-        ]);
+        ]});
       },
       onError: (error: AxiosError) => {
         if (toastIdRef.current) {
@@ -114,10 +114,10 @@ Props) => {
           isClosable: true,
         });
       }
-      queryClient.invalidateQueries([
+      queryClient.invalidateQueries({queryKey:[
         "annualReportPDF",
         thisReport?.pk ? thisReport.pk : thisReport.id,
-      ]);
+      ]});
 
       // setTimeout(() => {
       //     refetchData();

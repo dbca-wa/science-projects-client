@@ -14,7 +14,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
-import { useUser } from "../../../lib/hooks/useUser";
+import { useUser } from "../../../lib/hooks/tanstack/useUser";
 import theme from "../../../theme";
 import { Head } from "../../Base/Head";
 import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";

@@ -1,3 +1,4 @@
+import { TextButtonFlex } from "@/components/TextButtonFlex";
 import {
   Box,
   Button,
@@ -24,13 +25,12 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { IAddLocationForm, ISimpleLocationData } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdMoreVert } from "react-icons/md";
-import { useForm } from "react-hook-form";
-import { deleteLocation, updateLocation } from "../../../lib/api";
 import { AxiosError } from "axios";
-import { TextButtonFlex } from "@/components/TextButtonFlex";
+import { useForm } from "react-hook-form";
+import { MdMoreVert } from "react-icons/md";
+import { deleteLocation, updateLocation } from "../../../lib/api";
+import { IAddLocationForm, ISimpleLocationData } from "../../../types";
 
 export const LocationItemDisplay = ({
   pk,
@@ -53,7 +53,8 @@ export const LocationItemDisplay = ({
   const toast = useToast();
   const queryClient = useQueryClient();
 
-  const updateMutation = useMutation(updateLocation, {
+  const updateMutation = useMutation({
+    mutationFn: updateLocation,
     onSuccess: () => {
       toast({
         status: "success",
@@ -61,7 +62,7 @@ export const LocationItemDisplay = ({
         position: "top-right",
       });
       onUpdateModalClose();
-      queryClient.invalidateQueries(["locations"]);
+      queryClient.invalidateQueries({ queryKey: ["locations"] });
     },
     onError: () => {
       toast({
@@ -72,7 +73,8 @@ export const LocationItemDisplay = ({
     },
   });
 
-  const deleteMutation = useMutation(deleteLocation, {
+  const deleteMutation = useMutation({
+    mutationFn: deleteLocation,
     onSuccess: () => {
       toast({
         status: "success",
@@ -80,7 +82,7 @@ export const LocationItemDisplay = ({
         position: "top-right",
       });
       onDeleteModalClose();
-      queryClient.invalidateQueries(["locations"]);
+      queryClient.invalidateQueries({ queryKey: ["locations"] });
     },
   });
 
@@ -271,7 +273,7 @@ export const LocationItemDisplay = ({
               <Button
                 form="update-form"
                 type="submit"
-                isLoading={updateMutation.isLoading}
+                isLoading={updateMutation.isPending}
                 color={"white"}
                 background={colorMode === "light" ? "blue.500" : "blue.600"}
                 _hover={{

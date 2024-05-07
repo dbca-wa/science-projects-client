@@ -32,7 +32,7 @@ import {
   deleteUserAdmin,
 } from "../../lib/api";
 import { useMutation } from "@tanstack/react-query";
-import { useUserSearchContext } from "../../lib/hooks/UserSearchContext";
+import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
 
 interface IModalProps {
   isOpen: boolean;
@@ -80,8 +80,9 @@ export const DeleteUserModal = ({
     MutationSuccess,
     MutationError,
     AdminSwitchVar
-  >(deleteUserAdmin, {
+  >({
     // Start of mutation handling
+    mutationFn: deleteUserAdmin,
     onMutate: () => {
       addToast({
         title: "Deleting...",
@@ -179,10 +180,10 @@ export const DeleteUserModal = ({
             </Center>
             <Center mt={4}>
               <UnorderedList>
+                <ListItem>They will be removed from all projects</ListItem>
                 <ListItem>
-                  They will be removed from all projects
+                  Any projects they were leading will require a new project lead
                 </ListItem>
-                <ListItem>Any projects they were leading will require a new project lead</ListItem>
 
                 <ListItem>Their comments will be deleted</ListItem>
               </UnorderedList>
@@ -214,7 +215,7 @@ export const DeleteUserModal = ({
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }} // isDisabled={!changesMade}
                 isDisabled={userIsSuper}
-                isLoading={deletionMutation.isLoading}
+                isLoading={deletionMutation.isPending}
                 type="submit"
                 ml={3}
               >

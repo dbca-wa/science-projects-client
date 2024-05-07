@@ -9,8 +9,10 @@ import {
   DrawerOverlay,
   Flex,
   FormControl,
+  FormHelperText,
   Grid,
   Input,
+  ListItem,
   Menu,
   MenuButton,
   MenuItem,
@@ -24,30 +26,28 @@ import {
   ModalOverlay,
   Spinner,
   Text,
+  UnorderedList,
   VStack,
+  useColorMode,
   useDisclosure,
   useToast,
-  UnorderedList,
-  ListItem,
-  useColorMode,
-  FormHelperText,
 } from "@chakra-ui/react";
-import { IReport } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
+import { MdMoreVert } from "react-icons/md";
 import { deleteReport, updateReport } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { IReport } from "../../../types";
 import { UserProfile } from "../Users/UserProfile";
 // import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
 import { AxiosError } from "axios";
-import { useGetFullReport } from "../../../lib/hooks/useGetFullReport";
-import { useGetReportMedia } from "../../../lib/hooks/useGetReportMedia";
-import { useUser } from "../../../lib/hooks/useUser";
+import { useState } from "react";
+import { useGetFullReport } from "../../../lib/hooks/tanstack/useGetFullReport";
+import { useGetReportMedia } from "../../../lib/hooks/tanstack/useGetReportMedia";
+import { useUser } from "../../../lib/hooks/tanstack/useUser";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { TextButtonFlex } from "../../TextButtonFlex";
 import { ReportMediaChanger } from "./ReportMediaChanger";
-import { useState } from "react";
 
 export const ReportItemDisplay = ({
   pk,
@@ -107,7 +107,8 @@ export const ReportItemDisplay = ({
   const { userLoading: creatorLoading, userData: creatorData } =
     useFullUserByPk(creator);
 
-  const updateMutation = useMutation(updateReport, {
+  const updateMutation = useMutation({
+    mutationFn: updateReport,
     onSuccess: () => {
       toast({
         status: "success",
@@ -115,7 +116,7 @@ export const ReportItemDisplay = ({
         position: "top-right",
       });
       onUpdateModalClose();
-      queryClient.invalidateQueries(["reports"]);
+      queryClient.invalidateQueries({ queryKey: ["reports"] });
     },
     onError: () => {
       toast({
@@ -126,7 +127,8 @@ export const ReportItemDisplay = ({
     },
   });
 
-  const deleteMutation = useMutation(deleteReport, {
+  const deleteMutation = useMutation({
+    mutationFn: deleteReport,
     onSuccess: () => {
       toast({
         status: "success",
@@ -134,7 +136,7 @@ export const ReportItemDisplay = ({
         position: "top-right",
       });
       onDeleteModalClose();
-      queryClient.invalidateQueries(["reports"]);
+      queryClient.invalidateQueries({ queryKey: ["reports"] });
     },
   });
 

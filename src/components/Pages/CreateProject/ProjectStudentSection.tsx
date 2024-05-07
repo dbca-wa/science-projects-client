@@ -1,5 +1,6 @@
 // Tab data for Project External Project info on the creation page.
 
+import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import {
   Button,
   Flex,
@@ -14,11 +15,10 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import "../../../styles/modalscrollbar.css";
+import { HiAcademicCap } from "react-icons/hi";
 import { IoIosCreate } from "react-icons/io";
 import { ICreateProjectStudentDetails } from "../../../lib/api";
-import { HiAcademicCap } from "react-icons/hi";
-import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
+import "../../../styles/modalscrollbar.css";
 
 interface IProjectStudentProps {
   studentFilled: boolean;
@@ -51,8 +51,8 @@ export const ProjectStudentSection = ({
         ? "blackAlpha.300"
         : "blackAlpha.200"
       : hoveredTitle
-      ? "whiteAlpha.400"
-      : "whiteAlpha.300"
+        ? "whiteAlpha.400"
+        : "whiteAlpha.300"
   }`;
 
   const [level, setLevel] = useState<string>("");

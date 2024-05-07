@@ -1,20 +1,20 @@
 import { Box } from "@chakra-ui/react";
+import { $generateHtmlFromNodes } from "@lexical/html";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
   InitialConfigType,
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
-import { $generateHtmlFromNodes } from "@lexical/html";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { $getRoot } from "lexical";
-import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
-import { RevisedSimpleRichTextToolbar } from "../../Toolbar/RevisedSimpleRichTextToolbar";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { $getRoot } from "lexical";
 import { EditorSubsections, EditorType } from "../../../../types";
+import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
+import { RevisedSimpleRichTextToolbar } from "../../Toolbar/RevisedSimpleRichTextToolbar";
 
 interface Props {
   initialConfig: InitialConfigType;

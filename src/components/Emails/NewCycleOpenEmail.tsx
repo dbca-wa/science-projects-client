@@ -54,7 +54,7 @@ export const NewCycleOpenEmail = ({ userData }: Props) => {
               <Button
                 className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3"
                 // href={inviteLink}
-                href={"https://scienceprojects-test.dbca.wa.gov.au"}
+                href={"https://scienceprojects.dbca.wa.gov.au"}
               >
                 {/* Join the team */}
                 Visit Dashboard

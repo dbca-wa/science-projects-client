@@ -3,10 +3,10 @@
 import "../../../styles/texteditor.css";
 import { EditorSubsections, EditorType } from "../../../types";
 
-import { useState } from "react";
 import { Box, useColorMode } from "@chakra-ui/react";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
+import { useState } from "react";
 import { SimpleEditableRTE } from "./Sections/SimpleEditableRTE";
 
 interface IProps {

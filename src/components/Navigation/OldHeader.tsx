@@ -1,7 +1,7 @@
 // Header for traditional layout
 
 // Components
-import { CgPlayListAdd, CgBrowse } from "react-icons/cg";
+import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { NavMenu } from "./NavMenu";
 
 // Chakra
@@ -27,27 +27,26 @@ import {
 } from "@chakra-ui/react";
 
 // React, Settings, & Nav
-import { useEffect, useState } from "react";
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+  // useLocation,
+  useRouterState,
+} from "@tanstack/react-router";
+import React, { useEffect, useState } from "react";
 import theme from "../../theme";
 
 // Icon imports
-import { GiHamburgerMenu } from "react-icons/gi";
-import { IoMdDocument } from "react-icons/io";
 import { AiFillProject } from "react-icons/ai";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { CgViewList } from "react-icons/cg";
-import { ImBriefcase, ImUsers } from "react-icons/im";
 import { FaAddressCard, FaLocationArrow, FaUserPlus } from "react-icons/fa";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { ImBriefcase, ImUsers } from "react-icons/im";
+import { IoMdDocument } from "react-icons/io";
 
-import { Navitar } from "./Navitar";
-import { SidebarNavMenu } from "./SidebarNavMenu";
-import { CreateUserModal } from "../Modals/CreateUserModal";
-import { ToggleLayout } from "../ToggleLayout";
-import { ToggleDarkMode } from "../ToggleDarkMode";
-import { useUser } from "../../lib/hooks/useUser";
-import { RiAdminFill, RiOrganizationChart, RiTeamFill } from "react-icons/ri";
+import { FcApproval } from "react-icons/fc";
+import { GoOrganization } from "react-icons/go";
+import { HiDocumentPlus } from "react-icons/hi2";
 import {
   MdEmail,
   MdManageHistory,
@@ -55,16 +54,17 @@ import {
   MdOutlineSettingsSuggest,
   MdVerifiedUser,
 } from "react-icons/md";
-import { GoOrganization } from "react-icons/go";
-import {
-  FcApproval,
-  // FcDataBackup
-} from "react-icons/fc";
+import { RiAdminFill, RiOrganizationChart, RiTeamFill } from "react-icons/ri";
 import { VscFeedback } from "react-icons/vsc";
-import { HiDocumentPlus } from "react-icons/hi2";
+import { useUser } from "../../lib/hooks/tanstack/useUser";
 import { BatchApproveModal } from "../Modals/BatchApproveModal";
 import { BatchApproveOldModal } from "../Modals/BatchApproveOldModal";
+import { CreateUserModal } from "../Modals/CreateUserModal";
 import { NewCycleModal } from "../Modals/NewCycleModal";
+import { ToggleDarkMode } from "../ToggleDarkMode";
+import { ToggleLayout } from "../ToggleLayout";
+import { Navitar } from "./Navitar";
+import { SidebarNavMenu } from "./SidebarNavMenu";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -78,7 +78,7 @@ const ProjectMenuContents = () => {
       >
         <MenuItem
           onClick={() => {
-            navigate("/projects/browse");
+            navigate({ to: "/projects/browse" });
           }}
         >
           {<CgBrowse />}
@@ -86,7 +86,7 @@ const ProjectMenuContents = () => {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate("/projects/add");
+            navigate({ to: "/projects/add" });
           }}
         >
           {<CgPlayListAdd />}
@@ -113,7 +113,7 @@ const ReportMenuContents = () => {
         {userData?.is_superuser ? (
           <MenuItem
             onClick={() => {
-              navigate("/reports/current");
+              navigate({ to: "/reports/current" });
             }}
           >
             <MdOutlineAccessTimeFilled />
@@ -125,7 +125,7 @@ const ReportMenuContents = () => {
 
         <MenuItem
           onClick={() => {
-            navigate("/reports");
+            navigate({ to: "/reports" });
           }}
         >
           {<CgViewList />}
@@ -159,7 +159,7 @@ const UserMenuContents = () => {
       >
         <MenuItem
           onClick={() => {
-            navigate("/users");
+            navigate({ to: "/users" });
           }}
         >
           {<ImUsers />}
@@ -198,7 +198,7 @@ const AdminMenuContents = ({
       >
         <MenuItem
           onClick={() => {
-            navigate("/crud/addresses");
+            navigate({ to: "/crud/addresses" });
           }}
         >
           {<FaAddressCard />}
@@ -206,7 +206,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate("/crud/affiliations");
+            navigate({ to: "/crud/affiliations" });
           }}
         >
           {<RiTeamFill />}
@@ -215,7 +215,7 @@ const AdminMenuContents = ({
 
         <MenuItem
           onClick={() => {
-            navigate("/crud/branches");
+            navigate({ to: "/crud/branches" });
           }}
         >
           {<RiOrganizationChart />}
@@ -223,7 +223,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate("/crud/businessareas");
+            navigate({ to: "/crud/businessareas" });
           }}
         >
           {<ImBriefcase />}
@@ -231,7 +231,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate("/crud/divisions");
+            navigate({ to: "/crud/divisions" });
           }}
         >
           {<GoOrganization />}
@@ -239,7 +239,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate("/crud/emails");
+            navigate({ to: "/crud/emails" });
           }}
         >
           {<MdEmail />}
@@ -248,7 +248,7 @@ const AdminMenuContents = ({
 
         <MenuItem
           onClick={() => {
-            navigate("/crud/locations");
+            navigate({ to: "/crud/locations" });
           }}
         >
           {<FaLocationArrow />}
@@ -256,7 +256,7 @@ const AdminMenuContents = ({
         </MenuItem>
         <MenuItem
           onClick={() => {
-            navigate("/crud/reports");
+            navigate({ to: "/crud/reports" });
           }}
         >
           {<MdManageHistory />}
@@ -265,14 +265,14 @@ const AdminMenuContents = ({
 
         <MenuItem
           onClick={() => {
-            navigate("/crud/services");
+            navigate({ to: "/crud/services" });
           }}
         >
           {<MdOutlineSettingsSuggest />}
           <Text ml={2}>Services</Text>
         </MenuItem>
 
-        <MenuItem onClick={() => navigate("/crud/feedback")}>
+        <MenuItem onClick={() => navigate({ to: "/crud/feedback" })}>
           {<VscFeedback />}
           <Text ml={2}>View Feedback</Text>
         </MenuItem>
@@ -371,7 +371,7 @@ const OldHeader = () => {
   }, [theme.breakpoints.lg]);
 
   const { colorMode } = useColorMode();
-  const location = useLocation();
+  const location = useRouterState().location;
   const [shouldRenderUserSearch, setShouldRenderUserSearch] = useState(false);
   const [shouldRenderProjectSearch, setShouldRenderProjectSearch] =
     useState(false);
@@ -426,7 +426,7 @@ const OldHeader = () => {
               size={"md"}
               variant={"unstyled"}
               onClick={() => {
-                navigate("/");
+                navigate({ to: "/" });
               }}
             >
               <Text fontSize={18}>SPMS</Text>

@@ -12,7 +12,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import {
   EditorSections,
   EditorSubsections,
@@ -232,7 +232,7 @@ export const StudentProgressReportDisplayEditor = ({
   const [prepopulationData, setPrepopulationData] = useState(displayData);
 
   const A4Width = 210; // in millimeters
-  const A4Height = A4Width * 1.414; // 1.414 is the aspect ratio of A4 paper (297 / 210)
+  // const A4Height = A4Width * 1.414; // 1.414 is the aspect ratio of A4 paper (297 / 210)
 
   return (
     // Wrapper
@@ -273,10 +273,11 @@ export const StudentProgressReportDisplayEditor = ({
                 <Box
                   cursor={"pointer"}
                   onClick={() =>
-                    navigate(
-                      `/projects/${project?.pk}/${reportKind === "student" ? "student" : "progress"
-                      }`
-                    )
+                    navigate({
+                      to: `/projects/${project?.pk}/${
+                        reportKind === "student" ? "student" : "progress"
+                      }`,
+                    })
                   }
                 >
                   <ExtractedHTMLTitle
@@ -318,10 +319,11 @@ export const StudentProgressReportDisplayEditor = ({
                 <Box
                   cursor={"pointer"}
                   onClick={() =>
-                    navigate(
-                      `/projects/${project?.pk}/${reportKind === "student" ? "student" : "progress"
-                      }`
-                    )
+                    navigate({
+                      to: `/projects/${project?.pk}/${
+                        reportKind === "student" ? "student" : "progress"
+                      }`,
+                    })
                   }
                 >
                   <ExtractedHTMLTitle
@@ -414,13 +416,13 @@ export const StudentProgressReportDisplayEditor = ({
             // editorText={editorText}
             // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-          // setShouldShowTree={setShouldShowTree}
-          // isEditorOpen={isEditorOpen}
-          // setIsEditorOpen={setIsEditorOpen}
-          // setDisplayData={setDisplayData}
-          // textEditorName={
-          //   section === "description" ? "Description" : undefined
-          // }
+            // setShouldShowTree={setShouldShowTree}
+            // isEditorOpen={isEditorOpen}
+            // setIsEditorOpen={setIsEditorOpen}
+            // setDisplayData={setDisplayData}
+            // textEditorName={
+            //   section === "description" ? "Description" : undefined
+            // }
           />
         )}
       </Box>

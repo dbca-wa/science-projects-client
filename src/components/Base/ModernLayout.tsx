@@ -1,12 +1,14 @@
 // Component for adjusting the layout to Modern
 
-import { Outlet } from "react-router-dom";
+// import { Outlet } from "@tanstack/react-router";
+import { Outlet } from "@tanstack/react-router";
+
+import { Box, Spinner } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
 import { ModernHeader } from "../Navigation/ModernHeader";
 import { Sidebar } from "../Navigation/Sidebar";
 import { ModernPageWrapper } from "../Wrappers/ModernPageWrapper";
-import { Box, Spinner } from "@chakra-ui/react";
-import { useLayoutSwitcher } from "../../lib/hooks/LayoutSwitcherContext";
-import { motion } from "framer-motion";
 
 export const ModernLayout = () => {
   const { loading } = useLayoutSwitcher();

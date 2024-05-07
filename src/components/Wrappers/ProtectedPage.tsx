@@ -1,8 +1,8 @@
 // An auth wrapper for displaying content only to users who are logged in
 
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../../lib/hooks/useUser";
+import { useUser } from "../../lib/hooks/tanstack/useUser";
 
 interface IProtectedPageProps {
   children: React.ReactNode;
@@ -17,7 +17,7 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
     if (!userLoading) {
       if (!isLoggedIn || userData?.pk === undefined) {
         console.log("No user. Navigating to login.");
-        navigate("/login");
+        navigate({ to: "/login" });
       } else {
         setShowContent(true);
       }

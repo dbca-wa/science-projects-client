@@ -23,8 +23,8 @@ import {
 import { IDeleteDocument, deleteDocumentCall } from "../../lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { useGetStudentReportAvailableReportYears } from "../../lib/hooks/useGetStudentReportAvailableReportYears";
-import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/useGetProgressReportAvailableReportYears";
+import { useGetStudentReportAvailableReportYears } from "../../lib/hooks/tanstack/useGetStudentReportAvailableReportYears";
+import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/tanstack/useGetProgressReportAvailableReportYears";
 import { useRef } from "react";
 
 interface Props {
@@ -69,7 +69,8 @@ export const DeleteDocumentModal = ({
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
-  const deleteDocumentMutation = useMutation(deleteDocumentCall, {
+  const deleteDocumentMutation = useMutation({
+    mutationFn: deleteDocumentCall,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -98,7 +99,7 @@ export const DeleteDocumentModal = ({
       }
 
       setTimeout(async () => {
-        queryClient.invalidateQueries(["projects", projectPk]);
+        queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
         await refetchData();
         onClose();
         console.log("deleting");
@@ -209,7 +210,7 @@ export const DeleteDocumentModal = ({
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }}
-                isLoading={deleteDocumentMutation.isLoading}
+                isLoading={deleteDocumentMutation.isPending}
                 type="submit"
                 ml={3}
               >

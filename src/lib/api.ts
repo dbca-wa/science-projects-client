@@ -3,7 +3,7 @@ import { QueryFunctionContext } from "@tanstack/react-query";
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
 import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
-import { IConceptPlanGenerationData } from "./hooks/useGetConceptPlanData";
+import { IConceptPlanGenerationData } from "../types";
 
 
 // INSTANCE SETUP ==================================================================
@@ -12,7 +12,9 @@ const baseBackendUrl =
     process.env.NODE_ENV === "development" ?
         "http://127.0.0.1:8000/api/v1/"
         :
-        "https://scienceprojects-test.dbca.wa.gov.au/api/v1/"
+        process.env.TEST === "True" ?
+        "https://scienceprojects-test.dbca.wa.gov.au/api/v1/" :
+        "https://scienceprojects.dbca.wa.gov.au/api/v1/"
 
 const instance = axios.create({
     baseURL: baseBackendUrl,
@@ -85,7 +87,7 @@ export const logOut = () => {
         .then((response) => {
             if (response.data.ok) {
                 if (process.env.NODE_ENV !== "development") {
-                    window.location.href = 'https://scienceprojects-test.dbca.wa.gov.au/sso/auth_logout'
+                    window.location.href = 'https://scienceprojects.dbca.wa.gov.au/sso/auth_logout'
                 }
                 return response.data;
             } else {

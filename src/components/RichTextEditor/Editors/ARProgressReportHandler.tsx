@@ -1,5 +1,5 @@
 // React
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // Styles and Styling Components
 import { useColorMode } from "@chakra-ui/react";
@@ -8,9 +8,9 @@ import "../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
+import { IMainDoc, IProjectData, IProjectMember, IReport } from "@/types";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { PREditor } from "./PREditor";
-import { IMainDoc, IProjectData, IProjectMember, IReport } from "@/types";
 
 export interface IProgressReportDisplayData {
   pk?: number;

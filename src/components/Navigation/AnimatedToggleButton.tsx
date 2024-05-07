@@ -33,8 +33,8 @@ export const AnimatedToggleButton = ({
   const transition = initial
     ? { opacity: { duration: 0 } } // No transition on initial render
     : visible
-    ? { opacity: { duration: 0.6 } } // transition for fade-in, delay converted to seconds
-    : { opacity: { duration: 0 } }; // transition for fade-out
+      ? { opacity: { duration: 0.6 } } // transition for fade-in, delay converted to seconds
+      : { opacity: { duration: 0 } }; // transition for fade-out
 
   return (
     <motion.div

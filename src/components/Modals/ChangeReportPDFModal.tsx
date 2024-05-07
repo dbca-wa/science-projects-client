@@ -57,7 +57,8 @@ export const ChangeReportPDFModal = ({
     setReportMediaId(report && report?.pdf?.pk);
   }, [report]);
 
-  const ararPDFChangeMutation = useMutation(updateReportPDF, {
+  const ararPDFChangeMutation = useMutation({
+    mutationFn: updateReportPDF,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -80,8 +81,8 @@ export const ChangeReportPDFModal = ({
       onChangePDFClose();
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["ararsWithoutPDFs"]);
-        queryClient.invalidateQueries(["ararsWithPDFs"]);
+        queryClient.invalidateQueries({ queryKey: ["ararsWithoutPDFs"] });
+        queryClient.invalidateQueries({ queryKey: ["ararsWithPDFs"] });
         refetchPDFs();
         // refetchReportsWithoutPDFs();
       }, 350);
@@ -100,7 +101,8 @@ export const ChangeReportPDFModal = ({
     },
   });
 
-  const deletePDFMutation = useMutation(deleteFinalAnnualReportPDF, {
+  const deletePDFMutation = useMutation({
+    mutationFn: deleteFinalAnnualReportPDF,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -123,8 +125,8 @@ export const ChangeReportPDFModal = ({
       onChangePDFClose();
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["ararsWithoutPDFs"]);
-        queryClient.invalidateQueries(["ararsWithPDFs"]);
+        queryClient.invalidateQueries({ queryKey: ["ararsWithoutPDFs"] });
+        queryClient.invalidateQueries({ queryKey: ["ararsWithPDFs"] });
         refetchPDFs();
         // refetchReportsWithoutPDFs();
       }, 350);
@@ -241,7 +243,7 @@ export const ChangeReportPDFModal = ({
           <Button
             // form="addpdf-form"
             // type="submit"
-            isLoading={ararPDFChangeMutation.isLoading}
+            isLoading={ararPDFChangeMutation.isPending}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{

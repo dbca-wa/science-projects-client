@@ -1,42 +1,42 @@
 // Modal for editing profile section of user
 
+import { useProfile } from "@/lib/hooks/tanstack/useProfile";
 import {
-  Image,
-  Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  useColorMode,
-  Grid,
-  FormControl,
-  FormLabel,
-  InputGroup,
-  Input,
-  useToast,
-  FormErrorMessage,
-  ToastId,
   Box,
-  FormHelperText,
-  Textarea,
+  Button,
   Center,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
+  Grid,
+  Image,
+  Input,
+  InputGroup,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Textarea,
+  ToastId,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import {
-  updateProfile,
-  IProfileUpdateVariables,
-  getProfile,
   IProfileUpdateError,
   IProfileUpdateSuccess,
+  IProfileUpdateVariables,
+  updateProfile,
 } from "../../lib/api";
+import { useNoImage } from "../../lib/hooks/helper/useNoImage";
+import useServerImageUrl from "../../lib/hooks/helper/useServerImageUrl";
 import { IProfile } from "../../types";
-import useServerImageUrl from "../../lib/hooks/useServerImageUrl";
-import { useNoImage } from "../../lib/hooks/useNoImage";
 
 interface IEditProfileModalProps {
   isOpen: boolean;
@@ -55,10 +55,7 @@ export const EditProfileModal = ({
 
   const noImageLink = useNoImage();
 
-  const { isLoading, data } = useQuery<IProfile>(
-    ["profile", userId],
-    getProfile
-  );
+  const { isLoading, profileData: data } = useProfile(userId);
 
   const { colorMode } = useColorMode();
 
@@ -106,8 +103,9 @@ export const EditProfileModal = ({
     IProfileUpdateSuccess,
     IProfileUpdateError,
     IProfileUpdateVariables
-  >(updateProfile, {
+  >({
     // Start of mutation handling
+    mutationFn: updateProfile,
     onMutate: () => {
       addToast({
         title: "Updating profile...",
@@ -119,8 +117,8 @@ export const EditProfileModal = ({
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      queryClient.refetchQueries([`profile`, userId]);
-      queryClient.refetchQueries([`me`]);
+      queryClient.refetchQueries({ queryKey: [`profile`, userId] });
+      queryClient.refetchQueries({ queryKey: [`me`] });
 
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
@@ -370,7 +368,7 @@ export const EditProfileModal = ({
             </ModalBody>
             <ModalFooter>
               <Button
-                isLoading={mutation.isLoading}
+                isLoading={mutation.isPending}
                 type="submit"
                 bgColor={colorMode === "light" ? `green.500` : `green.600`}
                 color={colorMode === "light" ? `white` : `whiteAlpha.900`}

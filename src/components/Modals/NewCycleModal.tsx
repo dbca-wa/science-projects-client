@@ -28,7 +28,7 @@ import {
   MutationSuccess,
   openNewCycle,
 } from "../../lib/api";
-import { useLatestReportYear } from "@/lib/hooks/useLatestReportYear";
+import { useLatestReportYear } from "@/lib/hooks/tanstack/useLatestReportYear";
 
 interface IModalProps {
   isOpen: boolean;
@@ -66,8 +66,9 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
     MutationSuccess,
     MutationError,
     INewCycle
-  >(openNewCycle, {
+  >({
     // Start of mutation handling
+    mutationFn: openNewCycle,
     onMutate: () => {
       addToast({
         title: "Batch Creating Progress Reports...",
@@ -222,7 +223,7 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
                 _hover={{
                   background: colorMode === "light" ? "green.400" : "green.500",
                 }} // isDisabled={!changesMade}
-                isLoading={newCycleMutation.isLoading}
+                isLoading={newCycleMutation.isPending}
                 onClick={() =>
                   onSubmit({
                     alsoUpdate: shouldIncludeUpdate,

@@ -1,33 +1,34 @@
+import { AffiliationSearchDropdown } from "@/components/Navigation/AffiliationSearchDropdown";
 import {
-  Text,
   Box,
   Button,
+  Center,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   FormControl,
-  Input,
-  VStack,
-  useDisclosure,
-  Center,
-  Spinner,
-  Grid,
-  DrawerOverlay,
-  DrawerCloseButton,
-  DrawerHeader,
   FormLabel,
-  useToast,
-  useColorMode,
+  Grid,
+  Input,
   Modal,
   ModalBody,
   ModalContent,
-  ModalOverlay,
   ModalHeader,
+  ModalOverlay,
+  Spinner,
+  Text,
   ToastId,
+  VStack,
+  useColorMode,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -35,10 +36,8 @@ import {
   getAllAffiliations,
   mergeAffiliations,
 } from "../../../lib/api";
-import { useQueryClient } from "@tanstack/react-query";
 import { IAffiliation, IMergeAffiliation } from "../../../types";
 import { AffiliationItemDisplay } from "./AffiliationItemDisplay";
-import { AffiliationSearchDropdown } from "@/components/Navigation/AffiliationSearchDropdown";
 
 export const AffiliationsCRUD = () => {
   const { register, handleSubmit } = useForm<IAffiliation>();
@@ -90,7 +89,8 @@ export const AffiliationsCRUD = () => {
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
-  const creationMutation = useMutation(createAffiliation, {
+  const creationMutation = useMutation({
+    mutationFn: createAffiliation,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -110,7 +110,7 @@ export const AffiliationsCRUD = () => {
         });
       }
       onAddClose();
-      queryClient.invalidateQueries(["affiliations"]);
+      queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     },
     onError: () => {
       if (toastIdRef.current) {
@@ -126,7 +126,8 @@ export const AffiliationsCRUD = () => {
     },
   });
 
-  const mergeMutation = useMutation(mergeAffiliations, {
+  const mergeMutation = useMutation({
+    mutationFn: mergeAffiliations,
     onMutate: () => {
       mergeToast({
         status: "loading",
@@ -148,7 +149,7 @@ export const AffiliationsCRUD = () => {
       clearSecondaryAffiliationArray();
       setPrimaryAffiliation(null);
       onMergeClose();
-      queryClient.invalidateQueries(["affiliations"]);
+      queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     },
     onError: () => {
       if (toastIdRef.current) {
@@ -314,7 +315,7 @@ export const AffiliationsCRUD = () => {
                 <Button
                   form="add-form"
                   type="submit"
-                  isLoading={creationMutation.isLoading}
+                  isLoading={creationMutation.isPending}
                   color={"white"}
                   background={colorMode === "light" ? "blue.500" : "blue.600"}
                   _hover={{
@@ -407,7 +408,7 @@ export const AffiliationsCRUD = () => {
                         secondaryAffiliations,
                       });
                     }}
-                    isLoading={mergeMutation.isLoading}
+                    isLoading={mergeMutation.isPending}
                     color={"white"}
                     background={
                       colorMode === "light" ? "orange.500" : "orange.600"

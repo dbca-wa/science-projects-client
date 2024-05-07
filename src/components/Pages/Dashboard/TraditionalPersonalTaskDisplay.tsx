@@ -1,3 +1,5 @@
+import { useBoxShadow } from "@/lib/hooks/helper/useBoxShadow";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -12,22 +14,20 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { ITaskDisplayCard } from "../../../types";
-import { useNavigate } from "react-router-dom";
-import { useProjectSearchContext } from "../../../lib/hooks/ProjectSearchContext";
-import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CloseIcon, CheckIcon } from "@chakra-ui/icons";
+import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { FaUser } from "react-icons/fa";
+import { MdPriorityHigh } from "react-icons/md";
 import {
   MutationError,
   MutationSuccess,
   completeTask,
   deletePersonalTask,
 } from "../../../lib/api";
+import { useProjectSearchContext } from "../../../lib/hooks/helper/ProjectSearchContext";
+import { ITaskDisplayCard } from "../../../types";
 import { TaskDetailsModal } from "../../Modals/TaskDetailsModal";
-import { FaUser } from "react-icons/fa";
-import { MdPriorityHigh } from "react-icons/md";
-import { useBoxShadow } from "@/lib/hooks/useBoxShadow";
 interface Props {
   task: ITaskDisplayCard;
 }
@@ -41,9 +41,9 @@ export const TraditionalPersonalTaskDisplay = ({ task }: Props) => {
 
   const goToProject = (pk: number) => {
     if (isOnProjectsPage) {
-      navigate(`${pk}`);
+      navigate({ to: `${pk}` });
     } else {
-      navigate(`projects/${pk}`);
+      navigate({ to: `projects/${pk}` });
     }
   };
   const toast = useToast();
@@ -77,7 +77,8 @@ export const TraditionalPersonalTaskDisplay = ({ task }: Props) => {
     MutationSuccess,
     MutationError,
     { pk: number }
-  >(deletePersonalTask, {
+  >({
+    mutationFn: deletePersonalTask,
     onMutate: () => {
       addToast({
         title: "Deleting Task...",
@@ -100,7 +101,7 @@ export const TraditionalPersonalTaskDisplay = ({ task }: Props) => {
         });
       }
       setTimeout(() => {
-        queryClient.refetchQueries([`mytasks`]);
+        queryClient.refetchQueries({ queryKey: [`mytasks`] });
       }, 350);
     },
     // Error handling based on API-file-declared interface
@@ -122,8 +123,9 @@ export const TraditionalPersonalTaskDisplay = ({ task }: Props) => {
     MutationSuccess,
     MutationError,
     { pk: number }
-  >(completeTask, {
+  >({
     // Start of mutation handling
+    mutationFn: completeTask,
     onMutate: () => {
       addToast({
         title: "Completing Task...",
@@ -146,7 +148,7 @@ export const TraditionalPersonalTaskDisplay = ({ task }: Props) => {
         });
       }
       setTimeout(() => {
-        queryClient.refetchQueries([`mytasks`]);
+        queryClient.refetchQueries({ queryKey: [`mytasks`] });
       }, 350);
     },
     // Error handling based on API-file-declared interface

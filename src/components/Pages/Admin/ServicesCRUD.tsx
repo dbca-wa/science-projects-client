@@ -48,7 +48,8 @@ export const ServicesCRUD = () => {
   } = useDisclosure();
 
   const queryClient = useQueryClient();
-  const mutation = useMutation(createDepartmentalService, {
+  const mutation = useMutation({
+    mutationFn: createDepartmentalService,
     onSuccess: () => {
       toast({
         status: "success",
@@ -56,7 +57,7 @@ export const ServicesCRUD = () => {
         position: "top-right",
       });
       onAddClose();
-      queryClient.invalidateQueries(["departmentalServices"]);
+      queryClient.invalidateQueries({ queryKey: ["departmentalServices"] });
     },
     onError: () => {
       console.log("error");
@@ -226,7 +227,7 @@ export const ServicesCRUD = () => {
                         <Box key={key}>
                           {(
                             (mutation.error as AxiosError).response.data[
-                            key
+                              key
                             ] as string[]
                           ).map((errorMessage, index) => (
                             <Text key={`${key}-${index}`} color="red.500">
@@ -243,7 +244,7 @@ export const ServicesCRUD = () => {
                 <Button
                   // form="add-form"
                   // type="submit"
-                  isLoading={mutation.isLoading}
+                  isLoading={mutation.isPending}
                   color={"white"}
                   background={colorMode === "light" ? "blue.500" : "blue.600"}
                   _hover={{

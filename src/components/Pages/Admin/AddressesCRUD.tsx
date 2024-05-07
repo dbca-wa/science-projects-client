@@ -1,36 +1,35 @@
 import {
-  Text,
   Box,
   Button,
+  Center,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   FormControl,
+  FormLabel,
+  Grid,
   Input,
   InputGroup,
-  VStack,
-  useDisclosure,
-  Center,
   Spinner,
-  Grid,
-  DrawerOverlay,
-  DrawerCloseButton,
-  DrawerHeader,
-  FormLabel,
-  useToast,
+  Text,
+  VStack,
   useColorMode,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { IAddress, IBranch } from "../../../types";
 import { createAddress, getAllAddresses } from "../../../lib/api";
-import { useQueryClient } from "@tanstack/react-query";
-import { AddressItemDisplay } from "./AddressItemDisplay";
+import { IAddress, IBranch } from "../../../types";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
-import { AxiosError } from "axios";
+import { AddressItemDisplay } from "./AddressItemDisplay";
 
 export const AddressesCRUD = () => {
   const { register, handleSubmit, watch, reset } = useForm<IAddress>();
@@ -42,7 +41,8 @@ export const AddressesCRUD = () => {
   } = useDisclosure();
 
   const queryClient = useQueryClient();
-  const mutation = useMutation(createAddress, {
+  const mutation = useMutation({
+    mutationFn: createAddress,
     onSuccess: () => {
       toast({
         status: "success",
@@ -51,7 +51,7 @@ export const AddressesCRUD = () => {
       });
       reset();
       onAddClose();
-      queryClient.invalidateQueries(["addresses"]);
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
     },
     onError: () => {
       toast({
@@ -309,7 +309,7 @@ export const AddressesCRUD = () => {
                 <Button
                   // form="add-form"
                   // type="submit"
-                  isLoading={mutation.isLoading}
+                  isLoading={mutation.isPending}
                   color={"white"}
                   background={colorMode === "light" ? "blue.500" : "blue.600"}
                   _hover={{

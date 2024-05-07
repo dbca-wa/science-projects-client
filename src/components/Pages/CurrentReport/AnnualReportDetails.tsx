@@ -2,9 +2,9 @@
 
 import { RichTextEditor } from "@/components/RichTextEditor/Editors/RichTextEditor";
 // import { updateReport } from "@/lib/api";
-import { useGetFullLatestReport } from "@/lib/hooks/useGetFullLatestReport";
+import { useGetFullLatestReport } from "@/lib/hooks/tanstack/useGetFullLatestReport";
 // import { useGetLatestReportMedia } from "@/lib/hooks/useGetLatestReportMedia";
-import { useUser } from "@/lib/hooks/useUser";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { IReport } from "@/types";
 import {
   Box,
@@ -14,7 +14,6 @@ import {
   Spinner,
   VStack,
   useColorMode,
-  // useToast,
 } from "@chakra-ui/react";
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -65,7 +64,9 @@ export const AnnualReportDetails = () => {
         </Center>
       ) : (
         <Center flexDir={"column"}>
-          <VStack p={6} spacing={6}
+          <VStack
+            p={6}
+            spacing={6}
             //  w={`${A4Width}mm`}
             w="100%"
           >
