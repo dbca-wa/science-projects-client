@@ -136,6 +136,7 @@ export const ReportItemDisplay = ({
         position: "top-right",
       });
       onDeleteModalClose();
+      queryClient.invalidateQueries({ queryKey: ["latestReport"] });
       queryClient.invalidateQueries({ queryKey: ["reports"] });
     },
   });
