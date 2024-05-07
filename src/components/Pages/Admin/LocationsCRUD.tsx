@@ -1,42 +1,41 @@
 import {
-  Text,
   Box,
   Button,
+  Center,
+  Checkbox,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   FormControl,
+  FormLabel,
+  Grid,
   Input,
   InputGroup,
-  VStack,
-  useDisclosure,
-  Center,
-  Spinner,
-  Grid,
-  DrawerOverlay,
-  DrawerCloseButton,
-  DrawerHeader,
-  FormLabel,
-  Checkbox,
-  useToast,
   Select,
+  Spinner,
+  Text,
+  VStack,
   useColorMode,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import _ from "lodash";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { LocationItemDisplay } from "./LocationItemDisplay";
+import { createLocation, getAllLocations } from "../../../lib/api";
 import {
   IAddLocationForm,
   ISimpleLocationData,
   OrganisedLocationData,
 } from "../../../types";
-import { createLocation, getAllLocations } from "../../../lib/api";
-import _ from "lodash";
-import { useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { LocationItemDisplay } from "./LocationItemDisplay";
 
 export const LocationsCRUD = () => {
   const { register, handleSubmit } = useForm<IAddLocationForm>();
@@ -47,7 +46,8 @@ export const LocationsCRUD = () => {
   });
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(createLocation, {
+  const mutation = useMutation({
+    mutationFn: createLocation,
     onSuccess: () => {
       toast({
         status: "success",
@@ -55,7 +55,7 @@ export const LocationsCRUD = () => {
         position: "top-right",
       });
       onAddClose();
-      queryClient.invalidateQueries(["locations"]);
+      queryClient.invalidateQueries({ queryKey: ["locations"] });
     },
     onError: () => {
       toast({
@@ -419,7 +419,7 @@ export const LocationsCRUD = () => {
                 <Button
                   form="add-form"
                   type="submit"
-                  isLoading={mutation.isLoading}
+                  isLoading={mutation.isPending}
                   color={"white"}
                   background={colorMode === "light" ? "blue.500" : "blue.600"}
                   _hover={{

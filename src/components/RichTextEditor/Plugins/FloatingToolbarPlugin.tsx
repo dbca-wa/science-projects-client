@@ -1,5 +1,5 @@
+import { $isCodeHighlightNode } from "@lexical/code";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useCallback, useEffect, useRef, useState } from "react";
 import {
   $getSelection,
   $isParagraphNode,
@@ -10,24 +10,24 @@ import {
   LexicalEditor,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
-import { $isCodeHighlightNode } from "@lexical/code";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useColorMode, Flex } from "@chakra-ui/react";
-import { createPortal } from "react-dom";
-import {
-  mergeRegister,
-  $getNearestBlockElementAncestorOrThrow,
-} from "@lexical/utils";
-import { getSelectedNode } from "@/lib/utils/getSelectedNode";
 import { getDOMRangeRect } from "@/lib/utils/getDOMRangeRect";
+import { getSelectedNode } from "@/lib/utils/getSelectedNode";
 import { setFloatingElemPosition } from "@/lib/utils/setFloatingElemPosition";
+import { Flex, useColorMode } from "@chakra-ui/react";
+import {
+  $getNearestBlockElementAncestorOrThrow,
+  mergeRegister,
+} from "@lexical/utils";
+import { createPortal } from "react-dom";
 
 // import {INSERT_INLINE_COMMAND} from '../CommentPlugin';
-import { RevisedBaseToolbarButton } from "../Buttons/RevisedBaseToolbarButton";
 import { FaBold, FaItalic, FaUnderline } from "react-icons/fa";
-import { VerticalDivider } from "../Toolbar/VerticalDivider";
-import { MdSubscript, MdSuperscript } from "react-icons/md";
 import { ImClearFormatting } from "react-icons/im";
+import { MdSubscript, MdSuperscript } from "react-icons/md";
+import { RevisedBaseToolbarButton } from "../Buttons/RevisedBaseToolbarButton";
+import { VerticalDivider } from "../Toolbar/VerticalDivider";
 
 interface IFloatingToolbar {
   editor: LexicalEditor;

@@ -11,22 +11,22 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { BsPlus } from "react-icons/bs";
+import { getProgressReportForYear } from "../../../lib/api";
+import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
+import { useGetProgressReportAvailableReportYears } from "../../../lib/hooks/tanstack/useGetProgressReportAvailableReportYears";
 import {
   IProgressReport,
   IProjectDocuments,
   IProjectMember,
   IUserMe,
 } from "../../../types";
-import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { useEffect, useState } from "react";
-import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions";
-import { motion } from "framer-motion";
-import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
 import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
-import { useGetProgressReportAvailableReportYears } from "../../../lib/hooks/useGetProgressReportAvailableReportYears";
-import { getProgressReportForYear } from "../../../lib/api";
+import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
-import { BsPlus } from "react-icons/bs";
+import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions";
 
 interface Props {
   baseAPI: string;
@@ -47,7 +47,7 @@ export const ProgressReportContents = ({
   refetch,
   setToLastTab,
 }: Props) => {
-  useEffect(() => console.log(userData))
+  useEffect(() => console.log(userData));
   // Handling years
   const { availableProgressReportYearsData } =
     useGetProgressReportAvailableReportYears(
@@ -312,7 +312,6 @@ export const ProgressReportContents = ({
             data={selectedProgressReport?.future}
             section={"future"}
           />
-
 
           {selectedProgressReport?.document && (
             <CommentSection

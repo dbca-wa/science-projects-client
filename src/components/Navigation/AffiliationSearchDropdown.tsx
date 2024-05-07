@@ -1,6 +1,6 @@
 // Dropdown search component for affiliations. Displays 5 affiliations below the search box.
 
-import { useAffiliation } from "@/lib/hooks/useAffiliation";
+import { useAffiliation } from "@/lib/hooks/tanstack/useAffiliation";
 import { CloseIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -25,9 +25,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { FaTrash } from "react-icons/fa";
 import { getAffiliationsBasedOnSearchTerm } from "../../lib/api";
 import { IAffiliation } from "../../types";
-import { FaTrash } from "react-icons/fa";
 
 interface IAffiliationSearchDropdown {
   isRequired: boolean;

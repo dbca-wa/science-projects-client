@@ -3,7 +3,7 @@
 import { BreadCrumb } from "../components/Base/BreadCrumb";
 import { IUserData } from "../types";
 import { Head } from "../components/Base/Head";
-import { useUserSearchContext } from "../lib/hooks/UserSearchContext";
+import { useUserSearchContext } from "../lib/hooks/helper/UserSearchContext";
 import {
   Box,
   Button,
@@ -21,8 +21,9 @@ import {
 import { useEffect, useState } from "react";
 import { CreateUserModal } from "../components/Modals/CreateUserModal";
 import { PaginatorUser } from "../components/Pages/Users/PaginatorUser";
-import { useLayoutSwitcher } from "../lib/hooks/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "../lib/hooks/helper/LayoutSwitcherContext";
 import { SearchUsers } from "@/components/Navigation/SearchUsers";
+import { createRoute } from "@tanstack/react-router";
 
 export const Users = () => {
   const {
@@ -134,7 +135,6 @@ export const Users = () => {
     }
   };
 
-
   const isXlOrLarger = useBreakpointValue({
     base: false,
     sm: false,
@@ -158,9 +158,6 @@ export const Users = () => {
     lg: true,
     xlg: true,
   });
-
-
-
 
   const { layout } = useLayoutSwitcher();
 
@@ -282,14 +279,7 @@ export const Users = () => {
               base: "1fr",
               lg: "8fr 4fr",
               xl: "4fr 4fr 2.5fr",
-              // base: "4fr 4fr 2.5fr",
-              // base: "4fr 4fr 2.5fr",
-              //   lg: "4fr 4fr 2.5fr",
             }}
-            // templateColumns={{
-            //   base: "4fr 4fr 2.5fr",
-            //   lg: "4fr 4fr 2.5fr",
-            // }}
             pt={0}
             pb={4}
             pl={6}
@@ -307,24 +297,17 @@ export const Users = () => {
                   <Text as={"b"}>Business Area</Text>
                 </Box>
               </>
-            ) : isLargerOrLarger ?
-              (
-                <>
-
-                  <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
-                    <Text as={"b"}>Email</Text>
-                  </Box>
-                </>
-              )
-              : !isOver690 ? (
+            ) : isLargerOrLarger ? (
+              <>
                 <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
                   <Text as={"b"}>Email</Text>
                 </Box>
-              )
-                : null}
-
-
-
+              </>
+            ) : !isOver690 ? (
+              <Box w="100%" overflow="hidden" textOverflow={"ellipsis"}>
+                <Text as={"b"}>Email</Text>
+              </Box>
+            ) : null}
           </Grid>
         </Grid>
 
@@ -345,3 +328,5 @@ export const Users = () => {
     </>
   );
 };
+
+export const Route = createRoute({});

@@ -1,15 +1,15 @@
 // Maps out the areas to checkboxes which when clicked update a parent state (see params)
 
 import {
-  FormControl,
-  Grid,
-  FormLabel,
-  InputGroup,
-  Flex,
   Checkbox,
+  Flex,
+  FormControl,
+  FormLabel,
+  Grid,
+  InputGroup,
 } from "@chakra-ui/react";
-import { ISimpleLocationData } from "../../../types";
 import { useEffect, useState } from "react";
+import { ISimpleLocationData } from "../../../types";
 
 interface Props {
   title: string;

@@ -30,7 +30,7 @@ import { ISpawnDocument, spawnNewEmptyDocument } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/useGetProgressReportAvailableReportYears";
+import { useGetProgressReportAvailableReportYears } from "../../lib/hooks/tanstack/useGetProgressReportAvailableReportYears";
 
 interface Props {
   projectPk: string | number;
@@ -92,7 +92,8 @@ export const CreateProgressReportModal = ({
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
-  const createProgressReportMutation = useMutation(spawnNewEmptyDocument, {
+  const createProgressReportMutation = useMutation({
+    mutationFn: spawnNewEmptyDocument,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -116,7 +117,7 @@ export const CreateProgressReportModal = ({
       }
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["projects", projectPk]);
+        queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
         refetchData();
         onClose();
       }, 350);
@@ -217,7 +218,9 @@ export const CreateProgressReportModal = ({
                           .map((freeReportYear, index: number) => {
                             return (
                               <option key={index} value={freeReportYear.year}>
-                                {`FY ${freeReportYear.year - 1} - ${String(freeReportYear.year).slice(2)}`}
+                                {`FY ${freeReportYear.year - 1} - ${String(
+                                  freeReportYear.year
+                                ).slice(2)}`}
                               </option>
                             );
                           })}
@@ -257,7 +260,7 @@ export const CreateProgressReportModal = ({
                         background:
                           colorMode === "light" ? "green.400" : "green.500",
                       }}
-                      isLoading={createProgressReportMutation.isLoading}
+                      isLoading={createProgressReportMutation.isPending}
                       isDisabled={!yearValue || !selectedReportId || !projPk}
                       type="submit"
                       ml={3}

@@ -4,19 +4,18 @@ import {
   InitialConfigType,
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 // import { $getRoot } from "lexical";
-import { RevisedSimpleRichTextToolbar } from "../../Toolbar/RevisedSimpleRichTextToolbar";
+import { $generateHtmlFromNodes } from "@lexical/html";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { $generateHtmlFromNodes } from "@lexical/html";
-import { PrepopulateCommentDisplayPlugin } from "./../../Plugins/PrepopulateCommentDisplayPlugin";
+import { useState } from "react";
 import { CustomFocusPlugin } from "../../Plugins/CustomFocusPlugin";
-import { CLEAR_EDITOR_COMMAND } from "lexical";
-import { useEffect, useState } from "react";
+import { RevisedSimpleRichTextToolbar } from "../../Toolbar/RevisedSimpleRichTextToolbar";
+import { PrepopulateCommentDisplayPlugin } from "./../../Plugins/PrepopulateCommentDisplayPlugin";
 
 interface Props {
   allowInsertButton?: boolean;
@@ -41,7 +40,6 @@ export const SimpleStatefulRTE = ({
   setValueFunction,
   shouldFocus,
 }: Props) => {
-
   const [firstRender, setFirstRender] = useState(true);
 
   return (
@@ -52,30 +50,30 @@ export const SimpleStatefulRTE = ({
         <ListPlugin />
         <OnChangePlugin
           onChange={(editorState, editor) => {
-
             editorState.read(() => {
               // const root = $getRoot();
               //   setEditorText(root.__cachedText);
 
               if (setValueAsPlainText === true && value !== "") {
                 if (firstRender === false) {
-
-                  const text = $generateHtmlFromNodes(editor, null)
-                  const parser = new DOMParser()
-                  const doc = parser.parseFromString(text, 'text/html')
+                  const text = $generateHtmlFromNodes(editor, null);
+                  const parser = new DOMParser();
+                  const doc = parser.parseFromString(text, "text/html");
                   setValueFunction(doc.body.innerText);
                 }
               } else {
                 const newHtml = $generateHtmlFromNodes(editor, null);
                 setValueFunction(newHtml);
               }
-            })
+            });
           }}
         />
 
         {value && value !== "" && (
-          <PrepopulateCommentDisplayPlugin data={value} setPopulationInProgress={setFirstRender} />
-
+          <PrepopulateCommentDisplayPlugin
+            data={value}
+            setPopulationInProgress={setFirstRender}
+          />
         )}
 
         {/* Text Area */}
@@ -123,8 +121,7 @@ export const SimpleStatefulRTE = ({
 
         <ClearEditorPlugin />
         {/* <DataDisplayPlugin setDisplayData={setDisplayData} /> */}
-        {shouldFocus && (<CustomFocusPlugin shouldFocus={shouldFocus} />
-        )}
+        {shouldFocus && <CustomFocusPlugin shouldFocus={shouldFocus} />}
       </LexicalComposer>
     </>
   );

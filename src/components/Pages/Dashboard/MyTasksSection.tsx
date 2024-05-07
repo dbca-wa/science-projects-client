@@ -11,12 +11,12 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 // import { TaskDisplayCard } from "./TaskDisplayCard"
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { IMainDoc, ITaskDisplayCard } from "../../../types";
-import { ModernPersonalTaskDisplayCard } from "./ModernPersonalTaskDisplayCard";
-import { ModernEndorsementTaskDisplayCard } from "./ModernEndorsementTaskDisplayCard";
 import { ModernDocumentTaskDisplayCard } from "./ModernDocumentTaskDisplayCard";
+import { ModernEndorsementTaskDisplayCard } from "./ModernEndorsementTaskDisplayCard";
+import { ModernPersonalTaskDisplayCard } from "./ModernPersonalTaskDisplayCard";
 
 interface ITaskSection {
   personalTaskData: {
@@ -48,7 +48,7 @@ export const MyTasksSection = ({
   //   endorsementTaskDataLoading,
   documentTaskData,
 }: //   documentTaskDataLoading,
-  ITaskSection) => {
+ITaskSection) => {
   const { colorMode } = useColorMode();
   const [total, setTotal] = useState(0);
 
@@ -63,11 +63,11 @@ export const MyTasksSection = ({
       documentTaskData &&
       setTotal(
         personalTaskData?.todo?.length +
-        personalTaskData?.inprogress?.length +
-        endorsementTaskData.aec.length +
-        // endorsementTaskData.bm.length +
-        // endorsementTaskData.hc.length +
-        documentTaskData?.all?.length
+          personalTaskData?.inprogress?.length +
+          endorsementTaskData.aec.length +
+          // endorsementTaskData.bm.length +
+          // endorsementTaskData.hc.length +
+          documentTaskData?.all?.length
       );
   }, [personalTaskData, endorsementTaskData, documentTaskData]);
 
@@ -124,7 +124,7 @@ export const MyTasksSection = ({
   ) : (
     <Flex flexDir={"column"} w={"100%"} h={"100%"}>
       {personalTaskData &&
-        [...personalTaskData.todo, ...personalTaskData.inprogress].length >= 1 ? (
+      [...personalTaskData.todo, ...personalTaskData.inprogress].length >= 1 ? (
         <>
           <Box position="relative" padding="10">
             <Divider />
@@ -188,15 +188,15 @@ export const MyTasksSection = ({
       ) : null}
 
       {documentTaskData?.team &&
-        documentTaskData?.directorate &&
-        documentTaskData?.ba &&
-        documentTaskData?.lead &&
-        [
-          ...documentTaskData.team,
-          ...documentTaskData.lead,
-          ...documentTaskData.directorate,
-          ...documentTaskData.ba,
-        ].length >= 1 ? (
+      documentTaskData?.directorate &&
+      documentTaskData?.ba &&
+      documentTaskData?.lead &&
+      [
+        ...documentTaskData.team,
+        ...documentTaskData.lead,
+        ...documentTaskData.directorate,
+        ...documentTaskData.ba,
+      ].length >= 1 ? (
         <>
           <Box position="relative" padding="10">
             <Divider />
@@ -232,13 +232,13 @@ export const MyTasksSection = ({
       ) : null}
 
       {endorsementTaskData?.aec &&
-        endorsementTaskData?.bm &&
-        endorsementTaskData?.hc &&
-        [
-          ...endorsementTaskData.aec,
-          ...endorsementTaskData.bm,
-          ...endorsementTaskData.hc,
-        ].length >= 1 ? (
+      endorsementTaskData?.bm &&
+      endorsementTaskData?.hc &&
+      [
+        ...endorsementTaskData.aec,
+        ...endorsementTaskData.bm,
+        ...endorsementTaskData.hc,
+      ].length >= 1 ? (
         <>
           <Box position="relative" padding="10">
             <Divider />

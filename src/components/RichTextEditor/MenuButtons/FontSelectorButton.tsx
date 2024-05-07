@@ -1,9 +1,9 @@
 // A button that displays current font and opens a dropdown to select font
 // Options include Arial, Courier New, Georgia, Times New Roman, Trebuchet MS, and Veranda
 
+import { useState } from "react";
 import { BsFonts } from "react-icons/bs";
 import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton";
-import { useState } from "react";
 
 export const FontSelectorButton = () => {
   const [currentFont, setCurrentFont] = useState<string>("Arial");

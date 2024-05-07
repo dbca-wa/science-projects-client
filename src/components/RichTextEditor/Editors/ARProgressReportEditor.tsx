@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Text, useColorMode, Image } from "@chakra-ui/react";
+import { Box, Center, Flex, Image, Text, useColorMode } from "@chakra-ui/react";
 import {
   InitialConfigType,
   LexicalComposer,
@@ -9,22 +9,21 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $getRoot } from "lexical";
 // import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
+import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import DraggableBlockPlugin from "@/components/RichTextEditor/Plugins/DraggableBlockPlugin";
+import { IProjectData } from "@/types";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
-import React, { useEffect, useState } from "react";
-import { EditorSections, IProjectData } from "@/types";
+import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import FloatingToolbarPlugin from "../Plugins/FloatingToolbarPlugin";
 import ListMaxIndentLevelPlugin from "../Plugins/ListMaxIndentLevelPlugin";
-import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
-import { RevisedRichTextToolbar } from "../Toolbar/RevisedRichTextToolbar";
 import { PrepopulateHTMLPlugin } from "../Plugins/PrepopulateHTMLPlugin";
-import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
-import { useNavigate } from "react-router-dom";
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 // import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -71,8 +70,7 @@ export const ARProgressReportEditor = ({
   // setIsEditorOpen,
   // //    editorText,
   // // setEditorText,
-}:
-  Props) => {
+}: Props) => {
   const dragBtnMargin = 10;
   const toolBarHeight = 45;
   const [floatingAnchorElem, setFloatingAnchorElem] =
@@ -136,9 +134,7 @@ export const ARProgressReportEditor = ({
                   <Box
                     cursor={"pointer"}
                     onClick={() =>
-                      navigate(
-                        `/projects/${project?.pk}/student`
-                      )
+                      navigate({ to: `/projects/${project?.pk}/student` })
                     }
                   >
                     <ExtractedHTMLTitle
@@ -174,9 +170,7 @@ export const ARProgressReportEditor = ({
                   <Box
                     cursor={"pointer"}
                     onClick={() =>
-                      navigate(
-                        `/projects/${project?.pk}/student`
-                      )
+                      navigate({ to: `/projects/${project?.pk}/student` })
                     }
                   >
                     <ExtractedHTMLTitle
@@ -245,7 +239,13 @@ export const ARProgressReportEditor = ({
                 >
                   {/* Toolbar */}
                   {/* <RevisedRichTextToolbar /> */}
-                  <Text fontWeight={"bold"} fontSize={"lg"} px={8} mt={2} ml={3}>
+                  <Text
+                    fontWeight={"bold"}
+                    fontSize={"lg"}
+                    px={8}
+                    mt={2}
+                    ml={3}
+                  >
                     Progress Report
                   </Text>
 
@@ -269,7 +269,7 @@ export const ARProgressReportEditor = ({
                           outline: "none",
                         }}
 
-                      // autoFocus
+                        // autoFocus
                       />
                     </Box>
                   </Box>

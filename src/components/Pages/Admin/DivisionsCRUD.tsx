@@ -49,7 +49,8 @@ export const DivisionsCRUD = () => {
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
-  const mutation = useMutation(createDivision, {
+  const mutation = useMutation({
+    mutationFn: createDivision,
     onSuccess: (data: IDivision) => {
       // console.log("success")
       toast({
@@ -59,7 +60,7 @@ export const DivisionsCRUD = () => {
       });
       console.log(data);
       onAddClose();
-      queryClient.invalidateQueries(["divisions"]);
+      queryClient.invalidateQueries({ queryKey: ["divisions"] });
     },
     onError: () => {
       console.log("error");
@@ -304,7 +305,7 @@ export const DivisionsCRUD = () => {
                 <Button
                   // form="add-form"
                   // type="submit"
-                  isLoading={mutation.isLoading}
+                  isLoading={mutation.isPending}
                   color={"white"}
                   background={colorMode === "light" ? "blue.500" : "blue.600"}
                   _hover={{

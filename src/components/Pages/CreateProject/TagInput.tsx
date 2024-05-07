@@ -1,18 +1,18 @@
 // Used to input keywords and save them to a parametised state - similar to linkedin skill
 
-import React, { useEffect, useState } from "react";
 import {
-  FormControl,
-  FormLabel,
-  InputGroup,
-  Input,
-  FormHelperText,
-  Tag,
-  TagLabel,
-  TagCloseButton,
   Flex,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Input,
+  InputGroup,
+  Tag,
+  TagCloseButton,
+  TagLabel,
   useColorMode,
 } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
 
 interface Props {
   setTagFunction: React.Dispatch<React.SetStateAction<string[]>>;

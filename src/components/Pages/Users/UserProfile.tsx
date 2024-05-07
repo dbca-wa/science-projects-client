@@ -1,36 +1,36 @@
 // The drawer content that pops out when clicking on a user grid item
 
+import { DeactivateUserModal } from "@/components/Modals/DeactivateUserModal";
 import {
   Avatar,
-  Image,
   Box,
   Button,
   Center,
   Flex,
   Grid,
   Icon,
+  Image,
   Spacer,
   Spinner,
   Text,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { FiCopy } from "react-icons/fi";
-import { FcApproval } from "react-icons/fc";
-import { AiFillCloseCircle } from "react-icons/ai";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { useFormattedDate } from "../../../lib/hooks/useFormattedDate";
-import { useCopyText } from "../../../lib/hooks/useCopyText";
-import { DeleteUserModal } from "../../Modals/DeleteUserModal";
-import { PromoteUserModal } from "../../Modals/PromoteUserModal";
-import { useUser } from "../../../lib/hooks/useUser";
-import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
-import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
-import { useNavigate } from "react-router-dom";
-import { useUpdatePage } from "../../../lib/hooks/useUpdatePage";
+import { AiFillCloseCircle } from "react-icons/ai";
+import { FcApproval } from "react-icons/fc";
+import { FiCopy } from "react-icons/fi";
+import { useCopyText } from "../../../lib/hooks/helper/useCopyText";
+import { useFormattedDate } from "../../../lib/hooks/helper/useFormattedDate";
+import { useUpdatePage } from "../../../lib/hooks/helper/useUpdatePage";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { useUser } from "../../../lib/hooks/tanstack/useUser";
 import { IBranch, IBusinessArea } from "../../../types";
-import { DeactivateUserModal } from "@/components/Modals/DeactivateUserModal";
+import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
+import { DeleteUserModal } from "../../Modals/DeleteUserModal";
+import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
+import { PromoteUserModal } from "../../Modals/PromoteUserModal";
 
 interface Props {
   pk: number;
@@ -468,7 +468,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   onClick={
                     user.email === me.userData.email
                       ? () => {
-                          navigate("/users/me");
+                          navigate({ to: "/users/me" });
                         }
                       : onEditUserDetailsModalOpen
                   }
@@ -483,8 +483,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           ? "blue.500"
                           : "blue.400"
                         : user?.is_superuser
-                        ? "blue.500"
-                        : "blue.400",
+                          ? "blue.500"
+                          : "blue.400",
                     color: "white",
                   }}
                   isDisabled={
@@ -504,8 +504,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         ? "red.600"
                         : "green.600"
                       : user?.is_superuser
-                      ? "red.800"
-                      : "green.500"
+                        ? "red.800"
+                        : "green.500"
                   }
                   color={
                     colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
@@ -517,8 +517,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           ? "red.500"
                           : "green.500"
                         : user?.is_superuser
-                        ? "red.700"
-                        : "green.400",
+                          ? "red.700"
+                          : "green.400",
                     color: "white",
                   }}
                   isDisabled={

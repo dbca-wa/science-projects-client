@@ -1,6 +1,8 @@
 // Maps out the document provided to the rich text editor components for concept plan documents.
 
 import { useColorMode } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import {
   IConceptPlan,
   IProjectDocuments,
@@ -8,10 +10,8 @@ import {
   IUserMe,
 } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { ConceptPlanDocActions } from "./DocActions/ConceptPlanDocActions";
-import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
-import { motion } from "framer-motion";
 import { CommentSection } from "./CommentSection";
+import { ConceptPlanDocActions } from "./DocActions/ConceptPlanDocActions";
 
 interface Props {
   all_documents: IProjectDocuments;
@@ -29,9 +29,9 @@ export const ConceptPlanContents = ({
   all_documents,
   document,
   refetch,
-  baseAPI
+  baseAPI,
 }: // setToLastTab,
-  Props) => {
+Props) => {
   const { colorMode } = useColorMode();
 
   const documentType = "conceptplan";
@@ -158,10 +158,10 @@ export const ConceptPlanContents = ({
       {document?.document && (
         <CommentSection
           baseAPI={baseAPI}
-          documentID={document?.document?.pk} userData={userData} />
-
+          documentID={document?.document?.pk}
+          userData={userData}
+        />
       )}
-
     </motion.div>
   );
 };

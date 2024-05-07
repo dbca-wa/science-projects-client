@@ -1,6 +1,6 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 // import { useProjectSearchContext } from "@/lib/hooks/ProjectSearchContext";
-import { useBoxShadow } from "@/lib/hooks/useBoxShadow";
+import { useBoxShadow } from "@/lib/hooks/helper/useBoxShadow";
 import { IMainDoc } from "@/types";
 import {
   Box,
@@ -11,8 +11,8 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
+import { useNavigate } from "@tanstack/react-router";
 import { HiDocumentCheck } from "react-icons/hi2";
-import { useNavigate } from "react-router-dom";
 
 interface IProps {
   inputKind:
@@ -53,7 +53,7 @@ export const TraditionalDocumentTaskDisplay = ({
     //   navigate(`${pk}/${urlkind}`);
     // }
     else {
-      navigate(`projects/${pk}/${urlkind}`);
+      navigate({ to: `projects/${pk}/${urlkind}` });
     }
   };
 
@@ -162,8 +162,8 @@ export const TraditionalDocumentTaskDisplay = ({
               inputKind === "directorate"
                 ? "red"
                 : inputKind === "business_area_lead"
-                ? "blue"
-                : "green"
+                  ? "blue"
+                  : "green"
             }.600`}
             fontWeight={"semibold"}
             fontSize={"small"}

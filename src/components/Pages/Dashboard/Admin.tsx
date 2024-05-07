@@ -2,24 +2,26 @@
 // still somewhat limited as not all functions have been created. Instead the other functions are
 // accessible to developers via the django admin panel.
 
+import { BatchApproveModal } from "@/components/Modals/BatchApproveModal";
+import { BatchApproveOldModal } from "@/components/Modals/BatchApproveOldModal";
+import { NewCycleModal } from "@/components/Modals/NewCycleModal";
 import {
   Center,
-  Text,
+  Divider,
   Flex,
   Grid,
   Icon,
-  Divider,
+  Text,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
+import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 import { FaAddressCard, FaLocationArrow } from "react-icons/fa";
-import {
-  FcApproval,
-  // , FcDataBackup
-} from "react-icons/fc";
+import { FcApproval } from "react-icons/fc";
 import { GoOrganization } from "react-icons/go";
+import { HiDocumentPlus } from "react-icons/hi2";
 import { ImBriefcase } from "react-icons/im";
 import {
   MdEmail,
@@ -28,12 +30,7 @@ import {
   MdVerifiedUser,
 } from "react-icons/md";
 import { RiOrganizationChart, RiTeamFill } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
 import { VscFeedback } from "react-icons/vsc";
-import { BatchApproveModal } from "@/components/Modals/BatchApproveModal";
-import { BatchApproveOldModal } from "@/components/Modals/BatchApproveOldModal";
-import { HiDocumentPlus } from "react-icons/hi2";
-import { NewCycleModal } from "@/components/Modals/NewCycleModal";
 
 export const Admin = () => {
   const {
@@ -269,7 +266,7 @@ const AdminOptionBox = ({
   const handleOnClick = () => {
     // console.log(route)
     if (route !== undefined && route !== null) {
-      navigate(route);
+      navigate({ to: route });
     } else if (!route) {
       onClick();
     }

@@ -1,34 +1,33 @@
 import {
-  Text,
   Box,
   Button,
+  Center,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   FormControl,
-  Input,
-  VStack,
-  useDisclosure,
-  Center,
-  Spinner,
-  Grid,
-  DrawerOverlay,
-  DrawerCloseButton,
-  DrawerHeader,
   FormLabel,
-  useToast,
+  Grid,
+  Input,
+  Spinner,
+  Text,
+  VStack,
   useColorMode,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { createBranch, getAllBranches } from "../../../lib/api";
-import { useQueryClient } from "@tanstack/react-query";
 import { IBranch } from "../../../types";
-import { BranchItemDisplay } from "./BranchItemDisplay";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { BranchItemDisplay } from "./BranchItemDisplay";
 
 export const BranchesCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IBranch>();
@@ -43,7 +42,8 @@ export const BranchesCRUD = () => {
   const nameData = watch("name");
 
   const queryClient = useQueryClient();
-  const mutation = useMutation(createBranch, {
+  const mutation = useMutation({
+    mutationFn: createBranch,
     onSuccess: () => {
       toast({
         status: "success",
@@ -51,7 +51,7 @@ export const BranchesCRUD = () => {
         position: "top-right",
       });
       onAddClose();
-      queryClient.invalidateQueries(["branches"]);
+      queryClient.invalidateQueries({ queryKey: ["branches"] });
     },
     onError: () => {
       toast({
@@ -234,7 +234,7 @@ export const BranchesCRUD = () => {
                       manager: selectedUser,
                     });
                   }}
-                  isLoading={mutation.isLoading}
+                  isLoading={mutation.isPending}
                   color={"white"}
                   background={colorMode === "light" ? "blue.500" : "blue.600"}
                   _hover={{

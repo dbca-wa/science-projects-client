@@ -61,7 +61,8 @@ export const ProjectClosureModal = ({
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
-  const closureMutation = useMutation(closeProjectCall, {
+  const closureMutation = useMutation({
+    mutationFn: closeProjectCall,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -82,7 +83,7 @@ export const ProjectClosureModal = ({
       }
 
       setTimeout(async () => {
-        queryClient.invalidateQueries(["projects", projectPk]);
+        queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
         await refetchData();
         setToLastTab(-1);
         onClose();
@@ -262,7 +263,7 @@ export const ProjectClosureModal = ({
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }}
-                isLoading={closureMutation.isLoading}
+                isLoading={closureMutation.isPending}
                 type="submit"
                 isDisabled={!closureReason || !outcomeValue || !projPk}
                 ml={3}

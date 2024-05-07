@@ -21,7 +21,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { useUserSearchContext } from "../../lib/hooks/UserSearchContext";
+import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AdminSwitchVar,
@@ -70,8 +70,9 @@ export const PromoteUserModal = ({
     MutationSuccess,
     MutationError,
     AdminSwitchVar
-  >(switchAdmin, {
+  >({
     // Start of mutation handling
+    mutationFn: switchAdmin,
     onMutate: () => {
       addToast({
         title: "Updating membership...",
@@ -85,10 +86,10 @@ export const PromoteUserModal = ({
     onSuccess: (data) => {
       console.log(data);
 
-      queryClient.refetchQueries([`user`, userPk]);
-      queryClient.refetchQueries([`personalInfo`, userPk]);
-      queryClient.refetchQueries([`membership`, userPk]);
-      queryClient.refetchQueries([`profile`, userPk]);
+      queryClient.refetchQueries({ queryKey: [`user`, userPk] });
+      queryClient.refetchQueries({ queryKey: [`personalInfo`, userPk] });
+      queryClient.refetchQueries({ queryKey: [`membership`, userPk] });
+      queryClient.refetchQueries({ queryKey: [`profile`, userPk] });
       reFetch();
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
@@ -202,7 +203,7 @@ export const PromoteUserModal = ({
             </Button>
             <Button
               isDisabled={userIsExternal}
-              isLoading={promotionMutation.isLoading}
+              isLoading={promotionMutation.isPending}
               form="promotion-form"
               type="submit"
               bgColor={colorMode === "light" ? `green.500` : `green.600`}

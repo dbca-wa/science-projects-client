@@ -31,7 +31,7 @@ import { IDepartmentalService } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
 import {
   deleteDepartmentalService,
@@ -75,7 +75,8 @@ export const ServiceItemDisplay = ({
     onUserOpen();
   };
 
-  const updateMutation = useMutation(updateDepartmentalService, {
+  const updateMutation = useMutation({
+    mutationFn: updateDepartmentalService,
     onSuccess: () => {
       toast({
         status: "success",
@@ -83,7 +84,7 @@ export const ServiceItemDisplay = ({
         position: "top-right",
       });
       onUpdateModalClose();
-      queryClient.invalidateQueries(["departmentalServices"]);
+      queryClient.invalidateQueries({ queryKey: ["departmentalServices"] });
     },
     onError: () => {
       toast({
@@ -94,7 +95,8 @@ export const ServiceItemDisplay = ({
     },
   });
 
-  const deleteMutation = useMutation(deleteDepartmentalService, {
+  const deleteMutation = useMutation({
+    mutationFn: deleteDepartmentalService,
     onSuccess: () => {
       toast({
         status: "success",
@@ -102,7 +104,7 @@ export const ServiceItemDisplay = ({
         position: "top-right",
       });
       onDeleteModalClose();
-      queryClient.invalidateQueries(["departmentalServices"]);
+      queryClient.invalidateQueries({ queryKey: ["departmentalServices"] });
     },
   });
 
@@ -138,7 +140,7 @@ export const ServiceItemDisplay = ({
         width="100%"
         p={3}
         borderWidth={1}
-      // gridColumnGap={8}
+        // gridColumnGap={8}
       >
         <TextButtonFlex name={name} onClick={onUpdateModalOpen} />
         <Flex>
@@ -256,7 +258,7 @@ export const ServiceItemDisplay = ({
                   autoComplete="off"
                   value={nameData}
                   onChange={(e) => setNameData(e.target.value)}
-                // {...register("name", { required: true })}
+                  // {...register("name", { required: true })}
                 />
               </FormControl>
               <FormControl>
@@ -290,7 +292,7 @@ export const ServiceItemDisplay = ({
               <Button
                 // form="update-form"
                 // type="submit"
-                isLoading={updateMutation.isLoading}
+                isLoading={updateMutation.isPending}
                 color={"white"}
                 background={colorMode === "light" ? "blue.500" : "blue.600"}
                 _hover={{

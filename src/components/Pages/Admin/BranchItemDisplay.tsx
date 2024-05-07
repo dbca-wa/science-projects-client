@@ -27,16 +27,16 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { IBranch } from "../../../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MdMoreVert } from "react-icons/md";
-import { useForm } from "react-hook-form";
-import { deleteBranch, updateBranch } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { UserProfile } from "../Users/UserProfile";
-import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { MdMoreVert } from "react-icons/md";
+import { deleteBranch, updateBranch } from "../../../lib/api";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { IBranch } from "../../../types";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
+import { UserProfile } from "../Users/UserProfile";
 
 export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
   const { register, handleSubmit, watch, reset } = useForm<IBranch>();
@@ -60,7 +60,8 @@ export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
   const nameData = watch("name");
   const [selectedUser, setSelectedUser] = useState<number>(manager);
 
-  const updateMutation = useMutation(updateBranch, {
+  const updateMutation = useMutation({
+    mutationFn: updateBranch,
     onSuccess: () => {
       toast({
         status: "success",
@@ -68,7 +69,7 @@ export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
         position: "top-right",
       });
       onUpdateModalClose();
-      queryClient.invalidateQueries(["branches"]);
+      queryClient.invalidateQueries({ queryKey: ["branches"] });
       reset();
     },
     onError: () => {
@@ -80,7 +81,8 @@ export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
     },
   });
 
-  const deleteMutation = useMutation(deleteBranch, {
+  const deleteMutation = useMutation({
+    mutationFn: deleteBranch,
     onSuccess: () => {
       toast({
         status: "success",
@@ -88,7 +90,7 @@ export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
         position: "top-right",
       });
       onDeleteModalClose();
-      queryClient.invalidateQueries(["branches"]);
+      queryClient.invalidateQueries({ queryKey: ["branches"] });
     },
   });
 
@@ -292,7 +294,7 @@ export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
                     manager: selectedUser,
                   });
                 }}
-                isLoading={updateMutation.isLoading}
+                isLoading={updateMutation.isPending}
                 color={"white"}
                 background={colorMode === "light" ? "blue.500" : "blue.600"}
                 _hover={{

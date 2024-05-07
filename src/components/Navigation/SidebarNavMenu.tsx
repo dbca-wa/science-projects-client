@@ -1,15 +1,15 @@
 // For handling the sidebar on smaller screens on traditional version
 
 import {
+  Box,
+  Button,
+  Center,
   Flex,
   Menu,
   MenuButton,
+  MenuList,
   Text,
   TextProps,
-  Button,
-  Center,
-  MenuList,
-  Box,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { GoTriangleDown } from "react-icons/go";
@@ -57,8 +57,8 @@ export const SidebarNavMenu = ({
         ? { bg: `${cScheme}.500` }
         : {}
       : cScheme
-      ? `${cScheme}.500`
-      : "transparent";
+        ? `${cScheme}.500`
+        : "transparent";
 
   const fontColorStyle =
     isHovered || isOpen
@@ -66,8 +66,8 @@ export const SidebarNavMenu = ({
         ? { color: fColor }
         : "white"
       : fColor
-      ? fColor
-      : "whiteAlpha.700";
+        ? fColor
+        : "whiteAlpha.700";
 
   return (
     <Box zIndex={isOpen ? 2 : 1}>

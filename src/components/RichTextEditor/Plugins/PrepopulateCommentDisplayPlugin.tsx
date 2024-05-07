@@ -1,6 +1,6 @@
+import { $generateNodesFromDOM } from "@lexical/html";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useEffect, useState } from "react";
-import { $generateNodesFromDOM } from "@lexical/html";
 // import { $generateNodesFromDOM, $getRoot, $getList, ListItemNode, ListNode } from "@lexical/html";
 import { $getRoot } from "lexical";
 interface HTMLPrepopulationProp {
@@ -9,7 +9,8 @@ interface HTMLPrepopulationProp {
 }
 
 export const PrepopulateCommentDisplayPlugin = ({
-  data, setPopulationInProgress
+  data,
+  setPopulationInProgress,
 }: HTMLPrepopulationProp) => {
   const checkIsHtml = (data: string) => {
     // Regular expression to check for HTML tags
@@ -32,9 +33,7 @@ export const PrepopulateCommentDisplayPlugin = ({
         setFixedText(
           `<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;">${data}</span></p>`
         );
-
       }
-
     }
   }, [isHtml]);
 
@@ -45,8 +44,10 @@ export const PrepopulateCommentDisplayPlugin = ({
           `<tr>${row
             .map(
               (cell, colIndex) =>
-                `<${rowIndex === 0 || colIndex === 0 ? "th" : "td"
-                } class="table-cell-dark${rowIndex === 0 ? " table-cell-header-dark" : ""
+                `<${
+                  rowIndex === 0 || colIndex === 0 ? "th" : "td"
+                } class="table-cell-dark${
+                  rowIndex === 0 ? " table-cell-header-dark" : ""
                 }">${cell}</${rowIndex === 0 || colIndex === 0 ? "th" : "td"}>`
             )
             .join("")}</tr>`

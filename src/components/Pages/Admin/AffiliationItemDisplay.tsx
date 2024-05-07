@@ -47,7 +47,8 @@ export const AffiliationItemDisplay = ({ pk, name }: IAffiliation) => {
 
   const nameData = watch("name");
 
-  const updateMutation = useMutation(updateAffiliation, {
+  const updateMutation = useMutation({
+    mutationFn: updateAffiliation,
     onSuccess: () => {
       toast({
         status: "success",
@@ -55,7 +56,7 @@ export const AffiliationItemDisplay = ({ pk, name }: IAffiliation) => {
         position: "top-right",
       });
       onUpdateModalClose();
-      queryClient.invalidateQueries(["affiliations"]);
+      queryClient.invalidateQueries({ queryKey: ["affiliations"] });
       reset();
     },
     onError: () => {
@@ -67,7 +68,8 @@ export const AffiliationItemDisplay = ({ pk, name }: IAffiliation) => {
     },
   });
 
-  const deleteMutation = useMutation(deleteAffiliation, {
+  const deleteMutation = useMutation({
+    mutationFn: deleteAffiliation,
     onSuccess: () => {
       toast({
         status: "success",
@@ -75,7 +77,7 @@ export const AffiliationItemDisplay = ({ pk, name }: IAffiliation) => {
         position: "top-right",
       });
       onDeleteModalClose();
-      queryClient.invalidateQueries(["affiliations"]);
+      queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     },
   });
 
@@ -219,7 +221,7 @@ export const AffiliationItemDisplay = ({ pk, name }: IAffiliation) => {
                     name: nameData,
                   });
                 }}
-                isLoading={updateMutation.isLoading}
+                isLoading={updateMutation.isPending}
                 color={"white"}
                 background={colorMode === "light" ? "blue.500" : "blue.600"}
                 _hover={{

@@ -9,32 +9,32 @@ import {
   ChevronRightIcon,
 } from "@chakra-ui/icons";
 import {
-  InputProps as ChakraInputProps,
-  Menu,
-  MenuButton,
-  Button,
-  MenuList,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Text,
   Box,
-  Grid,
+  Button,
   Center,
-  HStack,
-  IconButton,
-  VStack,
-  Heading,
-  useColorModeValue,
+  InputProps as ChakraInputProps,
   Flex,
   FormControl,
   FormLabel,
+  Grid,
+  HStack,
+  Heading,
   Icon,
-  useDisclosure,
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Menu,
+  MenuButton,
+  MenuList,
+  Text,
+  VStack,
   useColorMode,
+  useColorModeValue,
+  useDisclosure,
 } from "@chakra-ui/react";
-import React, { useState, createRef } from "react";
 import dayjs from "dayjs";
+import { createRef, useState } from "react";
 import { BsFillCalendarEventFill } from "react-icons/bs";
 
 /**
@@ -319,15 +319,15 @@ export const DatePicker = ({
                         isSelectedDay(day)
                           ? "white"
                           : isCurrentDay(day)
-                          ? "white"
-                          : color
+                            ? "white"
+                            : color
                       }
                       backgroundColor={
                         isSelectedDay(day)
                           ? "blue.500"
                           : isCurrentDay(day)
-                          ? "gray.400"
-                          : ""
+                            ? "gray.400"
+                            : ""
                       }
                       variant="ghost"
                       size="sm"

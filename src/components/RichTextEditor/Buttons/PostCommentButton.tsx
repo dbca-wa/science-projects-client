@@ -36,7 +36,8 @@ export const PostCommentButton = ({
 
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
-  const postCommentMutation = useMutation(createDocumentComment, {
+  const postCommentMutation = useMutation({
+    mutationFn: createDocumentComment,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -55,7 +56,9 @@ export const PostCommentButton = ({
           isClosable: true,
         });
       }
-      queryClient.invalidateQueries(["documentComments", documentId]);
+      queryClient.invalidateQueries({
+        queryKey: ["documentComments", documentId],
+      });
 
       setTimeout(async () => {
         await refetchComments();

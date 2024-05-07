@@ -1,6 +1,7 @@
 // A button for aligning text left, center, right, justified
 // Also has options for Outdent and Indent
 
+import { useState } from "react";
 import {
   FaAlignCenter,
   FaAlignJustify,
@@ -8,7 +9,6 @@ import {
   FaAlignRight,
 } from "react-icons/fa";
 import { BaseToolbarMenuButton } from "../Buttons/BaseToolbarMenuButton";
-import { useState } from "react";
 
 interface Props {
   isSmall?: boolean;
@@ -57,16 +57,16 @@ export const AlignButton = ({ isSmall, onClick }: Props) => {
         currentTitle === "Left" || currentTitle === "Left Align"
           ? FaAlignLeft
           : currentTitle === "Ctr" || currentTitle === "Center Align"
-          ? FaAlignCenter
-          : currentTitle === "Right" || currentTitle === "Right Align"
-          ? FaAlignRight
-          : currentTitle === "Just" || currentTitle === "Jusitfy Align"
-          ? FaAlignJustify
-          : // currentTitle === "Out" || currentTitle === "Outdent" ?
-            //     FaOutdent :
-            // currentTitle === "In" || currentTitle === "Indent" ?
-            // FaIndent
-            FaAlignLeft
+            ? FaAlignCenter
+            : currentTitle === "Right" || currentTitle === "Right Align"
+              ? FaAlignRight
+              : currentTitle === "Just" || currentTitle === "Jusitfy Align"
+                ? FaAlignJustify
+                : // currentTitle === "Out" || currentTitle === "Outdent" ?
+                  //     FaOutdent :
+                  // currentTitle === "In" || currentTitle === "Indent" ?
+                  // FaIndent
+                  FaAlignLeft
       }
       menuItems={[
         {

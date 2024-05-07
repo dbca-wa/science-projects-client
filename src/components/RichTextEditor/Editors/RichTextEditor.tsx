@@ -4,18 +4,18 @@
 import { useEffect, useRef, useState } from "react";
 
 // Styles and Styling Components
-import { Box, useColorMode, Text, Flex, Grid } from "@chakra-ui/react";
+import { Box, Flex, Grid, Text, useColorMode } from "@chakra-ui/react";
 
 import "../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
-import { EditableSRTE } from "./Sections/EditableSRTE";
-import { DisplaySRTE } from "./Sections/DisplaySRTE";
+import { useGetRTESectionTitle } from "@/lib/hooks/helper/useGetRTESectionTitle";
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { EditorSections, EditorSubsections, EditorType } from "../../../types";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
-import { useGetRTESectionTitle } from "@/lib/hooks/useGetRTESectionTitle";
-import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
+import { DisplaySRTE } from "./Sections/DisplaySRTE";
+import { EditableSRTE } from "./Sections/EditableSRTE";
 
 interface IProps {
   canEdit: boolean;
@@ -216,10 +216,10 @@ export const RichTextEditor = ({
               ? "gray.200"
               : "gray.100"
             : section === "description" ||
-              section === "externalAims" ||
-              section === "externalDescription"
-            ? "gray.800"
-            : "gray.700"
+                section === "externalAims" ||
+                section === "externalDescription"
+              ? "gray.800"
+              : "gray.700"
         }
         // roundedTop={"8px"}
         roundedTop={20}
@@ -267,8 +267,8 @@ export const RichTextEditor = ({
               ? "whiteAlpha.600"
               : "whiteAlpha.400"
             : isEditorOpen
-            ? "blackAlpha.500"
-            : "blackAlpha.400"
+              ? "blackAlpha.500"
+              : "blackAlpha.400"
         }
       >
         {isEditorOpen ? (

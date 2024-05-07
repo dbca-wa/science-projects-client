@@ -1,12 +1,12 @@
 import { useColorMode } from "@chakra-ui/react";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { ListItemNode, ListNode } from "@lexical/list";
-import { HeadingNode } from "@lexical/rich-text";
-import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { HeadingNode } from "@lexical/rich-text";
+import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 
 import "../../../../styles/texteditor.css";
 

@@ -1,7 +1,7 @@
 // The basic rich text editor component; does not allow sticky notes, emotes, etc.
 
 // React
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // Styles and Styling Components
 import { useColorMode } from "@chakra-ui/react";
@@ -10,9 +10,9 @@ import "../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
+import { IMainDoc, IProjectData, IProjectMember, IReport } from "@/types";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { SREditor } from "./SREditor";
-import { IMainDoc, IProjectData, IProjectMember, IReport } from "@/types";
 
 export interface IStudentReportDisplayData {
   pk?: number;

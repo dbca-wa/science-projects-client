@@ -3,8 +3,8 @@
 import { Box, Grid, Text, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useCheckUserInTeam } from "../../../lib/hooks/useCheckUserInTeam";
-import { useCheckUserIsTeamLeader } from "../../../lib/hooks/useCheckUserIsTeamLeader";
+import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
+import { useCheckUserIsTeamLeader } from "../../../lib/hooks/helper/useCheckUserIsTeamLeader";
 import {
   IProjectAreas,
   IProjectDocuments,
@@ -37,11 +37,10 @@ export const ProjectPlanContents = ({
   refetch,
   setToLastTab,
   projectAreas,
-  baseAPI
+  baseAPI,
 }: Props) => {
   const { colorMode } = useColorMode();
-  useEffect(() => console.log(console.log(document)
-  ))
+  useEffect(() => console.log(console.log(document)));
   const documentType = "projectplan";
   const editorKey = colorMode + documentType;
 
@@ -53,7 +52,6 @@ export const ProjectPlanContents = ({
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
     document?.methodology_image?.file
   );
-
 
   return (
     <motion.div
@@ -166,14 +164,11 @@ export const ProjectPlanContents = ({
         section={"methodology"}
       />
 
-
       {/* <MethodologyImageDisplay /> */}
       <MethodologyImage
         refetch={refetch}
         document={document}
-        helperText={
-          "Upload an image for the methodology (Optional)"
-        }
+        helperText={"Upload an image for the methodology (Optional)"}
         selectedImageUrl={selectedImageUrl}
         setSelectedImageUrl={setSelectedImageUrl}
         selectedFile={selectedFile}
@@ -256,7 +251,7 @@ export const ProjectPlanContents = ({
         userIsLeader={userIsLeader}
         userData={userData}
         refetchDocument={refetch}
-      // isProjectLeader={}
+        // isProjectLeader={}
       />
 
       <Box pb={6} mt={4}>

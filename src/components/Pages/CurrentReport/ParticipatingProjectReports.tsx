@@ -1,9 +1,9 @@
 // WIP tab contents for participating projects. Features some additional info and the projects via AnnualReportProjectDisplay
 
 import { ARProgressReportHandler } from "@/components/RichTextEditor/Editors/ARProgressReportHandler";
-import { useLatestYearsActiveProgressReports } from "@/lib/hooks/useLatestYearsActiveProgressReports";
-import { useLatestYearsActiveStudentProjects } from "@/lib/hooks/useLatestYearsActiveStudentProjects";
-import { useUser } from "@/lib/hooks/useUser";
+import { useLatestYearsActiveProgressReports } from "@/lib/hooks/tanstack/useLatestYearsActiveProgressReports";
+import { useLatestYearsActiveStudentProjects } from "@/lib/hooks/tanstack/useLatestYearsActiveStudentProjects";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
   Accordion,
   AccordionButton,
@@ -18,10 +18,10 @@ import {
 // import {
 // JSXElementConstructor, ReactElement,
 // useEffect } from "react";
-import whitePaperBackground from "@/images/white-texture.jpg";
-import { RiBook3Fill } from "react-icons/ri";
-import { MdScience } from "react-icons/md";
 import { ARStudentReportHandler } from "@/components/RichTextEditor/Editors/ARStudentReportHandler";
+import whitePaperBackground from "@/images/white-texture.jpg";
+import { MdScience } from "react-icons/md";
+import { RiBook3Fill } from "react-icons/ri";
 // import { render } from "@react-email/render";
 
 export const ParticipatingProjectReports = () => {

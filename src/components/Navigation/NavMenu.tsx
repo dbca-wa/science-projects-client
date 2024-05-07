@@ -1,15 +1,15 @@
 // Component for handling hover opening of menus on Header/Nav
 
 import {
+  Box,
+  Button,
+  Center,
   Flex,
   Menu,
   MenuButton,
+  MenuList,
   Text,
   TextProps,
-  Button,
-  Center,
-  MenuList,
-  Box,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { GoTriangleDown } from "react-icons/go";
@@ -49,7 +49,7 @@ export const NavMenu = ({
 
   const handleItemClick = () => {
     setIsOpen(false);
-  }
+  };
 
   const bgStyle = isHovered
     ? cScheme

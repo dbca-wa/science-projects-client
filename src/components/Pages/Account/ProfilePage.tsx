@@ -1,27 +1,27 @@
 // Handles Profile Page view
 
 import {
-  Image,
   Box,
+  Center,
   Flex,
   Grid,
+  Image,
   Spinner,
   Text,
   useColorMode,
   useDisclosure,
-  Center,
 } from "@chakra-ui/react";
-import { useUser } from "../../../lib/hooks/useUser";
-import { FcApproval } from "react-icons/fc";
-import { AiFillCloseCircle } from "react-icons/ai";
-import { UserGridItem } from "../Users/UserGridItem";
-import { EditPersonalInformationModal } from "../../Modals/EditPersonalInformationModal";
-import { EditMembershipModal } from "../../Modals/EditMembershipModal";
-import { EditProfileModal } from "../../Modals/EditProfileModal";
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import useApiEndpoint from "../../../lib/hooks/useApiEndpoint";
-import useServerImageUrl from "../../../lib/hooks/useServerImageUrl";
+import { useEffect, useState } from "react";
+import { AiFillCloseCircle } from "react-icons/ai";
+import { FcApproval } from "react-icons/fc";
+import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
+import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
+import { useUser } from "../../../lib/hooks/tanstack/useUser";
+import { EditMembershipModal } from "../../Modals/EditMembershipModal";
+import { EditPersonalInformationModal } from "../../Modals/EditPersonalInformationModal";
+import { EditProfileModal } from "../../Modals/EditProfileModal";
+import { UserGridItem } from "../Users/UserGridItem";
 
 const AnimatedClickToEdit = () => {
   return (
@@ -233,14 +233,14 @@ export const ProfilePage = () => {
                     ? me.title === "mr"
                       ? "Mr."
                       : me.title === "mrs"
-                      ? "Mrs."
-                      : me.title === "ms"
-                      ? "Ms."
-                      : me.title === "master"
-                      ? "Master"
-                      : me.title === "dr"
-                      ? "Dr."
-                      : "Bad Title"
+                        ? "Mrs."
+                        : me.title === "ms"
+                          ? "Ms."
+                          : me.title === "master"
+                            ? "Master"
+                            : me.title === "dr"
+                              ? "Dr."
+                              : "Bad Title"
                     : "--"}
                 </Text>
               </Flex>
@@ -400,8 +400,8 @@ export const ProfilePage = () => {
                   {!me.is_staff
                     ? "External"
                     : me?.agency?.name
-                    ? me.agency.name
-                    : NoDataText}
+                      ? me.agency.name
+                      : NoDataText}
                 </Text>
               </Flex>
               {me.is_staff && (

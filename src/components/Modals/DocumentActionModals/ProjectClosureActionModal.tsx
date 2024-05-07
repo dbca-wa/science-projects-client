@@ -29,8 +29,8 @@ import {
   IUserMe,
 } from "../../../types";
 import { handleDocumentAction } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/useFullUserByPk";
-import { useDirectorateMembers } from "../../../lib/hooks/useDirectorateMembers";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { useDirectorateMembers } from "../../../lib/hooks/tanstack/useDirectorateMembers";
 
 interface Props {
   userData: IUserMe;
@@ -85,16 +85,18 @@ export const ProjectClosureActionModal = ({
     }
   };
 
-  const approveProjectClosureMutation = useMutation(handleDocumentAction, {
+  const approveProjectClosureMutation = useMutation({
+    mutationFn: handleDocumentAction,
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${action === "approve"
-          ? "Approving"
-          : action === "recall"
-            ? "Recalling"
-            : "Sending Back"
-          }`,
+        title: `${
+          action === "approve"
+            ? "Approving"
+            : action === "recall"
+              ? "Recalling"
+              : "Sending Back"
+        }`,
         position: "top-right",
       });
     },
@@ -102,12 +104,13 @@ export const ProjectClosureActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${action === "approve"
-            ? "Approved"
-            : action === "recall"
-              ? "Recalled"
-              : "Sent Back"
-            }`,
+          description: `Document ${
+            action === "approve"
+              ? "Approved"
+              : action === "recall"
+                ? "Recalled"
+                : "Sent Back"
+          }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -121,18 +124,21 @@ export const ProjectClosureActionModal = ({
       onClose();
 
       setTimeout(() => {
-        queryClient.invalidateQueries(["projects", projectData?.pk]);
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectData?.pk],
+        });
       }, 350);
     },
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${action === "approve"
-            ? "Approve"
-            : action === "recall"
-              ? "Recall"
-              : "Send Back"
-            } project closure`,
+          title: `Could Not ${
+            action === "approve"
+              ? "Approve"
+              : action === "recall"
+                ? "Recall"
+                : "Send Back"
+          } project closure`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -155,7 +161,7 @@ export const ProjectClosureActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-    // isCentered={true}
+      // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -164,11 +170,13 @@ export const ProjectClosureActionModal = ({
       >
         <ModalHeader>
           {action === "approve"
-            ? stage === 1 ? "Submit" : "Approve"
+            ? stage === 1
+              ? "Submit"
+              : "Approve"
             : action === "recall"
-              ? "Recall" :
-              action === "reopen" ?
-                "Reopen"
+              ? "Recall"
+              : action === "reopen"
+                ? "Reopen"
                 : "Send Back"}{" "}
           {action === "reopen" ? "Project" : "Document"}?
         </ModalHeader>
@@ -205,15 +213,16 @@ export const ProjectClosureActionModal = ({
                   <Text fontWeight={"bold"}>Stage 1</Text>
                   <br />
                   <Text>
-                    In your capacity as Project Lead, would you like to {action === "approve" ? "submit" : action}{" "}
-                    this {action === "reopen" ? "Project" : "project closure"}?
+                    In your capacity as Project Lead, would you like to{" "}
+                    {action === "approve" ? "submit" : action} this{" "}
+                    {action === "reopen" ? "Project" : "project closure"}?
                   </Text>
                   <br />
                   <Text>
                     {action === "approve"
                       ? "This will send an email to the Business Area Lead for approval."
-                      :
-                      action === "reopen" ? "This will delete the project closure document and set the status of the project to 'update requested'."
+                      : action === "reopen"
+                        ? "This will delete the project closure document and set the status of the project to 'update requested'."
                         : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been recalled your submission."}
                   </Text>
 
@@ -228,8 +237,12 @@ export const ProjectClosureActionModal = ({
                       ({baLead.first_name} {baLead.last_name} - {baLead.email})
                     </strong>{" "}
                     alerting them that you have{" "}
-                    {action === "approve" ? "submitted" : action === "reopen" ? "reopened" : "recalled"} this{" "}
-                    {action === "approve" ? "document" : "project"}?
+                    {action === "approve"
+                      ? "submitted"
+                      : action === "reopen"
+                        ? "reopened"
+                        : "recalled"}{" "}
+                    this {action === "approve" ? "document" : "project"}?
                   </Checkbox>
                 </Box>
               ) : stage === 2 ? (
@@ -237,16 +250,18 @@ export const ProjectClosureActionModal = ({
                   <Text fontWeight={"bold"}>Stage 2</Text>
                   <br />
                   <Text>
-                    In your capacity as Business Area Lead, would you like to {action}{" "}
-                    this {action === "reopen" ? "Project" : "project closure"}?
+                    In your capacity as Business Area Lead, would you like to{" "}
+                    {action} this{" "}
+                    {action === "reopen" ? "Project" : "project closure"}?
                   </Text>
                   <br />
                   <Text>
                     {action === "approve"
                       ? "This will send an email to members of the Directorate for approval."
                       : action === "recall"
-                        ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval." :
-                        action === "reopen" ? "This will delete the project closure document and set the status of the project to 'update requested'."
+                        ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
+                        : action === "reopen"
+                          ? "This will delete the project closure document and set the status of the project to 'update requested'."
                           : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
                   </Text>
 
@@ -278,7 +293,9 @@ export const ProjectClosureActionModal = ({
                     isChecked={shouldSendEmail}
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
-                    Send emails to members of the Directorate alerting them that you have {action === "approve" ? "approved" : "reopened"} this {action === "approve" ? "document" : "project"}?
+                    Send emails to members of the Directorate alerting them that
+                    you have {action === "approve" ? "approved" : "reopened"}{" "}
+                    this {action === "approve" ? "document" : "project"}?
                   </Checkbox>
                 </Box>
               ) : (
@@ -286,7 +303,12 @@ export const ProjectClosureActionModal = ({
                   <Text fontWeight={"bold"}>Stage 3</Text>
                   <br />
                   <Text>
-                    In your capacity as Directorate, would you like to {action === "approve" ? "submit" : action === "send_back" ? "send back" : action}{" "}
+                    In your capacity as Directorate, would you like to{" "}
+                    {action === "approve"
+                      ? "submit"
+                      : action === "send_back"
+                        ? "send back"
+                        : action}{" "}
                     this {action === "reopen" ? "Project" : "project closure"}?
                   </Text>
                   <br />
@@ -295,7 +317,8 @@ export const ProjectClosureActionModal = ({
                       ? "This will provide final approval for this project closure, closing the project."
                       : action === "recall"
                         ? "This will return the directorate approval status from 'Granted' to 'Required'. The project will also be reopened."
-                        : action === "reopen" ? "This will delete the project closure document and set the status of the project to 'update requested'."
+                        : action === "reopen"
+                          ? "This will delete the project closure document and set the status of the project to 'update requested'."
                           : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been sent back for revision."}
                   </Text>
 
@@ -342,7 +365,7 @@ export const ProjectClosureActionModal = ({
           <Button
             form="approval-form"
             type="submit"
-            isLoading={approveProjectClosureMutation.isLoading}
+            isLoading={approveProjectClosureMutation.isPending}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{
@@ -350,10 +373,14 @@ export const ProjectClosureActionModal = ({
             }}
           >
             {action === "approve"
-              ? stage === 1 ? "Submit" : "Approve"
+              ? stage === 1
+                ? "Submit"
+                : "Approve"
               : action === "recall"
                 ? "Recall"
-                : action === "reopen" ? "Reopen" : "Send Back"}
+                : action === "reopen"
+                  ? "Reopen"
+                  : "Send Back"}
           </Button>
         </ModalFooter>
       </ModalContent>

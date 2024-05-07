@@ -1,5 +1,6 @@
 // Dropdown search component for branches. Displays 5 branches below the search box.
 
+import { CloseIcon } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
@@ -19,10 +20,9 @@ import {
   useRef,
   useState,
 } from "react";
-import { IBranch } from "../../types";
 import { getBranchesBasedOnSearchTerm } from "../../lib/api";
-import { CloseIcon } from "@chakra-ui/icons";
-import { useBranch } from "../../lib/hooks/useBranch";
+import { useBranch } from "../../lib/hooks/tanstack/useBranch";
+import { IBranch } from "../../types";
 
 interface IBranchSearchDropdown {
   isRequired: boolean;

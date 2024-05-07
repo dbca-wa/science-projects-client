@@ -14,14 +14,14 @@ import {
   Tag,
   Text,
   useColorMode,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useBusinessArea } from "../../../../lib/hooks/useBusinessArea";
-import { useFormattedDate } from "../../../../lib/hooks/useFormattedDate";
-import { useFullUserByPk } from "../../../../lib/hooks/useFullUserByPk";
-import { useProjectTeam } from "../../../../lib/hooks/useProjectTeam";
-import { useUser } from "../../../../lib/hooks/useUser";
+import { useFormattedDate } from "../../../../lib/hooks/helper/useFormattedDate";
+import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea";
+import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
+import { useProjectTeam } from "../../../../lib/hooks/tanstack/useProjectTeam";
+import { useUser } from "../../../../lib/hooks/tanstack/useUser";
 import {
   IProjectAreas,
   IProjectDocuments,
@@ -251,7 +251,7 @@ export const ProjectPlanDocActions = ({
               </Box>
               <Grid
                 pt={2}
-              // gridGap={2}
+                // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -280,7 +280,7 @@ export const ProjectPlanDocActions = ({
                             : projectPlanData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                              colorMode === "light"
+                                colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -456,9 +456,9 @@ export const ProjectPlanDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-              // gridGap={2}
-              // pt={4}
-              // pos={"relative"}
+                // gridGap={2}
+                // pt={4}
+                // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -583,44 +583,46 @@ export const ProjectPlanDocActions = ({
                                                             documentPk={projectPlanData?.document?.pk ? projectPlanData?.document?.pk : projectPlanData?.document?.id}
                                                             projectData={projectPlanData?.document?.project}
                                                         /> */}
-                          {all_documents?.progress_reports.length < 1 && all_documents?.concept_plan && (
-                            <>
-                              <DeleteDocumentModal
-                                projectPk={
-                                  projectPlanData?.document?.project?.pk
-                                }
-                                documentPk={
-                                  projectPlanData?.document?.pk
-                                    ? projectPlanData?.document?.pk
-                                    : projectPlanData?.document?.id
-                                }
-                                // deleting the main doc will also delete the projectplan
-                                documentKind="projectplan"
-                                onClose={onCloseDeleteDocumentModal}
-                                isOpen={isDeleteDocumentModalOpen}
-                                refetchData={refetchData}
-                                setToLastTab={setToLastTab}
-                              />
-                              <Button
-                                color={"white"}
-                                background={
-                                  colorMode === "light" ? "red.500" : "red.600"
-                                }
-                                _hover={{
-                                  background:
+                          {all_documents?.progress_reports.length < 1 &&
+                            all_documents?.concept_plan && (
+                              <>
+                                <DeleteDocumentModal
+                                  projectPk={
+                                    projectPlanData?.document?.project?.pk
+                                  }
+                                  documentPk={
+                                    projectPlanData?.document?.pk
+                                      ? projectPlanData?.document?.pk
+                                      : projectPlanData?.document?.id
+                                  }
+                                  // deleting the main doc will also delete the projectplan
+                                  documentKind="projectplan"
+                                  onClose={onCloseDeleteDocumentModal}
+                                  isOpen={isDeleteDocumentModalOpen}
+                                  refetchData={refetchData}
+                                  setToLastTab={setToLastTab}
+                                />
+                                <Button
+                                  color={"white"}
+                                  background={
                                     colorMode === "light"
-                                      ? "red.400"
-                                      : "red.500",
-                                }}
-                                size={"sm"}
-                                onClick={onOpenDeleteDocumentModal}
-                                mr={2}
-                              >
-                                Delete Document
-                              </Button>
-
-                            </>
-                          )}
+                                      ? "red.500"
+                                      : "red.600"
+                                  }
+                                  _hover={{
+                                    background:
+                                      colorMode === "light"
+                                        ? "red.400"
+                                        : "red.500",
+                                  }}
+                                  size={"sm"}
+                                  onClick={onOpenDeleteDocumentModal}
+                                  mr={2}
+                                >
+                                  Delete Document
+                                </Button>
+                              </>
+                            )}
 
                           {projectAreas.areas.length < 1 ? (
                             <>
@@ -672,46 +674,39 @@ export const ProjectPlanDocActions = ({
                               Submit
                             </Button>
                           )}
-
-
                         </Center>
                       )}
 
-                    {
-                      projectPlanData?.document
-                        ?.project_lead_approval_granted === true &&
-                        projectPlanData?.document
-                          ?.business_area_lead_approval_granted === true &&
-                        projectPlanData?.document
-                          ?.directorate_approval_granted === true &&
-                        all_documents?.progress_reports?.length < 1 &&
-                        (userData?.is_superuser || leaderMember?.user?.pk === userData?.pk) ?
-                        (
-                          <Flex justifyContent={"flex-end"}>
-                            <Button
-                              mt={3}
-                              color={"white"}
-                              background={
-                                colorMode === "light"
-                                  ? "orange.500"
-                                  : "orange.600"
-                              }
-                              _hover={{
-                                background:
-                                  colorMode === "light"
-                                    ? "orange.400"
-                                    : "orange.500",
-                              }}
-                              size={"sm"}
-                              onClick={
-                                onOpenCreateProgressReportModal
-                              }
-                              ml={2}
-                            >
-                              Create Progress Report
-                            </Button>
-                          </Flex>
-                        ) : null}
+                    {projectPlanData?.document
+                      ?.project_lead_approval_granted === true &&
+                    projectPlanData?.document
+                      ?.business_area_lead_approval_granted === true &&
+                    projectPlanData?.document?.directorate_approval_granted ===
+                      true &&
+                    all_documents?.progress_reports?.length < 1 &&
+                    (userData?.is_superuser ||
+                      leaderMember?.user?.pk === userData?.pk) ? (
+                      <Flex justifyContent={"flex-end"}>
+                        <Button
+                          mt={3}
+                          color={"white"}
+                          background={
+                            colorMode === "light" ? "orange.500" : "orange.600"
+                          }
+                          _hover={{
+                            background:
+                              colorMode === "light"
+                                ? "orange.400"
+                                : "orange.500",
+                          }}
+                          size={"sm"}
+                          onClick={onOpenCreateProgressReportModal}
+                          ml={2}
+                        >
+                          Create Progress Report
+                        </Button>
+                      </Flex>
+                    ) : null}
                   </Grid>
                 </Grid>
 
@@ -723,7 +718,7 @@ export const ProjectPlanDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                // pos={"relative"}
+                  // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -761,12 +756,12 @@ export const ProjectPlanDocActions = ({
                     mt={
                       projectPlanData?.document
                         ?.project_lead_approval_granted &&
-                        projectPlanData?.document
-                          ?.directorate_approval_granted === false
+                      projectPlanData?.document
+                        ?.directorate_approval_granted === false
                         ? 3
                         : 0
                     }
-                  // gridTemplateColumns={"repeat(2, 1fr)"}
+                    // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {projectPlanData?.document?.project_lead_approval_granted &&
                       projectPlanData?.document
@@ -902,22 +897,19 @@ export const ProjectPlanDocActions = ({
                           </Button>
                         </Center>
                       )}
-
-
                   </Flex>
-                  {
-                    all_documents?.progress_reports?.length < 1 &&
-
-                      (userData?.is_superuser || projectPlanData?.document?.project?.business_area?.leader === userData?.pk) &&
-                      projectPlanData?.document
-                        ?.project_lead_approval_granted === true &&
-                      projectPlanData?.document
-                        ?.business_area_lead_approval_granted === true &&
-                      projectPlanData?.document
-                        ?.directorate_approval_granted === true ?
-                      (
-                        <Flex justifyContent={"flex-end"}>
-                          {/* <CreateProgressReportModal
+                  {all_documents?.progress_reports?.length < 1 &&
+                  (userData?.is_superuser ||
+                    projectPlanData?.document?.project?.business_area
+                      ?.leader === userData?.pk) &&
+                  projectPlanData?.document?.project_lead_approval_granted ===
+                    true &&
+                  projectPlanData?.document
+                    ?.business_area_lead_approval_granted === true &&
+                  projectPlanData?.document?.directorate_approval_granted ===
+                    true ? (
+                    <Flex justifyContent={"flex-end"}>
+                      {/* <CreateProgressReportModal
                           projectPk={
                             projectPlanData?.document?.project?.pk
                           }
@@ -927,31 +919,24 @@ export const ProjectPlanDocActions = ({
                           refetchData={refetchData}
                         /> */}
 
-                          <Button
-                            mt={3}
-                            color={"white"}
-                            background={
-                              colorMode === "light"
-                                ? "orange.500"
-                                : "orange.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light"
-                                  ? "orange.400"
-                                  : "orange.500",
-                            }}
-                            size={"sm"}
-                            onClick={
-                              onOpenCreateProgressReportModal
-                            }
-                            ml={2}
-                          >
-                            Create Progress Report
-                          </Button>
-                        </Flex>
-                      ) : null}
-
+                      <Button
+                        mt={3}
+                        color={"white"}
+                        background={
+                          colorMode === "light" ? "orange.500" : "orange.600"
+                        }
+                        _hover={{
+                          background:
+                            colorMode === "light" ? "orange.400" : "orange.500",
+                        }}
+                        size={"sm"}
+                        onClick={onOpenCreateProgressReportModal}
+                        ml={2}
+                      >
+                        Create Progress Report
+                      </Button>
+                    </Flex>
+                  ) : null}
                 </Grid>
 
                 {/* Directorate GRID */}
@@ -1051,7 +1036,7 @@ export const ProjectPlanDocActions = ({
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           {all_documents?.progress_reports.length >=
-                            1 ? null : (
+                          1 ? null : (
                             <>
                               <ProjectPlanActionModal
                                 userData={userData}
@@ -1089,55 +1074,53 @@ export const ProjectPlanDocActions = ({
                               </Button>
                             </>
                           )}
-                          {(all_documents?.progress_reports?.length < 1)
-                            &&
-                            projectPlanData?.document
-                              ?.project_lead_approval_granted === true &&
-                            projectPlanData?.document
-                              ?.business_area_lead_approval_granted === true &&
-                            projectPlanData?.document
-                              ?.directorate_approval_granted === true
-                            ? (
-                              <>
-                                <CreateProgressReportModal
-                                  projectPk={
-                                    projectPlanData?.document?.project?.pk
-                                  }
-                                  documentKind="progressreport"
-                                  onClose={onCloseCreateProgressReportModal}
-                                  isOpen={isCreateProgressReportModalOpen}
-                                  refetchData={refetchData}
-                                />
+                          {all_documents?.progress_reports?.length < 1 &&
+                          projectPlanData?.document
+                            ?.project_lead_approval_granted === true &&
+                          projectPlanData?.document
+                            ?.business_area_lead_approval_granted === true &&
+                          projectPlanData?.document
+                            ?.directorate_approval_granted === true ? (
+                            <>
+                              <CreateProgressReportModal
+                                projectPk={
+                                  projectPlanData?.document?.project?.pk
+                                }
+                                documentKind="progressreport"
+                                onClose={onCloseCreateProgressReportModal}
+                                isOpen={isCreateProgressReportModalOpen}
+                                refetchData={refetchData}
+                              />
 
-                                <Button
-                                  color={"white"}
-                                  background={
+                              <Button
+                                color={"white"}
+                                background={
+                                  colorMode === "light"
+                                    ? "orange.500"
+                                    : "orange.600"
+                                }
+                                _hover={{
+                                  background:
                                     colorMode === "light"
-                                      ? "orange.500"
-                                      : "orange.600"
-                                  }
-                                  _hover={{
-                                    background:
-                                      colorMode === "light"
-                                        ? "orange.400"
-                                        : "orange.500",
-                                  }}
-                                  size={"sm"}
-                                  onClick={
-                                    onOpenCreateProgressReportModal
-                                    // () => spawnProgressReport(
-                                    //     {
-                                    //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
-                                    //         kind: "progressreport"
-                                    //     }
-                                    // )
-                                  }
-                                  ml={2}
-                                >
-                                  Create Progress Report
-                                </Button>
-                              </>
-                            ) : null}
+                                      ? "orange.400"
+                                      : "orange.500",
+                                }}
+                                size={"sm"}
+                                onClick={
+                                  onOpenCreateProgressReportModal
+                                  // () => spawnProgressReport(
+                                  //     {
+                                  //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
+                                  //         kind: "progressreport"
+                                  //     }
+                                  // )
+                                }
+                                ml={2}
+                              >
+                                Create Progress Report
+                              </Button>
+                            </>
+                          ) : null}
                         </Center>
                       )}
 
@@ -1186,8 +1169,10 @@ export const ProjectPlanDocActions = ({
                 </Grid>
 
                 {/* PDF and email buttons */}
-                <ProjectDocumentPDFSection data_document={projectPlanData} refetchData={refetchData} />
-
+                <ProjectDocumentPDFSection
+                  data_document={projectPlanData}
+                  refetchData={refetchData}
+                />
               </Grid>
             </Box>
           </Grid>

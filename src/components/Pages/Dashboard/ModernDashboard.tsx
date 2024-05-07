@@ -17,18 +17,18 @@ import {
 import { Quote } from "../../Quote";
 import { useEffect, useState } from "react";
 import { MyTasksSection } from "./MyTasksSection";
-import { useUser } from "../../../lib/hooks/useUser";
+import { useUser } from "../../../lib/hooks/tanstack/useUser";
 
-import { useGetMyTasks } from "../../../lib/hooks/useGetMyTasks";
-import { useGetMyProjects } from "../../../lib/hooks/useGetMyProjects";
+import { useGetMyTasks } from "../../../lib/hooks/tanstack/useGetMyTasks";
+import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
 import { MyProjectsSection } from "./MyProjectsSection";
 import { Admin } from "./Admin";
 import { IDashProps } from "../../../types";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useRouterState, useNavigate } from "@tanstack/react-router";
 import { AddIcon } from "@chakra-ui/icons";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
-import { useGetDocumentsPendingMyAction } from "@/lib/hooks/useGetDocumentsPendingMyAction";
-import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/useGetEndorsementsPendingMyAction";
+import { useGetDocumentsPendingMyAction } from "@/lib/hooks/tanstack/useGetDocumentsPendingMyAction";
+import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/tanstack/useGetEndorsementsPendingMyAction";
 
 export const ModernDashboard = ({ activeTab }: IDashProps) => {
   const handleAddTaskClick = () => {
@@ -36,7 +36,7 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
     onAddTaskOpen();
   };
 
-  const location = useLocation();
+  const location = useRouterState().location;
   const navigate = useNavigate();
 
   const queryParams = new URLSearchParams(location.search);
@@ -71,16 +71,16 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
       // Check if data is available and then sort tasks
       const sortedTaskData = taskData
         ? {
-          done: sortTasksByStatus(
-            taskData.filter((task) => task.status === "done")
-          ),
-          todo: sortTasksByStatus(
-            taskData.filter((task) => task.status === "todo")
-          ),
-          inprogress: sortTasksByStatus(
-            taskData.filter((task) => task.status === "inprogress")
-          ),
-        }
+            done: sortTasksByStatus(
+              taskData.filter((task) => task.status === "done")
+            ),
+            todo: sortTasksByStatus(
+              taskData.filter((task) => task.status === "todo")
+            ),
+            inprogress: sortTasksByStatus(
+              taskData.filter((task) => task.status === "inprogress")
+            ),
+          }
         : null;
 
       // Set the state with the correct type
@@ -167,16 +167,16 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
                 <Box sx={countCircleStyling}>
                   {tasksLoading === false && combinedData !== null
                     ? (pendingEndorsementsDataLoading === false
-                      ? pendingEndorsementsData.aec.length
-                      // +
-                      //   pendingEndorsementsData.bm.length +
-                      //   pendingEndorsementsData.hc.length
-                      : 0) +
-                    (pendingProjectDocumentDataLoading === false
-                      ? pendingProjectDocumentData.all.length
-                      : 0) +
-                    (combinedData.inprogress.length +
-                      combinedData.todo.length)
+                        ? pendingEndorsementsData.aec.length
+                        : // +
+                          //   pendingEndorsementsData.bm.length +
+                          //   pendingEndorsementsData.hc.length
+                          0) +
+                      (pendingProjectDocumentDataLoading === false
+                        ? pendingProjectDocumentData.all.length
+                        : 0) +
+                      (combinedData.inprogress.length +
+                        combinedData.todo.length)
                     : 0}
                 </Box>
               </Center>
@@ -231,9 +231,9 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
             <Quote />
             <Box mt={1}>
               {tasksLoading === false &&
-                combinedData !== null &&
-                pendingEndorsementsDataLoading === false &&
-                pendingProjectDocumentDataLoading === false ? (
+              combinedData !== null &&
+              pendingEndorsementsDataLoading === false &&
+              pendingProjectDocumentDataLoading === false ? (
                 <MyTasksSection
                   personalTaskData={combinedData}
                   personalTaskDataLoading={tasksLoading}

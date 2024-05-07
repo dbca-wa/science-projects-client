@@ -1,12 +1,12 @@
 // The options bar which sits below the text area in the simple rich text editor
 
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { Flex, Grid } from "@chakra-ui/react";
-import { WordCount } from "./WordCount";
+import { EditorSections, EditorSubsections, EditorType } from "../../../types";
 import { ClearButton } from "../Buttons/ClearButton";
 import { SaveButton } from "../Buttons/SaveButton";
 import { TreeButton } from "../Buttons/TreeButton";
-import { EditorSections, EditorSubsections, EditorType } from "../../../types";
-import { useUser } from "@/lib/hooks/useUser";
+import { WordCount } from "./WordCount";
 
 interface IOptionsBarProps {
   // editor: LexicalEditor;
@@ -74,8 +74,9 @@ export const OptionsBar = ({
           <Grid
             px={10}
             py={4}
-            gridTemplateColumns={`repeat(${userData?.is_superuser ? 3 : 2
-              }, 1fr)`}
+            gridTemplateColumns={`repeat(${
+              userData?.is_superuser ? 3 : 2
+            }, 1fr)`}
             // width={"100%"}
             gridColumnGap={2}
           >

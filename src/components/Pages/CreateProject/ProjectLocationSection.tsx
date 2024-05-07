@@ -1,16 +1,10 @@
 // Tab data for Project Location on the creation page. WIP need to update to take in pre-set locations for use in update project.
 
-import {
-  Box,
-  Button,
-  Flex,
-  Grid,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Grid, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import "../../../styles/modalscrollbar.css";
-import { useGetLocations } from "../../../lib/hooks/useGetLocations";
 import { IoIosCreate } from "react-icons/io";
+import { useGetLocations } from "../../../lib/hooks/tanstack/useGetLocations";
+import "../../../styles/modalscrollbar.css";
 import { AreaCheckAndMaps } from "./AreaCheckAndMaps";
 
 interface IProjectLocationProps {
@@ -175,8 +169,8 @@ export const ProjectLocationSection = ({
             justifyContent={"flex-end"}
             pb={4}
             pt={10}
-          // pr={"200px"}
-          // bg={"red"}
+            // pr={"200px"}
+            // bg={"red"}
           >
             <Grid mr={4}>
               <></>
@@ -212,13 +206,13 @@ export const ProjectLocationSection = ({
                   }}
                   rightIcon={
                     projectType.includes("External") ||
-                      projectType.includes("Student") ? undefined : (
+                    projectType.includes("Student") ? undefined : (
                       <IoIosCreate />
                     )
                   }
                 >
                   {projectType.includes("External") ||
-                    projectType.includes("Student")
+                  projectType.includes("Student")
                     ? `Next`
                     : `Create`}
                 </Button>
