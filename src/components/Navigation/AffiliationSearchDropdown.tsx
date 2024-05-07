@@ -73,8 +73,14 @@ export const AffiliationSearchDropdown = forwardRef(
       if (searchTerm.trim() !== "") {
         getAffiliationsBasedOnSearchTerm(searchTerm, 1)
           .then((data) => {
-            console.log(data.affiliations);
-            setFilteredItems(data.affiliations);
+            // console.log(data.affiliations);
+            const filtr = data.affiliations.filter((item) => {
+              return !array?.some((arrayItem) => arrayItem.pk === item.pk);
+            });
+            console.log(filtr);
+            setFilteredItems(filtr);
+
+            // setFilteredItems(data.affiliations);
           })
           .catch((error) => {
             console.error("Error fetching affiliations:", error);
@@ -92,10 +98,12 @@ export const AffiliationSearchDropdown = forwardRef(
     useEffect(() => {
       if (!affiliationLoading && affiliationData) {
         setterFunction
-          ? setterFunction(affiliationData.pk)
-          : arrayAddFunction(affiliationData.pk);
+          ? setterFunction(affiliationData?.pk)
+          : arrayAddFunction(affiliationData?.pk);
         setIsMenuOpen(false);
-        setterFunction && setSelectedAffiliation(affiliationData); // Update the selected affiliation
+        setterFunction &&
+          affiliationData &&
+          setSelectedAffiliation(affiliationData); // Update the selected affiliation
         setSearchTerm(""); // Clear the search term when a affiliation is selected
       }
     }, [affiliationLoading, affiliationData]);
@@ -190,7 +198,7 @@ export const AffiliationSearchDropdown = forwardRef(
             </Button>
           )}
         </FormControl>
-        {array && (
+        {array?.length > 0 && (
           <Flex flexWrap="wrap" gap={2} pt={array?.length > 1 ? 7 : 0} pb={2}>
             {array?.map((aff, index) => (
               <Tag
@@ -204,7 +212,7 @@ export const AffiliationSearchDropdown = forwardRef(
                   background: colorMode === "light" ? "blue.400" : "blue.500",
                 }}
               >
-                <TagLabel pl={1}>{aff.name}</TagLabel>
+                <TagLabel pl={1}>{aff?.name}</TagLabel>
                 <TagCloseButton
                   onClick={() => arrayRemoveFunction(aff)}
                   userSelect={"none"}
