@@ -24,7 +24,7 @@ import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
 import { MyProjectsSection } from "./MyProjectsSection";
 import { Admin } from "./Admin";
 import { IDashProps } from "../../../types";
-import { useRouterState, useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AddIcon } from "@chakra-ui/icons";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 import { useGetDocumentsPendingMyAction } from "@/lib/hooks/tanstack/useGetDocumentsPendingMyAction";
@@ -36,7 +36,7 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
     onAddTaskOpen();
   };
 
-  const location = useRouterState().location;
+  const location = useLocation();
   const navigate = useNavigate();
 
   const queryParams = new URLSearchParams(location.search);

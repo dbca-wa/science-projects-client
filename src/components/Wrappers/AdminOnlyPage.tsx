@@ -1,6 +1,6 @@
 // An auth wrapper for components meant only for Admins
 
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useUser } from "../../lib/hooks/tanstack/useUser";
 
@@ -18,7 +18,7 @@ export const AdminOnlyPage = ({ children }: IAdminOnlyPageProps) => {
       if (userData?.is_superuser) {
         setShowContent(true);
       } else {
-        navigate({ to: "/" });
+        navigate("/");
       }
     }
   }, [userLoading, userData]);

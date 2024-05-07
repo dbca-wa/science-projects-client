@@ -2,7 +2,7 @@ import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
 import { ITaskEndorsement } from "@/types";
 import { Box, Center, Flex, Text, useColorMode } from "@chakra-ui/react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaBiohazard } from "react-icons/fa";
@@ -69,9 +69,9 @@ export const ModernEndorsementTaskDisplayCard = ({
       console.log("The Pk is undefined. Potentially use 'id' instead.");
       console.log(endorsement?.project_plan?.document?.project?.pk);
     } else if (isOnProjectsPage) {
-      navigate({ to: `${pk}/${urlkind}` });
+      navigate(`${pk}/${urlkind}`);
     } else {
-      navigate({ to: `projects/${pk}/${urlkind}` });
+      navigate(`projects/${pk}/${urlkind}`);
     }
   };
 

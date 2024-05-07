@@ -2,12 +2,12 @@
 // NOTE: Can potentially remove/replace entirely with React Helmet.
 
 import { useEffect } from "react";
-import { useRouterState } from "@tanstack/react-router";
+import { useLocation } from "react-router-dom";
 
 const baseTitle = "SPMS";
 
 export const useDocumentTitle = () => {
-  const location = useRouterState().location;
+  const location = useLocation();
 
   useEffect(() => {
     const path = location.pathname.split("/");

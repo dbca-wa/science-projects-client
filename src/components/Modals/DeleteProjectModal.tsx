@@ -23,7 +23,7 @@ import {
 import { ISimplePkProp, deleteProjectCall } from "../../lib/api";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 interface Props {

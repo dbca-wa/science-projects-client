@@ -36,7 +36,7 @@ import {
   ProjectCreationMutationSuccess,
   createProject,
 } from "../../lib/api";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection";
 import { useUser } from "../../lib/hooks/tanstack/useUser";

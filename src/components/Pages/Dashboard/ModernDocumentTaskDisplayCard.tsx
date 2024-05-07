@@ -5,7 +5,7 @@ import { Box, Text, Flex, useColorMode, Center } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { HiDocumentCheck } from "react-icons/hi2";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 
 interface IProps {
   document: IMainDoc;
@@ -47,9 +47,9 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else if (isOnProjectsPage) {
-      navigate({ to: `${pk}/${urlkind}` });
+      navigate(`${pk}/${urlkind}`);
     } else {
-      navigate({ to: `projects/${pk}/${urlkind}` });
+      navigate(`projects/${pk}/${urlkind}`);
     }
   };
 
