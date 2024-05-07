@@ -27,11 +27,11 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { FiCopy } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import {
   RemoveUserMutationType,
   promoteUserToLeader,
@@ -211,7 +211,7 @@ export const ProjectUserDetails = ({
           refetchTeamData && refetchTeamData();
           // const url =
           if (!location.pathname.includes("project")) {
-            navigate({ to: `/projects/${project_id}` });
+            navigate(`/projects/${project_id}`);
           } else {
             onClose();
           }
@@ -268,7 +268,7 @@ export const ProjectUserDetails = ({
           refetchTeamData && refetchTeamData();
           // const url =
           if (!location.pathname.includes("project")) {
-            navigate({ to: `/projects/${project_id}` });
+            navigate(`/projects/${project_id}`);
           } else {
             onClose();
           }
@@ -327,7 +327,7 @@ export const ProjectUserDetails = ({
           refetchTeamData && refetchTeamData();
           // const url =
           if (!location.pathname.includes("project")) {
-            navigate({ to: `/projects/${project_id}` });
+            navigate(`/projects/${project_id}`);
           } else {
             // onClose();
           }

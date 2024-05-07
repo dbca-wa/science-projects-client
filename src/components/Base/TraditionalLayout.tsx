@@ -1,7 +1,7 @@
 // A component for handlign the traditional layout
 
 import { Box, Image, Spinner, useColorMode } from "@chakra-ui/react";
-import { Outlet } from "@tanstack/react-router";
+import { Outlet } from "react-router-dom";
 import { TraditionalPageWrapper } from "../Wrappers/TraditionalPageWrapper";
 import { Footer } from "./Footer";
 import dayImage from "../../assets/80mile.jpg";

@@ -16,7 +16,6 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useNavigate } from "@tanstack/react-router";
 import { AiFillCalendar, AiFillTag } from "react-icons/ai";
 import {
   FaEdit,
@@ -27,6 +26,7 @@ import {
   FaUserFriends,
 } from "react-icons/fa";
 import { HiOutlineExternalLink } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 import {
   IExtendedProjectDetails,
   IExternalProjectDetails,
@@ -538,13 +538,13 @@ export const ProjectOverviewCard = ({
                 whiteSpace={"normal"}
                 textAlign={"left"}
                 onClick={() =>
-                  navigate({
-                    to: `/projects/${
+                  navigate(
+                    `/projects/${
                       baseInformation.pk !== undefined
                         ? baseInformation.pk
                         : baseInformation.id
-                    }`,
-                  })
+                    }`
+                  )
                 }
               >
                 {/* <Link

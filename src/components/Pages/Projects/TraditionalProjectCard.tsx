@@ -9,7 +9,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { AiFillCalendar, AiFillTag } from "react-icons/ai";
 import { TbAlertOctagon } from "react-icons/tb";
 import PlaceHolderImage from "../../../assets/no-image-placeholder.png";

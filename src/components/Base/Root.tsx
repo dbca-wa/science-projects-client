@@ -4,9 +4,16 @@ import { useScrollToTop } from "../../lib/hooks/helper/useScrollToTop";
 import { TraditionalLayout } from "./TraditionalLayout";
 import { ModernLayout } from "./ModernLayout";
 import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
+import { ProtectedPage } from "../Wrappers/ProtectedPage";
 
 export const Root = () => {
   const { layout } = useLayoutSwitcher();
   useScrollToTop();
-  return <>{layout === "modern" ? <ModernLayout /> : <TraditionalLayout />}</>;
+  return (
+    <>
+      {/* <ProtectedPage> */}
+      {layout === "modern" ? <ModernLayout /> : <TraditionalLayout />}
+      {/* </ProtectedPage> */}
+    </>
+  );
 };

@@ -3,12 +3,12 @@
 import { useEffect } from "react";
 import {
   // useLocation,
-  useRouterState,
-} from "@tanstack/react-router";
+  useLocation,
+} from "react-router-dom";
 
 export const useScrollToTop = () => {
   // const location = useLocation();
-  const location = useRouterState().location;
+  const location = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);

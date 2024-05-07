@@ -15,7 +15,6 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 import { FaAddressCard, FaLocationArrow } from "react-icons/fa";
@@ -31,6 +30,7 @@ import {
 } from "react-icons/md";
 import { RiOrganizationChart, RiTeamFill } from "react-icons/ri";
 import { VscFeedback } from "react-icons/vsc";
+import { useNavigate } from "react-router-dom";
 
 export const Admin = () => {
   const {
@@ -266,7 +266,7 @@ const AdminOptionBox = ({
   const handleOnClick = () => {
     // console.log(route)
     if (route !== undefined && route !== null) {
-      navigate({ to: route });
+      navigate(route);
     } else if (!route) {
       onClick();
     }

@@ -18,7 +18,7 @@ import { ITaskDisplayCard } from "../../../types";
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaUser } from "react-icons/fa";
 import {
@@ -87,7 +87,7 @@ export const ModernPersonalTaskDisplayCard = ({
 
   const handleProjectTaskCardClick = () => {
     if (document) {
-      navigate({ to: `projects/${document?.project?.pk}` });
+      navigate(`projects/${document?.project?.pk}`);
       // Handle logic for opening the doc via a link
       // navigate(`projects/${project.pk}?docToOpen=${document.pk}`)
     }

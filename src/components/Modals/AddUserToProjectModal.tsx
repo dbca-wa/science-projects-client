@@ -39,7 +39,7 @@ import {
   useForm,
 } from "react-hook-form";
 import { INewMember, createTeamMember } from "../../lib/api";
-import { useRouterState, useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CustomAxiosError } from "../../types";
 
 interface IAddUserToProjectModalProps {
@@ -106,7 +106,7 @@ export const AddUserToProjectModal = ({
     toastIdRef.current = toast(data);
   };
 
-  const location = useRouterState().location;
+  const location = useLocation();
 
   const navigate = useNavigate();
 

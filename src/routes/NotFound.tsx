@@ -2,13 +2,13 @@
 // Needs to be in the middle.
 
 import {
-  Heading,
-  VStack,
-  Text,
-  Button,
-  Kbd,
-  Grid,
   Box,
+  Button,
+  Grid,
+  Heading,
+  Kbd,
+  Text,
+  VStack,
   useColorMode,
 } from "@chakra-ui/react";
 import { Link, useLocation, useNavigate } from "react-router-dom";

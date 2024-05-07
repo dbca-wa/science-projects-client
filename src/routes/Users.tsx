@@ -23,7 +23,6 @@ import { CreateUserModal } from "../components/Modals/CreateUserModal";
 import { PaginatorUser } from "../components/Pages/Users/PaginatorUser";
 import { useLayoutSwitcher } from "../lib/hooks/helper/LayoutSwitcherContext";
 import { SearchUsers } from "@/components/Navigation/SearchUsers";
-import { createRoute } from "@tanstack/react-router";
 
 export const Users = () => {
   const {
@@ -328,5 +327,3 @@ export const Users = () => {
     </>
   );
 };
-
-export const Route = createRoute({});

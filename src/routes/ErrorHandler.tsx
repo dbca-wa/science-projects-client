@@ -1,24 +1,18 @@
 // Route for handling errors - used in Router to determine/display what error is produced on page.
 
-import { ErrorRouteComponent,  createFileRoute, useRouter, useRouterState } from "@tanstack/react-router";
+import { useRouteError } from "react-router-dom";
 import { ProtectedPage } from "../components/Wrappers/ProtectedPage";
-import { OtherError } from "./OtherError";
 import { NotFound } from "./NotFound";
+import { OtherError } from "./OtherError";
 
-interface IErrorHandlerProps {
-  error: ErrorRouteComponent;
-}
-
-export const ErrorHandler = ({error}) => {
-  const router = useRouter()
-  router.
+export const ErrorHandler = () => {
   const error = useRouteError() as {
     status?: number;
     message?: string;
     stack: string;
   };
 
-  if (error === 404) {
+  if (error?.status === 404) {
     return (
       <ProtectedPage>
         <NotFound />
@@ -28,7 +22,7 @@ export const ErrorHandler = ({error}) => {
     return (
       <ProtectedPage>
         <OtherError
-          code={statusCode || 500}
+          code={error?.status || 500}
           message={error?.message || "Unknown error"}
           stack={error?.stack}
         />
@@ -36,10 +30,3 @@ export const ErrorHandler = ({error}) => {
     );
   }
 };
-
-
-// export const Route = createFileRoute('/paths')({
-//   errorComponent: ({error, reset}) => {
-//     return <div>ERRORL {error.message}</div>
-//   }
-// })
