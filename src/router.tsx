@@ -1,32 +1,32 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import { Root } from "./components/Base/Root";
-import { Login } from "./routes/Login";
-import { ProtectedPage } from "./components/Wrappers/ProtectedPage";
-import { ContentWrapper } from "./components/Wrappers/ContentWrapper";
-import { Dashboard } from "./routes/Dashboard";
-import { AdminOnlyPage } from "./components/Wrappers/AdminOnlyPage";
-import { ReportsCRUD } from "./components/Pages/Admin/ReportsCRUD";
+import { AddressesCRUD } from "./components/Pages/Admin/AddressesCRUD";
+import { AffiliationsCRUD } from "./components/Pages/Admin/AffiliationsCRUD";
+import { BranchesCRUD } from "./components/Pages/Admin/BranchesCRUD";
 import { BusinessAreasCRUD } from "./components/Pages/Admin/BusinessAreasCRUD";
-import { ServicesCRUD } from "./components/Pages/Admin/ServicesCRUD";
 import { DivisionsCRUD } from "./components/Pages/Admin/DivisionsCRUD";
 import { LocationsCRUD } from "./components/Pages/Admin/LocationsCRUD";
-import { AffiliationsCRUD } from "./components/Pages/Admin/AffiliationsCRUD";
-import { AddressesCRUD } from "./components/Pages/Admin/AddressesCRUD";
-import { BranchesCRUD } from "./components/Pages/Admin/BranchesCRUD";
-import { TestEmailPage } from "./routes/TestEmailPage";
+import { ReportsCRUD } from "./components/Pages/Admin/ReportsCRUD";
+import { ServicesCRUD } from "./components/Pages/Admin/ServicesCRUD";
 import { UserFeedbackPage } from "./components/Pages/Admin/UserFeedbackPage";
-import { Reports } from "./routes/Reports";
-import { CurrentReport } from "./routes/CurrentReport";
-import { Projects } from "./routes/Projects";
-import { CreateProject } from "./routes/CreateProject";
-import { ProjectDetail } from "./routes/ProjectDetail";
-import { Users } from "./routes/Users";
-import { CreateUser } from "./routes/CreateUser";
-import { AccountEdit } from "./routes/AccountEdit";
+import { AdminOnlyPage } from "./components/Wrappers/AdminOnlyPage";
+import { ContentWrapper } from "./components/Wrappers/ContentWrapper";
 import { LayoutCheckWrapper } from "./components/Wrappers/LayoutCheckWrapper";
-import { HowTo } from "./routes/HowTo";
-import { Tasks } from "./routes/Tasks";
+import { ProtectedPage } from "./components/Wrappers/ProtectedPage";
+import { AccountEdit } from "./routes/AccountEdit";
+import { CreateProject } from "./routes/CreateProject";
+import { CreateUser } from "./routes/CreateUser";
+import { CurrentReport } from "./routes/CurrentReport";
+import { Dashboard } from "./routes/Dashboard";
 import { ErrorHandler } from "./routes/ErrorHandler";
+import { HowTo } from "./routes/HowTo";
+import { Login } from "./routes/Login";
+import { ProjectDetail } from "./routes/ProjectDetail";
+import { Projects } from "./routes/Projects";
+import { Reports } from "./routes/Reports";
+import { Tasks } from "./routes/Tasks";
+import { TestEmailPage } from "./routes/TestEmailPage";
+import { Users } from "./routes/Users";
 
 export const router = createBrowserRouter([
   // Login
@@ -34,7 +34,10 @@ export const router = createBrowserRouter([
     path: "login",
     element: <Login />,
   },
-
+  // {
+  //   path:"science",
+  //   element: <Science />
+  // },
   {
     path: "/",
     element: (
@@ -53,6 +56,21 @@ export const router = createBrowserRouter([
           </ContentWrapper>
         ),
       },
+
+      // HERE FOR TESTING MAIN CONTENT COMPONENT. 
+      // ON UPDATE/MIGRATION, MOVE TO SEPARATE ROUTE AND UPDATE NGINX for 
+      // https://science.dbca.wa.gov.au/ to use that route, add header/footer
+      // and adjust migration script
+
+      // {
+      //   path: "/science",
+      //   element: (
+      //     <ContentWrapper>
+      //       <Science />
+      //     </ContentWrapper>
+      //   ),
+      // },
+      
 
       // ADMIN
       {
