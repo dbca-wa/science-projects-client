@@ -44,6 +44,7 @@ import { RevisedRichTextToolbar } from "../Toolbar/RevisedRichTextToolbar";
 import { IProgressReportDisplayData } from "./ARProgressReportHandler";
 import { ApproveProgressReportModal } from "@/components/Modals/RTEModals/ApproveProgressReportModal";
 import { TiTick } from "react-icons/ti";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 
 interface IPREditorProps {
   // isEditing: boolean;
@@ -157,8 +158,8 @@ export const PREditor = ({
   setManagementImplicationsDisplayData,
   setFutureDirectionsDisplayData,
   setContextDisplayData,
-  // key
-}: IPREditorProps) => {
+}: // key
+IPREditorProps) => {
   // const navigate = useNavigate();
   const { colorMode } = useColorMode();
 
@@ -432,24 +433,30 @@ export const PREditor = ({
     uneditableInitialConfig,
   ]);
 
-
-  const {isOpen: isApproveProgressReportOpen, onOpen:onOpenApproveProgressReport, onClose: onCloseApproveProgressReport} = useDisclosure();
+  const {
+    isOpen: isApproveProgressReportOpen,
+    onOpen: onOpenApproveProgressReport,
+    onClose: onCloseApproveProgressReport,
+  } = useDisclosure();
   const [reportHovered, setReportHovered] = useState(false);
-  const [isActive, setIsActive] = useState(fullPRData?.document?.project?.status === "active");
-  useEffect(() => 
-    {setIsActive(fullPRData?.document?.project?.status === "active")}
-, [fullPRData]);
+  const [isActive, setIsActive] = useState(
+    fullPRData?.document?.project?.status === "active"
+  );
+  useEffect(() => {
+    setIsActive(fullPRData?.document?.project?.status === "active");
+  }, [fullPRData]);
 
+  const noImage = useNoImage();
 
   return (
     <>
       {/* setIsEditing */}
-      <ApproveProgressReportModal 
+      <ApproveProgressReportModal
         isActive={isActive}
-        report={fullPRData} 
-        isOpen={isApproveProgressReportOpen} 
-        onClose={onCloseApproveProgressReport}      
-    />
+        report={fullPRData}
+        isOpen={isApproveProgressReportOpen}
+        onClose={onCloseApproveProgressReport}
+      />
       <Box
         mx={4}
         pos={"relative"}
@@ -463,44 +470,46 @@ export const PREditor = ({
         onMouseOver={() => setReportHovered(true)}
         onMouseOut={() => setReportHovered(false)}
       >
-        {reportHovered ? 
-             <Box pos={"absolute"} right={4} top={4}>
-                    <Button
-                        ml={2}
-                        bg={
-                          isActive ?
-                          colorMode === "light" ? `orange.500` : `orange.600`
-                          :
-                          colorMode === "light" ? `green.500` : `green.600`}
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.800"
-                        }
-                        _hover={
-                          colorMode === "light"
-                            ? {
-                                bg: isActive ? `orange.600` : `green.600`,
-                                color: `white`,
-                              }
-                            : {
-                                bg: isActive ? `orange.500` : `green.500`,
-                                color: `white`,
-                              }
-                        }
-                        minW={"32px"}
-                        minH={"32px"}
-                        maxW={"32px"}
-                        maxH={"32px"}
-                        rounded={"full"}
-                        data-tip="Click to edit"
-                        onClick={onOpenApproveProgressReport}
-                      >
-                        <Icon as={isActive ? FaUndo : TiTick } />
-                      </Button>
-             </Box>
-        : null}
-   
+        {reportHovered ? (
+          <Box pos={"absolute"} right={4} top={4}>
+            <Button
+              ml={2}
+              bg={
+                isActive
+                  ? colorMode === "light"
+                    ? `orange.500`
+                    : `orange.600`
+                  : colorMode === "light"
+                  ? `green.500`
+                  : `green.600`
+              }
+              color={
+                colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.800"
+              }
+              _hover={
+                colorMode === "light"
+                  ? {
+                      bg: isActive ? `orange.600` : `green.600`,
+                      color: `white`,
+                    }
+                  : {
+                      bg: isActive ? `orange.500` : `green.500`,
+                      color: `white`,
+                    }
+              }
+              minW={"32px"}
+              minH={"32px"}
+              maxW={"32px"}
+              maxH={"32px"}
+              rounded={"full"}
+              data-tip="Click to edit"
+              onClick={onOpenApproveProgressReport}
+            >
+              <Icon as={isActive ? FaUndo : TiTick} />
+            </Button>
+          </Box>
+        ) : null}
+
         <Flex
           id={`topContent_${fullPRData?.document?.project?.pk}`}
           pt={6}
@@ -510,7 +519,7 @@ export const PREditor = ({
             <>
               <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
                 <Image
-                  src={fullPRData?.document?.project?.image?.file}
+                  src={fullPRData?.document?.project?.image?.file ?? noImage}
                   w={"100%"}
                   h={"100%"}
                   objectFit={"cover"}
@@ -526,13 +535,11 @@ export const PREditor = ({
                     // fontSize={"xs"}
                     noOfLines={4}
                     cursor={"pointer"}
-                    onClick={() =>
-                      {
-                        const url = `/projects/${fullPRData?.document?.project?.pk}/progress`
-                        window.open(url, '_blank');
-                        // navigate(url);
-                      }
-                    }
+                    onClick={() => {
+                      const url = `/projects/${fullPRData?.document?.project?.pk}/progress`;
+                      window.open(url, "_blank");
+                      // navigate(url);
+                    }}
                   />
                 </Box>
 
@@ -553,13 +560,11 @@ export const PREditor = ({
                     fontSize={"17px"}
                     // fontSize={"xs"}
                     cursor={"pointer"}
-                    onClick={() =>
-                      {
-                        const url = `/projects/${fullPRData?.document?.project?.pk}/progress`
-                        window.open(url, '_blank');
-                        // navigate(url);
-                      }
-                    }
+                    onClick={() => {
+                      const url = `/projects/${fullPRData?.document?.project?.pk}/progress`;
+                      window.open(url, "_blank");
+                      // navigate(url);
+                    }}
                     noOfLines={4}
                   />
                 </Box>
@@ -571,7 +576,7 @@ export const PREditor = ({
               </Box>
               <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
                 <Image
-                  src={fullPRData?.document?.project?.image?.file}
+                  src={fullPRData?.document?.project?.image?.file ?? noImage}
                   w={"100%"}
                   h={"100%"}
                   objectFit={"cover"}
