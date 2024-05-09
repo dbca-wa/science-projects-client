@@ -375,6 +375,9 @@ export const AffiliationsCRUD = () => {
                   // as="form"
                   // id="merge-form"
                 >
+                  <Box justifyContent={"start"} w={"100%"}>
+                    <Text>Combine similar affiliations into one!</Text>
+                  </Box>
                   <FormControl>
                     <AffiliationSearchDropdown
                       autoFocus
