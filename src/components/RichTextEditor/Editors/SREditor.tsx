@@ -43,6 +43,7 @@ import { FcApproval } from "react-icons/fc";
 import { MdApproval } from "react-icons/md";
 import { TiTick } from "react-icons/ti";
 import { ApproveProgressReportModal } from "@/components/Modals/RTEModals/ApproveProgressReportModal";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 
 interface ISREditorProps {
   isEditing: boolean;
@@ -73,7 +74,6 @@ const SRProjDetails = ({ project, team_members }: ISRProjDetails) => {
   const students = getMembersByRole(team_members, "student");
   const academicSupervisors = getMembersByRole(team_members, "academicsuper");
   const scientists = getMembersByRole(team_members, "supervising");
-
 
   return (
     <Box py={3}>
@@ -114,8 +114,8 @@ export const SREditor = ({
   canEdit,
   displayData,
   setDisplayData,
-  // key
-}: ISREditorProps) => {
+}: // key
+ISREditorProps) => {
   // const navigate = useNavigate();
   const { colorMode } = useColorMode();
 
@@ -235,22 +235,30 @@ export const SREditor = ({
     setIsEditing(false);
   };
 
-  const {isOpen: isApproveProgressReportOpen, onOpen:onOpenApproveProgressReport, onClose: onCloseApproveProgressReport} = useDisclosure();
+  const {
+    isOpen: isApproveProgressReportOpen,
+    onOpen: onOpenApproveProgressReport,
+    onClose: onCloseApproveProgressReport,
+  } = useDisclosure();
 
-  const [isActive, setIsActive] = useState(fullSRData?.document?.project?.status === "active");
-  useEffect(() => 
-    {setIsActive(fullSRData?.document?.project?.status === "active")}
-, [fullSRData]);
+  const [isActive, setIsActive] = useState(
+    fullSRData?.document?.project?.status === "active"
+  );
+  useEffect(() => {
+    setIsActive(fullSRData?.document?.project?.status === "active");
+  }, [fullSRData]);
+
+  const noImage = useNoImage();
 
   return (
     <>
       {/* setIsEditing */}
-    <ApproveProgressReportModal 
-    isActive={isActive}
-    report={fullSRData} 
-    isOpen={isApproveProgressReportOpen} 
-    onClose={onCloseApproveProgressReport}      
-    />
+      <ApproveProgressReportModal
+        isActive={isActive}
+        report={fullSRData}
+        isOpen={isApproveProgressReportOpen}
+        onClose={onCloseApproveProgressReport}
+      />
       <Box
         mx={4}
         pos={"relative"}
@@ -273,15 +281,14 @@ export const SREditor = ({
             <>
               <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
                 <Image
-                  src={fullSRData?.document?.project?.image?.file}
+                  src={fullSRData?.document?.project?.image?.file ?? noImage}
                   w={"100%"}
                   h={"100%"}
                   objectFit={"cover"}
                 />
               </Box>
               <Box ml={4} flex={1}>
-                <Box
-                >
+                <Box>
                   <ExtractedHTMLTitle
                     htmlContent={fullSRData?.document?.project?.title}
                     color={"blue.500"}
@@ -290,13 +297,11 @@ export const SREditor = ({
                     // fontSize={"xs"}
                     noOfLines={4}
                     cursor={"pointer"}
-                    onClick={() =>
-                      { 
-                        const url = `/projects/${fullSRData?.document?.project?.pk}/student`;
-                        window.open(url, '_blank');
-                        // navigate(url);
-                      }
-                    }
+                    onClick={() => {
+                      const url = `/projects/${fullSRData?.document?.project?.pk}/student`;
+                      window.open(url, "_blank");
+                      // navigate(url);
+                    }}
                   />
                 </Box>
 
@@ -309,8 +314,7 @@ export const SREditor = ({
           ) : (
             <>
               <Box mr={4} flex={1}>
-                <Box
-                >
+                <Box>
                   <ExtractedHTMLTitle
                     htmlContent={fullSRData?.document?.project?.title}
                     color={"blue.500"}
@@ -319,13 +323,11 @@ export const SREditor = ({
                     // fontSize={"xs"}
                     noOfLines={4}
                     cursor={"pointer"}
-                    onClick={() =>
-                    { 
+                    onClick={() => {
                       const url = `/projects/${fullSRData?.document?.project?.pk}/student`;
-                      window.open(url, '_blank');
+                      window.open(url, "_blank");
                       // navigate(url);
-                    }
-                    }
+                    }}
                   />
                 </Box>
 
@@ -336,7 +338,7 @@ export const SREditor = ({
               </Box>
               <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
                 <Image
-                  src={fullSRData?.document?.project?.image?.file}
+                  src={fullSRData?.document?.project?.image?.file ?? noImage}
                   w={"100%"}
                   h={"100%"}
                   objectFit={"cover"}
@@ -462,75 +464,77 @@ export const SREditor = ({
                     </Box>
                   ) : isHovered ? (
                     <>
-                    <Box pos={"absolute"} right={8} top={0}>
-                    <Button
-                        ml={2}
-                        bg={
-                          isActive ?
-                          colorMode === "light" ? `orange.500` : `orange.600`
-                          :
-                          colorMode === "light" ? `green.500` : `green.600`}
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.800"
-                        }
-                        _hover={
-                          colorMode === "light"
-                            ? {
-                                bg: isActive ? `orange.600` : `green.600`,
-                                color: `white`,
-                              }
-                            : {
-                                bg: isActive ? `orange.500` : `green.500`,
-                                color: `white`,
-                              }
-                        }
-                        minW={"32px"}
-                        minH={"32px"}
-                        maxW={"32px"}
-                        maxH={"32px"}
-                        rounded={"full"}
-                        data-tip="Click to edit"
-                        onClick={onOpenApproveProgressReport}
-                      >
-                        <Icon as={isActive ? FaUndo : TiTick } />
-                      </Button>
-
-                    </Box>
-                    <Box pos={"absolute"} right={20} top={0}>
-                      <Button
-                        ml={2}
-                        bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.800"
-                        }
-                        _hover={
-                          colorMode === "light"
-                            ? {
-                                bg: `gray.600`,
-                                color: `white`,
-                              }
-                            : {
-                                bg: `gray.500`,
-                                color: `white`,
-                              }
-                        }
-                        minW={"32px"}
-                        minH={"32px"}
-                        maxW={"32px"}
-                        maxH={"32px"}
-                        rounded={"full"}
-                        data-tip="Click to Save"
-                        onClick={() => setIsEditing(true)}
-                      >
-                        <Icon as={AiFillEdit} />
-                      </Button>
-                    </Box>
+                      <Box pos={"absolute"} right={8} top={0}>
+                        <Button
+                          ml={2}
+                          bg={
+                            isActive
+                              ? colorMode === "light"
+                                ? `orange.500`
+                                : `orange.600`
+                              : colorMode === "light"
+                              ? `green.500`
+                              : `green.600`
+                          }
+                          color={
+                            colorMode === "light"
+                              ? "whiteAlpha.900"
+                              : "whiteAlpha.800"
+                          }
+                          _hover={
+                            colorMode === "light"
+                              ? {
+                                  bg: isActive ? `orange.600` : `green.600`,
+                                  color: `white`,
+                                }
+                              : {
+                                  bg: isActive ? `orange.500` : `green.500`,
+                                  color: `white`,
+                                }
+                          }
+                          minW={"32px"}
+                          minH={"32px"}
+                          maxW={"32px"}
+                          maxH={"32px"}
+                          rounded={"full"}
+                          data-tip="Click to edit"
+                          onClick={onOpenApproveProgressReport}
+                        >
+                          <Icon as={isActive ? FaUndo : TiTick} />
+                        </Button>
+                      </Box>
+                      <Box pos={"absolute"} right={20} top={0}>
+                        <Button
+                          ml={2}
+                          bg={colorMode === "light" ? `gray.500` : `gray.600`}
+                          color={
+                            colorMode === "light"
+                              ? "whiteAlpha.900"
+                              : "whiteAlpha.800"
+                          }
+                          _hover={
+                            colorMode === "light"
+                              ? {
+                                  bg: `gray.600`,
+                                  color: `white`,
+                                }
+                              : {
+                                  bg: `gray.500`,
+                                  color: `white`,
+                                }
+                          }
+                          minW={"32px"}
+                          minH={"32px"}
+                          maxW={"32px"}
+                          maxH={"32px"}
+                          rounded={"full"}
+                          data-tip="Click to Save"
+                          onClick={() => setIsEditing(true)}
+                        >
+                          <Icon as={AiFillEdit} />
+                        </Button>
+                      </Box>
                     </>
-                    
                   ) : null}
                 </Box>
 
