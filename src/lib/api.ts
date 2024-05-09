@@ -521,12 +521,13 @@ export interface IFullUserUpdateVariables {
     image?: File | string | null | undefined;
     about?: string;
     expertise?: string;
-
+    affiliation?: IAffiliation;
 }
 
-export const adminUpdateUser = async ({ userPk, title, phone, fax, branch, business_area, image, about, expertise }: IFullUserUpdateVariables) => {
+export const adminUpdateUser = async (
+    { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }: IFullUserUpdateVariables) => {
     console.log(
-        { userPk, title, phone, fax, branch, business_area, image, about, expertise }
+        { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }
     )
 
     try {
@@ -534,6 +535,7 @@ export const adminUpdateUser = async ({ userPk, title, phone, fax, branch, busin
         console.log(business_area)
 
         const membershipData = {
+            affiliation: affiliation?.pk,
             userPk: userPk,
             branch: (branch !== null && branch !== '') ? Number(branch) : 0,
             business_area: (business_area !== null && business_area !== '') ? Number(business_area) : 0,
@@ -567,7 +569,7 @@ export interface IMembershipUpdateVariables {
     userPk: string | number;
     branch: number;
     business_area: number;
-    affiliation: number;
+    affiliation?: number;
 }
 
 export const updateMembership = async ({ userPk, branch, business_area, affiliation }: IMembershipUpdateVariables) => {

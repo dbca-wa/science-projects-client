@@ -12,6 +12,7 @@ import {
   DrawerOverlay,
   Flex,
   FormControl,
+  FormHelperText,
   FormLabel,
   Grid,
   Input,
@@ -40,7 +41,7 @@ import { IAffiliation, IMergeAffiliation } from "../../../types";
 import { AffiliationItemDisplay } from "./AffiliationItemDisplay";
 
 export const AffiliationsCRUD = () => {
-  const { register, handleSubmit } = useForm<IAffiliation>();
+  const { register, handleSubmit, watch } = useForm<IAffiliation>();
   const [primaryAffiliation, setPrimaryAffiliation] =
     useState<IAffiliation | null>(null);
   const [secondaryAffiliations, setSecondaryAffiliations] = useState<
@@ -166,7 +167,7 @@ export const AffiliationsCRUD = () => {
   });
 
   const onSubmitMerge = (formData: IMergeAffiliation) => {
-    console.log("SUBMISSION DATA:", formData);
+    // console.log("SUBMISSION DATA:", formData);
     mergeMutation.mutate(formData);
   };
 
@@ -201,15 +202,39 @@ export const AffiliationsCRUD = () => {
     }
   }, [slices, searchTerm]);
 
+  const [createIsDisabled, setCreateIsDisabled] = useState(false);
+  const nameValue = watch("name");
+  const [alreadyPresentNames, setAlreadyPresentNames] = useState([]);
+
   useEffect(() => {
     // Initialize filteredSlices with all items when no filters are applied
     if (!searchTerm && slices) {
       setFilteredSlices(slices);
       setCountOfItems(slices.length);
+      if (slices && alreadyPresentNames.length === 0) {
+        setAlreadyPresentNames(
+          Array.from(slices).map((slice) => slice.name.toLowerCase())
+        );
+      }
     }
-  }, [searchTerm, slices]);
+  }, [searchTerm, slices, alreadyPresentNames]);
 
   const { colorMode } = useColorMode();
+
+  useEffect(() => {
+    if (!nameValue) {
+      setCreateIsDisabled(true);
+    } else {
+      // console.log(nameValue);
+      // console.log(alreadyPresentNames);
+      if (alreadyPresentNames.includes(nameValue.toLowerCase())) {
+        setCreateIsDisabled(true);
+      } else {
+        setCreateIsDisabled(false);
+      }
+    }
+  }, [nameValue, alreadyPresentNames]);
+
   return (
     <>
       {isLoading ? (
@@ -305,6 +330,11 @@ export const AffiliationsCRUD = () => {
                       autoComplete="off"
                       {...register("name", { required: true })}
                     />
+                    <FormHelperText>
+                      Note: Exclude "The" from the start of any names. For
+                      example, "The University of Western Australia" should be
+                      "University of Western Australia"
+                    </FormHelperText>
                   </FormControl>
                   {creationMutation.isError ? (
                     <Text color={"red.500"}>Something went wrong</Text>
@@ -323,6 +353,7 @@ export const AffiliationsCRUD = () => {
                   }}
                   size="lg"
                   width={"100%"}
+                  isDisabled={createIsDisabled}
                 >
                   Create
                 </Button>
