@@ -47,7 +47,7 @@ export const ProgressReportContents = ({
   refetch,
   setToLastTab,
 }: Props) => {
-  useEffect(() => console.log(userData));
+  // useEffect(() => console.log(userData));
   // Handling years
   const { availableProgressReportYearsData } =
     useGetProgressReportAvailableReportYears(
