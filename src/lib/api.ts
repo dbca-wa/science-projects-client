@@ -8,11 +8,11 @@ import { IConceptPlanGenerationData } from "../types";
 
 // INSTANCE SETUP ==================================================================
 
-// const PRODUCTION_BACKEND_API_URL = import.meta.env.PRODUCTION_BACKEND_API_URL
-// const PRODUCTION_BACKEND_BASE_URL = import.meta.env.PRODUCTION_BACKEND_BASE_URL
+const PRODUCTION_BACKEND_API_URL = import.meta.env.PRODUCTION_BACKEND_API_URL
+const PRODUCTION_BACKEND_BASE_URL = import.meta.env.PRODUCTION_BACKEND_BASE_URL
 
-const PRODUCTION_BACKEND_API_URL = process.env.PRODUCTION_BACKEND_API_URL;
-const PRODUCTION_BACKEND_BASE_URL = process.env.PRODUCTION_BACKEND_BASE_URL;
+// const PRODUCTION_BACKEND_API_URL = process.env.PRODUCTION_BACKEND_API_URL;
+// const PRODUCTION_BACKEND_BASE_URL = process.env.PRODUCTION_BACKEND_BASE_URL;
 
 const baseBackendUrl =
     process.env.NODE_ENV === "development" ?
