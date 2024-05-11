@@ -20,6 +20,8 @@ interface Props {
 }
 
 export const ReviewDocumentEmail = ({ userData }: Props) => {
+  const PRODUCTION_BACKEND_BASE_URL = import.meta.env.PRODUCTION_BACKEND_BASE_URL
+
   return (
     <Html>
       <Head />
@@ -63,7 +65,7 @@ export const ReviewDocumentEmail = ({ userData }: Props) => {
               <Button
                 className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3"
                 // href={inviteLink}
-                href={"https://scienceprojects.dbca.wa.gov.au"}
+                href={PRODUCTION_BACKEND_BASE_URL}
               >
                 {/* Join the team */}
                 Review Document

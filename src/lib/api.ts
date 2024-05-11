@@ -100,7 +100,7 @@ export const logOut = () => {
         .then((response) => {
             if (response.data.ok) {
                 if (process.env.NODE_ENV !== "development") {
-                    window.location.href = 'https://scienceprojects.dbca.wa.gov.au/sso/auth_logout'
+                    window.location.href = `${PRODUCTION_BACKEND_BASE_URL}sso/auth_logout`
                 }
                 return response.data;
             } else {
@@ -322,7 +322,7 @@ export interface IApproveProgressReport {
     documentPk: number;
 }
 
-export const approveProgressReport = async ({isActive, kind, reportPk, documentPk}: IApproveProgressReport) => {
+export const approveProgressReport = async ({ isActive, kind, reportPk, documentPk }: IApproveProgressReport) => {
     console.log({
         kind,
         reportPk,
@@ -2701,7 +2701,7 @@ export const createAffiliation = async (formData: IAffiliation) => {
     })
 }
 
-export const mergeAffiliations = async(formData:IMergeAffiliation) => {
+export const mergeAffiliations = async (formData: IMergeAffiliation) => {
     console.log(formData)
     return instance.post(
         "agencies/affiliations/merge", formData

@@ -2,14 +2,10 @@ import { useEffect, useState } from "react";
 
 const useServerImageUrl = (originalLink) => {
   const [apiEndpoint, setApiEndpoint] = useState<string>("");
-
+  const PRODUCTION_BACKEND_BASE_URL = import.meta.env.PRODUCTION_BACKEND_BASE_URL
   useEffect(() => {
     if (process.env.NODE_ENV === "production") {
-      if (process.env.DEV === "True") {
-        setApiEndpoint("https://scienceprojects-test.dbca.wa.gov.au");
-      } else {
-        setApiEndpoint("https://scienceprojects.dbca.wa.gov.au");
-      }
+      setApiEndpoint(PRODUCTION_BACKEND_BASE_URL);
     } else {
       setApiEndpoint("http://127.0.0.1:8000");
     }
