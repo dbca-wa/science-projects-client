@@ -1,5 +1,5 @@
-# This command sets the base image for the Docker image. It specifies the use of the "node:22-alpine3.18" image, which is a lightweight Alpine Linux-based image that comes with Node.js pre-installed
-FROM node:22-alpine3.18 as BUILD_IMAGE
+# node:22-alpine3.18
+FROM node:latest as BUILD_IMAGE
 # This command sets the working directory inside the Docker container to "/app". This is the directory where subsequent commands will be executed.
 WORKDIR /app
 
@@ -13,19 +13,18 @@ ENV PATH="./node_modules/.bin:$PATH"
 COPY . .
 
 # Set default values for environment variables (This is set on github action for production test and main builds)
-ARG PRODUCTION_BACKEND_BASE_URL=https://127.0.0.1:8000/
-ARG PRODUCTION_BACKEND_API_URL=https://127.0.0.1:8000/v1/api/
+ARG VITE_PRODUCTION_BACKEND_BASE_URL=https://127.0.0.1:8000/
+ARG VITE_PRODUCTION_BACKEND_API_URL=https://127.0.0.1:8000/v1/api/
 
 # Set environment variables for runtime access
-ENV PRODUCTION_BACKEND_BASE_URL=$PRODUCTION_BACKEND_BASE_URL
-ENV PRODUCTION_BACKEND_API_URL=$PRODUCTION_BACKEND_API_URL
+ENV VITE_PRODUCTION_BACKEND_BASE_URL=$VITE_PRODUCTION_BACKEND_BASE_URL
+ENV VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL
 
-# This command runs the "npm build" script inside the container.
-RUN npm run build -- --PRODUCTION_BACKEND_BASE_URL $PRODUCTION_BACKEND_BASE_URL --PRODUCTION_BACKEND_API_URL $PRODUCTION_BACKEND_API_URL
+# This command runs the "npm build" script inside the container (it will use above env variables).
+RUN npm run build 
 
-
-# Multistage to prevent code exposure
-FROM node:22-alpine3.18 as PRODUCTION_IMAGE
+# Multistage build to prevent code exposure / reduce image size
+FROM node:latest as PRODUCTION_IMAGE
 WORKDIR /client
 
 COPY --from=BUILD_IMAGE /app/dist/ /client/dist/

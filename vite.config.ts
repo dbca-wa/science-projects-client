@@ -5,6 +5,10 @@ import path from "path"
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // define: {
+  //   VITE_PRODUCTION_BACKEND_API_URL: `${process.env.VITE_PRODUCTION_BACKEND_API_URL}`,
+  //   VITE_PRODUCTION_BACKEND_BASE_URL: `${process.env.VITE_PRODUCTION_BACKEND_BASE_URL}`,
+  // },
   plugins: [
     react(),
   ],
@@ -20,7 +24,7 @@ export default defineConfig({
 
 })
 
-    // TanStackRouterVite(),
+// TanStackRouterVite(),
 
 // Host set to truse or 0.0.0.0 listens on all addresses
 //  --host=127.0.0.1 --port=3000 in vite preview package.json
