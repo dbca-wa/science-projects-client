@@ -81,8 +81,10 @@ export interface IUsernameLoginError {
 export const logInOrdinary = ({
     username,
     password,
-}: IUsernameLoginVariables): Promise<IUsernameLoginSuccess> =>
-    instance.post(`users/log-in`, { username, password })
+}: IUsernameLoginVariables): Promise<IUsernameLoginSuccess> => {
+    console.log(instance.defaults.baseURL);
+
+    return instance.post(`users/log-in`, { username, password })
         .then((response) => {
             if (response.data.ok) {
                 return response.data;
@@ -93,6 +95,7 @@ export const logInOrdinary = ({
         .catch((error) => {
             throw error;
         });
+}
 
 export const logOut = () => {
     return instance
