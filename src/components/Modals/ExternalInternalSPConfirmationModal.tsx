@@ -64,7 +64,8 @@ export const ExternalInternalSPConfirmationModal = ({
               {isExternalSP ? (
                 <Box my={4}>
                   <Text color={"blue.500"}>
-                    A concept plan will NOT be created.{" "}
+                    As this is an externally led project, a concept plan will
+                    NOT be created.{" "}
                   </Text>
                   <Text color={"blue.500"}>
                     Instead a project plan will be created.
@@ -73,7 +74,8 @@ export const ExternalInternalSPConfirmationModal = ({
               ) : (
                 <Box my={4}>
                   <Text color={"blue.500"}>
-                    A concept plan will be created.
+                    As this is not an externally led project, a concept plan
+                    will be created.
                   </Text>
                 </Box>
               )}
