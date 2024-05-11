@@ -25,6 +25,7 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../lib/hooks/tanstack/useUser";
+const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
 
 interface ILoginData {
   username: string;
@@ -116,14 +117,19 @@ export const Login = ({ onClose }: IIsModal) => {
     mutation.mutate({ username, password });
   };
 
+  const buildType = process.env.NODE_ENV;
   // useEffect(() => console.log(process.env.NODE_ENV))
   const { userData, userLoading } = useUser();
   useEffect(() => {
     if (!userLoading && userData?.pk !== undefined) {
       // console.log(userData)
       navigate("/");
+    } else {
+      if (buildType !== "development") {
+        window.location.reload()
+      }
     }
-  }, [userLoading, userData]);
+  }, [userLoading, userData, buildType]);
 
   const { colorMode } = useColorMode();
 
