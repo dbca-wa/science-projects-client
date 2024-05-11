@@ -24,8 +24,12 @@ import { FaDatabase } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
+import confetti from "canvas-confetti";
+
 
 export const TraditionalDashboard = () => {
+  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
+
   const user = useUser();
 
   const { colorMode } = useColorMode();
@@ -54,9 +58,9 @@ export const TraditionalDashboard = () => {
       setShouldConcat(false);
       // setAnnualReportText("Annual Report");
       if (window.innerWidth < 1350) {
-        setSpmsText("Science Project <br/> Management System (TEST)");
+        setSpmsText(`Science Project <br/> Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes('-test') ? '(TEST)' : ''}`);
       } else {
-        setSpmsText("Science Project Management System (TEST)");
+        setSpmsText(`Science Project Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes('-test') ? '(TEST)' : ''}`);
       }
     }
   }, [theme.breakpoints.lg, user?.userData?.first_name]);
@@ -77,6 +81,33 @@ export const TraditionalDashboard = () => {
     onOpen: onOpenFeedbackModal,
     onClose: onCloseFeedbackModal,
   } = useDisclosure();
+
+
+  useEffect(() => {
+    // confetti({
+    //   particleCount: 150
+    // });
+    // confetti({
+    //   spread: 180
+    // });
+    confetti({
+      particleCount: 100,
+      // startVelocity: 30,
+      spread: 360,
+      origin: {
+        x: 0.285,
+        // x: Math.random(),
+        // since they fall down, start a bit higher than random
+        // y: Math.random() - 0.2
+        y: 0.25
+      }
+    })
+
+
+    setTimeout(() => {
+      confetti.reset();
+    }, 5000);
+  }, [])
 
   return (
     <>
@@ -114,44 +145,13 @@ export const TraditionalDashboard = () => {
         )}
 
         <Flex flexDir={"column"}>
-          <Text mt={5} fontSize={"16px"} fontWeight={"normal"}>
-            Currently under development, this version serves to identify and
-            address bugs and areas for improvement. Please feel free to explore
-            and test the site.
+          <Text mt={5} fontSize={"16px"} fontWeight={"semibold"}>
+            &#127881; We have successfully migrated to SPMS 2.0! &#127881;
           </Text>
-          <Text fontSize={"16px"} fontWeight={"normal"}>
-            Rest assured, all data will be restored to a database snapshot when
-            the site is production-ready.
-          </Text>
-          <Flex mt={4} flexDir={"column"}>
-            <Box mt={2}>
-              <Text as={"span"} fontWeight={"bold"}>
-                Note:
-              </Text>
-              <Text
-                ml={1}
-                as={"span"}
-                // fontWeight={'semibold'}
-              >
-                Lists and nested lists are now supported when copy-pasting from
-                MS Word on Desktop. If you are using MS Word online, you must
-                download the file and copy content from there.
-              </Text>
-            </Box>
-
-            <Text mt={4}>
-              Further note that the following is not yet implemented, and will
-              be integrated on production release:
-            </Text>
-            <UnorderedList pl={8} pt={4}>
-              <ListItem>'latest report' page</ListItem>
-              <ListItem>PDF generation</ListItem>
-              <ListItem>SPMS emails</ListItem>
-            </UnorderedList>
-          </Flex>
-          <Flex mt={4}>
+          <Text>This new version features speed and security upgrades, dark mode, a new layout, copy-pasting from word, improved email and more!</Text>
+          <span style={{ marginTop: 20 }}>
             <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
-              For feedback or feature requests, kindly submit them here:
+              We are always looking for ways to improve, and value your feedback! If you notice something off, or would like to request a change, please submit feedback here. Don't be shy, we can only make things better with your help!
             </Text>
 
             <Button
@@ -162,10 +162,7 @@ export const TraditionalDashboard = () => {
             >
               Submit Feedback
             </Button>
-          </Flex>
-          <Text>
-            Don't be shy, we can only make things better with your help!
-          </Text>
+          </span>
         </Flex>
       </Box>
       <Grid

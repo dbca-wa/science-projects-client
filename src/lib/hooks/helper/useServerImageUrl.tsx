@@ -6,7 +6,7 @@ const useServerImageUrl = (originalLink) => {
 
   let sanitised = VITE_PRODUCTION_BACKEND_BASE_URL;
 
-  if (sanitised.endsWith('/')) {
+  if (sanitised?.endsWith('/')) {
     sanitised = sanitised.slice(0, -1);
   }
 
