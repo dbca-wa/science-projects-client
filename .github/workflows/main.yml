@@ -21,8 +21,8 @@ jobs:
 
       - name: Build and Push Image
         env:
-            VITE_PRODUCTION_BACKEND_BASE_URL: "https://scienceprojects.dbca.gov.au/"
-            VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects.dbca.gov.au/api/v1/"
+            VITE_PRODUCTION_BACKEND_BASE_URL: "https://scienceprojects.dbca.wa.gov.au/"
+            VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects.dbca.wa.gov.au/api/v1/"
         run: |
           docker build . --build-arg VITE_PRODUCTION_BACKEND_BASE_URL=$VITE_PRODUCTION_BACKEND_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL  --tag ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
           docker push ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
@@ -31,8 +31,8 @@ jobs:
 
       - name: Build and Push Test Image
         env:
-          VITE_PRODUCTION_BACKEND_BASE_URL: "https://scienceprojects-test.dbca.gov.au/"
-          VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects-test.dbca.gov.au/api/v1/"
+          VITE_PRODUCTION_BACKEND_BASE_URL: "https://scienceprojects-test.dbca.wa.gov.au/"
+          VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects-test.dbca.wa.gov.au/api/v1/"
         run: | 
           docker build . --build-arg VITE_PRODUCTION_BACKEND_BASE_URL=$VITE_PRODUCTION_BACKEND_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:test-${{ steps.tag.outputs.TAG_NAME }}
           docker push ghcr.io/dbca-wa/science-projects-client:test-${{ steps.tag.outputs.TAG_NAME }}
