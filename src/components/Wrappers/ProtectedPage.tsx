@@ -16,7 +16,7 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
 
   useEffect(() => {
     if (!userLoading) {
-      console.log(location.pathname)
+      // console.log(location.pathname)
       if (!isLoggedIn || userData?.pk === undefined) {
         if (location.pathname !== "/login") {
           console.log("No user and not on login page. Navigating to login.");
