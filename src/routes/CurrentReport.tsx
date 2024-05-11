@@ -61,8 +61,6 @@ export const CurrentReport = () => {
   const formattedYearBefore = yearBefore?.toString().substring(2);
   const financialYearString = `FY ${formattedYearBefore}-${formattedLatestYear}`;
 
-
-
   return isLoading ? (
     <Spinner />
   ) : (
@@ -73,21 +71,15 @@ export const CurrentReport = () => {
           <Text flex={1} fontSize={"2xl"} fontWeight={"bold"} pb={6}>
             Annual Report ({financialYearString}){" "}
           </Text>
-
-
         </Flex>
 
         {thisReport !== null && thisReport !== undefined && (
-          <Tabs
-            isLazy
-            isFitted
-            variant={"enclosed"}
-          >
+          <Tabs isLazy isFitted variant={"enclosed"}>
             <TabList>
               <Tab>Details</Tab>
               <Tab>Media</Tab>
-              <Tab>Approved Progress Reports</Tab>
               <Tab>Pending Reports</Tab>
+              <Tab>Approved Progress Reports</Tab>
               <Tab>Print Preview</Tab>
               {/* <Tab>Test</Tab> */}
             </TabList>
@@ -96,16 +88,19 @@ export const CurrentReport = () => {
                 <AnnualReportDetails />
               </TabPanel>
               <TabPanel>
-                <AnnualReportMedia reportId={thisReport?.pk ? thisReport.pk : thisReport?.id} />
+                <AnnualReportMedia
+                  reportId={thisReport?.pk ? thisReport.pk : thisReport?.id}
+                />
+              </TabPanel>
+
+              <TabPanel>
+                <LatestReportsNotYetApproved />
               </TabPanel>
 
               <TabPanel>
                 <ParticipatingProjectReports />
               </TabPanel>
 
-              <TabPanel>
-                <LatestReportsNotYetApproved />
-              </TabPanel>
               <TabPanel>
                 <PDFViewer thisReport={thisReport} />
                 {/* <AnnualReportPrintPreview thisReport={thisReport} /> */}
