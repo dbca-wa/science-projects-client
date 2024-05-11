@@ -97,7 +97,7 @@ export const Navitar = ({
 
   const { layout } = useLayoutSwitcher();
 
-  useEffect(() => console.log(userData), [userData])
+  // useEffect(() => console.log(userData), [userData])
 
   return (
     <Box userSelect={"none"} zIndex={isOpen ? 2 : 1}>
