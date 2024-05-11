@@ -32,11 +32,11 @@ import { FcCancel } from "react-icons/fc";
 
 interface IPDFSectionProps {
   data_document:
-    | IConceptPlan
-    | IProjectPlan
-    | IProgressReport
-    | IStudentReport
-    | IProjectClosure;
+  | IConceptPlan
+  | IProjectPlan
+  | IProgressReport
+  | IStudentReport
+  | IProjectClosure;
   refetchData: () => void;
 }
 
@@ -81,7 +81,7 @@ export const ProjectDocumentPDFSection = ({
       }
       // console.log(response);
       // console.log(response.res)
-      const fileUrl = `${apiEndpoint}${response.res.data.file}`;
+      const fileUrl = `${apiEndpoint}${response?.res?.data?.file}`;
 
       if (fileUrl) {
         window.open(fileUrl, "_blank");
@@ -100,9 +100,8 @@ export const ProjectDocumentPDFSection = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Generate PDF",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -145,9 +144,8 @@ export const ProjectDocumentPDFSection = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Cancel",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -230,15 +228,15 @@ export const ProjectDocumentPDFSection = ({
       >
         <Box
           alignSelf={"center"}
-          // bg={"red"}
-          // justifyContent={""}
+        // bg={"red"}
+        // justifyContent={""}
         >
           <Text fontWeight={"semibold"}>PDF</Text>
         </Box>
 
         <Flex flex={1} justifyContent={"flex-end"} w={"100%"}>
           {data_document?.document?.pdf?.file &&
-          !projectDocPDFGenerationMutation.isPending ? (
+            !projectDocPDFGenerationMutation.isPending ? (
             <Button
               as={motion.div}
               initial={{ y: -10, opacity: 0 }}

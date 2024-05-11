@@ -8,29 +8,14 @@ import { IConceptPlanGenerationData } from "../types";
 
 // INSTANCE SETUP ==================================================================
 
-const PRODUCTION_BACKEND_API_URL = import.meta.env.VITE_PRODUCTION_BACKEND_API_URL
-const PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
-
-// const PRODUCTION_BACKEND_API_URL = process.env.PRODUCTION_BACKEND_API_URL;
-// const PRODUCTION_BACKEND_BASE_URL = process.env.PRODUCTION_BACKEND_BASE_URL;
+const VITE_PRODUCTION_BACKEND_API_URL = import.meta.env.VITE_PRODUCTION_BACKEND_API_URL
+const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
 
 const baseBackendUrl =
     process.env.NODE_ENV === "development" ?
         "http://127.0.0.1:8000/api/v1/"
         :
-        PRODUCTION_BACKEND_API_URL
-// process.env.TEST === "True" ?
-//     "https://scienceprojects-test.dbca.wa.gov.au/api/v1/" :
-//     "https://scienceprojects.dbca.wa.gov.au/api/v1/"
-
-
-// const baseBackendUrl =
-//     process.env.NODE_ENV === "development" ?
-//         "http://127.0.0.1:8000/api/v1/"
-//         :
-//         process.env.TEST === "True" ?
-//         "https://scienceprojects-test.dbca.wa.gov.au/api/v1/" :
-//         "https://scienceprojects.dbca.wa.gov.au/api/v1/"
+        VITE_PRODUCTION_BACKEND_API_URL
 
 const instance = axios.create({
     baseURL: baseBackendUrl,
@@ -106,7 +91,7 @@ export const logOut = () => {
         .then((response) => {
             if (response.data.ok) {
                 if (process.env.NODE_ENV !== "development") {
-                    window.location.href = `${PRODUCTION_BACKEND_BASE_URL}sso/auth_logout`
+                    window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/auth_logout`
                 }
                 return response.data;
             } else {
