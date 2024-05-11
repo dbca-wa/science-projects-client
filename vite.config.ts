@@ -5,10 +5,6 @@ import path from "path"
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // define: {
-  //   VITE_PRODUCTION_BACKEND_API_URL: `${process.env.VITE_PRODUCTION_BACKEND_API_URL}`,
-  //   VITE_PRODUCTION_BACKEND_BASE_URL: `${process.env.VITE_PRODUCTION_BACKEND_BASE_URL}`,
-  // },
   plugins: [
     react(),
   ],

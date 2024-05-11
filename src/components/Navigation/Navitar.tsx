@@ -20,7 +20,7 @@ import { FiLogOut } from "react-icons/fi";
 import { SiReadthedocs } from "react-icons/si";
 import { GoTriangleDown } from "react-icons/go";
 import { INavitar } from "../../types";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { logOut } from "../../lib/api";
@@ -74,7 +74,8 @@ export const Navitar = ({
       }
       // queryClient.refetchQueries(['me']);
       queryClient.invalidateQueries({ queryKey: ["me"] });
-      navigate("/login");
+      // navigate("/login");
+      window.location.reload()
     },
   });
   const onLogOut = async () => {
@@ -95,6 +96,8 @@ export const Navitar = ({
   };
 
   const { layout } = useLayoutSwitcher();
+
+  useEffect(() => console.log(userData), [userData])
 
   return (
     <Box userSelect={"none"} zIndex={isOpen ? 2 : 1}>
