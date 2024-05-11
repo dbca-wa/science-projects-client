@@ -1539,7 +1539,7 @@ function $insertDataTransferForRichText(
       // console.log("STRING", levelOneFinishedString)
       const parser = new DOMParser();
       const dom = parser.parseFromString(levelOneFinishedString, "text/html");
-      return generateNodesFromDom(dom);
+      return generateNodesFromDom(dom, editor, selection);
     } catch (e) {
       // Fail silently.
       console.log("ERROR", e);
