@@ -36,7 +36,7 @@ interface Props {
 export const PDFViewer = ({
   thisReport,
 }: // refetchData
-Props) => {
+  Props) => {
   const { register: genRegister, handleSubmit: handleGenSubmit } =
     useForm<IDocGen>();
   const { register: cancelGenRegister, handleSubmit: handleCancelGenSubmit } =
@@ -82,9 +82,8 @@ Props) => {
         toast.update(toastIdRef.current, {
           title: "Could Not Generate AR PDF",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -131,9 +130,8 @@ Props) => {
         toast.update(toastIdRef.current, {
           title: "Could Not Cancel",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -172,7 +170,7 @@ Props) => {
     ) {
       timer = setInterval(() => {
         setGenerationTime((prevTime) => prevTime + 1000); // Increase by 1 second (1000 milliseconds)
-        if (generationTime >= 30000) {
+        if (generationTime >= 60000) {
           setShowRestartMessage(true); // Show restart message after 30 seconds
         }
       }, 1000); // Run every second
@@ -219,9 +217,9 @@ Props) => {
         <Center>
           <Text fontSize={"sm"}>
             {annualReportPDFGenerationMutation.isPending ||
-            pdfDocumentData?.report?.pdf_generation_in_progress
+              pdfDocumentData?.report?.pdf_generation_in_progress
               ? showRestartMessage
-                ? "PDF Generating... It's been 30 seconds, maybe you should cancel and try again"
+                ? "PDF Generating... It's been 60 seconds, maybe you should cancel and try again"
                 : `PDF Generating...`
               : "You may download this pdf or create a new one in under a minute."}
           </Text>
@@ -256,7 +254,7 @@ Props) => {
           </Box>
 
           {annualReportPDFGenerationMutation.isPending ||
-          pdfDocumentData?.report?.pdf_generation_in_progress ? (
+            pdfDocumentData?.report?.pdf_generation_in_progress ? (
             <Button
               size={"sm"}
               ml={2}
@@ -336,8 +334,8 @@ Props) => {
         pdfDocumentData !== undefined ? (
           (pdfDocumentData?.report?.pdf_generation_in_progress &&
             !cancelDocGenerationMutation.isSuccess) ||
-          (annualReportPDFGenerationMutation.isPending &&
-            !cancelDocGenerationMutation.isSuccess) ? (
+            (annualReportPDFGenerationMutation.isPending &&
+              !cancelDocGenerationMutation.isSuccess) ? (
             <Center mt={100}>
               <img
                 src="/bouncing-ball.svg"
