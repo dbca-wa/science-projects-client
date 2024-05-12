@@ -124,10 +124,10 @@ export const Login = ({ onClose }: IIsModal) => {
     if (!userLoading && userData?.pk !== undefined) {
       // console.log(userData)
       navigate("/");
-    } else {
-      if (buildType !== "development") {
-        window.location.reload()
-      }
+      return;
+    }
+    if (buildType !== "development" && !userLoading && userData && userData.pk === undefined) {
+      window.location.reload()
     }
   }, [userLoading, userData, buildType]);
 
