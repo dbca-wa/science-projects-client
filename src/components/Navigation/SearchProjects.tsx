@@ -174,16 +174,16 @@ export const SearchProjects = ({ orientation }: IProps) => {
             style={
               colorMode === "light"
                 ? {
-                    color: "black",
-                    backgroundColor: "white",
-                    borderColor: "gray.200",
-                    caretColor: "black !important",
-                  }
+                  color: "black",
+                  backgroundColor: "white",
+                  borderColor: "gray.200",
+                  caretColor: "black !important",
+                }
                 : {
-                    color: "white",
-                    borderColor: "white",
-                    caretColor: "black !important",
-                  }
+                  color: "white",
+                  borderColor: "white",
+                  caretColor: "black !important",
+                }
             }
           >
             <option value={0} color={"black"}>
@@ -206,16 +206,16 @@ export const SearchProjects = ({ orientation }: IProps) => {
             style={
               colorMode === "light"
                 ? {
-                    color: "black",
-                    backgroundColor: "white",
-                    borderColor: "gray.200",
-                    caretColor: "black !important",
-                  }
+                  color: "black",
+                  backgroundColor: "white",
+                  borderColor: "gray.200",
+                  caretColor: "black !important",
+                }
                 : {
-                    color: "white",
-                    borderColor: "white",
-                    caretColor: "black !important",
-                  }
+                  color: "white",
+                  borderColor: "white",
+                  caretColor: "black !important",
+                }
             }
           >
             <option key={"All"} value={"All"} color={"black"}>
@@ -231,7 +231,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
                 <option key={`${ba.name}${index}`} value={ba.pk}>
                   {ba?.division ? `[${ba?.division?.slug}] ` : ""}
                   {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
-                  {ba.is_active ? "" : "(Inactive)"}
+                  {ba.is_active ? "" : "(INACTIVE)"}
                 </option>
               ));
             })}
@@ -252,16 +252,16 @@ export const SearchProjects = ({ orientation }: IProps) => {
           style={
             colorMode === "light"
               ? {
-                  color: "black",
-                  backgroundColor: "white",
-                  borderColor: "gray.200",
-                  caretColor: "black !important",
-                }
+                color: "black",
+                backgroundColor: "white",
+                borderColor: "gray.200",
+                caretColor: "black !important",
+              }
               : {
-                  color: "white",
-                  borderColor: "white",
-                  caretColor: "black !important",
-                }
+                color: "white",
+                borderColor: "white",
+                caretColor: "black !important",
+              }
           }
         >
           <option value={"All"} color={"black"}>
