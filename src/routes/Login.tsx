@@ -127,7 +127,8 @@ export const Login = ({ onClose }: IIsModal) => {
       return;
     }
     if (buildType !== "development" && !userLoading && userData && userData.pk === undefined) {
-      window.location.reload()
+      // UPDATE HERE TO DBCA UTILS LOGIN URL
+      // window.location.reload()
     }
   }, [userLoading, userData, buildType]);
 
