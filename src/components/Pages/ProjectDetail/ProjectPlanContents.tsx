@@ -214,11 +214,11 @@ export const ProjectPlanContents = ({
         section={"related_projects"}
       />
 
-      <Box pb={6} mt={4}>
+      <Box pb={6} mt={4} w={"100%"} >
         <Text fontWeight={"bold"} fontSize={"2xl"}>
           Funding
         </Text>
-        <Grid mt={4} gridTemplateColumns={"repeat(1, 1fr)"}>
+        <Grid mt={4} gridTemplateColumns={"repeat(1, 1fr)"} pos={"relative"}>
           <RichTextEditor
             canEdit={userInTeam || userData?.is_superuser}
             document_pk={document?.document?.pk}
@@ -251,7 +251,7 @@ export const ProjectPlanContents = ({
         userIsLeader={userIsLeader}
         userData={userData}
         refetchDocument={refetch}
-        // isProjectLeader={}
+      // isProjectLeader={}
       />
 
       <Box pb={6} mt={4}>

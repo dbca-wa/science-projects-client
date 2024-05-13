@@ -13,14 +13,22 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
   const navigate = useNavigate();
   const [showContent, setShowContent] = useState(false);
   const location = useLocation();
+  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
 
   useEffect(() => {
     if (!userLoading) {
       // console.log(location.pathname)
       if (!isLoggedIn || userData?.pk === undefined) {
-        if (location.pathname !== "/login") {
+        if (location.pathname !== "/login"
+          // && location.pathname !== "/science"
+        ) {
           console.log("No user and not on login page. Navigating to login.");
-          navigate("/login");
+          if (process.env.NODE_ENV === "production") {
+            window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin=/`;
+          } else {
+            navigate("/login");
+          }
+
         }
       }
       else {

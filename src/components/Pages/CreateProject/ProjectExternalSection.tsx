@@ -1,13 +1,13 @@
 // Tab data for Project External Project info on the creation page.
 
+import { AffiliationCreateSearchDropdown } from "@/components/Navigation/AffiliationCreateSearchDropdown";
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import { Button, Flex, FormControl, Grid, useColorMode } from "@chakra-ui/react";
+import { IAffiliation } from "@/types";
+import { Box, Button, Flex, FormControl, Grid, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { ICreateProjectExternalDetails } from "../../../lib/api";
 import "../../../styles/modalscrollbar.css";
-import { IAffiliation } from "@/types";
-import { AffiliationCreateSearchDropdown } from "@/components/Navigation/AffiliationCreateSearchDropdown";
 
 interface IProjectExternalProps {
   externalFilled: boolean;
@@ -33,22 +33,50 @@ export const ProjectExternalSection = ({
   const [collaborationWith, setCollaborationWith] = useState<string>("");
 
 
-  const [secondaryAffiliations, setSecondaryAffiliations] = useState<
+  const [collaboratingPartnersArray, setCollaboratingPartnersArray] = useState<
     IAffiliation[] | null
   >([]);
 
-  const addSecondaryAffiliationPkToArray = (affiliation: IAffiliation) => {
-    setSecondaryAffiliations((prev) => [...prev, affiliation]);
+  const addCollaboratingPartnersPkToArray = (affiliation: IAffiliation) => {
+    setCollaborationWith((prevString) => {
+      let updatedString = prevString.trim(); // Remove any leading or trailing spaces
+
+      // Add a comma and a space if not already present
+      if (updatedString && !/,\s*$/.test(updatedString)) {
+        updatedString += ", ";
+      }
+
+      // Append affiliation name
+      updatedString += affiliation.name.trim();
+
+      // Check if the first two characters are a space and comma, remove them
+      if (updatedString.startsWith(", ")) {
+        updatedString = updatedString.substring(2);
+      }
+
+      return updatedString;
+    })
+    setCollaboratingPartnersArray((prev) => [...prev, affiliation]);
   };
 
-  const removeSecondaryAffiliationPkFromArray = (affiliation: IAffiliation) => {
-    setSecondaryAffiliations((prev) =>
+  const removeCollaboratingPartnersPkFromArray = (affiliation: IAffiliation) => {
+    setCollaborationWith(prevString => {
+      const regex = new RegExp(`.{0,2}${affiliation.name.trim()}\\s*`, 'g');
+      let updatedString = prevString.replace(regex, '').trim();
+      if (updatedString.startsWith(", ")) {
+        updatedString = updatedString.substring(2);
+      }
+      return updatedString
+    });
+
+    setCollaboratingPartnersArray((prev) =>
       prev.filter((item) => item !== affiliation)
     );
   };
 
-  const clearSecondaryAffiliationArray = () => {
-    setSecondaryAffiliations([]);
+  const clearCollaboratingPartnersPkArray = () => {
+    setCollaborationWith('');
+    setCollaboratingPartnersArray([]);
   };
   useEffect(() => {
     setExternalData({
@@ -88,9 +116,14 @@ export const ProjectExternalSection = ({
 
   const { colorMode } = useColorMode();
 
+
+  useEffect(() => {
+
+  })
+
   return (
-    <>
-      <UnboundStatefulEditor
+    <Box px={8}>
+      {/* <UnboundStatefulEditor
         title="Collaboration With"
         placeholder="Enter collaborating entities..."
         helperText={
@@ -102,25 +135,28 @@ export const ProjectExternalSection = ({
         value={collaborationWith}
         setValueFunction={setCollaborationWith}
         setValueAsPlainText={true}
-      />
+      /> */}
 
       <FormControl>
         <AffiliationCreateSearchDropdown
           autoFocus
           isRequired
           isEditable
-          array={secondaryAffiliations}
-          arrayAddFunction={addSecondaryAffiliationPkToArray}
+          array={collaboratingPartnersArray}
+          arrayAddFunction={addCollaboratingPartnersPkToArray}
           arrayRemoveFunction={
-            removeSecondaryAffiliationPkFromArray
+            removeCollaboratingPartnersPkFromArray
           }
-          arrayClearFunction={clearSecondaryAffiliationArray}
+          arrayClearFunction={clearCollaboratingPartnersPkArray}
 
           label="Collaboration With"
           placeholder="Search for or add a collaboration partner"
-          helperText="The entity/s this project is in collaporation with"
+          helperText="The entity/s this project is in collaboration with"
         />
       </FormControl>
+
+      {/* <Text>Collab with: {collaborationWith}</Text> */}
+
 
       <UnboundStatefulEditor
         title="Budget"
@@ -181,6 +217,6 @@ export const ProjectExternalSection = ({
           </Button>
         </Grid>
       </Flex>
-    </>
+    </Box>
   );
 };

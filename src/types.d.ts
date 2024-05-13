@@ -241,7 +241,7 @@ interface IStudentProjectDetails {
     id: number;
     old_id: number | null;
     level: string;
-    organisation: "string";
+    organisation: string;
     project: ISmallProject;
 }
 

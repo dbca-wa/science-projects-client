@@ -206,7 +206,7 @@ export const RichTextEditor = ({
 
   return (
     // Wrapper
-    <Box pb={6}>
+    <Box pb={6} maxW={"100%"}>
       <Flex
         bg={
           colorMode === "light"
@@ -216,13 +216,13 @@ export const RichTextEditor = ({
               ? "gray.200"
               : "gray.100"
             : section === "description" ||
-                section === "externalAims" ||
-                section === "externalDescription"
+              section === "externalAims" ||
+              section === "externalDescription"
               ? "gray.800"
               : "gray.700"
         }
         // roundedTop={"8px"}
-        roundedTop={20}
+        roundedTop={20} maxW={"100%"}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
           <Text
@@ -257,7 +257,8 @@ export const RichTextEditor = ({
 
       <Box
         pos={"relative"}
-        w={"100%"}
+        // w={"100%"}
+        maxW={"100%"}
         // bg={"gray.100"}
         roundedBottom={20}
         boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
@@ -314,13 +315,13 @@ export const RichTextEditor = ({
             // editorText={editorText}
             // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-            // setShouldShowTree={setShouldShowTree}
-            // isEditorOpen={isEditorOpen}
-            // setIsEditorOpen={setIsEditorOpen}
-            // setDisplayData={setDisplayData}
-            // textEditorName={
-            //   section === "description" ? "Description" : undefined
-            // }
+          // setShouldShowTree={setShouldShowTree}
+          // isEditorOpen={isEditorOpen}
+          // setIsEditorOpen={setIsEditorOpen}
+          // setDisplayData={setDisplayData}
+          // textEditorName={
+          //   section === "description" ? "Description" : undefined
+          // }
           />
         )}
       </Box>

@@ -44,10 +44,11 @@ const capitalizeAfterSpaceOrHyphen = (name: string) => {
 
 interface IProps {
   onSuccess?: () => void;
+  onClose?: () => void;
   isModal?: boolean;
 }
 
-export const CreateUser = ({ onSuccess, isModal }: IProps) => {
+export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const navigate = useNavigate();
@@ -70,6 +71,7 @@ export const CreateUser = ({ onSuccess, isModal }: IProps) => {
   const [lastNameError, setLastNameError] = useState("");
 
   const location = useLocation();
+  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
 
   useEffect(() => {
     if (
@@ -174,6 +176,10 @@ export const CreateUser = ({ onSuccess, isModal }: IProps) => {
   const validateEmail = (email: string) => {
     // Simple email validation regex pattern
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailGood = emailRegex.test(email);
+    if (emailGood && email.endsWith("@dbca.wa.gov.au")) {
+      return false
+    }
     return emailRegex.test(email);
   };
 
@@ -265,9 +271,12 @@ export const CreateUser = ({ onSuccess, isModal }: IProps) => {
         >
           <TypewriterText
             text={
-              "Please note that this is for adding external users only. Enter the external user's details, not your own.\nIf you are trying to add a DBCA staff member, please send them a link to this website and an account will be created when they visit.\nAll existing users can be found on the users page.\n"
+              `This is for adding external users only. \nIf you are trying to add a DBCA staff member, please send them a link to this website and an account will be created when they visit.\nAll existing users can be found on the users page.\n`
             }
           />
+          {
+            location.pathname !== "/users" && <Button variant={"link"} color={"blue.500"} onClick={() => { navigate(`/users`) }}>{`${VITE_PRODUCTION_BACKEND_BASE_URL}users`}</Button>
+          }
         </Box>
       )}
 
@@ -366,7 +375,7 @@ export const CreateUser = ({ onSuccess, isModal }: IProps) => {
             )}
             {email.length >= 5 && !isValidEmail && (
               <FormHelperText color="red.500">
-                Please enter a valid email address.
+                {email.endsWith('@dbca.wa.gov.au') ? "'@dbca.wa.gov.au' addresses are not valid for adding external users. Please enter a valid external email address." : "Please enter a valid email address."}
               </FormHelperText>
             )}
             {email.length >= 5 && isValidEmail && !emailsMatch && (
@@ -412,9 +421,12 @@ export const CreateUser = ({ onSuccess, isModal }: IProps) => {
           >
             <TypewriterText
               text={
-                "Please note that this is for adding external users only. Enter the external user's details, not your own.\nIf you are trying to add a DBCA staff member, please send them a link to this website and an account will be created when they visit.\nAll existing users can be found on the users page.\n"
+                `This is for adding external users only. \nIf you are trying to add a DBCA staff member, please send them a link to this website and an account will be created when they visit.\nAll existing users can be found on the users page.\n`
               }
             />
+            {
+              location.pathname !== "/users" && <Button variant={"link"} color={"blue.500"} onClick={() => { navigate(`/users`); onClose(); }}>{`${VITE_PRODUCTION_BACKEND_BASE_URL}users`}</Button>
+            }
           </Box>
         )}
 

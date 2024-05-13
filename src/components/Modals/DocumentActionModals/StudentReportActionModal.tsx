@@ -91,13 +91,12 @@ export const StudentReportActionModal = ({
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${
-          action === "approve"
+        title: `${action === "approve"
             ? "Approving"
             : action === "recall"
               ? "Recalling"
               : "Sending Back"
-        }`,
+          }`,
         position: "top-right",
       });
     },
@@ -105,13 +104,12 @@ export const StudentReportActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${
-            action === "approve"
+          description: `Document ${action === "approve"
               ? "Approved"
               : action === "recall"
                 ? "Recalled"
                 : "Sent Back"
-          }`,
+            }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -134,13 +132,12 @@ export const StudentReportActionModal = ({
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${
-            action === "approve"
+          title: `Could Not ${action === "approve"
               ? "Approve"
               : action === "recall"
                 ? "Recall"
                 : "Send Back"
-          } student Report`,
+            } student Report`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -163,7 +160,7 @@ export const StudentReportActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-      // isCentered={true}
+    // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -273,7 +270,7 @@ export const StudentReportActionModal = ({
                       Directorate Members
                     </Text>
                     <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
-                      {isDirectorateLoading &&
+                      {!isDirectorateLoading &&
                         directorateData
                           ?.filter((member) => member.is_active) // Filter only active members
                           .map((member, index) => (

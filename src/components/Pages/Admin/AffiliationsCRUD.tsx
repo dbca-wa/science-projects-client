@@ -227,7 +227,7 @@ export const AffiliationsCRUD = () => {
     } else {
       // console.log(nameValue);
       // console.log(alreadyPresentNames);
-      if (alreadyPresentNames.includes(nameValue.toLowerCase())) {
+      if (nameValue.includes(',') || alreadyPresentNames.includes(nameValue.toLowerCase())) {
         setCreateIsDisabled(true);
       } else {
         setCreateIsDisabled(false);

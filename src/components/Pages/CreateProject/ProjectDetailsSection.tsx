@@ -200,7 +200,7 @@ export const ProjectDetailsSection = ({
             <FormHelperText
             // color={colorMode === "light" ? "gray.500" : "gray.400"}
             >
-              The Business Area / Program that this project belongs to.
+              The Business Area / Program that this project belongs to. Only active Business Areas are selectable.
             </FormHelperText>
           </FormControl>
         </Box>

@@ -138,7 +138,7 @@ export const AffiliationSearchDropdown = forwardRef(
 
     return (
       <>
-        <FormControl isRequired={isRequired} mb={4} zIndex={99}>
+        <FormControl isRequired={isRequired} mb={4} >
           <FormLabel>{label}</FormLabel>
           {selectedAffiliation ? (
             <Box mb={2} color="blue.500">
@@ -164,8 +164,8 @@ export const AffiliationSearchDropdown = forwardRef(
 
           {selectedAffiliation ? null : (
             <Box pos="relative" w="100%">
-              <CustomMenu isOpen={filteredItems?.length > 0 && isMenuOpen}>
-                <CustomMenuList minWidth="100%">
+              <CustomMenu isOpen={filteredItems?.length > 0 && isMenuOpen} >
+                <CustomMenuList minWidth="100%" >
                   {filteredItems.map((affiliation) => (
                     <CustomMenuItem
                       key={affiliation.pk}
@@ -193,6 +193,7 @@ export const AffiliationSearchDropdown = forwardRef(
               background={colorMode === "light" ? "red.500" : "red.800"}
               px={2}
               rightIcon={<FaTrash />}
+              color={"white"}
             >
               Clear Secondary Affiliations
             </Button>
@@ -252,8 +253,8 @@ const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
       w="100%"
       bg={colorMode === "light" ? "white" : "gray.700"}
       boxShadow="md"
-      zIndex={1}
       display={isOpen ? "block" : "none"}
+      zIndex={99}
       {...rest}
     >
       {children}
@@ -285,6 +286,7 @@ const CustomMenuItem = ({
       onMouseOut={() => setIsHovered(false)}
       bg={isHovered ? "gray.200" : "transparent"}
       alignItems="center"
+      zIndex={99}
       {...rest}
     >
       <Box

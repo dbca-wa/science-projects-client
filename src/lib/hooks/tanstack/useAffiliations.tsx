@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllAffiliations } from "../../api";
 
 export const useAffiliations = () => {
-  const { isPending, data } = useQuery({
+  const { isPending, data, refetch } = useQuery({
     queryKey: ["affiliations"],
     queryFn: getAllAffiliations,
     retry: false,
@@ -19,5 +19,6 @@ export const useAffiliations = () => {
   return {
     affiliationsLoading: isPending,
     affiliationsData: sortedAffiliations,
+    refetchAffiliations: refetch,
   };
 };
