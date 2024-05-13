@@ -26,9 +26,9 @@ import { TbWorldWww } from "react-icons/tb";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 import confetti from "canvas-confetti";
 
-
 export const TraditionalDashboard = () => {
-  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
+  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
+    .VITE_PRODUCTION_BACKEND_BASE_URL;
 
   const user = useUser();
 
@@ -58,9 +58,17 @@ export const TraditionalDashboard = () => {
       setShouldConcat(false);
       // setAnnualReportText("Annual Report");
       if (window.innerWidth < 1350) {
-        setSpmsText(`Science Project <br/> Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes('-test') ? '(TEST)' : ''}`);
+        setSpmsText(
+          `Science Project <br/> Management System ${
+            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          }`
+        );
       } else {
-        setSpmsText(`Science Project Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes('-test') ? '(TEST)' : ''}`);
+        setSpmsText(
+          `Science Project Management System ${
+            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          }`
+        );
       }
     }
   }, [theme.breakpoints.lg, user?.userData?.first_name]);
@@ -82,7 +90,6 @@ export const TraditionalDashboard = () => {
     onClose: onCloseFeedbackModal,
   } = useDisclosure();
 
-
   useEffect(() => {
     // confetti({
     //   particleCount: 150
@@ -95,19 +102,18 @@ export const TraditionalDashboard = () => {
       // startVelocity: 30,
       spread: 360,
       origin: {
-        x: 0.3,
+        x: 0.385,
         // x: Math.random(),
         // since they fall down, start a bit higher than random
         // y: Math.random() - 0.2
-        y: 0.25
-      }
-    })
-
+        y: 0.3,
+      },
+    });
 
     setTimeout(() => {
       confetti.reset();
     }, 5000);
-  }, [])
+  }, []);
 
   return (
     <>
@@ -148,10 +154,16 @@ export const TraditionalDashboard = () => {
           <Text mt={5} fontSize={"16px"} fontWeight={"semibold"}>
             &#127881; We have successfully migrated to SPMS 2.0! &#127881;
           </Text>
-          <Text>This new version features speed and security upgrades, dark mode, a new layout, copy-pasting from word, improved email and more!</Text>
+          <Text>
+            This new version features speed and security upgrades, dark mode, a
+            new layout, copy-pasting from word, improved email and more!
+          </Text>
           <span style={{ marginTop: 20 }}>
             <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
-              We are always looking for ways to improve, and value your feedback! If you notice something off, or would like to request a change, please submit feedback here. Don't be shy, we can only make things better with your help!
+              We are always looking for ways to improve, and value your
+              feedback! If you notice something off, or would like to request a
+              change, please submit feedback here. Don't be shy, we can only
+              make things better with your help!
             </Text>
 
             <Button
