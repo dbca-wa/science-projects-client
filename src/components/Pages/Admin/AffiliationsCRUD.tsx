@@ -372,8 +372,8 @@ export const AffiliationsCRUD = () => {
               >
                 <VStack
                   spacing={4}
-                  // as="form"
-                  // id="merge-form"
+                // as="form"
+                // id="merge-form"
                 >
                   <Box justifyContent={"start"} w={"100%"}>
                     <Text>Combine similar affiliations into one!</Text>

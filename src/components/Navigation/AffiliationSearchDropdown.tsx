@@ -138,7 +138,7 @@ export const AffiliationSearchDropdown = forwardRef(
 
     return (
       <>
-        <FormControl isRequired={isRequired} mb={4}>
+        <FormControl isRequired={isRequired} mb={4} zIndex={99}>
           <FormLabel>{label}</FormLabel>
           {selectedAffiliation ? (
             <Box mb={2} color="blue.500">

@@ -75,7 +75,7 @@ export const ProjectBaseInformation = ({
   const MIN_TITLE_LENGTH = BASE_SIZE_WITH_ONE_CHARACTER + 6;
 
   useEffect(() => {
-    console.log(projectTitle.length);
+    // console.log(projectTitle.length);
     if (projectTitle.length >= MAX_TITLE_LENGTH) {
       setTitleLengthError(true);
     } else if (projectTitle?.length < MIN_TITLE_LENGTH) {
@@ -121,9 +121,9 @@ export const ProjectBaseInformation = ({
               type="text"
               placeholder="Year"
               value={currentYear}
-              onChange={() => {
-                console.log(currentYear);
-              }}
+            // onChange={() => {
+            //   console.log(currentYear);
+            // }}
             />
           </InputGroup>
 
@@ -132,9 +132,9 @@ export const ProjectBaseInformation = ({
               type="text"
               placeholder="Kind"
               value={projectKind}
-              onChange={() => {
-                console.log(projectKind);
-              }}
+            // onChange={() => {
+            //   console.log(projectKind);
+            // }}
             />
           </InputGroup>
 

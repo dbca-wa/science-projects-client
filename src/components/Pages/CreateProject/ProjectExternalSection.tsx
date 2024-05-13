@@ -1,11 +1,13 @@
 // Tab data for Project External Project info on the creation page.
 
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import { Button, Flex, Grid, useColorMode } from "@chakra-ui/react";
+import { Button, Flex, FormControl, Grid, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 import { ICreateProjectExternalDetails } from "../../../lib/api";
 import "../../../styles/modalscrollbar.css";
+import { IAffiliation } from "@/types";
+import { AffiliationCreateSearchDropdown } from "@/components/Navigation/AffiliationCreateSearchDropdown";
 
 interface IProjectExternalProps {
   externalFilled: boolean;
@@ -30,6 +32,24 @@ export const ProjectExternalSection = ({
   const [budget, setBudget] = useState<string>("");
   const [collaborationWith, setCollaborationWith] = useState<string>("");
 
+
+  const [secondaryAffiliations, setSecondaryAffiliations] = useState<
+    IAffiliation[] | null
+  >([]);
+
+  const addSecondaryAffiliationPkToArray = (affiliation: IAffiliation) => {
+    setSecondaryAffiliations((prev) => [...prev, affiliation]);
+  };
+
+  const removeSecondaryAffiliationPkFromArray = (affiliation: IAffiliation) => {
+    setSecondaryAffiliations((prev) =>
+      prev.filter((item) => item !== affiliation)
+    );
+  };
+
+  const clearSecondaryAffiliationArray = () => {
+    setSecondaryAffiliations([]);
+  };
   useEffect(() => {
     setExternalData({
       externalDescription: externalDescription,
@@ -83,6 +103,24 @@ export const ProjectExternalSection = ({
         setValueFunction={setCollaborationWith}
         setValueAsPlainText={true}
       />
+
+      <FormControl>
+        <AffiliationCreateSearchDropdown
+          autoFocus
+          isRequired
+          isEditable
+          array={secondaryAffiliations}
+          arrayAddFunction={addSecondaryAffiliationPkToArray}
+          arrayRemoveFunction={
+            removeSecondaryAffiliationPkFromArray
+          }
+          arrayClearFunction={clearSecondaryAffiliationArray}
+
+          label="Collaboration With"
+          placeholder="Search for or add a collaboration partner"
+          helperText="The entity/s this project is in collaporation with"
+        />
+      </FormControl>
 
       <UnboundStatefulEditor
         title="Budget"

@@ -90,10 +90,12 @@ export const logOut = () => {
         .post(`users/log-out`, null,)
         .then((response) => {
             if (response.data.ok) {
-                if (process.env.NODE_ENV !== "development") {
-                    window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/auth_logout`
-                }
+                // if (process.env.NODE_ENV !== "development") {
                 return response.data;
+                // window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/auth_logout`
+                // } else {
+                //     re
+                // }
             } else {
                 throw new Error('Error logging out.', response.data.error);
             }
@@ -391,7 +393,7 @@ export const getUsersBasedOnSearchTerm = async (searchTerm: string, page: number
             url += `&businessArea=${filters.businessArea}`
         }
 
-        console.log(url)
+        // console.log(url)
 
         const response = await instance.get(url);
 

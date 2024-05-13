@@ -100,6 +100,20 @@ export const ProjectDetailsSection = ({
     }
   }, [dsLoading, servicesDataFromAPI]);
 
+
+  const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
+  // Function to check if a string contains HTML tags
+  const checkIsHtml = (data) => {
+    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+    return htmlRegex.test(data);
+  };
+
+  // Function to sanitize HTML content and extract text
+  const sanitizeHtml = (htmlString) => {
+    const doc = new DOMParser().parseFromString(htmlString, "text/html");
+    return doc.body.textContent || "";
+  };
+
   return (
     <>
       <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={8} px={24}>
@@ -158,6 +172,7 @@ export const ProjectDetailsSection = ({
             <FormLabel>Business Area</FormLabel>
 
             <InputGroup>
+
               <Select
                 variant="filled"
                 placeholder="Select a Business Area"
@@ -166,31 +181,19 @@ export const ProjectDetailsSection = ({
                 }
                 value={selectedBusinessArea}
               >
-                {businessAreaList.map((ba, index) => {
-                  const checkIsHtml = (data: string) => {
-                    // Regular expression to check for HTML tags
-                    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+                {orderedDivisionSlugs.flatMap((divSlug) => {
+                  // Filter business areas for the current division
+                  const divisionBusinessAreas = businessAreaList
+                    .filter((ba) => ba.division.slug === divSlug && ba.is_active)
+                    .sort((a, b) => a.name.localeCompare(b.name));
 
-                    // Check if the string contains any HTML tags
-
-                    return htmlRegex.test(data);
-                  };
-
-                  const isHtml = checkIsHtml(ba.name);
-                  let baName = ba.name;
-                  if (isHtml === true) {
-                    const parser = new DOMParser();
-                    const dom = parser.parseFromString(ba.name, "text/html");
-                    const content = dom.body.textContent;
-                    baName = content;
-                  }
-                  if (ba?.is_active) {
-                    return (
-                      <option key={index} value={ba.pk}>
-                        {baName}
-                      </option>
-                    );
-                  }
+                  return divisionBusinessAreas.map((ba, index) => (
+                    <option key={`${ba.name}${index}`} value={ba.pk}>
+                      {ba?.division ? `[${ba?.division?.slug}] ` : ""}
+                      {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
+                      {ba.is_active ? "" : "(INACTIVE)"}
+                    </option>
+                  ));
                 })}
               </Select>
             </InputGroup>
