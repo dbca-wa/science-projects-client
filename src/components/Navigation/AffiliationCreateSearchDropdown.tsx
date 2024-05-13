@@ -16,8 +16,11 @@ import {
     TagCloseButton,
     TagLabel,
     Text,
+    ToastId,
     useColorMode,
+    useToast
 } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     forwardRef,
     useEffect,
@@ -26,7 +29,8 @@ import {
     useState,
 } from "react";
 import { FaTrash } from "react-icons/fa";
-import { getAffiliationsBasedOnSearchTerm } from "../../lib/api";
+import { GrOrganization } from "react-icons/gr";
+import { createAffiliation, getAffiliationsBasedOnSearchTerm } from "../../lib/api";
 import { IAffiliation } from "../../types";
 
 interface IAffiliationSearchDropdown {
@@ -42,6 +46,7 @@ interface IAffiliationSearchDropdown {
     preselectedAffiliationPk?: number;
     isEditable?: boolean;
     autoFocus?: boolean;
+    hideTags?: boolean;
 }
 
 export const AffiliationCreateSearchDropdown = forwardRef(
@@ -58,6 +63,7 @@ export const AffiliationCreateSearchDropdown = forwardRef(
             helperText,
             preselectedAffiliationPk,
             isEditable,
+            hideTags,
         }: IAffiliationSearchDropdown,
         ref
     ) => {
@@ -68,6 +74,8 @@ export const AffiliationCreateSearchDropdown = forwardRef(
         const [isMenuOpen, setIsMenuOpen] = useState(true); // Stores the menu open state
         const [selectedAffiliation, setSelectedAffiliation] =
             useState<IAffiliation | null>(); // New state to store the selected name
+
+        // const { refetchAffiliations } = useAffiliations();
 
         useEffect(() => {
             if (searchTerm.trim() !== "") {
@@ -175,11 +183,26 @@ export const AffiliationCreateSearchDropdown = forwardRef(
                                     ))}
                                 </CustomMenuList>
                             </CustomMenu>
+                            {
+                                !(filteredItems?.length > 0) && isMenuOpen && searchTerm.length >= 2 && (
+                                    <CustomMenu isOpen={isMenuOpen}>
+
+                                        <CustomMenuList minWidth="100%">
+                                            <DropdownCreateAffiliationMenuItem
+                                                name={searchTerm}
+                                                // refetchAffiliationsFn={refetchAffiliations} 
+                                                setFilteredItems={setFilteredItems}
+                                                array={array} />
+                                        </CustomMenuList>
+                                    </CustomMenu>
+
+                                )
+                            }
                         </Box>
                     )}
 
                     <FormHelperText>{helperText}</FormHelperText>
-                    {array?.length > 1 && (
+                    {(array?.length > 1) && !hideTags && (
                         <Button
                             onClick={() => {
                                 arrayClearFunction
@@ -193,12 +216,13 @@ export const AffiliationCreateSearchDropdown = forwardRef(
                             background={colorMode === "light" ? "red.500" : "red.800"}
                             px={2}
                             rightIcon={<FaTrash />}
+                            color={"white"}
                         >
-                            Clear Secondary Affiliations
+                            Clear Affiliations
                         </Button>
                     )}
                 </FormControl>
-                {array?.length > 0 && (
+                {!hideTags && array?.length > 0 && (
                     <Flex flexWrap="wrap" gap={2} pt={array?.length > 1 ? 7 : 0} pb={2}>
                         {array?.map((aff, index) => (
                             <Tag
@@ -261,6 +285,129 @@ const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
     );
 };
 
+
+interface ICreateAffiliationProps {
+    name: string;
+    // refetchAffiliationsFn: () => void;
+    array: IAffiliation[];
+    setFilteredItems: React.Dispatch<React.SetStateAction<IAffiliation[]>>;
+}
+const DropdownCreateAffiliationMenuItem = (
+    {
+        name,
+        // refetchAffiliationsFn,
+        array,
+        setFilteredItems,
+        ...rest
+    }: ICreateAffiliationProps) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    const toast = useToast();
+
+    const queryClient = useQueryClient();
+    const toastIdRef = useRef<ToastId>();
+    const addToast = (data) => {
+        toastIdRef.current = toast(data);
+    };
+    const createAffiliationMutation = useMutation({
+        mutationFn: createAffiliation,
+        onMutate: () => {
+            addToast({
+                status: "loading",
+                title: "Creating Affiliation...",
+                position: "top-right",
+            });
+        },
+        onSuccess: () => {
+            if (toastIdRef.current) {
+                toast.update(toastIdRef.current, {
+                    title: "Success",
+                    description: `Created`,
+                    status: "success",
+                    position: "top-right",
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+            //   onAddClose();
+            queryClient.invalidateQueries({ queryKey: ["affiliations"] });
+            // refetchAffiliationsFn();
+            getAffiliationsBasedOnSearchTerm(name, 1)
+                .then((data) => {
+                    // console.log(data.affiliations);
+                    const filtr = data.affiliations.filter((item) => {
+                        return !array?.some((arrayItem) => arrayItem.pk === item.pk);
+                    });
+                    console.log(filtr);
+                    setFilteredItems(filtr);
+
+                    // setFilteredItems(data.affiliations);
+                })
+                .catch((error) => {
+                    console.error("Error fetching affiliations:", error);
+                    setFilteredItems([]);
+                });
+        },
+        onError: () => {
+            if (toastIdRef.current) {
+                toast.update(toastIdRef.current, {
+                    title: "Failed",
+                    description: `Something went wrong!`,
+                    status: "error",
+                    position: "top-right",
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
+        },
+    });
+
+
+
+    const onSubmit = (formData: IAffiliation) => {
+        createAffiliationMutation.mutate(formData)
+    };
+
+    const { colorMode } = useColorMode();
+    return (
+        <Flex
+            as="button"
+            type="button"
+            w="100%"
+            textAlign="left"
+            p={2}
+
+            onMouseOver={() => setIsHovered(true)}
+            onMouseOut={() => setIsHovered(false)}
+            bg={isHovered ? "gray.200" : "transparent"}
+            alignItems="center"
+            {...rest}
+        >
+            {/* <form onSubmit={handleS}></form> */}
+            <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="start"
+                ml={3}
+                h="100%"
+            >
+                <Button
+                    onClick={() => onSubmit({
+                        name: `${name[0].toLocaleUpperCase()}${name.slice(1)}`
+                    })}
+                    isDisabled={name.includes(',')}
+                    leftIcon={<GrOrganization />}
+                    variant={"ghost"}
+                    color={name.includes(',') ? "red.500" : colorMode === "light" ? "green.500" : "green.300"}
+                >
+                    {name.includes(',') ? `Can't add a name with commas` : `Click to add "${name[0].toLocaleUpperCase()}${name.slice(1)}" as an organisation/affiliation`}
+                </Button>
+            </Box>
+        </Flex>
+
+    )
+}
+
 const CustomMenuItem = ({
     onClick,
     affiliation,
@@ -302,6 +449,7 @@ const CustomMenuItem = ({
     );
 };
 
+
 const CustomMenuList = ({
     minWidth,
     children,
@@ -319,6 +467,8 @@ interface SelectedAffiliationPkProps {
     onClear: () => void;
     isEditable: boolean;
 }
+
+
 
 const SelectedAffiliationPk = ({
     affiliation,

@@ -158,7 +158,8 @@ export const EditableSRTE = ({
         <RichTextPlugin
           contentEditable={
             <Box
-            // mr={3}
+              // mr={3}
+              maxW={"100%"}
             >
               {/* Toolbar */}
               <RevisedRichTextToolbar />
@@ -175,7 +176,8 @@ export const EditableSRTE = ({
                   <ContentEditable
                     style={{
                       minHeight: "50px",
-                      width: "100%",
+                      // width: "100%",
+                      maxWidth: "100%",
                       height: "auto",
                       padding: "32px",
                       paddingBottom: "16px",
@@ -183,7 +185,7 @@ export const EditableSRTE = ({
                       outline: "none",
                     }}
 
-                    // autoFocus
+                  // autoFocus
                   />
                 </Box>
               </Box>
@@ -234,7 +236,7 @@ export const EditableSRTE = ({
             setCanSave={setCanSave}
             editorIsOpen={isEditorOpen}
             setIsEditorOpen={setIsEditorOpen}
-            // setDisplayData={setDisplayData}
+          // setDisplayData={setDisplayData}
           />
         </Box>
         {shouldShowTree ? <TreeViewPlugin /> : null}

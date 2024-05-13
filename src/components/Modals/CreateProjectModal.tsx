@@ -306,7 +306,7 @@ export const CreateProjectModal = ({
               </TabPanel>
               <TabPanel>
                 {projectType.includes("External") ||
-                projectType.includes("Student") ? (
+                  projectType.includes("Student") ? (
                   <ProjectLocationSection
                     locationFilled={locationFilled}
                     locationData={locationData}

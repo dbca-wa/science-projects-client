@@ -109,7 +109,7 @@ export const MethodologyImage = ({
   return (
     <Box pb={6}>
       <Flex
-        bg={colorMode === "light" ? "gray.800" : "gray.700"}
+        bg={colorMode === "light" ? "gray.100" : "gray.700"}
         // roundedTop={"8px"}
         roundedTop={20}
       >
@@ -282,9 +282,9 @@ export const MethodologyImage = ({
                             // isIndeterminate
                             size={"xs"}
                             value={uploadProgress}
-                            // hasStripe
-                            // animation={"step-start"}
-                            //
+                          // hasStripe
+                          // animation={"step-start"}
+                          //
                           />
                         </Box>
                       </Center>

@@ -1,5 +1,6 @@
 // Modal version of CreateUser component
 
+import { CreateUser } from "@/routes/CreateUser";
 import {
   Modal,
   ModalOverlay,
@@ -11,6 +12,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface IAddUserModalProps {
   isOpen: boolean;
@@ -36,6 +38,8 @@ export const CreateUserModal = ({ isOpen, onClose }: IAddUserModalProps) => {
     onClose();
   };
 
+  const navigate = useNavigate();
+
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"3xl"}>
       <ModalOverlay />
@@ -44,6 +48,7 @@ export const CreateUserModal = ({ isOpen, onClose }: IAddUserModalProps) => {
         <ModalCloseButton />
         <ModalBody>
           {/* <CreateUser onSuccess={openToast} isModal={true} /> */}
+          <CreateUser isModal onClose={handleToastClose} onSuccess={() => navigate('/users')} />
         </ModalBody>
       </ModalContent>
     </Modal>

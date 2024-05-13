@@ -19,6 +19,8 @@ import { HiAcademicCap } from "react-icons/hi";
 import { IoIosCreate } from "react-icons/io";
 import { ICreateProjectStudentDetails } from "../../../lib/api";
 import "../../../styles/modalscrollbar.css";
+import { IAffiliation } from "@/types";
+import { AffiliationCreateSearchDropdown } from "@/components/Navigation/AffiliationCreateSearchDropdown";
 
 interface IProjectStudentProps {
   studentFilled: boolean;
@@ -45,18 +47,70 @@ export const ProjectStudentSection = ({
 
   const [hoveredTitle, setHoveredTitle] = useState(false);
 
-  const titleBorderColor = `${
-    colorMode === "light"
-      ? hoveredTitle
-        ? "blackAlpha.300"
-        : "blackAlpha.200"
-      : hoveredTitle
-        ? "whiteAlpha.400"
-        : "whiteAlpha.300"
-  }`;
+  const titleBorderColor = `${colorMode === "light"
+    ? hoveredTitle
+      ? "blackAlpha.300"
+      : "blackAlpha.200"
+    : hoveredTitle
+      ? "whiteAlpha.400"
+      : "whiteAlpha.300"
+    }`;
 
   const [level, setLevel] = useState<string>("");
   const [organisation, setOrganisation] = useState<string>("");
+
+
+  const [collaboratingPartnersArray, setCollaboratingPartnersArray] = useState<
+    IAffiliation[] | null
+  >([]);
+
+  useEffect(() => {
+    console.log(collaboratingPartnersArray)
+    console.log(organisation)
+  }, [collaboratingPartnersArray, organisation])
+  const addCollaboratingPartnersPkToArray = (affiliation: IAffiliation) => {
+    setOrganisation((prevString) => {
+      let updatedString = prevString.trim(); // Remove any leading or trailing spaces
+
+      // Add a comma and a space if not already present
+      if (updatedString && !/,\s*$/.test(updatedString)) {
+        updatedString += ", ";
+      }
+
+      // Append affiliation name
+      updatedString += affiliation.name.trim();
+
+      // Check if the first two characters are a space and comma, remove them
+      if (updatedString.startsWith(", ")) {
+        updatedString = updatedString.substring(2);
+      }
+
+      return updatedString;
+    })
+    setCollaboratingPartnersArray((prev) => [...prev, affiliation]);
+  };
+
+  const removeCollaboratingPartnersPkFromArray = (affiliation: IAffiliation) => {
+    console.log(affiliation)
+    setOrganisation(prevString => {
+      const regex = new RegExp(`.{0,2}${affiliation.name.trim()}\\s*`, 'g');
+      let updatedString = prevString.replace(regex, '').trim();
+      if (updatedString.startsWith(", ")) {
+        updatedString = updatedString.substring(2);
+      }
+      return updatedString
+    });
+
+    setCollaboratingPartnersArray((prev) =>
+      prev.filter((item) => item !== affiliation)
+    );
+  };
+
+  const clearCollaboratingPartnersPkArray = () => {
+    setOrganisation('');
+    setCollaboratingPartnersArray([]);
+  };
+
 
   useEffect(() => {
     setStudentData({
@@ -76,7 +130,7 @@ export const ProjectStudentSection = ({
 
   return (
     <>
-      <UnboundStatefulEditor
+      {/* <UnboundStatefulEditor
         title="Organisation"
         placeholder="Enter the academic organisation..."
         helperText={"The academic organisation of the student"}
@@ -86,7 +140,23 @@ export const ProjectStudentSection = ({
         value={organisation}
         setValueFunction={setOrganisation}
         setValueAsPlainText={true}
+      /> */}
+
+      <AffiliationCreateSearchDropdown
+        autoFocus
+        isRequired
+        isEditable
+        array={collaboratingPartnersArray}
+        arrayAddFunction={addCollaboratingPartnersPkToArray}
+        arrayRemoveFunction={
+          removeCollaboratingPartnersPkFromArray
+        }
+        arrayClearFunction={clearCollaboratingPartnersPkArray}
+        label="Organisation"
+        placeholder="Enter the academic organisation..."
+        helperText="The academic organisation of the student"
       />
+      {organisation}
 
       <FormControl pb={6} isRequired userSelect={"none"}>
         <FormLabel
@@ -105,7 +175,7 @@ export const ProjectStudentSection = ({
             borderTopRightRadius={"none"}
             borderBottomRightRadius={"none"}
             borderRight={"none"}
-            // boxSize={10}
+          // boxSize={10}
           >
             <Icon as={HiAcademicCap} boxSize={5} />
           </InputLeftAddon>

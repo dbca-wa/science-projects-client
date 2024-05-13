@@ -1,36 +1,36 @@
 // Navitar - shown on both layouts. Uses useLayoutSwitcher to determine style
 
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 import {
   Avatar,
+  Box,
+  Center,
+  Flex,
   Menu,
-  Text,
   MenuButton,
   MenuGroup,
   MenuItem,
   MenuList,
-  Center,
-  Box,
+  Text,
+  ToastId,
   useColorMode,
   useToast,
-  ToastId,
-  Flex,
 } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import { FaBook, FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import { SiReadthedocs } from "react-icons/si";
 import { GoTriangleDown } from "react-icons/go";
-import { INavitar } from "../../types";
-import { useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { SiReadthedocs } from "react-icons/si";
+import { TbWorldWww } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { logOut } from "../../lib/api";
-import { useUser } from "../../lib/hooks/tanstack/useUser";
 import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
-import { TbWorldWww } from "react-icons/tb";
-import { ToggleLayout } from "../ToggleLayout";
-import { ToggleDarkMode } from "../ToggleDarkMode";
 import useApiEndpoint from "../../lib/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import { useUser } from "../../lib/hooks/tanstack/useUser";
+import { INavitar } from "../../types";
+import { ToggleDarkMode } from "../ToggleDarkMode";
+import { ToggleLayout } from "../ToggleLayout";
 
 export const Navitar = ({
   isModern,

@@ -127,7 +127,7 @@ export const ProjectDetailEditModal = ({
           display={"inline-flex"}
           // justifyContent={"center"}
           alignItems={"center"}
-          // pb={6}
+        // pb={6}
         >
           <Box
             color={
@@ -197,7 +197,7 @@ export const ProjectDetailEditModal = ({
             </TabPanel>
             <TabPanel>
               {projectType.includes("External") ||
-              projectType.includes("Student") ? (
+                projectType.includes("Student") ? (
                 <ProjectLocationSection
                   locationFilled={locationFilled}
                   locationData={locationData}
@@ -236,7 +236,7 @@ export const ProjectDetailEditModal = ({
                   onClose={onClose}
                   backClick={goBack}
                   createClick={kickOffMutation}
-                  // projectPk={}
+                // projectPk={}
                 />
               </TabPanel>
             )}
@@ -251,7 +251,7 @@ export const ProjectDetailEditModal = ({
                   onClose={onClose}
                   backClick={goBack}
                   createClick={kickOffMutation}
-                  // projectPk={}
+                // projectPk={}
                 />
               </TabPanel>
             )}

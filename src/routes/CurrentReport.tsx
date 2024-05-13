@@ -4,6 +4,7 @@
 import { LatestReportsNotYetApproved } from "@/components/Pages/CurrentReport/LatestReportsNotYetApproved";
 import {
   Box,
+  Center,
   Flex,
   Grid,
   Spinner,
@@ -62,7 +63,11 @@ export const CurrentReport = () => {
   const financialYearString = `FY ${formattedYearBefore}-${formattedLatestYear}`;
 
   return isLoading ? (
-    <Spinner />
+    <Center mt={4}>
+
+      <Spinner size={"lg"} />
+
+    </Center>
   ) : (
     <>
       <Box>
