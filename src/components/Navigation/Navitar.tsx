@@ -64,7 +64,7 @@ export const Navitar = ({
         duration: 1000,
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       console.log("logout success");
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
@@ -76,6 +76,14 @@ export const Navitar = ({
       }
       // queryClient.refetchQueries(['me']);
       queryClient.invalidateQueries({ queryKey: ["me"] });
+      console.log("DATA IS:", data)
+      if (data?.logoutUrl) {
+        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}${data.logoutUrl}`
+      }
+      // sso/signedout?relogin=/
+      else {
+        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}`
+      }
       // navigate("/login");
       // window.location.href = VITE_PRODUCTION_BACKEND_BASE_URL;
       // window.location.assign('https://dbcab2c.b2clogin.com/dbcab2c.onmicrosoft.com/B2C_1A_Default_uat/oauth2/v2.0/logout?post_logout_redirect_uri=https%3A//login.microsoftonline.com/7b934664-cdcf-4e28-a3ee-1a5bcca0a1b6/oauth2/logout')

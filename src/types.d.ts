@@ -42,8 +42,8 @@ export interface IConceptPlanGenerationData {
     strategic_context: string;
     staff_time_allocation: string;
     indicative_operating_budget: string;
-  }
-  
+}
+
 
 
 export interface IAffiliation {
@@ -428,7 +428,7 @@ interface IProgressReport {
     aims: string | null;
     progress: string | null;
     implications: string | null;
-    future: string | null; 
+    future: string | null;
     team_members: IProjectMember[];
 }
 

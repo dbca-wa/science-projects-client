@@ -149,15 +149,14 @@ export const EditProjectModal = ({
     (details?.student as IStudentProjectDetails)?.level
   );
   const [hoveredTitle, setHoveredTitle] = useState(false);
-  const titleBorderColor = `${
-    colorMode === "light"
-      ? hoveredTitle
-        ? "blackAlpha.300"
-        : "blackAlpha.200"
-      : hoveredTitle
-        ? "whiteAlpha.400"
-        : "whiteAlpha.300"
-  }`;
+  const titleBorderColor = `${colorMode === "light"
+    ? hoveredTitle
+      ? "blackAlpha.300"
+      : "blackAlpha.200"
+    : hoveredTitle
+      ? "whiteAlpha.400"
+      : "whiteAlpha.300"
+    }`;
 
   const [keywords, setKeywords] = useState(currentKeywords);
   const [startDate, setStartDate] = useState(currentDates[0]);
@@ -409,7 +408,7 @@ export const EditProjectModal = ({
                       />
                     </Grid>
                   ) : (details?.student as IStudentProjectDetails)
-                      ?.organisation ? (
+                    ?.organisation ? (
                     <Grid
                       gridTemplateColumns={"repeat(1, 1fr)"}
                       gridGap={2}
@@ -517,7 +516,7 @@ export const EditProjectModal = ({
                             borderTopRightRadius={"none"}
                             borderBottomRightRadius={"none"}
                             borderRight={"none"}
-                            // boxSize={10}
+                          // boxSize={10}
                           >
                             <Icon as={HiAcademicCap} boxSize={5} />
                           </InputLeftAddon>
