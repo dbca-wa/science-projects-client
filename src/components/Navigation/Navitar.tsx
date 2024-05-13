@@ -50,6 +50,8 @@ export const Navitar = ({
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
+  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
+
   const mutation = useMutation({
     mutationFn: logOut,
     onMutate: () => {
@@ -75,7 +77,7 @@ export const Navitar = ({
       // queryClient.refetchQueries(['me']);
       queryClient.invalidateQueries({ queryKey: ["me"] });
       // navigate("/login");
-      window.location.reload()
+      window.location.href = VITE_PRODUCTION_BACKEND_BASE_URL;
     },
   });
   const onLogOut = async () => {
