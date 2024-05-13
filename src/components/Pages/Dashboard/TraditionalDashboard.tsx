@@ -49,7 +49,8 @@ export const TraditionalDashboard = () => {
     if (window.innerWidth < 1150) {
       setWelcomeUser("");
       setShouldConcat(true);
-      setSpmsText("SPMS");
+      setSpmsText(`SPMS ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+        }`);
       // setAnnualReportText("Report");
     } else {
       setWelcomeUser(
@@ -59,14 +60,12 @@ export const TraditionalDashboard = () => {
       // setAnnualReportText("Annual Report");
       if (window.innerWidth < 1350) {
         setSpmsText(
-          `Science Project <br/> Management System ${
-            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project <br/> Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`
         );
       } else {
         setSpmsText(
-          `Science Project Management System ${
-            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`
         );
       }

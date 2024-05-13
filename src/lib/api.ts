@@ -391,6 +391,8 @@ export const getUsersBasedOnSearchTerm = async (searchTerm: string, page: number
             url += `&businessArea=${filters.businessArea}`
         }
 
+        console.log(url)
+
         const response = await instance.get(url);
 
         const { users, total_results, total_pages } = response.data;

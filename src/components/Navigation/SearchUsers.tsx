@@ -69,6 +69,24 @@ export const SearchUsers = () => {
     });
   };
 
+  // const handleOnlySelectedBusinessAreaChange: React.ChangeEventHandler<
+  //   HTMLSelectElement
+  // > = (event) => {
+  //   const businessAreaValue = event.target.value;
+  //   // console.log(businessAreaValue);
+  //   setSearchFilters({
+  //     onlyActive: onlyActive,
+  //     onlyInactive: onlyInactive,
+  //     filterBA: businessAreaValue,
+  //     filterProjectKind: filterProjectKind,
+  //     filterProjectStatus: filterProjectStatus,
+  //     filterYear: filterYear,
+  //   });
+  // };
+
+  // useEffect(() => console.log(businessAreaValue), [])
+
+
   useEffect(() => {
     const fetchBusinessAreas = async () => {
       try {
@@ -83,10 +101,61 @@ export const SearchUsers = () => {
   }, []);
 
   // console.log(businessAreas);
+  const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
+  // Function to check if a string contains HTML tags
+  const checkIsHtml = (data) => {
+    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+    return htmlRegex.test(data);
+  };
+
+  // Function to sanitize HTML content and extract text
+  const sanitizeHtml = (htmlString) => {
+    const doc = new DOMParser().parseFromString(htmlString, "text/html");
+    return doc.body.textContent || "";
+  };
+
 
   return (
     <Flex>
       <Select
+        onChange={handleOnlySelectedBusinessAreaChange}
+        size={"sm"}
+        // mx={4}
+        rounded={"5px"}
+        style={
+          colorMode === "light"
+            ? {
+              color: "black",
+              backgroundColor: "white",
+              borderColor: "gray.200",
+              caretColor: "black !important",
+            }
+            : {
+              color: "white",
+              borderColor: "white",
+              caretColor: "black !important",
+            }
+        }
+      >
+        <option key={"All"} value={"All"} color={"black"}>
+          All Business Areas
+        </option>
+        {orderedDivisionSlugs.flatMap((divSlug) => {
+          // Filter business areas for the current division
+          const divisionBusinessAreas = businessAreas
+            .filter((ba) => ba.division.slug === divSlug)
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+          return divisionBusinessAreas.map((ba, index) => (
+            <option key={`${ba.name}${index}`} value={ba.pk}>
+              {ba?.division ? `[${ba?.division?.slug}] ` : ""}
+              {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
+              {ba.is_active ? "" : "(INACTIVE)"}
+            </option>
+          ));
+        })}
+      </Select>
+      {/* <Select
         onChange={handleOnlySelectedBusinessAreaChange}
         size={"sm"}
         mx={4}
@@ -94,16 +163,16 @@ export const SearchUsers = () => {
         style={
           colorMode === "light"
             ? {
-                color: "black",
-                backgroundColor: "white",
-                borderColor: "gray.200",
-                caretColor: "black !important",
-              }
+              color: "black",
+              backgroundColor: "white",
+              borderColor: "gray.200",
+              caretColor: "black !important",
+            }
             : {
-                color: "white",
-                borderColor: "white",
-                caretColor: "black !important",
-              }
+              color: "white",
+              borderColor: "white",
+              caretColor: "black !important",
+            }
         }
       >
         <option value={"All"} color={"black"}>
@@ -128,11 +197,11 @@ export const SearchUsers = () => {
           }
           return (
             <option key={index} value={ba.pk}>
-              {baName}
+              [{ba.division.slug}] {baName}
             </option>
           );
         })}{" "}
-      </Select>
+      </Select> */}
 
       <InputGroup borderColor="gray.200" size="sm">
         <InputRightElement
