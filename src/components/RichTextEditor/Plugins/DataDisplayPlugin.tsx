@@ -13,7 +13,7 @@ export const DataDisplayPlugin = ({ setDisplayData }: DataDisplayProps) => {
     editor.update(() => {
       const newHtml = $generateHtmlFromNodes(editor, null);
 
-      console.log("DATA DISPLAY PLUGIN:", newHtml);
+      // console.log("DATA DISPLAY PLUGIN:", newHtml);
       setDisplayData(newHtml);
     });
   }, [editorState]);

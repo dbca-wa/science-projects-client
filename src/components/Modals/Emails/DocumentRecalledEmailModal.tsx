@@ -1,10 +1,12 @@
 import { ProjectSearchDropdown } from "@/components/Navigation/ProjectSearchDropdown";
 import { UserSearchDropdown } from "@/components/Navigation/UserSearchDropdown";
-import { sendDocumentApprovedEmail } from "@/lib/api";
+import { sendDocumentRecalledEmail } from "@/lib/api";
 import { IEmailModalProps, ISendSingleEmail } from "@/types";
 import {
   Button,
   Flex,
+  FormControl,
+  FormLabel,
   Grid,
   Modal,
   ModalBody,
@@ -13,13 +15,14 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Select,
   Text,
   ToastId,
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export const DocumentRecalledEmailModal = ({
@@ -35,7 +38,8 @@ export const DocumentRecalledEmailModal = ({
 
   const [projectTitle, setProjectTitle] = useState("");
   const [projectPk, setProjectPk] = useState<null | number>();
-  // const [projectDocumentType, setProjectDocumentType] = useState("");
+  const [projectDocumentKind, setProjectDocumentKind] = useState<"concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure">("concept")
+  const [stage, setStage] = useState<number>();
 
   // Destructure viewing users info
   const {
@@ -55,6 +59,7 @@ export const DocumentRecalledEmailModal = ({
       toUserPk,
       toUserEmail,
       toUserName,
+      projectDocumentKind
     });
     if (
       !projectPk ||
@@ -63,7 +68,9 @@ export const DocumentRecalledEmailModal = ({
       !toUserPk ||
       !fromUserPk ||
       !fromUserEmail ||
-      !fromUserName
+      !fromUserName ||
+      !projectDocumentKind ||
+      !stage
     ) {
       setCanSend(false);
     } else {
@@ -77,6 +84,7 @@ export const DocumentRecalledEmailModal = ({
     toUserPk,
     toUserEmail,
     toUserName,
+    projectDocumentKind, stage
   ]);
 
   const {
@@ -100,8 +108,9 @@ export const DocumentRecalledEmailModal = ({
     console.log(emailFunction);
     const dataForMutation = {
       recipients_list: [formData.toUserPk],
-      project_pk: 1,
-      // document_kind: "concept"
+      project_pk: formData.project,
+      document_kind: formData.projectDocumentKind,
+      stage: formData.stage,
     };
     await sendDocApprovedEmailMutation.mutate({ ...dataForMutation });
   };
@@ -114,7 +123,7 @@ export const DocumentRecalledEmailModal = ({
     toastIdRef.current = toast(data);
   };
   const sendDocApprovedEmailMutation = useMutation({
-    mutationFn: sendDocumentApprovedEmail,
+    mutationFn: sendDocumentRecalledEmail,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -158,7 +167,7 @@ export const DocumentRecalledEmailModal = ({
         onClose();
       }}
       size={"md"}
-      // isCentered={true}
+    // isCentered={true}
     >
       {" "}
       <ModalOverlay />
@@ -205,6 +214,36 @@ export const DocumentRecalledEmailModal = ({
                 helperText={"Select the user you would like to send to."}
               />
             ) : null}
+            {toUserPk ? (
+              <FormControl isRequired>
+                <FormLabel>Document Kind</FormLabel>
+                <Select
+                  {...register("projectDocumentKind")}
+                  onChange={(e) => setProjectDocumentKind(e.target.value as "concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure")}
+                >
+                  <option value={"concept"}>Concept</option>
+                  <option value={"projectplan"}>Project Plan</option>
+                  <option value={"progressreport"}>Progress Report</option>
+                  <option value={"studentreport"}>Student Report</option>
+                  <option value={"projectclosure"}>Closure</option>
+                </Select>
+              </FormControl>
+            ) : null}
+
+            {projectDocumentKind ?
+              (
+                <FormControl isRequired>
+                  <FormLabel>Stage</FormLabel>
+                  <Select
+                    onChange={(e) => setStage(Number(e.target.value))}
+                  >
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                  </Select>
+                </FormControl>
+              )
+              : null}
 
             {canSend ? (
               <>
@@ -223,6 +262,14 @@ export const DocumentRecalledEmailModal = ({
                 <Grid gridTemplateColumns={"2fr 10fr"} px={1}>
                   <Text fontWeight={"bold"}>To:</Text>
                   <Text textAlign={"right"}>{toUserEmail}</Text>
+                </Grid>
+                <Grid gridTemplateColumns={"2fr 10fr"} px={1}>
+                  <Text fontWeight={"bold"}>Doc Type:</Text>
+                  <Text textAlign={"right"}>{projectDocumentKind}</Text>
+                </Grid>
+                <Grid gridTemplateColumns={"2fr 10fr"} px={1}>
+                  <Text fontWeight={"bold"}>Stage:</Text>
+                  <Text textAlign={"right"}>{stage}</Text>
                 </Grid>
               </>
             ) : null}
@@ -255,7 +302,8 @@ export const DocumentRecalledEmailModal = ({
                   fromUserPk: fromUserPk,
                   project: projectPk,
                   projectTitle: projectTitle,
-                  // projectDocumentType: projectDocumentType,
+                  projectDocumentKind: projectDocumentKind,
+                  stage: stage,
                 });
               }}
               color={"white"}

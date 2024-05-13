@@ -108,9 +108,9 @@ export const EditProjectModal = ({
     currentAreas.map((area) => area.pk)
   );
 
-  useEffect(() => {
-    console.log(details);
-  });
+  // useEffect(() => {
+  //   console.log(details);
+  // });
 
 
 
@@ -211,7 +211,7 @@ export const EditProjectModal = ({
   };
 
   const removeCollaboratingPartnersPkFromArray = (affiliation: IAffiliation) => {
-    console.log()
+    // console.log()
     if (collaborationWith !== undefined) {
       setCollaborationWith(prevString => {
         // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
@@ -242,7 +242,7 @@ export const EditProjectModal = ({
         if (modifiedString.startsWith(", ")) {
           modifiedString = modifiedString.substring(2);
         }
-        console.log("MOD:", modifiedString)
+        // console.log("MOD:", modifiedString)
         return modifiedString;
       });
     }
@@ -333,7 +333,7 @@ export const EditProjectModal = ({
           "text/html"
         );
         const collaborationContent = collaborationDoc.body.textContent;
-        console.log({ budget, collaborationContent, aims, descriptionContent });
+        // console.log({ budget, collaborationContent, aims, descriptionContent });
 
         if (
           descriptionContent.length > 0 &&
@@ -353,11 +353,11 @@ export const EditProjectModal = ({
           "text/html"
         );
         const organisationContent = organisationDoc.body.textContent;
-        console.log({
-          level,
-          organisation,
-          length: organisationContent.length,
-        });
+        // console.log({
+        //   level,
+        //   organisation,
+        //   length: organisationContent.length,
+        // });
 
         if (level && organisationContent.length > 0) {
           setCanUpdate(true);
@@ -397,8 +397,8 @@ export const EditProjectModal = ({
   };
 
   const updateProject = async (formData: IEditProject) => {
-    console.log("updating project");
-    console.log(formData);
+    // console.log("updating project");
+    // console.log(formData);
     await updateProjectMutation.mutate(formData);
   };
 
@@ -579,7 +579,7 @@ export const EditProjectModal = ({
                                   if (modifiedString.startsWith(", ")) {
                                     modifiedString = modifiedString.substring(2);
                                   }
-                                  console.log("MOD:", modifiedString)
+                                  // console.log("MOD:", modifiedString)
                                   return modifiedString;
                                 });
 
@@ -665,7 +665,7 @@ export const EditProjectModal = ({
                                     if (modifiedString.startsWith(", ")) {
                                       modifiedString = modifiedString.substring(2);
                                     }
-                                    console.log("MOD:", modifiedString)
+                                    // console.log("MOD:", modifiedString)
                                     return modifiedString;
                                   });
                                 }
@@ -682,7 +682,7 @@ export const EditProjectModal = ({
                                     if (modifiedString.startsWith(", ")) {
                                       modifiedString = modifiedString.substring(2);
                                     }
-                                    console.log("MOD:", modifiedString)
+                                    // console.log("MOD:", modifiedString)
                                     return modifiedString;
                                   });
                                 }

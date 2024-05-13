@@ -67,16 +67,16 @@ const LENGTH_LIMIT = 75;
 
 const AtSignMentionsRegex = new RegExp(
   "(^|\\s|\\()(" +
-    "[" +
-    TRIGGERS +
-    "]" +
-    "((?:" +
-    VALID_CHARS +
-    VALID_JOINS +
-    "){0," +
-    LENGTH_LIMIT +
-    "})" +
-    ")$"
+  "[" +
+  TRIGGERS +
+  "]" +
+  "((?:" +
+  VALID_CHARS +
+  VALID_JOINS +
+  "){0," +
+  LENGTH_LIMIT +
+  "})" +
+  ")$"
 );
 
 // 50 is the longest alias length limit.
@@ -85,15 +85,15 @@ const ALIAS_LENGTH_LIMIT = 50;
 // Regex used to match alias.
 const AtSignMentionsRegexAliasRegex = new RegExp(
   "(^|\\s|\\()(" +
-    "[" +
-    TRIGGERS +
-    "]" +
-    "((?:" +
-    VALID_CHARS +
-    "){0," +
-    ALIAS_LENGTH_LIMIT +
-    "})" +
-    ")$"
+  "[" +
+  TRIGGERS +
+  "]" +
+  "((?:" +
+  VALID_CHARS +
+  "){0," +
+  ALIAS_LENGTH_LIMIT +
+  "})" +
+  ")$"
 );
 
 // At most, 5 suggestions are shown in the popup.
@@ -227,7 +227,7 @@ const realLookupService = {
     setTimeout(() => {
       getInternalUsersBasedOnSearchTerm(string, true)
         .then((data) => {
-          console.log(data.users);
+          // console.log(data.users);
           // setFilteredItems(data.users);
           callback(data.users);
         })
@@ -379,7 +379,7 @@ const CustomMentionsTypeheadMenuItem = ({
         onMouseOut={() => setIsHovered(false)}
         bg={isHovered ? "gray.200" : "transparent"}
         alignItems="center"
-        // {...rest}
+      // {...rest}
       >
         <Avatar
           src={
@@ -409,19 +409,16 @@ const CustomMentionsTypeheadMenuItem = ({
                 : "gray.500"
             }
           >
-            {`${
-              option.user.first_name === "None"
+            {`${option.user.first_name === "None"
                 ? option.user.username
                 : option.user.first_name
-            } ${
-              option.user.last_name === "None" ? "" : option.user.last_name
-            } ${
-              option.user.is_staff
+              } ${option.user.last_name === "None" ? "" : option.user.last_name
+              } ${option.user.is_staff
                 ? option.user.is_superuser
                   ? "(Admin)"
                   : "(Staff)"
                 : "(External)"
-            }`}
+              }`}
           </Text>
         </Box>
       </Flex>
@@ -574,57 +571,57 @@ export default function NewMentionsPlugin(): JSX.Element | null {
       ) =>
         anchorElementRef.current && results.length
           ? ReactDOM.createPortal(
-              <Box
-                // className="typeahead-popover mentions-menu"
-                background={"#fff"}
-                w={"250px"}
-                boxShadow={"0px 5px 10px rgba(0, 0, 0, 0.3)"}
+            <Box
+              // className="typeahead-popover mentions-menu"
+              background={"#fff"}
+              w={"250px"}
+              boxShadow={"0px 5px 10px rgba(0, 0, 0, 0.3)"}
+              borderRadius={"8px"}
+              // position={"fixed"}
+              zIndex={999999999}
+              // pos={"fixed"}
+              // top={0}
+              // left={0}
+              position="absolute"
+              top={`${anchorElementRef.current.offsetHeight - 15}px`}
+              left={`${anchorElementRef.current.offsetWidth - 17.5}px`}
+            >
+              <UnorderedList
+                css={{
+                  msOverflowStyle: "none",
+                  scrollbarWidth: "none",
+                  listStyle: "none",
+                  "::-webkit-scrollbar": {
+                    display: "none",
+                  },
+                }}
+                padding={0}
+                margin={0}
                 borderRadius={"8px"}
-                // position={"fixed"}
+                maxH={"200px"}
                 zIndex={999999999}
-                // pos={"fixed"}
-                // top={0}
-                // left={0}
-                position="absolute"
-                top={`${anchorElementRef.current.offsetHeight - 15}px`}
-                left={`${anchorElementRef.current.offsetWidth - 17.5}px`}
+                overflowY={"scroll"}
               >
-                <UnorderedList
-                  css={{
-                    msOverflowStyle: "none",
-                    scrollbarWidth: "none",
-                    listStyle: "none",
-                    "::-webkit-scrollbar": {
-                      display: "none",
-                    },
-                  }}
-                  padding={0}
-                  margin={0}
-                  borderRadius={"8px"}
-                  maxH={"200px"}
-                  zIndex={999999999}
-                  overflowY={"scroll"}
-                >
-                  {options.map((option, i: number) => (
-                    <CustomMentionsTypeheadMenuItem
-                      key={option.key}
-                      isSelected={selectedIndex === i}
-                      onClick={() => {
-                        setHighlightedIndex(i);
-                        selectOptionAndCleanUp(option);
-                      }}
-                      onMouseEnter={() => {
-                        setHighlightedIndex(i);
-                      }}
-                      index={i}
-                      option={option}
-                      optionLength={options.length}
-                    />
-                  ))}
-                </UnorderedList>
-              </Box>,
-              anchorElementRef.current
-            )
+                {options.map((option, i: number) => (
+                  <CustomMentionsTypeheadMenuItem
+                    key={option.key}
+                    isSelected={selectedIndex === i}
+                    onClick={() => {
+                      setHighlightedIndex(i);
+                      selectOptionAndCleanUp(option);
+                    }}
+                    onMouseEnter={() => {
+                      setHighlightedIndex(i);
+                    }}
+                    index={i}
+                    option={option}
+                    optionLength={options.length}
+                  />
+                ))}
+              </UnorderedList>
+            </Box>,
+            anchorElementRef.current
+          )
           : null
       }
     />

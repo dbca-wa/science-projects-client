@@ -52,12 +52,12 @@ interface IWrapper {
   templateName: string;
   openModalFunction: () => void;
   props?:
-    | IReviewDocumentEmail
-    | INewCycleEmail
-    | IProjectClosureEmail
-    | IDocumentReadyEmail
-    | IDocumentApproved
-    | IDocumentRecalled;
+  | IReviewDocumentEmail
+  | INewCycleEmail
+  | IProjectClosureEmail
+  | IDocumentReadyEmail
+  | IDocumentApproved
+  | IDocumentRecalled;
 }
 
 const EmailWrapper = ({
@@ -101,7 +101,7 @@ const EmailWrapper = ({
         border={"1px solid"}
         borderColor={"gray.300"}
         rounded={"xl"}
-        // bg={colorMode === "light" ? "gray.200" : "gray.700"}
+      // bg={colorMode === "light" ? "gray.200" : "gray.700"}
       >
         {children}
       </Box>
