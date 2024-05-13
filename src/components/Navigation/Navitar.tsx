@@ -78,7 +78,7 @@ export const Navitar = ({
       queryClient.invalidateQueries({ queryKey: ["me"] });
       console.log("DATA IS:", data)
       if (data?.logoutUrl) {
-        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}${data.logoutUrl}`
+        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}${data.logoutUrl.slice(1)}`
       }
       // sso/signedout?relogin=/
       else {
