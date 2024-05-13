@@ -128,7 +128,12 @@ export const Login = ({ onClose }: IIsModal) => {
     }
     if (buildType !== "development" && !userLoading && userData && userData.pk === undefined) {
       // UPDATE HERE TO DBCA UTILS LOGIN URL
+      console.log(`navigating to ${VITE_PRODUCTION_BACKEND_BASE_URL}`)
+      window.location.href = VITE_PRODUCTION_BACKEND_BASE_URL;
       // window.location.reload()
+    } else {
+      console.log(`Would ordinarily navigate to ${VITE_PRODUCTION_BACKEND_BASE_URL}, but in dev mode`)
+
     }
   }, [userLoading, userData, buildType]);
 
