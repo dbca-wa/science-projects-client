@@ -98,7 +98,7 @@ export const Projects = () => {
     HTMLSelectElement
   > = (event) => {
     const statusValue = event.target.value;
-    console.log(statusValue);
+    // console.log(statusValue);
     setSearchFilters({
       onlyActive,
       onlyInactive,
@@ -113,7 +113,7 @@ export const Projects = () => {
     HTMLSelectElement
   > = (event) => {
     const projectKindValue = event.target.value;
-    console.log(projectKindValue);
+    // console.log(projectKindValue);
     setSearchFilters({
       onlyActive,
       onlyInactive,
@@ -153,7 +153,7 @@ export const Projects = () => {
           duration: 3000,
           isClosable: true,
         });
-        console.log(response);
+        // console.log(response);
         const downloadUrl = window.URL.createObjectURL(response as Blob);
         const link = document.createElement("a");
         link.href = downloadUrl;
@@ -169,9 +169,8 @@ export const Projects = () => {
         toast.update(toastIdRef.current, {
           title: "Could Not Generate Projects CSV",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -298,7 +297,7 @@ export const Projects = () => {
               }}
               // px={4}
               w={"100%"}
-              // bg={"red"}
+            // bg={"red"}
             >
               <Select
                 onChange={handleOnlySelectedProjectKindChange}
@@ -308,15 +307,15 @@ export const Projects = () => {
                 style={
                   colorMode === "light"
                     ? {
-                        color: "black",
-                        borderColor: "gray.100",
-                        caretColor: "black !important",
-                      }
+                      color: "black",
+                      borderColor: "gray.100",
+                      caretColor: "black !important",
+                    }
                     : {
-                        color: "white",
-                        borderColor: "white",
-                        caretColor: "black !important",
-                      }
+                      color: "white",
+                      borderColor: "white",
+                      caretColor: "black !important",
+                    }
                 }
               >
                 <option value={"All"}>All Kinds</option>
@@ -333,15 +332,15 @@ export const Projects = () => {
                 style={
                   colorMode === "light"
                     ? {
-                        color: "black",
-                        borderColor: "gray.100",
-                        caretColor: "black !important",
-                      }
+                      color: "black",
+                      borderColor: "gray.100",
+                      caretColor: "black !important",
+                    }
                     : {
-                        color: "white",
-                        borderColor: "white",
-                        caretColor: "black !important",
-                      }
+                      color: "white",
+                      borderColor: "white",
+                      caretColor: "black !important",
+                    }
                 }
               >
                 <option value={"All"}>All Statuses</option>

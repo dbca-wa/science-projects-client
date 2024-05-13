@@ -1,6 +1,7 @@
 // Tab data for Project External Project info on the creation page.
 
-import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
+import { AffiliationCreateSearchDropdown } from "@/components/Navigation/AffiliationCreateSearchDropdown";
+import { IAffiliation } from "@/types";
 import {
   Button,
   Flex,
@@ -19,8 +20,6 @@ import { HiAcademicCap } from "react-icons/hi";
 import { IoIosCreate } from "react-icons/io";
 import { ICreateProjectStudentDetails } from "../../../lib/api";
 import "../../../styles/modalscrollbar.css";
-import { IAffiliation } from "@/types";
-import { AffiliationCreateSearchDropdown } from "@/components/Navigation/AffiliationCreateSearchDropdown";
 
 interface IProjectStudentProps {
   studentFilled: boolean;

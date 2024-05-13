@@ -85,10 +85,10 @@ export const ProjectDetail = ({
 
   const setToSelectedTab = () => {
     if (tabs?.includes(selectedTab)) {
-      console.log(`Tab setting to  ${selectedTab}`);
+      // console.log(`Tab setting to  ${selectedTab}`);
       setActiveTabIndex(tabs.indexOf(selectedTab));
     } else {
-      console.log(`Tabs do not include ${selectedTab}`);
+      // console.log(`Tabs do not include ${selectedTab}`);
     }
   };
 
@@ -130,11 +130,11 @@ export const ProjectDetail = ({
       documents?.concept_plan && "concept",
       documents?.project_plan && "project",
       documents?.progress_reports &&
-        documents.progress_reports.length > 0 &&
-        "progress",
+      documents.progress_reports.length > 0 &&
+      "progress",
       documents?.student_reports &&
-        documents.student_reports.length > 0 &&
-        "student",
+      documents.student_reports.length > 0 &&
+      "student",
       documents?.project_closure && "closure",
     ].filter(Boolean);
 

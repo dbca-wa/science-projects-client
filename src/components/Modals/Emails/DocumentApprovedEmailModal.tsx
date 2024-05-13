@@ -5,6 +5,8 @@ import { IEmailModalProps, ISendSingleEmail } from "@/types";
 import {
   Button,
   Flex,
+  FormControl,
+  FormLabel,
   Grid,
   Modal,
   ModalBody,
@@ -13,6 +15,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Select,
   Text,
   ToastId,
   useColorMode,
@@ -34,6 +37,7 @@ export const DocumentApprovedEmailModal = ({
   const [toUserPk, setToUserPk] = useState<null | number>();
 
   const [projectTitle, setProjectTitle] = useState("");
+  const [projectDocumentKind, setProjectDocumentKind] = useState<"concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure">("concept")
   const [projectPk, setProjectPk] = useState<null | number>();
   // const [projectDocumentType, setProjectDocumentType] = useState("");
 
@@ -100,8 +104,8 @@ export const DocumentApprovedEmailModal = ({
     console.log(emailFunction);
     const dataForMutation = {
       recipients_list: [formData.toUserPk],
-      project_pk: 1,
-      // document_kind: "concept"
+      project_pk: formData.project,
+      document_kind: formData.projectDocumentKind
     };
     await sendDocApprovedEmailMutation.mutate({ ...dataForMutation });
   };
@@ -158,7 +162,7 @@ export const DocumentApprovedEmailModal = ({
         onClose();
       }}
       size={"md"}
-      // isCentered={true}
+    // isCentered={true}
     >
       {" "}
       <ModalOverlay />
@@ -206,6 +210,22 @@ export const DocumentApprovedEmailModal = ({
               />
             ) : null}
 
+            {toUserPk ? (
+              <FormControl isRequired>
+                <FormLabel>Document Kind</FormLabel>
+                <Select
+                  {...register("projectDocumentKind")}
+                  onChange={(e) => setProjectDocumentKind(e.target.value as "concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure")}
+                >
+                  <option value={"concept"}>Concept</option>
+                  <option value={"projectplan"}>Project Plan</option>
+                  <option value={"progressreport"}>Progress Report</option>
+                  <option value={"studentreport"}>Student Report</option>
+                  <option value={"projectclosure"}>Closure</option>
+                </Select>
+              </FormControl>
+            ) : null}
+
             {canSend ? (
               <>
                 <Grid gridTemplateColumns={"2fr 10fr"} px={1} mt={4}>
@@ -223,6 +243,10 @@ export const DocumentApprovedEmailModal = ({
                 <Grid gridTemplateColumns={"2fr 10fr"} px={1}>
                   <Text fontWeight={"bold"}>To:</Text>
                   <Text textAlign={"right"}>{toUserEmail}</Text>
+                </Grid>
+                <Grid gridTemplateColumns={"2fr 10fr"} px={1}>
+                  <Text fontWeight={"bold"}>Doc Type:</Text>
+                  <Text textAlign={"right"}>{projectDocumentKind}</Text>
                 </Grid>
               </>
             ) : null}
@@ -252,7 +276,7 @@ export const DocumentApprovedEmailModal = ({
                   fromUserPk: fromUserPk,
                   project: projectPk,
                   projectTitle: projectTitle,
-                  // projectDocumentType: projectDocumentType,
+                  projectDocumentKind: projectDocumentKind,
                 });
               }}
               color={"white"}

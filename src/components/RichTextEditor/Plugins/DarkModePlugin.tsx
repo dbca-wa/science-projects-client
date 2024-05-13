@@ -16,12 +16,12 @@ export const DarkModePlugin = () => {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    console.log("Changed to", colorMode);
+    // console.log("Changed to", colorMode);
 
     editor.update(() => {
-      console.log("Color Mode:", colorMode);
+      // console.log("Color Mode:", colorMode);
       const generated = $generateHtmlFromNodes(editor, null);
-      console.log("Generated HTML from nodes:", generated);
+      // console.log("Generated HTML from nodes:", generated);
 
       let newHTMLString = "";
       if (colorMode === "dark" && String(generated).includes("-light")) {
@@ -29,9 +29,9 @@ export const DarkModePlugin = () => {
       } else if (colorMode === "light" && String(generated).includes("-dark")) {
         newHTMLString = generated.replace(/-dark"/g, '-light"');
       } else {
-        console.log("neither condition met");
+        // console.log("neither condition met");
       }
-      console.log("New HTML:", newHTMLString);
+      // console.log("New HTML:", newHTMLString);
       editor.focus();
 
       editor.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);

@@ -122,7 +122,7 @@ export const Login = ({ onClose }: IIsModal) => {
   const { userData, userLoading } = useUser();
   useEffect(() => {
     if (!userLoading && userData?.pk !== undefined) {
-      console.log(`User Present: `, userData)
+      // console.log(`User Present: `, userData)
       navigate("/");
       return;
     } else {

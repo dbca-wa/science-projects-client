@@ -82,7 +82,8 @@ export interface ISendSingleEmail {
     toUserName: string;
     project?: number;
     projectTitle?: string;
-    projectDocumentType?: string;
+    projectDocumentKind?: "concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure";
+    stage?: number;
 }
 
 

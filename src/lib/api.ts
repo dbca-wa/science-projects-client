@@ -70,7 +70,7 @@ export const logInOrdinary = ({
     username,
     password,
 }: IUsernameLoginVariables): Promise<IUsernameLoginSuccess> => {
-    console.log(instance.defaults.baseURL);
+    // console.log(instance.defaults.baseURL);
 
     return instance.post(`users/log-in`, { username, password })
         .then((response) => {
@@ -114,7 +114,7 @@ export const getDoesUserWithEmailExist = async (email: string) => {
             { email },
         );
         const { exists } = response.data;
-        console.log(exists ? 'User exists' : 'User does not exist');
+        // console.log(exists ? 'User exists' : 'User does not exist');
         return exists;
     } catch (error) {
         console.error('Error checking user by email:', error);
@@ -232,7 +232,7 @@ export const createDocumentComment = async ({ documentId, payload, user }: Docum
         user,
         payload
     }
-    console.log("postContent", postContent)
+    // console.log("postContent", postContent)
     const res = instance.post(`documents/projectdocuments/${documentId}/comments`, postContent).then(res => res.data);
     return res;
 }
@@ -316,11 +316,11 @@ export interface IApproveProgressReport {
 }
 
 export const approveProgressReport = async ({ isActive, kind, reportPk, documentPk }: IApproveProgressReport) => {
-    console.log({
-        kind,
-        reportPk,
-        documentPk, isActive,
-    })
+    // console.log({
+    //     kind,
+    //     reportPk,
+    //     documentPk, isActive,
+    // })
     const res = instance.post(`documents/actions/finalApproval`, {
         kind, reportPk, documentPk, isActive: isActive.toString() === '1' ? true : false
     }).then(res => {
@@ -333,7 +333,7 @@ export const approveProgressReport = async ({ isActive, kind, reportPk, document
 export const getTeamLead = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
 
-    console.log(pk)
+    // console.log(pk)
     const res = instance.get(`projects/project_members/${pk}/leader`).then(res => {
         return res.data
     })
@@ -363,7 +363,7 @@ export const getSingleUser = async ({ queryKey }: QueryFunctionContext) => {
     const [_, userPk] = queryKey;
     return instance.get(
         `users/${userPk}`,).then(res => {
-            console.log(res.data);
+            // console.log(res.data);
             return res.data;
         })
 }
@@ -534,13 +534,13 @@ export interface IFullUserUpdateVariables {
 
 export const adminUpdateUser = async (
     { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }: IFullUserUpdateVariables) => {
-    console.log(
-        { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }
-    )
+    // console.log(
+    //     { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }
+    // )
 
     try {
-        console.log(branch)
-        console.log(business_area)
+        // console.log(branch)
+        // console.log(business_area)
 
         const membershipData = {
             affiliation: affiliation?.pk,
@@ -581,7 +581,7 @@ export interface IMembershipUpdateVariables {
 }
 
 export const updateMembership = async ({ userPk, branch, business_area, affiliation }: IMembershipUpdateVariables) => {
-    console.log(userPk, branch, business_area, affiliation)
+    // console.log(userPk, branch, business_area, affiliation)
     const response = await instance.put(
         `users/${userPk}/membership`, {
         user_pk: userPk,
@@ -596,9 +596,9 @@ export const updateMembership = async ({ userPk, branch, business_area, affiliat
 
 
 export const updatePersonalInformation = async ({ userPk, title, phone, fax }: IPIUpdateVariables) => {
-    console.log(
-        userPk, title, phone, fax
-    )
+    // console.log(
+    //     userPk, title, phone, fax
+    // )
     return instance.put(
         `users/${userPk}/pi`,
         { title, phone, fax }).then(res => res.data);
@@ -618,9 +618,9 @@ export const updatePersonalInformation = async ({ userPk, title, phone, fax }: I
 
 export const updateProfile = async ({ userPk, image, about, expertise }: IProfileUpdateVariables) => {
 
-    console.log(
-        userPk, image, about, expertise
-    )
+    // console.log(
+    //     userPk, image, about, expertise
+    // )
 
     const formData = new FormData();
     formData.append('userPk', userPk);
@@ -642,7 +642,7 @@ export const updateProfile = async ({ userPk, image, about, expertise }: IProfil
 
     }
 
-    console.log(formData);
+    // console.log(formData);
 
     const response = await instance.put(`users/${userPk}/profile`, formData, {
         headers: {
@@ -679,7 +679,7 @@ export const getFullProject = async ({ queryKey }: QueryFunctionContext) => {
 export const getFullProjectSimple = async (preselectedProjectPk: number) => {
     try {
         const res = await instance.get(`projects/${preselectedProjectPk}`);
-        console.log(res.data);
+        // console.log(res.data);
         return res.data;
     } catch (error) {
         console.error('Error fetching project:', error);
@@ -735,7 +735,7 @@ export const seekEndorsementAndSave = async ({
     // bmEndorsementRequired, bmEndorsementProvided
 }: ISpecialEndorsement) => {
 
-    console.log(aecPDFFile?.name)
+    // console.log(aecPDFFile?.name)
     const formData = new FormData();
     // formData.append('bm_endorsement_required', bmEndorsementRequired.toString());
     // formData.append('bm_endorsement_provided', bmEndorsementProvided.toString());
@@ -747,12 +747,12 @@ export const seekEndorsementAndSave = async ({
     if (aecPDFFile !== undefined && aecPDFFile !== null) {
         formData.append('aec_pdf_file', aecPDFFile);
     }
-    console.log(
-        formData
-    )
-    for (const pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-    }
+    // console.log(
+    //     formData
+    // )
+    // for (const pair of formData.entries()) {
+    //     console.log(pair[0], pair[1]);
+    // }
 
     // const res = instance.post(`documents/project_plan/${projectPlanPk}/seek_endorsement`, data).then(res => {
     //     return res.data
@@ -834,7 +834,7 @@ export const createTeamMember = async ({ user, project, role, timeAllocation, sh
         old_id: 1,
     }
 
-    console.log(data);
+    // console.log(data);
 
     const response = await instance.post(`projects/project_members`, data);
     return response.data;
@@ -847,17 +847,17 @@ export type RemoveUserMutationType = {
 
 export const removeTeamMemberFromProject = async (formData: RemoveUserMutationType) => {
 
-    console.log(formData);
+    // console.log(formData);
 
     const response = await instance.delete(`projects/project_members/${formData.project}/${formData.user}`);
-    console.log(response.data === "");
-    console.log(response.status);
+    // console.log(response.data === "");
+    // console.log(response.status);
     return response;
 
 }
 
 export const updateProjectMember = async (formData: any) => {
-    console.log(formData);
+    // console.log(formData);
 
     const projectId = formData.projectPk;
     const userId = formData.userPk;
@@ -874,8 +874,8 @@ export const updateProjectMember = async (formData: any) => {
         }
     );
 
-    console.log(response.data === "");
-    console.log(response.status);
+    // console.log(response.data === "");
+    // console.log(response.status);
     return response.data;
 
 
@@ -883,7 +883,7 @@ export const updateProjectMember = async (formData: any) => {
 
 
 export const promoteUserToLeader = async (formData: RemoveUserMutationType) => {
-    console.log(formData);
+    // console.log(formData);
 
     const response = await instance.post(
         `projects/promote`,
@@ -893,8 +893,8 @@ export const promoteUserToLeader = async (formData: RemoveUserMutationType) => {
         }
     );
 
-    console.log(response.data === "");
-    console.log(response.status);
+    // console.log(response.data === "");
+    // console.log(response.status);
     return response.data;
 }
 
@@ -1005,7 +1005,7 @@ export const createProject = async ({ baseInformationData, detailsData, location
     formData.append('description', baseInformationData.description);
     formData.append('keywords', baseInformationData.keywords.join(', '));
     if (isExternalSP) {
-        console.log(`Is External: ${isExternalSP}`)
+        // console.log(`Is External: ${isExternalSP}`)
         formData.append('isExternalSP', isExternalSP.toString());
     }
 
@@ -1115,8 +1115,8 @@ export const updateProjectDetails = async ({
     externalDescription,
     aims, budget, collaborationWith, level, organisation,
 }: IEditProject) => {
-    console.log('editing')
-    console.log('keywords:', keywords)
+    // console.log('editing')
+    // console.log('keywords:', keywords)
 
 
 
@@ -1164,13 +1164,13 @@ export const updateProjectDetails = async ({
 
 
     if (startDate) {
-        console.log('startDate is', startDate)
+        // console.log('startDate is', startDate)
         const dateFormatted = new Date(startDate);
 
         newFormData.append('startDate', dateFormatted.toISOString())
     }
     if (endDate) {
-        console.log('endDate is', endDate)
+        // console.log('endDate is', endDate)
         const dateFormatted = new Date(endDate);
 
         newFormData.append('endDate', dateFormatted.toISOString());
@@ -1217,7 +1217,7 @@ export const updateProjectDetails = async ({
 
 
 
-    console.log(newFormData);
+    // console.log(newFormData);
     // console.log(data)
 
     const res = instance.put(`projects/${projectPk}`, newFormData,
@@ -1391,7 +1391,7 @@ export interface IDocGenerationProps {
 
 export const downloadProjectDocument = async ({ docPk }: IDocGenerationProps) => {
     if (docPk === undefined) return;
-    console.log(docPk);
+    // console.log(docPk);
     const pk = Number(docPk);
 
     const url = "documents/downloadProjectDocument"
@@ -1562,10 +1562,10 @@ export interface IUpdatePDF {
 export const deleteFinalAnnualReportPDF = async (
     annualReportPDFPk: number
 ) => {
-    console.log(annualReportPDFPk);
+    // console.log(annualReportPDFPk);
 
     const res = await instance.delete(`medias/report_pdfs/${annualReportPDFPk}`);
-    console.log(res);
+    // console.log(res);
     return res.data;
 }
 
@@ -1575,11 +1575,11 @@ export const updateReportPDF = async ({
     // userId,
     pdfFile
 }: IUpdatePDF) => {
-    console.log({
-        // userId,
-        reportMediaId,
-        pdfFile
-    })
+    // console.log({
+    //     // userId,
+    //     reportMediaId,
+    //     pdfFile
+    // })
 
     const formData = new FormData();
     function isFileArray(obj: any): obj is File[] {
@@ -1600,8 +1600,8 @@ export const updateReportPDF = async ({
     // formData.append('user', userId.toString());
     // formData.append('report', reportMediaId.toString());
 
-    console.log(';formdata is')
-    console.log(formData)
+    // console.log(';formdata is')
+    // console.log(formData)
 
     const res = await instance.put(`medias/report_pdfs/${reportMediaId}`, formData,
         {
@@ -1609,7 +1609,7 @@ export const updateReportPDF = async ({
                 'Content-Type': 'multipart/form-data',
             },
         });
-    console.log(res);
+    // console.log(res);
     return res.data;
 
 }
@@ -1619,11 +1619,11 @@ export const addPDFToReport = async ({
     userId,
     pdfFile
 }: IAddPDF) => {
-    console.log({
-        userId,
-        reportId,
-        pdfFile
-    })
+    // console.log({
+    //     userId,
+    //     reportId,
+    //     pdfFile
+    // })
 
     const formData = new FormData();
     function isFileArray(obj: any): obj is File[] {
@@ -1644,8 +1644,8 @@ export const addPDFToReport = async ({
     formData.append('user', userId.toString());
     formData.append('report', reportId.toString());
 
-    console.log(';formdata is')
-    console.log(formData)
+    // console.log(';formdata is')
+    // console.log(formData)
 
     const res = await instance.post('medias/report_pdfs', formData,
         {
@@ -1653,7 +1653,7 @@ export const addPDFToReport = async ({
                 'Content-Type': 'multipart/form-data',
             },
         });
-    console.log(res);
+    // console.log(res);
     return res.data;
 }
 
@@ -1782,7 +1782,7 @@ export const saveHtmlToDB = async (
             "kind": writeable_document_kind,
             "kind_pk": writeable_document_pk,
         }
-        console.log(data)
+        // console.log(data)
         const params = {
             [section]: htmlData,
         }
@@ -1797,8 +1797,8 @@ export const saveHtmlToDB = async (
         }
         const formattedKind = formatDocumentKind(writeable_document_kind)
 
-        console.log(`documents/${formattedKind}/${writeable_document_pk}`)
-        console.log(params)
+        // console.log(`documents/${formattedKind}/${writeable_document_pk}`)
+        // console.log(params)
 
         return urlType(
             `documents/${formattedKind}/${writeable_document_pk}`,
@@ -1835,12 +1835,12 @@ export const handleMethodologyImage = async ({ kind, project_plan_pk, file }: IH
     if (kind === "update" || kind === "post") {
         const newFormData = new FormData();
         if (file !== null) {
-            console.log(file)
+            // console.log(file)
             if (file instanceof File) {
-                console.log('is file')
+                // console.log('is file')
                 newFormData.append('file', file);
             } else if (typeof file === 'string') {
-                console.log('is string')
+                // console.log('is string')
                 newFormData.append('file', file);
             }
         }
@@ -1916,7 +1916,7 @@ export const closeProjectCall = async ({ projectPk, reason, outcome }: IClosePro
             outcome: outcome,
         }
 
-        console.log(params)
+        // console.log(params)
 
         return instance.post(
             url, params
@@ -1933,7 +1933,7 @@ export const openProjectCall = async ({ pk }: ISimplePkProp) => {
             project: pk,
         }
 
-        console.log(params)
+        // console.log(params)
 
         return instance.post(
             url, params
@@ -1946,7 +1946,7 @@ export interface ISimplePkProp {
 }
 
 export const deleteProjectCall = async ({ pk }: ISimplePkProp) => {
-    console.log(pk)
+    // console.log(pk)
     if (pk !== undefined) {
         const url = `projects/${pk}`
 
@@ -1962,7 +1962,7 @@ export interface ISetProjectAreas {
 }
 
 export const setProjectAreas = async ({ areas, projectPk }: ISetProjectAreas) => {
-    console.log({ areas, projectPk })
+    // console.log({ areas, projectPk })
     const url = `projects/${projectPk}/areas`
     const params = {
         'areas': areas,
@@ -1981,13 +1981,13 @@ export interface IDeleteDocument {
 }
 
 export const deleteDocumentCall = async ({ projectPk, documentPk, documentKind }: IDeleteDocument) => {
-    console.log(
-        {
-            projectPk,
-            documentPk,
-            documentKind,
-        }
-    );
+    // console.log(
+    //     {
+    //         projectPk,
+    //         documentPk,
+    //         documentKind,
+    //     }
+    // );
     if (documentPk !== undefined) {
         const url = `documents/projectdocuments/${documentPk}`
         return instance.delete(
@@ -2002,12 +2002,12 @@ export interface IDeleteComment {
 }
 
 export const deleteCommentCall = async ({ commentPk, documentPk }: IDeleteComment) => {
-    console.log(
-        {
-            commentPk,
-            documentPk,
-        }
-    );
+    // console.log(
+    //     {
+    //         commentPk,
+    //         documentPk,
+    //     }
+    // );
     if (documentPk !== undefined) {
         const url = `communications/comments/${commentPk}`
         return instance.delete(
@@ -2031,7 +2031,7 @@ export const spawnNewEmptyDocument = async ({ projectPk, kind, year, report_id }
 
     const choices = ["concept", "projectplan", "progressreport", "studentreport", "projectclosure"]
     if (!choices.includes(kind)) {
-        console.log(`returning as choice is ${kind}`)
+        // console.log(`returning as choice is ${kind}`)
         return;
     }
     // else {
@@ -2178,7 +2178,7 @@ export const createPersonalTask = async ({ user, name, description }: IQuickTask
 
 export const createCommentReaction = ({ reaction, comment, user }: ICommentReaction) => {
 
-    console.log({ reaction, comment, user })
+    // console.log({ reaction, comment, user })
     // return "hi"
     const res = instance.post(
         "communications/reactions", {
@@ -2198,9 +2198,9 @@ export const createCommentReaction = ({ reaction, comment, user }: ICommentReact
 
 
 export const createFeedbackItem = async ({ user, text, kind, status }: IFeedback) => {
-    console.log({
-        user, text, kind, status
-    })
+    // console.log({
+    //     user, text, kind, status
+    // })
     const res = instance.post(
         "tasks/feedback", {
         user: user,
@@ -2412,7 +2412,7 @@ interface IReportMediaUploadProps {
 }
 
 export const uploadReportMediaImage = async ({ pk, file, section }: IReportMediaUploadProps) => {
-    console.log({ pk, file, section });
+    // console.log({ pk, file, section });
 
     const newFormData = new FormData();
 
@@ -2423,12 +2423,12 @@ export const uploadReportMediaImage = async ({ pk, file, section }: IReportMedia
         newFormData.append('section', section);
     }
     if (file !== null) {
-        console.log(file)
+        // console.log(file)
         if (file instanceof File) {
-            console.log('is file')
+            // console.log('is file')
             newFormData.append('file', file);
         } else if (typeof file === 'string') {
-            console.log('is string')
+            // console.log('is string')
             newFormData.append('file', file);
         }
 
@@ -2454,7 +2454,7 @@ interface IReportMediaDeleteProps {
 }
 
 export const deleteReportMediaImage = async ({ pk, section }: IReportMediaDeleteProps) => {
-    console.log({ pk, section });
+    // console.log({ pk, section });
 
     const newFormData = new FormData();
     if (section !== undefined) {
@@ -2535,7 +2535,7 @@ export const createReport = async (formData: IReportCreation) => {
 
 
 export const updateReportMedia = async (formData: IReport) => {
-    console.log(formData);
+    // console.log(formData);
     return {
         "status": 200,
         "message": "ok",
@@ -2688,7 +2688,7 @@ export const getAffiliationsBasedOnSearchTerm = async (searchTerm: string, page:
 };
 
 export const createAffiliation = async (formData: IAffiliation) => {
-    console.log(formData);
+    // console.log(formData);
     return instance.post(
         "agencies/affiliations", formData
     ).then(res => {
@@ -2697,7 +2697,7 @@ export const createAffiliation = async (formData: IAffiliation) => {
 }
 
 export const mergeAffiliations = async (formData: IMergeAffiliation) => {
-    console.log(formData)
+    // console.log(formData)
     return instance.post(
         "agencies/affiliations/merge", formData
     ).then(res => res.data)
@@ -2794,7 +2794,7 @@ export const createBusinessArea = async (formData: IBusinessArea) => {
 
     }
 
-    console.log(newFormData);
+    // console.log(newFormData);
 
     return instance.post(
         "agencies/business_areas", newFormData
@@ -2822,7 +2822,7 @@ export interface BusinessAreaUpdateProps {
 
 export const updateBusinessArea = async (formData: BusinessAreaUpdateProps) => {
 
-    console.log(formData)
+    // console.log(formData)
 
     const newFormData = new FormData();
 
@@ -2853,12 +2853,12 @@ export const updateBusinessArea = async (formData: BusinessAreaUpdateProps) => {
     }
 
     if (formData.image !== null) {
-        console.log(formData.image)
+        // console.log(formData.image)
         if (formData.image instanceof File) {
-            console.log('is file')
+            // console.log('is file')
             newFormData.append('image', formData.image);
         } else if (typeof formData.image === 'string') {
-            console.log('is string')
+            // console.log('is string')
             newFormData.append('image', formData.image);
         }
 
@@ -2868,7 +2868,7 @@ export const updateBusinessArea = async (formData: BusinessAreaUpdateProps) => {
         }
     }
 
-    console.log(newFormData);
+    // console.log(newFormData);
 
     return instance.put(
         `agencies/business_areas/${formData.pk}`, newFormData
@@ -2981,7 +2981,7 @@ export const getAllLocations = async () => {
 
         return organizedLocations;
     } catch (error) {
-        console.log("Error with Locations")
+        // console.log("Error with Locations")
 
         return {
             dbcaregion: [],
@@ -3064,6 +3064,57 @@ export const deleteDepartmentalService = async (pk: number) => {
 
 
 // EMAILS ==========================================================================
+
+
+export interface IDocumentApproved {
+    recipients_list: number[]; // array of pks
+    project_pk: number;
+    document_kind?: string; //concept, projectplan, progressreport, studentreport,projectclosur
+}
+
+
+export const sendDocumentApprovedEmail = async ({ recipients_list, project_pk,
+    document_kind
+}: IDocumentApproved) => {
+    return instance.post(
+        `documents/document_approved_email`,
+        {
+            "recipients_list": recipients_list,
+            "project_pk": project_pk,
+            "document_kind": document_kind,
+        }
+    ).then(res => {
+        return res.data;
+    }
+    );
+}
+
+export interface IDocumentRecalled {
+    stage: number;
+
+    recipients_list: number[]; // array of pks
+    project_pk: number;
+    document_kind: string; //concept, projectplan, progressreport, studentreport,projectclosur
+}
+
+
+export const sendDocumentRecalledEmail = async ({ recipients_list, project_pk, document_kind, stage }: IDocumentRecalled) => {
+    return instance.post(
+        `documents/document_recalled_email`,
+        {
+            "stage": stage,
+            "recipients_list": recipients_list,
+            "project_pk": project_pk,
+            "document_kind": document_kind,
+        }
+    ).then(res => {
+        return res.data;
+    }
+    );
+}
+
+
+
 
 export interface IReviewDocumentEmail {
     recipients_list: number[]; // array of pks
@@ -3163,30 +3214,6 @@ export const sendDocumentSentBackEmail = async ({ recipients_list, project_pk, d
 }
 
 
-export interface IDocumentApproved {
-    recipients_list: number[]; // array of pks
-    project_pk: number;
-    document_kind?: string; //concept, projectplan, progressreport, studentreport,projectclosur
-}
-
-
-export const sendDocumentApprovedEmail = async ({ recipients_list, project_pk,
-    // document_kind 
-}: IDocumentApproved) => {
-    return instance.post(
-        `documents/document_approved_email`,
-        {
-            "recipients_list": recipients_list,
-            "project_pk": project_pk,
-            // "document_kind": document_kind,
-        }
-    ).then(res => {
-        return res.data;
-    }
-    );
-}
-
-
 
 export const sendConceptPlanEmail = async ({ recipients_list, project_pk, document_kind }: IDocumentApproved) => {
     return instance.post(
@@ -3203,30 +3230,6 @@ export const sendConceptPlanEmail = async ({ recipients_list, project_pk, docume
 }
 
 
-
-export interface IDocumentRecalled {
-    stage: number;
-
-    recipients_list: number[]; // array of pks
-    project_pk: number;
-    document_kind: string; //concept, projectplan, progressreport, studentreport,projectclosur
-}
-
-
-export const sendDocumentRecalledEmail = async ({ recipients_list, project_pk, document_kind, stage }: IDocumentRecalled) => {
-    return instance.post(
-        `documents/document_recalled_email`,
-        {
-            "stage": stage,
-            "recipients_list": recipients_list,
-            "project_pk": project_pk,
-            "document_kind": document_kind,
-        }
-    ).then(res => {
-        return res.data;
-    }
-    );
-}
 
 
 // export const celeryStartTask = async () => {
@@ -3419,7 +3422,7 @@ export const generateProjectDocument = async ({ document_pk }: IDocGen) => {
             return response.text();
         })
         .then(cssFileContent => {
-            console.log({ cssFileURL, cssFileContent });
+            // console.log({ cssFileURL, cssFileContent });
             // Send the object as JSON
             const css_content = JSON.stringify(cssFileContent);
             // You can send jsonString to your server using an HTTP request (e.g., fetch or axios)
@@ -3433,7 +3436,7 @@ export const generateProjectDocument = async ({ document_pk }: IDocGen) => {
         { "css_content": cssFileContents }
 
     );
-    console.log(res.data);
+    // console.log(res.data);
     return { res };
 }
 
@@ -3475,7 +3478,7 @@ export const cancelProjectDocumentGeneration = async ({ document_pk }: IDocGen) 
     const res = await instance.post(
         `documents/cancel_doc_gen/${document_pk}`,
     );
-    console.log(res.data);
+    // console.log(res.data);
     return { res };
 }
 
@@ -3483,6 +3486,6 @@ export const cancelAnnualReportPDF = async ({ document_pk }: IDocGen) => {
     const res = await instance.post(
         `documents/reports/${document_pk}/cancel_doc_gen`,
     );
-    console.log(res.data);
+    // console.log(res.data);
     return { res };
 }
