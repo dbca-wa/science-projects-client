@@ -640,6 +640,7 @@ export const ConceptPlanDocActions = ({
                     mt={1}
                     justifyContent={"flex-end"}
                     alignItems={"center"}
+                    mb={2}
                   >
                     <Text flex={1} fontWeight={"semibold"}>
                       Business Area Lead

@@ -92,10 +92,10 @@ export const StudentReportActionModal = ({
       addToast({
         status: "loading",
         title: `${action === "approve"
-            ? "Approving"
-            : action === "recall"
-              ? "Recalling"
-              : "Sending Back"
+          ? "Approving"
+          : action === "recall"
+            ? "Recalling"
+            : "Sending Back"
           }`,
         position: "top-right",
       });
@@ -105,10 +105,10 @@ export const StudentReportActionModal = ({
         toast.update(toastIdRef.current, {
           title: "Success",
           description: `Document ${action === "approve"
-              ? "Approved"
-              : action === "recall"
-                ? "Recalled"
-                : "Sent Back"
+            ? "Approved"
+            : action === "recall"
+              ? "Recalled"
+              : "Sent Back"
             }`,
           status: "success",
           position: "top-right",
@@ -133,10 +133,10 @@ export const StudentReportActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: `Could Not ${action === "approve"
-              ? "Approve"
-              : action === "recall"
-                ? "Recall"
-                : "Send Back"
+            ? "Approve"
+            : action === "recall"
+              ? "Recall"
+              : "Send Back"
             } student Report`,
           description: `${error}`,
           status: "error",
@@ -149,6 +149,7 @@ export const StudentReportActionModal = ({
   });
 
   const onApprove = (formData: IApproveDocument) => {
+    formData.shouldSendEmail = shouldSendEmail;
     approveStudentReportMutation.mutate(formData);
   };
 
@@ -255,42 +256,43 @@ export const StudentReportActionModal = ({
                         : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
                   </Text>
 
-                  <Box
-                    pt={4}
-                    border={"1px solid"}
-                    borderColor={"gray.500"}
-                    rounded={"2xl"}
-                    p={4}
-                    mt={4}
-                  >
-                    <Text
-                      // px={1}
-                      fontWeight={"semibold"}
+                  {(action === "recall" || action === "approve") && (
+                    <Box
+                      pt={4}
+                      border={"1px solid"}
+                      borderColor={"gray.500"}
+                      rounded={"2xl"}
+                      p={4}
+                      mt={4}
                     >
-                      Directorate Members
-                    </Text>
-                    <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
-                      {!isDirectorateLoading &&
-                        directorateData
-                          ?.filter((member) => member.is_active) // Filter only active members
-                          .map((member, index) => (
-                            <Center key={index}>
-                              <Box px={2} w={"100%"}>
-                                <Text>{`${member.first_name} ${member.last_name}`}</Text>
-                              </Box>
-                            </Center>
-                          ))}
-                    </Grid>
-                  </Box>
+                      <Text fontWeight={"semibold"}>Directorate Members</Text>
+                      <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
+                        {!isDirectorateLoading &&
+                          directorateData
+                            ?.filter((member) => member.is_active) // Filter only active members
+                            .map((member, index) => (
+                              <Center key={index}>
+                                <Box px={2} w={"100%"}>
+                                  <Text>{`${member.first_name} ${member.last_name}`}</Text>
+                                </Box>
+                              </Center>
+                            ))}
+                      </Grid>
+                    </Box>
+                  )}
                   <Checkbox
                     isDisabled={!userData?.is_superuser}
                     mt={8}
                     isChecked={shouldSendEmail}
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
-                    Send emails to members of the Directorate alerting them that
-                    you have approved this document?
+                    Send emails to
+                    {action === "send_back" ? stage === 2 ? ` Project lead ` : ` Business Area Lead (${baLead?.first_name} ${baLead?.last_name}) ` : " members of the Directorate alerting them that "}
+                    alerting them
+                    you have {action === "approve" ? "approved" : action === "send_back" ? "sent back" : "reopened"}{" "}
+                    this {action === "reopen" ? "project" : "document"}?
                   </Checkbox>
+
                 </Box>
               ) : (
                 <Box>
