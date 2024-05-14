@@ -90,13 +90,12 @@ export const ConceptPlanActionModal = ({
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${
-          action === "approve"
-            ? "Approving"
-            : action === "recall"
-              ? "Recalling"
-              : "Sending Back"
-        }`,
+        title: `${action === "approve"
+          ? "Approving"
+          : action === "recall"
+            ? "Recalling"
+            : "Sending Back"
+          }`,
         position: "top-right",
       });
     },
@@ -104,13 +103,12 @@ export const ConceptPlanActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${
-            action === "approve"
-              ? "Approved"
-              : action === "recall"
-                ? "Recalled"
-                : "Sent Back"
-          }`,
+          description: `Document ${action === "approve"
+            ? "Approved"
+            : action === "recall"
+              ? "Recalled"
+              : "Sent Back"
+            }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -137,13 +135,12 @@ export const ConceptPlanActionModal = ({
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${
-            action === "approve"
-              ? "Approve"
-              : action === "recall"
-                ? "Recall"
-                : "Send Back"
-          } Concept Plan`,
+          title: `Could Not ${action === "approve"
+            ? "Approve"
+            : action === "recall"
+              ? "Recall"
+              : "Send Back"
+            } Concept Plan`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -155,6 +152,7 @@ export const ConceptPlanActionModal = ({
   });
 
   const onApprove = (formData: IApproveDocument) => {
+    formData.shouldSendEmail = shouldSendEmail;
     approveConceptPlanMutation.mutate(formData);
   };
 
@@ -166,7 +164,7 @@ export const ConceptPlanActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-      // isCentered={true}
+    // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -260,28 +258,30 @@ export const ConceptPlanActionModal = ({
                         : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
                   </Text>
 
-                  <Box
-                    pt={4}
-                    border={"1px solid"}
-                    borderColor={"gray.500"}
-                    rounded={"2xl"}
-                    p={4}
-                    mt={4}
-                  >
-                    <Text fontWeight={"semibold"}>Directorate Members</Text>
-                    <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
-                      {!isDirectorateLoading &&
-                        directorateData
-                          ?.filter((member) => member.is_active) // Filter only active members
-                          .map((member, index) => (
-                            <Center key={index}>
-                              <Box px={2} w={"100%"}>
-                                <Text>{`${member.first_name} ${member.last_name}`}</Text>
-                              </Box>
-                            </Center>
-                          ))}
-                    </Grid>
-                  </Box>
+                  {(action === "recall" || action === "approve") && (
+                    <Box
+                      pt={4}
+                      border={"1px solid"}
+                      borderColor={"gray.500"}
+                      rounded={"2xl"}
+                      p={4}
+                      mt={4}
+                    >
+                      <Text fontWeight={"semibold"}>Directorate Members</Text>
+                      <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
+                        {!isDirectorateLoading &&
+                          directorateData
+                            ?.filter((member) => member.is_active) // Filter only active members
+                            .map((member, index) => (
+                              <Center key={index}>
+                                <Box px={2} w={"100%"}>
+                                  <Text>{`${member.first_name} ${member.last_name}`}</Text>
+                                </Box>
+                              </Center>
+                            ))}
+                      </Grid>
+                    </Box>
+                  )}
                   <Checkbox
                     isDisabled={!userData?.is_superuser}
                     mt={8}
