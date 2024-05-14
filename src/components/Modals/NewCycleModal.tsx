@@ -151,6 +151,7 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
   });
 
   const onSubmit = async (formData: INewCycle) => {
+    formData.shouldSendEmails = shouldSendEmails;
     await newCycleMutation.mutateAsync(formData);
     onClose();
   };
