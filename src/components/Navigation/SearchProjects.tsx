@@ -268,6 +268,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
             All Business Areas
           </option>
           {businessAreas.map((ba, index) => {
+            console.log(ba)
             const checkIsHtml = (data: string) => {
               // Regular expression to check for HTML tags
               const htmlRegex = /<\/?[a-z][\s\S]*>/i;

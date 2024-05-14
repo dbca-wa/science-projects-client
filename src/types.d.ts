@@ -667,6 +667,22 @@ interface IBusinessArea {
     data_custodian?: number;
 }
 
+interface IBusinessAreaCreate {
+    agency?: number;
+    old_id?: number;
+    pk?: number;
+    slug?: string;
+    division?: number;
+    is_active: boolean;
+    name: string;
+    focus: string;
+    introduction: string;
+    image: BusinessAreaImage | File | null;
+    leader?: number;
+    finance_admin?: number;
+    data_custodian?: number;
+}
+
 // effective_from: Date;
 //effective_to: Date;   // always null, delete ?
 

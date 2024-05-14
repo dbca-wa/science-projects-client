@@ -3,6 +3,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getAllDivisions } from "../../api";
+import { IDivision } from "@/types";
 
 export const useGetDivisions = () => {
   const { isPending, data } = useQuery({
@@ -13,6 +14,6 @@ export const useGetDivisions = () => {
 
   return {
     divsLoading: isPending,
-    divsData: data,
+    divsData: data as IDivision[],
   };
 };

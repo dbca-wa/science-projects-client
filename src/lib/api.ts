@@ -2759,6 +2759,10 @@ export const createBusinessArea = async (formData: IBusinessArea) => {
 
     const newFormData = new FormData();
 
+    if (formData.division !== undefined) {
+        newFormData.append('division', formData.division.toString());
+    }
+
     if (formData.old_id !== undefined) {
         newFormData.append('old_id', formData.old_id.toString());
     }
@@ -2809,6 +2813,7 @@ export interface BusinessAreaUpdateProps {
     agency?: number;
     old_id?: number;
     pk?: number;
+    division?: number;
     slug: string;
     name: string;
     focus: string;
@@ -2825,6 +2830,10 @@ export const updateBusinessArea = async (formData: BusinessAreaUpdateProps) => {
     // console.log(formData)
 
     const newFormData = new FormData();
+
+    if (formData.division !== undefined) {
+        newFormData.append('division', formData.division.toString());
+    }
 
     if (formData.old_id !== undefined) {
         newFormData.append('old_id', formData.old_id.toString());

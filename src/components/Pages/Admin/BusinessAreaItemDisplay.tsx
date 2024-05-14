@@ -117,8 +117,8 @@ export const BusinessAreaItemDisplay = ({
         title: "Updated",
         position: "top-right",
       });
-      onUpdateModalClose();
       queryClient.invalidateQueries({ queryKey: ["businessAreas"] });
+      onUpdateModalClose();
     },
     onError: () => {
       // console.log("error")
@@ -199,6 +199,8 @@ export const BusinessAreaItemDisplay = ({
     } = formData;
     const image = selectedFile;
 
+    // console.log(baDivision)
+
     const payload = {
       pk,
       agency,
@@ -213,7 +215,9 @@ export const BusinessAreaItemDisplay = ({
       introduction,
       image,
       selectedImageUrl,
+      division: baDivision,
     };
+    // console.log(payload)
     // Create an object to pass as a single argument to mutation.mutate
     if (!selectedFile) {
       console.log("WITHOUT IMAGE:", payload);
@@ -270,12 +274,9 @@ export const BusinessAreaItemDisplay = ({
 
   const { divsLoading, divsData } = useGetDivisions();
 
-  const defaultSelectedDivision = divsData?.find(
-    (div) => div.pk === division?.pk
-  );
-  const [baDivision, setBaDivision] = useState<IDivision>(
-    defaultSelectedDivision || {}
-  );
+  const [baDivision, setBaDivision] = useState<number>(division.pk);
+
+
 
   return (
     <>
@@ -342,7 +343,7 @@ export const BusinessAreaItemDisplay = ({
         width="100%"
         p={3}
         borderWidth={1}
-        // bg={"red"}
+      // bg={"red"}
       >
         <Flex
           justifyContent="flex-start"
@@ -574,22 +575,25 @@ export const BusinessAreaItemDisplay = ({
                   autoComplete="off"
                   value={nameData}
                   onChange={(e) => setNameData(e.target.value)}
-                  // {...register("name", { required: true })}
+                // {...register("name", { required: true })}
                 />
               </FormControl>
 
-              {!divsLoading && divsData ? (
+              {!divsLoading && divsData && baDivision ? (
                 <FormControl mb={2}>
                   <FormLabel>Division</FormLabel>
                   <Select
-                    value={baDivision?.pk}
+                    value={baDivision}
+                    // defaultValue={baDivision}
                     onChange={(e) => {
-                      const selectedDivision = divsData.find(
-                        (div) => div.pk === e.target.value
-                      );
-                      if (selectedDivision) {
-                        setBaDivision(selectedDivision);
-                      }
+                      setBaDivision(Number(e.target.value))
+                      // console.log(division)
+                      // const selectedDivision = divsData.find(
+                      //   (div) => div.id === Number(e.target.value)
+                      // );
+                      // if (selectedDivision) {
+                      //   setBaDivision(selectedDivision?.pk);
+                      // }
                     }}
                   >
                     {divsData?.map((div) => (

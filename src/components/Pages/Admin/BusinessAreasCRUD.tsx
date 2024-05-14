@@ -1,34 +1,36 @@
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
+import { useGetDivisions } from "@/lib/hooks/tanstack/useGetDivisions";
 import {
   Box,
   Button,
   Center,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
   FormControl,
   FormHelperText,
   FormLabel,
   Grid,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
   Spinner,
+  Stack,
   Text,
-  VStack,
   useColorMode,
   useDisclosure,
-  useToast,
+  useToast
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { createBusinessArea, getAllBusinessAreas } from "../../../lib/api";
-import { IBusinessArea } from "../../../types";
+import { IBusinessArea, IBusinessAreaCreate } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { BusinessAreaItemDisplay } from "./BusinessAreaItemDisplay";
 import { StatefulMediaChanger } from "./StatefulMediaChanger";
@@ -40,7 +42,7 @@ export const BusinessAreasCRUD = () => {
     watch,
     reset,
     // formState: { errors },
-  } = useForm<IBusinessArea>();
+  } = useForm<IBusinessAreaCreate>();
   const toast = useToast();
   const {
     isOpen: addIsOpen,
@@ -57,9 +59,9 @@ export const BusinessAreasCRUD = () => {
         title: "Created",
         position: "top-right",
       });
-      onAddClose();
-      clearFields();
       queryClient.invalidateQueries({ queryKey: ["businessAreas"] });
+      clearFields();
+      onAddClose();
     },
     onError: () => {
       toast({
@@ -124,6 +126,7 @@ export const BusinessAreasCRUD = () => {
   const [selectedLeader, setSelectedLeader] = useState<number>();
   const [selectedFinanceAdmin, setSelectedFinanceAdmin] = useState<number>();
   const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
+  const [division, setDivision] = useState<number>();
 
   const clearFields = () => {
     reset();
@@ -136,6 +139,7 @@ export const BusinessAreasCRUD = () => {
 
   useEffect(() => {
     if (
+      division &&
       introduction?.length >= 5 &&
       focus?.length >= 5 &&
       nameData?.length >= 5
@@ -144,7 +148,8 @@ export const BusinessAreasCRUD = () => {
     } else {
       setCanSubmit(false);
     }
-  }, [nameData, focus, introduction]);
+  }, [nameData, focus, introduction, division]);
+
 
   const onSubmitBusinessAreaCreation = (formData: IBusinessArea) => {
     const {
@@ -174,6 +179,7 @@ export const BusinessAreasCRUD = () => {
       focus,
       introduction,
       image,
+      division,
     };
     console.log(payload);
     mutation.mutate(payload);
@@ -183,6 +189,8 @@ export const BusinessAreasCRUD = () => {
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>();
 
   const { colorMode } = useColorMode();
+
+  const { divsData, divsLoading } = useGetDivisions();
 
   return (
     <>
@@ -279,23 +287,47 @@ export const BusinessAreasCRUD = () => {
                     focus={s.focus}
                     introduction={s.introduction}
                     image={s.image}
+                    division={s.division}
                   />
                 ))}
             </Grid>
           </Box>
 
-          <Drawer isOpen={addIsOpen} onClose={onAddClose} size={"lg"}>
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-              <DrawerHeader>Add Business Area</DrawerHeader>
-              <DrawerBody>
-                <VStack
+          <Modal isOpen={addIsOpen} onClose={onAddClose} size={"2xl"}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalCloseButton onClick={onAddClose} />
+              <ModalHeader>Add Business Area</ModalHeader>
+              <ModalBody>
+                <Stack
                   spacing={6}
                   as="form"
                   id="add-form"
                   onSubmit={handleSubmit(onSubmit)}
                 >
+                  {/* <FormControl isRequired>
+                    <FormLabel>Name</FormLabel>
+                    <Input
+                      autoComplete="off"
+                      autoFocus
+                      {...register("division", { required: true })}
+                    />
+                    <FormHelperText>Name of the Business Area</FormHelperText>
+                  </FormControl> */}
+                  {!divsLoading && (
+                    <Select
+                      onChange={(e) => setDivision(Number(e.target.value))}
+                      value={division}
+                      defaultValue={division}
+                    // {...register("division", { required: true })}
+
+                    >
+                      <option value={1}>Select a Division</option>
+                      {divsData?.map((divi) => <option value={divi.pk}>[{divi.slug}] {divi.name}</option>)}
+                    </Select>
+                  )}
+
+
                   <FormControl isRequired>
                     <FormLabel>Name</FormLabel>
                     <Input
@@ -404,7 +436,7 @@ export const BusinessAreasCRUD = () => {
                         <Box key={key}>
                           {(
                             (mutation.error as AxiosError)?.response?.data[
-                              key
+                            key
                             ] as string[]
                           ).map((errorMessage, index) => (
                             <Text key={`${key}-${index}`} color="red.500">
@@ -415,9 +447,9 @@ export const BusinessAreasCRUD = () => {
                       ))}
                     </Box>
                   ) : null}
-                </VStack>
-              </DrawerBody>
-              <DrawerFooter>
+                </Stack>
+              </ModalBody>
+              <ModalFooter>
                 <Button
                   // form="add-form"
                   // type="submit"
@@ -446,9 +478,9 @@ export const BusinessAreasCRUD = () => {
                 >
                   Create
                 </Button>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </>
       )}
     </>
