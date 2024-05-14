@@ -71,7 +71,7 @@ export const BusinessAreasCRUD = () => {
       });
     },
   });
-  const onSubmit = (formData: IBusinessArea) => {
+  const onSubmit = (formData: IBusinessAreaCreate) => {
     mutation.mutate(formData);
   };
   const { isLoading, data: slices } = useQuery<IBusinessArea[]>({
@@ -151,7 +151,7 @@ export const BusinessAreasCRUD = () => {
   }, [nameData, focus, introduction, division]);
 
 
-  const onSubmitBusinessAreaCreation = (formData: IBusinessArea) => {
+  const onSubmitBusinessAreaCreation = (formData: IBusinessAreaCreate) => {
     const {
       // old_id,
       // slug,

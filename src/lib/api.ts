@@ -2,7 +2,7 @@ import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/C
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProgressReport, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
+import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IBusinessAreaCreate, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProgressReport, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
 import { IConceptPlanGenerationData } from "../types";
 
 
@@ -2755,7 +2755,7 @@ export const getSingleBusinessArea = async ({ queryKey }: QueryFunctionContext) 
 }
 
 
-export const createBusinessArea = async (formData: IBusinessArea) => {
+export const createBusinessArea = async (formData: IBusinessAreaCreate) => {
 
     const newFormData = new FormData();
 
