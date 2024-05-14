@@ -161,7 +161,7 @@ export const TraditionalDashboard = () => {
             <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
               We are always looking for ways to improve, and value your
               feedback! If you notice something off, or would like to request a
-              change, please submit feedback here. Don't be shy, we can only
+              change, please submit feedback here, send an email to jarid.prince@dbca.wa.gov.au, or send a message on Teams. Don't be shy, we can only
               make things better with your help!
             </Text>
 
