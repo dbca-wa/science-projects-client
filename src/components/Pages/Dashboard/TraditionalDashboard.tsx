@@ -7,11 +7,16 @@ import {
   Flex,
   Grid,
   Heading,
-  ListItem,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
   Text,
-  UnorderedList,
   useColorMode,
-  useDisclosure,
+  useDisclosure
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
@@ -24,7 +29,7 @@ import { FaDatabase } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
-import confetti from "canvas-confetti";
+import ConfettiComponent from "@/components/Fun/HomeConfetti";
 
 export const TraditionalDashboard = () => {
   const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
@@ -89,30 +94,22 @@ export const TraditionalDashboard = () => {
     onClose: onCloseFeedbackModal,
   } = useDisclosure();
 
-  useEffect(() => {
-    // confetti({
-    //   particleCount: 150
-    // });
-    // confetti({
-    //   spread: 180
-    // });
-    confetti({
-      particleCount: 100,
-      // startVelocity: 30,
-      spread: 360,
-      origin: {
-        x: 0.385,
-        // x: Math.random(),
-        // since they fall down, start a bit higher than random
-        // y: Math.random() - 0.2
-        y: 0.3,
-      },
-    });
+  // useEffect(() => {
+  //   confetti({
+  //     particleCount: 100,
+  //     spread: 360,
+  //     origin: {
+  //       x: 0.385,
+  //       y: 0.3,
+  //     },
+  //   });
 
-    setTimeout(() => {
-      confetti.reset();
-    }, 5000);
-  }, []);
+  //   setTimeout(() => {
+  //     confetti.reset();
+  //   }, 5000);
+  // }, []);
+
+  const [dataCatalogueDisabled, setDataCatalogueDisabled] = useState(true);
 
   return (
     <>
@@ -126,7 +123,7 @@ export const TraditionalDashboard = () => {
         isFeedbackModalOpen={isFeedbackModalOpen}
         onCloseFeedbackModal={onCloseFeedbackModal}
       />
-
+      <ConfettiComponent />
       <Box
         mt={5}
         bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
@@ -150,8 +147,10 @@ export const TraditionalDashboard = () => {
         )}
 
         <Flex flexDir={"column"}>
-          <Text mt={5} fontSize={"16px"} fontWeight={"semibold"}>
-            &#127881; We have successfully migrated to SPMS 2.0! &#127881;
+          <Text mt={5} fontSize={"16px"} fontWeight={"semibold"}
+            onClick={() => localStorage.removeItem("confettiCount")}
+          >
+            &#127881; We have successfully migrated to SPMS 3.0! &#127881;
           </Text>
           <Text>
             This new version features speed and security upgrades, dark mode, a
@@ -186,19 +185,41 @@ export const TraditionalDashboard = () => {
         }}
         gap={10}
       >
-        <Button
-          leftIcon={<FaDatabase />}
-          bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
-          color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-          _hover={{
-            bg: colorMode === "light" ? `blue.600` : `blue.400`,
-            color: colorMode === "light" ? `white` : `white`,
-          }}
-          as="a"
-          href="https://data.dbca.wa.gov.au/"
-        >
-          {shouldConcat ? "Data" : "Data Catalogue"}
-        </Button>
+
+        <Popover trigger="hover">
+          <PopoverTrigger>
+            <Button
+              leftIcon={<FaDatabase />}
+              bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
+              color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+              _hover={{
+                bg: colorMode === "light" ? `blue.600` : `blue.400`,
+                color: colorMode === "light" ? `white` : `white`,
+              }}
+              // as="a"
+              onClick={() => {
+                if (!dataCatalogueDisabled) {
+                  window.open("https://data.dbca.wa.gov.au/", "_blank")
+                }
+              }}
+            // isDisabled={dataCatalogueDisabled}
+            >
+              {shouldConcat ? "Data" : "Data Catalogue"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <PopoverArrow />
+            {/* <PopoverCloseButton /> */}
+            {/* <PopoverHeader>Confirmation!</PopoverHeader> */}
+            <PopoverBody
+              justifyContent={"center"}
+              display={"flex"}
+            >
+              Coming Soon
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
+
         <Button
           leftIcon={<TbWorldWww />}
           bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
@@ -207,10 +228,11 @@ export const TraditionalDashboard = () => {
             bg: colorMode === "light" ? `blue.600` : `blue.400`,
             color: colorMode === "light" ? `white` : `white`,
           }}
-          as={"a"}
-          href="https://scientificsites.dpaw.wa.gov.au/"
+          // as={"a"}
+          // href="https://scientificsites.dpaw.wa.gov.au/"
+          onClick={() => window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank")}
         >
-          {shouldConcat ? "Scientific Sites" : "Scientific Site Register"}
+          {shouldConcat ? "Scientific Sites" : "Scientific Sites Register"}
         </Button>
         <Button
           leftIcon={<FaCirclePlus />}

@@ -265,7 +265,7 @@ export const Navitar = ({
                 zIndex={isOpen ? 2 : 1}
               >
                 {<TbWorldWww />}
-                <Text ml={2}>Scientific Site Register</Text>
+                <Text ml={2}>Scientific Sites Register</Text>
               </MenuItem>
             </MenuGroup>
           )}
