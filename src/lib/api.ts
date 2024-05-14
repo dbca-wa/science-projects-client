@@ -100,6 +100,7 @@ export const logOut = () => {
                 throw new Error('Error logging out.', response.data.error);
             }
         }).catch((e) => {
+            console.log(e)
             throw e;
         });
 

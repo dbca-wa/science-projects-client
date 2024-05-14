@@ -88,9 +88,10 @@ export const Navitar = ({
       // window.location.href = VITE_PRODUCTION_BACKEND_BASE_URL;
       // window.location.assign('https://dbcab2c.b2clogin.com/dbcab2c.onmicrosoft.com/B2C_1A_Default_uat/oauth2/v2.0/logout?post_logout_redirect_uri=https%3A//login.microsoftonline.com/7b934664-cdcf-4e28-a3ee-1a5bcca0a1b6/oauth2/logout')
     },
-    onError: () => {
+    onError: (error) => {
       console.log("logout error, navigating to login")
-      navigate(`${VITE_PRODUCTION_BACKEND_BASE_URL}login`);
+      console.log(error);
+      window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}login`;
     }
   });
 
