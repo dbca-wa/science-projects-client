@@ -19,7 +19,7 @@ import {
 // JSXElementConstructor, ReactElement,
 // useEffect } from "react";
 import { ARStudentReportHandler } from "@/components/RichTextEditor/Editors/ARStudentReportHandler";
-import whitePaperBackground from "@/images/white-texture.jpg";
+// import whitePaperBackground from "@/images/white-texture.jpg";
 import { MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 // import { render } from "@react-email/render";
@@ -71,7 +71,7 @@ export const ParticipatingProjectReports = () => {
           py={4}
           // bg={"orange"}
           position="relative"
-          // zIndex={1}
+        // zIndex={1}
         >
           <Box
             position="absolute"
@@ -80,7 +80,8 @@ export const ParticipatingProjectReports = () => {
             right="0"
             bottom="0"
             minH={`${A4Height}mm`}
-            backgroundImage={`url(${whitePaperBackground})`}
+            // 
+            background={"white"}
             backgroundSize="cover"
             backgroundPosition="center"
             backgroundRepeat="no-repeat"
@@ -90,7 +91,7 @@ export const ParticipatingProjectReports = () => {
           />
           {latestStudentReportsData?.length +
             latestProgressReportsData?.length <
-          1 ? (
+            1 ? (
             <Center>
               <Text pos={"absolute"} top={10}>
                 There are no approved reports for this year
@@ -139,7 +140,7 @@ export const ParticipatingProjectReports = () => {
                     <Text
                       fontWeight={"bold"}
                       fontSize={"xl"}
-                      // color={"black"}
+                    // color={"black"}
                     >
                       Student Reports ({latestStudentReportsData?.length})
                     </Text>
@@ -204,7 +205,7 @@ export const ParticipatingProjectReports = () => {
                     <Text
                       fontWeight={"bold"}
                       fontSize={"xl"}
-                      // color={"black"}
+                    // color={"black"}
                     >
                       Progress Reports ({latestProgressReportsData?.length})
                     </Text>

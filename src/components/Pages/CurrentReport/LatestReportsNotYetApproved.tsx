@@ -2,7 +2,7 @@
 
 import { ARProgressReportHandler } from "@/components/RichTextEditor/Editors/ARProgressReportHandler";
 import { ARStudentReportHandler } from "@/components/RichTextEditor/Editors/ARStudentReportHandler";
-import whitePaperBackground from "@/images/white-texture.jpg";
+// import whitePaperBackground from "@/images/white-texture.jpg";
 import { useLatestYearsUnapprovedReports } from "@/lib/hooks/tanstack/useLatestReportsUnapproved";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
@@ -48,7 +48,7 @@ export const LatestReportsNotYetApproved = () => {
           // bg={"orange"}
           position="relative"
 
-          // zIndex={1}
+        // zIndex={1}
         >
           <Box
             position="absolute"
@@ -57,7 +57,8 @@ export const LatestReportsNotYetApproved = () => {
             left="0"
             right="0"
             bottom="0"
-            backgroundImage={`url(${whitePaperBackground})`}
+            // backgroundImage={`url(${whitePaperBackground})`}
+            background={"white"}
             backgroundSize="cover"
             backgroundPosition="center"
             backgroundRepeat="no-repeat"
@@ -67,7 +68,7 @@ export const LatestReportsNotYetApproved = () => {
           />
           {unapprovedData["student_reports"].length +
             unapprovedData["progress_reports"].length <
-          1 ? (
+            1 ? (
             <Center>
               <Text pos={"absolute"} top={10}>
                 There are no unapproved reports for this year
@@ -79,7 +80,7 @@ export const LatestReportsNotYetApproved = () => {
               allowMultiple
               zIndex={2}
               w={"100%"}
-              // bg={"red"}
+            // bg={"red"}
             >
               <AccordionItem
                 mt={-4}
@@ -122,7 +123,7 @@ export const LatestReportsNotYetApproved = () => {
                     <Text
                       fontWeight={"bold"}
                       fontSize={"xl"}
-                      // color={"black"}
+                    // color={"black"}
                     >
                       Student Reports (
                       {unapprovedData["student_reports"].length})
@@ -188,7 +189,7 @@ export const LatestReportsNotYetApproved = () => {
                     <Text
                       fontWeight={"bold"}
                       fontSize={"xl"}
-                      // color={"black"}
+                    // color={"black"}
                     >
                       Progress Reports (
                       {unapprovedData["progress_reports"].length})
