@@ -5,7 +5,7 @@ import { useCurrentYear } from "../../lib/hooks/helper/useCurrentYear";
 
 export const Footer = () => {
   const currentYear = useCurrentYear();
-  const FooterText = "SPMS2 v0.9.11";
+  const VERSION = process.env.VITE_SPMS_VERSIONING || "3.0.0";
 
   return (
     <Box
@@ -22,7 +22,7 @@ export const Footer = () => {
           color="whiteAlpha.800"
           href="https://github.com/dbca-wa/science-projects-client"
         >
-          {FooterText}
+          {`SPMS ${VERSION}`}
         </Link>
         &nbsp;
         <Text>© 2012-{currentYear} DBCA. All rights reserved.</Text>
