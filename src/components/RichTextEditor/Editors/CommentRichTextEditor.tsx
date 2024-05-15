@@ -248,7 +248,9 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
   const { colorMode } = useColorMode();
   // const imageUrl = useServerImageUrl(userData?.image?.file);
 
-  return userData.image ? (
+  console.log(userData)
+
+  return (
     <Box
       pl={3}
       pt={2}
@@ -263,7 +265,7 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
         sx={{ alignSelf: "flex-start" }}
         mt={2}
       >
-        <Avatar
+        {userData?.image ? (<Avatar
           size={"md"}
           src={
             userData?.image?.file.startsWith("http")
@@ -275,7 +277,16 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
           userSelect={"none"}
           style={{ pointerEvents: "none" }}
           draggable={false}
-        />
+        />) : (<Avatar
+          size={"md"}
+          src={""}
+          name={`${userData?.first_name} ${userData?.last_name}`}
+          mr={2}
+          userSelect={"none"}
+          style={{ pointerEvents: "none" }}
+          draggable={false}
+        />)}
+
         <Flex
           pl={1}
           pr={0}
@@ -292,7 +303,7 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
               color={
                 colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
               }
-              // w={"100%"}
+            // w={"100%"}
             >
               {`${userData?.first_name} ${userData?.last_name}`}
             </Text>
@@ -300,52 +311,5 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
         </Flex>
       </Flex>
     </Box>
-  ) : null;
-  // <Box
-  //   pl={3}
-  //   pt={2}
-  //   onClick={() => {
-  //     // If the editor is not focused, focus it.
-  //     editor.focus();
-  //   }}
-  // >
-  //   <Flex
-  //     flexDir="row"
-  //     // color="gray.500"
-  //     sx={{ alignSelf: "flex-start" }}
-  //     mt={2}
-  //   >
-  //     <Avatar
-  //       size={"md"}
-  //       src={""}
-  //       mr={2}
-  //       userSelect={"none"}
-  //       style={{ pointerEvents: "none" }}
-  //       draggable={false}
-  //     />
-
-  //     <Flex
-  //       pl={1}
-  //       pr={0}
-  //       w={"100%"}
-  //       h={"100%"}
-  //       justifyContent={"space-between"}
-  //       paddingRight={"40px"}
-  //     >
-  //       <Box userSelect={"none"}>
-  //         <Text
-  //           fontWeight="bold"
-  //           pl={1}
-  //           mt={0}
-  //           color={
-  //             colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
-  //           }
-  //         // w={"100%"}
-  //         >
-  //           {`${userData?.first_name} ${userData?.last_name}`}
-  //         </Text>
-  //       </Box>
-  //     </Flex>
-  //   </Flex>
-  // </Box>;
+  )
 };

@@ -44,10 +44,8 @@ export const PrepopulateCommentDisplayPlugin = ({
           `<tr>${row
             .map(
               (cell, colIndex) =>
-                `<${
-                  rowIndex === 0 || colIndex === 0 ? "th" : "td"
-                } class="table-cell-dark${
-                  rowIndex === 0 ? " table-cell-header-dark" : ""
+                `<${rowIndex === 0 || colIndex === 0 ? "th" : "td"
+                } class="table-cell-dark${rowIndex === 0 ? " table-cell-header-dark" : ""
                 }">${cell}</${rowIndex === 0 || colIndex === 0 ? "th" : "td"}>`
             )
             .join("")}</tr>`
@@ -69,7 +67,7 @@ export const PrepopulateCommentDisplayPlugin = ({
   };
 
   const removeHTMLSpace = (text: string) => {
-    return text.replace(/&nbsp;/g, "");
+    return text.replace(/&nbsp;/g, " ");
   };
 
   const [editor] = useLexicalComposerContext();
