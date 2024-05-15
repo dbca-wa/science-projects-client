@@ -18,7 +18,7 @@ export const Footer = () => {
       userSelect={"none"}
     >
       <Center fontSize="12px" textAlign="center"
-        onClick={() => console.log(import.meta.env.VITE_SPMS_VERSION)}
+        onClick={() => console.log(VERSION)}
       >
         <Link
           color="whiteAlpha.800"
