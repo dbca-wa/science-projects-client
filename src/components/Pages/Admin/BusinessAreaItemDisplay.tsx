@@ -1,4 +1,5 @@
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
+import { useGetDivisions } from "@/lib/hooks/tanstack/useGetDivisions";
 import {
   Box,
   Button,
@@ -44,15 +45,14 @@ import {
   updateBusinessArea,
 } from "../../../lib/api";
 import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
-import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import useDistilledHtml from "../../../lib/hooks/helper/useDistilledHtml";
 import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
-import { BusinessAreaImage, IBusinessArea, IDivision } from "../../../types";
+import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { BusinessAreaImage, IBusinessArea } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
 import { UserProfile } from "../Users/UserProfile";
-import useDistilledHtml from "../../../lib/hooks/helper/useDistilledHtml";
 import { StatefulMediaChanger } from "./StatefulMediaChanger";
-import { useGetDivisions } from "@/lib/hooks/tanstack/useGetDivisions";
 
 export const BusinessAreaItemDisplay = ({
   pk,
@@ -277,6 +277,7 @@ export const BusinessAreaItemDisplay = ({
   const [baDivision, setBaDivision] = useState<number>(division.pk);
 
 
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <>
@@ -351,31 +352,48 @@ export const BusinessAreaItemDisplay = ({
           pos={"relative"}
         >
           {name ? (
-            <Box
+
+            <Skeleton
+              isLoaded={imageLoaded}
               rounded="lg"
               // overflow="hidden"
               w="80px"
               h="69px"
               pos={"relative"}
+              cursor={"pointer"}
+              style={{ transformStyle: "preserve-3d" }}
+              boxShadow="0px 10px 15px -5px rgba(0, 0, 0, 0.3), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.06), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.1), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.1)"
+              border={colorMode === "dark" ? "1px solid" : undefined}
+              borderColor={"gray.700"}
             >
-              <Image
-                src={
-                  image instanceof File
-                    ? `${apiEndpoint}${image.name}` // Use the image directly for File
-                    : image?.file
-                      ? `${apiEndpoint}${image.file}`
-                      : NoImageFile
-                }
+              <Box
                 rounded="lg"
-                width={"100%"}
-                height={"100%"}
-                objectFit={"cover"}
-                filter={!is_active ? "grayscale(100%)" : undefined}
-              />
-              <Box pos={"absolute"} bottom={-1} right={-1} color={"red"}>
-                {is_active ? <FcOk size={"24px"} /> : <ImCross size={"18px"} />}
+                // overflow="hidden"
+                w="80px"
+                h="69px"
+                pos={"relative"}
+              >
+                <Image
+                  onLoad={() => setImageLoaded(true)}
+                  src={
+                    image instanceof File
+                      ? `${apiEndpoint}${image.name}` // Use the image directly for File
+                      : image?.file
+                        ? `${apiEndpoint}${image.file}`
+                        : NoImageFile
+                  }
+                  rounded="lg"
+                  width={"100%"}
+                  height={"100%"}
+                  objectFit={"cover"}
+                  filter={!is_active ? "grayscale(100%)" : undefined}
+                />
+                <Box pos={"absolute"} bottom={-1} right={-1} color={"red"}>
+                  {is_active ? <FcOk size={"24px"} /> : <ImCross size={"18px"} />}
+                </Box>
               </Box>
-            </Box>
+            </Skeleton>
+
           ) : (
             <Skeleton rounded="lg" overflow="hidden" w="80px" h="69px" />
           )}
