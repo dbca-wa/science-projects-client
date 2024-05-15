@@ -47,17 +47,17 @@ export const ModernProjectCard = ({
   const statusDictionary: {
     [key: string]: { label: string; color: string };
   }[] = [
-    { new: { label: "New", color: "gray.500" } },
-    { pending: { label: "Pending Project Plan", color: "yellow.500" } },
-    { active: { label: "Active (Approved)", color: "green.500" } },
-    { updating: { label: "Update Requested", color: "yellow.500" } }, // previously "red.500"
-    { closure_requested: { label: "Closure Requested", color: "orange.500" } }, // previously "red.500"
-    { closing: { label: "Closure Pending Final Update", color: "red.500" } }, // previously "red.500"
-    { final_update: { label: "Final Update Requested", color: "red.500" } }, // previously "red.500"
-    { completed: { label: "Completed and Closed", color: "red.500" } }, // preivously blue.500"
-    { terminated: { label: "Terminated and Closed", color: "gray.800" } },
-    { suspended: { label: "Suspended", color: "gray.500" } },
-  ];
+      { new: { label: "New", color: "gray.500" } },
+      { pending: { label: "Pending Project Plan", color: "yellow.500" } },
+      { active: { label: "Active (Approved)", color: "green.500" } },
+      { updating: { label: "Update Requested", color: "yellow.500" } }, // previously "red.500"
+      { closure_requested: { label: "Closure Requested", color: "orange.500" } }, // previously "red.500"
+      { closing: { label: "Closure Pending Final Update", color: "red.500" } }, // previously "red.500"
+      { final_update: { label: "Final Update Requested", color: "red.500" } }, // previously "red.500"
+      { completed: { label: "Completed and Closed", color: "red.500" } }, // preivously blue.500"
+      { terminated: { label: "Terminated and Closed", color: "gray.800" } },
+      { suspended: { label: "Suspended", color: "gray.500" } },
+    ];
 
   const getStatusValue = (status: string): { label: string; color: string } => {
     const matchedStatus = statusDictionary.find((item) => status in item);
