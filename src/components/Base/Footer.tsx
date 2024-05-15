@@ -5,7 +5,7 @@ import { useCurrentYear } from "../../lib/hooks/helper/useCurrentYear";
 
 export const Footer = () => {
   const currentYear = useCurrentYear();
-  const VERSION = process.env.VITE_SPMS_VERSIONING || "3.0.0";
+  const VERSION = import.meta.env.VITE_SPMS_VERSIONING || "3.0.0";
 
   return (
     <Box
