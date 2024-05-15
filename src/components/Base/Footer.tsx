@@ -5,7 +5,7 @@ import { useCurrentYear } from "../../lib/hooks/helper/useCurrentYear";
 
 export const Footer = () => {
   const currentYear = useCurrentYear();
-  const VERSION = import.meta.env.VITE_SPMS_VERSIONING || "3.0.0";
+  const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.0.0";
 
   return (
     <Box
@@ -17,7 +17,9 @@ export const Footer = () => {
       py={4}
       userSelect={"none"}
     >
-      <Center fontSize="12px" textAlign="center">
+      <Center fontSize="12px" textAlign="center"
+        onClick={() => console.log(import.meta.env.VITE_SPMS_VERSION)}
+      >
         <Link
           color="whiteAlpha.800"
           href="https://github.com/dbca-wa/science-projects-client"
