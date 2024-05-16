@@ -50,6 +50,7 @@ export const ProjectDetail = ({
   const [documents, setDocuments] = useState<IProjectDocuments | null>();
   const [members, setMembers] = useState<IProjectMember[]>([]);
   const [distilledTitle, setDistilledTitle] = useState<string>();
+  const [baLead, setBaLead] = useState<number>();
 
   useEffect(() => {
     if (!isLoading && projectData) {
@@ -59,6 +60,7 @@ export const ProjectDetail = ({
       setDetails(projectData.details);
       setDocuments(projectData.documents);
       setMembers(projectData.members);
+      setBaLead(projectData?.project?.business_area?.leader);
       const parser = new DOMParser();
       const doc = parser.parseFromString(
         projectData?.project?.title,
@@ -334,6 +336,7 @@ export const ProjectDetail = ({
                         project_id={
                           projectPk !== undefined ? Number(projectPk) : 0
                         }
+                        ba_leader={baLead}
                       />
                     </motion.div>
                   ) : (
@@ -351,6 +354,7 @@ export const ProjectDetail = ({
                       document={documents.concept_plan}
                       all_documents={documents}
                       refetch={refetch}
+                      baLead={baLead}
                     />
                   </TabPanel>
                 )}
@@ -367,6 +371,7 @@ export const ProjectDetail = ({
                       members={members}
                       setToLastTab={setToLastTab}
                       projectAreas={location}
+                      baLead={baLead}
                     />
                   </TabPanel>
                 )}
@@ -383,6 +388,7 @@ export const ProjectDetail = ({
                         userData={me?.userData}
                         members={members}
                         setToLastTab={setToLastTab}
+                        baLead={baLead}
                       />
                     </TabPanel>
                   )}
@@ -400,6 +406,7 @@ export const ProjectDetail = ({
                         userData={me?.userData}
                         members={members}
                         setToLastTab={setToLastTab}
+                        baLead={baLead}
                       />
                     </TabPanel>
                   )}
@@ -415,6 +422,7 @@ export const ProjectDetail = ({
                       all_documents={documents}
                       refetch={refetch}
                       setToLastTab={setToLastTab}
+                      baLead={baLead}
                     />
                   </TabPanel>
                 )}

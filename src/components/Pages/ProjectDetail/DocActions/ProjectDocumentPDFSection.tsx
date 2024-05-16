@@ -24,7 +24,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { motion } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { BsStars } from "react-icons/bs";
 import { FaFileDownload } from "react-icons/fa";
@@ -166,11 +166,21 @@ export const ProjectDocumentPDFSection = ({
     projectDocPDFGenerationMutation.mutate(formData);
   };
 
+  useEffect(() => console.log(data_document), [data_document])
+
   const downloadPDF = () => {
     {
+      let file = data_document?.document?.pdf?.file;
+
       try {
+        if (file.startsWith('http')) {
+          const parts = file.split('/');
+          // Join the parts from the fourth element onwards, including the leading slash
+          const extractedText = '/' + parts.slice(3).join('/');
+          file = extractedText;
+        }
         window.open(
-          `${apiEndpoint}${data_document?.document?.pdf?.file}`,
+          `${apiEndpoint}${file}`,
           "_blank"
         );
       } catch (error) {

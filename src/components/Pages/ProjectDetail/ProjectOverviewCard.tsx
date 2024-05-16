@@ -827,6 +827,8 @@ export const ProjectOverviewCard = ({
                                             zIndex={
                                                 -1}
                                         > */}
+
+
                   <Center>
                     <Box mr={2}>
                       <IoMdSettings />
@@ -836,6 +838,7 @@ export const ProjectOverviewCard = ({
                       <BsCaretDownFill />
                     </Box>
                   </Center>
+
 
                   {/* <MdMoreVert /> */}
                   {/* </Flex> */}
@@ -998,7 +1001,7 @@ export const ProjectOverviewCard = ({
                 <RichTextEditor
                   // wordLimit={500}
                   limitCanBePassed={false}
-                  canEdit={userInTeam || me?.userData?.is_superuser}
+                  canEdit={userInTeam || userIsLeader || userIsBaLead || me?.userData?.is_superuser}
                   editorType="ProjectDetail"
                   data={
                     (details?.external as IExternalProjectDetails)?.description
@@ -1015,7 +1018,7 @@ export const ProjectOverviewCard = ({
                 <RichTextEditor
                   // wordLimit={500}
                   limitCanBePassed={false}
-                  canEdit={userInTeam || me?.userData?.is_superuser}
+                  canEdit={userInTeam || userIsLeader || userIsBaLead || me?.userData?.is_superuser}
                   editorType="ProjectDetail"
                   data={(details?.external as IExternalProjectDetails)?.aims}
                   details_pk={
@@ -1032,7 +1035,7 @@ export const ProjectOverviewCard = ({
               <RichTextEditor
                 // wordLimit={500}
                 limitCanBePassed={false}
-                canEdit={userInTeam || me?.userData?.is_superuser}
+                canEdit={userInTeam || userIsLeader || userIsBaLead || me?.userData?.is_superuser}
                 editorType="ProjectDetail"
                 data={baseInformation.description}
                 project_pk={baseInformation.id}

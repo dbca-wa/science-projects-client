@@ -33,19 +33,20 @@ import {
 } from "../../lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
+import { IUserData } from "@/types";
 
 interface IModalProps {
   isOpen: boolean;
   onClose: () => void;
   userIsSuper: boolean;
-  userPk: string | number;
+  user: IUserData;
 }
 
 export const DeactivateUserModal = ({
   isOpen,
   onClose,
   userIsSuper,
-  userPk,
+  user,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
   const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
@@ -107,7 +108,7 @@ export const DeactivateUserModal = ({
       if (onClose) {
         onClose();
       }
-      queryClient.invalidateQueries({ queryKey: ["users", userPk] });
+      queryClient.invalidateQueries({ queryKey: ["users", user?.pk] });
       reFetch();
     },
     // Error handling based on API - file - declared interface
@@ -169,25 +170,25 @@ export const DeactivateUserModal = ({
       <ModalOverlay />
       <Flex as={"form"} onSubmit={handleSubmit(onSubmit)}>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-          <ModalHeader>Deactivate User?</ModalHeader>
+          <ModalHeader>{user?.is_active ? "Deactivate" : "Reactivate"} User?</ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
             <Center>
               <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to deactivate this user?
+                Are you sure you want to {user?.is_active ? "deactivate" : "reactivate"} this user?
               </Text>
             </Center>
             <Center mt={4}>
-              <UnorderedList>
-                <ListItem>They will be no longer receive emails</ListItem>
+              <UnorderedList mb={0} pb={0}>
+                <ListItem mb={0} pb={0}>They will now receive emails</ListItem>
               </UnorderedList>
             </Center>
-            <FormControl my={2} mb={4} userSelect="none">
+            <FormControl mt={0} mb={4} userSelect="none">
               <InputGroup>
                 <Input
                   type="hidden"
-                  {...register("userPk", { required: true, value: userPk })}
+                  {...register("userPk", { required: true, value: user?.pk })}
                   readOnly
                 />
               </InputGroup>
@@ -207,13 +208,13 @@ export const DeactivateUserModal = ({
                 isLoading={deactivationMutation.isPending}
                 type="submit"
                 color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
+                background={colorMode === "light" ? user?.is_active ? "red.500" : "green.500" : user?.is_active ? "red.600" : "green.500"}
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }}
                 ml={3}
               >
-                Deactivate
+                {user?.is_active ? "Deactivate" : "Reactivate"}
               </Button>
             </Grid>
           </ModalFooter>

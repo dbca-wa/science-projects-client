@@ -27,7 +27,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { FiCopy } from "react-icons/fi";
@@ -54,6 +54,7 @@ interface Props {
   shortCode: number | string;
   refetchTeamData: () => void;
   onClose: () => void;
+  ba_leader: number;
 }
 
 export const ProjectUserDetails = ({
@@ -67,6 +68,7 @@ export const ProjectUserDetails = ({
   usersCount,
   project_id,
   refetchTeamData,
+  ba_leader,
 }: Props) => {
   const { userLoading: loading, userData: user } = useFullUserByPk(pk);
   const formatted_date = useFormattedDate(user?.date_joined);
@@ -143,6 +145,8 @@ export const ProjectUserDetails = ({
       removeUserMutation.mutate(formData);
     }
   };
+
+
 
   const promoteThisUser = () => {
     if (!is_leader) {
@@ -350,6 +354,15 @@ export const ProjectUserDetails = ({
     },
   });
 
+
+
+  useEffect(() => {
+    console.log({
+      currentUserPk: me?.userData?.pk,
+      leaderPk: leader_pk,
+    })
+  })
+
   return loading || pk === undefined ? (
     <Center w={"100%"} h={"100%"}>
       <Spinner size={"xl"} />
@@ -441,7 +454,7 @@ export const ProjectUserDetails = ({
           }}
           onClick={removeThisUser}
           isDisabled={usersCount === 1}
-          // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
+        // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
         >
           Remove from Project
         </Button>
@@ -534,7 +547,7 @@ export const ProjectUserDetails = ({
         />
         {/* <Text>-</Text> */}
         {!is_leader &&
-          (me?.userData?.is_superuser || me?.userData?.pk === leader_pk) && (
+          (me?.userData.is_superuser || me?.userData.pk === ba_leader || me?.userData?.pk === leader_pk) && (
             <Button
               mt={4}
               bg={colorMode === "dark" ? "green.600" : "green.500"}
@@ -545,7 +558,7 @@ export const ProjectUserDetails = ({
               isDisabled={!user?.is_staff}
               onClick={promoteThisUser}
 
-              // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
+            // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
             >
               Promote to Leader
             </Button>

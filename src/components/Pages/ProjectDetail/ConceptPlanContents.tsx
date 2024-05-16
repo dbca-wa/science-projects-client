@@ -20,6 +20,7 @@ interface Props {
   document: IConceptPlan | null;
   baseAPI: string;
   refetch: () => void;
+  baLead: number;
   // setToLastTab: (tabToGoTo?: number) => void;
 }
 
@@ -30,8 +31,9 @@ export const ConceptPlanContents = ({
   document,
   refetch,
   baseAPI,
+  baLead,
 }: // setToLastTab,
-Props) => {
+  Props) => {
   const { colorMode } = useColorMode();
 
   const documentType = "conceptplan";
@@ -39,7 +41,12 @@ Props) => {
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
-
+  const isBaLead = mePk === baLead
+  const isFullyApproved = (
+    all_documents?.concept_plan?.document.project_lead_approval_granted &&
+    all_documents?.concept_plan?.document.business_area_lead_approval_granted &&
+    all_documents?.concept_plan?.document.directorate_approval_granted
+  )
   return (
     <motion.div
       initial={{ y: -10, opacity: 0 }}
@@ -62,7 +69,7 @@ Props) => {
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={userInTeam || userData?.is_superuser}
+        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -75,7 +82,7 @@ Props) => {
       />
       <RichTextEditor
         wordLimit={500}
-        canEdit={userInTeam || userData?.is_superuser}
+        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -89,7 +96,7 @@ Props) => {
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={userInTeam || userData?.is_superuser}
+        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -102,7 +109,7 @@ Props) => {
       />
       <RichTextEditor
         wordLimit={500}
-        canEdit={userInTeam || userData?.is_superuser}
+        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -115,7 +122,7 @@ Props) => {
       />
       <RichTextEditor
         wordLimit={500}
-        canEdit={userInTeam || userData?.is_superuser}
+        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -129,7 +136,7 @@ Props) => {
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={userInTeam || userData?.is_superuser}
+        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -143,7 +150,7 @@ Props) => {
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={userInTeam || userData?.is_superuser}
+        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}

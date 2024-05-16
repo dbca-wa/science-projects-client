@@ -40,7 +40,7 @@ interface IProjectPlanDocumentActions {
   all_documents: IProjectDocuments;
   projectAreas: IProjectAreas;
   setToLastTab: (tabToGoTo?: number) => void;
-  // projectPk: number;
+  isBaLead: boolean;
 }
 
 export const ProjectPlanDocActions = ({
@@ -48,7 +48,7 @@ export const ProjectPlanDocActions = ({
   projectAreas,
   projectPlanData,
   refetchData,
-  // , projectPk
+  isBaLead,
   setToLastTab,
 }: IProjectPlanDocumentActions) => {
   const { colorMode } = useColorMode();
@@ -186,8 +186,18 @@ export const ProjectPlanDocActions = ({
     onClose: onCreatorClose,
   } = useDisclosure();
 
+
   return (
     <>
+      <CreateProgressReportModal
+        projectPk={
+          projectPlanData?.document?.project?.pk
+        }
+        documentKind="progressreport"
+        onClose={onCloseCreateProgressReportModal}
+        isOpen={isCreateProgressReportModalOpen}
+        refetchData={refetchData}
+      />
       {actionsReady && leaderMember ? (
         <>
           <Drawer
@@ -251,7 +261,7 @@ export const ProjectPlanDocActions = ({
               </Box>
               <Grid
                 pt={2}
-                // gridGap={2}
+              // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -280,7 +290,7 @@ export const ProjectPlanDocActions = ({
                             : projectPlanData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                                colorMode === "light"
+                              colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -456,9 +466,9 @@ export const ProjectPlanDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-                // gridGap={2}
-                // pt={4}
-                // pos={"relative"}
+              // gridGap={2}
+              // pt={4}
+              // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -512,7 +522,7 @@ export const ProjectPlanDocActions = ({
                       projectPlanData?.document
                         ?.project_lead_approval_granted === true &&
                       (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk) && (
+                        userData?.pk === leaderMember?.user?.pk || isBaLead) && (
                         <Center justifyContent={"flex-end"}>
                           <ProjectPlanActionModal
                             userData={userData}
@@ -554,7 +564,7 @@ export const ProjectPlanDocActions = ({
                       projectPlanData?.document
                         ?.project_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk) && (
+                        userData?.pk === leaderMember?.user?.pk || isBaLead) && (
                         <Center justifyContent={"flex-end"}>
                           <ProjectPlanActionModal
                             userData={userData}
@@ -677,15 +687,16 @@ export const ProjectPlanDocActions = ({
                         </Center>
                       )}
 
-                    {projectPlanData?.document
+                    {(projectPlanData?.document
                       ?.project_lead_approval_granted === true &&
-                    projectPlanData?.document
-                      ?.business_area_lead_approval_granted === true &&
-                    projectPlanData?.document?.directorate_approval_granted ===
-                      true &&
-                    all_documents?.progress_reports?.length < 1 &&
-                    (userData?.is_superuser ||
-                      leaderMember?.user?.pk === userData?.pk) ? (
+                      projectPlanData?.document
+                        ?.business_area_lead_approval_granted === true &&
+                      projectPlanData?.document?.directorate_approval_granted ===
+                      true) &&
+                      (all_documents?.progress_reports?.length < 1) &&
+                      (userData?.is_superuser ||
+                        leaderMember?.user?.pk === userData?.pk ||
+                        isBaLead) ? (
                       <Flex justifyContent={"flex-end"}>
                         <Button
                           mt={3}
@@ -718,7 +729,7 @@ export const ProjectPlanDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
+                // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -756,12 +767,12 @@ export const ProjectPlanDocActions = ({
                     mt={
                       projectPlanData?.document
                         ?.project_lead_approval_granted &&
-                      projectPlanData?.document
-                        ?.directorate_approval_granted === false
+                        projectPlanData?.document
+                          ?.directorate_approval_granted === false
                         ? 3
                         : 0
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
+                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {projectPlanData?.document?.project_lead_approval_granted &&
                       projectPlanData?.document
@@ -899,14 +910,14 @@ export const ProjectPlanDocActions = ({
                       )}
                   </Flex>
                   {all_documents?.progress_reports?.length < 1 &&
-                  (userData?.is_superuser ||
-                    projectPlanData?.document?.project?.business_area
-                      ?.leader === userData?.pk) &&
-                  projectPlanData?.document?.project_lead_approval_granted ===
+                    (userData?.is_superuser ||
+                      projectPlanData?.document?.project?.business_area
+                        ?.leader === userData?.pk) &&
+                    projectPlanData?.document?.project_lead_approval_granted ===
                     true &&
-                  projectPlanData?.document
-                    ?.business_area_lead_approval_granted === true &&
-                  projectPlanData?.document?.directorate_approval_granted ===
+                    projectPlanData?.document
+                      ?.business_area_lead_approval_granted === true &&
+                    projectPlanData?.document?.directorate_approval_granted ===
                     true ? (
                     <Flex justifyContent={"flex-end"}>
                       {/* <CreateProgressReportModal
@@ -1036,7 +1047,7 @@ export const ProjectPlanDocActions = ({
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           {all_documents?.progress_reports.length >=
-                          1 ? null : (
+                            1 ? null : (
                             <>
                               <ProjectPlanActionModal
                                 userData={userData}
@@ -1074,15 +1085,15 @@ export const ProjectPlanDocActions = ({
                               </Button>
                             </>
                           )}
-                          {all_documents?.progress_reports?.length < 1 &&
-                          projectPlanData?.document
-                            ?.project_lead_approval_granted === true &&
-                          projectPlanData?.document
-                            ?.business_area_lead_approval_granted === true &&
-                          projectPlanData?.document
-                            ?.directorate_approval_granted === true ? (
+                          {(all_documents?.progress_reports?.length < 1) &&
+                            (projectPlanData?.document
+                              ?.project_lead_approval_granted === true &&
+                              projectPlanData?.document
+                                ?.business_area_lead_approval_granted === true &&
+                              projectPlanData?.document
+                                ?.directorate_approval_granted === true) ? (
                             <>
-                              <CreateProgressReportModal
+                              {/* <CreateProgressReportModal
                                 projectPk={
                                   projectPlanData?.document?.project?.pk
                                 }
@@ -1090,7 +1101,7 @@ export const ProjectPlanDocActions = ({
                                 onClose={onCloseCreateProgressReportModal}
                                 isOpen={isCreateProgressReportModalOpen}
                                 refetchData={refetchData}
-                              />
+                              /> */}
 
                               <Button
                                 color={"white"}

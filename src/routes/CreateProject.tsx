@@ -35,7 +35,7 @@ export const CreateProject = () => {
       description:
         "An ongoing body of scientific work that supports biodiversity science, conservation and other business functions.",
       bulletPoints: [
-        "Requires prior approval by Executive Director or delegate",
+        "Requires prior approval by Executive Director",
         "Requires annual progress reporting",
         "Immediate closure without closure form",
       ],
@@ -49,7 +49,7 @@ export const CreateProject = () => {
       description:
         "A project being undertaken by a student to attain a higher degree for which a DBCA staff member is a co-supervisor.",
       bulletPoints: [
-        "Requires prior approval by Executive Director or delegate",
+        "Requires prior approval by Executive Director",
         "Requires annual progress reporting",
         "Immediate closure without closure form",
       ],
@@ -62,7 +62,7 @@ export const CreateProject = () => {
       description:
         "A formal collaborative scientific partnership with an external organisation or organisations.",
       bulletPoints: [
-        "Requires prior approval by Executive Director or delegate",
+        "Requires prior approval by Executive Director",
         "Project details automatically included in annual reporting",
         "Immediate closure without closure form",
       ],

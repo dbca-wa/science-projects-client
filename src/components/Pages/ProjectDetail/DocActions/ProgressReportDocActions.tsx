@@ -34,6 +34,7 @@ interface IProgressDocumentActions {
   callSameData: () => void;
   documents: IProgressReport[];
   setToLastTab: (tabToGoTo?: number) => void;
+  isBaLead: boolean;
 }
 
 export const ProgressReportDocActions = ({
@@ -42,9 +43,10 @@ export const ProgressReportDocActions = ({
   documents,
   callSameData,
   setToLastTab,
+  isBaLead,
 }: // setSelectedProgressReport, setSelectedYear,
-// , projectPk
-IProgressDocumentActions) => {
+  // , projectPk
+  IProgressDocumentActions) => {
   const { colorMode } = useColorMode();
 
   const {
@@ -255,7 +257,7 @@ IProgressDocumentActions) => {
               </Box>
               <Grid
                 pt={2}
-                // gridGap={2}
+              // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -284,7 +286,7 @@ IProgressDocumentActions) => {
                             : progressReportData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                                colorMode === "light"
+                              colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -460,9 +462,9 @@ IProgressDocumentActions) => {
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-                // gridGap={2}
-                // pt={4}
-                // pos={"relative"}
+              // gridGap={2}
+              // pt={4}
+              // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -516,7 +518,7 @@ IProgressDocumentActions) => {
                       progressReportData?.document
                         ?.project_lead_approval_granted === true &&
                       (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk) && (
+                        userData?.pk === leaderMember?.user?.pk || isBaLead) && (
                         <Center justifyContent={"flex-end"}>
                           <ProgressReportActionModal
                             userData={userData}
@@ -553,7 +555,7 @@ IProgressDocumentActions) => {
                       progressReportData?.document
                         ?.project_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk) && (
+                        userData?.pk === leaderMember?.user?.pk || isBaLead) && (
                         <Center justifyContent={"flex-end"}>
                           <ProgressReportActionModal
                             userData={userData}
@@ -643,7 +645,7 @@ IProgressDocumentActions) => {
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
+                // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -685,7 +687,7 @@ IProgressDocumentActions) => {
                         ? 3
                         : 0
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
+                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {progressReportData?.document
                       ?.project_lead_approval_granted &&
