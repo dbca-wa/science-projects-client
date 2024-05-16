@@ -365,6 +365,7 @@ export const ProjectOverviewCard = ({
               projectPk={
                 baseInformation?.pk ? baseInformation.pk : baseInformation.id
               }
+              projectKind={baseInformation?.kind}
               isOpen={isClosureModalOpen}
               onClose={onCloseClosureModal}
               refetchData={refetchData}

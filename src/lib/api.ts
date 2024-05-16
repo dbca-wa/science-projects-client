@@ -1885,6 +1885,7 @@ export interface ISpawnDocument {
 
 
 export interface ICloseProjectProps {
+    projectKind: string;
     projectPk: number;
     reason: string;
     outcome: 'forcecompleted' | "completed" | "terminated" | "suspended";
@@ -1903,16 +1904,17 @@ export const setClosureOutcome = async ({ outcome, closurePk }: IClosureOutcomeP
     instance.put(url, params).then(res => res.data)
 }
 
-export const closeProjectCall = async ({ projectPk, reason, outcome }: ICloseProjectProps) => {
+export const closeProjectCall = async ({ projectPk, reason, outcome, projectKind }: ICloseProjectProps) => {
     // console.log(projectPk, reason, outcome);
     if (projectPk !== undefined) {
 
         const url = `documents/projectdocuments`
-        const kind = 'projectclosure';
+        const docKind = 'projectclosure';
 
         const params = {
             project: projectPk,
-            kind: kind,
+            kind: docKind,
+            projectKind: projectKind,
             reason: reason,
             outcome: outcome,
         }
