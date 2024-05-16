@@ -45,14 +45,12 @@ interface IConceptDocumentActions {
   conceptPlanData: IConceptPlan;
   refetchData: () => void;
   all_documents: IProjectDocuments;
-
-  // projectPk: number;
 }
 
 export const ConceptPlanDocActions = ({
   all_documents,
   conceptPlanData,
-  refetchData,
+  refetchData
 }: // , projectPk
   IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
@@ -545,7 +543,9 @@ export const ConceptPlanDocActions = ({
                       conceptPlanData?.document
                         ?.project_lead_approval_granted === true &&
                       (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk) && (
+                        userData?.pk === leaderMember?.user?.pk ||
+                        userData?.pk === baLead?.pk
+                      ) && (
                         <Center justifyContent={"flex-end"}>
                           <ConceptPlanActionModal
                             userData={userData}
@@ -587,7 +587,8 @@ export const ConceptPlanDocActions = ({
                       conceptPlanData?.document
                         ?.project_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk) && (
+                        userData?.pk === leaderMember?.user?.pk ||
+                        userData?.pk === baLead?.pk) && (
                         <Center justifyContent={"flex-end"}>
                           <ConceptPlanActionModal
                             userData={userData}

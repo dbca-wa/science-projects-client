@@ -41,6 +41,7 @@ interface ITeamMember {
   draggingUser: IUserData | IUserMe;
   backgroundColor: string | undefined; // Add backgroundColor prop
   refetchTeamData: () => void;
+  ba_leader: number;
 }
 
 export const TeamMember = ({
@@ -61,6 +62,7 @@ export const TeamMember = ({
   draggableProps,
   dragHandleProps,
   backgroundColor, // Accept backgroundColor prop
+  ba_leader,
 }: ITeamMember) => {
   // Define your styles for the dragged state
   const { colorMode } = useColorMode();
@@ -138,6 +140,7 @@ export const TeamMember = ({
         <DrawerContent>
           <DrawerBody>
             <ProjectUserDetails
+              ba_leader={ba_leader}
               project_id={project_id}
               pk={user_id}
               is_leader={is_leader}

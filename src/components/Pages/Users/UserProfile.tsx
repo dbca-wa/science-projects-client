@@ -110,7 +110,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
         isOpen={isDeactivateModalOpen}
         onClose={onDeactivateModalClose}
         userIsSuper={userInQuestionIsSuperuser}
-        userPk={user.pk}
+        user={user}
       />
       <PromoteUserModal
         isOpen={isPromoteModalOpen}
@@ -468,8 +468,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   onClick={
                     user.email === me.userData.email
                       ? () => {
-                          navigate("/users/me");
-                        }
+                        navigate("/users/me");
+                      }
                       : onEditUserDetailsModalOpen
                   }
                   bg={user?.is_superuser ? "blue.600" : "blue.500"}
@@ -540,7 +540,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                     user.is_superuser || user.email === me.userData.email
                   }
                 >
-                  Deactivate
+                  {user?.is_active ? "Deactivate" : "Reactivate"}
                 </Button>
                 <Button
                   onClick={onDeleteModalOpen}

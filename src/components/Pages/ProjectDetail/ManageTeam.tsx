@@ -24,11 +24,13 @@ import { TeamMemberDisplay } from "./TeamMemberDisplay";
 interface Props {
   // team: IProjectMember[];
   project_id: number;
+  ba_leader: number;
 }
 
 export const ManageTeam = ({
   // team,
   project_id,
+  ba_leader,
 }: Props) => {
   const [rearrangedTeam, setRearrangedTeam] = useState<IProjectMember[]>([]);
   const [currentlyDraggingIndex, setCurrentlyDraggingIndex] = useState<
@@ -43,6 +45,8 @@ export const ManageTeam = ({
     String(project_id)
   );
 
+  useEffect(() => console.log(ba_leader, userData?.pk))
+
   const [leaderPk, setLeaderPk] = useState();
 
   useEffect(() => {
@@ -55,7 +59,7 @@ export const ManageTeam = ({
       );
       if (leaderMember) {
         // Set the leader's pk
-        setLeaderPk(leaderMember.pk);
+        setLeaderPk(leaderMember.user.pk);
       }
       setRearrangedTeam(sortedTeam);
     }
@@ -165,25 +169,33 @@ export const ManageTeam = ({
           </Text>
 
           <Flex w={"100%"} justifyContent={"flex-end"}>
-            <Button
-              size={"sm"}
-              onClick={onOpenAddUserModal}
-              leftIcon={<BsPlus />}
-              bg={colorMode === "light" ? "green.500" : "green.600"}
-              _hover={{
-                bg: colorMode === "light" ? "green.400" : "green.500",
-              }}
-              color={"white"}
-              userSelect={"none"}
-            >
-              Invite Member
-            </Button>
-            <AddUserToProjectModal
-              isOpen={isAddUserModalOpen}
-              onClose={onCloseAddUserModal}
-              preselectedProject={project_id}
-              refetchTeamData={refetchTeamData}
-            />
+            {
+              (userData.is_superuser || userData.pk === ba_leader ||
+                userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk) && (
+                <>
+                  <Button
+                    size={"sm"}
+                    onClick={onOpenAddUserModal}
+                    leftIcon={<BsPlus />}
+                    bg={colorMode === "light" ? "green.500" : "green.600"}
+                    _hover={{
+                      bg: colorMode === "light" ? "green.400" : "green.500",
+                    }}
+                    color={"white"}
+                    userSelect={"none"}
+                  >
+                    Invite Member
+                  </Button>
+                  <AddUserToProjectModal
+                    isOpen={isAddUserModalOpen}
+                    onClose={onCloseAddUserModal}
+                    preselectedProject={project_id}
+                    refetchTeamData={refetchTeamData}
+                  />
+
+                </>
+              )
+            }
           </Flex>
           <Box>
             <Text
@@ -201,7 +213,7 @@ export const ManageTeam = ({
         {teamData.length > 0 ? (
           // Allow project leader or admin to change order
           userData.is_superuser ||
-          userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk ? (
+            userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk ? (
             <DragDropContext
               onDragStart={(start) => {
                 setCurrentlyDraggingIndex(start.source.index);
@@ -226,6 +238,7 @@ export const ManageTeam = ({
                             pos={"relative"}
                           >
                             <TeamMember
+                              ba_leader={ba_leader}
                               key={index}
                               leader_pk={leaderPk}
                               user_id={tm.user.pk}
@@ -283,6 +296,7 @@ export const ManageTeam = ({
             <Grid rounded={"xl"} mt={4} overflow="hidden">
               {rearrangedTeam.map((tm, index) => (
                 <TeamMemberDisplay
+                  ba_leader={ba_leader}
                   key={index}
                   leader_pk={leaderPk}
                   user_id={tm.user.pk}

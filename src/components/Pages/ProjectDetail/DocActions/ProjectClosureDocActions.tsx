@@ -37,6 +37,7 @@ interface IConceptDocumentActions {
   refetchData: () => void;
   all_documents: IProjectDocuments;
   setToLastTab: (tabToGoTo?: number) => void;
+  isBaLead: boolean;
   // projectPk: number;
 }
 
@@ -44,8 +45,9 @@ export const ProjectClosureDocActions = ({
   projectClosureData,
   refetchData,
   setToLastTab,
+  isBaLead,
 }: // , projectPk
-IConceptDocumentActions) => {
+  IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
 
   // useEffect(() => {
@@ -285,7 +287,7 @@ IConceptDocumentActions) => {
               </Box>
               <Grid
                 pt={2}
-                // gridGap={2}
+              // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -314,7 +316,7 @@ IConceptDocumentActions) => {
                             : projectClosureData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                                colorMode === "light"
+                              colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -490,9 +492,9 @@ IConceptDocumentActions) => {
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-                // gridGap={2}
-                // pt={4}
-                // pos={"relative"}
+              // gridGap={2}
+              // pt={4}
+              // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -557,18 +559,19 @@ IConceptDocumentActions) => {
                       w={"100%"}
                       mt={
                         projectClosureData?.document?.project?.status ===
-                        "completed"
+                          "completed"
                           ? 3
                           : projectClosureData?.document
-                                ?.business_area_lead_approval_granted
+                            ?.business_area_lead_approval_granted
                             ? 0
                             : 3
                       }
                     >
-                      {projectClosureData?.document?.project?.status ===
-                        "completed" && (
-                        <>
-                          {/* <ProjectClosureActionModal
+                      {(projectClosureData?.document?.project?.status ===
+                        "completed" || projectClosureData?.document?.project?.status === "terminated" || projectClosureData?.document?.project?.status === "suspended") &&
+                        (isBaLead || leaderMember?.pk === userData?.pk || userData?.is_superuser) && (
+                          <>
+                            {/* <ProjectClosureActionModal
                             userData={userData}
                             action={"reopen"}
                             refetchData={refetchData}
@@ -584,34 +587,34 @@ IConceptDocumentActions) => {
                             stage={1}
                             projectData={projectClosureData?.document?.project}
                           /> */}
-                          <Button
-                            color={"white"}
-                            background={
-                              colorMode === "light"
-                                ? "orange.500"
-                                : "orange.600"
-                            }
-                            _hover={{
-                              background:
+                            <Button
+                              color={"white"}
+                              background={
                                 colorMode === "light"
-                                  ? "orange.400"
-                                  : "orange.500",
-                            }}
-                            size={"sm"}
-                            onClick={onS1ReopenModalOpen}
+                                  ? "orange.500"
+                                  : "orange.600"
+                              }
+                              _hover={{
+                                background:
+                                  colorMode === "light"
+                                    ? "orange.400"
+                                    : "orange.500",
+                              }}
+                              size={"sm"}
+                              onClick={onS1ReopenModalOpen}
                             // mr={3}
-                          >
-                            Reopen Project
-                          </Button>
-                        </>
-                      )}
+                            >
+                              Reopen Project
+                            </Button>
+                          </>
+                        )}
 
                       {projectClosureData?.document
                         ?.business_area_lead_approval_granted === false &&
                         projectClosureData?.document
                           ?.project_lead_approval_granted === true &&
                         (userData?.is_superuser ||
-                          userData?.pk === leaderMember?.user?.pk) && (
+                          userData?.pk === leaderMember?.user?.pk || isBaLead) && (
                           <>
                             <ProjectClosureActionModal
                               userData={userData}
@@ -659,7 +662,7 @@ IConceptDocumentActions) => {
                         projectClosureData?.document
                           ?.project_lead_approval_granted === false &&
                         (userData?.is_superuser ||
-                          userData?.pk === leaderMember?.user?.pk) && (
+                          userData?.pk === leaderMember?.user?.pk || isBaLead) && (
                           <Center justifyContent={"flex-end"}>
                             <>
                               <DeleteDocumentModal
@@ -681,9 +684,9 @@ IConceptDocumentActions) => {
                                   setStatusIfRequired(
                                     projectClosureData?.document?.project?.pk
                                       ? projectClosureData?.document?.project
-                                          ?.pk
+                                        ?.pk
                                       : projectClosureData?.document?.project
-                                          ?.id,
+                                        ?.id,
                                     "updating"
                                   );
                                 }}
@@ -764,7 +767,7 @@ IConceptDocumentActions) => {
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
+                // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -801,14 +804,14 @@ IConceptDocumentActions) => {
                     w={"100%"}
                     mt={
                       projectClosureData?.document?.project?.status ===
-                      "completed"
+                        "completed"
                         ? 3
                         : projectClosureData?.document
-                              ?.directorate_approval_granted
+                          ?.directorate_approval_granted
                           ? 0
                           : 3
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
+                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     <ProjectClosureActionModal
                       userData={userData}
@@ -828,9 +831,9 @@ IConceptDocumentActions) => {
                     />
                     {projectClosureData?.document
                       ?.project_lead_approval_granted &&
-                    projectClosureData?.document
-                      ?.business_area_lead_approval_granted === false &&
-                    (userData?.is_superuser || userData?.pk === baLead?.pk) ? (
+                      projectClosureData?.document
+                        ?.business_area_lead_approval_granted === false &&
+                      (userData?.is_superuser || userData?.pk === baLead?.pk) ? (
                       <Center
                       // justifyContent={"flex-start"}
                       // ml={4}
@@ -889,24 +892,28 @@ IConceptDocumentActions) => {
                           Send Back
                         </Button>
                       </Center>
-                    ) : projectClosureData?.document?.project?.status ===
-                      "completed" ? (
-                      <Button
-                        color={"white"}
-                        background={
-                          colorMode === "light" ? "orange.500" : "orange.600"
-                        }
-                        _hover={{
-                          background:
-                            colorMode === "light" ? "orange.400" : "orange.500",
-                        }}
-                        size={"sm"}
-                        onClick={onS2ReopenModalOpen}
-                        mr={0}
-                      >
-                        Reopen Project
-                      </Button>
-                    ) : null}
+                    ) :
+
+                      (projectClosureData?.document?.project?.status ===
+                        "completed" || projectClosureData?.document?.project?.status === "terminated" || projectClosureData?.document?.project?.status === "suspended") &&
+                        (isBaLead || userData?.is_superuser)
+                        ? (
+                          <Button
+                            color={"white"}
+                            background={
+                              colorMode === "light" ? "orange.500" : "orange.600"
+                            }
+                            _hover={{
+                              background:
+                                colorMode === "light" ? "orange.400" : "orange.500",
+                            }}
+                            size={"sm"}
+                            onClick={onS2ReopenModalOpen}
+                            mr={0}
+                          >
+                            Reopen Project
+                          </Button>
+                        ) : null}
 
                     {projectClosureData?.document
                       ?.business_area_lead_approval_granted &&
@@ -1054,8 +1061,9 @@ IConceptDocumentActions) => {
                       stage={3}
                       projectData={projectClosureData?.document?.project}
                     />
-                    {projectClosureData?.document?.project?.status ===
-                    "completed" ? (
+                    {(projectClosureData?.document?.project?.status ===
+                      "completed" || projectClosureData?.document?.project?.status === "terminated" || projectClosureData?.document?.project?.status === "suspended") &&
+                      (userData?.is_superuser || userData?.business_area?.name === "Directorate") ? (
                       <Button
                         color={"white"}
                         background={

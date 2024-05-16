@@ -36,6 +36,7 @@ interface Props {
   members: IProjectMember[];
   refetch: () => void;
   setToLastTab: (tabToGoTo?: number) => void;
+  baLead: number;
 }
 
 export const ProgressReportContents = ({
@@ -46,6 +47,7 @@ export const ProgressReportContents = ({
   documents,
   refetch,
   setToLastTab,
+  baLead,
 }: Props) => {
   // useEffect(() => console.log(userData));
   // Handling years
@@ -89,6 +91,12 @@ export const ProgressReportContents = ({
 
   const [forceRefresh, setForceRefresh] = useState(false);
 
+  const isFullyApproved = (
+    documents?.filter((r) => r.year === selectedYear)[0]?.document.project_lead_approval_granted &&
+    documents?.filter((r) => r.year === selectedYear)[0]?.document.business_area_lead_approval_granted &&
+    documents?.filter((r) => r.year === selectedYear)[0]?.document.directorate_approval_granted
+  )
+
   const handleSetSameYear = () => {
     setForceRefresh((prevForceRefresh) => !prevForceRefresh);
   };
@@ -129,6 +137,8 @@ export const ProgressReportContents = ({
     onClose: onCloseCreateProgressReportModal,
   } = useDisclosure();
 
+  const isBaLead = mePk === baLead
+
   return (
     <>
       <CreateProgressReportModal
@@ -148,32 +158,37 @@ export const ProgressReportContents = ({
         mb={8}
         width={"100%"}
       >
-        <Flex width={"100%"} justifyContent={"space-between"}>
-          <Center>
-            <Button
-              background={colorMode === "light" ? "orange.500" : "orange.600"}
-              color={"white"}
-              _hover={{
-                background: colorMode === "light" ? "orange.400" : "orange.500",
-              }}
-              size={"sm"}
-              onClick={
-                onOpenCreateProgressReportModal
-                // () => spawnProgressReport(
-                //     {
-                //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
-                //         kind: "progressreport"
-                //     }
-                // )
-              }
-              isDisabled={availableProgressReportYearsData?.length < 1}
-              leftIcon={<BsPlus size={"20px"} />}
-            >
-              New Report
-            </Button>
-          </Center>
 
-          <Center>
+        <Flex width={"100%"} justifyContent={"space-between"}>
+          {(isBaLead || userData?.is_superuser || userInTeam) ?
+            (
+              <Center>
+                <Button
+                  background={colorMode === "light" ? "orange.500" : "orange.600"}
+                  color={"white"}
+                  _hover={{
+                    background: colorMode === "light" ? "orange.400" : "orange.500",
+                  }}
+                  size={"sm"}
+                  onClick={
+                    onOpenCreateProgressReportModal
+                    // () => spawnProgressReport(
+                    //     {
+                    //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
+                    //         kind: "progressreport"
+                    //     }
+                    // )
+                  }
+                  isDisabled={(availableProgressReportYearsData?.length < 1)}
+                  leftIcon={<BsPlus size={"20px"} />}
+                >
+                  New Report
+                </Button>
+              </Center>
+            )
+            : null
+          }
+          <Center flex={1} justifyContent={"flex-end"}>
             <Flex alignItems={"center"}>
               <Text
                 mr={3}
@@ -199,129 +214,133 @@ export const ProgressReportContents = ({
         </Flex>
       </Box>
 
-      {isLoading ? (
-        <Box
-          minH={"100vh"}
-          display="flex" // Use display: flex to enable flexbox layout
-          justifyContent="center" // Center horizontally
-          pt={"50px"}
-        >
-          <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="xl"
-          />
-        </Box>
-      ) : (
-        <motion.div
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 10, opacity: 0 }}
-          transition={{
-            duration: 0.7,
-            delay: 1 / 7,
-          }}
-          style={{
-            height: "100%",
-            animation: "oscillate 8s ease-in-out infinite",
-          }}
-        >
-          {/* Actions */}
-          <ProgressReportDocActions
-            refetchData={refetch}
-            callSameData={handleSetSameYear}
-            progressReportData={selectedProgressReport}
-            documents={documents}
-            setToLastTab={setToLastTab}
-          />
-          {/* Editors */}
 
-          <RichTextEditor
-            key={`context${editorKey}`} // Change the key to force a re-render
-            wordLimit={150}
-            limitCanBePassed={true}
-            canEdit={userInTeam || userData?.is_superuser}
-            writeable_document_kind={"Progress Report"}
-            writeable_document_pk={selectedProgressReport?.pk}
-            project_pk={selectedProgressReport?.document?.project?.pk}
-            document_pk={selectedProgressReport?.document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            data={selectedProgressReport?.context}
-            section={"context"}
-          />
-
-          <RichTextEditor
-            key={`aims${editorKey}`} // Change the key to force a re-render
-            wordLimit={150}
-            limitCanBePassed={true}
-            canEdit={userInTeam || userData?.is_superuser}
-            writeable_document_kind={"Progress Report"}
-            writeable_document_pk={selectedProgressReport?.pk}
-            project_pk={selectedProgressReport.document.project.pk}
-            document_pk={selectedProgressReport?.document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            data={selectedProgressReport?.aims}
-            section={"aims"}
-          />
-
-          <RichTextEditor
-            key={`progress${editorKey}`} // Change the key to force a re-render
-            wordLimit={150}
-            limitCanBePassed={true}
-            canEdit={userInTeam || userData?.is_superuser}
-            writeable_document_kind={"Progress Report"}
-            writeable_document_pk={selectedProgressReport?.pk}
-            project_pk={selectedProgressReport.document.project.pk}
-            document_pk={selectedProgressReport?.document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            data={selectedProgressReport?.progress}
-            section={"progress"}
-          />
-
-          <RichTextEditor
-            key={`implications${editorKey}`} // Change the key to force a re-render
-            wordLimit={150}
-            limitCanBePassed={true}
-            canEdit={userInTeam || userData?.is_superuser}
-            writeable_document_kind={"Progress Report"}
-            writeable_document_pk={selectedProgressReport?.pk}
-            project_pk={selectedProgressReport.document.project.pk}
-            document_pk={selectedProgressReport?.document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            data={selectedProgressReport?.implications}
-            section={"implications"}
-          />
-
-          <RichTextEditor
-            key={`future${editorKey}`} // Change the key to force a re-render
-            wordLimit={150}
-            limitCanBePassed={true}
-            canEdit={userInTeam || userData?.is_superuser}
-            writeable_document_kind={"Progress Report"}
-            writeable_document_pk={selectedProgressReport?.pk}
-            project_pk={selectedProgressReport.document.project.pk}
-            document_pk={selectedProgressReport?.document?.pk}
-            isUpdate={true}
-            editorType="ProjectDocument"
-            data={selectedProgressReport?.future}
-            section={"future"}
-          />
-
-          {selectedProgressReport?.document && (
-            <CommentSection
-              baseAPI={baseAPI}
-              documentID={selectedProgressReport?.document?.pk}
-              userData={userData}
+      {
+        isLoading ? (
+          <Box
+            minH={"100vh"}
+            display="flex" // Use display: flex to enable flexbox layout
+            justifyContent="center" // Center horizontally
+            pt={"50px"}
+          >
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
             />
-          )}
-        </motion.div>
-      )}
+          </Box>
+        ) : (
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 10, opacity: 0 }}
+            transition={{
+              duration: 0.7,
+              delay: 1 / 7,
+            }}
+            style={{
+              height: "100%",
+              animation: "oscillate 8s ease-in-out infinite",
+            }}
+          >
+            {/* Actions */}
+            <ProgressReportDocActions
+              refetchData={refetch}
+              callSameData={handleSetSameYear}
+              progressReportData={selectedProgressReport}
+              documents={documents}
+              setToLastTab={setToLastTab}
+              isBaLead={isBaLead}
+            />
+            {/* Editors */}
+
+            <RichTextEditor
+              key={`context${editorKey}`} // Change the key to force a re-render
+              wordLimit={150}
+              limitCanBePassed={true}
+              canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+              writeable_document_kind={"Progress Report"}
+              writeable_document_pk={selectedProgressReport?.pk}
+              project_pk={selectedProgressReport?.document?.project?.pk}
+              document_pk={selectedProgressReport?.document?.pk}
+              isUpdate={true}
+              editorType="ProjectDocument"
+              data={selectedProgressReport?.context}
+              section={"context"}
+            />
+
+            <RichTextEditor
+              key={`aims${editorKey}`} // Change the key to force a re-render
+              wordLimit={150}
+              limitCanBePassed={true}
+              canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+              writeable_document_kind={"Progress Report"}
+              writeable_document_pk={selectedProgressReport?.pk}
+              project_pk={selectedProgressReport.document.project.pk}
+              document_pk={selectedProgressReport?.document?.pk}
+              isUpdate={true}
+              editorType="ProjectDocument"
+              data={selectedProgressReport?.aims}
+              section={"aims"}
+            />
+
+            <RichTextEditor
+              key={`progress${editorKey}`} // Change the key to force a re-render
+              wordLimit={150}
+              limitCanBePassed={true}
+              canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+              writeable_document_kind={"Progress Report"}
+              writeable_document_pk={selectedProgressReport?.pk}
+              project_pk={selectedProgressReport.document.project.pk}
+              document_pk={selectedProgressReport?.document?.pk}
+              isUpdate={true}
+              editorType="ProjectDocument"
+              data={selectedProgressReport?.progress}
+              section={"progress"}
+            />
+
+            <RichTextEditor
+              key={`implications${editorKey}`} // Change the key to force a re-render
+              wordLimit={150}
+              limitCanBePassed={true}
+              canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+              writeable_document_kind={"Progress Report"}
+              writeable_document_pk={selectedProgressReport?.pk}
+              project_pk={selectedProgressReport.document.project.pk}
+              document_pk={selectedProgressReport?.document?.pk}
+              isUpdate={true}
+              editorType="ProjectDocument"
+              data={selectedProgressReport?.implications}
+              section={"implications"}
+            />
+
+            <RichTextEditor
+              key={`future${editorKey}`} // Change the key to force a re-render
+              wordLimit={150}
+              limitCanBePassed={true}
+              canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+              writeable_document_kind={"Progress Report"}
+              writeable_document_pk={selectedProgressReport?.pk}
+              project_pk={selectedProgressReport.document.project.pk}
+              document_pk={selectedProgressReport?.document?.pk}
+              isUpdate={true}
+              editorType="ProjectDocument"
+              data={selectedProgressReport?.future}
+              section={"future"}
+            />
+
+            {selectedProgressReport?.document && (
+              <CommentSection
+                baseAPI={baseAPI}
+                documentID={selectedProgressReport?.document?.pk}
+                userData={userData}
+              />
+            )}
+          </motion.div>
+        )
+      }
     </>
   );
 };

@@ -34,6 +34,7 @@ interface ITeamMember {
   project_id: number;
   leader_pk: number;
   refetchTeamData: () => void;
+  ba_leader: number;
 }
 
 export const TeamMemberDisplay = ({
@@ -50,6 +51,7 @@ export const TeamMemberDisplay = ({
   username,
   usersCount,
   project_id,
+  ba_leader
 }: ITeamMember) => {
   const { colorMode } = useColorMode();
 
@@ -116,6 +118,7 @@ export const TeamMemberDisplay = ({
         <DrawerContent>
           <DrawerBody>
             <ProjectUserDetails
+              ba_leader={ba_leader}
               leader_pk={leader_pk}
               project_id={project_id}
               pk={user_id}

@@ -29,12 +29,14 @@ interface IEndorsementProps {
   document: IProjectPlan;
   userData: IUserMe;
   userIsLeader: boolean;
+  isBaLead: boolean;
   refetchDocument: () => void;
 }
 
 export const ProjectPlanEndorsements = ({
   document,
   userData,
+  isBaLead,
   refetchDocument,
 }: IEndorsementProps) => {
   const { register, watch, setValue } = useForm<ISpecialEndorsement>();
@@ -100,12 +102,12 @@ export const ProjectPlanEndorsements = ({
   // }, [userData]);
 
   useEffect(() => {
-    if (userData?.is_superuser || userData?.is_aec) {
+    if (userData?.is_superuser || userData?.is_aec || isBaLead) {
       setUserCanEditAECEndorsement(true);
     } else {
       setUserCanEditAECEndorsement(false);
     }
-  }, [userData]);
+  }, [userData, isBaLead]);
 
   const [uploadedPDF, setUploadedPDF] = useState<File>();
   const [isError, setIsError] = useState(false);
@@ -168,7 +170,7 @@ export const ProjectPlanEndorsements = ({
             rounded={"lg"}
             p={6}
             w={"100%"}
-            // gridRowGap={2}
+          // gridRowGap={2}
           >
             {/* Title */}
             <Box mb={4}>
@@ -340,9 +342,9 @@ export const ProjectPlanEndorsements = ({
               borderColor={"gray.300"}
               p={4}
               rounded={"xl"}
-              // roundedTop={0}
-              // borderTop={0}
-              // roundedBottom={0}
+            // roundedTop={0}
+            // borderTop={0}
+            // roundedBottom={0}
             >
               <Flex
                 // ml={8}
@@ -353,7 +355,7 @@ export const ProjectPlanEndorsements = ({
                   <Text
                     fontWeight={"semibold"}
 
-                    // color={involvesAnimalsValue ? "black" : "gray.500"}
+                  // color={involvesAnimalsValue ? "black" : "gray.500"}
                   >
                     Animal Ethics Committee Endorsement Required?
                   </Text>
@@ -473,12 +475,11 @@ export const ProjectPlanEndorsements = ({
                             }
                           >
                             {document?.endorsements?.aec_pdf?.file
-                              ? `${
-                                  document.endorsements.aec_pdf.file
-                                    .split("/")
-                                    .pop()
-                                    .split(".")[0]
-                                }.pdf`
+                              ? `${document.endorsements.aec_pdf.file
+                                .split("/")
+                                .pop()
+                                .split(".")[0]
+                              }.pdf`
                               : "No File"}
                             {/* {baseApi}{document?.endorsements?.aec_pdf?.file} */}
                           </Text>
