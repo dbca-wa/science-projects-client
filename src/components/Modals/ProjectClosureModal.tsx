@@ -32,6 +32,7 @@ import { useForm } from "react-hook-form";
 interface Props {
   // thisUser: IUserMe;
   // leaderPk: number;
+  projectKind: string;
   projectPk: string | number;
   isOpen: boolean;
   onClose: () => void;
@@ -40,6 +41,7 @@ interface Props {
 }
 
 export const ProjectClosureModal = ({
+  projectKind,
   projectPk,
   isOpen,
   onClose,
@@ -105,6 +107,7 @@ export const ProjectClosureModal = ({
 
   const closeProject = () => {
     const newForm = {
+      projectKind: projectKind,
       reason: reasonValue,
       projectPk: projPk,
       outcome: outcomeValue,
