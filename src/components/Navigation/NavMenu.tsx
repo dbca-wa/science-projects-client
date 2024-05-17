@@ -5,6 +5,7 @@ import {
   Button,
   Center,
   Flex,
+  Icon,
   Menu,
   MenuButton,
   MenuList,
@@ -12,6 +13,7 @@ import {
   TextProps,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { IconType } from "react-icons";
 import { GoTriangleDown } from "react-icons/go";
 
 interface INavMenuProps extends TextProps {
@@ -19,7 +21,7 @@ interface INavMenuProps extends TextProps {
   cScheme?: string;
   hoverColor?: string;
   fColor?: string;
-  leftIcon?: React.ReactNode;
+  leftIcon?: IconType;
   children?: React.ReactNode;
   noChevron?: boolean;
 }
@@ -95,7 +97,7 @@ export const NavMenu = ({
           <Flex>
             {leftIcon ? (
               <Box display={"flex"}>
-                <Center mr={menuName ? 1.5 : 0}>{leftIcon}</Center>
+                <Center mr={menuName ? 1.5 : 0}><Icon as={leftIcon} /></Center>
 
                 <Center mr={menuName ? 1.5 : 0}>
                   <Text>{menuName}</Text>

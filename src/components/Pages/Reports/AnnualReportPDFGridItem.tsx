@@ -70,7 +70,10 @@ export const AnnualReportPDFGridItem = ({ report, refetchFunction }: Props) => {
             bg={colorMode === "light" ? "white" : "gray.800"}
             px="4"
           >
-            {report?.year}
+            {report?.year && (
+              `FY ${Number(String(report?.year).slice(2)) - 1}-${Number(String(report?.year).slice(2))}`
+            )}
+
           </AbsoluteCenter>
         </Box>
         <Grid

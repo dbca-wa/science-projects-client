@@ -223,18 +223,18 @@ export const ProjectDetailsSection = ({
                 preselectedUserPk={thisUser}
                 label={
                   projectType !== "Student Project"
-                    ? "Research Scientist"
-                    : "Supervising Scientist"
+                    ? "Scientific Support"
+                    : "Project Leader"
                 }
                 placeholder={
                   projectType === "Student Project"
-                    ? "Search for a Supervising Scientist"
-                    : "Search for a Research Scientist"
+                    ? "Search for a Project Leader"
+                    : "Search for a Project Leader"
                 }
                 helperText={
                   projectType === "Student Project"
-                    ? "The supervising scientist."
-                    : "Research Scientist (Project Leader)"
+                    ? "The Project Leader."
+                    : "Scientific Support"
                 }
               />
             </Box>

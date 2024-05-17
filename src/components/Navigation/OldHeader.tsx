@@ -35,14 +35,14 @@ import theme from "../../theme";
 import { AiFillProject } from "react-icons/ai";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { CgViewList } from "react-icons/cg";
-import { FaAddressCard, FaLocationArrow, FaUserPlus } from "react-icons/fa";
+import { FaAddressCard, FaLocationArrow, FaUserCircle, FaUserPlus, FaUsers } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImBriefcase, ImUsers } from "react-icons/im";
 import { IoMdDocument } from "react-icons/io";
 
 import { FcApproval } from "react-icons/fc";
 import { GoOrganization } from "react-icons/go";
-import { HiDocumentPlus } from "react-icons/hi2";
+import { HiDocumentPlus, HiMiniSquares2X2 } from "react-icons/hi2";
 import {
   MdEmail,
   MdManageHistory,
@@ -61,6 +61,10 @@ import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { Navitar } from "./Navitar";
 import { SidebarNavMenu } from "./SidebarNavMenu";
+import { FaBookBookmark } from "react-icons/fa6";
+import { NavButton } from "./NavButton";
+import { PiBookOpenTextFill } from "react-icons/pi";
+import { SidebarNavButton } from "./SidebarNavButton";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -92,6 +96,33 @@ const ProjectMenuContents = () => {
     </>
   );
 };
+
+const GuideContents = () => {
+  const navigate = useNavigate();
+
+  return (
+    <>
+      <MenuGroup
+        title="View"
+        fontSize={"12px"}
+        color={"gray.500"}
+        textAlign={"center"}
+      >
+        <MenuItem
+          onClick={() => {
+            navigate("/guide");
+          }}
+        >
+          <FaBookBookmark />
+
+          {/* {<AiFillPrinter />} */}
+          <Text ml={2}>View Quick Guide</Text>
+        </MenuItem>
+      </MenuGroup>
+    </>
+  );
+}
+
 
 const ReportMenuContents = () => {
   const navigate = useNavigate();
@@ -538,6 +569,16 @@ const OldHeader = () => {
                               }
                             />
                           )}
+
+                          {/* Guide */}
+                          {!userLoading && userData.is_superuser && (
+
+                            <SidebarNavButton
+                              leftIcon={FaBookBookmark}
+                              buttonName="Guide"
+                              onClick={() => console.log("You clicked the guide!")}
+                            />
+                          )}
                         </Grid>
                       </VStack>
                     </DrawerBody>
@@ -558,17 +599,20 @@ const OldHeader = () => {
                 <NavMenu
                   menuName="Projects"
                   children={<ProjectMenuContents />}
+                  leftIcon={HiMiniSquares2X2}
                 />
 
                 {/* Staff */}
-                <NavMenu menuName="Users" children={<UserMenuContents />} />
+                <NavMenu menuName="Users" children={<UserMenuContents />} leftIcon={FaUsers} />
 
                 {/* Reports */}
-                <NavMenu menuName="Reports" children={<ReportMenuContents />} />
+                <NavMenu menuName="Reports" children={<ReportMenuContents />} leftIcon={PiBookOpenTextFill} />
+
 
                 {!userLoading && userData.is_superuser && (
                   <NavMenu
                     menuName="Admin"
+                    leftIcon={RiAdminFill}
                     children={
                       <AdminMenuContents
                         handleDataDump={handleDataDump}
@@ -579,6 +623,16 @@ const OldHeader = () => {
                         }
                       />
                     }
+                  />
+                )}
+
+                {/* Guide */}
+                {!userLoading && !userData.is_superuser && (
+
+                  <NavButton
+                    leftIcon={FaBookBookmark}
+                    buttonName="Guide"
+                    onClick={() => console.log("You clicked the guide!")}
                   />
                 )}
               </HStack>

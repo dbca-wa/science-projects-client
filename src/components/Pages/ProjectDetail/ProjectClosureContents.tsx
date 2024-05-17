@@ -59,7 +59,7 @@ export const ProjectClosureContents = ({
     "completed",
     "terminated",
     "suspended",
-    "forcecompleted",
+    // "forcecompleted",
   ];
 
   const queryClient = useQueryClient();
@@ -177,9 +177,7 @@ export const ProjectClosureContents = ({
           >
             {potentialOutcomes.map((outcome) => (
               <option key={outcome} value={outcome}>
-                {outcome === "forcecompleted"
-                  ? "Force Completed"
-                  : outcome.charAt(0).toUpperCase() + outcome.slice(1)}
+                {outcome.charAt(0).toUpperCase() + outcome.slice(1)}
               </option>
             ))}
           </Select>
