@@ -27,6 +27,7 @@ import { Reports } from "./routes/Reports";
 import { Tasks } from "./routes/Tasks";
 import { TestEmailPage } from "./routes/TestEmailPage";
 import { Users } from "./routes/Users";
+import { UserGuide } from "./components/Pages/UserGuide/UserGuide";
 
 export const router = createBrowserRouter([
   // Login
@@ -56,7 +57,6 @@ export const router = createBrowserRouter([
           </ContentWrapper>
         ),
       },
-
       // HERE FOR TESTING MAIN CONTENT COMPONENT. 
       // ON UPDATE/MIGRATION, MOVE TO SEPARATE ROUTE AND UPDATE NGINX for 
       // https://science.dbca.wa.gov.au/ to use that route, add header/footer
@@ -70,7 +70,16 @@ export const router = createBrowserRouter([
       //     </ContentWrapper>
       //   ),
       // },
-      
+
+
+      {
+        path: "guide",
+        element: (
+          <ContentWrapper>
+            <UserGuide />
+          </ContentWrapper>
+        ),
+      },
 
       // ADMIN
       {
@@ -184,6 +193,7 @@ export const router = createBrowserRouter([
           </ContentWrapper>
         ),
       },
+
 
       // Reports
       {

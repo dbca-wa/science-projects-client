@@ -56,11 +56,11 @@ export const TeamMemberDisplay = ({
   const { colorMode } = useColorMode();
 
   const roleColors: { [key: string]: { bg: string; color: string } } = {
-    "Research Scientist": { bg: "green.700", color: "white" },
-    "Supervising Scientist": { bg: "orange.700", color: "white" },
+    "Scientific Support": { bg: "green.700", color: "white" },
+    "Project Leader": { bg: "orange.700", color: "white" },
     "Academic Supervisor": { bg: "blue.500", color: "white" },
     "Supervised Student": { bg: "blue.400", color: "whiteAlpha.900" },
-    "Technical Officer": { bg: "orange.900", color: "white" },
+    "Technical Support": { bg: "orange.900", color: "white" },
     "Consulted Peer": { bg: "green.200", color: "black" },
     "External Collaborator": { bg: "gray.200", color: "black" },
     "External Peer": { bg: "gray.300", color: "black" },
@@ -79,11 +79,11 @@ export const TeamMemberDisplay = ({
     | "group";
 
   const roleDefinitions: [Role, string][] = [
-    ["research", "Research Scientist"],
-    ["supervising", "Supervising Scientist"],
+    ["research", "Scientific Support"],
+    ["supervising", "Project Leader"],
     ["academicsuper", "Academic Supervisor"],
     ["student", "Supervised Student"],
-    ["technical", "Technical Officer"],
+    ["technical", "Technical Support"],
     ["consulted", "Consulted Peer"],
     ["externalcol", "External Collaborator"],
     ["externalpeer", "External Peer"],

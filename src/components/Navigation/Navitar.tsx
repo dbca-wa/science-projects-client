@@ -197,12 +197,13 @@ export const Navitar = ({
 
               <MenuItem
                 onClick={() => {
-                  window.open("https://sdis.readthedocs.io", "_blank");
+                  navigate('/guide')
+                  // window.open("https://sdis.readthedocs.io", "_blank");
                 }}
                 zIndex={isOpen ? 2 : 1}
               >
                 {<SiReadthedocs />}
-                <Text ml={2}>User Manual</Text>
+                <Text ml={2}>Guide</Text>
               </MenuItem>
             </MenuGroup>
           )}
@@ -234,10 +235,13 @@ export const Navitar = ({
               {<FaUserCircle />}
               <Text ml={2}>My Public Profile</Text>
             </MenuItem>
-            <MenuItem onClick={onLogOut} zIndex={isOpen ? 2 : 1}>
-              {<FiLogOut />}
-              <Text ml={2}>Logout</Text>
-            </MenuItem>
+            {userData?.is_superuser && (
+              <MenuItem onClick={onLogOut} zIndex={isOpen ? 2 : 1}>
+                {<FiLogOut />}
+                <Text ml={2}>Logout</Text>
+              </MenuItem>
+            )}
+
           </MenuGroup>
           {isModern && (
             <MenuGroup

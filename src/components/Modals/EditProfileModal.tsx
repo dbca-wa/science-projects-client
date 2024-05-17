@@ -216,6 +216,14 @@ export const EditProfileModal = ({
   //   });
   // }, [selectedImageUrl, selectedFile, imageUrl, currentImage]);
 
+  useEffect(() => {
+    console.log({
+      // https://archives.bulbagarden.net/media/upload/thumb/4/4a/0025Pikachu.png/250px-0025Pikachu.png
+      imageUrl,
+      selectedFile,
+    })
+  })
+
   return (
     <Modal
       isOpen={isOpen}
@@ -296,15 +304,15 @@ export const EditProfileModal = ({
                       <Image
                         objectFit="cover"
                         src={
-                          (selectedFile !== null && selectedImageUrl) ||
-                          imageUrl ||
-                          noImageLink
+                          (selectedFile === null || !String(imageUrl).endsWith("undefined")) ? noImageLink :
+                            selectedImageUrl ? selectedImageUrl
+                              : imageUrl
                         }
                         alt="Preview"
                         userSelect="none"
                         bg="gray.800"
-                        // onLoad={handleImageLoadSuccess}
-                        // onError={handleImageLoadError}
+                      // onLoad={handleImageLoadSuccess}
+                      // onError={handleImageLoadError}
                       />
                     </Center>
                   </Box>

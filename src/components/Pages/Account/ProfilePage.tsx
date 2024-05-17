@@ -15,7 +15,6 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
-import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
 import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
 import { EditMembershipModal } from "../../Modals/EditMembershipModal";
@@ -41,7 +40,6 @@ const AnimatedClickToEdit = () => {
 };
 
 export const ProfilePage = () => {
-  const baseAPI = useApiEndpoint();
 
   const { userLoading: loading, userData: me } = useUser();
   useEffect(() => {
@@ -102,7 +100,7 @@ export const ProfilePage = () => {
             userId={`${me.pk}`}
             isOpen={isEditProfileModalOpen}
             onClose={onCloseEditProfileModal}
-            currentImage={`${baseAPI}${me.image?.file}`}
+            currentImage={`${me.image?.file}`}
           />
 
           <EditMembershipModal

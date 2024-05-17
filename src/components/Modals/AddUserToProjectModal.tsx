@@ -77,16 +77,16 @@ export const AddUserToProjectModal = ({
         humanReadable = "Involved Group";
         break;
       case "research":
-        humanReadable = "Research Scientist";
+        humanReadable = "Scientific Support";
         break;
       case "supervising":
-        humanReadable = "Supervising Scientist";
+        humanReadable = "Project Leader";
         break;
       case "student":
         humanReadable = "Supervised Student";
         break;
       case "technical":
-        humanReadable = "Technical Officer";
+        humanReadable = "Technical Support";
         break;
 
       default:
@@ -147,8 +147,8 @@ export const AddUserToProjectModal = ({
           queryKey: [
             "projects",
             preselectedProject !== undefined &&
-            preselectedProject !== null &&
-            preselectedProject !== 0
+              preselectedProject !== null &&
+              preselectedProject !== 0
               ? preselectedProject
               : selectedProject,
           ],
@@ -156,12 +156,11 @@ export const AddUserToProjectModal = ({
         refetchTeamData && refetchTeamData();
         if (!location.pathname.includes("project")) {
           navigate(
-            `/projects/${
-              preselectedProject !== undefined &&
+            `/projects/${preselectedProject !== undefined &&
               preselectedProject !== null &&
               preselectedProject !== 0
-                ? preselectedProject
-                : selectedProject
+              ? preselectedProject
+              : selectedProject
             }`
           );
         }
@@ -172,9 +171,9 @@ export const AddUserToProjectModal = ({
         const nonFieldErrors = error?.response?.data?.non_field_errors;
         const errorMessage =
           nonFieldErrors &&
-          nonFieldErrors.includes(
-            "The fields project, user must make a unique set."
-          )
+            nonFieldErrors.includes(
+              "The fields project, user must make a unique set."
+            )
             ? "Cannot add a user to a project they are already in."
             : nonFieldErrors?.join(", ") || "An error occurred";
 
@@ -281,8 +280,8 @@ export const AddUserToProjectModal = ({
               )}
 
               {preselectedUser !== 0 &&
-              preselectedUser !== null &&
-              preselectedUser !== undefined ? (
+                preselectedUser !== null &&
+                preselectedUser !== undefined ? (
                 <UserSearchDropdown
                   {...register("user", { required: true })}
                   onlyInternal={false}
@@ -335,12 +334,12 @@ export const AddUserToProjectModal = ({
                     <option value="academicsuper">Academic Supervisor</option>
                     <option value="consulted">Consulted Peer</option>
                     <option value="externalcol">External Collaborator</option>
-                    <option value="externalpeer">External Peer</option>
+                    {/* <option value="externalpeer">External Peer</option> */}
                     <option value="group">Involved Group</option>
-                    <option value="research">Research Scientist</option>
-                    <option value="supervising">Supervising Scientist</option>
+                    <option value="research">Scientific Support</option>
+                    {/* <option value="supervising">Project Leader</option> */}
                     <option value="student">Supervised Student</option>
-                    <option value="technical">Technical Officer</option>
+                    <option value="technical">Technical Support</option>
                   </Select>
                 </InputGroup>
                 <FormHelperText>

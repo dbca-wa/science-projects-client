@@ -10,9 +10,7 @@ import {
   Popover,
   PopoverArrow,
   PopoverBody,
-  PopoverCloseButton,
   PopoverContent,
-  PopoverHeader,
   PopoverTrigger,
   Text,
   useColorMode,
@@ -24,12 +22,12 @@ import theme from "../../../theme";
 import { Head } from "../../Base/Head";
 import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
 // import { IDashProps } from "../../../types";
+import ConfettiComponent from "@/components/Fun/HomeConfetti";
 import { UserFeedbackModal } from "@/components/Modals/UserFeedbackModal";
 import { FaDatabase } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
-import ConfettiComponent from "@/components/Fun/HomeConfetti";
 
 export const TraditionalDashboard = () => {
   const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
@@ -159,7 +157,7 @@ export const TraditionalDashboard = () => {
           <span style={{ marginTop: 20 }}>
             <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
               We are always looking for ways to improve, and value your
-              feedback! If you notice something off, or would like to request a
+              feedback! If you notice something off (even minor issues), or would like to request a
               change, please submit feedback here, send an email to jarid.prince@dbca.wa.gov.au, or send a message on Teams. Don't be shy, we can only
               make things better with your help!
             </Text>

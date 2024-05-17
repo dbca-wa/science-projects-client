@@ -114,16 +114,16 @@ export const ProjectUserDetails = ({
         humanReadable = "Involved Group";
         break;
       case "research":
-        humanReadable = "Research Scientist";
+        humanReadable = "Scientific Support";
         break;
       case "supervising":
-        humanReadable = "Supervising Scientist";
+        humanReadable = "Project Leader";
         break;
       case "student":
         humanReadable = "Supervised Student";
         break;
       case "technical":
-        humanReadable = "Technical Officer";
+        humanReadable = "Technical Support";
         break;
 
       default:
@@ -490,12 +490,12 @@ export const ProjectUserDetails = ({
               <option value="academicsuper">Academic Supervisor</option>
               <option value="consulted">Consulted Peer</option>
               <option value="externalcol">External Collaborator</option>
-              <option value="externalpeer">External Peer</option>
+              {/* <option value="externalpeer">External Peer</option> */}
               <option value="group">Involved Group</option>
-              <option value="research">Research Scientist</option>
-              <option value="supervising">Supervising Scientist</option>
+              <option value="research">Scientific Support</option>
+              {/* <option value="supervising">Project Leader</option> */}
               <option value="student">Supervised Student</option>
-              <option value="technical">Technical Officer</option>
+              <option value="technical">Technical Support</option>
             </Select>
           </InputGroup>
           <FormHelperText>
