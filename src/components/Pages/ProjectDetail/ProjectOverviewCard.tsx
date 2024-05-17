@@ -485,13 +485,13 @@ export const ProjectOverviewCard = ({
           >
             <Box pos={"absolute"} right={3} top={3}>
               <Tag
-                fontWeight={"semibold"}
+                fontWeight={"bold"}
                 color={"white"}
                 ml={3}
                 textAlign={"center"}
                 justifyContent={"center"}
                 p={"10px"}
-                size={"sm"}
+                size={"lg"}
                 bgColor={
                   baseInformation?.kind === "core_function"
                     ? "red.600"
