@@ -246,7 +246,7 @@ export const ProjectDocumentPDFSection = ({
 
         <Flex flex={1} justifyContent={"flex-end"} w={"100%"}>
           {data_document?.document?.pdf?.file &&
-            !projectDocPDFGenerationMutation.isPending ? (
+            (!projectDocPDFGenerationMutation.isPending && !data_document?.document?.pdf_generation_in_progress) ? (
             <Button
               as={motion.div}
               initial={{ y: -10, opacity: 0 }}
