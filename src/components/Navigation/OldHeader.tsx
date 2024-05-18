@@ -35,11 +35,17 @@ import theme from "../../theme";
 import { AiFillProject } from "react-icons/ai";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { CgViewList } from "react-icons/cg";
-import { FaAddressCard, FaLocationArrow, FaUserCircle, FaUserPlus, FaUsers } from "react-icons/fa";
+import {
+  FaAddressCard,
+  FaLocationArrow,
+  FaUserPlus,
+  FaUsers,
+} from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImBriefcase, ImUsers } from "react-icons/im";
 import { IoMdDocument } from "react-icons/io";
 
+import { FaBookBookmark } from "react-icons/fa6";
 import { FcApproval } from "react-icons/fc";
 import { GoOrganization } from "react-icons/go";
 import { HiDocumentPlus, HiMiniSquares2X2 } from "react-icons/hi2";
@@ -50,6 +56,7 @@ import {
   MdOutlineSettingsSuggest,
   MdVerifiedUser,
 } from "react-icons/md";
+import { PiBookOpenTextFill } from "react-icons/pi";
 import { RiAdminFill, RiOrganizationChart, RiTeamFill } from "react-icons/ri";
 import { VscFeedback } from "react-icons/vsc";
 import { useUser } from "../../lib/hooks/tanstack/useUser";
@@ -59,12 +66,11 @@ import { CreateUserModal } from "../Modals/CreateUserModal";
 import { NewCycleModal } from "../Modals/NewCycleModal";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
-import { Navitar } from "./Navitar";
-import { SidebarNavMenu } from "./SidebarNavMenu";
-import { FaBookBookmark } from "react-icons/fa6";
 import { NavButton } from "./NavButton";
-import { PiBookOpenTextFill } from "react-icons/pi";
+import { Navitar } from "./Navitar";
 import { SidebarNavButton } from "./SidebarNavButton";
+import { SidebarNavMenu } from "./SidebarNavMenu";
+import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -121,8 +127,7 @@ const GuideContents = () => {
       </MenuGroup>
     </>
   );
-}
-
+};
 
 const ReportMenuContents = () => {
   const navigate = useNavigate();
@@ -370,6 +375,7 @@ const OldHeader = () => {
   };
 
   const [shouldShowHamburger, setShouldShowHamburger] = useState(false);
+  const [shouldShowGuide, setShouldShowGuide] = useState(true);
   const [windowSizeValue, setWindowSizeValue] = useState<number>(480);
 
   const {
@@ -384,6 +390,14 @@ const OldHeader = () => {
       setShouldShowHamburger(true);
     } else {
       setShouldShowHamburger(false);
+    }
+    if (
+      window.innerWidth < parseFloat(theme.breakpoints["1200px"]) &&
+      userData?.is_superuser
+    ) {
+      setShouldShowGuide(false);
+    } else {
+      setShouldShowGuide(true);
     }
     setWindowSizeValue(window.innerWidth);
   };
@@ -419,6 +433,7 @@ const OldHeader = () => {
   }, [location.pathname]);
 
   const { userLoading, userData } = useUser();
+  const { layout } = useLayoutSwitcher();
 
   return (
     <Box>
@@ -517,15 +532,26 @@ const OldHeader = () => {
                             justifyContent={"right"}
                             alignItems={"center"}
                           >
-                            <Center mr={4}>
-                              <ToggleLayout />
-                              <ToggleDarkMode />
-                            </Center>
+                            {/* <Center mr={4}> */}
+                            <Flex
+                              justifyContent={"center"}
+                              textAlign={"center"}
+                              // bg={"red"}
+                              flexDir={"row"}
+                              // pr={3}
+                              pr={0}
+                            >
+                              <ToggleLayout showText />
+                              <ToggleDarkMode showText />
+                            </Flex>
 
-                            <Navitar
-                              isModern={false}
-                              windowSize={windowSizeValue}
-                            />
+                            {/* </Center> */}
+                            <Box ml={3} flex={1}>
+                              <Navitar
+                                isModern={false}
+                                windowSize={windowSizeValue}
+                              />
+                            </Box>
                           </Flex>
                         </HStack>
 
@@ -571,14 +597,13 @@ const OldHeader = () => {
                           )}
 
                           {/* Guide */}
-                          {!userLoading && userData.is_superuser && (
-
-                            <SidebarNavButton
-                              leftIcon={FaBookBookmark}
-                              buttonName="Guide"
-                              onClick={() => console.log("You clicked the guide!")}
-                            />
-                          )}
+                          {/* {!userLoading && userData.is_superuser && ( */}
+                          <SidebarNavButton
+                            leftIcon={FaBookBookmark}
+                            buttonName="Guide"
+                            onClick={() => navigate("/guide")}
+                          />
+                          {/* )} */}
                         </Grid>
                       </VStack>
                     </DrawerBody>
@@ -603,11 +628,18 @@ const OldHeader = () => {
                 />
 
                 {/* Staff */}
-                <NavMenu menuName="Users" children={<UserMenuContents />} leftIcon={FaUsers} />
+                <NavMenu
+                  menuName="Users"
+                  children={<UserMenuContents />}
+                  leftIcon={FaUsers}
+                />
 
                 {/* Reports */}
-                <NavMenu menuName="Reports" children={<ReportMenuContents />} leftIcon={PiBookOpenTextFill} />
-
+                <NavMenu
+                  menuName="Reports"
+                  children={<ReportMenuContents />}
+                  leftIcon={PiBookOpenTextFill}
+                />
 
                 {!userLoading && userData.is_superuser && (
                   <NavMenu
@@ -627,14 +659,16 @@ const OldHeader = () => {
                 )}
 
                 {/* Guide */}
-                {!userLoading && !userData.is_superuser && (
-
+                {/* {!userLoading && !userData.is_superuser && ( */}
+                {shouldShowGuide ? (
                   <NavButton
                     leftIcon={FaBookBookmark}
                     buttonName="Guide"
-                    onClick={() => console.log("You clicked the guide!")}
+                    onClick={() => navigate("/guide")}
                   />
-                )}
+                ) : null}
+
+                {/* )} */}
               </HStack>
 
               {/* RHS Items */}

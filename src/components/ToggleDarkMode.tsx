@@ -2,20 +2,36 @@
 
 import {
   Box,
+  Button,
   IconButton,
   useColorMode,
   useColorModeValue,
+  Text,
+  MenuItem,
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaMoon, FaSun } from "react-icons/fa";
 
-export const ToggleDarkMode = () => {
+interface IOptionalToggleDarkProps {
+  showText?: boolean;
+  asMenuItem?: boolean;
+}
+
+export const ToggleDarkMode = ({
+  showText,
+  asMenuItem,
+}: IOptionalToggleDarkProps) => {
   const { toggleColorMode } = useColorMode();
   const colorToggleIcon = useColorModeValue(<FaMoon />, <FaSun />);
   const keyColorMode = useColorModeValue("light", "dark");
   const iconButtonColorScheme = useColorModeValue("blue", "orange");
 
-  return (
+  return asMenuItem ? (
+    <MenuItem onClick={toggleColorMode} zIndex={2}>
+      {colorToggleIcon}
+      <Text ml={2}> Toggle Dark Mode</Text>
+    </MenuItem>
+  ) : (
     <AnimatePresence mode="wait" initial={false}>
       <Box
         as={motion.div}
@@ -26,16 +42,32 @@ export const ToggleDarkMode = () => {
         exit={{ x: 10, opacity: 0 }}
         sx={{ transitionDuration: 2.01 }}
       >
-        <IconButton
-          size={"md"}
-          icon={colorToggleIcon}
-          onClick={() => {
-            toggleColorMode();
-          }}
-          colorScheme={iconButtonColorScheme}
-          variant={"ghost"}
-          aria-label="Toggle Dark Mode"
-        />
+        {showText ? (
+          <Button
+            // bg={"blue"}
+            color={`${iconButtonColorScheme}.400`}
+            size={"md"}
+            rightIcon={colorToggleIcon}
+            onClick={() => {
+              toggleColorMode();
+            }}
+            variant={"ghost"}
+            aria-label="Toggle Dark Mode"
+          >
+            <Text>{keyColorMode === "dark" ? "Light" : "Dark"}</Text>
+          </Button>
+        ) : (
+          <IconButton
+            size={"md"}
+            icon={colorToggleIcon}
+            onClick={() => {
+              toggleColorMode();
+            }}
+            colorScheme={iconButtonColorScheme}
+            variant={"ghost"}
+            aria-label="Toggle Dark Mode"
+          />
+        )}
       </Box>
     </AnimatePresence>
   );

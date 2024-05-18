@@ -1,13 +1,28 @@
 // Component for changing the layout between modern and traditional
 
-import { Box, IconButton, useColorModeValue } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  IconButton,
+  MenuItem,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { RiLayoutTopFill, RiLayout3Fill } from "react-icons/ri";
+import { RiLayout3Fill, RiLayoutTopFill } from "react-icons/ri";
 import { useLayoutSwitcher } from "../lib/hooks/helper/LayoutSwitcherContext";
 
-export const ToggleLayout = () => {
+interface IOptionalToggleLayoutProps {
+  showText?: boolean;
+  asMenuItem?: boolean;
+}
+
+export const ToggleLayout = ({
+  showText,
+  asMenuItem,
+}: IOptionalToggleLayoutProps) => {
   const { layout, switchLayout } = useLayoutSwitcher();
-  const iconColor = useColorModeValue("gray.400", "gray.500");
+  const iconColor = useColorModeValue("gray.400", "gray.300");
   const layouts = {
     traditional: {
       key: "traditional",
@@ -24,7 +39,18 @@ export const ToggleLayout = () => {
   };
   const currentLayout = layouts[layout];
 
-  return (
+  return asMenuItem ? (
+    <MenuItem onClick={switchLayout} zIndex={2}>
+      {layouts[layout].icon}
+      <Text ml={2}>
+        {" "}
+        Toggle Layout
+        {/* {`${currentLayout.key[0].toUpperCase()}${currentLayout.key.slice(
+        1
+      )}`} */}
+      </Text>
+    </MenuItem>
+  ) : (
     <AnimatePresence mode="wait" initial={false}>
       <Box
         color={iconColor}
@@ -36,14 +62,28 @@ export const ToggleLayout = () => {
         exit={{ x: 10, opacity: 0 }}
         sx={{ transitionDuration: 2.01 }}
       >
-        <IconButton
-          color={iconColor}
-          size={"md"}
-          icon={currentLayout.icon}
-          onClick={currentLayout.onclick}
-          variant={"ghost"}
-          aria-label="Toggle Dark Mode"
-        />
+        {showText ? (
+          <Button
+            // bg={"blue"}
+            color={iconColor}
+            size={"md"}
+            rightIcon={currentLayout.icon}
+            onClick={currentLayout.onclick}
+            variant={"ghost"}
+            aria-label="Toggle Layout"
+          >
+            <Text pl={3}>{layout === "modern" ? "Traditional" : "Modern"}</Text>
+          </Button>
+        ) : (
+          <IconButton
+            color={iconColor}
+            size={"md"}
+            icon={currentLayout.icon}
+            onClick={currentLayout.onclick}
+            variant={"ghost"}
+            aria-label="Toggle Layout"
+          />
+        )}
       </Box>
     </AnimatePresence>
   );
