@@ -89,7 +89,7 @@ export const logOut = () => {
     return instance
         .post(`users/log-out`, null,)
         .then((response) => {
-            if (response.data.ok) {
+            if (response.data) {
                 // if (process.env.NODE_ENV !== "development") {
                 return response.data;
                 // window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/auth_logout`
