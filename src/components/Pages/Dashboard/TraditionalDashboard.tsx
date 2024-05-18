@@ -14,7 +14,7 @@ import {
   PopoverTrigger,
   Text,
   useColorMode,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
@@ -52,8 +52,11 @@ export const TraditionalDashboard = () => {
     if (window.innerWidth < 1150) {
       setWelcomeUser("");
       setShouldConcat(true);
-      setSpmsText(`SPMS ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
-        }`);
+      setSpmsText(
+        `SPMS ${
+          VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+        }`
+      );
       // setAnnualReportText("Report");
     } else {
       setWelcomeUser(
@@ -63,12 +66,14 @@ export const TraditionalDashboard = () => {
       // setAnnualReportText("Annual Report");
       if (window.innerWidth < 1350) {
         setSpmsText(
-          `Science Project <br/> Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project <br/> Management System ${
+            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`
         );
       } else {
         setSpmsText(
-          `Science Project Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project Management System ${
+            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`
         );
       }
@@ -145,7 +150,10 @@ export const TraditionalDashboard = () => {
         )}
 
         <Flex flexDir={"column"}>
-          <Text mt={5} fontSize={"16px"} fontWeight={"semibold"}
+          <Text
+            mt={5}
+            fontSize={"16px"}
+            fontWeight={"semibold"}
             onClick={() => localStorage.removeItem("confettiCount")}
           >
             &#127881; We have successfully migrated to SPMS 3.0! &#127881;
@@ -157,9 +165,10 @@ export const TraditionalDashboard = () => {
           <span style={{ marginTop: 20 }}>
             <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
               We are always looking for ways to improve, and value your
-              feedback! If you notice something off (even minor issues), or would like to request a
-              change, please submit feedback here, send an email to jarid.prince@dbca.wa.gov.au, or send a message on Teams. Don't be shy, we can only
-              make things better with your help!
+              feedback! If you notice something off, or would like to request a
+              change, please submit feedback here, send an email to
+              jarid.prince@dbca.wa.gov.au, or send a message on Teams. Don't be
+              shy, we can only make things better with your help!
             </Text>
 
             <Button
@@ -183,7 +192,6 @@ export const TraditionalDashboard = () => {
         }}
         gap={10}
       >
-
         <Popover trigger="hover">
           <PopoverTrigger>
             <Button
@@ -197,10 +205,10 @@ export const TraditionalDashboard = () => {
               // as="a"
               onClick={() => {
                 if (!dataCatalogueDisabled) {
-                  window.open("https://data.dbca.wa.gov.au/", "_blank")
+                  window.open("https://data.dbca.wa.gov.au/", "_blank");
                 }
               }}
-            // isDisabled={dataCatalogueDisabled}
+              // isDisabled={dataCatalogueDisabled}
             >
               {shouldConcat ? "Data" : "Data Catalogue"}
             </Button>
@@ -209,10 +217,7 @@ export const TraditionalDashboard = () => {
             <PopoverArrow />
             {/* <PopoverCloseButton /> */}
             {/* <PopoverHeader>Confirmation!</PopoverHeader> */}
-            <PopoverBody
-              justifyContent={"center"}
-              display={"flex"}
-            >
+            <PopoverBody justifyContent={"center"} display={"flex"}>
               Coming Soon
             </PopoverBody>
           </PopoverContent>
@@ -228,7 +233,9 @@ export const TraditionalDashboard = () => {
           }}
           // as={"a"}
           // href="https://scientificsites.dpaw.wa.gov.au/"
-          onClick={() => window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank")}
+          onClick={() =>
+            window.open("https://scientificsites.dpaw.wa.gov.au/", "_blank")
+          }
         >
           {shouldConcat ? "Scientific Sites" : "Scientific Sites Register"}
         </Button>
