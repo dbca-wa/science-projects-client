@@ -50,7 +50,8 @@ export const Navitar = ({
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
-  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
+  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
+    .VITE_PRODUCTION_BACKEND_BASE_URL;
 
   const mutation = useMutation({
     mutationFn: logOut,
@@ -76,25 +77,26 @@ export const Navitar = ({
       }
       // queryClient.refetchQueries(['me']);
       queryClient.invalidateQueries({ queryKey: ["me"] });
-      console.log("DATA IS:", data)
+      console.log("DATA IS:", data);
       if (data?.logoutUrl) {
-        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}${data.logoutUrl.slice(1)}`
+        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}${data.logoutUrl.slice(
+          1
+        )}`;
       }
       // sso/signedout?relogin=/
       else {
-        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}`
+        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}`;
       }
       // navigate("/login");
       // window.location.href = VITE_PRODUCTION_BACKEND_BASE_URL;
       // window.location.assign('https://dbcab2c.b2clogin.com/dbcab2c.onmicrosoft.com/B2C_1A_Default_uat/oauth2/v2.0/logout?post_logout_redirect_uri=https%3A//login.microsoftonline.com/7b934664-cdcf-4e28-a3ee-1a5bcca0a1b6/oauth2/logout')
     },
     onError: (error) => {
-      console.log("logout error, navigating to login")
+      console.log("logout error, navigating to login");
       console.log(error);
       window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}login`;
-    }
+    },
   });
-
 
   const onLogOut = async () => {
     mutation.mutate();
@@ -143,8 +145,8 @@ export const Navitar = ({
                     ? userData.first_name.length < 12
                       ? userData.first_name
                       : windowSize >= 1150
-                        ? userData.first_name
-                        : `${userData?.first_name.substring(0, 9)}...`
+                      ? userData.first_name
+                      : `${userData?.first_name.substring(0, 9)}...`
                     : userData.username)}
               </Text>
             ) : null}
@@ -157,8 +159,8 @@ export const Navitar = ({
                     ? `${userData.image?.file}`
                     : `${baseAPI}${userData.image?.file}`
                   : userData.image?.old_file
-                    ? userData.image?.old_file
-                    : noImage
+                  ? userData.image?.old_file
+                  : noImage
               }
             ></Avatar>
             <Center
@@ -182,31 +184,27 @@ export const Navitar = ({
           mt={"-7.5px"}
           zIndex={isOpen ? 2 : 1}
         >
-          {!isModern && (
-            <MenuGroup
-              title="Docs, Settings & Layout"
-              fontSize={"12px"}
-              color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
-              textAlign={"center"}
+          <MenuGroup
+            title="Docs & Layout"
+            fontSize={"12px"}
+            color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
+            textAlign={"center"}
+            zIndex={isOpen ? 2 : 1}
+          >
+            <MenuItem
+              onClick={() => {
+                navigate("/guide");
+                // window.open("https://sdis.readthedocs.io", "_blank");
+              }}
               zIndex={isOpen ? 2 : 1}
             >
-              <Flex>
-                <ToggleLayout />
-                <ToggleDarkMode />
-              </Flex>
+              {<SiReadthedocs />}
+              <Text ml={2}>Quick Guide</Text>
+            </MenuItem>
 
-              <MenuItem
-                onClick={() => {
-                  navigate('/guide')
-                  // window.open("https://sdis.readthedocs.io", "_blank");
-                }}
-                zIndex={isOpen ? 2 : 1}
-              >
-                {<SiReadthedocs />}
-                <Text ml={2}>Guide</Text>
-              </MenuItem>
-            </MenuGroup>
-          )}
+            <ToggleLayout asMenuItem />
+            <ToggleDarkMode asMenuItem />
+          </MenuGroup>
 
           <MenuGroup
             title="DBCA Account"
@@ -241,7 +239,6 @@ export const Navitar = ({
                 <Text ml={2}>Logout</Text>
               </MenuItem>
             )}
-
           </MenuGroup>
           {isModern && (
             <MenuGroup

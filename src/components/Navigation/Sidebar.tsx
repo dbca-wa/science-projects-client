@@ -22,6 +22,7 @@ import { useUpdatePage } from "../../lib/hooks/helper/useUpdatePage";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { AnimatedToggleButton } from "./AnimatedToggleButton";
+import { SiReadthedocs } from "react-icons/si";
 
 const buttonWidthVariants = {
   open: {
@@ -98,6 +99,12 @@ export const Sidebar = () => {
       section: "ARAR",
     },
     { title: "Reports", img: HiDocumentDuplicate, route: "/reports" },
+    {
+      title: "Quick Guide",
+      img: SiReadthedocs,
+      route: "/guide",
+      section: "Guide",
+    },
   ];
 
   const handleToggleSidebar = () => {
@@ -214,8 +221,8 @@ export const Sidebar = () => {
                     ? "blue.500"
                     : undefined
                   : activeMenu === menu.title
-                    ? "blue.500"
-                    : undefined
+                  ? "blue.500"
+                  : undefined
               }
               color={
                 colorMode === "light"
@@ -223,8 +230,8 @@ export const Sidebar = () => {
                     ? "white"
                     : "blackAlpha.800"
                   : activeMenu === menu.title
-                    ? "whiteAlpha.800"
-                    : "whiteAlpha.800"
+                  ? "whiteAlpha.800"
+                  : "whiteAlpha.800"
               }
               _hover={
                 colorMode === "light"
@@ -238,14 +245,14 @@ export const Sidebar = () => {
                         bg: "gray.100",
                       }
                   : activeMenu === menu.title
-                    ? {
-                        color: "whiteAlpha.800",
-                        bg: "blue.400",
-                      }
-                    : {
-                        color: "whiteAlpha.800",
-                        bg: "blue.400",
-                      }
+                  ? {
+                      color: "whiteAlpha.800",
+                      bg: "blue.400",
+                    }
+                  : {
+                      color: "whiteAlpha.800",
+                      bg: "blue.400",
+                    }
               }
               onClick={() => {
                 setActiveMenu(menu.title);
