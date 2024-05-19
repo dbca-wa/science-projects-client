@@ -218,11 +218,12 @@ export const RichTextEditor = ({
             : section === "description" ||
               section === "externalAims" ||
               section === "externalDescription"
-              ? "gray.800"
-              : "gray.700"
+            ? "gray.800"
+            : "gray.700"
         }
         // roundedTop={"8px"}
-        roundedTop={20} maxW={"100%"}
+        roundedTop={20}
+        maxW={"100%"}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
           <Text
@@ -268,8 +269,8 @@ export const RichTextEditor = ({
               ? "whiteAlpha.600"
               : "whiteAlpha.400"
             : isEditorOpen
-              ? "blackAlpha.500"
-              : "blackAlpha.400"
+            ? "blackAlpha.500"
+            : "blackAlpha.400"
         }
       >
         {isEditorOpen ? (
@@ -315,13 +316,13 @@ export const RichTextEditor = ({
             // editorText={editorText}
             // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-          // setShouldShowTree={setShouldShowTree}
-          // isEditorOpen={isEditorOpen}
-          // setIsEditorOpen={setIsEditorOpen}
-          // setDisplayData={setDisplayData}
-          // textEditorName={
-          //   section === "description" ? "Description" : undefined
-          // }
+            // setShouldShowTree={setShouldShowTree}
+            // isEditorOpen={isEditorOpen}
+            // setIsEditorOpen={setIsEditorOpen}
+            // setDisplayData={setDisplayData}
+            // textEditorName={
+            //   section === "description" ? "Description" : undefined
+            // }
           />
         )}
       </Box>

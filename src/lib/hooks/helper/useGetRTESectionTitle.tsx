@@ -1,6 +1,10 @@
+import { GuideSections } from "@/lib/api";
+import { EditorSubsections } from "@/types";
 import { useState, useEffect } from "react";
 
-export const useGetRTESectionTitle = (section: string) => {
+export const useGetRTESectionTitle = (
+  section: GuideSections | EditorSubsections
+) => {
   const [sectionText, setSectionText] = useState("");
 
   useEffect(() => {
@@ -106,6 +110,39 @@ export const useGetRTESectionTitle = (section: string) => {
         break;
       case "externalAims":
         setSectionText("External Aims");
+        break;
+      case "guide_report":
+        setSectionText("Annual Report");
+        break;
+      case "guide_documents":
+        setSectionText("Project Documents");
+        break;
+      case "guide_project_team":
+        setSectionText("Project Teams");
+        break;
+      case "guide_project_view":
+        setSectionText("Search Projects");
+        break;
+      case "guide_project_creation":
+        setSectionText("Project Creation");
+        break;
+      case "guide_user_view":
+        setSectionText("Search Users");
+        break;
+      case "guide_user_creation":
+        setSectionText("User Creation");
+        break;
+      case "guide_profile":
+        setSectionText("User Profile");
+        break;
+      case "guide_login":
+        setSectionText("Login");
+        break;
+      case "guide_about":
+        setSectionText("About");
+        break;
+      case "guide_admin":
+        setSectionText("Admin");
         break;
       default:
         setSectionText("Scientific Outputs");

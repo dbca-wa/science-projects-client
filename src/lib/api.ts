@@ -2,7 +2,7 @@ import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/C
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IBusinessAreaCreate, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProgressReport, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
+import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAdminOptions, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IBusinessAreaCreate, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProgressReport, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
 import { IConceptPlanGenerationData } from "../types";
 
 
@@ -1710,6 +1710,7 @@ export interface IHTMLSave {
     canSave: boolean;
 }
 
+
 // Also have this handle directors message, research intro etc. (annual report)
 export const saveHtmlToDB = async (
     { editorType, htmlData, details_pk, project_pk, document_pk, writeable_document_kind, writeable_document_pk, section, isUpdate, canSave }: IHTMLSave) => {
@@ -1824,6 +1825,39 @@ export const saveHtmlToDB = async (
 
     }
 }
+
+
+export type GuideSections = "guide_admin" | "guide_about" | "guide_login" | "guide_profile" | "guide_user_creation" | "guide_user_view" | "guide_project_creation" | "guide_project_view" | "guide_project_team" | "guide_documents" | "guide_report";
+
+export interface IHTMLGuideSave {
+    htmlData: string;
+    isUpdate: boolean;
+    adminOptionsPk: null | number;
+    section: null | GuideSections;
+    softRefetch?: () => void;
+    setIsEditorOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+    canSave: boolean;
+}
+
+export const saveGuideHtmlToDB = async (
+    { htmlData, adminOptionsPk, section, isUpdate, canSave }: IHTMLGuideSave) => {
+
+    const urlType = isUpdate ? instance.put : instance.post;
+        const params = {
+            [section]: htmlData,
+        }
+        return urlType(
+            `adminoptions/${adminOptionsPk}`,
+            params,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        ).then(res => res.data);
+    
+}
+
 
 export interface IHandleMethodologyImage {
     kind: string;
@@ -2648,6 +2682,24 @@ export const updateBranch = async (formData: IBranch) => {
 export const deleteBranch = async (pk: number) => {
     return instance.delete(
         `agencies/branches/${pk}`
+    ).then(res => {
+        return res.data;
+    }
+    );
+}
+
+// ADMIN
+
+export const getAdminOptionsByPk = async ({queryKey}: QueryFunctionContext) => {
+    const [_, pk] = queryKey;
+    // adminoptions
+    const res = instance.get(`adminoptions/${pk}`).then(res => res.data);
+    return res;
+}
+
+export const updateAdminOptions = async (formData: IAdminOptions) => {
+    return instance.put(
+        `adminoptions/${formData.pk}`, formData
     ).then(res => {
         return res.data;
     }

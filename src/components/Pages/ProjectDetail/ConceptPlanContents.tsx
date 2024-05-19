@@ -33,7 +33,7 @@ export const ConceptPlanContents = ({
   baseAPI,
   baLead,
 }: // setToLastTab,
-  Props) => {
+Props) => {
   const { colorMode } = useColorMode();
 
   const documentType = "conceptplan";
@@ -41,12 +41,11 @@ export const ConceptPlanContents = ({
 
   const mePk = userData?.pk ? userData?.pk : userData?.id;
   const userInTeam = useCheckUserInTeam(mePk, members);
-  const isBaLead = mePk === baLead
-  const isFullyApproved = (
+  const isBaLead = mePk === baLead;
+  const isFullyApproved =
     all_documents?.concept_plan?.document.project_lead_approval_granted &&
     all_documents?.concept_plan?.document.business_area_lead_approval_granted &&
-    all_documents?.concept_plan?.document.directorate_approval_granted
-  )
+    all_documents?.concept_plan?.document.directorate_approval_granted;
   return (
     <motion.div
       initial={{ y: -10, opacity: 0 }}
@@ -69,7 +68,10 @@ export const ConceptPlanContents = ({
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -82,7 +84,10 @@ export const ConceptPlanContents = ({
       />
       <RichTextEditor
         wordLimit={500}
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -96,7 +101,10 @@ export const ConceptPlanContents = ({
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -109,7 +117,10 @@ export const ConceptPlanContents = ({
       />
       <RichTextEditor
         wordLimit={500}
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -122,7 +133,10 @@ export const ConceptPlanContents = ({
       />
       <RichTextEditor
         wordLimit={500}
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -136,7 +150,10 @@ export const ConceptPlanContents = ({
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -150,7 +167,10 @@ export const ConceptPlanContents = ({
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
