@@ -28,13 +28,6 @@ export const AccountEdit = () => {
       case "publicprofile":
         content = <PublicProfilePage />;
         break;
-      // case "groups":
-      //     content = <GroupsPage user={me} loading={loading} colorMode={colorMode} />;
-      //     break;
-      // case "settings":
-      //     content = <SettingsPage user={me} loading={loading} colorMode={colorMode} />;
-      //     break;
-
       default:
         content = null;
         break;

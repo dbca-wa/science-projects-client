@@ -10,43 +10,31 @@ import "../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
+import { GuideSections } from "@/lib/api";
 import { useGetRTESectionTitle } from "@/lib/hooks/helper/useGetRTESectionTitle";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { EditorSections, EditorSubsections, EditorType } from "../../../types";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
-import { DisplaySRTE } from "./Sections/DisplaySRTE";
-import { EditableSRTE } from "./Sections/EditableSRTE";
+import { DisplayGuideSRTE } from "./Sections/DisplayGuideSRTE";
+import { EditableGuideSRTE } from "./Sections/EditableGuideSRTE";
 
 interface IProps {
   canEdit: boolean;
   data: string;
   titleTextSize?: string;
-  section: EditorSubsections;
-  project_pk?: number;
-  details_pk?: number;
-  document_pk?: number;
-  writeable_document_kind?: EditorSections | null;
-  writeable_document_pk?: number | null;
-  editorType: EditorType;
+  section: GuideSections;
+  adminOptionsPk: number;
   isUpdate: boolean;
-  wordLimit?: number;
-  limitCanBePassed?: boolean;
+  refetch: () => void;
 }
 
-export const RichTextEditor = ({
+export const GuideRichTextEditor = ({
   canEdit,
   data,
   titleTextSize,
   section,
-  project_pk,
-  document_pk,
-  editorType,
+  adminOptionsPk,
   isUpdate,
-  writeable_document_kind,
-  writeable_document_pk,
-  details_pk,
-  wordLimit,
-  limitCanBePassed,
+  refetch,
 }: IProps) => {
   const [shouldShowTree, setShouldShowTree] = useState(false);
   const { colorMode } = useColorMode();
@@ -208,28 +196,13 @@ export const RichTextEditor = ({
     // Wrapper
     <Box pb={6} maxW={"100%"}>
       <Flex
-        bg={
-          colorMode === "light"
-            ? section === "description" ||
-              section === "externalAims" ||
-              section === "externalDescription"
-              ? "gray.200"
-              : "gray.100"
-            : section === "description" ||
-              section === "externalAims" ||
-              section === "externalDescription"
-            ? "gray.800"
-            : "gray.700"
-        }
-        // roundedTop={"8px"}
+        bg={colorMode === "light" ? "gray.200" : "gray.700"}
         roundedTop={20}
         maxW={"100%"}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
           <Text
-            // pt={1}
             pl={8}
-            // paddingBottom={"12px"}
             my={0}
             py={2}
             fontWeight={"bold"}
@@ -274,20 +247,14 @@ export const RichTextEditor = ({
         }
       >
         {isEditorOpen ? (
-          <EditableSRTE
+          <EditableGuideSRTE
             // key={prepopulationData}
-
+            adminOptionsPk={adminOptionsPk}
             initialConfig={initialConfig}
             editorRef={editorRef}
             data={prepopulationData}
             section={section}
-            project_pk={project_pk}
-            document_pk={document_pk}
-            editorType={editorType}
             isUpdate={isUpdate}
-            writeable_document_kind={writeable_document_kind}
-            writeable_document_pk={writeable_document_pk}
-            details_pk={details_pk}
             displayData={displayData}
             editorText={editorText}
             setEditorText={setEditorText}
@@ -296,39 +263,20 @@ export const RichTextEditor = ({
             isEditorOpen={isEditorOpen}
             setIsEditorOpen={setIsEditorOpen}
             setDisplayData={setDisplayData}
-            wordLimit={wordLimit}
-            limitCanBePassed={limitCanBePassed}
             canSave={canSave}
             setCanSave={setCanSave}
+            refetch={refetch}
           />
         ) : (
-          <DisplaySRTE
+          <DisplayGuideSRTE
             key={prepopulationData}
             initialConfig={uneditableInitialCOnfig}
-            // editorRef={editorRef}
             data={prepopulationData}
             section={section}
-            // project_pk={project_pk}
-            // document_pk={document_pk}
-            // editorType={editorType}
-            // isUpdate={isUpdate}
-            // displayData={displayData}
-            // editorText={editorText}
-            // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-            // setShouldShowTree={setShouldShowTree}
-            // isEditorOpen={isEditorOpen}
-            // setIsEditorOpen={setIsEditorOpen}
-            // setDisplayData={setDisplayData}
-            // textEditorName={
-            //   section === "description" ? "Description" : undefined
-            // }
           />
         )}
       </Box>
-      {/* <p>Editor text is: {`${editorText}`}</p>
-            <p>Data is: {`${data}`}</p>
-            <p>Display Data is: {`${displayData}`}</p> */}
     </Box>
   );
 };
