@@ -1978,6 +1978,17 @@ export const openProjectCall = async ({ pk }: ISimplePkProp) => {
     }
 }
 
+export const suspendProjectCall = async ({ pk }: ISimplePkProp) => {
+    // console.log(projectPk, reason, outcome);
+    if (pk !== undefined) {
+
+        const url = `projects/${pk}/suspend`
+
+        return instance.post(url).then(res => res.data);
+    }
+}
+
+
 export interface ISimplePkProp {
     pk: number;
 }

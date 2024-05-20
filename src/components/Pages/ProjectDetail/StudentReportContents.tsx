@@ -127,12 +127,14 @@ export const StudentReportContents = ({
     onClose: onCloseCreateStudentReportModal,
   } = useDisclosure();
 
-  const isBaLead = mePk === baLead
-  const isFullyApproved = (
-    documents?.filter((r) => r.year === selectedYear)[0]?.document.project_lead_approval_granted &&
-    documents?.filter((r) => r.year === selectedYear)[0]?.document.business_area_lead_approval_granted &&
-    documents?.filter((r) => r.year === selectedYear)[0]?.document.directorate_approval_granted
-  )
+  const isBaLead = mePk === baLead;
+  const isFullyApproved =
+    documents?.filter((r) => r.year === selectedYear)[0]?.document
+      .project_lead_approval_granted &&
+    documents?.filter((r) => r.year === selectedYear)[0]?.document
+      .business_area_lead_approval_granted &&
+    documents?.filter((r) => r.year === selectedYear)[0]?.document
+      .directorate_approval_granted;
 
   return (
     <>
@@ -154,34 +156,35 @@ export const StudentReportContents = ({
         width={"100%"}
       >
         <Flex width={"100%"} justifyContent={"space-between"}>
-          {(
-            isBaLead || userInTeam ||
-            userData?.is_superuser) && (
-              <Center>
-                <Button
-                  background={colorMode === "light" ? "orange.500" : "orange.600"}
-                  color={"white"}
-                  _hover={{
-                    background: colorMode === "light" ? "orange.400" : "orange.500",
-                  }}
-                  size={"sm"}
-                  onClick={
-                    onOpenCreateStudentReportModal
-                    // () => spawnProgressReport(
-                    //     {
-                    //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
-                    //         kind: "progressreport"
-                    //     }
-                    // )
-                  }
-                  isDisabled={availableStudentYearsData?.length < 1}
-                  leftIcon={<BsPlus size={"20px"} />}
-                >
-                  New Report
-                </Button>
-              </Center>
-            )}
-
+          {(isBaLead || userInTeam || userData?.is_superuser) && (
+            <Center>
+              <Button
+                background={colorMode === "light" ? "orange.500" : "orange.600"}
+                color={"white"}
+                _hover={{
+                  background:
+                    colorMode === "light" ? "orange.400" : "orange.500",
+                }}
+                size={"sm"}
+                onClick={
+                  onOpenCreateStudentReportModal
+                  // () => spawnProgressReport(
+                  //     {
+                  //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
+                  //         kind: "progressreport"
+                  //     }
+                  // )
+                }
+                isDisabled={
+                  availableStudentYearsData?.length < 1 ||
+                  documents[0].document?.project?.status === "suspended"
+                }
+                leftIcon={<BsPlus size={"20px"} />}
+              >
+                New Report
+              </Button>
+            </Center>
+          )}
 
           <Center flex={1} justifyContent={"flex-end"}>
             <Flex alignItems={"center"}>
@@ -252,7 +255,10 @@ export const StudentReportContents = ({
           <RichTextEditor
             wordLimit={150}
             limitCanBePassed={false}
-            canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+            canEdit={
+              ((userInTeam || isBaLead) && !isFullyApproved) ||
+              userData?.is_superuser
+            }
             writeable_document_kind={"Student Report"}
             writeable_document_pk={selectedStudentReport?.pk}
             project_pk={selectedStudentReport?.document?.project?.pk}

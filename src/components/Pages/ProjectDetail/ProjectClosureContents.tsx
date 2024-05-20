@@ -58,7 +58,7 @@ export const ProjectClosureContents = ({
   const potentialOutcomes = [
     "completed",
     "terminated",
-    "suspended",
+    // "suspended",
     // "forcecompleted",
   ];
 
@@ -99,8 +99,9 @@ export const ProjectClosureContents = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Set Closure Outcome",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -122,13 +123,13 @@ export const ProjectClosureContents = ({
     setClosureMutation.mutate(formData);
   };
 
-  const isBaLead = mePk === baLead
+  const isBaLead = mePk === baLead;
 
-  const isFullyApproved = (
+  const isFullyApproved =
     all_documents?.project_closure?.document.project_lead_approval_granted &&
-    all_documents?.project_closure?.document.business_area_lead_approval_granted &&
-    all_documents?.project_closure?.document.directorate_approval_granted
-  )
+    all_documents?.project_closure?.document
+      .business_area_lead_approval_granted &&
+    all_documents?.project_closure?.document.directorate_approval_granted;
 
   return (
     <motion.div
@@ -152,7 +153,7 @@ export const ProjectClosureContents = ({
         refetchData={refetch}
         setToLastTab={setToLastTab}
         isBaLead={isBaLead}
-      // projectPk={projectPk}
+        // projectPk={projectPk}
       />
 
       <Flex
@@ -185,7 +186,10 @@ export const ProjectClosureContents = ({
       </Flex>
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Closure"}
@@ -198,7 +202,10 @@ export const ProjectClosureContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Closure"}
@@ -211,7 +218,10 @@ export const ProjectClosureContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Closure"}
@@ -223,7 +233,10 @@ export const ProjectClosureContents = ({
         section={"data_location"}
       />
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Closure"}
@@ -235,7 +248,10 @@ export const ProjectClosureContents = ({
         section={"hardcopy_location"}
       />
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Closure"}
@@ -247,7 +263,10 @@ export const ProjectClosureContents = ({
         section={"backup_location"}
       />
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Closure"}

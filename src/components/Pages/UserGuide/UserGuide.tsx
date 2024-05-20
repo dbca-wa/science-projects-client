@@ -373,16 +373,15 @@ export const UserGuide = () => {
   //   softRefetch
 
   const [selected, setSelected] = useState("about");
-  const [pageViewChildren, setPageViewChildren] = useState<React.ReactNode>(
-    <>Test</>
-  );
+  const [pageViewChildren, setPageViewChildren] = useState<React.ReactNode>();
   const handleSidebarMenuClick = (page: string) => {
     setSelected(page);
   };
 
   useEffect(() => {
-    let content = null;
     if (!userLoading && userData && !adminOptionsLoading && adminOptionsData) {
+      let content = null;
+
       switch (selected) {
         case "about":
           content = (
@@ -482,10 +481,9 @@ export const UserGuide = () => {
           content = null;
           break;
       }
+      setPageViewChildren(content);
     }
-
-    setPageViewChildren(content);
-  }, [selected, userData, userLoading]);
+  }, [selected, userData, userLoading, adminOptionsData, adminOptionsLoading]);
 
   return (
     <>

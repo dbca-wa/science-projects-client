@@ -25,6 +25,10 @@ export const ToggleDarkMode = ({
   const colorToggleIcon = useColorModeValue(<FaMoon />, <FaSun />);
   const keyColorMode = useColorModeValue("light", "dark");
   const iconButtonColorScheme = useColorModeValue("blue", "orange");
+  const backgroundHoverColor = useColorModeValue(
+    "whiteAlpha.400",
+    "whiteAlpha.500"
+  );
 
   return asMenuItem ? (
     <MenuItem onClick={toggleColorMode} zIndex={2}>
@@ -53,6 +57,10 @@ export const ToggleDarkMode = ({
             }}
             variant={"ghost"}
             aria-label="Toggle Dark Mode"
+            _hover={{
+              bg: backgroundHoverColor,
+              color: `${iconButtonColorScheme}.300`,
+            }}
           >
             <Text>{keyColorMode === "dark" ? "Light" : "Dark"}</Text>
           </Button>
