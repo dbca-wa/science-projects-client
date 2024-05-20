@@ -23,6 +23,11 @@ import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { AnimatedToggleButton } from "./AnimatedToggleButton";
 import { SiReadthedocs } from "react-icons/si";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
+import { RiAdminFill } from "react-icons/ri";
+import { FaBookBookmark, FaUsers } from "react-icons/fa6";
+import { PiBookOpenTextFill } from "react-icons/pi";
+import { HiMiniSquares2X2 } from "react-icons/hi2";
 
 const buttonWidthVariants = {
   open: {
@@ -82,30 +87,70 @@ export const Sidebar = () => {
     setActiveMenu(getMenuTitleByRoute(currentPage));
   }, [currentPage]);
 
-  const Menus = [
-    {
-      title: "Projects",
-      img: AiOutlineFundProjectionScreen,
-      route: "/projects",
-      section: "Projects",
-    },
-    { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
-    { title: "Users", img: ImUsers, route: "/users", section: "Users" },
-    { title: "Add user", img: FiUserPlus, route: "/users/add" },
-    {
-      title: `Latest Report`,
-      img: MdOutlineAccessTimeFilled,
-      route: "/reports/current",
-      section: "ARAR",
-    },
-    { title: "Reports", img: HiDocumentDuplicate, route: "/reports" },
-    {
-      title: "Quick Guide",
-      img: SiReadthedocs,
-      route: "/guide",
-      section: "Guide",
-    },
-  ];
+  const { userData, userLoading } = useUser();
+
+  const Menus = userData?.is_superuser
+    ? [
+        {
+          title: "Projects",
+          img: HiMiniSquares2X2,
+          route: "/projects",
+          section: "Projects",
+        },
+        { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
+        { title: "Users", img: FaUsers, route: "/users", section: "Users" },
+        { title: "Add user", img: FiUserPlus, route: "/users/add" },
+        {
+          title: `Latest Report`,
+          img: MdOutlineAccessTimeFilled,
+          route: "/reports/current",
+          section: "ARAR",
+        },
+
+        { title: "Reports", img: PiBookOpenTextFill, route: "/reports" },
+        {
+          title: "Quick Guide",
+          img: FaBookBookmark,
+          route: "/guide",
+          section: "Guide",
+        },
+        {
+          title: "Admin",
+          img: RiAdminFill,
+          route: "/crud",
+          section: "Admin",
+        },
+      ]
+    : [
+        {
+          title: "Projects",
+          img: AiOutlineFundProjectionScreen,
+          route: "/projects",
+          section: "Projects",
+        },
+        { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
+        { title: "Users", img: ImUsers, route: "/users", section: "Users" },
+        { title: "Add user", img: FiUserPlus, route: "/users/add" },
+        // {
+        //   title: `Latest Report`,
+        //   img: MdOutlineAccessTimeFilled,
+        //   route: "/reports/current",
+        //   section: "ARAR",
+        // },
+
+        {
+          title: "Reports",
+          img: HiDocumentDuplicate,
+          route: "/reports",
+          section: "ARAR",
+        },
+        {
+          title: "Quick Guide",
+          img: SiReadthedocs,
+          route: "/guide",
+          section: "Guide",
+        },
+      ];
 
   const handleToggleSidebar = () => {
     setOpen(!open);

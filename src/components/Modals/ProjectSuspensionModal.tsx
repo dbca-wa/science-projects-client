@@ -1,45 +1,45 @@
 import {
-  Text,
+  Box,
+  Button,
   Center,
   Flex,
+  FormControl,
+  Grid,
+  Input,
+  InputGroup,
+  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Text,
   ToastId,
-  useToast,
-  useColorMode,
   UnorderedList,
-  ListItem,
-  FormControl,
-  InputGroup,
-  Input,
-  ModalFooter,
-  Grid,
-  Button,
-  Box,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
-import { ISimplePkProp, openProjectCall } from "../../lib/api";
-import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
+import { ISimplePkProp, suspendProjectCall } from "../../lib/api";
 
 interface Props {
-  // thisUser: IUserMe;
-  // leaderPk: number;
   projectPk: string | number;
   isOpen: boolean;
   onClose: () => void;
   refetchData: () => void;
+  projectStatus: string;
 }
 
-export const ProjectReopenModal = ({
+export const ProjectSuspensionModal = ({
   projectPk,
   isOpen,
   onClose,
   refetchData,
+  projectStatus,
 }: Props) => {
   const { register, handleSubmit, watch } = useForm<ISimplePkProp>();
   const projPk = watch("pk");
@@ -53,12 +53,14 @@ export const ProjectReopenModal = ({
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
-  const reopenMutation = useMutation({
-    mutationFn: openProjectCall,
+  const suspendMutation = useMutation({
+    mutationFn: suspendProjectCall,
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `Repening Project`,
+        title: `${
+          projectStatus !== "suspended" ? "Suspending" : "Unsuspending "
+        } Project`,
         position: "top-right",
       });
     },
@@ -66,7 +68,9 @@ export const ProjectReopenModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Project has been reopened`,
+          description: `Project has been ${
+            projectStatus !== "suspended" ? "suspended" : "unsuspended"
+          }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -90,7 +94,9 @@ export const ProjectReopenModal = ({
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could not reopen project`,
+          title: `Could not ${
+            projectStatus !== "suspended" ? "suspend" : "unsuspend"
+          } project`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -101,12 +107,12 @@ export const ProjectReopenModal = ({
     },
   });
 
-  const openProject = (formData: ISimplePkProp) => {
+  const suspendProject = (formData: ISimplePkProp) => {
     console.log(formData);
     const newForm = {
       pk: projPk,
     };
-    reopenMutation.mutate(newForm);
+    suspendMutation.mutate(newForm);
   };
 
   const { colorMode } = useColorMode();
@@ -114,10 +120,12 @@ export const ProjectReopenModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
       <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(openProject)}>
+      <Flex as={"form"} onSubmit={handleSubmit(suspendProject)}>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader>
-            Are you sure you want to reopen this project?
+            Are you sure you want to{" "}
+            {projectStatus !== "suspended" ? "suspend" : "unsuspend"} this
+            project?
           </ModalHeader>
           <ModalCloseButton />
 
@@ -140,13 +148,25 @@ export const ProjectReopenModal = ({
                   </Box>
                   <UnorderedList px={10} pt={4}>
                     <ListItem>
-                      The project will become active, with the status set to
-                      'updating'
+                      This will not create or delete any Project Closures
                     </ListItem>
                     <ListItem>
-                      The project closure document will be deleted
+                      {projectStatus !== "suspended"
+                        ? "The project will become inactive, with the status set to 'suspended'"
+                        : "The project will become active, with the status set to 'active'"}
                     </ListItem>
-                    <ListItem>Progress Reports can be created again</ListItem>
+                    <ListItem>
+                      {projectStatus !== "suspended"
+                        ? "The project will not be closed, but it's progress reports will not be included on the Annual Report."
+                        : "The project's progress reports will be included on the Annual Report, if one exists/is created for that FY."}
+                    </ListItem>
+                    {projectStatus !== "suspended" && (
+                      <ListItem>
+                        When a new Annual Reporting cycle begins, the status of
+                        the project will automatically be set to "update
+                        requested"
+                      </ListItem>
+                    )}
                   </UnorderedList>
                 </Box>
 
@@ -156,7 +176,9 @@ export const ProjectReopenModal = ({
                     color={"blue.400"}
                     textDecoration={"underline"}
                   >
-                    You can close the project again at any time.
+                    {projectStatus !== "suspended"
+                      ? "You can unsuspend the project again at any time, setting the status of the project to 'active'"
+                      : "You can suspend the project again at any time, immediately setting the status of the project to 'suspended'"}
                   </Text>
                 </Center>
 
@@ -186,11 +208,13 @@ export const ProjectReopenModal = ({
                 _hover={{
                   background: colorMode === "light" ? "green.400" : "green.500",
                 }}
-                isLoading={reopenMutation.isPending}
+                isLoading={suspendMutation.isPending}
                 type="submit"
                 ml={3}
               >
-                Open Project
+                {projectStatus !== "suspended"
+                  ? "Suspend Project"
+                  : "Unsuspend Project"}
               </Button>
             </Grid>
           </ModalFooter>

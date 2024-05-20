@@ -198,8 +198,7 @@ export const ProjectClosureModal = ({
                 <Center p={5}>
                   <Text fontWeight={"semibold"} color={"blue.500"}>
                     If instead you wish to permanently delete this project,
-                    please press cancel and select 'Delete' from the vertical
-                    ellipsis.
+                    please press cancel and select 'Delete' from the menu.
                   </Text>
                 </Center>
 
@@ -226,7 +225,7 @@ export const ProjectClosureModal = ({
                     >
                       <option value={"completed"}>Completion</option>
                       {/* <option value={"forcecompleted"}>Force Completion</option> */}
-                      <option value={"suspended"}>Suspension</option>
+                      {/* <option value={"suspended"}>Suspension</option> */}
                       <option value={"terminated"}>Termination</option>
                     </Select>
                     <FormHelperText>

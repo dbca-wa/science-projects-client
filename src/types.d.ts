@@ -20,6 +20,34 @@ type ProgressReportSection = "context" | "aims" | "progress" | "implications" | 
 type StudentReportSection = "progress_report";
 type ProjectClosureSection = "reason" | "intended_outcome" | "knowledge_transfer" | "data_location" | "hardcopy_location" | "backup_location" | "scientific_outputs";
 
+export interface IMiniUser {
+    pk: number;
+    first_name: string;
+    last_name: string;
+    username: string;
+    email: string;
+    is_active: boolean;
+    is_superuser: boolean;
+}
+
+export interface IAdminOptions {
+    pk: number;
+    email_options: string;
+    updated_at: Date;
+    created_at: Data;
+    maintainer: IMiniUser;
+    guide_admin: string;
+    guide_about: string;
+    guide_login: string;
+    guide_profile: string;
+    guide_user_creation: string;
+    guide_user_view: string;
+    guide_project_creation: string;
+    guide_project_view: string;
+    guide_project_team: string;
+    guide_documents: string;
+    guide_report: string;
+}
 
 export interface IConceptPlanGenerationData {
     project_pk: number;
@@ -102,7 +130,7 @@ export interface IAnnualReportPDFObject {
 }
 
 
-export type EditorType = "ProjectDetail" | "ProjectDocument" | "AnnualReport" | "Comment";
+export type EditorType = "ProjectDetail" | "ProjectDocument" | "AnnualReport" | "Comment" | "Guide";
 export type EditorSections =
     "Annual Report" |
     "Description" |
