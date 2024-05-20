@@ -540,25 +540,26 @@ export interface IFullUserUpdateVariables {
     image?: File | string | null | undefined;
     about?: string;
     expertise?: string;
-    affiliation?: IAffiliation;
+    affiliation?: IAffiliation | number;
 }
 
 export const adminUpdateUser = async (
     { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }: IFullUserUpdateVariables) => {
-    // console.log(
-    //     { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }
-    // )
+    console.log(
+        { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }
+    )
 
     try {
         // console.log(branch)
         // console.log(business_area)
-
+        
         const membershipData = {
-            affiliation: affiliation?.pk,
+            affiliation: typeof affiliation === "string" ? Number(affiliation) : affiliation?.pk,
             userPk: userPk,
             branch: (branch !== null && branch !== '') ? Number(branch) : 0,
             business_area: (business_area !== null && business_area !== '') ? Number(business_area) : 0,
         };
+        console.log(membershipData)
         await updateMembership(membershipData);
 
         const profileData = {

@@ -37,7 +37,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import { IBranch, IBusinessArea, IUserData } from "../../types";
+import { IAffiliation, IBranch, IBusinessArea, IUserData } from "../../types";
 import { GiGraduateCap } from "react-icons/gi";
 import { AiFillPhone } from "react-icons/ai";
 import { GrMail } from "react-icons/gr";
@@ -54,6 +54,7 @@ import { MdFax } from "react-icons/md";
 import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
 import noImageLink from "/sad-face.png";
 import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
+import { useAffiliations } from "@/lib/hooks/tanstack/useAffiliations";
 
 interface IModalProps {
   isOpen: boolean;
@@ -101,8 +102,8 @@ export const EditUserDetailsModal = ({
         ? "blackAlpha.300"
         : "blackAlpha.200"
       : hoveredTitle
-        ? "whiteAlpha.400"
-        : "whiteAlpha.300"
+      ? "whiteAlpha.400"
+      : "whiteAlpha.300"
   }`;
 
   // // Regex for validity of phone variable
@@ -251,8 +252,10 @@ export const EditUserDetailsModal = ({
     business_area,
     about,
     expertise,
+    affiliation,
   }: IFullUserUpdateVariables) => {
     const image = activeOption === "url" ? selectedImageUrl : selectedFile;
+    console.log(affiliation);
     await fullMutation.mutateAsync({
       userPk,
       title,
@@ -263,8 +266,11 @@ export const EditUserDetailsModal = ({
       image,
       about,
       expertise,
+      affiliation,
     });
   };
+
+  const { affiliationsLoading, affiliationsData } = useAffiliations();
 
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"3xl"}>
@@ -279,7 +285,7 @@ export const EditUserDetailsModal = ({
                 <TabList mb="1em">
                   <Tab>Base Information</Tab>
                   <Tab>Profile</Tab>
-                  <Tab isDisabled={!userData.is_staff}>Organisation</Tab>
+                  <Tab>Organisation</Tab>
                 </TabList>
                 <TabPanels>
                   <TabPanel>
@@ -527,11 +533,11 @@ export const EditUserDetailsModal = ({
                                         ? selectedImageUrl
                                         : noImageLink
                                       : activeOption === "upload" &&
-                                          selectedFile
-                                        ? URL.createObjectURL(selectedFile)
-                                        : userData?.image?.file
-                                          ? userData.image.file
-                                          : noImageLink
+                                        selectedFile
+                                      ? URL.createObjectURL(selectedFile)
+                                      : userData?.image?.file
+                                      ? userData.image.file
+                                      : noImageLink
                                   }
                                   alt="Preview"
                                   userSelect="none"
@@ -562,8 +568,8 @@ export const EditUserDetailsModal = ({
                                     activeOption === "url"
                                       ? "blue.500"
                                       : colorMode === "light"
-                                        ? "gray.200"
-                                        : "gray.700"
+                                      ? "gray.200"
+                                      : "gray.700"
                                   }
                                   color={
                                     colorMode === "light" ? "black" : "white"
@@ -591,8 +597,8 @@ export const EditUserDetailsModal = ({
                                     activeOption === "upload"
                                       ? "blue.500"
                                       : colorMode === "light"
-                                        ? "gray.200"
-                                        : "gray.700"
+                                      ? "gray.200"
+                                      : "gray.700"
                                   }
                                   color={"white"}
                                 >
@@ -696,15 +702,42 @@ export const EditUserDetailsModal = ({
                                 defaultValue={userData?.business_area?.pk || ""}
                                 {...register("business_area")}
                               >
-                                {businessAreas.map(
-                                  (ba: IBusinessArea, index: number) => {
+                                {businessAreas
+                                  .sort((a: IBusinessArea, b: IBusinessArea) =>
+                                    a.name.localeCompare(b.name)
+                                  )
+                                  .map((ba: IBusinessArea, index: number) => {
                                     return (
                                       <option key={index} value={ba.pk}>
                                         {ba.name}
                                       </option>
                                     );
-                                  }
-                                )}
+                                  })}
+                              </Select>
+                            )}
+                          </InputGroup>
+                        </FormControl>
+
+                        <FormControl my={4} mb={4} userSelect={"none"}>
+                          <FormLabel>Affiliation</FormLabel>
+                          <InputGroup>
+                            {!affiliationsLoading && affiliationsData && (
+                              <Select
+                                placeholder={"Select an Affiliation"}
+                                defaultValue={userData?.affiliation?.pk || ""}
+                                {...register("affiliation")}
+                              >
+                                {affiliationsData
+                                  .sort((a: IAffiliation, b: IAffiliation) =>
+                                    a.name.localeCompare(b.name)
+                                  )
+                                  .map((aff: IAffiliation, index: number) => {
+                                    return (
+                                      <option key={index} value={aff.pk}>
+                                        {aff.name}
+                                      </option>
+                                    );
+                                  })}
                               </Select>
                             )}
                           </InputGroup>
@@ -713,7 +746,37 @@ export const EditUserDetailsModal = ({
                     )}
 
                     {!userLoading && !userData.is_staff && (
-                      <Text>This user is external</Text>
+                      <>
+                        <Text>
+                          This user is external. You may only set their
+                          affiliation.
+                        </Text>
+
+                        <FormControl my={4} mb={4} userSelect={"none"}>
+                          <FormLabel>Affiliation</FormLabel>
+                          <InputGroup>
+                            {!affiliationsLoading && affiliationsData && (
+                              <Select
+                                placeholder={"Select an Affiliation"}
+                                defaultValue={userData?.affiliation?.pk || ""}
+                                {...register("affiliation")}
+                              >
+                                {affiliationsData
+                                  .sort((a: IAffiliation, b: IAffiliation) =>
+                                    a.name.localeCompare(b.name)
+                                  )
+                                  .map((aff: IAffiliation, index: number) => {
+                                    return (
+                                      <option key={index} value={aff.pk}>
+                                        {aff.name}
+                                      </option>
+                                    );
+                                  })}
+                              </Select>
+                            )}
+                          </InputGroup>
+                        </FormControl>
+                      </>
                     )}
                   </TabPanel>
                 </TabPanels>
