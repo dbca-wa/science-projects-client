@@ -86,6 +86,10 @@ export interface IMergeAffiliation {
     secondaryAffiliations: IAffiliation[]; // or IAffiliation and extract pk
 }
 
+export interface IProjectLeadsEmail {
+    shouldDownloadList: boolean;
+}
+
 export interface IEmailModalProps {
     isOpen: boolean;
     onClose: () => void;

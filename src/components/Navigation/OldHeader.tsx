@@ -71,6 +71,7 @@ import { Navitar } from "./Navitar";
 import { SidebarNavButton } from "./SidebarNavButton";
 import { SidebarNavMenu } from "./SidebarNavMenu";
 import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
+import { ProjectLeadEmailModal } from "../Modals/ProjectLeadEmailModal";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -212,12 +213,14 @@ interface AdminProps {
   handleNewReportCycle: () => void;
   handleBatchApproveReports: () => void;
   handleBatchApproveOldReports: () => void;
+  handleSendEmailToProjectLeads: () => void;
 }
 const AdminMenuContents = ({
   // handleDataDump,
   handleNewReportCycle,
   handleBatchApproveReports,
   handleBatchApproveOldReports,
+  handleSendEmailToProjectLeads,
 }: AdminProps) => {
   const navigate = useNavigate();
   return (
@@ -333,6 +336,10 @@ const AdminMenuContents = ({
           {<HiDocumentPlus />}
           <Text ml={2}>Open Annual Report Cycle</Text>
         </MenuItem>
+        <MenuItem onClick={handleSendEmailToProjectLeads}>
+          {<MdEmail />}
+          <Text ml={2}>Send Project Lead Email</Text>
+        </MenuItem>
       </MenuGroup>
     </>
   );
@@ -434,10 +441,19 @@ const OldHeader = () => {
 
   const { userLoading, userData } = useUser();
   const { layout } = useLayoutSwitcher();
+  const {
+    isOpen: isProjectLeadEmailModalOpen,
+    onOpen: onProjectLeadEmailModalOpen,
+    onClose: onProjectLeadEmailModalClose,
+  } = useDisclosure();
 
   return (
     <Box>
       {/* Nav background */}
+      <ProjectLeadEmailModal
+        isOpen={isProjectLeadEmailModalOpen}
+        onClose={onProjectLeadEmailModalClose}
+      />
       <BatchApproveModal
         isOpen={isBatchApproveOpen}
         onClose={onBatchApproveClose}
@@ -581,6 +597,9 @@ const OldHeader = () => {
                                   handleBatchApproveOldReports={
                                     handleBatchApproveOldReports
                                   }
+                                  handleSendEmailToProjectLeads={
+                                    onProjectLeadEmailModalOpen
+                                  }
                                 />
                               }
                             />
@@ -642,6 +661,9 @@ const OldHeader = () => {
                         handleBatchApproveReports={handleBatchApproveReports}
                         handleBatchApproveOldReports={
                           handleBatchApproveOldReports
+                        }
+                        handleSendEmailToProjectLeads={
+                          onProjectLeadEmailModalOpen
                         }
                       />
                     }

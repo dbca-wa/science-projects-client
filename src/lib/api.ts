@@ -2,7 +2,7 @@ import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/C
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAdminOptions, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IBusinessAreaCreate, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProgressReport, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
+import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAdminOptions, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IBusinessAreaCreate, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProgressReport, IProjectLeadsEmail, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
 import { IConceptPlanGenerationData } from "../types";
 
 
@@ -276,6 +276,16 @@ export const deleteUserAdmin = async ({ userPk }: AdminSwitchVar) => {
 
 export const batchApproveOLDProgressAndStudentReports = async () => {
     const res = instance.post(`documents/batchapproveold`).then(res => { return res.data });
+    return res;
+}
+
+
+
+export const sendEmailToProjectLeads = async ({shouldDownloadList}:IProjectLeadsEmail) => {
+    const data = {
+        shouldDownloadList
+    }
+    const res = instance.post(`documents/send_email_to_project_leads`, data).then(res => { return res.data });
     return res;
 }
 
