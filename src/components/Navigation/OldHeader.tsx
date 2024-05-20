@@ -505,28 +505,18 @@ const OldHeader = () => {
                   <DrawerContent bg={"blackAlpha.900"}>
                     <DrawerCloseButton color={"white"} />
 
-                    <DrawerHeader borderBottomWidth="1px" color="white">
+                    <DrawerHeader
+                      borderBottomWidth="1px"
+                      borderBottomColor={
+                        colorMode === "light" ? "gray.500" : "gray.500"
+                      }
+                      color="white"
+                    >
                       SPMS
                     </DrawerHeader>
                     <DrawerBody>
                       <VStack py={3}>
                         <HStack w={"100%"} zIndex={60}>
-                          {/* <Flex
-                            mr={"auto"}
-                            justifyContent={"left"}
-                            alignItems={"center"}
-                            w={"100%"}
-                          >
-                            <Center>
-                              <Text
-                                alignItems={"center"}
-                                fontSize={"lg"}
-                                color={"whiteAlpha.800"}
-                              >
-                                MENU
-                              </Text>
-                            </Center>
-                          </Flex> */}
                           <Flex
                             ml={"auto"}
                             justifyContent={"right"}
@@ -559,21 +549,21 @@ const OldHeader = () => {
                           {/* Projects */}
                           <SidebarNavMenu
                             menuName="Projects"
-                            leftIcon={<AiFillProject />}
+                            leftIcon={<HiMiniSquares2X2 />}
                             children={<ProjectMenuContents />}
                           />
 
                           {/* Staff */}
                           <SidebarNavMenu
                             menuName="Users"
-                            leftIcon={<BsFillPeopleFill />}
+                            leftIcon={<FaUsers />}
                             children={<UserMenuContents />}
                           />
 
                           {/* Reports */}
                           <SidebarNavMenu
                             menuName="Reports"
-                            leftIcon={<IoMdDocument />}
+                            leftIcon={<PiBookOpenTextFill />}
                             children={<ReportMenuContents />}
                           />
 

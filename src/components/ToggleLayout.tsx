@@ -23,6 +23,10 @@ export const ToggleLayout = ({
 }: IOptionalToggleLayoutProps) => {
   const { layout, switchLayout } = useLayoutSwitcher();
   const iconColor = useColorModeValue("gray.400", "gray.300");
+  const backgroundHoverColor = useColorModeValue(
+    "whiteAlpha.400",
+    "whiteAlpha.500"
+  );
   const layouts = {
     traditional: {
       key: "traditional",
@@ -71,6 +75,10 @@ export const ToggleLayout = ({
             onClick={currentLayout.onclick}
             variant={"ghost"}
             aria-label="Toggle Layout"
+            _hover={{
+              background: backgroundHoverColor,
+              color: "white",
+            }}
           >
             <Text pl={3}>{layout === "modern" ? "Traditional" : "Modern"}</Text>
           </Button>

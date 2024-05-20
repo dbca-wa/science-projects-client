@@ -123,7 +123,11 @@ export const ProjectReopenModal = ({
 
           <ModalBody>
             <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={10}>
-              <Box bg={"gray.50"} rounded={"2xl"} p={2}>
+              <Box
+                bg={colorMode === "light" ? "gray.50" : "gray.700"}
+                rounded={"2xl"}
+                p={2}
+              >
                 <Box px={4}>
                   <Text fontWeight={"semibold"} fontSize={"xl"}>
                     Info
