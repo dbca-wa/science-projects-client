@@ -3164,6 +3164,22 @@ export const sendDocumentApprovedEmail = async ({ recipients_list, project_pk,
     );
 }
 
+export interface IFeedbackReceived {
+    recipients_list: number[]; // array of pks
+}
+
+export const sendFeedbackReceivedEmail = async ({ recipients_list}: IFeedbackReceived) => {
+    return instance.post(
+        `documents/feedback_received_email`,
+        {
+            "recipients_list": recipients_list,
+        }
+    ).then(res => {
+        return res.data;
+    }
+    );
+}
+
 export interface IDocumentRecalled {
     stage: number;
 
