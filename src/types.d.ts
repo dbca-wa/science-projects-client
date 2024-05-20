@@ -97,7 +97,8 @@ export interface IEmailModalProps {
             | IProjectClosureEmail
             | IDocumentReadyEmail
             | IDocumentApproved
-            | IDocumentRecalled
+            | IDocumentRecalled 
+            | IFeedbackReceived
     ) => Promise<AxiosResponse | AxiosError>; // Allow props to be optional
 }
 

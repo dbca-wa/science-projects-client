@@ -14,6 +14,7 @@ import {
   IProjectClosureEmail,
   IReviewDocumentEmail,
   sendDocumentApprovedEmail,
+  sendFeedbackReceivedEmail,
   // sendDocumentReadyEmail,
   // sendDocumentRecalledEmail,
   // sendDocumentSentBackEmail,
@@ -41,6 +42,8 @@ import React, {
 } from "react";
 import { render } from "@react-email/render";
 import { DocumentRecalledEmailModal } from "@/components/Modals/Emails/DocumentRecalledEmailModal";
+import { FeedbackReceivedEmailModal } from "@/components/Modals/Emails/FeedbackReceivedEmailModal";
+import FeedbackReceivedEmail from "@/components/Emails/FeedbackReceivedEmail";
 // import {
 //   useMutation,
 //   //  useQueryClient
@@ -52,12 +55,12 @@ interface IWrapper {
   templateName: string;
   openModalFunction: () => void;
   props?:
-  | IReviewDocumentEmail
-  | INewCycleEmail
-  | IProjectClosureEmail
-  | IDocumentReadyEmail
-  | IDocumentApproved
-  | IDocumentRecalled;
+    | IReviewDocumentEmail
+    | INewCycleEmail
+    | IProjectClosureEmail
+    | IDocumentReadyEmail
+    | IDocumentApproved
+    | IDocumentRecalled;
 }
 
 const EmailWrapper = ({
@@ -101,7 +104,7 @@ const EmailWrapper = ({
         border={"1px solid"}
         borderColor={"gray.300"}
         rounded={"xl"}
-      // bg={colorMode === "light" ? "gray.200" : "gray.700"}
+        // bg={colorMode === "light" ? "gray.200" : "gray.700"}
       >
         {children}
       </Box>
@@ -152,6 +155,12 @@ export const TestEmailPage = () => {
     onClose: onDocumentRecalledModalClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isFeedbackReceivedModalOpen,
+    onOpen: onFeedbackReceivedModalOpen,
+    onClose: onFeedbackReceivedModalClose,
+  } = useDisclosure();
+
   return userLoading && !userData ? (
     <Center>
       <Spinner />
@@ -168,6 +177,12 @@ export const TestEmailPage = () => {
         isOpen={isDocumentRecalledModalOpen}
         onClose={onDocumentRecalledModalClose}
         emailFunction={sendDocumentApprovedEmail}
+        thisUser={userData}
+      />
+      <FeedbackReceivedEmailModal
+        isOpen={isFeedbackReceivedModalOpen}
+        onClose={onFeedbackReceivedModalClose}
+        emailFunction={sendFeedbackReceivedEmail}
         thisUser={userData}
       />
       <Text fontWeight={"bold"} fontSize={"xl"}>
@@ -253,6 +268,13 @@ export const TestEmailPage = () => {
           openModalFunction={onDocumentRecalledModalOpen}
         >
           <DocumentRecalledEmail userData={userData} />
+        </EmailWrapper>
+
+        <EmailWrapper
+          templateName={"Feedback Received"}
+          openModalFunction={onFeedbackReceivedModalOpen}
+        >
+          <FeedbackReceivedEmail userData={userData} />
         </EmailWrapper>
       </Grid>
     </Box>
