@@ -84,16 +84,28 @@ const ProjectMenuContents = () => {
         textAlign={"center"}
       >
         <MenuItem
-          onClick={() => {
-            navigate("/projects/browse");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/projects/browse`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/projects/browse");
+            }
           }}
         >
           {<CgBrowse />}
           <Text ml={2}>Browse Projects</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/projects/add");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/projects/add`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/projects/add");
+            }
           }}
         >
           {<CgPlayListAdd />}
@@ -116,8 +128,14 @@ const GuideContents = () => {
         textAlign={"center"}
       >
         <MenuItem
-          onClick={() => {
-            navigate("/guide");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/guide`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/guide");
+            }
           }}
         >
           <FaBookBookmark />
@@ -145,8 +163,14 @@ const ReportMenuContents = () => {
       >
         {userData?.is_superuser ? (
           <MenuItem
-            onClick={() => {
-              navigate("/reports/current");
+            onClick={(e) => {
+              if (e.ctrlKey || e.metaKey) {
+                // Handle Ctrl + Click (or Command + Click on Mac)
+                window.open(`/reports/current`, "_blank"); // Opens in a new tab
+              } else {
+                // Normal click handling
+                navigate("/reports/current");
+              }
             }}
           >
             <MdOutlineAccessTimeFilled />
@@ -157,8 +181,14 @@ const ReportMenuContents = () => {
         ) : null}
 
         <MenuItem
-          onClick={() => {
-            navigate("/reports");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/reports`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/reports");
+            }
           }}
         >
           {<CgViewList />}
@@ -191,8 +221,14 @@ const UserMenuContents = () => {
         textAlign={"center"}
       >
         <MenuItem
-          onClick={() => {
-            navigate("/users");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/users`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/users");
+            }
           }}
         >
           {<ImUsers />}
@@ -232,16 +268,28 @@ const AdminMenuContents = ({
         textAlign={"center"}
       >
         <MenuItem
-          onClick={() => {
-            navigate("/crud/addresses");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/addresses`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/addresses");
+            }
           }}
         >
           {<FaAddressCard />}
           <Text ml={2}>Addresses</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/affiliations");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/affiliations`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/affiliations");
+            }
           }}
         >
           {<RiTeamFill />}
@@ -249,32 +297,56 @@ const AdminMenuContents = ({
         </MenuItem>
 
         <MenuItem
-          onClick={() => {
-            navigate("/crud/branches");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/branches`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/branches");
+            }
           }}
         >
           {<RiOrganizationChart />}
           <Text ml={2}>Branches</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/businessareas");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/businessareas`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/businessareas");
+            }
           }}
         >
           {<ImBriefcase />}
           <Text ml={2}>Business Areas</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/divisions");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/divisions`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/divisions");
+            }
           }}
         >
           {<GoOrganization />}
           <Text ml={2}>Divisions</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/emails");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/emails`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/emails");
+            }
           }}
         >
           {<MdEmail />}
@@ -282,16 +354,28 @@ const AdminMenuContents = ({
         </MenuItem>
 
         <MenuItem
-          onClick={() => {
-            navigate("/crud/locations");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/locations`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/locations");
+            }
           }}
         >
           {<FaLocationArrow />}
           <Text ml={2}>Locations</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/reports");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/reports`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/reports");
+            }
           }}
         >
           {<MdManageHistory />}
@@ -299,15 +383,31 @@ const AdminMenuContents = ({
         </MenuItem>
 
         <MenuItem
-          onClick={() => {
-            navigate("/crud/services");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/services`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/services");
+            }
           }}
         >
           {<MdOutlineSettingsSuggest />}
           <Text ml={2}>Services</Text>
         </MenuItem>
 
-        <MenuItem onClick={() => navigate("/crud/feedback")}>
+        <MenuItem
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/feedback`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/feedback");
+            }
+          }}
+        >
           {<VscFeedback />}
           <Text ml={2}>View Feedback</Text>
         </MenuItem>
@@ -676,7 +776,15 @@ const OldHeader = () => {
                   <NavButton
                     leftIcon={FaBookBookmark}
                     buttonName="Guide"
-                    onClick={() => navigate("/guide")}
+                    onClick={(e) => {
+                      if (e.ctrlKey || e.metaKey) {
+                        // Handle Ctrl + Click (or Command + Click on Mac)
+                        window.open(`/guide`, "_blank"); // Opens in a new tab
+                      } else {
+                        // Normal click handling
+                        navigate("/guide");
+                      }
+                    }}
                   />
                 ) : null}
 

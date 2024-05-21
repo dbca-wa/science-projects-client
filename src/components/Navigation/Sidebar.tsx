@@ -218,9 +218,14 @@ export const Sidebar = () => {
           transitionDuration={"300ms"}
           textAlign={"center"}
           variant={"unstyled"}
-          onClick={() => {
-            setActiveMenu("Home");
-            updatePageContext("/");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/`, "_blank"); // Opens in a new tab
+            } else {
+              setActiveMenu("Home");
+              updatePageContext("/");
+            }
           }}
         >
           SPMS
@@ -299,9 +304,14 @@ export const Sidebar = () => {
                       bg: "blue.400",
                     }
               }
-              onClick={() => {
-                setActiveMenu(menu.title);
-                updatePageContext(menu.route);
+              onClick={(e) => {
+                if (e.ctrlKey || e.metaKey) {
+                  // Handle Ctrl + Click (or Command + Click on Mac)
+                  window.open(`${menu.route}`, "_blank"); // Opens in a new tab
+                } else {
+                  setActiveMenu(menu.title);
+                  updatePageContext(menu.route);
+                }
               }}
             >
               <Icon

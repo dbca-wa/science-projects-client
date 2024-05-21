@@ -13,7 +13,7 @@ export const useCopyText = (textToCopy: string) => {
           position: "top-right",
           status: "success",
           title: "Email Copied!",
-          description: "The email has been copied to the clipboard.",
+          description: "The email has been copied to your clipboard",
           duration: 2000,
           isClosable: true,
         });
@@ -23,7 +23,7 @@ export const useCopyText = (textToCopy: string) => {
           position: "top-right",
           status: "error",
           title: "Error!",
-          description: "Unable to copy the email to the clipboard.",
+          description: "Unable to copy the email to the clipboard",
           duration: 2000,
           isClosable: true,
         });

@@ -32,11 +32,13 @@ import {
   IProfileUpdateError,
   IProfileUpdateSuccess,
   IProfileUpdateVariables,
+  removeUserAvatar,
   updateProfile,
 } from "../../lib/api";
 import { useNoImage } from "../../lib/hooks/helper/useNoImage";
 import useServerImageUrl from "../../lib/hooks/helper/useServerImageUrl";
 import { IProfile } from "../../types";
+import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
 
 interface IEditProfileModalProps {
   isOpen: boolean;
@@ -216,13 +218,13 @@ export const EditProfileModal = ({
   //   });
   // }, [selectedImageUrl, selectedFile, imageUrl, currentImage]);
 
-  useEffect(() => {
-    console.log({
-      // https://archives.bulbagarden.net/media/upload/thumb/4/4a/0025Pikachu.png/250px-0025Pikachu.png
-      imageUrl,
-      selectedFile,
-    })
-  })
+  // useEffect(() => {
+  //   console.log({
+  //     // https://archives.bulbagarden.net/media/upload/thumb/4/4a/0025Pikachu.png/250px-0025Pikachu.png
+  //     imageUrl,
+  //     selectedFile,
+  //   });
+  // });
 
   return (
     <Modal
@@ -254,10 +256,10 @@ export const EditProfileModal = ({
               <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
                 <Box>
                   <FormControl userSelect="none">
-                    <FormLabel>About</FormLabel>
+                    <FormLabel>Position</FormLabel>
                     <InputGroup>
                       <Textarea
-                        placeholder="Tell us about yourself..."
+                        placeholder="Tell us about your role at DBCA..."
                         {...register("about")}
                         value={aboutValue}
                         onChange={(e) => setAboutValue(e.target.value)}
@@ -286,37 +288,25 @@ export const EditProfileModal = ({
                     )}
                   </FormControl>
                 </Box>
-                <Grid
-                  gridTemplateColumns={{ base: "3fr 10fr", md: "4fr 8fr" }}
-                  pos="relative"
-                  w="100%"
-                  h="100%"
-                >
+                <Grid>
                   <Box>
                     <FormLabel>Image</FormLabel>
-                    <Center
-                      maxH={{ base: "200px", xl: "225px" }}
-                      bg="gray.50"
-                      mt={1}
-                      rounded="lg"
-                      overflow="hidden"
-                    >
-                      <Image
-                        objectFit="cover"
-                        src={
-                          (selectedFile === null || !String(imageUrl).endsWith("undefined")) ? noImageLink :
-                            selectedImageUrl ? selectedImageUrl
-                              : imageUrl
-                        }
-                        alt="Preview"
-                        userSelect="none"
-                        bg="gray.800"
-                      // onLoad={handleImageLoadSuccess}
-                      // onError={handleImageLoadError}
-                      />
-                    </Center>
+                    <StatefulMediaChanger
+                      helperText={"Upload an image that represents you."}
+                      selectedImageUrl={selectedImageUrl}
+                      setSelectedImageUrl={setSelectedImageUrl}
+                      selectedFile={selectedFile}
+                      setSelectedFile={setSelectedFile}
+                      clearImageAddedFunctionality={async () => {
+                        const data = await removeUserAvatar({
+                          pk: Number(userId),
+                        });
+                        queryClient.refetchQueries();
+                      }}
+                    />
                   </Box>
-                  <FormControl ml={4} mt={10}>
+
+                  {/* <FormControl ml={4} mt={10}>
                     <InputGroup>
                       <Grid gridGap={2} ml={4}>
                         <FormControl>
@@ -370,7 +360,7 @@ export const EditProfileModal = ({
                         )}
                       </Grid>
                     </InputGroup>
-                  </FormControl>
+                  </FormControl> */}
                 </Grid>
               </Grid>
             </ModalBody>
