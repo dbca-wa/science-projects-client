@@ -289,8 +289,8 @@ export const sendEmailToProjectLeads = async ({shouldDownloadList}:IProjectLeads
     return res;
 }
 
-
 export const batchApproveProgressAndStudentReports = async () => {
+
     const res = instance.post(`documents/batchapprove`).then(res => { return res.data });
     return res;
 }
@@ -299,10 +299,13 @@ export const batchApproveProgressAndStudentReports = async () => {
 export interface INewCycle {
     alsoUpdate: boolean;
     shouldSendEmails: boolean;
+    shouldPrepopulate: boolean;
 }
 
-export const openNewCycle = async ({ alsoUpdate, shouldSendEmails }: INewCycle) => {
-    const res = instance.post(`documents/opennewcycle`, { 'update': alsoUpdate, 'send_emails': shouldSendEmails, }).then(res => { return res.data });
+export const openNewCycle = async ({ alsoUpdate, shouldSendEmails, shouldPrepopulate }: INewCycle) => {
+    console.log({shouldPrepopulate, shouldSendEmails, alsoUpdate});
+    // return "hi"
+    const res = instance.post(`documents/opennewcycle`, { 'update': alsoUpdate, 'send_emails': shouldSendEmails, "prepopulate": shouldPrepopulate,}).then(res => { return res.data });
     return res;
 }
 
@@ -562,13 +565,24 @@ export const adminUpdateUser = async (
         console.log(membershipData)
         await updateMembership(membershipData);
 
-        const profileData = {
-            userPk: userPk.toString(),
-            image: image !== undefined && image !== null ? image : '',
-            about: about !== undefined && about !== '' ? about : '',
-            expertise: expertise !== undefined && expertise !== '' ? expertise : '',
-        };
-        await updateProfile(profileData);
+        if (image !== undefined && image !== null)
+        {
+            const profileData = {
+                userPk: userPk.toString(),
+                image: image !== undefined && image !== null ? image : '',
+                about: about !== undefined && about !== '' ? about : '',
+                expertise: expertise !== undefined && expertise !== '' ? expertise : '',
+            };
+            await updateProfile(profileData);
+        } else {
+            const profileData = {
+                userPk: userPk.toString(),
+                about: about !== undefined && about !== '' ? about : '',
+                expertise: expertise !== undefined && expertise !== '' ? expertise : '',
+            };
+            await updateProfile(profileData);
+        }
+        
 
         const piData = {
             userPk: userPk.toString(),
@@ -583,6 +597,11 @@ export const adminUpdateUser = async (
     } catch (error: any) {
         throw new Error(error.message || 'An unknown error occurred');
     }
+}
+
+export const removeUserAvatar = async ({pk}:ISimplePkProp) => {
+    const userPk = pk;
+    return instance.post(`users/${userPk}/remove_avatar`).then((res) => res.data);
 }
 
 export interface IMembershipUpdateVariables {

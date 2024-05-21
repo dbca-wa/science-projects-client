@@ -48,6 +48,7 @@ import {
   MutationError,
   MutationSuccess,
   adminUpdateUser,
+  removeUserAvatar,
 } from "../../lib/api";
 import { useForm } from "react-hook-form";
 import { MdFax } from "react-icons/md";
@@ -55,6 +56,7 @@ import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
 import noImageLink from "/sad-face.png";
 import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
 import { useAffiliations } from "@/lib/hooks/tanstack/useAffiliations";
+import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
 
 interface IModalProps {
   isOpen: boolean;
@@ -468,10 +470,10 @@ export const EditUserDetailsModal = ({
                       <Grid>
                         <Box>
                           <FormControl userSelect="none">
-                            <FormLabel>About</FormLabel>
+                            <FormLabel>Position</FormLabel>
                             <InputGroup>
                               <Textarea
-                                placeholder="Tell us about yourself..."
+                                placeholder="Tell us about your role at DBCA..."
                                 {...register("about")}
                                 value={aboutValue}
                                 onChange={(e) => setAboutValue(e.target.value)}
@@ -485,7 +487,7 @@ export const EditUserDetailsModal = ({
                           </FormControl>
                         </Box>
                         <Box>
-                          <FormControl userSelect="none">
+                          <FormControl userSelect="none" mt={4}>
                             <FormLabel>Expertise</FormLabel>
                             <Textarea
                               placeholder="Briefly, what do you focus on..."
@@ -511,8 +513,9 @@ export const EditUserDetailsModal = ({
                           pos="relative"
                           w="100%"
                           h="100%"
+                          mt={4}
                         >
-                          <Box>
+                          {/* <Box>
                             <FormLabel>Image</FormLabel>
                             <Center
                               maxH={{ base: "200px", xl: "225px" }}
@@ -555,8 +558,64 @@ export const EditUserDetailsModal = ({
                                 />
                               )}
                             </Center>
-                          </Box>
-                          <FormControl ml={4} mt={10}>
+                          </Box> */}
+
+                          {/* <FormControl ml={4} mt={10}>
+                    <InputGroup>
+                      <Grid gridGap={2} ml={4}>
+                        <FormControl>
+                          <Input
+                            autoComplete="off"
+                            alignItems={"center"}
+                            type="file"
+                            // accept="image/*"
+                            accept=".png, .jpeg, .jpg, image/png, image/jpeg"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setSelectedFile(file);
+                                setSelectedImageUrl(URL.createObjectURL(file));
+                              }
+                            }}
+                            border={"none"}
+                            sx={{
+                              "::file-selector-button": {
+                                background:
+                                  colorMode === "light"
+                                    ? "gray.100"
+                                    : "gray.600",
+                                borderRadius: "8px",
+                                padding: "2px",
+                                paddingX: "8px",
+                                mt: "1px",
+                                border: "1px solid",
+                                borderColor:
+                                  colorMode === "light"
+                                    ? "gray.400"
+                                    : "gray.700",
+                                outline: "none",
+                                mr: "15px",
+                                ml: "-16px",
+                                cursor: "pointer",
+                              },
+                              pt: "3.5px",
+                              color:
+                                colorMode === "light" ? "gray.800" : "gray.200",
+                            }}
+                          />
+                        </FormControl>
+                        <FormHelperText>
+                          Upload an image for your display picture.
+                        </FormHelperText>
+                        {errors.image && (
+                          <FormErrorMessage>
+                            {errors.image.message}
+                          </FormErrorMessage>
+                        )}
+                      </Grid>
+                    </InputGroup>
+                  </FormControl> */}
+                          {/* <FormControl ml={4} mt={10}>
                             <InputGroup>
                               <Grid gridGap={2} ml={4}>
                                 <Button
@@ -660,8 +719,26 @@ export const EditUserDetailsModal = ({
                                 )}
                               </Grid>
                             </InputGroup>
-                          </FormControl>
+                          </FormControl> */}
                         </Grid>
+                        <Box>
+                          <FormLabel>Image</FormLabel>
+                          <StatefulMediaChanger
+                            helperText={"Upload an image that represents you."}
+                            selectedImageUrl={selectedImageUrl}
+                            setSelectedImageUrl={setSelectedImageUrl}
+                            selectedFile={selectedFile}
+                            setSelectedFile={setSelectedFile}
+                            clearImageAddedFunctionality={async () => {
+                              const data = await removeUserAvatar({
+                                pk: Number(userData?.pk),
+                              });
+                              queryClient.refetchQueries({
+                                queryKey: ["users", userData?.pk],
+                              });
+                            }}
+                          />
+                        </Box>
                       </Grid>
                     )}
                   </TabPanel>

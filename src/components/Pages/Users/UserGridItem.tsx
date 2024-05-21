@@ -235,7 +235,11 @@ export const UserGridItem = ({
                       ? "Executive"
                       : "Admin"
                     : is_staff
-                    ? "Staff"
+                    ? `Staff${
+                        business_area?.leader === pk
+                          ? " (Business Area Leader)"
+                          : ""
+                      }`
                     : "External User"
                 }
                 {is_active === false && ` (Inactive)`}

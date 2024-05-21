@@ -159,22 +159,27 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               <Text userSelect={"none"}>
                 {user?.email.startsWith("unset") ? "No Email" : user?.email}
               </Text>
-              {!user?.email.startsWith("unset") && (
-                <Button
-                  ml={2}
-                  size={"xs"}
-                  variant={"ghost"}
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
-                  onClick={copyEmail}
-                >
-                  <Icon as={FiCopy} />
-                </Button>
-              )}
             </Flex>
+            {!user?.email.startsWith("unset") && (
+              <Button
+                // ml={2}
+                size={"xs"}
+                variant={"ghost"}
+                color={"white"}
+                background={colorMode === "light" ? "blue.500" : "blue.600"}
+                _hover={{
+                  background: colorMode === "light" ? "blue.400" : "blue.500",
+                }}
+                onClick={copyEmail}
+                leftIcon={<FiCopy />}
+                ml={0}
+                rounded={4}
+                mt={2}
+              >
+                Copy Email
+                {/* <Icon as={FiCopy} /> */}
+              </Button>
+            )}
           </Flex>
         </Flex>
 
@@ -214,9 +219,11 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 bg: colorMode === "light" ? "blue.400" : "blue.300",
                 color: "white",
               }}
-              isDisabled={true}
+              // isDisabled={true}
+              onClick={openEmailAddressedToUser}
             >
-              Chat
+              {/* Chat */}
+              Email
             </Button>
           )}
 
@@ -271,6 +278,28 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         ? `${user.branch.name} Branch`
                         : "Branch not set"}
                     </Text>
+                    <Text
+                      fontSize="sm"
+                      color={colorMode === "light" ? "blue.600" : "gray.400"}
+                    >
+                      {user?.business_area?.name ? (
+                        <>
+                          <span>
+                            {user?.business_area?.leader.pk === user?.pk
+                              ? "Business Area Leader, "
+                              : ``}
+                          </span>
+                          <span
+                            onClick={() => console.log(user)}
+                            // style={{ color: "blue.500" }}
+                          >
+                            {user.business_area.name}
+                          </span>
+                        </>
+                      ) : (
+                        "Business Area not set"
+                      )}
+                    </Text>
                   </Flex>
                 </Center>
               </Flex>
@@ -301,7 +330,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 color={sectionTitleColor}
                 userSelect={"none"}
               >
-                About
+                Position
               </Text>
             </Flex>
             <Text>
@@ -468,8 +497,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   onClick={
                     user.email === me.userData.email
                       ? () => {
-                        navigate("/users/me");
-                      }
+                          navigate("/users/me");
+                        }
                       : onEditUserDetailsModalOpen
                   }
                   bg={user?.is_superuser ? "blue.600" : "blue.500"}
@@ -483,8 +512,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           ? "blue.500"
                           : "blue.400"
                         : user?.is_superuser
-                          ? "blue.500"
-                          : "blue.400",
+                        ? "blue.500"
+                        : "blue.400",
                     color: "white",
                   }}
                   isDisabled={
@@ -504,8 +533,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         ? "red.600"
                         : "green.600"
                       : user?.is_superuser
-                        ? "red.800"
-                        : "green.500"
+                      ? "red.800"
+                      : "green.500"
                   }
                   color={
                     colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
@@ -517,8 +546,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           ? "red.500"
                           : "green.500"
                         : user?.is_superuser
-                          ? "red.700"
-                          : "green.400",
+                        ? "red.700"
+                        : "green.400",
                     color: "white",
                   }}
                   isDisabled={

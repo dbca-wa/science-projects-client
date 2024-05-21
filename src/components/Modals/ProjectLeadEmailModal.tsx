@@ -1,9 +1,9 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
+import { IProjectLeadsEmail } from "@/types";
 import {
   Box,
   Button,
-  Center,
   Checkbox,
   Flex,
   Grid,
@@ -22,15 +22,9 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import {
-  MutationError,
-  MutationSuccess,
-  sendEmailToProjectLeads,
-} from "../../lib/api";
-import { useForm } from "react-hook-form";
-import { IProjectLeadsEmail } from "@/types";
+import { sendEmailToProjectLeads } from "../../lib/api";
 
 interface IModalProps {
   isOpen: boolean;
@@ -59,7 +53,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
     toastIdRef.current = toast(data);
   };
 
-  const queryClient = useQueryClient();
+  //   const queryClient = useQueryClient();
   const [shouldDownloadList, setShouldDownloadList] = useState(false);
 
   const projectLeadEmailMutation = useMutation({
@@ -67,7 +61,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
     mutationFn: sendEmailToProjectLeads,
     onMutate: () => {
       addToast({
-        title: "Sending Email to Project Leads...",
+        title: "Getting Email LIst...",
         description: "One moment!",
         status: "loading",
         position: "top-right",
@@ -94,7 +88,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
 
       if (shouldDownloadList) {
         // Convert fileContent dictionary into a string
-        const contentString = Object.values(fileContent).join("\n");
+        const contentString = Object.values(fileContent).join("");
 
         // Create a Blob from the string
         const blob = new Blob([contentString], { type: "text/plain" });
@@ -118,52 +112,21 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
         // Cleanup: remove the link elements and revoke the object URL
         document.body.removeChild(downloadLink);
         document.body.removeChild(openLink);
-
-        // // Create an anchor element and simulate a click to open the URL in a new tab
-        // const link = document.createElement("a");
-        // link.href = url;
-        // link.download = "active_project_leads.txt";
-        // link.target = "_blank";
-        // document.body.appendChild(link);
-        // link.click();
-
-        // // Cleanup: remove the link element and revoke the object URL
-        // document.body.removeChild(link);
-        // URL.revokeObjectURL(url);
       }
 
       if (emailList.length > 0) {
-        // Join the email addresses into a single string separated by commas
         const emailString = emailList.join(",");
-        const ccList = ["jarid.prince@dbca.wa.gov.au"];
-        const params = [];
-        const subject = "SPMS:";
-        params.push(`subject=${subject}`);
+        // const mailToLink = `mailto:${emailString}&subject=${subject}`;
+        // console.log(emailList);
+        // console.log("EMAIL STRING: ", emailString);
+        const mailToLink = `mailto:${emailString}&subject=SPMS:`;
+        // const mailToLink = `mailto:jarid.prince@dbca.wa.gov.au,rory.mcauley@dbca.wa.gov.au&subject=SPMS:`;
 
-        // if (ccList.length > 0 && !emailList.includes(ccList[0])) {
-        //   const ccString = ccList.join(",");
-        //   params.push(`cc=${ccString}`);
-        // }
-
-        // Create the mailto link
-        // const mailtoLink = `mailto:${emailString}&subject=SPMS:&cc=jarid.prince@dbca.wa.gov.au`;
-        let mailtoLink = `mailto:${emailString}`;
-
-        // ;&subject=SPMS:
-
-        if (params.length > 0) {
-          mailtoLink += "?" + params.join("&");
-        }
-        mailtoLink.replace("%40", "@");
-        // console.log(mailtoLink);
-        //
-        // Create an anchor element and simulate a click to open the mail application
+        // jarid.prince@dbca.wa.gov.au
         const link = document.createElement("a");
-        link.href = mailtoLink;
+        link.href = mailToLink;
         document.body.appendChild(link);
         link.click();
-
-        // Cleanup: remove the link element
         document.body.removeChild(link);
       }
 
@@ -175,7 +138,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
     // Error handling based on API - file - declared interface
     onError: (error) => {
       console.log(error);
-      let errorMessage = "Could not send emails"; // Default error message
+      let errorMessage = "Could not get emails"; // Default error message
 
       const collectErrors = (data, prefix = "") => {
         if (typeof data === "string") {
@@ -210,7 +173,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
 
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: "Could not send emails",
+          title: "Could not get emails",
           description: errorMessage,
           status: "error",
           position: "top-right",
@@ -225,8 +188,8 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
     await projectLeadEmailMutation.mutateAsync(formData);
   };
 
-  const { register, handleSubmit, watch, reset } =
-    useForm<IProjectLeadsEmail>();
+  //   const { register, handleSubmit, watch, reset } =
+  //     useForm<IProjectLeadsEmail>();
 
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
@@ -235,12 +198,12 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
       //   as={"form"} onSubmit={handleSubmit(onSubmit)}
       >
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-          <ModalHeader>Send Email to Project Leads?</ModalHeader>
+          <ModalHeader>Get Email of Project Leads?</ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
             <Text mt={4}>
-              Click 'Send Emails' to open your mail app and write a message to
+              Click 'Get Emails' to open your mail app and write a message to
               project leads. This will send to users who meet these conditions:
             </Text>
             <Box mt={4}>
@@ -251,18 +214,12 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
                 </ListItem>
                 <ListItem>User is a project lead</ListItem>
                 <ListItem>
-                  Project led is not in the "terminated" or "completed and
-                  closed" state
+                  Project led is in the "active", "suspended", or "update
+                  requested" state
                 </ListItem>
               </UnorderedList>
             </Box>
-            <Checkbox
-              mt={4}
-              isChecked={shouldDownloadList}
-              onChange={() => setShouldDownloadList((prev) => !prev)}
-            >
-              Also download the list of emails?
-            </Checkbox>
+
             {/* <FormControl my={2} mb={4} userSelect="none">
                   <InputGroup>
                     <Input
@@ -275,6 +232,19 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
             <Text mt={4}>
               To fetch users and proceed to your mail app, press "Send Emails".
             </Text>
+            <Text mt={4} fontWeight={"bold"}>
+              If the list is too long, your browser/mail client may not create
+              the email. In which case, you should download the list and copy
+              paste it into your mail client. Any project leads without a DBCA
+              email will be shown in this list.
+            </Text>
+            <Checkbox
+              mt={4}
+              isChecked={shouldDownloadList}
+              onChange={() => setShouldDownloadList((prev) => !prev)}
+            >
+              Also download the list of emails?
+            </Checkbox>
           </ModalBody>
           <ModalFooter>
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
@@ -295,7 +265,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
                 }
                 ml={3}
               >
-                Send Emails
+                Get Emails
               </Button>
             </Grid>
           </ModalFooter>

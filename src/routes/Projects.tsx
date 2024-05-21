@@ -169,8 +169,9 @@ export const Projects = () => {
         toast.update(toastIdRef.current, {
           title: "Could Not Generate Projects CSV",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -199,7 +200,8 @@ export const Projects = () => {
             fontSize={"sm"}
             color={colorMode === "dark" ? "gray.200" : "gray.600"}
           >
-            Search a project above. Use the filters below to fine-tune.
+            Use the filters below to fine-tune. You can ctrl click to open the
+            projects in another tab.
           </Text>
         </Flex>
 
@@ -297,7 +299,7 @@ export const Projects = () => {
               }}
               // px={4}
               w={"100%"}
-            // bg={"red"}
+              // bg={"red"}
             >
               <Select
                 onChange={handleOnlySelectedProjectKindChange}
@@ -307,15 +309,15 @@ export const Projects = () => {
                 style={
                   colorMode === "light"
                     ? {
-                      color: "black",
-                      borderColor: "gray.100",
-                      caretColor: "black !important",
-                    }
+                        color: "black",
+                        borderColor: "gray.100",
+                        caretColor: "black !important",
+                      }
                     : {
-                      color: "white",
-                      borderColor: "white",
-                      caretColor: "black !important",
-                    }
+                        color: "white",
+                        borderColor: "white",
+                        caretColor: "black !important",
+                      }
                 }
               >
                 <option value={"All"}>All Kinds</option>
@@ -332,15 +334,15 @@ export const Projects = () => {
                 style={
                   colorMode === "light"
                     ? {
-                      color: "black",
-                      borderColor: "gray.100",
-                      caretColor: "black !important",
-                    }
+                        color: "black",
+                        borderColor: "gray.100",
+                        caretColor: "black !important",
+                      }
                     : {
-                      color: "white",
-                      borderColor: "white",
-                      caretColor: "black !important",
-                    }
+                        color: "white",
+                        borderColor: "white",
+                        caretColor: "black !important",
+                      }
                 }
               >
                 <option value={"All"}>All Statuses</option>
