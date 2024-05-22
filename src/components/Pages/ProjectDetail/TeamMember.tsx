@@ -68,7 +68,7 @@ export const TeamMember = ({
   const { colorMode } = useColorMode();
 
   const roleColors: { [key: string]: { bg: string; color: string } } = {
-    "Scientific Support": { bg: "green.700", color: "white" },
+    "Science Support": { bg: "green.700", color: "white" },
     "Project Leader": { bg: "orange.700", color: "white" },
     "Academic Supervisor": { bg: "blue.500", color: "white" },
     "Supervised Student": { bg: "blue.400", color: "whiteAlpha.900" },
@@ -91,7 +91,7 @@ export const TeamMember = ({
     | "group";
 
   const roleDefinitions: [Role, string][] = [
-    ["research", "Scientific Support"],
+    ["research", "Science Support"],
     ["supervising", "Project Leader"],
     ["academicsuper", "Academic Supervisor"],
     ["student", "Supervised Student"],
@@ -187,8 +187,8 @@ export const TeamMember = ({
                 image?.file
                   ? `${baseURL}${image.file}`
                   : image?.old_file
-                    ? `${baseURL}${image.old_file}`
-                    : ""
+                  ? `${baseURL}${image.old_file}`
+                  : ""
               }
               userSelect={"none"}
               onClick={onUserOpen}
@@ -214,8 +214,8 @@ export const TeamMember = ({
                 isCurrentlyDragging
                   ? "white"
                   : colorMode === "light"
-                    ? "blue.500"
-                    : "blue.600"
+                  ? "blue.500"
+                  : "blue.600"
               }
               _hover={{
                 color: colorMode === "light" ? "blue.400" : "blue.500",

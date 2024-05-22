@@ -8,7 +8,6 @@ import { NavMenu } from "./NavMenu";
 import {
   Box,
   Button,
-  Center,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -32,8 +31,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import theme from "../../theme";
 
 // Icon imports
-import { AiFillProject } from "react-icons/ai";
-import { BsFillPeopleFill } from "react-icons/bs";
 import { CgViewList } from "react-icons/cg";
 import {
   FaAddressCard,
@@ -43,7 +40,6 @@ import {
 } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImBriefcase, ImUsers } from "react-icons/im";
-import { IoMdDocument } from "react-icons/io";
 
 import { FaBookBookmark } from "react-icons/fa6";
 import { FcApproval } from "react-icons/fc";
@@ -64,14 +60,13 @@ import { BatchApproveModal } from "../Modals/BatchApproveModal";
 import { BatchApproveOldModal } from "../Modals/BatchApproveOldModal";
 import { CreateUserModal } from "../Modals/CreateUserModal";
 import { NewCycleModal } from "../Modals/NewCycleModal";
+import { ProjectLeadEmailModal } from "../Modals/ProjectLeadEmailModal";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { NavButton } from "./NavButton";
 import { Navitar } from "./Navitar";
 import { SidebarNavButton } from "./SidebarNavButton";
 import { SidebarNavMenu } from "./SidebarNavMenu";
-import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
-import { ProjectLeadEmailModal } from "../Modals/ProjectLeadEmailModal";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -116,37 +111,37 @@ const ProjectMenuContents = () => {
   );
 };
 
-const GuideContents = () => {
-  const navigate = useNavigate();
+// const GuideContents = () => {
+//   const navigate = useNavigate();
 
-  return (
-    <>
-      <MenuGroup
-        title="View"
-        fontSize={"12px"}
-        color={"gray.500"}
-        textAlign={"center"}
-      >
-        <MenuItem
-          onClick={(e) => {
-            if (e.ctrlKey || e.metaKey) {
-              // Handle Ctrl + Click (or Command + Click on Mac)
-              window.open(`/guide`, "_blank"); // Opens in a new tab
-            } else {
-              // Normal click handling
-              navigate("/guide");
-            }
-          }}
-        >
-          <FaBookBookmark />
+//   return (
+//     <>
+//       <MenuGroup
+//         title="View"
+//         fontSize={"12px"}
+//         color={"gray.500"}
+//         textAlign={"center"}
+//       >
+//         <MenuItem
+//           onClick={(e) => {
+//             if (e.ctrlKey || e.metaKey) {
+//               // Handle Ctrl + Click (or Command + Click on Mac)
+//               window.open(`/guide`, "_blank"); // Opens in a new tab
+//             } else {
+//               // Normal click handling
+//               navigate("/guide");
+//             }
+//           }}
+//         >
+//           <FaBookBookmark />
 
-          {/* {<AiFillPrinter />} */}
-          <Text ml={2}>View Quick Guide</Text>
-        </MenuItem>
-      </MenuGroup>
-    </>
-  );
-};
+//           {/* {<AiFillPrinter />} */}
+//           <Text ml={2}>View Quick Guide</Text>
+//         </MenuItem>
+//       </MenuGroup>
+//     </>
+//   );
+// };
 
 const ReportMenuContents = () => {
   const navigate = useNavigate();
@@ -540,7 +535,7 @@ const OldHeader = () => {
   }, [location.pathname]);
 
   const { userLoading, userData } = useUser();
-  const { layout } = useLayoutSwitcher();
+  // const { layout } = useLayoutSwitcher();
   const {
     isOpen: isProjectLeadEmailModalOpen,
     onOpen: onProjectLeadEmailModalOpen,
@@ -583,8 +578,14 @@ const OldHeader = () => {
               color={"whiteAlpha.700"}
               size={"md"}
               variant={"unstyled"}
-              onClick={() => {
-                navigate("/");
+              onClick={(e) => {
+                if (e.ctrlKey || e.metaKey) {
+                  // Handle Ctrl + Click (or Command + Click on Mac)
+                  window.open("/", "_blank"); // Opens in a new tab
+                } else {
+                  // Normal click handling
+                  navigate("/");
+                }
               }}
             >
               <Text fontSize={18}>SPMS</Text>
@@ -733,27 +734,27 @@ const OldHeader = () => {
                 <NavMenu
                   menuName="Projects"
                   children={<ProjectMenuContents />}
-                  leftIcon={HiMiniSquares2X2}
+                  // leftIcon={HiMiniSquares2X2}
                 />
 
                 {/* Staff */}
                 <NavMenu
                   menuName="Users"
                   children={<UserMenuContents />}
-                  leftIcon={FaUsers}
+                  // leftIcon={FaUsers}
                 />
 
                 {/* Reports */}
                 <NavMenu
                   menuName="Reports"
                   children={<ReportMenuContents />}
-                  leftIcon={PiBookOpenTextFill}
+                  // leftIcon={PiBookOpenTextFill}
                 />
 
                 {!userLoading && userData.is_superuser && (
                   <NavMenu
                     menuName="Admin"
-                    leftIcon={RiAdminFill}
+                    // leftIcon={RiAdminFill}
                     children={
                       <AdminMenuContents
                         handleDataDump={handleDataDump}
@@ -774,7 +775,7 @@ const OldHeader = () => {
                 {/* {!userLoading && !userData.is_superuser && ( */}
                 {shouldShowGuide ? (
                   <NavButton
-                    leftIcon={FaBookBookmark}
+                    // leftIcon={FaBookBookmark}
                     buttonName="Guide"
                     onClick={(e) => {
                       if (e.ctrlKey || e.metaKey) {
