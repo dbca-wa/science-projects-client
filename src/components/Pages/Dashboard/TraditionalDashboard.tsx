@@ -114,6 +114,7 @@ export const TraditionalDashboard = () => {
   // }, []);
 
   const [dataCatalogueDisabled, setDataCatalogueDisabled] = useState(true);
+  const teamsChatUrl = "msteams:/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
 
   return (
     <>
@@ -175,11 +176,19 @@ export const TraditionalDashboard = () => {
             >
               jarid.prince@dbca.wa.gov.au
             </Link>
-
             <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
               {" "}
-              or message on Teams. Don't be shy, we can only make things better
-              with your help!
+              or{" "}
+            </Text>
+            <Link
+              href={teamsChatUrl}
+              color={colorMode === "light" ? "blue.400" : "blue.300"}
+            >
+              message on Teams.
+            </Link>
+            <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
+              {" "}
+              Don't be shy, we can only make things better with your help!
             </Text>
           </span>
         </Flex>
