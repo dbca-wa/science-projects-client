@@ -25,6 +25,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { sendEmailToProjectLeads } from "../../lib/api";
+import { AxiosError } from "axios";
 
 interface IModalProps {
   isOpen: boolean;
@@ -73,9 +74,8 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Opening Mail${
-            shouldDownloadList === true ? " and downloading file" : ""
-          }.`,
+          description: `Opening Mail${shouldDownloadList === true ? " and downloading file" : ""
+            }.`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -136,7 +136,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
       }
     },
     // Error handling based on API - file - declared interface
-    onError: (error) => {
+    onError: (error: AxiosError) => {
       console.log(error);
       let errorMessage = "Could not get emails"; // Default error message
 
