@@ -21,7 +21,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createFeedbackItem } from "../../lib/api";
+import { createFeedbackItem, sendFeedbackReceivedEmail } from "../../lib/api";
 import { IFeedback, IUserMe } from "../../types";
 import { FeedbackRichTextEditor } from "../RichTextEditor/Editors/FeedbackRichTextEditor";
 
@@ -72,6 +72,7 @@ export const UserFeedbackModal = ({
         });
       }
       reset();
+      sendFeedbackReceivedEmail({ recipients_list: [101073] });
       onCloseFeedbackModal();
 
       setTimeout(() => {

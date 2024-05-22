@@ -17,6 +17,7 @@ import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
 import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
 import { IProjectData } from "../../../types";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
+import { extendTheme } from "@chakra-ui/react";
 
 export const ModernProjectCard = ({
   pk,
@@ -47,17 +48,17 @@ export const ModernProjectCard = ({
   const statusDictionary: {
     [key: string]: { label: string; color: string };
   }[] = [
-      { new: { label: "New", color: "gray.500" } },
-      { pending: { label: "Pending Project Plan", color: "yellow.500" } },
-      { active: { label: "Active (Approved)", color: "green.500" } },
-      { updating: { label: "Update Requested", color: "yellow.500" } }, // previously "red.500"
-      { closure_requested: { label: "Closure Requested", color: "orange.500" } }, // previously "red.500"
-      { closing: { label: "Closure Pending Final Update", color: "red.500" } }, // previously "red.500"
-      { final_update: { label: "Final Update Requested", color: "red.500" } }, // previously "red.500"
-      { completed: { label: "Completed and Closed", color: "red.500" } }, // preivously blue.500"
-      { terminated: { label: "Terminated and Closed", color: "gray.800" } },
-      { suspended: { label: "Suspended", color: "gray.500" } },
-    ];
+    { new: { label: "New", color: "gray.500" } },
+    { pending: { label: "Pending Project Plan", color: "yellow.500" } },
+    { active: { label: "Active (Approved)", color: "green.500" } },
+    { updating: { label: "Update Requested", color: "yellow.500" } }, // previously "red.500"
+    { closure_requested: { label: "Closure Requested", color: "orange.500" } }, // previously "red.500"
+    { closing: { label: "Closure Pending Final Update", color: "red.500" } }, // previously "red.500"
+    { final_update: { label: "Final Update Requested", color: "red.500" } }, // previously "red.500"
+    { completed: { label: "Completed and Closed", color: "red.500" } }, // preivously blue.500"
+    { terminated: { label: "Terminated and Closed", color: "gray.800" } },
+    { suspended: { label: "Suspended", color: "gray.500" } },
+  ];
 
   const getStatusValue = (status: string): { label: string; color: string } => {
     const matchedStatus = statusDictionary.find((item) => status in item);
@@ -70,12 +71,17 @@ export const ModernProjectCard = ({
 
   const navigate = useNavigate();
 
-  const goToProject = () => {
-    if (isOnProjectsPage || window.location.pathname.endsWith("/projects")) {
-      // Case where the search bar is hidden
-      navigate(`${pk}`);
+  const goToProject = (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      // Handle Ctrl + Click (or Command + Click on Mac)
+      window.open(`/projects/${pk}`, "_blank"); // Opens in a new tab
     } else {
-      navigate(`projects/${pk}`);
+      // Normal click handling
+      if (isOnProjectsPage || window.location.pathname.endsWith("/projects")) {
+        navigate(`${pk}`);
+      } else {
+        navigate(`projects/${pk}`);
+      }
     }
   };
 
@@ -104,25 +110,34 @@ export const ModernProjectCard = ({
             kind === "core_function"
               ? "red.600"
               : kind === "science"
-                ? "green.500"
-                : kind === "student"
-                  ? "blue.400"
-                  : "gray.400"
+              ? "green.500"
+              : kind === "student"
+              ? "blue.400"
+              : "gray.400"
           }
         >
           {
             kind === "core_function"
               ? "CF"
               : kind === "external"
-                ? "EXT"
-                : kind === "science"
-                  ? "SP"
-                  : "STP" //Student
+              ? "EXT"
+              : kind === "science"
+              ? "SP"
+              : "STP" //Student
           }
           -{year}-{number}
         </Tag>
       </Box>
-      <Flex pos={"absolute"} left={0} bottom={0} p={4} zIndex={999}>
+      <Flex
+        pos={"absolute"}
+        left={0}
+        bottom={0}
+        p={4}
+        zIndex={999}
+        onClick={goToProject}
+        onMouseOver={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
         <Box zIndex={3}>
           <ExtractedHTMLTitle
             htmlContent={title}
@@ -181,9 +196,7 @@ export const ModernProjectCard = ({
         cursor={"pointer"}
         style={{ transformStyle: "preserve-3d", perspective: 1000 }}
         boxShadow="0px 10px 15px -5px rgba(0, 0, 0, 0.3), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.06), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.1), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.1)"
-        onClick={() => {
-          goToProject();
-        }}
+        onClick={goToProject}
         borderColor={"gray.700"}
         background={colorMode === "dark" ? "black" : undefined}
       >

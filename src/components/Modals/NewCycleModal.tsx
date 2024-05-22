@@ -150,8 +150,12 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
     },
   });
 
+  const [shouldPrepopulate, setShouldPrepopulate] = useState(false);
+
   const onSubmit = async (formData: INewCycle) => {
     formData.shouldSendEmails = shouldSendEmails;
+    formData.shouldPrepopulate = shouldPrepopulate;
+
     await newCycleMutation.mutateAsync(formData);
     onClose();
   };
@@ -181,18 +185,22 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
 
             <Box my={8}>
               <Checkbox
+                fontWeight={"semibold"}
                 isChecked={shouldIncludeUpdate}
                 onChange={() => setShouldIncludeUpdate(!shouldIncludeUpdate)}
               >
-                Also include projects with status "Update Requested"?
+                Also include projects with statuses "Update Requested" and
+                "Supsended"?
               </Checkbox>
               <Text fontSize={"xs"} mx={6}>
                 If this is selected, projects which have the status "Update
-                Requested" will also get new progress reports for the latest
-                financial year's report.
+                Requested" or "Suspended" will also get new progress reports for
+                the latest financial year's report, and be set to "Update
+                Requested".
               </Text>
               <Checkbox
                 mt={4}
+                fontWeight={"semibold"}
                 isChecked={shouldSendEmails}
                 onChange={() => setShouldSendEmails(!shouldSendEmails)}
               >
@@ -204,6 +212,18 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
                 for FY {`${latestYear - 1}-${String(latestYear).substring(2)}`}.
                 You may opt to open the cycle first and send these emails later
                 by leaving this unchecked for now.
+              </Text>
+              <Checkbox
+                mt={4}
+                fontWeight={"semibold"}
+                defaultChecked={shouldPrepopulate}
+                onChange={() => setShouldPrepopulate((prev) => !prev)}
+              >
+                Prepopulate?
+              </Checkbox>
+              <Text fontSize={"xs"} mx={6}>
+                If this is selected, the progress reports will be prepopulated
+                with data from the last reported year (if one exists).
               </Text>
             </Box>
             {/* <FormControl my={2} mb={4} userSelect="none">
@@ -235,6 +255,7 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
                   onSubmit({
                     alsoUpdate: shouldIncludeUpdate,
                     shouldSendEmails: shouldSendEmails,
+                    shouldPrepopulate: shouldPrepopulate,
                   })
                 }
                 ml={3}

@@ -7,6 +7,7 @@ import {
   Flex,
   Grid,
   Heading,
+  Link,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -166,20 +167,33 @@ export const TraditionalDashboard = () => {
             <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
               We are always looking for ways to improve, and value your
               feedback! If you notice something off, or would like to request a
-              change, please submit feedback here, send an email to
-              jarid.prince@dbca.wa.gov.au, or send a message on Teams. Don't be
-              shy, we can only make things better with your help!
+              change, please submit feedback here, send an email to{" "}
             </Text>
-
-            <Button
-              ml={2}
-              variant={"link"}
-              color={"red.500"}
-              onClick={onOpenFeedbackModal}
+            <Link
+              href={`mailto:jarid.prince@dbca.wa.gov.au&subject=SPMS Feedback`}
+              color={colorMode === "light" ? "blue.400" : "blue.300"}
             >
-              Submit Feedback
-            </Button>
+              jarid.prince@dbca.wa.gov.au
+            </Link>
+
+            <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
+              {" "}
+              or message on Teams. Don't be shy, we can only make things better
+              with your help!
+            </Text>
           </span>
+        </Flex>
+        <Flex alignItems={"end"} flexDir={"row"} justifyContent={"right"}>
+          <Button
+            variant={"solid"}
+            color={"white"}
+            bg={"blue.500"}
+            _hover={{ bg: "blue.400" }}
+            onClick={onOpenFeedbackModal}
+            mt={4}
+          >
+            Submit Feedback
+          </Button>
         </Flex>
       </Box>
       <Grid

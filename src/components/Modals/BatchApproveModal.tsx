@@ -23,11 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import {
-  MutationError,
-  MutationSuccess,
-  batchApproveProgressAndStudentReports,
-} from "../../lib/api";
+import { batchApproveProgressAndStudentReports } from "../../lib/api";
 
 interface IModalProps {
   isOpen: boolean;
@@ -58,7 +54,7 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
 
   const queryClient = useQueryClient();
 
-  const batchApproveMutation = useMutation<MutationSuccess, MutationError>({
+  const batchApproveMutation = useMutation({
     // Start of mutation handling
     mutationFn: batchApproveProgressAndStudentReports,
     onMutate: () => {
@@ -180,6 +176,7 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
                 </ListItem>
               </UnorderedList>
             </Box>
+
             {/* <FormControl my={2} mb={4} userSelect="none">
                 <InputGroup>
                   <Input

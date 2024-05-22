@@ -2,7 +2,7 @@ import { ICommentReaction } from "@/components/RichTextEditor/Editors/Sections/C
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios, { AxiosHeaders } from "axios";
 import Cookie from 'js-cookie';
-import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAdminOptions, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IBusinessAreaCreate, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProgressReport, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
+import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddLocationForm, IAddress, IAdminOptions, IAffiliation, IApproveDocument, IBranch, IBusinessArea, IBusinessAreaCreate, IDepartmentalService, IDivision, IFeedback, IMergeAffiliation, IPersonalInformation, IProfile, IProgressReport, IProjectLeadsEmail, IProjectMember, IQuickTask, IReport, IReportCreation, ISearchTerm, ISimpleLocationData, OrganisedLocationData, } from "../types";
 import { IConceptPlanGenerationData } from "../types";
 
 
@@ -280,7 +280,17 @@ export const batchApproveOLDProgressAndStudentReports = async () => {
 }
 
 
+
+export const sendEmailToProjectLeads = async ({shouldDownloadList}:IProjectLeadsEmail) => {
+    const data = {
+        shouldDownloadList
+    }
+    const res = instance.post(`documents/send_email_to_project_leads`, data).then(res => { return res.data });
+    return res;
+}
+
 export const batchApproveProgressAndStudentReports = async () => {
+
     const res = instance.post(`documents/batchapprove`).then(res => { return res.data });
     return res;
 }
@@ -289,10 +299,13 @@ export const batchApproveProgressAndStudentReports = async () => {
 export interface INewCycle {
     alsoUpdate: boolean;
     shouldSendEmails: boolean;
+    shouldPrepopulate: boolean;
 }
 
-export const openNewCycle = async ({ alsoUpdate, shouldSendEmails }: INewCycle) => {
-    const res = instance.post(`documents/opennewcycle`, { 'update': alsoUpdate, 'send_emails': shouldSendEmails, }).then(res => { return res.data });
+export const openNewCycle = async ({ alsoUpdate, shouldSendEmails, shouldPrepopulate }: INewCycle) => {
+    console.log({shouldPrepopulate, shouldSendEmails, alsoUpdate});
+    // return "hi"
+    const res = instance.post(`documents/opennewcycle`, { 'update': alsoUpdate, 'send_emails': shouldSendEmails, "prepopulate": shouldPrepopulate,}).then(res => { return res.data });
     return res;
 }
 
@@ -530,34 +543,46 @@ export interface IFullUserUpdateVariables {
     image?: File | string | null | undefined;
     about?: string;
     expertise?: string;
-    affiliation?: IAffiliation;
+    affiliation?: IAffiliation | number;
 }
 
 export const adminUpdateUser = async (
     { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }: IFullUserUpdateVariables) => {
-    // console.log(
-    //     { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }
-    // )
+    console.log(
+        { userPk, title, phone, fax, branch, business_area, image, about, expertise, affiliation }
+    )
 
     try {
         // console.log(branch)
         // console.log(business_area)
-
+        
         const membershipData = {
-            affiliation: affiliation?.pk,
+            affiliation: typeof affiliation === "string" ? Number(affiliation) : affiliation?.pk,
             userPk: userPk,
             branch: (branch !== null && branch !== '') ? Number(branch) : 0,
             business_area: (business_area !== null && business_area !== '') ? Number(business_area) : 0,
         };
+        console.log(membershipData)
         await updateMembership(membershipData);
 
-        const profileData = {
-            userPk: userPk.toString(),
-            image: image !== undefined && image !== null ? image : '',
-            about: about !== undefined && about !== '' ? about : '',
-            expertise: expertise !== undefined && expertise !== '' ? expertise : '',
-        };
-        await updateProfile(profileData);
+        if (image !== undefined && image !== null)
+        {
+            const profileData = {
+                userPk: userPk.toString(),
+                image: image !== undefined && image !== null ? image : '',
+                about: about !== undefined && about !== '' ? about : '',
+                expertise: expertise !== undefined && expertise !== '' ? expertise : '',
+            };
+            await updateProfile(profileData);
+        } else {
+            const profileData = {
+                userPk: userPk.toString(),
+                about: about !== undefined && about !== '' ? about : '',
+                expertise: expertise !== undefined && expertise !== '' ? expertise : '',
+            };
+            await updateProfile(profileData);
+        }
+        
 
         const piData = {
             userPk: userPk.toString(),
@@ -572,6 +597,11 @@ export const adminUpdateUser = async (
     } catch (error: any) {
         throw new Error(error.message || 'An unknown error occurred');
     }
+}
+
+export const removeUserAvatar = async ({pk}:ISimplePkProp) => {
+    const userPk = pk;
+    return instance.post(`users/${userPk}/remove_avatar`).then((res) => res.data);
 }
 
 export interface IMembershipUpdateVariables {
@@ -3157,6 +3187,22 @@ export const sendDocumentApprovedEmail = async ({ recipients_list, project_pk,
             "recipients_list": recipients_list,
             "project_pk": project_pk,
             "document_kind": document_kind,
+        }
+    ).then(res => {
+        return res.data;
+    }
+    );
+}
+
+export interface IFeedbackReceived {
+    recipients_list: number[]; // array of pks
+}
+
+export const sendFeedbackReceivedEmail = async ({ recipients_list}: IFeedbackReceived) => {
+    return instance.post(
+        `documents/feedback_received_email`,
+        {
+            "recipients_list": recipients_list,
         }
     ).then(res => {
         return res.data;

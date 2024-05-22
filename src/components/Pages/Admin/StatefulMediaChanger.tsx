@@ -21,6 +21,7 @@ interface Props {
   setSelectedImageUrl: React.Dispatch<React.SetStateAction<string>>;
   selectedFile: File | null;
   setSelectedFile: React.Dispatch<React.SetStateAction<File>>;
+  clearImageAddedFunctionality?: () => void;
 }
 
 export const StatefulMediaChanger = ({
@@ -29,6 +30,7 @@ export const StatefulMediaChanger = ({
   selectedFile,
   setSelectedFile,
   helperText,
+  clearImageAddedFunctionality,
 }: Props) => {
   const { colorMode } = useColorMode();
 
@@ -101,7 +103,10 @@ export const StatefulMediaChanger = ({
       onMouseLeave={() => setIsHovered(false)}
       cursor={isHovered ? "pointer" : undefined}
     >
-      {isHovered && selectedImageUrl ? (
+      {isHovered &&
+      selectedImageUrl &&
+      selectedImageUrl !== null &&
+      !selectedImageUrl.endsWith("undefined") ? (
         <Box
           bg={"white"}
           padding={4}
@@ -111,8 +116,13 @@ export const StatefulMediaChanger = ({
           top={4}
           color={isHovered ? "red.500" : "green.500"}
           _hover={{ color: "red.400" }}
-          onClick={(e) => {
+          onClick={async (e) => {
             onDeleteEntry(e);
+            if (clearImageAddedFunctionality) {
+              console.log("Clearing image");
+              await clearImageAddedFunctionality();
+              console.log("cleared");
+            }
           }}
           zIndex={99999}
         >
@@ -130,7 +140,10 @@ export const StatefulMediaChanger = ({
             borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
             rounded={"lg"}
           >
-            {selectedImageUrl && selectedImageUrl !== undefined ? (
+            {selectedImageUrl &&
+            selectedImageUrl !== undefined &&
+            selectedImageUrl !== null &&
+            !selectedImageUrl.endsWith("undefined") ? (
               <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
                 <Box overflow={"hidden"} w={"100%"} h={"100%"} rounded={"lg"}>
                   <Image

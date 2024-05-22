@@ -582,6 +582,7 @@ export const ProjectOverviewCard = ({
                   htmlContent={`${baseInformation.title}`}
                   color={"#62a0f2"}
                   fontWeight={"bold"}
+                  userSelect={"all"}
                   mb={"8px"}
                   fontSize={"22px"}
                   cursor={"pointer"}
@@ -776,7 +777,7 @@ export const ProjectOverviewCard = ({
                         md: "repeat(3, 1fr)",
                         lg: "repeat(2, 1fr)",
                         "1200px": "repeat(3, 1fr)",
-                        xl: "repeat(3, 1fr)",
+                        xl: "repeat(4, 1fr)",
                         "2xl": "repeat(4, 1fr)",
                       }
                     : {
