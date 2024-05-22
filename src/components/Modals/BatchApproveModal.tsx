@@ -24,6 +24,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { batchApproveProgressAndStudentReports } from "../../lib/api";
+import { AxiosError } from "axios";
 
 interface IModalProps {
   isOpen: boolean;
@@ -90,7 +91,7 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
       }
     },
     // Error handling based on API - file - declared interface
-    onError: (error) => {
+    onError: (error: AxiosError) => {
       console.log(error);
       let errorMessage = "An error occurred while batch approving"; // Default error message
 

@@ -281,7 +281,7 @@ export const batchApproveOLDProgressAndStudentReports = async () => {
 
 
 
-export const sendEmailToProjectLeads = async ({shouldDownloadList}:IProjectLeadsEmail) => {
+export const sendEmailToProjectLeads = async ({ shouldDownloadList }: IProjectLeadsEmail) => {
     const data = {
         shouldDownloadList
     }
@@ -303,9 +303,9 @@ export interface INewCycle {
 }
 
 export const openNewCycle = async ({ alsoUpdate, shouldSendEmails, shouldPrepopulate }: INewCycle) => {
-    console.log({shouldPrepopulate, shouldSendEmails, alsoUpdate});
+    console.log({ shouldPrepopulate, shouldSendEmails, alsoUpdate });
     // return "hi"
-    const res = instance.post(`documents/opennewcycle`, { 'update': alsoUpdate, 'send_emails': shouldSendEmails, "prepopulate": shouldPrepopulate,}).then(res => { return res.data });
+    const res = instance.post(`documents/opennewcycle`, { 'update': alsoUpdate, 'send_emails': shouldSendEmails, "prepopulate": shouldPrepopulate, }).then(res => { return res.data });
     return res;
 }
 
@@ -555,9 +555,9 @@ export const adminUpdateUser = async (
     try {
         // console.log(branch)
         // console.log(business_area)
-        
+
         const membershipData = {
-            affiliation: typeof affiliation === "string" ? Number(affiliation) : affiliation?.pk,
+            affiliation: typeof affiliation === "string" ? Number(affiliation) : (affiliation as IAffiliation)?.pk,
             userPk: userPk,
             branch: (branch !== null && branch !== '') ? Number(branch) : 0,
             business_area: (business_area !== null && business_area !== '') ? Number(business_area) : 0,
@@ -565,8 +565,7 @@ export const adminUpdateUser = async (
         console.log(membershipData)
         await updateMembership(membershipData);
 
-        if (image !== undefined && image !== null)
-        {
+        if (image !== undefined && image !== null) {
             const profileData = {
                 userPk: userPk.toString(),
                 image: image !== undefined && image !== null ? image : '',
@@ -582,7 +581,7 @@ export const adminUpdateUser = async (
             };
             await updateProfile(profileData);
         }
-        
+
 
         const piData = {
             userPk: userPk.toString(),
@@ -599,7 +598,7 @@ export const adminUpdateUser = async (
     }
 }
 
-export const removeUserAvatar = async ({pk}:ISimplePkProp) => {
+export const removeUserAvatar = async ({ pk }: ISimplePkProp) => {
     const userPk = pk;
     return instance.post(`users/${userPk}/remove_avatar`).then((res) => res.data);
 }
@@ -1873,19 +1872,19 @@ export const saveGuideHtmlToDB = async (
     { htmlData, adminOptionsPk, section, isUpdate, canSave }: IHTMLGuideSave) => {
 
     const urlType = isUpdate ? instance.put : instance.post;
-        const params = {
-            [section]: htmlData,
+    const params = {
+        [section]: htmlData,
+    }
+    return urlType(
+        `adminoptions/${adminOptionsPk}`,
+        params,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         }
-        return urlType(
-            `adminoptions/${adminOptionsPk}`,
-            params,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        ).then(res => res.data);
-    
+    ).then(res => res.data);
+
 }
 
 
@@ -2731,7 +2730,7 @@ export const deleteBranch = async (pk: number) => {
 
 // ADMIN
 
-export const getAdminOptionsByPk = async ({queryKey}: QueryFunctionContext) => {
+export const getAdminOptionsByPk = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
     // adminoptions
     const res = instance.get(`adminoptions/${pk}`).then(res => res.data);
@@ -3198,7 +3197,7 @@ export interface IFeedbackReceived {
     recipients_list: number[]; // array of pks
 }
 
-export const sendFeedbackReceivedEmail = async ({ recipients_list}: IFeedbackReceived) => {
+export const sendFeedbackReceivedEmail = async ({ recipients_list }: IFeedbackReceived) => {
     return instance.post(
         `documents/feedback_received_email`,
         {
