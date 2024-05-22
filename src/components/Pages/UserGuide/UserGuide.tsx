@@ -529,7 +529,7 @@ export const UserGuide = () => {
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("users")}
           /> */}
-          {/* <SideMenuSectionDivider />
+          <SideMenuSectionDivider />
           <SideMenuButton
             pageName={"Teams"}
             selectedString={selected}
@@ -539,7 +539,7 @@ export const UserGuide = () => {
             pageName={"Documents"}
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("documents")}
-          /> */}
+          />
           <SideMenuSectionDivider />
           {/* <SideMenuButton
             pageName={"Report"}
