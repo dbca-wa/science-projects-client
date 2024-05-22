@@ -148,9 +148,6 @@ export const ProjectSuspensionModal = ({
                   </Box>
                   <UnorderedList px={10} pt={4}>
                     <ListItem>
-                      This will not create or delete any Project Closures
-                    </ListItem>
-                    <ListItem>
                       {projectStatus !== "suspended"
                         ? "The project will become inactive, with the status set to 'suspended'"
                         : "The project will become active, with the status set to 'active'"}
@@ -162,11 +159,15 @@ export const ProjectSuspensionModal = ({
                     </ListItem>
                     {projectStatus !== "suspended" && (
                       <ListItem>
-                        When a new Annual Reporting cycle begins, the status of
-                        the project will automatically be set to "update
-                        requested"
+                        When a new Annual Reporting cycle begins, you will be
+                        sent a request to update your progress report. Either
+                        update the report or re-suspend the project.
                       </ListItem>
                     )}
+
+                    <ListItem>
+                      This will not create or delete any Project Closures
+                    </ListItem>
                   </UnorderedList>
                 </Box>
 

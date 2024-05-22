@@ -518,18 +518,18 @@ export const UserGuide = () => {
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("profile")}
           />
-          <SideMenuSectionDivider />
+          {/* <SideMenuSectionDivider /> */}
           <SideMenuButton
             pageName={"Projects"}
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("projects")}
           />
-          <SideMenuButton
+          {/* <SideMenuButton
             pageName={"Users"}
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("users")}
-          />
-          <SideMenuSectionDivider />
+          /> */}
+          {/* <SideMenuSectionDivider />
           <SideMenuButton
             pageName={"Teams"}
             selectedString={selected}
@@ -539,9 +539,9 @@ export const UserGuide = () => {
             pageName={"Documents"}
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("documents")}
-          />
+          /> */}
           <SideMenuSectionDivider />
-          <SideMenuButton
+          {/* <SideMenuButton
             pageName={"Report"}
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("report")}
@@ -550,7 +550,7 @@ export const UserGuide = () => {
             pageName={"Admin"}
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("admin")}
-          />
+          /> */}
         </Box>
       </Flex>
     </>

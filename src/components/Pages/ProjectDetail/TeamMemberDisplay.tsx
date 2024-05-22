@@ -51,12 +51,12 @@ export const TeamMemberDisplay = ({
   username,
   usersCount,
   project_id,
-  ba_leader
+  ba_leader,
 }: ITeamMember) => {
   const { colorMode } = useColorMode();
 
   const roleColors: { [key: string]: { bg: string; color: string } } = {
-    "Scientific Support": { bg: "green.700", color: "white" },
+    "Science Support": { bg: "green.700", color: "white" },
     "Project Leader": { bg: "orange.700", color: "white" },
     "Academic Supervisor": { bg: "blue.500", color: "white" },
     "Supervised Student": { bg: "blue.400", color: "whiteAlpha.900" },
@@ -79,7 +79,7 @@ export const TeamMemberDisplay = ({
     | "group";
 
   const roleDefinitions: [Role, string][] = [
-    ["research", "Scientific Support"],
+    ["research", "Science Support"],
     ["supervising", "Project Leader"],
     ["academicsuper", "Academic Supervisor"],
     ["student", "Supervised Student"],
@@ -159,8 +159,8 @@ export const TeamMemberDisplay = ({
                 image?.file
                   ? image.file
                   : image?.old_file
-                    ? image.old_file
-                    : undefined
+                  ? image.old_file
+                  : undefined
               }
               userSelect={"none"}
               onClick={onUserOpen}
