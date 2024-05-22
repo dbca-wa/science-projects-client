@@ -146,8 +146,6 @@ export const ProjectUserDetails = ({
     }
   };
 
-
-
   const promoteThisUser = () => {
     if (!is_leader) {
       console.log(
@@ -354,14 +352,12 @@ export const ProjectUserDetails = ({
     },
   });
 
-
-
   useEffect(() => {
     console.log({
       currentUserPk: me?.userData?.pk,
       leaderPk: leader_pk,
-    })
-  })
+    });
+  });
 
   return loading || pk === undefined ? (
     <Center w={"100%"} h={"100%"}>
@@ -375,8 +371,8 @@ export const ProjectUserDetails = ({
             user?.image?.file
               ? user.image.file
               : user?.image?.old_file
-                ? user.image.old_file
-                : ""
+              ? user.image.old_file
+              : ""
           }
           size={"2xl"}
         />
@@ -454,7 +450,7 @@ export const ProjectUserDetails = ({
           }}
           onClick={removeThisUser}
           isDisabled={usersCount === 1}
-        // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
+          // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
         >
           Remove from Project
         </Button>
@@ -547,7 +543,9 @@ export const ProjectUserDetails = ({
         />
         {/* <Text>-</Text> */}
         {!is_leader &&
-          (me?.userData.is_superuser || me?.userData.pk === ba_leader || me?.userData?.pk === leader_pk) && (
+          (me?.userData.is_superuser ||
+            me?.userData.pk === ba_leader ||
+            me?.userData?.pk === leader_pk) && (
             <Button
               mt={4}
               bg={colorMode === "dark" ? "green.600" : "green.500"}
@@ -558,7 +556,7 @@ export const ProjectUserDetails = ({
               isDisabled={!user?.is_staff}
               onClick={promoteThisUser}
 
-            // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
+              // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
             >
               Promote to Leader
             </Button>
@@ -646,7 +644,7 @@ export const ProjectUserDetails = ({
               mb={1}
               color={sectionTitleColor}
             >
-              About
+              Position
             </Text>
           </Flex>
           <Text>

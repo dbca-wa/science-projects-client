@@ -40,7 +40,6 @@ const AnimatedClickToEdit = () => {
 };
 
 export const ProfilePage = () => {
-
   const { userLoading: loading, userData: me } = useUser();
   useEffect(() => {
     if (!loading) {
@@ -231,14 +230,14 @@ export const ProfilePage = () => {
                     ? me.title === "mr"
                       ? "Mr."
                       : me.title === "mrs"
-                        ? "Mrs."
-                        : me.title === "ms"
-                          ? "Ms."
-                          : me.title === "master"
-                            ? "Master"
-                            : me.title === "dr"
-                              ? "Dr."
-                              : "Bad Title"
+                      ? "Mrs."
+                      : me.title === "ms"
+                      ? "Ms."
+                      : me.title === "master"
+                      ? "Master"
+                      : me.title === "dr"
+                      ? "Dr."
+                      : "Bad Title"
                     : "--"}
                 </Text>
               </Flex>
@@ -321,7 +320,7 @@ export const ProfilePage = () => {
               <Flex flexDir={"column"}>
                 <Box>
                   <Text color={subsectionTitleColor} fontSize={"sm"}>
-                    About
+                    Position
                   </Text>
                   <Box mt={1}>
                     <Text>
@@ -398,8 +397,8 @@ export const ProfilePage = () => {
                   {!me.is_staff
                     ? "External"
                     : me?.agency?.name
-                      ? me.agency.name
-                      : NoDataText}
+                    ? me.agency.name
+                    : NoDataText}
                 </Text>
               </Flex>
               {me.is_staff && (

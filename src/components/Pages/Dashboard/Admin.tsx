@@ -5,6 +5,7 @@
 import { BatchApproveModal } from "@/components/Modals/BatchApproveModal";
 import { BatchApproveOldModal } from "@/components/Modals/BatchApproveOldModal";
 import { NewCycleModal } from "@/components/Modals/NewCycleModal";
+import { ProjectLeadEmailModal } from "@/components/Modals/ProjectLeadEmailModal";
 import {
   Center,
   Divider,
@@ -39,6 +40,12 @@ export const Admin = () => {
     onOpen: onBatchApproveOpen,
   } = useDisclosure();
   const {
+    isOpen: isProjectLeadEmailModalOpen,
+    onOpen: onProjectLeadEmailModalOpen,
+    onClose: onProjectLeadEmailModalClose,
+  } = useDisclosure();
+
+  const {
     isOpen: isBatchApproveOldOpen,
     onClose: onBatchApproveOldClose,
     onOpen: onBatchApproveOldOpen,
@@ -61,6 +68,10 @@ export const Admin = () => {
 
   const handleOpenReportCycle = () => {
     onNewCycleOpen();
+  };
+
+  const handleSendEmailToProjectLeads = () => {
+    onProjectLeadEmailModalOpen();
   };
 
   const handleBatchApproveOldReports = () => {
@@ -89,6 +100,12 @@ export const Admin = () => {
       description: "Approve all progress reports requesting approval",
       reactIcon: HiDocumentPlus,
       onClick: handleOpenReportCycle,
+    },
+    {
+      name: "Send Email to Project Leads",
+      description: "Send an email to all project leads",
+      reactIcon: MdEmail,
+      onClick: handleSendEmailToProjectLeads,
     },
   ];
 
@@ -173,6 +190,10 @@ export const Admin = () => {
         isOpen={isBatchApproveOldOpen}
         onClose={onBatchApproveOldClose}
       />
+      <ProjectLeadEmailModal
+        isOpen={isProjectLeadEmailModalOpen}
+        onClose={onProjectLeadEmailModalClose}
+      />
       <NewCycleModal isOpen={isNewCycleOpen} onClose={onNewCycleClose} />
       <Text
         my={3}
@@ -215,7 +236,7 @@ export const Admin = () => {
       </Text>
       <Divider my={4} />
 
-      <Grid mt={6} gridTemplateColumns={"repeat(3, 1fr)"} gridGap={6}>
+      <Grid mt={6} gridTemplateColumns={"repeat(2, 1fr)"} gridGap={6}>
         {sortedAdminActions.map((action, index) => (
           <AdminOptionBox
             key={index}

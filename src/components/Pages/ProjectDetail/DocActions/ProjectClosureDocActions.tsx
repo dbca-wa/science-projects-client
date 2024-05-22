@@ -47,7 +47,7 @@ export const ProjectClosureDocActions = ({
   setToLastTab,
   isBaLead,
 }: // , projectPk
-  IConceptDocumentActions) => {
+IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
 
   // useEffect(() => {
@@ -287,7 +287,7 @@ export const ProjectClosureDocActions = ({
               </Box>
               <Grid
                 pt={2}
-              // gridGap={2}
+                // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -306,19 +306,19 @@ export const ProjectClosureDocActions = ({
                           ? "green.500"
                           : "green.600"
                         : projectClosureData.document.status === "inapproval"
-                          ? colorMode === "light"
-                            ? "blue.500"
-                            : "blue.600"
-                          : projectClosureData.document.status === "inreview"
-                            ? colorMode === "light"
-                              ? "orange.500"
-                              : "orange.600"
-                            : projectClosureData.document.status === "revising"
-                              ? "orange.500"
-                              : // New
-                              colorMode === "light"
-                                ? "red.500"
-                                : "red.600"
+                        ? colorMode === "light"
+                          ? "blue.500"
+                          : "blue.600"
+                        : projectClosureData.document.status === "inreview"
+                        ? colorMode === "light"
+                          ? "orange.500"
+                          : "orange.600"
+                        : projectClosureData.document.status === "revising"
+                        ? "orange.500"
+                        : // New
+                        colorMode === "light"
+                        ? "red.500"
+                        : "red.600"
                     }
                     color={"white"}
                     size={"md"}
@@ -326,12 +326,12 @@ export const ProjectClosureDocActions = ({
                     {projectClosureData.document.status === "inapproval"
                       ? "Approval Requested"
                       : projectClosureData.document.status === "approved"
-                        ? "Approved"
-                        : projectClosureData.document.status === "inreview"
-                          ? "Review Requested"
-                          : projectClosureData.document.status === "revising"
-                            ? "Revising"
-                            : "New Document"}
+                      ? "Approved"
+                      : projectClosureData.document.status === "inreview"
+                      ? "Review Requested"
+                      : projectClosureData.document.status === "revising"
+                      ? "Revising"
+                      : "New Document"}
                   </Tag>
                 </Flex>
                 <Flex
@@ -492,9 +492,9 @@ export const ProjectClosureDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-              // gridGap={2}
-              // pt={4}
-              // pos={"relative"}
+                // gridGap={2}
+                // pt={4}
+                // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -559,17 +559,47 @@ export const ProjectClosureDocActions = ({
                       w={"100%"}
                       mt={
                         projectClosureData?.document?.project?.status ===
-                          "completed"
+                        "completed"
                           ? 3
                           : projectClosureData?.document
-                            ?.business_area_lead_approval_granted
-                            ? 0
-                            : 3
+                              ?.business_area_lead_approval_granted
+                          ? userData?.is_superuser ||
+                            userData?.pk === leaderMember?.pk
+                            ? 2
+                            : 0
+                          : 3
                       }
                     >
-                      {(projectClosureData?.document?.project?.status ===
-                        "completed" || projectClosureData?.document?.project?.status === "terminated" || projectClosureData?.document?.project?.status === "suspended") &&
-                        (isBaLead || leaderMember?.pk === userData?.pk || userData?.is_superuser) && (
+                      {userData?.is_superuser ||
+                      userData?.pk === leaderMember?.pk ||
+                      userData?.pk === baData?.leader ? (
+                        <Button
+                          color={"white"}
+                          background={
+                            colorMode === "light" ? "orange.500" : "orange.600"
+                          }
+                          _hover={{
+                            background:
+                              colorMode === "light"
+                                ? "orange.400"
+                                : "orange.500",
+                          }}
+                          size={"sm"}
+                          onClick={onS1ReopenModalOpen}
+                          // mr={3}
+                        >
+                          Delete Closure
+                        </Button>
+                      ) : (
+                        (projectClosureData?.document?.project?.status ===
+                          "completed" ||
+                          projectClosureData?.document?.project?.status ===
+                            "terminated" ||
+                          projectClosureData?.document?.project?.status ===
+                            "suspended") &&
+                        (isBaLead ||
+                          leaderMember?.pk === userData?.pk ||
+                          userData?.is_superuser) && (
                           <>
                             {/* <ProjectClosureActionModal
                             userData={userData}
@@ -602,19 +632,21 @@ export const ProjectClosureDocActions = ({
                               }}
                               size={"sm"}
                               onClick={onS1ReopenModalOpen}
-                            // mr={3}
+                              // mr={3}
                             >
                               Reopen Project
                             </Button>
                           </>
-                        )}
+                        )
+                      )}
 
                       {projectClosureData?.document
                         ?.business_area_lead_approval_granted === false &&
                         projectClosureData?.document
                           ?.project_lead_approval_granted === true &&
                         (userData?.is_superuser ||
-                          userData?.pk === leaderMember?.user?.pk || isBaLead) && (
+                          userData?.pk === leaderMember?.user?.pk ||
+                          isBaLead) && (
                           <>
                             <ProjectClosureActionModal
                               userData={userData}
@@ -662,7 +694,8 @@ export const ProjectClosureDocActions = ({
                         projectClosureData?.document
                           ?.project_lead_approval_granted === false &&
                         (userData?.is_superuser ||
-                          userData?.pk === leaderMember?.user?.pk || isBaLead) && (
+                          userData?.pk === leaderMember?.user?.pk ||
+                          isBaLead) && (
                           <Center justifyContent={"flex-end"}>
                             <>
                               <DeleteDocumentModal
@@ -684,9 +717,9 @@ export const ProjectClosureDocActions = ({
                                   setStatusIfRequired(
                                     projectClosureData?.document?.project?.pk
                                       ? projectClosureData?.document?.project
-                                        ?.pk
+                                          ?.pk
                                       : projectClosureData?.document?.project
-                                        ?.id,
+                                          ?.id,
                                     "updating"
                                   );
                                 }}
@@ -767,7 +800,7 @@ export const ProjectClosureDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                // pos={"relative"}
+                  // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -804,14 +837,14 @@ export const ProjectClosureDocActions = ({
                     w={"100%"}
                     mt={
                       projectClosureData?.document?.project?.status ===
-                        "completed"
+                      "completed"
                         ? 3
                         : projectClosureData?.document
-                          ?.directorate_approval_granted
-                          ? 0
-                          : 3
+                            ?.directorate_approval_granted
+                        ? 0
+                        : 3
                     }
-                  // gridTemplateColumns={"repeat(2, 1fr)"}
+                    // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     <ProjectClosureActionModal
                       userData={userData}
@@ -831,9 +864,9 @@ export const ProjectClosureDocActions = ({
                     />
                     {projectClosureData?.document
                       ?.project_lead_approval_granted &&
-                      projectClosureData?.document
-                        ?.business_area_lead_approval_granted === false &&
-                      (userData?.is_superuser || userData?.pk === baLead?.pk) ? (
+                    projectClosureData?.document
+                      ?.business_area_lead_approval_granted === false &&
+                    (userData?.is_superuser || userData?.pk === baLead?.pk) ? (
                       <Center
                       // justifyContent={"flex-start"}
                       // ml={4}
@@ -892,28 +925,29 @@ export const ProjectClosureDocActions = ({
                           Send Back
                         </Button>
                       </Center>
-                    ) :
-
-                      (projectClosureData?.document?.project?.status ===
-                        "completed" || projectClosureData?.document?.project?.status === "terminated" || projectClosureData?.document?.project?.status === "suspended") &&
-                        (isBaLead || userData?.is_superuser)
-                        ? (
-                          <Button
-                            color={"white"}
-                            background={
-                              colorMode === "light" ? "orange.500" : "orange.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light" ? "orange.400" : "orange.500",
-                            }}
-                            size={"sm"}
-                            onClick={onS2ReopenModalOpen}
-                            mr={0}
-                          >
-                            Reopen Project
-                          </Button>
-                        ) : null}
+                    ) : (projectClosureData?.document?.project?.status ===
+                        "completed" ||
+                        projectClosureData?.document?.project?.status ===
+                          "terminated" ||
+                        projectClosureData?.document?.project?.status ===
+                          "suspended") &&
+                      (isBaLead || userData?.is_superuser) ? (
+                      <Button
+                        color={"white"}
+                        background={
+                          colorMode === "light" ? "orange.500" : "orange.600"
+                        }
+                        _hover={{
+                          background:
+                            colorMode === "light" ? "orange.400" : "orange.500",
+                        }}
+                        size={"sm"}
+                        onClick={onS2ReopenModalOpen}
+                        mr={0}
+                      >
+                        Reopen Project
+                      </Button>
+                    ) : null}
 
                     {projectClosureData?.document
                       ?.business_area_lead_approval_granted &&
@@ -1062,8 +1096,13 @@ export const ProjectClosureDocActions = ({
                       projectData={projectClosureData?.document?.project}
                     />
                     {(projectClosureData?.document?.project?.status ===
-                      "completed" || projectClosureData?.document?.project?.status === "terminated" || projectClosureData?.document?.project?.status === "suspended") &&
-                      (userData?.is_superuser || userData?.business_area?.name === "Directorate") ? (
+                      "completed" ||
+                      projectClosureData?.document?.project?.status ===
+                        "terminated" ||
+                      projectClosureData?.document?.project?.status ===
+                        "suspended") &&
+                    (userData?.is_superuser ||
+                      userData?.business_area?.name === "Directorate") ? (
                       <Button
                         color={"white"}
                         background={

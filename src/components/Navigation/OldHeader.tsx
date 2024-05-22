@@ -71,6 +71,7 @@ import { Navitar } from "./Navitar";
 import { SidebarNavButton } from "./SidebarNavButton";
 import { SidebarNavMenu } from "./SidebarNavMenu";
 import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
+import { ProjectLeadEmailModal } from "../Modals/ProjectLeadEmailModal";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -83,16 +84,28 @@ const ProjectMenuContents = () => {
         textAlign={"center"}
       >
         <MenuItem
-          onClick={() => {
-            navigate("/projects/browse");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/projects/browse`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/projects/browse");
+            }
           }}
         >
           {<CgBrowse />}
           <Text ml={2}>Browse Projects</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/projects/add");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/projects/add`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/projects/add");
+            }
           }}
         >
           {<CgPlayListAdd />}
@@ -115,8 +128,14 @@ const GuideContents = () => {
         textAlign={"center"}
       >
         <MenuItem
-          onClick={() => {
-            navigate("/guide");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/guide`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/guide");
+            }
           }}
         >
           <FaBookBookmark />
@@ -144,8 +163,14 @@ const ReportMenuContents = () => {
       >
         {userData?.is_superuser ? (
           <MenuItem
-            onClick={() => {
-              navigate("/reports/current");
+            onClick={(e) => {
+              if (e.ctrlKey || e.metaKey) {
+                // Handle Ctrl + Click (or Command + Click on Mac)
+                window.open(`/reports/current`, "_blank"); // Opens in a new tab
+              } else {
+                // Normal click handling
+                navigate("/reports/current");
+              }
             }}
           >
             <MdOutlineAccessTimeFilled />
@@ -156,8 +181,14 @@ const ReportMenuContents = () => {
         ) : null}
 
         <MenuItem
-          onClick={() => {
-            navigate("/reports");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/reports`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/reports");
+            }
           }}
         >
           {<CgViewList />}
@@ -190,8 +221,14 @@ const UserMenuContents = () => {
         textAlign={"center"}
       >
         <MenuItem
-          onClick={() => {
-            navigate("/users");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/users`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/users");
+            }
           }}
         >
           {<ImUsers />}
@@ -212,12 +249,14 @@ interface AdminProps {
   handleNewReportCycle: () => void;
   handleBatchApproveReports: () => void;
   handleBatchApproveOldReports: () => void;
+  handleSendEmailToProjectLeads: () => void;
 }
 const AdminMenuContents = ({
   // handleDataDump,
   handleNewReportCycle,
   handleBatchApproveReports,
   handleBatchApproveOldReports,
+  handleSendEmailToProjectLeads,
 }: AdminProps) => {
   const navigate = useNavigate();
   return (
@@ -229,16 +268,28 @@ const AdminMenuContents = ({
         textAlign={"center"}
       >
         <MenuItem
-          onClick={() => {
-            navigate("/crud/addresses");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/addresses`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/addresses");
+            }
           }}
         >
           {<FaAddressCard />}
           <Text ml={2}>Addresses</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/affiliations");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/affiliations`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/affiliations");
+            }
           }}
         >
           {<RiTeamFill />}
@@ -246,32 +297,56 @@ const AdminMenuContents = ({
         </MenuItem>
 
         <MenuItem
-          onClick={() => {
-            navigate("/crud/branches");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/branches`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/branches");
+            }
           }}
         >
           {<RiOrganizationChart />}
           <Text ml={2}>Branches</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/businessareas");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/businessareas`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/businessareas");
+            }
           }}
         >
           {<ImBriefcase />}
           <Text ml={2}>Business Areas</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/divisions");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/divisions`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/divisions");
+            }
           }}
         >
           {<GoOrganization />}
           <Text ml={2}>Divisions</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/emails");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/emails`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/emails");
+            }
           }}
         >
           {<MdEmail />}
@@ -279,16 +354,28 @@ const AdminMenuContents = ({
         </MenuItem>
 
         <MenuItem
-          onClick={() => {
-            navigate("/crud/locations");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/locations`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/locations");
+            }
           }}
         >
           {<FaLocationArrow />}
           <Text ml={2}>Locations</Text>
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            navigate("/crud/reports");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/reports`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/reports");
+            }
           }}
         >
           {<MdManageHistory />}
@@ -296,15 +383,31 @@ const AdminMenuContents = ({
         </MenuItem>
 
         <MenuItem
-          onClick={() => {
-            navigate("/crud/services");
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/services`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/services");
+            }
           }}
         >
           {<MdOutlineSettingsSuggest />}
           <Text ml={2}>Services</Text>
         </MenuItem>
 
-        <MenuItem onClick={() => navigate("/crud/feedback")}>
+        <MenuItem
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/feedback`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/feedback");
+            }
+          }}
+        >
           {<VscFeedback />}
           <Text ml={2}>View Feedback</Text>
         </MenuItem>
@@ -332,6 +435,10 @@ const AdminMenuContents = ({
         <MenuItem onClick={handleNewReportCycle}>
           {<HiDocumentPlus />}
           <Text ml={2}>Open Annual Report Cycle</Text>
+        </MenuItem>
+        <MenuItem onClick={handleSendEmailToProjectLeads}>
+          {<MdEmail />}
+          <Text ml={2}>Send Project Lead Email</Text>
         </MenuItem>
       </MenuGroup>
     </>
@@ -434,10 +541,19 @@ const OldHeader = () => {
 
   const { userLoading, userData } = useUser();
   const { layout } = useLayoutSwitcher();
+  const {
+    isOpen: isProjectLeadEmailModalOpen,
+    onOpen: onProjectLeadEmailModalOpen,
+    onClose: onProjectLeadEmailModalClose,
+  } = useDisclosure();
 
   return (
     <Box>
       {/* Nav background */}
+      <ProjectLeadEmailModal
+        isOpen={isProjectLeadEmailModalOpen}
+        onClose={onProjectLeadEmailModalClose}
+      />
       <BatchApproveModal
         isOpen={isBatchApproveOpen}
         onClose={onBatchApproveClose}
@@ -581,6 +697,9 @@ const OldHeader = () => {
                                   handleBatchApproveOldReports={
                                     handleBatchApproveOldReports
                                   }
+                                  handleSendEmailToProjectLeads={
+                                    onProjectLeadEmailModalOpen
+                                  }
                                 />
                               }
                             />
@@ -643,6 +762,9 @@ const OldHeader = () => {
                         handleBatchApproveOldReports={
                           handleBatchApproveOldReports
                         }
+                        handleSendEmailToProjectLeads={
+                          onProjectLeadEmailModalOpen
+                        }
                       />
                     }
                   />
@@ -654,7 +776,15 @@ const OldHeader = () => {
                   <NavButton
                     leftIcon={FaBookBookmark}
                     buttonName="Guide"
-                    onClick={() => navigate("/guide")}
+                    onClick={(e) => {
+                      if (e.ctrlKey || e.metaKey) {
+                        // Handle Ctrl + Click (or Command + Click on Mac)
+                        window.open(`/guide`, "_blank"); // Opens in a new tab
+                      } else {
+                        // Normal click handling
+                        navigate("/guide");
+                      }
+                    }}
                   />
                 ) : null}
 
