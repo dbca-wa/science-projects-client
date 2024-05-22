@@ -74,8 +74,9 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Opening Mail${shouldDownloadList === true ? " and downloading file" : ""
-            }.`,
+          description: `Opening Mail${
+            shouldDownloadList === true ? " and downloading file" : ""
+          }.`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -98,7 +99,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
 
         const downloadLink = document.createElement("a");
         downloadLink.href = url;
-        downloadLink.download = "file.txt";
+        downloadLink.download = "project_leads_list.txt";
         document.body.appendChild(downloadLink);
         downloadLink.click();
 

@@ -8,8 +8,14 @@ interface IPageViewProps {
 
 export const AccountPageViewWrapper = ({ children }: IPageViewProps) => {
   return (
-    <Box height="100%" display="flex" flexDirection="column" flex={1}>
-      <Box overflowY="auto" flex="1" p={3}>
+    <Box
+      height="100%"
+      display="flex"
+      flexDirection="column"
+      flex={1}
+      overflowX={"hidden"}
+    >
+      <Box overflowY="auto" flex="1" p={3} overflowX={"hidden"}>
         {children}
       </Box>
     </Box>

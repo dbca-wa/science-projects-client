@@ -100,7 +100,6 @@ export const ProjectDetailsSection = ({
     }
   }, [dsLoading, servicesDataFromAPI]);
 
-
   const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
   // Function to check if a string contains HTML tags
   const checkIsHtml = (data) => {
@@ -172,7 +171,6 @@ export const ProjectDetailsSection = ({
             <FormLabel>Business Area</FormLabel>
 
             <InputGroup>
-
               <Select
                 variant="filled"
                 placeholder="Select a Business Area"
@@ -184,13 +182,17 @@ export const ProjectDetailsSection = ({
                 {orderedDivisionSlugs.flatMap((divSlug) => {
                   // Filter business areas for the current division
                   const divisionBusinessAreas = businessAreaList
-                    .filter((ba) => ba.division.slug === divSlug && ba.is_active)
+                    .filter(
+                      (ba) => ba.division.slug === divSlug && ba.is_active
+                    )
                     .sort((a, b) => a.name.localeCompare(b.name));
 
                   return divisionBusinessAreas.map((ba, index) => (
                     <option key={`${ba.name}${index}`} value={ba.pk}>
                       {ba?.division ? `[${ba?.division?.slug}] ` : ""}
-                      {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
+                      {checkIsHtml(ba.name)
+                        ? sanitizeHtml(ba.name)
+                        : ba.name}{" "}
                       {ba.is_active ? "" : "(INACTIVE)"}
                     </option>
                   ));
@@ -200,7 +202,8 @@ export const ProjectDetailsSection = ({
             <FormHelperText
             // color={colorMode === "light" ? "gray.500" : "gray.400"}
             >
-              The Business Area / Program that this project belongs to. Only active Business Areas are selectable.
+              The Business Area / Program that this project belongs to. Only
+              active Business Areas are selectable.
             </FormHelperText>
           </FormControl>
         </Box>
@@ -223,7 +226,7 @@ export const ProjectDetailsSection = ({
                 preselectedUserPk={thisUser}
                 label={
                   projectType !== "Student Project"
-                    ? "Scientific Support"
+                    ? "Science Support"
                     : "Project Leader"
                 }
                 placeholder={
@@ -234,7 +237,7 @@ export const ProjectDetailsSection = ({
                 helperText={
                   projectType === "Student Project"
                     ? "The Project Leader."
-                    : "Scientific Support"
+                    : "Science Support"
                 }
               />
             </Box>
