@@ -45,7 +45,7 @@ export const ManageTeam = ({
     String(project_id)
   );
 
-  useEffect(() => console.log(ba_leader, userData?.pk))
+  // useEffect(() => console.log(ba_leader, userData?.pk))
 
   const [leaderPk, setLeaderPk] = useState();
 

@@ -30,6 +30,10 @@ export interface IMiniUser {
     is_superuser: boolean;
 }
 
+export interface IMaintainer {
+    maintainer: IMiniUser;
+}
+
 export interface IAdminOptions {
     pk: number;
     email_options: string;
@@ -101,7 +105,7 @@ export interface IEmailModalProps {
             | IProjectClosureEmail
             | IDocumentReadyEmail
             | IDocumentApproved
-            | IDocumentRecalled 
+            | IDocumentRecalled
             | IFeedbackReceived
     ) => Promise<AxiosResponse | AxiosError>; // Allow props to be optional
 }

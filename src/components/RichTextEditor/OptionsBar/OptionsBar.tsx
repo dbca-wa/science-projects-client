@@ -7,6 +7,8 @@ import { ClearButton } from "../Buttons/ClearButton";
 import { SaveButton } from "../Buttons/SaveButton";
 import { TreeButton } from "../Buttons/TreeButton";
 import { WordCount } from "./WordCount";
+import { PasteHTMLDataButton } from "../Buttons/PasteHTMLDataButton";
+import { useMaintainer } from "@/lib/hooks/tanstack/useMaintainer";
 
 interface IOptionsBarProps {
   // editor: LexicalEditor;
@@ -58,6 +60,8 @@ export const OptionsBar = ({
   setCanSave,
 }: IOptionsBarProps) => {
   const { userData } = useUser();
+  const { maintainerData, maintainerLoading } = useMaintainer();
+
   return (
     editorIsOpen && (
       <Flex height={20} width={"100%"} bottom={0}>
@@ -74,20 +78,26 @@ export const OptionsBar = ({
           <Grid
             px={10}
             py={4}
-            gridTemplateColumns={`repeat(${
-              userData?.is_superuser ? 3 : 2
-            }, 1fr)`}
+            gridTemplateColumns={`repeat(${userData?.pk === maintainerData?.pk ? 6 : 2
+              }, 1fr)`}
             // width={"100%"}
             gridColumnGap={2}
           >
-            {userData?.is_superuser ? (
-              <TreeButton
-                shouldShowTree={shouldShowTree}
-                setShouldShowTree={setShouldShowTree}
-                editorText={editorText}
-                rawHTML={rawHTML}
-              />
+            {userData?.pk === maintainerData?.pk ? (
+              <>
+                <TreeButton
+                  shouldShowTree={shouldShowTree}
+                  setShouldShowTree={setShouldShowTree}
+                  editorText={editorText}
+                  rawHTML={rawHTML}
+                />
+                <PasteHTMLDataButton kind="unordered" />
+                <PasteHTMLDataButton kind="ordered" />
+                <PasteHTMLDataButton kind="both" />
+
+              </>
             ) : null}
+
 
             <ClearButton canClear={true} />
             <SaveButton

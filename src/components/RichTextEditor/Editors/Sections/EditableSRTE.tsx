@@ -149,10 +149,7 @@ export const EditableSRTE = ({
             });
           }}
         />
-        {/* {data !== undefined && data !== null && ( */}
-        <PrepopulateHTMLPlugin data={data} />
-        {/* )} */}
-        <CustomPastePlugin />
+
 
         {/* Text Area */}
         <RichTextPlugin
@@ -253,6 +250,10 @@ export const EditableSRTE = ({
         <FloatingToolbarPlugin anchorElem={floatingAnchorElem} />
 
         <AutoFocusPlugin />
+        {/* {data !== undefined && data !== null && ( */}
+        <PrepopulateHTMLPlugin data={data} />
+        {/* )} */}
+        <CustomPastePlugin />
       </LexicalComposer>
     </>
   );
