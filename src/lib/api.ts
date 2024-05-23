@@ -2730,6 +2730,12 @@ export const deleteBranch = async (pk: number) => {
 
 // ADMIN
 
+
+export const getMaintainer = async () => {
+    const res = instance.get(`adminoptions/maintainer`).then(res => res.data);
+    return res;
+}
+
 export const getAdminOptionsByPk = async ({ queryKey }: QueryFunctionContext) => {
     const [_, pk] = queryKey;
     // adminoptions

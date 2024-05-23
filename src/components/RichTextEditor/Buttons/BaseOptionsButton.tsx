@@ -30,13 +30,13 @@ export const BaseOptionsButton = ({
         _hover={
           colorMode === "light"
             ? {
-                bg: `${colorScheme}.600`,
-                color: `white`,
-              }
+              bg: `${colorScheme}.600`,
+              color: `white`,
+            }
             : {
-                bg: `${colorScheme}.500`,
-                color: `white`,
-              }
+              bg: `${colorScheme}.500`,
+              color: `white`,
+            }
         }
         onClick={onClick}
         rounded={"full"}
