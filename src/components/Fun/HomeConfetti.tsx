@@ -1,7 +1,7 @@
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
 
-const ConfettiComponent = () => {
+const HomeConfetti = () => {
     // Retrieve the count from localStorage or cookies
 
     const getLocalConfettiCount = () => {
@@ -47,4 +47,4 @@ const ConfettiComponent = () => {
     return null; // or return any JSX if needed
 };
 
-export default ConfettiComponent;
+export default HomeConfetti;

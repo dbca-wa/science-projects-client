@@ -203,9 +203,10 @@ export const ManageTeam = ({
               color={colorMode === "light" ? "gray.600" : "gray.400"}
               userSelect={"none"}
             >
-              Click and drag a user to re-arrange order (Leader only), or click
-              their name to adjust their details for this project. To reassign
-              leader, click a user's name and promote them.
+              To reassign the project leader, click a user's name and promote them.
+              This will set other users with leader role to Science Support or External Collaborator, depending on their staff status.
+              Click a member's name to adjust their details and role for this project.
+              Project and Business Area leads can click and drag a user to re-arrange order.
             </Text>
           </Box>
         </Grid>

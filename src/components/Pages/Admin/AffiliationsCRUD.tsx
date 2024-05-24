@@ -62,12 +62,12 @@ export const AffiliationsCRUD = () => {
     setSecondaryAffiliations([]);
   };
 
-  useEffect(() => {
-    console.log({
-      primaryAffiliation,
-      secondaryAffiliations,
-    });
-  }, [primaryAffiliation, secondaryAffiliations]);
+  // useEffect(() => {
+  //   console.log({
+  //     primaryAffiliation,
+  //     secondaryAffiliations,
+  //   });
+  // }, [primaryAffiliation, secondaryAffiliations]);
 
   const toast = useToast();
   const {

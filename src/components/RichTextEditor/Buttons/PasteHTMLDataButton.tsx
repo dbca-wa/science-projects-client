@@ -1913,77 +1913,148 @@ export const PasteHTMLDataButton = ({ kind }: Props) => {
   <body lang=EN-AU style='tab-interval:36.0pt;word-wrap:break-word'>
   <!--StartFragment-->
   
-  <p class=MsoNormal>Testing test, dots:<o:p></o:p></p>
-  
   <p class=MsoListParagraphCxSpFirst style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
   style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
-  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>        
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span></span></span><![endif]>ABC<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
   style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
-  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>        
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span></span></span><![endif]>123<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
   style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
-  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>        
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span></span></span><![endif]>Aaaa<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
   auto;text-indent:-18.0pt;mso-list:l0 level2 lfo1'><![if !supportLists]><span
   style='font-family:"Courier New";mso-fareast-font-family:"Courier New"'><span
-  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>  
+  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
   </span></span></span><![endif]>Aasdasd<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
   auto;text-indent:-18.0pt;mso-list:l0 level2 lfo1'><![if !supportLists]><span
   style='font-family:"Courier New";mso-fareast-font-family:"Courier New"'><span
-  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>  
+  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
   </span></span></span><![endif]>Asdasd<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
   style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
-  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>        
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span></span></span><![endif]>Asdsd<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
   style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
-  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>        
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span></span></span><![endif]>Sdad<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
   style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
-  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>        
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span></span></span><![endif]>Asds<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
   auto;text-indent:-18.0pt;mso-list:l0 level2 lfo1'><![if !supportLists]><span
   style='font-family:"Courier New";mso-fareast-font-family:"Courier New"'><span
-  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>  
+  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
   </span></span></span><![endif]>Asdsad<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='margin-left:108.0pt;mso-add-space:
   auto;text-indent:-18.0pt;mso-list:l0 level3 lfo1'><![if !supportLists]><span
   style='font-family:Wingdings;mso-fareast-font-family:Wingdings;mso-bidi-font-family:
-  Wingdings'><span style='mso-list:Ignore'>§<span style='font:7.0pt "Times New Roman"'> 
+  Wingdings'><span style='mso-list:Ignore'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
   </span></span></span><![endif]>Asdasd<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='margin-left:108.0pt;mso-add-space:
   auto;text-indent:-18.0pt;mso-list:l0 level3 lfo1'><![if !supportLists]><span
   style='font-family:Wingdings;mso-fareast-font-family:Wingdings;mso-bidi-font-family:
-  Wingdings'><span style='mso-list:Ignore'>§<span style='font:7.0pt "Times New Roman"'> 
+  Wingdings'><span style='mso-list:Ignore'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
   </span></span></span><![endif]>Sadad<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
   auto;text-indent:-18.0pt;mso-list:l0 level2 lfo1'><![if !supportLists]><span
   style='font-family:"Courier New";mso-fareast-font-family:"Courier New"'><span
-  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>  
+  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
   </span></span></span><![endif]>Sadasd<o:p></o:p></p>
   
   <p class=MsoListParagraphCxSpLast style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
   style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
-  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>        
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span></span><![endif]>Asdasdsad<o:p></o:p></p>
+  
+  <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+  
+  <p class=MsoListParagraphCxSpFirst style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+  style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span></span><![endif]>ABC<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+  style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span></span><![endif]>123<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+  style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span></span><![endif]>Aaaa<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
+  auto;text-indent:-18.0pt;mso-list:l0 level2 lfo1'><![if !supportLists]><span
+  style='font-family:"Courier New";mso-fareast-font-family:"Courier New"'><span
+  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+  </span></span></span><![endif]>Aasdasd<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
+  auto;text-indent:-18.0pt;mso-list:l0 level2 lfo1'><![if !supportLists]><span
+  style='font-family:"Courier New";mso-fareast-font-family:"Courier New"'><span
+  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+  </span></span></span><![endif]>Asdasd<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+  style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span></span><![endif]>Asdsd<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+  style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span></span><![endif]>Sdad<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+  style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span></span><![endif]>Asds<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
+  auto;text-indent:-18.0pt;mso-list:l0 level2 lfo1'><![if !supportLists]><span
+  style='font-family:"Courier New";mso-fareast-font-family:"Courier New"'><span
+  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+  </span></span></span><![endif]>Asdsad<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='margin-left:108.0pt;mso-add-space:
+  auto;text-indent:-18.0pt;mso-list:l0 level3 lfo1'><![if !supportLists]><span
+  style='font-family:Wingdings;mso-fareast-font-family:Wingdings;mso-bidi-font-family:
+  Wingdings'><span style='mso-list:Ignore'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+  </span></span></span><![endif]>Asdasd<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='margin-left:108.0pt;mso-add-space:
+  auto;text-indent:-18.0pt;mso-list:l0 level3 lfo1'><![if !supportLists]><span
+  style='font-family:Wingdings;mso-fareast-font-family:Wingdings;mso-bidi-font-family:
+  Wingdings'><span style='mso-list:Ignore'>§<span style='font:7.0pt "Times New Roman"'>&nbsp;
+  </span></span></span><![endif]>Sadad<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
+  auto;text-indent:-18.0pt;mso-list:l0 level2 lfo1'><![if !supportLists]><span
+  style='font-family:"Courier New";mso-fareast-font-family:"Courier New"'><span
+  style='mso-list:Ignore'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;
+  </span></span></span><![endif]>Sadasd<o:p></o:p></p>
+  
+  <p class=MsoListParagraphCxSpLast style='text-indent:-18.0pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+  style='font-family:Symbol;mso-fareast-font-family:Symbol;mso-bidi-font-family:
+  Symbol'><span style='mso-list:Ignore'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span></span></span><![endif]>Asdasdsad<o:p></o:p></p>
   
   <!--EndFragment-->
@@ -1991,6 +2062,7 @@ export const PasteHTMLDataButton = ({ kind }: Props) => {
   
   </html>
   `
+
   const testBoth = `<html xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:w="urn:schemas-microsoft-com:office:word"
   xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"

@@ -27,7 +27,7 @@ export const TraditionalEndorsementTaskDisplay = ({
   const navigate = useNavigate();
   const { isOnProjectsPage } = useProjectSearchContext();
 
-  const goToProjectDocument = (pk: number | undefined, document: IMainDoc) => {
+  const goToProjectDocument = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, pk: number | undefined, document: IMainDoc) => {
     let urlkind = "";
     if (document?.kind === "progressreport") {
       urlkind = "progress";
@@ -44,9 +44,20 @@ export const TraditionalEndorsementTaskDisplay = ({
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else if (isOnProjectsPage) {
-      navigate(`${pk}/${urlkind}`);
+      if (e.ctrlKey || e.metaKey) {
+        window.open(`${pk}/${urlkind}`, "_blank"); // Opens in a new tab
+      }
+      else {
+        navigate(`${pk}/${urlkind}`);
+      }
     } else {
-      navigate(`projects/${pk}/${urlkind}`);
+      if (e.ctrlKey || e.metaKey) {
+        window.open(`projects/${pk}/${urlkind}`, "_blank"); // Opens in a new tab
+      }
+      else {
+        navigate(`projects/${pk}/${urlkind}`);
+      }
+
     }
   };
 
@@ -81,8 +92,9 @@ export const TraditionalEndorsementTaskDisplay = ({
         boxShadow: boxShadow,
         zIndex: 999,
       }}
-      onClick={() =>
+      onClick={(e) =>
         goToProjectDocument(
+          e,
           document?.project?.pk ? document?.project?.pk : document?.project?.id,
           document
         )
