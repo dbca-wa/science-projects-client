@@ -13,13 +13,14 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { HiDocumentCheck } from "react-icons/hi2";
+import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
 
 interface IProps {
   inputKind:
-    | "team_member"
-    | "project_lead"
-    | "business_area_lead"
-    | "directorate";
+  | "team_member"
+  | "project_lead"
+  | "business_area_lead"
+  | "directorate";
   document: IMainDoc;
 }
 
@@ -30,9 +31,10 @@ export const TraditionalDocumentTaskDisplay = ({
   // useEffect(() => { console.log(document) }, [document])
   const { colorMode } = useColorMode();
   const navigate = useNavigate();
-  // const { isOnProjectsPage } = useProjectSearchContext();
+  const { isOnProjectsPage } = useProjectSearchContext();
 
-  const goToProjectDocument = (pk: number | undefined, document: IMainDoc) => {
+
+  const goToProjectDocument = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, pk: number | undefined, document: IMainDoc) => {
     let urlkind = "";
     if (document?.kind === "progressreport") {
       urlkind = "progress";
@@ -49,14 +51,24 @@ export const TraditionalDocumentTaskDisplay = ({
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     }
-    // else if (isOnProjectsPage) {
-    //   navigate(`${pk}/${urlkind}`);
-    // }
     else {
-      navigate(`projects/${pk}/${urlkind}`);
+      if (isOnProjectsPage) {
+        if (e.ctrlKey || e.metaKey) {
+          window.open(`${pk}/${urlkind}`, "_blank"); // Opens in a new tab
+        }
+        else {
+          navigate(`${pk}/${urlkind}`);
+        }
+      } else {
+        if (e.ctrlKey || e.metaKey) {
+          window.open(`projects/${pk}/${urlkind}`, "_blank"); // Opens in a new tab
+        }
+        else {
+          navigate(`projects/${pk}/${urlkind}`);
+        }
+      }
     }
   };
-
   const formattedDocumentKind = (docKind: string) => {
     // "conceptplan" | "projectplan" | "progressreport" | "studentreport" | "projectclosure"
     if (docKind === "studentreport") {
@@ -114,8 +126,8 @@ export const TraditionalDocumentTaskDisplay = ({
         boxShadow: boxShadow,
         zIndex: 999,
       }}
-      onClick={() =>
-        goToProjectDocument(
+      onClick={(e) =>
+        goToProjectDocument(e,
           document?.project?.pk ? document?.project?.pk : document?.project?.id,
           document
         )
@@ -158,13 +170,12 @@ export const TraditionalDocumentTaskDisplay = ({
         </Flex>
         <Flex>
           <Text
-            color={`${
-              inputKind === "directorate"
-                ? "red"
-                : inputKind === "business_area_lead"
-                  ? "blue"
-                  : "green"
-            }.600`}
+            color={`${inputKind === "directorate"
+              ? "red"
+              : inputKind === "business_area_lead"
+                ? "blue"
+                : "green"
+              }.600`}
             fontWeight={"semibold"}
             fontSize={"small"}
             mr={1}
@@ -175,8 +186,8 @@ export const TraditionalDocumentTaskDisplay = ({
             {inputKind === "team_member"
               ? "Input required"
               : `Determine if the ${formattedDocumentKind(
-                  document?.kind
-                )} for this project is satisfactory`}
+                document?.kind
+              )} for this project is satisfactory`}
           </Text>
         </Flex>
       </Grid>

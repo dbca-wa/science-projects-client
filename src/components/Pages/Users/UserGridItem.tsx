@@ -53,25 +53,7 @@ export const UserGridItem = ({
   branches,
   businessAreas,
 }: IUserData) => {
-  if (username === "natalie_robson") {
-    console.log({
-      pk,
-      username,
-      email,
-      first_name,
-      last_name,
-      is_staff,
-      is_superuser,
-      is_active,
-      business_area,
-      role,
-      branch,
-      image,
-      affiliation,
-      branches,
-      businessAreas,
-    });
-  }
+
   const fullName =
     first_name !== null && last_name !== null
       ? `${first_name} ${last_name}`
@@ -171,7 +153,7 @@ export const UserGridItem = ({
           // isXlOrLarger ?
           <Flex
             ml={2}
-            // bg={"red"}
+          // bg={"red"}
           >
             <Box minW={55} mr={4}>
               <Avatar
@@ -207,13 +189,13 @@ export const UserGridItem = ({
                   ? isXlOrLarger
                     ? fullName
                     : fullName.length > 16
-                    ? `${fullName.substring(0, 10)}...`
-                    : fullName
+                      ? `${fullName.substring(0, 10)}...`
+                      : fullName
                   : isXlOrLarger
-                  ? fullName.startsWith("None")
-                    ? username
-                    : `${fullName}`
-                  : username}
+                    ? fullName.startsWith("None")
+                      ? username
+                      : `${fullName}`
+                    : username}
               </Button>
               <Text
                 fontSize={"sm"}
@@ -223,8 +205,8 @@ export const UserGridItem = ({
                       ? "orange.500"
                       : "blue.500"
                     : is_staff
-                    ? "green.500"
-                    : // External user
+                      ? "green.500"
+                      : // External user
                       "gray.500"
                 }
               >
@@ -235,12 +217,11 @@ export const UserGridItem = ({
                       ? "Executive"
                       : "Admin"
                     : is_staff
-                    ? `Staff${
-                        business_area?.leader === pk
-                          ? " (Business Area Leader)"
-                          : ""
+                      ? `Staff${business_area?.leader === pk
+                        ? " (Business Area Leader)"
+                        : ""
                       }`
-                    : "External User"
+                      : "External User"
                 }
                 {is_active === false && ` (Inactive)`}
               </Text>
@@ -293,8 +274,8 @@ export const UserGridItem = ({
                 ? email.endsWith("email.com")
                   ? "(Not Provided)"
                   : email.length >= 15
-                  ? `${email.substring(0, 13)}...`
-                  : email
+                    ? `${email.substring(0, 13)}...`
+                    : email
                 : "-"}
             </Text>
           </Box>
@@ -314,8 +295,8 @@ export const UserGridItem = ({
                 ? email.endsWith("email.com")
                   ? "(Not Provided)"
                   : email.length >= 25
-                  ? `${email.substring(0, 20)}...`
-                  : email
+                    ? `${email.substring(0, 20)}...`
+                    : email
                 : "-"}
             </Text>
           </Box>

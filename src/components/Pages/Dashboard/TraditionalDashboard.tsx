@@ -8,6 +8,9 @@ import {
   Grid,
   Heading,
   Link,
+  List,
+  ListIcon,
+  ListItem,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -23,12 +26,13 @@ import theme from "../../../theme";
 import { Head } from "../../Base/Head";
 import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
 // import { IDashProps } from "../../../types";
-import ConfettiComponent from "@/components/Fun/HomeConfetti";
+import HomeConfetti from "@/components/Fun/HomeConfetti";
 import { UserFeedbackModal } from "@/components/Modals/UserFeedbackModal";
 import { FaDatabase } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
+import { MdCheckCircle } from "react-icons/md";
 
 export const TraditionalDashboard = () => {
   const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
@@ -54,8 +58,7 @@ export const TraditionalDashboard = () => {
       setWelcomeUser("");
       setShouldConcat(true);
       setSpmsText(
-        `SPMS ${
-          VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+        `SPMS ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
         }`
       );
       // setAnnualReportText("Report");
@@ -67,14 +70,12 @@ export const TraditionalDashboard = () => {
       // setAnnualReportText("Annual Report");
       if (window.innerWidth < 1350) {
         setSpmsText(
-          `Science Project <br/> Management System ${
-            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project <br/> Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`
         );
       } else {
         setSpmsText(
-          `Science Project Management System ${
-            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`
         );
       }
@@ -128,7 +129,7 @@ export const TraditionalDashboard = () => {
         isFeedbackModalOpen={isFeedbackModalOpen}
         onCloseFeedbackModal={onCloseFeedbackModal}
       />
-      <ConfettiComponent />
+      {/* <HomeConfetti /> */}
       <Box
         mt={5}
         bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
@@ -153,17 +154,65 @@ export const TraditionalDashboard = () => {
 
         <Flex flexDir={"column"}>
           <Text
-            mt={5}
+            my={2}
             fontSize={"16px"}
             fontWeight={"semibold"}
-            onClick={() => localStorage.removeItem("confettiCount")}
+          // onClick={() => localStorage.removeItem("confettiCount")}
           >
-            &#127881; We have successfully migrated to SPMS 3.0! &#127881;
+            {/* &#127881;  &#127881; */}
+            &#9881;&#65039; SPMS 3.1.0 Patch Notes &#9881;&#65039;
           </Text>
-          <Text>
-            This new version features speed and security upgrades, dark mode, a
-            new layout, copy-pasting from word, improved email and more!
-          </Text>
+          <List spacing={1} ml={2} >
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Rich Text Editor: Unordered/Ordered List pasting from word (up to 3 levels)
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Ctrl + Click links to open multiple documents, projects, and pages quickly
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Role Name / Leader Promotion Update
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Added Simple Guide
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Updated project Suspend functionality
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Added additional admin and business area lead functionality
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Adjusted user image component
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Enabled 'Email' button for user profiles
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Adjusted visuals of feedback button, project tag, dark/light mode button, layout button, icons on modern layout/sidebar, and user profile to indicate if business area lead.
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Added departmental service to generated pdfs
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Added abilitiy to set affiliation of external users
+            </ListItem>
+            <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+              <ListIcon as={MdCheckCircle} color='green.500' />
+              Increased length of both profile sections to 2000 characters and renamed 'About' to 'Position'
+            </ListItem>
+          </List>
+
           <span style={{ marginTop: 20 }}>
             <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
               We are always looking for ways to improve, and value your
@@ -231,7 +280,7 @@ export const TraditionalDashboard = () => {
                   window.open("https://data.dbca.wa.gov.au/", "_blank");
                 }
               }}
-              // isDisabled={dataCatalogueDisabled}
+            // isDisabled={dataCatalogueDisabled}
             >
               {shouldConcat ? "Data" : "Data Catalogue"}
             </Button>

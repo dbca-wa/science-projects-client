@@ -114,7 +114,6 @@ const convertUnordered = (text: string, colorMode) => {
 
   const createListFromStartAndEndData = (arrayOfFirstClassPTags: Element[], dom: Document) => {
     for (const p of arrayOfFirstClassPTags) {
-      console.log(p)
       // Create a list
       const ul = dom.createElement("ul");
       // Create an LI version of P tag
@@ -125,7 +124,6 @@ const convertUnordered = (text: string, colorMode) => {
       listGroup.push(firstItemLi)
       // Keep track of original processed items to remove/replace later
       const processed: Element[] = []
-      // processed.push(p);
       // Iterate over p tag's next items, adding them to the list until reaching end class (and when reaching, add it to list)
       let nextItem = p.nextElementSibling;
       while (
@@ -135,7 +133,6 @@ const convertUnordered = (text: string, colorMode) => {
         // Convert the item to an li
         const listVersion = dom.createElement("li");
         listVersion.innerText = (nextItem as HTMLParagraphElement).innerText;
-        console.log(listVersion)
         // Add it to the list
         listGroup.push(listVersion);
         // Add original to processed
@@ -149,7 +146,6 @@ const convertUnordered = (text: string, colorMode) => {
           nextItem = nextItem.nextElementSibling;
         }
       }
-      // console.log(listGroup)
       // use list to append to ul
       for (const item of listGroup) {
         ul.append(item);
@@ -185,11 +181,6 @@ const convertUnordered = (text: string, colorMode) => {
           li.replaceWith(ulContainer)
           processedItems.forEach((li) => li.remove());
         }
-        // else if (ulGroup.length <= 1) {
-        //   const subContainer = dom.createElement('ul');
-        //   subContainer.append(li.cloneNode(true))
-        //   li.replaceWith(subContainer);
-        // }
       }
       // Find consecutive Lis to clean and begin third level
       listItems = Array.from(dom.querySelectorAll('li'))
@@ -237,15 +228,12 @@ const convertUnordered = (text: string, colorMode) => {
       }
 
     }
-    console.log(dom.body)
     return dom;
   }
 
   const listStartPTags = Array.from(dom.querySelectorAll("p")).filter((p) => {
     if (p.classList.contains(firstClass)) {
       if (firstLevelRegex.test(p.innerHTML)) {
-        const text = p.innerText;
-        console.log(text)
         return true
       }
       return false;
@@ -253,6 +241,7 @@ const convertUnordered = (text: string, colorMode) => {
 
     return false
   })
+
   const newDom = createListFromStartAndEndData(listStartPTags, dom);
   return newDom.body.innerHTML;
 };
@@ -266,206 +255,300 @@ const convertOrdered = (text: string, colorMode) => {
   const middleClass = 'MsoListParagraphCxSpMiddle';
   const endClass = 'MsoListParagraphCxSpLast';
 
-  // const firstLevelRegex = /·\s*(<br\s*\/?>)?\s*/i
-  // const secondLevelRegex = /o\s*(<br\s*\/?>)?\s*/i
-  // const thirdLevelRegex = /§\s*(<br\s*\/?>)?\s*/i
-
   const firstLevelRegex = /^[0-9]\.\s*(<br\s*\/?>)?\s*/i;
   const secondLevelRegex = /^[a-z]\.\s*(<br\s*\/?>)?\s*/i;
-  // const thirdLevelRegex = /^[ivxl]\.\s*(<br\s*\/?>)?\s*/i;
   const thirdLevelRegex = /^[ivxl]+\.\s*(<br\s*\/?>)?\s*/i;
-
-  const createListFromStartAndEndData = (arrayOfFirstClassPTags: Element[], dom: Document) => {
-
-    for (const p of arrayOfFirstClassPTags) {
-      // PART 1 - CREATING FIRST LIST FOR EACH START P TAG ==================================
-
-      // Create a list whiwh will serve as the main container
-      const ol = dom.createElement("ol");
-      // Create an LI version of the first p tag
-      const firstItemLi = dom.createElement("li");
-      firstItemLi.textContent = p.textContent.trim()
-      // Create a group and append that li to it
-      const listGroup = []
-      listGroup.push(firstItemLi)
-      // Keep track of original processed items to remove/replace later
-      const processed: Element[] = []
-      // Iterate over p tag's next items, adding them to the list until reaching end class (and when reaching, add it to list)
-      let nextItem = p.nextElementSibling;
-      while (
-        // Ensure it is a p tag
-        nextItem !== null && nextItem.tagName === "P"
-        // Ensure that the p tag is a part of the list by making sure it has middle or end class
-        &&
-        (nextItem.classList.contains(middleClass) || nextItem.classList.contains(endClass))
-        // Ensure it isnt handled already
-        &&
-        !processed.includes(nextItem)
-      ) {
-        // If we are here, it means it is an item that belongs to the list IN SOME CAPACITY.
-        // Add original to processed
-        processed.push(nextItem);
-
-        // Convert the item to an li
-        const itemBeingHandled = nextItem;
-
-        const listVersion = dom.createElement("li");
-        listVersion.innerText = (itemBeingHandled as HTMLParagraphElement).innerText.trim();
-
-        // Add it to the list
-        listGroup.push(listVersion);
-
-        // Establish next item for iteration
-        nextItem = itemBeingHandled.nextElementSibling;
-      }
-      console.log("GROUP:\n\n", listGroup)
-
-
-
-      // use list to append to ul
-      for (const item of listGroup) {
-        ol.append(item);
-      }
-      // replace the original p tag (move to location) and delete the others
-      p.replaceWith(ol);
-      for (const pTag of processed) {
-        (pTag).remove();
-      }
-
-      // PART 2 - CREATING TERTIARY LISTS ==================================
-
-      // Create an array of list items from the newly created ol
-      const listItemsInOL = Array.from(ol.querySelectorAll('li'))
-      console.log("LIST ITEMS IN OL\n", listItemsInOL)
-
-      // Find consecutive Lis that have roman numerals 
-      const liSubGroup: HTMLLIElement[][] = []
-      const processedOnes = []
-      const levelThreeGroups: HTMLElement[][] = []
-      for (const liItem of listItemsInOL) {
-        if (!processedOnes.includes(liItem)) {
-          const thirdGroup = []
-          // processedOnes.push(liItem)
-          let current: Element = liItem;
-          while (current !== null && current.tagName === "LI" && thirdLevelRegex.test(((current as HTMLLIElement)).innerText)) {
-            processedOnes.push(current);
-            thirdGroup.push(current)
-            current = current.nextElementSibling;
-            console.log("Next", current)
-          }
-          if (thirdGroup.length >= 1) {
-            levelThreeGroups.push(thirdGroup)
-          }
-        }
-      }
-      console.log("THREE GROUPS\n", levelThreeGroups)
-
-      // replace and delete l3s
-      for (const threeGroup of levelThreeGroups) {
-        const holder = dom.createElement("li")
-        const cont = dom.createElement("ol")
-        for (const li of threeGroup) {
-          cont.append(li.cloneNode(true));
-          if (threeGroup[0] !== li) {
-            li.remove()
-          }
-        }
-        holder.append(cont)
-        threeGroup[0].replaceWith(holder)
-        console.log(holder)
-      }
-
-
-      // PART 3 - CREATING SECONDARY LISTS ==================================
-
-
-
-
-      // // collect the group
-
-
-      //   thirdGroup.push(liItem)
-      //   let next = liItem.nextElementSibling;
-      //   while (next !== null && next.tagName === "LI" && (secondLevelRegex.test(next.innerHTML) || thirdLevelRegex.test(next.innerHTML))) {
-
-      //     processed.push(next);
-      //     secondAndThirdsGroup.push(next);
-      //     next = next.nextElementSibling;
-      //   }
-      //   liSubGroup.push(secondAndThirdsGroup)
-      // }
-      // }
-      // }
-
-
-      // PART 3 - FINAL LSIT ==================================
-      // // Find consecutive Lis to clean and begin third level
-      // listItems = Array.from(dom.querySelectorAll('li'))
-
-      // // Cleanup strange characters
-      // for (const li of listItems) {
-      //   cleanListItem(li, firstLevelRegex)
-      //   cleanListItem(li, secondLevelRegex)
-      // }
-
-      // const thirdLiItems = Array.from(dom.querySelectorAll('li')).filter((li) => thirdLevelRegex.test(li.innerText))
-      // for (const lastLi of thirdLiItems) {
-      //   const lastLiProcessed: HTMLLIElement[] = [];
-      //   const thirdOlGroup: HTMLLIElement[] = []
-      //   // lastLi doesnt need to be added to the group, because the group will replace it
-      //   let nextItem = lastLi.nextElementSibling;
-      //   while (
-      //     nextItem !== null && nextItem.tagName === "LI" &&
-      //     (thirdLevelRegex.test(nextItem.innerHTML))
-      //   ) {
-      //     thirdOlGroup.push(nextItem as HTMLLIElement);
-      //     lastLiProcessed.push(nextItem as HTMLLIElement);
-      //     nextItem = nextItem.nextElementSibling;
-      //   }
-
-      //   const ulContainer = dom.createElement("ol");
-      //   for (const liItem of thirdOlGroup) {
-      //     const clone = liItem.cloneNode(true)
-      //     ulContainer.append(clone)
-      //   }
-      //   if (thirdOlGroup.length > 1) {
-      //     lastLi.replaceWith(ulContainer)
-      //     lastLiProcessed.forEach((li) => li.remove());
-      //   }
-      //   else if (thirdOlGroup.length <= 1) {
-      //     const subContainer = dom.createElement('ol');
-      //     subContainer.append(lastLi.cloneNode(true))
-      //     lastLi.replaceWith(subContainer);
-      //   }
-      // }
-
-      // listItems = Array.from(dom.querySelectorAll('li'))
-      // for (const item of listItems) {
-      //   cleanListItem(item, thirdLevelRegex)
-      // }
-
-    }
-    // console.log(dom.body)
-    return dom;
-  }
 
 
   const listStartPTags = Array.from(dom.querySelectorAll("p")).filter((p) => {
     if (p.classList.contains(firstClass)) {
-      // /^[0-9]+\.\s*/i
       const span = p.querySelector('span')
       if (firstLevelRegex.test(span.innerText.trim())) {
-        const text = p.innerText;
-        console.log(text);
+        return true;
+
+      }
+    }
+    return false
+  })
+
+
+  const listEndPTags = Array.from(dom.querySelectorAll("p")).filter((p) => {
+    if (p.classList.contains(middleClass)) {
+      // /^[0-9]+\.\s*/i
+      const span = p.querySelector('span')
+      if (thirdLevelRegex.test(span.innerText.trim())) {
         return true;
       }
     }
     return false
   })
 
-  console.log(text)
-  console.log(listStartPTags)
-  const newDom = createListFromStartAndEndData(listStartPTags, dom);
+  const handleThirdLevels = (arrayofThirdLevelPTags: Element[], dom: Document) => {
+    // Establish ol list based on new dom
+    const listOfOls: HTMLOListElement[] = Array.from(dom.querySelectorAll('ol'));
+
+    // Establish list of any third levels that follow an ol ===================================
+    const thirdGroups: HTMLParagraphElement[][] = [];
+    for (const ol of listOfOls) {
+      let next = ol.nextElementSibling;
+      const l3Group: HTMLParagraphElement[] = [];
+      const processed: HTMLParagraphElement[] = []
+      while (next !== null && next.tagName === "P" && !processed.includes(next as HTMLParagraphElement) && thirdLevelRegex.test((next as HTMLParagraphElement).innerText.trim())) {
+        next.innerHTML.trim()
+        l3Group.push(next as HTMLParagraphElement);
+        processed.push(next as HTMLParagraphElement);
+        next = next.nextElementSibling;
+      }
+      if (l3Group.length > 0) {
+        thirdGroups.push(l3Group)
+      }
+    }
+
+    // Genereate list / list items for those and append consecutive ones to the list. ===================================
+    for (const group of thirdGroups) {
+      const containerLi = dom.createElement('li');
+      const containerOl = dom.createElement('ol');
+
+      // create li versions
+      for (const pTag of group) {
+        const liVersion = dom.createElement('li');
+        liVersion.textContent = pTag.textContent;
+        containerOl.append(liVersion);
+      }
+      containerLi.append(containerOl);
+      // cleanup and replacement
+      for (const pTag of group) {
+        if (group[0] !== pTag) {
+          pTag.remove()
+        } else {
+          pTag.replaceWith(containerLi)
+        }
+      }
+      // Append that list to previous ol as an li > ol >CONTAINING LIST ITEMS ===================================
+      containerLi.previousElementSibling.append(containerLi);
+    }
+    return dom;
+  }
+
+  const handleSecondLevels = (arrayofSecondLevelPTags: Element[], dom: Document) => {
+    // HANDLE THIRD LEVEL ITEMS ==============================================================
+    const processedTwos: HTMLParagraphElement[] = [];
+    const twoGroups: HTMLParagraphElement[][] = [];
+    for (const p of arrayofSecondLevelPTags) {
+      const l2Group: HTMLParagraphElement[] = []
+
+      if (!processedTwos.includes((p as HTMLParagraphElement))) {
+        // Check if previous element in array
+        l2Group.push(p as HTMLParagraphElement);
+        processedTwos.push((p as HTMLParagraphElement))
+        let prev = p.previousElementSibling;
+
+        while (
+          prev !== null &&
+          prev.tagName === "P" &&
+          arrayofSecondLevelPTags.includes(prev)
+          &&
+          !processedTwos.includes(prev as HTMLParagraphElement)
+        ) {
+          processedTwos.push(p as HTMLParagraphElement)
+          prev = prev.previousElementSibling;
+        }
+        twoGroups.push(l2Group)
+      }
+    }
+    for (const group of twoGroups) {
+      const thirdLevelOlContainer = dom.createElement("ol")
+      const newGroup = group.reverse();
+      for (const pTag of newGroup) {
+        // create li version
+        const li = dom.createElement("li");
+        li.textContent = pTag.innerText;
+        thirdLevelOlContainer.append(li);
+      }
+      for (const itemToRemoveOrReplace of newGroup) {
+        if (itemToRemoveOrReplace === newGroup[0]) {
+          const lastIndex = group.length - 1
+          group[lastIndex].replaceWith(thirdLevelOlContainer);
+        }
+        else {
+          itemToRemoveOrReplace.remove();
+        }
+      }
+    }
+    return dom;
+  }
+
+  const handleFirstLevels = (arrayofFirstLevelPTags: Element[], dom: Document) => {
+    // Iterate over each list denoted by starterp
+    for (const starterP of arrayofFirstLevelPTags) {
+
+      // establish ending p
+      const endingPTag: HTMLParagraphElement[] = [];
+      let next = starterP.nextElementSibling;
+      while ((endingPTag.length) < 1 && next !== null) {
+        if (next.classList.contains(endClass)) {
+          endingPTag.push(next as HTMLParagraphElement)
+          break;
+        }
+        next = next.nextElementSibling;
+      }
+      const listEndElement = endingPTag[0];
+
+      // Establish container and create a list of things to later to it
+      const containerOl = dom.createElement("ol");
+      const listItemsBeforeAddToOlContainer: Element[] = [];
+
+      // With the start and end of the list established, 
+      // create lis for each item inbetween, inclusive of start and end elements
+      const processedElements: Element[] = [];
+
+      // Start =========
+      const startListVer = dom.createElement('li')
+      const startClone = (starterP as HTMLParagraphElement).cloneNode(true)
+      startListVer.append(startClone);
+      listItemsBeforeAddToOlContainer.push(startListVer)
+      processedElements.push(starterP);
+
+      // Middle =========
+      let nextToConvert = starterP.nextElementSibling;
+      while (
+        nextToConvert !== null
+        && nextToConvert !== listEndElement
+      ) {
+        listItemsBeforeAddToOlContainer.push(nextToConvert)
+        processedElements.push(nextToConvert);
+        nextToConvert = nextToConvert.nextElementSibling;
+      }
+
+      // End =========
+      const endListVer = dom.createElement('li')
+      endListVer.append((listEndElement as HTMLParagraphElement).cloneNode(true));
+      listItemsBeforeAddToOlContainer.push(endListVer)
+
+      for (const listItem of listItemsBeforeAddToOlContainer) {
+        if (listItem.tagName === "ol") {
+          const wrapper = dom.createElement("li");
+          wrapper.append(listItem)
+          containerOl.append(wrapper)
+        } else {
+          containerOl.append(listItem)
+
+        }
+      }
+
+      // Cleanup - remove and replace
+      starterP.replaceWith(containerOl)
+      listEndElement.remove()
+
+
+      const domOlPs: Element[] = Array.from(dom.querySelectorAll('p')).filter((p) => {
+        const parent = p.parentElement
+        if (parent.tagName === "OL" && parent.parentElement !== null && parent.parentElement.tagName === "BODY") {
+          return true
+        }
+        return false;
+      })
+
+      // Convert ptags belong to OL to li
+      for (const pLi of domOlPs) {
+        const liVer = dom.createElement('li');
+        const newInnerText = (pLi as HTMLParagraphElement).innerText.trim()
+        liVer.innerText = newInnerText;
+        pLi.replaceWith(liVer)
+      }
+
+      const domOlLis: Element[] = Array.from(dom.querySelectorAll('li')).filter((li) => {
+        const parent = li.parentElement
+        if (parent.tagName === "OL" && parent.parentElement !== null && parent.parentElement.tagName === "BODY") {
+          return true
+        }
+        return false;
+      })
+
+
+      // Clean paragraphs
+      for (const item of domOlLis) {
+        if ((item.firstChild as Element).tagName === "P") {
+          const li = dom.createElement('li')
+          li.innerText = (item.firstChild as HTMLParagraphElement).innerText.trim()
+          item.replaceWith(li)
+        }
+      }
+
+      // wrap ols that are in ols with an li
+      const insideOlOl = Array.from(dom.querySelectorAll('ol')).filter((ol) => ol.parentElement.tagName === "OL")
+      for (const item of insideOlOl) {
+        const clone = (item as HTMLOListElement).cloneNode(true);
+        const cloneWrapper = dom.createElement("li");
+        cloneWrapper.append(clone)
+        item.replaceWith(cloneWrapper)
+      }
+
+      const liInOl = Array.from(dom.querySelectorAll('li')).filter((li) => li.parentElement.tagName === "OL")
+      console.log("LATEST DOM", dom)
+      for (const li of liInOl) {
+        if (firstLevelRegex.test(li.innerHTML)) {
+          cleanListItem(li, firstLevelRegex)
+        }
+        if (thirdLevelRegex.test(li.innerHTML.trim())) {
+          const replacement = dom.createElement("li");
+          replacement.innerHTML = li.innerHTML.trim().replace(thirdLevelRegex, '');
+          li.replaceWith(replacement);
+        }
+
+        if (secondLevelRegex.test(li.innerHTML.trim())) {
+          const replacement = dom.createElement("li");
+          replacement.innerHTML = li.innerHTML.trim().replace(secondLevelRegex, '');
+          li.replaceWith(replacement);
+        }
+      }
+    }
+    return dom;
+  }
+
+  const listMiddlePTags = Array.from(dom.querySelectorAll("p")).filter((p) => {
+    if (p.classList.contains(middleClass)) {
+      const span = p.querySelector('span')
+      if (secondLevelRegex.test(span.innerText.trim())) {
+        const text = p.innerText.trim();
+        const prevSib = p.previousElementSibling;
+
+        if (text.startsWith('i.') && prevSib && !(prevSib as HTMLElement).innerText.trim().startsWith("h.")) {
+          return false;
+        }
+        return true;
+
+      }
+    }
+    return false
+  })
+
+
+  const moveRoguesToLastOL = (dom: Document) => {
+    // find ols
+    const rogues: HTMLOListElement[] = Array.from(dom.querySelectorAll('ol'));
+
+    // if previous item is an ol, append children to that ol
+    for (const rogue of rogues) {
+      const prevItem = rogue.previousElementSibling;
+      if (prevItem !== null) {
+        // console.log("HERE RRR")
+        if ((prevItem as Element).tagName === "OL") {
+          for (const item of rogue.childNodes) {
+            prevItem.appendChild(item)
+          }
+          rogue.remove()
+        }
+      }
+    }
+    return dom;
+  }
+
+
+  let newDom = handleSecondLevels(listMiddlePTags, dom)
+  newDom = handleThirdLevels(listEndPTags, newDom);
+  const roguesRemoved = moveRoguesToLastOL(newDom);
+  newDom = handleFirstLevels(listStartPTags, roguesRemoved)
   return newDom.body.innerHTML;
 };
 
@@ -477,7 +560,7 @@ const removeHTMLSpace = (text: string) => {
   return text.replace(/&nbsp;/g, " ");
 };
 
-const cleanListItem = (li: HTMLLIElement, regex: RegExp) => {
+const cleanListItem = (li: Element, regex: RegExp) => {
   // Replace the matched pattern with an empty string
   li.innerHTML = li.innerHTML.replace(regex, '');
 
@@ -485,10 +568,11 @@ const cleanListItem = (li: HTMLLIElement, regex: RegExp) => {
   li.innerHTML = li.innerHTML.trim();
 }
 
-// const handlePastedWordUnorderedList = (text: string, colorMode: string) => {
-//   const unorderedCleaned = convertUnordered(text, colorMode);
-//   return unorderedCleaned;
-// };
+const handlePastedWordUnorderedList = (text: string, colorMode: string) => {
+  const unorderedCleaned = convertUnordered(text, colorMode);
+  // return text;
+  return unorderedCleaned;
+};
 
 const handlePastedWordOrderedList = (text: string, colorMode: string) => {
   const orderedCleaned = convertOrdered(text, colorMode);
@@ -509,8 +593,9 @@ function $insertDataTransferForRichText(
   if (htmlString) {
     try {
       const withoutNbsp = removeHTMLSpace(htmlString);
+      const unorderedHandled = handlePastedWordUnorderedList(withoutNbsp, colorMode);
       const orderedHandled = handlePastedWordOrderedList(
-        withoutNbsp,
+        unorderedHandled,
         colorMode
       );
       const parser = new DOMParser();
@@ -525,7 +610,6 @@ function $insertDataTransferForRichText(
 
 const generateNodesFromDom = (dom: Document, editor, selection) => {
   const nodes = $generateNodesFromDOM(editor, dom);
-  // console.log(nodes);
   return $insertGeneratedNodes(editor, nodes, selection);
 };
 

@@ -92,13 +92,26 @@ export const TraditionalTasksAndProjects = () => {
   const { isOnProjectsPage } = useProjectSearchContext();
   const navigate = useNavigate();
 
-  const goToProject = (pk: number | undefined) => {
+  const goToProject = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, pk: number | undefined) => {
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
-    } else if (isOnProjectsPage) {
-      navigate(`${pk}`);
-    } else {
-      navigate(`projects/${pk}`);
+    }
+    else {
+      if (isOnProjectsPage) {
+        if (e.ctrlKey || e.metaKey) {
+          window.open(`${pk}`, "_blank"); // Opens in a new tab
+        }
+        else {
+          navigate(`${pk}`);
+        }
+      } else {
+        if (e.ctrlKey || e.metaKey) {
+          window.open(`projects/${pk}`, "_blank"); // Opens in a new tab
+        }
+        else {
+          navigate(`projects/${pk}`);
+        }
+      }
     }
   };
 
@@ -445,8 +458,8 @@ export const TraditionalTasksAndProjects = () => {
                           }
                           w={"100%"}
                           p={2}
-                          onClick={() =>
-                            goToProject(project?.pk ? project.pk : project.id)
+                          onClick={(e) =>
+                            goToProject(e, project?.pk ? project.pk : project.id)
                           }
                           _hover={{
                             color:

@@ -276,8 +276,8 @@ export const BusinessAreasCRUD = () => {
                 })
                 .map((s) => (
                   <BusinessAreaItemDisplay
-                    is_active={s.is_active}
                     key={s.pk}
+                    is_active={s.is_active}
                     pk={s.pk}
                     slug={s.slug}
                     name={s.name}
@@ -323,7 +323,7 @@ export const BusinessAreasCRUD = () => {
 
                     >
                       <option value={1}>Select a Division</option>
-                      {divsData?.map((divi) => <option value={divi.pk}>[{divi.slug}] {divi.name}</option>)}
+                      {divsData?.map((divi) => <option key={divi.pk} value={divi.pk}>[{divi.slug}] {divi.name}</option>)}
                     </Select>
                   )}
 
