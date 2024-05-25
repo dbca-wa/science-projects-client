@@ -992,7 +992,7 @@ export interface ICreateProjectBaseInfo {
 
 export interface ICreateProjectDetails {
     dataCustodian: number;
-    supervisingScientist: number;
+    projectLead: number;
     departmentalService: number;
     businessArea: number;
     startDate: Date;
@@ -1056,7 +1056,7 @@ export const createProject = async ({ baseInformationData, detailsData, location
         formData.append('departmentalService', detailsData.departmentalService.toString());
     }
     formData.append('dataCustodian', detailsData.dataCustodian.toString());
-    formData.append('supervisingScientist', detailsData.supervisingScientist.toString());
+    formData.append('projectLead', detailsData.projectLead.toString());
 
     if (detailsData.startDate) {
         formData.append('startDate', detailsData.startDate.toISOString())
