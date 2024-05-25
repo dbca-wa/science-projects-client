@@ -95,16 +95,18 @@ export const ExternalInternalSPConfirmationModal = ({
                 }}
                 ml={3}
                 isDisabled={buttonDisabled}
-                onClick={() => {
+                onClick={async () => {
                   setButtonDisabled(true);
-                  mutationFunction();
+                  await mutationFunction();
+                  setButtonDisabled(false);
+
                   onClose();
                 }}
               >
                 Create
               </Button>
             </Grid>
-            {}
+            { }
           </ModalFooter>
         </ModalContent>
       </Flex>

@@ -46,7 +46,7 @@ export const ProjectDetailsSection = ({
   const [selectedDepartmentalService, setSelectedDepartmentalService] =
     useState<number>(0);
 
-  const [selectedSupervisingScientist, setSelectedSupervisingScientist] =
+  const [selectedLeader, setSelectedLeader] =
     useState<number>();
   const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
   const [startDate, setStartDate] = useState<Date>();
@@ -58,7 +58,7 @@ export const ProjectDetailsSection = ({
     if (
       selectedBusinessArea &&
       // && selectedDepartmentalService
-      selectedSupervisingScientist &&
+      selectedLeader &&
       selectedDataCustodian &&
       startDate &&
       endDate &&
@@ -72,7 +72,7 @@ export const ProjectDetailsSection = ({
     startDate,
     endDate,
     selectedDataCustodian,
-    selectedSupervisingScientist,
+    selectedLeader,
     selectedDepartmentalService,
     selectedBusinessArea,
     setProjectDetailsFilled,
@@ -222,11 +222,11 @@ export const ProjectDetailsSection = ({
             <Box mb={4}>
               <UserSearchDropdown
                 isRequired={true}
-                setUserFunction={setSelectedSupervisingScientist}
+                setUserFunction={setSelectedLeader}
                 preselectedUserPk={thisUser}
                 label={
                   projectType !== "Student Project"
-                    ? "Science Support"
+                    ? "Project Leader"
                     : "Project Leader"
                 }
                 placeholder={
@@ -237,7 +237,7 @@ export const ProjectDetailsSection = ({
                 helperText={
                   projectType === "Student Project"
                     ? "The Project Leader."
-                    : "Science Support"
+                    : "The Project Leader."
                 }
               />
             </Box>
@@ -278,7 +278,7 @@ export const ProjectDetailsSection = ({
                 businessArea: selectedBusinessArea,
                 departmentalService: selectedDepartmentalService,
                 dataCustodian: selectedDataCustodian,
-                supervisingScientist: selectedSupervisingScientist,
+                projectLead: selectedLeader,
                 startDate: startDate,
                 endDate: endDate,
               });
