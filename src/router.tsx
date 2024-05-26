@@ -209,7 +209,9 @@ export const router = createBrowserRouter([
         path: "reports/current", // change to :year
         element: (
           <ContentWrapper>
-            <CurrentReport />
+            <AdminOnlyPage>
+              <CurrentReport />
+            </AdminOnlyPage>
           </ContentWrapper>
         ),
       },
