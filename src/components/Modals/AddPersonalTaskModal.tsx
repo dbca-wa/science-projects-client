@@ -22,14 +22,16 @@ import { useForm } from "react-hook-form";
 import { useRef } from "react";
 import { createPersonalTask } from "../../lib/api";
 
-interface IUserInterface {
+// interface IUserInterface {
+//   userData: IUserMe;
+//   isLoggedIn: boolean;
+//   userLoading: boolean;
+// }
+
+interface Props {
   userData: IUserMe;
   isLoggedIn: boolean;
   userLoading: boolean;
-}
-
-interface Props {
-  user: IUserInterface;
   isAnimating?: boolean;
   setIsAnimating?: (state: boolean) => void;
   isAddTaskOpen: boolean;
@@ -37,7 +39,7 @@ interface Props {
 }
 
 export const AddPersonalTaskModal = ({
-  user,
+  userData, userLoading,
   setIsAnimating,
   isAddTaskOpen,
   onAddTaskClose,
@@ -118,11 +120,11 @@ export const AddPersonalTaskModal = ({
           id="taskcreation-form"
           onSubmit={handleSubmit(onSubmitTaskCreation)}
         >
-          {user.userLoading === false && (
+          {userLoading === false && (
             <Input
               {...register("user", { required: true })}
               type="hidden"
-              defaultValue={user.userData.pk}
+              defaultValue={userData.pk}
             />
           )}
 
