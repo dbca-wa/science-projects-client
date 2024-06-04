@@ -3,9 +3,10 @@ import { useEffect } from 'react';
 
 const HomeConfetti = () => {
     // Retrieve the count from localStorage or cookies
-
+    const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.1.1";
+    // localStorage.setItem(`confettiCount-${VERSION}`, `0`)
     const getLocalConfettiCount = () => {
-        const returned = localStorage.getItem('confettiCount')
+        const returned = localStorage.getItem(`confettiCount-${VERSION}`)
         if (!returned) {
             return 0
         }
@@ -13,7 +14,7 @@ const HomeConfetti = () => {
     }
 
     const setLocalConfettiCount = (confettiCount: number) => {
-        localStorage.setItem('confettiCount', `${confettiCount}`)
+        localStorage.setItem(`confettiCount-${VERSION}`, `${confettiCount}`)
     }
 
     const conf = (getLocalConfettiCount())
@@ -21,7 +22,7 @@ const HomeConfetti = () => {
     useEffect(() => {
         console.log(conf)
         // If the count is less than 4, trigger the confetti effect
-        if (conf < 4) {
+        if (conf < 3) {
             confetti({
                 particleCount: 100,
                 spread: 360,

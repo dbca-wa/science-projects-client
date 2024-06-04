@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import ReactDOM from "react-dom/client";
+import "@/main.css";
 
 // Custom Providers and theme
 
@@ -30,7 +31,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // Prevents uneccessary refretching of API
-      retry: 2, retryDelay: 1000, refetchOnWindowFocus: false,     },
+      retry: 2, retryDelay: 1000, refetchOnWindowFocus: false,
+    },
   },
 });
 
