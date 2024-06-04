@@ -1,4 +1,5 @@
 import { Head } from "@/components/Base/Head";
+import HomeConfetti from "@/components/Fun/HomeConfetti";
 import { UserFeedbackModal } from "@/components/Modals/UserFeedbackModal";
 import theme from "@/theme";
 import { IUserMe } from "@/types";
@@ -13,9 +14,11 @@ interface IUserInterface {
     userLoading: boolean;
 }
 
-export const PatchNotes = (user: IUserInterface) => {
+export const PatchNotes = ({ userData, isLoggedIn, userLoading }: IUserInterface) => {
     const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
         .VITE_PRODUCTION_BACKEND_BASE_URL;
+
+    const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.1.1";
 
     const [welcomeUser, setWelcomeUser] = useState("");
     const [spmsText, setSpmsText] = useState("Science Project Management System");
@@ -62,7 +65,7 @@ export const PatchNotes = (user: IUserInterface) => {
             // setAnnualReportText("Report");
         } else {
             setWelcomeUser(
-                `Hello, ${user?.userData?.first_name}! Welcome to SPMS, DBCA's portal for science project documentation, approval and reporting.`
+                `Hello, ${userData?.first_name}! Welcome to SPMS, DBCA's portal for science project documentation, approval and reporting.`
             );
             setShouldConcat(false);
             // setAnnualReportText("Annual Report");
@@ -78,7 +81,7 @@ export const PatchNotes = (user: IUserInterface) => {
                 );
             }
         }
-    }, [theme.breakpoints.lg, user?.userData?.first_name]);
+    }, [theme.breakpoints.lg, userData?.first_name]);
 
 
 
@@ -90,9 +93,11 @@ export const PatchNotes = (user: IUserInterface) => {
 
     return (
         <>
-            {/* <HomeConfetti /> */}
+            <HomeConfetti />
             <UserFeedbackModal
-                user={user}
+                userLoading={userLoading}
+                userData={userData}
+                isLoggedIn={isLoggedIn}
                 isFeedbackModalOpen={isFeedbackModalOpen}
                 onCloseFeedbackModal={onCloseFeedbackModal}
             />
@@ -127,7 +132,7 @@ export const PatchNotes = (user: IUserInterface) => {
                     >
                         {/* &#127881;  &#127881; */}
                         {/* &#9881;&#65039; */}
-                        &#127881; SPMS 3.1.1 Patch Notes &#127881;
+                        &#127881; SPMS {VERSION} Patch Notes &#127881;
                         {/* &#9881;&#65039; */}
                     </Text>
                     <List spacing={1} ml={2} >
@@ -145,11 +150,15 @@ export const PatchNotes = (user: IUserInterface) => {
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Ensured leaders are labelled as leaders
+                            Ensured project leaders are only labelled as "Leader"
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
                             Fix: Ensure progress reports of closed projects for a FY appear on that year's report
+                        </ListItem>
+                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+                            <ListIcon as={MdCheckCircle} color='green.500' />
+                            Fix: Removed email bug on submitting for approval
                         </ListItem>
                     </List>
 
