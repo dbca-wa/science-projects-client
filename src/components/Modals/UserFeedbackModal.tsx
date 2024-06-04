@@ -2,43 +2,46 @@
 
 import {
   Button,
-  FormControl,
-  FormLabel,
-  Input,
-  InputGroup,
+  Divider,
+  Grid,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
+  Text,
   ToastId,
   useColorMode,
-  useToast,
+  useToast
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { BsMicrosoftTeams } from "react-icons/bs";
+import { MdEmail } from "react-icons/md";
 import { createFeedbackItem, sendFeedbackReceivedEmail } from "../../lib/api";
 import { IFeedback, IUserMe } from "../../types";
-import { FeedbackRichTextEditor } from "../RichTextEditor/Editors/FeedbackRichTextEditor";
 
-interface IUserInterface {
+// interface IUserInterface {
+//   userData: IUserMe;
+//   isLoggedIn: boolean;
+//   userLoading: boolean;
+// }
+
+interface Props {
   userData: IUserMe;
   isLoggedIn: boolean;
   userLoading: boolean;
-}
-
-interface Props {
-  user: IUserInterface;
+  // user: IUserInterface;
   isFeedbackModalOpen: boolean;
   onCloseFeedbackModal: () => void;
 }
 
 export const UserFeedbackModal = ({
-  user,
+  userData,
+  isLoggedIn,
+  userLoading,
   isFeedbackModalOpen,
   onCloseFeedbackModal,
 }: Props) => {
@@ -122,15 +125,15 @@ export const UserFeedbackModal = ({
       isOpen={isFeedbackModalOpen}
       onClose={onCloseFeedbackModal}
       size={"3xl"}
-      // scrollBehavior="inside"
-      // isCentered={true}
+    // scrollBehavior="inside"
+    // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
         color={colorMode === "light" ? "black" : "white"}
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
-        <ModalHeader>Send Feedback</ModalHeader>
+        <ModalHeader>Feedback | Help</ModalHeader>
         <ModalCloseButton />
 
         <ModalBody
@@ -138,12 +141,62 @@ export const UserFeedbackModal = ({
           id="feedback-form"
           onSubmit={handleSubmit(onSubmitFeedbackCreation)}
         >
-          {user.userLoading === false && (
+
+          <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}
+            py={8}
+          >
+            <Button
+              onClick={() => window.open("msteams:/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au", "_blank")}
+              leftIcon={<BsMicrosoftTeams />}
+              backgroundColor={colorMode === "light" ? "purple.500" : "purple.600"}
+              color={"white"}
+              _hover={{
+                backgroundColor: colorMode === "light" ? "purple.400" : "purple.500"
+              }}            >
+              Message on Teams
+            </Button>
+            <div className="flex items-center justify-center w-full py-5 px-40">
+              {/* <hr className="flex-grow border-t-2 border-slate-300 dark:border-white mx-2" /> */}
+              <Divider
+                mx={2}
+                flexGrow={1}
+                borderTop={2}
+                borderColor={colorMode === "light" ? "gray.300" : "white"}
+              />
+              {/* <span className="px-2  text-black dark:text-white"></span> */}
+              <Text
+                color={colorMode === "light" ? "black" : "whtie"}
+              >
+                OR
+              </Text>
+              {/* <hr className="flex-grow border-t-2 border-slate-300 dark:border-white mx-2" /> */}
+              <Divider
+                mx={2}
+                flexGrow={1}
+                borderTop={2}
+                borderColor={colorMode === "light" ? "gray.300" : "white"}
+              />
+            </div>
+
+            <Button
+              onClick={() => window.open("mailto:jarid.prince@dbca.wa.gov.au&subject=SPMS%20Assistance", "_blank")}
+              leftIcon={<MdEmail />}
+              backgroundColor={colorMode === "light" ? "blue.500" : "blue.600"}
+              color={"white"}
+              _hover={{
+                backgroundColor: colorMode === "light" ? "blue.400" : "blue.500"
+              }}
+            >
+              Send an Email
+            </Button>
+          </Grid>
+
+          {/* {userLoading === false && (
             <>
               <Input
                 {...register("user", { required: true })}
                 type="hidden"
-                defaultValue={user.userData.pk}
+                defaultValue={userData.pk}
               />
               <Input
                 {...register("status", { required: true })}
@@ -151,9 +204,9 @@ export const UserFeedbackModal = ({
                 defaultValue={"new"}
               />
             </>
-          )}
+          )} */}
 
-          <FormControl pb={6}>
+          {/* <FormControl pb={6}>
             <FormLabel>Kind</FormLabel>
             <InputGroup>
               <Select {...register("kind", { required: true })}>
@@ -165,17 +218,12 @@ export const UserFeedbackModal = ({
 
           <FormControl>
             <FeedbackRichTextEditor
-              userData={user?.userData}
+              userData={userData}
               setText={setText}
             />
-            {/* <Textarea
-                mt={2}
-                placeholder="What would you like to say..."
-                {...register("text", { required: true })}
-              /> */}
-          </FormControl>
+          </FormControl> */}
         </ModalBody>
-
+        {/* 
         <ModalFooter>
           <Button
             // variant="ghost"
@@ -185,9 +233,6 @@ export const UserFeedbackModal = ({
             Cancel
           </Button>
           <Button
-            // form="feedback-form"
-            // type="submit"
-            // isDisabled={!isDirty || !isValid}
 
             isLoading={feedbackCreationMutation.isPending}
             isDisabled={!canSubmit}
@@ -207,7 +252,7 @@ export const UserFeedbackModal = ({
           >
             Send Feedback
           </Button>
-        </ModalFooter>
+        </ModalFooter> */}
       </ModalContent>
     </Modal>
   );

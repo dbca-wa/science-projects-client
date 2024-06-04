@@ -221,7 +221,7 @@ export const PDFViewer = ({
               ? showRestartMessage
                 ? "PDF Generating... It's been 60 seconds, maybe you should cancel and try again"
                 : `PDF Generating...`
-              : "You may download this pdf or create a new one in under a minute."}
+              : "You may download this pdf or create a new one in under a minute (average 20 seconds)"}
           </Text>
         </Center>
         <Flex>
