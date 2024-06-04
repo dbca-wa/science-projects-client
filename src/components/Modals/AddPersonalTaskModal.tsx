@@ -39,7 +39,8 @@ interface Props {
 }
 
 export const AddPersonalTaskModal = ({
-  userData, userLoading,
+  userData,
+  userLoading,
   setIsAnimating,
   isAddTaskOpen,
   onAddTaskClose,

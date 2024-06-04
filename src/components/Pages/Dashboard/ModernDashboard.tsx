@@ -29,6 +29,7 @@ import { AddIcon } from "@chakra-ui/icons";
 import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 import { useGetDocumentsPendingMyAction } from "@/lib/hooks/tanstack/useGetDocumentsPendingMyAction";
 import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/tanstack/useGetEndorsementsPendingMyAction";
+import { PatchNotes } from "./PatchNotes";
 
 export const ModernDashboard = ({ activeTab }: IDashProps) => {
   const handleAddTaskClick = () => {
@@ -71,16 +72,16 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
       // Check if data is available and then sort tasks
       const sortedTaskData = taskData
         ? {
-            done: sortTasksByStatus(
-              taskData.filter((task) => task.status === "done")
-            ),
-            todo: sortTasksByStatus(
-              taskData.filter((task) => task.status === "todo")
-            ),
-            inprogress: sortTasksByStatus(
-              taskData.filter((task) => task.status === "inprogress")
-            ),
-          }
+          done: sortTasksByStatus(
+            taskData.filter((task) => task.status === "done")
+          ),
+          todo: sortTasksByStatus(
+            taskData.filter((task) => task.status === "todo")
+          ),
+          inprogress: sortTasksByStatus(
+            taskData.filter((task) => task.status === "inprogress")
+          ),
+        }
         : null;
 
       // Set the state with the correct type
@@ -129,7 +130,7 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
     fontSize: "sm",
   };
 
-  const user = useUser();
+  const { userLoading, userData, isLoggedIn } = useUser();
   const {
     isOpen: isAddTaskOpen,
     onOpen: onAddTaskOpen,
@@ -140,7 +141,9 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
   return (
     <>
       <AddPersonalTaskModal
-        user={user}
+        userData={userData}
+        isLoggedIn={isLoggedIn}
+        userLoading={userLoading}
         isAnimating={isAnimating}
         setIsAnimating={setIsAnimating}
         isAddTaskOpen={isAddTaskOpen}
@@ -167,16 +170,16 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
                 <Box sx={countCircleStyling}>
                   {tasksLoading === false && combinedData !== null
                     ? (pendingEndorsementsDataLoading === false
-                        ? pendingEndorsementsData.aec.length
-                        : // +
-                          //   pendingEndorsementsData.bm.length +
-                          //   pendingEndorsementsData.hc.length
-                          0) +
-                      (pendingProjectDocumentDataLoading === false
-                        ? pendingProjectDocumentData.all.length
-                        : 0) +
-                      (combinedData.inprogress.length +
-                        combinedData.todo.length)
+                      ? pendingEndorsementsData.aec.length
+                      : // +
+                      //   pendingEndorsementsData.bm.length +
+                      //   pendingEndorsementsData.hc.length
+                      0) +
+                    (pendingProjectDocumentDataLoading === false
+                      ? pendingProjectDocumentData.all.length
+                      : 0) +
+                    (combinedData.inprogress.length +
+                      combinedData.todo.length)
                     : 0}
                 </Box>
               </Center>
@@ -198,7 +201,7 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
               </Center>
             )}
           </Tab>
-          {user.userData.is_superuser && (
+          {userData.is_superuser && (
             <Tab
               sx={tabBaseStyling}
               _selected={tabActiveStyling}
@@ -228,12 +231,16 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Quote />
+            <Box mb={2}>
+              <Quote />
+            </Box>
+            <PatchNotes userData={userData} isLoggedIn={isLoggedIn} userLoading={userLoading} />
+
             <Box mt={1}>
               {tasksLoading === false &&
-              combinedData !== null &&
-              pendingEndorsementsDataLoading === false &&
-              pendingProjectDocumentDataLoading === false ? (
+                combinedData !== null &&
+                pendingEndorsementsDataLoading === false &&
+                pendingProjectDocumentDataLoading === false ? (
                 <MyTasksSection
                   personalTaskData={combinedData}
                   personalTaskDataLoading={tasksLoading}
@@ -257,7 +264,7 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
             <MyProjectsSection data={projectData} loading={projectsLoading} />
           </TabPanel>
 
-          {user.userData.is_superuser && (
+          {userData.is_superuser && (
             <TabPanel>
               <Admin />
             </TabPanel>

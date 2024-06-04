@@ -27,6 +27,8 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import MentionsPlugin, { MentionNode } from "../Plugins/MentionsPlugin";
+import { useEffect } from "react";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 // import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface Props {
@@ -35,6 +37,7 @@ interface Props {
 }
 
 export const FeedbackRichTextEditor = ({ userData, setText }: Props) => {
+  // useEffect(() => console.log(userData))
   const { colorMode } = useColorMode();
   // const [comment, setComment] = useState("");
 
@@ -203,9 +206,10 @@ const UserContainer = ({ userData }: UserContainerProps) => {
   const [editor] = useLexicalComposerContext();
 
   const { colorMode } = useColorMode();
-  const imageUrl = useServerImageUrl(userData?.image?.file);
+  // const imageUrl = useServerImageUrl(userData?.image?.file);
+  const baseAPI = useApiEndpoint();
 
-  return userData?.image?.file ? (
+  return (
     <Box
       pl={3}
       pt={2}
@@ -220,7 +224,29 @@ const UserContainer = ({ userData }: UserContainerProps) => {
         sx={{ alignSelf: "flex-start" }}
         mt={2}
       >
-        <Avatar
+        {userData?.image ? (<Avatar
+          size={"md"}
+          src={
+            userData?.image?.file.startsWith("http")
+              ? userData?.image?.file
+              : `${baseAPI}${userData?.image?.file}`
+          }
+          name={`${userData?.first_name} ${userData?.last_name}`}
+          mr={2}
+          userSelect={"none"}
+          style={{ pointerEvents: "none" }}
+          draggable={false}
+        />) : (<Avatar
+          size={"md"}
+          src={""}
+          name={`${userData?.first_name} ${userData?.last_name}`}
+          mr={2}
+          userSelect={"none"}
+          style={{ pointerEvents: "none" }}
+          draggable={false}
+        />)}
+
+        {/* <Avatar
           size={"md"}
           src={imageUrl}
           name={`${userData?.first_name} ${userData?.last_name}`}
@@ -228,7 +254,7 @@ const UserContainer = ({ userData }: UserContainerProps) => {
           userSelect={"none"}
           style={{ pointerEvents: "none" }}
           draggable={false}
-        />
+        /> */}
         <Flex
           pl={1}
           pr={0}
@@ -245,7 +271,7 @@ const UserContainer = ({ userData }: UserContainerProps) => {
               color={
                 colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
               }
-              // w={"100%"}
+            // w={"100%"}
             >
               {`${userData?.first_name} ${userData?.last_name}`}
             </Text>
@@ -253,5 +279,5 @@ const UserContainer = ({ userData }: UserContainerProps) => {
         </Flex>
       </Flex>
     </Box>
-  ) : null;
+  )
 };
