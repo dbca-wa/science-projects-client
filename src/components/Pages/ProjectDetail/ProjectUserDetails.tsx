@@ -389,7 +389,7 @@ export const ProjectUserDetails = ({
               ? `${user.first_name} ${user.last_name}`
               : `${user.username}`}
           </Text>
-          <Text userSelect={"none"}>{user?.expertise}</Text>
+          {/* <Text userSelect={"none"}>{user?.expertise}</Text> */}
           <Text userSelect={"none"}>
             {user?.phone ? user.phone : "No Phone number"}
           </Text>

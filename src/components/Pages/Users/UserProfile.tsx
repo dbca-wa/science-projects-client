@@ -291,7 +291,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           </span>
                           <span
                             onClick={() => console.log(user)}
-                            // style={{ color: "blue.500" }}
+                          // style={{ color: "blue.500" }}
                           >
                             {user.business_area.name}
                           </span>
@@ -497,8 +497,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   onClick={
                     user.email === me.userData.email
                       ? () => {
-                          navigate("/users/me");
-                        }
+                        navigate("/users/me");
+                      }
                       : onEditUserDetailsModalOpen
                   }
                   bg={user?.is_superuser ? "blue.600" : "blue.500"}
@@ -512,8 +512,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           ? "blue.500"
                           : "blue.400"
                         : user?.is_superuser
-                        ? "blue.500"
-                        : "blue.400",
+                          ? "blue.500"
+                          : "blue.400",
                     color: "white",
                   }}
                   isDisabled={
@@ -533,8 +533,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         ? "red.600"
                         : "green.600"
                       : user?.is_superuser
-                      ? "red.800"
-                      : "green.500"
+                        ? "red.800"
+                        : "green.500"
                   }
                   color={
                     colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
@@ -546,8 +546,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           ? "red.500"
                           : "green.500"
                         : user?.is_superuser
-                        ? "red.700"
-                        : "green.400",
+                          ? "red.700"
+                          : "green.400",
                     color: "white",
                   }}
                   isDisabled={
