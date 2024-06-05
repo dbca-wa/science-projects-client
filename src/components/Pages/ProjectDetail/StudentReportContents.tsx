@@ -44,6 +44,7 @@ export const StudentReportContents = ({
   baseAPI,
   baLead,
 }: Props) => {
+  useEffect(() => console.log(documents))
   // Handling years
   const { availableStudentYearsData } = useGetStudentReportAvailableReportYears(
     Number(documents[0].document?.project?.pk)
@@ -268,6 +269,8 @@ export const StudentReportContents = ({
             key={`progress${editorKey}`} // Change the key to force a re-render
             data={selectedStudentReport?.progress_report}
             section={"progress_report"}
+            documentsCount={documents.length}
+
           />
           <CommentSection
             baseAPI={baseAPI}

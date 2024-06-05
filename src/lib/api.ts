@@ -269,6 +269,21 @@ export const switchAdmin = async ({ userPk }: AdminSwitchVar) => {
     return res;
 }
 
+export interface PRPopulationVar {
+    writeable_document_kind: string;
+    section: string;
+    project_pk: number;
+}
+
+export const getPreviousDataForProgressReportPopulation = async ({writeable_document_kind, section, project_pk}:PRPopulationVar) => {
+    const res = instance.post(`documents/get_previous_reports_data`, {
+        writeable_document_kind,
+        section,
+        project_pk
+    }).then(res => res.data);
+    return res;
+}
+
 export const deleteUserAdmin = async ({ userPk }: AdminSwitchVar) => {
     const res = instance.delete(`users/${userPk}`).then(res => { return res.data })
     return res;

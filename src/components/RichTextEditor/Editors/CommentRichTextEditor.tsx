@@ -248,7 +248,7 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
   const { colorMode } = useColorMode();
   // const imageUrl = useServerImageUrl(userData?.image?.file);
 
-  console.log(userData)
+  // console.log(userData)
 
   return (
     <Box

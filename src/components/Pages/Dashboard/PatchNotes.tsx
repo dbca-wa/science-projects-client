@@ -138,27 +138,44 @@ export const PatchNotes = ({ userData, isLoggedIn, userLoading }: IUserInterface
                     <List spacing={1} ml={2} >
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Added one-time confetti every new patch
+                            Change: Adjusted New Cycle email text for admins
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Added feedback button & patch notes to modern layout
+                            Change: Ensured project leaders are only labelled as "Leader", and remain that way
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Added "My Business Area" page for business area leaders to submit changes about their Business Area to directorate for review.
-                        </ListItem>
-                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
-                            <ListIcon as={MdCheckCircle} color='green.500' />
-                            Ensured project leaders are only labelled as "Leader"
-                        </ListItem>
-                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
-                            <ListIcon as={MdCheckCircle} color='green.500' />
-                            Fix: Ensure progress reports of closed projects for a FY appear on that year's report
+                            Change: Sorted author names on Project Overview based on position on team, not alphabetical last names
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
                             Fix: Removed email bug on submitting for approval
+                        </ListItem>
+                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+                            <ListIcon as={MdCheckCircle} color='green.500' />
+                            Fix: Project documents modifed date and user updated when saving
+                        </ListItem>
+                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+                            <ListIcon as={MdCheckCircle} color='green.500' />
+                            Fix: Added feedback button & patch notes to modern layout / adjusted feedback modal for direct contact
+                        </ListItem>
+                        {/* <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+                            <ListIcon as={MdCheckCircle} color='green.500' />
+                            Added "My Business Area" page for business area leaders to submit changes about their Business Area to directorate for review.
+                        </ListItem> */}
+
+                        {/* <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+                            <ListIcon as={MdCheckCircle} color='green.500' />
+                            Fix: Ensure progress reports of closed projects for a FY appear on that year's report
+                        </ListItem> */}
+                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+                            <ListIcon as={MdCheckCircle} color='green.500' />
+                            Feature: Added one-time confetti every new patch to alert users
+                        </ListItem>
+                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+                            <ListIcon as={MdCheckCircle} color='green.500' />
+                            Feature: Added a "Populate" button for eligible progress reports, when editing empty Rich Text Editor. Enables populating sections with last report's data quickly.
                         </ListItem>
                     </List>
 
