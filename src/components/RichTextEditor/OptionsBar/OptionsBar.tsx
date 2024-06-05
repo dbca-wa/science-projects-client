@@ -9,6 +9,7 @@ import { TreeButton } from "../Buttons/TreeButton";
 import { WordCount } from "./WordCount";
 import { PasteHTMLDataButton } from "../Buttons/PasteHTMLDataButton";
 import { useMaintainer } from "@/lib/hooks/tanstack/useMaintainer";
+import { PopulationButton } from "../Buttons/PopulationButton";
 
 interface IOptionsBarProps {
   // editor: LexicalEditor;
@@ -33,10 +34,13 @@ interface IOptionsBarProps {
   displayData: string;
   editorIsOpen: boolean;
   setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  shouldCheckForPrepopulation: boolean;
+  documentTypeCount: number;
   // setDisplayData: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const OptionsBar = ({
+  shouldCheckForPrepopulation,
   // editor,
   details_pk,
   displayData,
@@ -55,12 +59,15 @@ export const OptionsBar = ({
   document_pk,
   wordLimit,
   limitCanBePassed,
+  documentTypeCount,
   //   setDisplayData,
   canSave,
   setCanSave,
 }: IOptionsBarProps) => {
   const { userData } = useUser();
   const { maintainerData, maintainerLoading } = useMaintainer();
+
+  const showPopulationButton = (shouldCheckForPrepopulation && editorText.length === 0 && documentTypeCount > 1)
 
   return (
     editorIsOpen && (
@@ -78,11 +85,21 @@ export const OptionsBar = ({
           <Grid
             px={10}
             py={4}
-            gridTemplateColumns={`repeat(${userData?.pk === maintainerData?.pk ? 6 : 2
-              }, 1fr)`}
+            gridTemplateColumns={`repeat(${showPopulationButton ?
+              userData?.pk === maintainerData?.pk ? editorText.length !== 0 ? 6 : 7 : editorText.length !== 0 ? 2 : 3
+              : userData?.pk === maintainerData?.pk ? 6 : 2}, 1fr)`}
             // width={"100%"}
             gridColumnGap={2}
           >
+            {showPopulationButton && (
+              <PopulationButton
+                canPopulate={shouldCheckForPrepopulation}
+                // editorText={editorText}
+                writeable_document_kind={writeable_document_kind}
+                section={section}
+                project_pk={project_pk}
+              />
+            )}
             {userData?.pk === maintainerData?.pk ? (
               <>
                 <TreeButton

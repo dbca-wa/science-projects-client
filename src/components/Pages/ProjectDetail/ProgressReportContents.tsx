@@ -183,7 +183,7 @@ export const ProgressReportContents = ({
                 isDisabled={
                   availableProgressReportYearsData?.length < 1 ||
                   all_documents?.project_plan?.document?.project?.status ===
-                    "suspended"
+                  "suspended"
                 }
                 leftIcon={<BsPlus size={"20px"} />}
               >
@@ -273,6 +273,7 @@ export const ProgressReportContents = ({
             editorType="ProjectDocument"
             data={selectedProgressReport?.context}
             section={"context"}
+            documentsCount={documents.length}
           />
 
           <RichTextEditor
@@ -291,6 +292,7 @@ export const ProgressReportContents = ({
             editorType="ProjectDocument"
             data={selectedProgressReport?.aims}
             section={"aims"}
+            documentsCount={documents.length}
           />
 
           <RichTextEditor
@@ -309,6 +311,7 @@ export const ProgressReportContents = ({
             editorType="ProjectDocument"
             data={selectedProgressReport?.progress}
             section={"progress"}
+            documentsCount={documents.length}
           />
 
           <RichTextEditor
@@ -327,6 +330,7 @@ export const ProgressReportContents = ({
             editorType="ProjectDocument"
             data={selectedProgressReport?.implications}
             section={"implications"}
+            documentsCount={documents.length}
           />
 
           <RichTextEditor
@@ -345,6 +349,7 @@ export const ProgressReportContents = ({
             editorType="ProjectDocument"
             data={selectedProgressReport?.future}
             section={"future"}
+            documentsCount={documents.length}
           />
 
           {selectedProgressReport?.document && (

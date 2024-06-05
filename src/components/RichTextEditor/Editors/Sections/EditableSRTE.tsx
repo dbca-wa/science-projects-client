@@ -65,6 +65,8 @@ interface Props {
 
   canSave: boolean;
   setCanSave: React.Dispatch<React.SetStateAction<boolean>>;
+  shouldCheckForPrepopulation: boolean;
+  documentsCount?: number;
 }
 
 export const EditableSRTE = ({
@@ -91,6 +93,8 @@ export const EditableSRTE = ({
   limitCanBePassed,
   canSave,
   setCanSave,
+  shouldCheckForPrepopulation,
+  documentsCount,
 }: Props) => {
   const dragBtnMargin = 10;
   const toolBarHeight = 45;
@@ -233,6 +237,8 @@ export const EditableSRTE = ({
             setCanSave={setCanSave}
             editorIsOpen={isEditorOpen}
             setIsEditorOpen={setIsEditorOpen}
+            shouldCheckForPrepopulation={shouldCheckForPrepopulation}
+            documentTypeCount={documentsCount}
           // setDisplayData={setDisplayData}
           />
         </Box>

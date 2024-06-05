@@ -207,11 +207,10 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
                 Also send emails?
               </Checkbox>
               <Text fontSize={"xs"} mx={6}>
-                If this is selected, all active DBCA members registered on the
-                site will receive an email alerting them the new cycle is open
+                If this is selected, all active business area leads will receive an email alerting them the new cycle is open
                 for FY {`${latestYear - 1}-${String(latestYear).substring(2)}`}.
                 You may opt to open the cycle first and send these emails later
-                by leaving this unchecked for now.
+                by leaving this unchecked for now, and checking/opening the cycle again later.
               </Text>
               <Checkbox
                 mt={4}

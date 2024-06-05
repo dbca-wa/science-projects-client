@@ -31,6 +31,7 @@ interface IProps {
   isUpdate: boolean;
   wordLimit?: number;
   limitCanBePassed?: boolean;
+  documentsCount?: number;
 }
 
 export const RichTextEditor = ({
@@ -47,6 +48,7 @@ export const RichTextEditor = ({
   details_pk,
   wordLimit,
   limitCanBePassed,
+  documentsCount
 }: IProps) => {
   const [shouldShowTree, setShouldShowTree] = useState(false);
   const { colorMode } = useColorMode();
@@ -203,6 +205,7 @@ export const RichTextEditor = ({
   }, [displayData]);
 
   const [prepopulationData, setPrepopulationData] = useState(displayData);
+  const [shouldCheckForPrepopulation, setShouldCheckForPrepopulation] = useState(writeable_document_kind === "Student Report" || writeable_document_kind === "Progress Report");
 
 
   return (
@@ -247,6 +250,7 @@ export const RichTextEditor = ({
             gridTemplateColumns={"repeat(1, 1fr)"}
             gridColumnGap={2}
           >
+
             {canEdit && (
               <HideEditorButton
                 setIsEditorOpen={setIsEditorOpen}
@@ -301,6 +305,8 @@ export const RichTextEditor = ({
             limitCanBePassed={limitCanBePassed}
             canSave={canSave}
             setCanSave={setCanSave}
+            shouldCheckForPrepopulation={shouldCheckForPrepopulation}
+            documentsCount={documentsCount ? documentsCount : 1}
           />
         ) : (
           <DisplaySRTE
