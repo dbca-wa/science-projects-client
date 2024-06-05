@@ -22,7 +22,7 @@ const HomeConfetti = () => {
     useEffect(() => {
         console.log(conf)
         // If the count is less than 4, trigger the confetti effect
-        if (conf < 3) {
+        if (conf < 2) {
             confetti({
                 particleCount: 100,
                 spread: 360,

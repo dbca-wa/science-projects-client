@@ -145,10 +145,14 @@ export const ProjectOverviewCard = ({
 
     // Sorts the filteredMembers array alphabetically based on last_name
     filteredMembers.sort((a, b) => {
-      const lastNameA = a.user.last_name!.toUpperCase();
-      const lastNameB = b.user.last_name!.toUpperCase();
-      if (lastNameA < lastNameB) return -1;
-      if (lastNameA > lastNameB) return 1;
+      const posA = a.position;
+      const posB = b.position;
+      if (posA < posB) return -1;
+      if (posA > posB) return 1;
+      // const lastNameA = a.user.last_name!.toUpperCase();
+      // const lastNameB = b.user.last_name!.toUpperCase();
+      // if (lastNameA < lastNameB) return -1;
+      // if (lastNameA > lastNameB) return 1;
       return 0;
     });
 

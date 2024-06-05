@@ -371,8 +371,8 @@ export const ProjectUserDetails = ({
             user?.image?.file
               ? user.image.file
               : user?.image?.old_file
-              ? user.image.old_file
-              : ""
+                ? user.image.old_file
+                : ""
           }
           size={"2xl"}
         />
@@ -450,7 +450,7 @@ export const ProjectUserDetails = ({
           }}
           onClick={removeThisUser}
           isDisabled={usersCount === 1}
-          // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
+        // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
         >
           Remove from Project
         </Button>
@@ -465,39 +465,50 @@ export const ProjectUserDetails = ({
         flexDir={"column"}
         mt={2}
       >
-        <Flex>
-          <Text
-            fontWeight={"bold"}
-            fontSize={"sm"}
-            mb={1}
-            color={sectionTitleColor}
-          >
-            Project Role ({userRole ? humanReadableRoleName(userRole) : "None"})
-          </Text>
-        </Flex>
-        <FormControl py={2}>
-          <InputGroup>
-            <Select
-              variant="filled"
-              placeholder="Select a Role for the User"
-              onChange={(e) => handleUpdateRole(e.target.value)}
-              value={userRole}
-            >
-              <option value="academicsuper">Academic Supervisor</option>
-              <option value="consulted">Consulted Peer</option>
-              <option value="externalcol">External Collaborator</option>
-              {/* <option value="externalpeer">External Peer</option> */}
-              <option value="group">Involved Group</option>
-              <option value="research">Science Support</option>
-              {/* <option value="supervising">Project Leader</option> */}
-              <option value="student">Supervised Student</option>
-              <option value="technical">Technical Support</option>
-            </Select>
-          </InputGroup>
-          <FormHelperText>
-            The role this team member fills within this project.
-          </FormHelperText>
-        </FormControl>
+
+        {(humanReadableRoleName(userRole) === "Project Leader" && !me?.userData.is_superuser) ? (
+          "Project Leaders cannot change to a different role."
+        ) :
+          (
+            <>
+              <Flex>
+                <Text
+                  fontWeight={"bold"}
+                  fontSize={"sm"}
+                  mb={1}
+                  color={sectionTitleColor}
+                >
+                  Project Role ({userRole ? humanReadableRoleName(userRole) : "None"})
+                </Text>
+              </Flex>
+              <FormControl py={2}>
+                <InputGroup>
+                  <Select
+                    variant="filled"
+                    placeholder="Select a Role for the User"
+                    onChange={(e) => handleUpdateRole(e.target.value)}
+                    value={userRole}
+                    isDisabled={humanReadableRoleName(userRole) === "Project Leader" && !me?.userData.is_superuser}
+                  >
+                    <option value="academicsuper">Academic Supervisor</option>
+                    <option value="consulted">Consulted Peer</option>
+                    <option value="externalcol">External Collaborator</option>
+                    {/* <option value="externalpeer">External Peer</option> */}
+                    <option value="group">Involved Group</option>
+                    <option value="research">Science Support</option>
+                    {/* <option value="supervising">Project Leader</option> */}
+                    <option value="student">Supervised Student</option>
+                    <option value="technical">Technical Support</option>
+                  </Select>
+                </InputGroup>
+                <FormHelperText>
+                  The role this team member fills within this project.
+                </FormHelperText>
+              </FormControl>
+            </>
+          )
+        }
+
 
         <Flex mt={4}>
           <Text
@@ -556,7 +567,7 @@ export const ProjectUserDetails = ({
               isDisabled={!user?.is_staff}
               onClick={promoteThisUser}
 
-              // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
+            // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
             >
               Promote to Leader
             </Button>
