@@ -661,7 +661,7 @@ export const ProjectUserDetails = ({
           <Text>
             {user.about
               ? user.about
-              : "This user has not filled in their 'About' section."}
+              : "This user has not filled in this section."}
           </Text>
           <Flex mt={4}>
             <Text
@@ -676,7 +676,7 @@ export const ProjectUserDetails = ({
           <Text>
             {user?.expertise
               ? user.expertise
-              : "This user has not filled in their 'Expertise' section."}
+              : "This user has not filled in this section."}
           </Text>
         </Flex>
 
@@ -702,14 +702,14 @@ export const ProjectUserDetails = ({
             </Text>
           </Flex>
           <Grid gridTemplateColumns="1fr 3fr">
-            <Text color={subsectionTitleColor}>
+            {/* <Text color={subsectionTitleColor}>
               <b>Role: </b>
             </Text>
             <Text>
               {user?.role
                 ? user.role
-                : "This user has not filled in their 'role' section."}
-            </Text>
+                : "This user has not filled in this section."}
+            </Text> */}
             <Text color={subsectionTitleColor}>
               <b>Joined: </b>
             </Text>
