@@ -20,7 +20,7 @@ const HomeConfetti = () => {
     const conf = (getLocalConfettiCount())
 
     useEffect(() => {
-        console.log(conf)
+        // console.log(conf)
         // If the count is less than 4, trigger the confetti effect
         if (conf < 1) {
             confetti({

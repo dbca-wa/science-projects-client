@@ -350,7 +350,7 @@ export const Projects = () => {
                 <option value={"active"}>Active (Approved)</option>
                 <option value={"updating"}>Update Requested</option>
                 <option value={"closure_requested"}>Closure Requested</option>
-                <option value={"final_update"}>Final Update Requested</option>
+                {/* <option value={"final_update"}>Final Update Requested</option> */}
                 <option value={"completed"}>Completed and Closed</option>
                 <option value={"terminated"}>Terminated</option>
                 <option value={"suspended"}>Suspended</option>
