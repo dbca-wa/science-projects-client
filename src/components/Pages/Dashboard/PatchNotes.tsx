@@ -138,27 +138,27 @@ export const PatchNotes = ({ userData, isLoggedIn, userLoading }: IUserInterface
                     <List spacing={1} ml={2} >
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Change: Adjusted New Cycle email text for admins
+                            Update: Batch populated Context and Aims sections for latest progress reports belonging to projects with prior reports
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Change: Ensured project leaders are only labelled as "Leader", and remain that way
+                            Change: Sorted project results - most recent projects first & terminated, closed and suspended projects appear at the end
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Change: Sorted author names on Project Overview based on position on team, not alphabetical last names
+                            Change: Tasks for project lead also appear for team to ensure entire team aware of status
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Fix: Removed email bug on submitting for approval
+                            Fix: Set status of project closures of non "science" to "approved" when auto closed
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Fix: Project documents modifed date and user updated when saving
+                            Fix: Fixed bug where some users who don't have a business area set could not see their tasks
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Fix: Added feedback button & patch notes to modern layout / adjusted feedback modal for direct contact
+                            Fix: Prevented a project plan spawn bug caused by bad data when approving a concept plan that already has a project plan
                         </ListItem>
                         {/* <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
@@ -169,13 +169,10 @@ export const PatchNotes = ({ userData, isLoggedIn, userLoading }: IUserInterface
                             <ListIcon as={MdCheckCircle} color='green.500' />
                             Fix: Ensure progress reports of closed projects for a FY appear on that year's report
                         </ListItem> */}
+
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
-                            Feature: Added one-time confetti every new patch to alert users
-                        </ListItem>
-                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
-                            <ListIcon as={MdCheckCircle} color='green.500' />
-                            Feature: Added a "Populate" button for eligible progress reports, when editing empty Rich Text Editor. Enables populating sections with last report's data quickly.
+                            Feature: Added admin ability to batch populate progress reports for pre-existing progress reports (aims and context for latest year only)
                         </ListItem>
                     </List>
 
