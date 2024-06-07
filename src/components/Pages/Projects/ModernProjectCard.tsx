@@ -17,7 +17,6 @@ import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
 import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
 import { IProjectData } from "../../../types";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
-import { extendTheme } from "@chakra-ui/react";
 
 export const ModernProjectCard = ({
   pk,

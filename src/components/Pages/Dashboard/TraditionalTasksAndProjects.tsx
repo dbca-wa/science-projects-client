@@ -117,6 +117,13 @@ export const TraditionalTasksAndProjects = () => {
 
   const boxShadow = useBoxShadow();
 
+  // useEffect(() => {
+  //   if (!pendingEndorsementsDataLoading) {
+  //     console.log(pendingProjectDocumentData)
+
+  //   }
+  // }, [pendingProjectDocumentData, pendingEndorsementsDataLoading])
+
   return (
     <>
       <Box mt={6}>

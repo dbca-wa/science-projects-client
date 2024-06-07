@@ -87,7 +87,7 @@ export const ProjectDocumentPDFSection = ({
         window.open(fileUrl, "_blank");
       }
 
-      console.log(data_document);
+      // console.log(data_document);
       queryClient.invalidateQueries({
         queryKey: ["projects", data_document?.document?.project?.pk],
       });
@@ -157,16 +157,16 @@ export const ProjectDocumentPDFSection = ({
   });
 
   const beginCancelDocGen = (formData: IDocGen) => {
-    console.log(formData);
+    // console.log(formData);
     cancelDocGenerationMutation.mutate(formData);
   };
 
   const beginProjectDocPDFGeneration = (formData: IDocGen) => {
-    console.log(formData);
+    // console.log(formData);
     projectDocPDFGenerationMutation.mutate(formData);
   };
 
-  useEffect(() => console.log(data_document), [data_document])
+  // useEffect(() => console.log(data_document), [data_document])
 
   const downloadPDF = () => {
     {

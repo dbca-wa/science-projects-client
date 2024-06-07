@@ -344,21 +344,21 @@ export const ProjectOverviewCard = ({
     return levelDic[level];
   };
 
-  useEffect(() => {
-    console.log({
-      userIsBaLead,
-      userIsLeader,
-      userInTeam,
-      mePk,
-      me,
-    });
-    const shouldSee = (me?.userData?.is_superuser ||
-      userIsLeader ||
-      userIsBaLead ||
-      me?.userData?.business_area?.name === "Directorate");
+  // useEffect(() => {
+  //   console.log({
+  //     userIsBaLead,
+  //     userIsLeader,
+  //     userInTeam,
+  //     mePk,
+  //     me,
+  //   });
+  //   const shouldSee = (me?.userData?.is_superuser ||
+  //     userIsLeader ||
+  //     userIsBaLead ||
+  //     me?.userData?.business_area?.name === "Directorate");
 
-    console.log("SHOULD SEE MENU: ", shouldSee)
-  }, [userIsBaLead, userIsLeader, userInTeam, mePk, me])
+  //   console.log("SHOULD SEE MENU: ", shouldSee)
+  // }, [userIsBaLead, userIsLeader, userInTeam, mePk, me])
 
   return (
     <>
