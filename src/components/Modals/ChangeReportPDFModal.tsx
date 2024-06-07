@@ -166,8 +166,8 @@ export const ChangeReportPDFModal = ({
       isOpen={isChangePDFOpen}
       onClose={onChangePDFClose}
       size={"lg"}
-      // scrollBehavior="inside"
-      // isCentered={true}
+    // scrollBehavior="inside"
+    // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -179,7 +179,7 @@ export const ChangeReportPDFModal = ({
 
         <ModalBody>
           <Text mb={4}>
-            Use this form to change the finalized pdf of the report.
+            Use this form to change the finalised pdf of the report.
           </Text>
 
           {report ? (
