@@ -360,6 +360,8 @@ export const ProjectOverviewCard = ({
   //   console.log("SHOULD SEE MENU: ", shouldSee)
   // }, [userIsBaLead, userIsLeader, userInTeam, mePk, me])
 
+  // useEffect(() => console.log(baseInformation))
+
   return (
     <>
       {(me?.userData?.is_superuser ||
@@ -944,7 +946,8 @@ export const ProjectOverviewCard = ({
                       baseInformation?.status === "terminated" ||
                       baseInformation?.status === "completed" ||
                       baseInformation?.status === "closing" ||
-                      baseInformation?.status === "closure_requested"
+                      baseInformation?.status === "closure_requested" ||
+                      baseInformation?.status === "closed"
                     }
                   >
                     <Flex
@@ -970,9 +973,13 @@ export const ProjectOverviewCard = ({
                       isDisabled={
                         baseInformation?.status !== "closure_requested" &&
                         baseInformation?.status !== "closing" &&
-                        baseInformation?.status !== "closed"
+                        baseInformation?.status !== "closed" &&
+                        baseInformation?.status !== "completed" &&
+                        baseInformation?.status !== "terminated"
+
                       }
                     >
+
                       <Flex alignItems={"center"}>
                         <Box mr={2}>
                           {documents?.project_closure?.document ? (
@@ -994,12 +1001,24 @@ export const ProjectOverviewCard = ({
 
                   {!documents?.project_closure?.document && (
                     <MenuItem
-                      onClick={onOpenClosureModal}
-                      isDisabled={
-                        baseInformation?.status === "closure_requested" ||
-                        baseInformation?.status === "closing" ||
-                        baseInformation?.status === "closed"
+                      onClick={
+                        (documents?.project_closure?.document || (
+                          baseInformation?.status === "terminated" ||
+                          baseInformation?.status === "completed" ||
+                          baseInformation?.status === "closing" ||
+                          baseInformation?.status === "closure_requested" ||
+                          baseInformation?.status === "closed"
+                        ))
+                          ? onOpenReopenModal
+                          : onOpenClosureModal
                       }
+                    // isDisabled={
+                    //   baseInformation?.status === "closure_requested" ||
+                    //   baseInformation?.status === "closing" ||
+                    //   baseInformation?.status === "closed" ||
+                    //   baseInformation?.status === "completed"
+
+                    // }
                     >
                       <Flex alignItems={"center"}>
                         <Box mr={2}>
@@ -1011,7 +1030,13 @@ export const ProjectOverviewCard = ({
                         </Box>
                         <Box>
                           <Text>
-                            {documents?.project_closure?.document
+                            {(documents?.project_closure?.document || (
+                              baseInformation?.status === "terminated" ||
+                              baseInformation?.status === "completed" ||
+                              baseInformation?.status === "closing" ||
+                              baseInformation?.status === "closure_requested" ||
+                              baseInformation?.status === "closed"
+                            ))
                               ? "Reopen Project"
                               : "Close Project"}
                           </Text>

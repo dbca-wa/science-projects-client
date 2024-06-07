@@ -102,7 +102,7 @@ export const ProjectReopenModal = ({
   });
 
   const openProject = (formData: ISimplePkProp) => {
-    console.log(formData);
+    // console.log(formData);
     const newForm = {
       pk: projPk,
     };

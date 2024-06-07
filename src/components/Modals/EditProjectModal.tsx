@@ -398,7 +398,7 @@ export const EditProjectModal = ({
 
   const updateProject = async (formData: IEditProject) => {
     // console.log("updating project");
-    // console.log(formData);
+    console.log(formData);
     await updateProjectMutation.mutate(formData);
   };
 
