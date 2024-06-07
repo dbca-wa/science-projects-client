@@ -962,6 +962,8 @@ list-style-position: inside;
 padding: 0;
 margin: 0;
 list-style-position: inside;
+visibility:visible;
+
 }
 .editor-ul2 {
 padding: 0;
@@ -1577,14 +1579,6 @@ list-style-position: outside;
 
 
 
-.editor-nested-list-item {
-list-style-type: none;
-}
-.editor-nested-list-item:before,
-.editor-nested-list-item:after {
-display: none;
-}
-
 
 .editor-ol-light {
 font-size: 14px;
@@ -1632,7 +1626,6 @@ margin: 0;
 margin-bottom: 4px;
 margin-left: 22px;
 color: #333;
-
 }
 
 .editor-li-dark {
@@ -1654,6 +1647,7 @@ color: #eee;
 padding: 0;
 margin: 0;
 list-style-position: outside;
+
 }
 
 
@@ -1664,6 +1658,7 @@ list-style-position: outside;
 padding: 0;
 margin: 0;
 list-style-position: outside;
+
 }
 
 
@@ -1680,50 +1675,102 @@ color: aquamarine;
 }
 
 
+
+
+
+ul.editor-ul1 {
+  /* color: red; */
+  list-style-type: disc;
+}
+
+ol.editor-ol1 {
+  list-style-type: decimal;
+}
+
 ul.editor-ul2, ol.editor-ol2 {
-margin-left: 15px;
+  margin-left: 15px;
+  }
+  
+  ul.editor-ul3, ol.editor-ol3 {
+  margin-left: 5px;
+  }
+  
+  ul.editor-ul1 li::marker {
+  font-weight: bold; 
+  visibility:visible;
+  }
+  
+  
+  ul.editor-ul2 li::marker {
+  font-weight: bold; 
+    /* list-style-type: circle; */
+  }
+  ul.editor-ul3 li::marker {
+  font-weight: bold; 
+  /* list-style-type:square; */
+  }
+  
+  ol.editor-ol1 li {
+  margin-left: 15px;  
+  padding-left: 5px;
+  visibility:visible;
+  
+  }
+  ol.editor-ol1 li::marker {
+  font-weight: bold; 
+  visibility:visible;
+  
+  }
+  ol.editor-ol2 li {
+  margin-left: 15px;  
+  padding-left: 6px;
+  }
+  
+  ol.editor-ol2 li::marker {
+  font-weight: bold; 
+  }
+  
+  
+  ol.editor-ol3 li {
+  margin-left: 15px;  
+  padding-left: 6px;
+  }
+  
+  ol.editor-ol3 li::marker {
+  font-weight: bold; 
+  }
+  
+  
+  ol.editor-ol1 li::after {
+  background-color: orange;
+  }
+  
+
+.editor-nested-list-item {
+  list-style-type: none;
+  }
+  .editor-nested-list-item:before,
+  .editor-nested-list-item:after {
+  display: none;
+  }
+  
+
+/* 
+ul.editor li {
+  list-style-type: none;
 }
 
-ul.editor-ul3, ol.editor-ol3 {
-margin-left: 5px;
+ul.editor-ul1 li {
+  color: red;
+  list-style-type: disc;
 }
 
-ul.editor-ul1 li::marker {
-font-weight: bold; 
-}ul.editor-ul2 li::marker {
-font-weight: bold; 
-}
-ul.editor-ul3 li::marker {
-font-weight: bold; 
+ul.editor-ul2 li {
+  color: blue;
+  list-style-type: disc;
 }
 
-ol.editor-ol1 li {
-margin-left: 15px;  
-padding-left: 10px;
-}
-ol.editor-ol1 li::marker {
-font-weight: bold; 
-}
-ol.editor-ol2 li {
-margin-left: 15px;  
-padding-left: 6px;
-}
-
-ol.editor-ol2 li::marker {
-font-weight: bold; 
-}
-
-
-ol.editor-ol3 li {
-margin-left: 15px;  
-padding-left: 6px;
-}
-
-ol.editor-ol3 li::marker {
-font-weight: bold; 
-}
-
-
-ol.editor-ol1 li::after {
-background-color: orange;
-}
+ul.editor-ul3 li {
+  color: pink;
+  list-style-type: square;
+} */

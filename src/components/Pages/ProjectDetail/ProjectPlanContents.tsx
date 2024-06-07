@@ -42,7 +42,7 @@ export const ProjectPlanContents = ({
   baLead,
 }: Props) => {
   const { colorMode } = useColorMode();
-  useEffect(() => console.log(console.log(document)));
+  // useEffect(() => console.log(console.log(document)));
   const documentType = "projectplan";
   const editorKey = colorMode + documentType;
 
