@@ -206,6 +206,7 @@ export const ProjectDetail = ({
             <Text mt={6}>
               This project has either been deleted or never existed.
             </Text>
+            <Text mt={3}>If you believe this is in error, please submit feedback</Text>
             <Box mt={8}>
               <Button
                 color={"white"}
