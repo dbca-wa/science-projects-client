@@ -15,6 +15,7 @@ import { AddReportPDFModal } from "../components/Modals/AddReportPDFModal";
 import { useGetARARsWithPDF } from "../lib/hooks/tanstack/useGetARARsWithPDF";
 import { motion } from "framer-motion";
 import { AnnualReportPDFGridItem } from "../components/Pages/Reports/AnnualReportPDFGridItem";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 
 export const Reports = () => {
   const {
@@ -25,30 +26,37 @@ export const Reports = () => {
   const { reportsWithPDFData, reportsWithPDFLoading, refetchReportsWithPDFs } =
     useGetARARsWithPDF();
   const { colorMode } = useColorMode();
+  const { userData, userLoading } = useUser();
+
   return (
     <>
       <Box mt={5}>
         <Head title={"Reports"} />
-        <AddReportPDFModal
-          isAddPDFOpen={isAddPDFOpen}
-          onAddPDFClose={onAddPDFClose}
-          refetchPDFs={refetchReportsWithPDFs}
-        />
-        <Flex justifyContent={"flex-end"} w={"100%"}>
-          <Box justifySelf={"flex-end"}>
-            <Button
-              bg={colorMode === "dark" ? "green.500" : "green.400"}
-              color={"white"}
-              _hover={{
-                bg: colorMode === "dark" ? "green.400" : "green.300",
-              }}
-              onClick={onAddPDFOpen}
-            >
-              Add PDF
-            </Button>
-          </Box>
-        </Flex>
-
+        {
+          !userLoading && userData?.is_superuser && (
+            <>
+              <AddReportPDFModal
+                isAddPDFOpen={isAddPDFOpen}
+                onAddPDFClose={onAddPDFClose}
+                refetchPDFs={refetchReportsWithPDFs}
+              />
+              <Flex justifyContent={"flex-end"} w={"100%"}>
+                <Box justifySelf={"flex-end"}>
+                  <Button
+                    bg={colorMode === "dark" ? "green.500" : "green.400"}
+                    color={"white"}
+                    _hover={{
+                      bg: colorMode === "dark" ? "green.400" : "green.300",
+                    }}
+                    onClick={onAddPDFOpen}
+                  >
+                    Add PDF
+                  </Button>
+                </Box>
+              </Flex>
+            </>
+          )
+        }
         {!reportsWithPDFLoading && reportsWithPDFData ? (
           <Grid
             gridTemplateColumns={{
@@ -61,24 +69,31 @@ export const Reports = () => {
           >
             {reportsWithPDFData
               .sort((a, b) => b.year - a.year)
-              .map((report, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ y: -10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 10, opacity: 0 }}
-                  transition={{ duration: 0.7, delay: (index + 1) / 7 }}
-                  style={{
-                    height: "100%",
-                    animation: "oscillate 8s ease-in-out infinite",
-                  }}
-                >
-                  <AnnualReportPDFGridItem
-                    report={report}
-                    refetchFunction={refetchReportsWithPDFs}
-                  />
-                </motion.div>
-              ))}
+              .map((report, index) => {
+                if (report.is_published) {
+                  return (
+                    (
+                      <motion.div
+                        key={index}
+                        initial={{ y: -10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 10, opacity: 0 }}
+                        transition={{ duration: 0.7, delay: (index + 1) / 7 }}
+                        style={{
+                          height: "100%",
+                          animation: "oscillate 8s ease-in-out infinite",
+                        }}
+                      >
+                        <AnnualReportPDFGridItem
+                          report={report}
+                          refetchFunction={refetchReportsWithPDFs}
+                          userData={userData}
+                        />
+                      </motion.div>
+                    )
+                  )
+                }
+              })}
           </Grid>
         ) : (
           <Spinner />

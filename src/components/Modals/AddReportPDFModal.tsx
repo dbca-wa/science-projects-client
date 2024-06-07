@@ -125,7 +125,7 @@ export const AddReportPDFModal = ({
 
         <ModalBody>
           <Text mb={4}>
-            Use this form to add the finalized pdf to the report.
+            Use this form to add the finalised pdf to the report.
           </Text>
           {!reportsWithoutPDFLoading && reportsWithoutPDFData ? (
             <>

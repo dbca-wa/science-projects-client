@@ -187,7 +187,7 @@ const ReportMenuContents = () => {
           }}
         >
           {<CgViewList />}
-          <Text ml={2}>Finalised Reports</Text>
+          <Text ml={2}>Published Reports</Text>
         </MenuItem>
       </MenuGroup>
     </>
@@ -734,21 +734,21 @@ const OldHeader = () => {
                 <NavMenu
                   menuName="Projects"
                   children={<ProjectMenuContents />}
-                  // leftIcon={HiMiniSquares2X2}
+                // leftIcon={HiMiniSquares2X2}
                 />
 
                 {/* Staff */}
                 <NavMenu
                   menuName="Users"
                   children={<UserMenuContents />}
-                  // leftIcon={FaUsers}
+                // leftIcon={FaUsers}
                 />
 
                 {/* Reports */}
                 <NavMenu
                   menuName="Reports"
                   children={<ReportMenuContents />}
-                  // leftIcon={PiBookOpenTextFill}
+                // leftIcon={PiBookOpenTextFill}
                 />
 
                 {!userLoading && userData.is_superuser && (
