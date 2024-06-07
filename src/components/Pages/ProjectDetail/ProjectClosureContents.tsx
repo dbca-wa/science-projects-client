@@ -99,9 +99,8 @@ export const ProjectClosureContents = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Set Closure Outcome",
           description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
+            ? `${error.response.status}: ${Object.values(error.response.data)[0]
+            }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -153,130 +152,139 @@ export const ProjectClosureContents = ({
         refetchData={refetch}
         setToLastTab={setToLastTab}
         isBaLead={isBaLead}
-        // projectPk={projectPk}
+      // projectPk={projectPk}
       />
 
-      <Flex
-        width={"100%"}
-        mb={8}
-        p={2}
-        px={4}
-        border={"1px solid"}
-        borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-        rounded={"2xl"}
-      >
-        <Flex flex={1} justifyContent={"flex-start"} alignItems={"center"}>
-          <Text fontSize={"lg"} fontWeight={"bold"}>
-            Select an Intended Outcome:
-          </Text>
+      {(document.document.project.kind === "science" || userData?.is_superuser) && (!document?.document?.directorate_approval_granted) ? (
+        <Flex
+          width={"100%"}
+          mb={8}
+          p={2}
+          px={4}
+          border={"1px solid"}
+          borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
+          rounded={"2xl"}
+        >
+          <Flex flex={1} justifyContent={"flex-start"} alignItems={"center"}>
+            <Text fontSize={"lg"} fontWeight={"bold"}>
+              Select an Intended Outcome:
+            </Text>
+          </Flex>
+          <Flex justifyContent={"flex-end"}>
+            <Select
+              value={selectedOutcome}
+              onChange={(event) => handleNewOutcomeSelection(event)}
+              minW={"200px"}
+            >
+              {potentialOutcomes.map((outcome) => (
+                <option key={outcome} value={outcome}>
+                  {outcome.charAt(0).toUpperCase() + outcome.slice(1)}
+                </option>
+              ))}
+            </Select>
+          </Flex>
         </Flex>
-        <Flex justifyContent={"flex-end"}>
-          <Select
-            value={selectedOutcome}
-            onChange={(event) => handleNewOutcomeSelection(event)}
-            minW={"200px"}
-          >
-            {potentialOutcomes.map((outcome) => (
-              <option key={outcome} value={outcome}>
-                {outcome.charAt(0).toUpperCase() + outcome.slice(1)}
-              </option>
-            ))}
-          </Select>
-        </Flex>
-      </Flex>
+      ) : null}
 
-      <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
-        document_pk={document?.document?.pk}
-        project_pk={document?.document?.project?.pk}
-        writeable_document_kind={"Project Closure"}
-        writeable_document_pk={document?.pk}
-        isUpdate={true}
-        editorType="ProjectDocument"
-        key={`reason${editorKey}`} // Change the key to force a re-render
-        data={document?.reason}
-        section={"reason"}
-      />
 
-      <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
-        document_pk={document?.document?.pk}
-        project_pk={document?.document?.project?.pk}
-        writeable_document_kind={"Project Closure"}
-        writeable_document_pk={document?.pk}
-        isUpdate={true}
-        editorType="ProjectDocument"
-        key={`knowledge_transfer${editorKey}`} // Change the key to force a re-render
-        data={document?.knowledge_transfer}
-        section={"knowledge_transfer"}
-      />
+      {document.document.project.kind === "science" && (
+        <>
+          <RichTextEditor
+            canEdit={
+              ((userInTeam || isBaLead) && !isFullyApproved) ||
+              userData?.is_superuser
+            }
+            document_pk={document?.document?.pk}
+            project_pk={document?.document?.project?.pk}
+            writeable_document_kind={"Project Closure"}
+            writeable_document_pk={document?.pk}
+            isUpdate={true}
+            editorType="ProjectDocument"
+            key={`reason${editorKey}`} // Change the key to force a re-render
+            data={document?.reason}
+            section={"reason"}
+          />
 
-      <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
-        document_pk={document?.document?.pk}
-        project_pk={document?.document?.project?.pk}
-        writeable_document_kind={"Project Closure"}
-        writeable_document_pk={document?.pk}
-        isUpdate={true}
-        editorType="ProjectDocument"
-        key={`data_location${editorKey}`} // Change the key to force a re-render
-        data={document?.data_location}
-        section={"data_location"}
-      />
-      <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
-        document_pk={document?.document?.pk}
-        project_pk={document?.document?.project?.pk}
-        writeable_document_kind={"Project Closure"}
-        writeable_document_pk={document?.pk}
-        isUpdate={true}
-        editorType="ProjectDocument"
-        key={`hardcopy_location${editorKey}`} // Change the key to force a re-render
-        data={document?.hardcopy_location}
-        section={"hardcopy_location"}
-      />
-      <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
-        document_pk={document?.document?.pk}
-        project_pk={document?.document?.project?.pk}
-        writeable_document_kind={"Project Closure"}
-        writeable_document_pk={document?.pk}
-        isUpdate={true}
-        editorType="ProjectDocument"
-        key={`backup_location${editorKey}`} // Change the key to force a re-render
-        data={document?.backup_location}
-        section={"backup_location"}
-      />
-      <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
-        document_pk={document?.document?.pk}
-        project_pk={document?.document?.project?.pk}
-        writeable_document_kind={"Project Closure"}
-        writeable_document_pk={document?.pk}
-        isUpdate={true}
-        editorType="ProjectDocument"
-        key={`scientific_outputs${editorKey}`} // Change the key to force a re-render
-        data={document?.scientific_outputs}
-        section={"scientific_outputs"}
-      />
+          <RichTextEditor
+            canEdit={
+              ((userInTeam || isBaLead) && !isFullyApproved) ||
+              userData?.is_superuser
+            }
+            document_pk={document?.document?.pk}
+            project_pk={document?.document?.project?.pk}
+            writeable_document_kind={"Project Closure"}
+            writeable_document_pk={document?.pk}
+            isUpdate={true}
+            editorType="ProjectDocument"
+            key={`knowledge_transfer${editorKey}`} // Change the key to force a re-render
+            data={document?.knowledge_transfer}
+            section={"knowledge_transfer"}
+          />
+
+          <RichTextEditor
+            canEdit={
+              ((userInTeam || isBaLead) && !isFullyApproved) ||
+              userData?.is_superuser
+            }
+            document_pk={document?.document?.pk}
+            project_pk={document?.document?.project?.pk}
+            writeable_document_kind={"Project Closure"}
+            writeable_document_pk={document?.pk}
+            isUpdate={true}
+            editorType="ProjectDocument"
+            key={`data_location${editorKey}`} // Change the key to force a re-render
+            data={document?.data_location}
+            section={"data_location"}
+          />
+          <RichTextEditor
+            canEdit={
+              ((userInTeam || isBaLead) && !isFullyApproved) ||
+              userData?.is_superuser
+            }
+            document_pk={document?.document?.pk}
+            project_pk={document?.document?.project?.pk}
+            writeable_document_kind={"Project Closure"}
+            writeable_document_pk={document?.pk}
+            isUpdate={true}
+            editorType="ProjectDocument"
+            key={`hardcopy_location${editorKey}`} // Change the key to force a re-render
+            data={document?.hardcopy_location}
+            section={"hardcopy_location"}
+          />
+          <RichTextEditor
+            canEdit={
+              ((userInTeam || isBaLead) && !isFullyApproved) ||
+              userData?.is_superuser
+            }
+            document_pk={document?.document?.pk}
+            project_pk={document?.document?.project?.pk}
+            writeable_document_kind={"Project Closure"}
+            writeable_document_pk={document?.pk}
+            isUpdate={true}
+            editorType="ProjectDocument"
+            key={`backup_location${editorKey}`} // Change the key to force a re-render
+            data={document?.backup_location}
+            section={"backup_location"}
+          />
+          <RichTextEditor
+            canEdit={
+              ((userInTeam || isBaLead) && !isFullyApproved) ||
+              userData?.is_superuser
+            }
+            document_pk={document?.document?.pk}
+            project_pk={document?.document?.project?.pk}
+            writeable_document_kind={"Project Closure"}
+            writeable_document_pk={document?.pk}
+            isUpdate={true}
+            editorType="ProjectDocument"
+            key={`scientific_outputs${editorKey}`} // Change the key to force a re-render
+            data={document?.scientific_outputs}
+            section={"scientific_outputs"}
+          />
+
+        </>
+      )}
+
       <CommentSection
         documentID={document?.pk}
         userData={userData}

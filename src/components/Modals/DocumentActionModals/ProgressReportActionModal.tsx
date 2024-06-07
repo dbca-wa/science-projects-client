@@ -191,7 +191,7 @@ export const ProgressReportActionModal = ({
           id="approval-form"
           onSubmit={handleSubmit(onApprove)}
         >
-          {!baData || !baLead ? null : ( // || isDirectorateLoading || directorateData?.length < 1
+          {!baLead ? null : ( // || isDirectorateLoading || directorateData?.length < 1
             <>
               <Input
                 type="hidden"
@@ -353,33 +353,40 @@ export const ProgressReportActionModal = ({
           )}
         </ModalBody>
 
-        <ModalFooter>
-          <Button
-            // variant="ghost"
-            mr={3}
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            form="approval-form"
-            type="submit"
-            isLoading={approveProgressReportMutation.isPending}
-            bg={colorMode === "dark" ? "green.500" : "green.400"}
-            color={"white"}
-            _hover={{
-              bg: colorMode === "dark" ? "green.400" : "green.300",
-            }}
-          >
-            {action === "approve"
-              ? stage === 1
-                ? "Submit"
-                : "Approve"
-              : action === "recall"
-                ? "Recall"
-                : "Send Back"}
-          </Button>
-        </ModalFooter>
+        {(!baLead) ? (
+          <Center p={4} flexDir={"column"}>
+            <Text>No business area leader has been set for {baData.name}.</Text>
+            <Text>Contact an admin to set the leader for this business area.</Text>
+          </Center>
+        ) : (
+          <ModalFooter>
+            <Button
+              // variant="ghost"
+              mr={3}
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              form="approval-form"
+              type="submit"
+              isLoading={approveProgressReportMutation.isPending}
+              bg={colorMode === "dark" ? "green.500" : "green.400"}
+              color={"white"}
+              _hover={{
+                bg: colorMode === "dark" ? "green.400" : "green.300",
+              }}
+            >
+              {action === "approve"
+                ? stage === 1
+                  ? "Submit"
+                  : "Approve"
+                : action === "recall"
+                  ? "Recall"
+                  : "Send Back"}
+            </Button>
+          </ModalFooter>
+        )}
       </ModalContent>
     </Modal>
   );
