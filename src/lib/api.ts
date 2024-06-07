@@ -1228,7 +1228,8 @@ export const updateProjectDetails = async ({
     }
 
     if (businessArea !== undefined) {
-        newFormData.append('business_area', businessArea.toString());
+        // console.log(businessArea)
+        newFormData.append('businessArea', businessArea.toString());
     }
 
 

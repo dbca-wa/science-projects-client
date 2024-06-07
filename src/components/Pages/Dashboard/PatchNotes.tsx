@@ -150,6 +150,10 @@ export const PatchNotes = ({ userData, isLoggedIn, userLoading }: IUserInterface
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
+                            Change: Rich text editors removed for auto-closed project closures (non-science project closures)
+                        </ListItem>
+                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+                            <ListIcon as={MdCheckCircle} color='green.500' />
                             Fix: Set status of project closures of non "science" to "approved" when auto closed
                         </ListItem>
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
@@ -159,6 +163,10 @@ export const PatchNotes = ({ userData, isLoggedIn, userLoading }: IUserInterface
                         <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />
                             Fix: Prevented a project plan spawn bug caused by bad data when approving a concept plan that already has a project plan
+                        </ListItem>
+                        <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+                            <ListIcon as={MdCheckCircle} color='green.500' />
+                            Fix: Fixed bug causing business area to not update when editing a project
                         </ListItem>
                         {/* <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
                             <ListIcon as={MdCheckCircle} color='green.500' />

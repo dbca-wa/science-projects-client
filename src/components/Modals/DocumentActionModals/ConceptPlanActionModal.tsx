@@ -152,6 +152,7 @@ export const ConceptPlanActionModal = ({
   });
 
   const onApprove = (formData: IApproveDocument) => {
+    console.log(formData)
     formData.shouldSendEmail = shouldSendEmail;
     approveConceptPlanMutation.mutate(formData);
   };
@@ -190,7 +191,8 @@ export const ConceptPlanActionModal = ({
           id="approval-form"
           onSubmit={handleSubmit(onApprove)}
         >
-          {!baData || !baLead ? null : ( // || isDirectorateLoading || directorateData?.length < 1
+
+          {!baLead ? null : ( // || isDirectorateLoading || directorateData?.length < 1
             <>
               <Input
                 type="hidden"
@@ -233,15 +235,22 @@ export const ConceptPlanActionModal = ({
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
                     Send an email to the business area lead{" "}
-                    <strong>
-                      ({baLead.first_name} {baLead.last_name} - {baLead.email})
-                    </strong>{" "}
+                    {baLead && (
+                      <>
+                        <strong>
+                          ({baLead.first_name} {baLead.last_name} - {baLead.email})
+                        </strong>{" "}
+                      </>
+
+                    )}
+
                     alerting them that you have{" "}
                     {action === "approve" ? "submitted" : "recalled"} this
                     document?
                   </Checkbox>
                 </Box>
               ) : stage === 2 ? (
+                // !baData || !baLead ? null : ( // || isDirectorateLoading || directorateData?.length < 1
                 <Box>
                   <Text fontWeight={"bold"}>Stage 2</Text>
                   <br />
@@ -343,30 +352,39 @@ export const ConceptPlanActionModal = ({
                 </Box>
               )}
             </>
-          )}
+          )
+          }
         </ModalBody>
+        {(!baLead) ? (
+          <Center p={4} flexDir={"column"}>
+            <Text>No business area leader has been set for {baData.name}.</Text>
+            <Text>Contact an admin to set the leader for this business area.</Text>
+          </Center>
+        ) : (
+          <ModalFooter>
+            <Button mr={3} onClick={onClose}>
+              Cancel
+            </Button>
 
-        <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            form="approval-form"
-            type="submit"
-            isLoading={approveConceptPlanMutation.isPending}
-            bg={colorMode === "dark" ? "green.500" : "green.400"}
-            color={"white"}
-            _hover={{
-              bg: colorMode === "dark" ? "green.400" : "green.300",
-            }}
-          >
-            {action === "approve"
-              ? "Submit"
-              : action === "recall"
-                ? "Recall"
-                : "Send Back"}
-          </Button>
-        </ModalFooter>
+            <Button
+              form="approval-form"
+              type="submit"
+              isLoading={approveConceptPlanMutation.isPending}
+              bg={colorMode === "dark" ? "green.500" : "green.400"}
+              color={"white"}
+              _hover={{
+                bg: colorMode === "dark" ? "green.400" : "green.300",
+              }}
+            >
+              {action === "approve"
+                ? "Submit"
+                : action === "recall"
+                  ? "Recall"
+                  : "Send Back"}
+            </Button>
+          </ModalFooter>
+
+        )}
       </ModalContent>
     </Modal>
   );
