@@ -173,8 +173,8 @@ export const TraditionalDocumentTaskDisplay = ({
             color={`${inputKind === "directorate"
               ? "red"
               : inputKind === "business_area_lead"
-                ? "blue"
-                : "green"
+                ? "blue" : inputKind === "team_member" ? "gray"
+                  : "green"
               }.600`}
             fontWeight={"semibold"}
             fontSize={"small"}

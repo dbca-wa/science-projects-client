@@ -2,7 +2,7 @@
 
 import { Box, Grid, Text, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import { useCheckUserIsTeamLeader } from "../../../lib/hooks/helper/useCheckUserIsTeamLeader";
 import {
