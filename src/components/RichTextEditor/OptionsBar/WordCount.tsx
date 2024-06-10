@@ -38,7 +38,7 @@ export const WordCount = ({
 
     // const updatedCharLimit = wordLimit * 5;
 
-    if (wordCount < wordLimit) {
+    if (wordCount <= wordLimit) {
       const isLimitAlmostExceeded = wordCount >= wordLimit * 0.67; // || (charCount >= (updatedCharLimit * 0.67)) ||             // disabled char limit
       // const isLimitExceeded = charCount > updatedCharLimit;
 
