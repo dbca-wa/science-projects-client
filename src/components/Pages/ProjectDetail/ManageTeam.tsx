@@ -144,6 +144,14 @@ export const ManageTeam = ({
     }
   };
 
+  const checkInTeam = (pk: number) => {
+    // Find a team member whose user.pk matches the given pk
+    const teamMember = rearrangedTeam.find((tm) => tm?.user.pk === pk);
+
+    // If a matching team member is found, return true; otherwise, return false
+    return teamMember !== undefined;
+  };
+
   const { userLoading, userData } = useUser();
 
   return (
@@ -169,33 +177,33 @@ export const ManageTeam = ({
           </Text>
 
           <Flex w={"100%"} justifyContent={"flex-end"}>
-            {
-              (userData.is_superuser || userData.pk === ba_leader ||
-                userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk) && (
-                <>
-                  <Button
-                    size={"sm"}
-                    onClick={onOpenAddUserModal}
-                    leftIcon={<BsPlus />}
-                    bg={colorMode === "light" ? "green.500" : "green.600"}
-                    _hover={{
-                      bg: colorMode === "light" ? "green.400" : "green.500",
-                    }}
-                    color={"white"}
-                    userSelect={"none"}
-                  >
-                    Invite Member
-                  </Button>
-                  <AddUserToProjectModal
-                    isOpen={isAddUserModalOpen}
-                    onClose={onCloseAddUserModal}
-                    preselectedProject={project_id}
-                    refetchTeamData={refetchTeamData}
-                  />
-
-                </>
-              )
-            }
+            {(userData.is_superuser ||
+              userData.pk === ba_leader ||
+              checkInTeam(userData?.pk)) && (
+              // userData.is_superuser || userData.pk === ba_leader ||
+              // userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk)
+              <>
+                <Button
+                  size={"sm"}
+                  onClick={onOpenAddUserModal}
+                  leftIcon={<BsPlus />}
+                  bg={colorMode === "light" ? "green.500" : "green.600"}
+                  _hover={{
+                    bg: colorMode === "light" ? "green.400" : "green.500",
+                  }}
+                  color={"white"}
+                  userSelect={"none"}
+                >
+                  Invite Member
+                </Button>
+                <AddUserToProjectModal
+                  isOpen={isAddUserModalOpen}
+                  onClose={onCloseAddUserModal}
+                  preselectedProject={project_id}
+                  refetchTeamData={refetchTeamData}
+                />
+              </>
+            )}
           </Flex>
           <Box>
             <Text
@@ -203,10 +211,12 @@ export const ManageTeam = ({
               color={colorMode === "light" ? "gray.600" : "gray.400"}
               userSelect={"none"}
             >
-              To reassign the project leader, click a user's name and promote them.
-              This will set other users with leader role to Science Support or External Collaborator, depending on their staff status.
-              Click a member's name to adjust their details and role for this project.
-              Project and Business Area leads can click and drag a user to re-arrange order.
+              To reassign the project leader, click a user's name and promote
+              them. This will set other users with leader role to Science
+              Support or External Collaborator, depending on their staff status.
+              Click a member's name to adjust their details and role for this
+              project. Project and Business Area leads can click and drag a user
+              to re-arrange order.
             </Text>
           </Box>
         </Grid>
@@ -214,7 +224,7 @@ export const ManageTeam = ({
         {teamData.length > 0 ? (
           // Allow project leader or admin to change order
           userData.is_superuser ||
-            userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk ? (
+          userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk ? (
             <DragDropContext
               onDragStart={(start) => {
                 setCurrentlyDraggingIndex(start.source.index);
