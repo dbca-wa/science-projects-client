@@ -67,7 +67,10 @@ export const OptionsBar = ({
   const { userData } = useUser();
   const { maintainerData, maintainerLoading } = useMaintainer();
 
-  const showPopulationButton = (shouldCheckForPrepopulation && editorText.length === 0 && documentTypeCount > 1)
+  const showPopulationButton =
+    shouldCheckForPrepopulation &&
+    editorText.length === 0 &&
+    documentTypeCount > 1;
 
   return (
     editorIsOpen && (
@@ -85,9 +88,19 @@ export const OptionsBar = ({
           <Grid
             px={10}
             py={4}
-            gridTemplateColumns={`repeat(${showPopulationButton ?
-              userData?.pk === maintainerData?.pk ? editorText.length !== 0 ? 6 : 7 : editorText.length !== 0 ? 2 : 3
-              : userData?.pk === maintainerData?.pk ? 6 : 2}, 1fr)`}
+            gridTemplateColumns={`repeat(${
+              showPopulationButton
+                ? userData?.pk === maintainerData?.pk
+                  ? editorText.length !== 0
+                    ? 6
+                    : 7
+                  : editorText.length !== 0
+                    ? 2
+                    : 3
+                : userData?.pk === maintainerData?.pk
+                  ? 6
+                  : 2
+            }, 1fr)`}
             // width={"100%"}
             gridColumnGap={2}
           >
@@ -111,10 +124,8 @@ export const OptionsBar = ({
                 <PasteHTMLDataButton kind="unordered" />
                 <PasteHTMLDataButton kind="ordered" />
                 <PasteHTMLDataButton kind="both" />
-
               </>
             ) : null}
-
 
             <ClearButton canClear={true} />
             <SaveButton
