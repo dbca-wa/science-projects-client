@@ -117,12 +117,12 @@ export const TraditionalTasksAndProjects = () => {
 
   const boxShadow = useBoxShadow();
 
-  useEffect(() => {
-    if (!pendingEndorsementsDataLoading) {
-      console.log(pendingProjectDocumentData);
-      console.log(pendingProjectDocumentData?.team);
-    }
-  }, [pendingProjectDocumentData, pendingEndorsementsDataLoading]);
+  // useEffect(() => {
+  //   if (!pendingEndorsementsDataLoading) {
+  //     console.log(pendingProjectDocumentData);
+  //     console.log(pendingProjectDocumentData?.team);
+  //   }
+  // }, [pendingProjectDocumentData, pendingEndorsementsDataLoading]);
 
   return (
     <>
