@@ -275,7 +275,7 @@ export interface PRPopulationVar {
     project_pk: number;
 }
 
-export const getPreviousDataForProgressReportPopulation = async ({writeable_document_kind, section, project_pk}:PRPopulationVar) => {
+export const getPreviousDataForProgressReportPopulation = async ({ writeable_document_kind, section, project_pk }: PRPopulationVar) => {
     const res = instance.post(`documents/get_previous_reports_data`, {
         writeable_document_kind,
         section,
@@ -1167,14 +1167,14 @@ export const updateProjectDetails = async ({
 
     const newFormData = new FormData();
 
-    if (projectPk !== undefined) {
+    if (projectPk !== undefined && projectPk !== null) {
         newFormData.append('pk', projectPk.toString());
     }
-    if (title !== undefined) {
+    if (title !== undefined && title !== null) {
         newFormData.append('title', title);
     }
 
-    if (description !== undefined) {
+    if (description !== undefined && description !== null) {
         newFormData.append('description', description);
     }
     if (image !== null && image !== undefined) {
@@ -1184,29 +1184,32 @@ export const updateProjectDetails = async ({
             newFormData.append('image', image);
         }
     }
-    if (selectedImageUrl == null) {
+    if (selectedImageUrl === null) {
         newFormData.append('selectedImageUrl', 'delete')
     }
 
-    if (status !== undefined) {
+    if (status !== undefined && status !== null) {
         newFormData.append('status', status);
     }
-    if (dataCustodian !== undefined) {
+    if (dataCustodian !== undefined && dataCustodian !== null) {
         newFormData.append('data_custodian', dataCustodian.toString());
     }
-    if (keywords !== undefined) {
+    if (keywords !== undefined && keywords !== null) {
         // const keywordString = JSON.stringify(keywords)
         newFormData.append('keywords', keywords.join(', '));
 
     }
 
-    if (locations !== undefined && locations.length > 0) {
-        const locationsString = JSON.stringify(locations);
-        newFormData.append('locations', locationsString);
-    } else if (locations.length <= 0) {
+    if (locations !== undefined && locations !== null) {
+        if (locations.length > 0) {
+            const locationsString = JSON.stringify(locations);
+            newFormData.append('locations', locationsString);
+        } else if (locations.length <= 0) {
+            newFormData.append('locations', '[]')
+        }
+    } else {
         newFormData.append('locations', '[]')
     }
-
 
     if (startDate) {
         // console.log('startDate is', startDate)
@@ -1223,41 +1226,41 @@ export const updateProjectDetails = async ({
     }
 
 
-    if (departmentalService !== undefined) {
+    if (departmentalService !== undefined && departmentalService !== null) {
         newFormData.append('service', departmentalService.toString());
     }
 
-    if (businessArea !== undefined) {
+    if (businessArea !== undefined && businessArea !== null) {
         // console.log(businessArea)
         newFormData.append('businessArea', businessArea.toString());
     }
 
 
-    if (externalDescription !== undefined && externalDescription.length > 0) {
+    if (externalDescription !== undefined && externalDescription !== null && externalDescription.length > 0) {
         newFormData.append('externalDescription', externalDescription.toString());
     }
 
-    if (aims !== undefined && aims.length > 0) {
+    if (aims !== undefined && aims !== null && aims.length > 0) {
         newFormData.append('aims', aims.toString());
     }
 
 
-    if (budget !== undefined && budget.length > 0) {
+    if (budget !== undefined && budget !== null && budget.length > 0) {
         newFormData.append('budget', budget.toString());
 
     }
 
 
-    if (collaborationWith !== undefined && collaborationWith.length > 0) {
+    if (collaborationWith !== undefined && collaborationWith !== null && collaborationWith.length > 0) {
         newFormData.append('collaborationWith', collaborationWith.toString());
 
     }
 
-    if (level !== undefined && level.length > 0) {
+    if (level !== undefined && level !== null && level.length > 0) {
         newFormData.append('level', level.toString());
     }
 
-    if (organisation !== undefined && organisation.length > 0) {
+    if (organisation !== undefined && organisation !== null && organisation.length > 0) {
         newFormData.append('organisation', organisation.toString());
     }
 
@@ -1272,7 +1275,7 @@ export const updateProjectDetails = async ({
                 'Content-Type': 'multipart/form-data',
             },
         }
-    ).then(res => res.data);
+    ).then((d) => d.data);
     // return {
     //     'data': data,
     //     'status': 200,
