@@ -41,7 +41,7 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
   const [tags, setTags] = useState<string[]>([]);
   useEffect(() => {
     // console.log(preExistingTags)
-    if (preExistingTags?.length >= 1) {
+    if (preExistingTags?.length >= 1 && preExistingTags[0] !== null) {
       // console.log(preExistingTags.length, preExistingTags);
       if (preExistingTags[0] === "") {
         setTags([]);

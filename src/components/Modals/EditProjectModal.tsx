@@ -54,6 +54,7 @@ import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
 import TagInput from "../Pages/CreateProject/TagInput";
 import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
+import { FaAnglesDown } from "react-icons/fa6";
 
 interface Props {
   // thisUser: IUserMe;
@@ -309,6 +310,7 @@ export const EditProjectModal = ({
       startDate === undefined ||
       endDate === undefined ||
       startDate > endDate ||
+      !businessArea ||
       businessArea === null ||
       businessArea === undefined ||
       dataCustodian === null ||
@@ -452,69 +454,77 @@ export const EditProjectModal = ({
 
   // }
 
+
+  // const modalContentRef = useRef<HTMLDivElement>(null);
+  // const updateButtonRef = useRef<HTMLButtonElement>(null);
+  // const [isButtonInView, setIsButtonInView] = useState(false);
+  // const [scrollPosition, setScrollPosition] = useState(0); // State for scroll position
+
+
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
+      <Modal isOpen={isOpen} onClose={onClose} size={"full"} >
         <ModalOverlay />
-        <Flex>
-          <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-            <ModalHeader>
-              <Flex
-                alignItems={"center"}
-                w={"100%"}
-                justifyContent={"flex-start"}
-              >
-                <Center cursor={"pointer"} pr={4} onClick={onClose}>
-                  <Box mr={3}>
-                    <FaArrowLeft />
-                  </Box>
-                  <Text>Go Back</Text>
-                </Center>
-              </Flex>
-            </ModalHeader>
-            <ModalCloseButton />
+        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}
+        // ref={modalContentRef}
+        >
+          <ModalHeader>
+            <Flex
+              alignItems={"center"}
+              w={"100%"}
+              justifyContent={"flex-start"}
+            >
+              <Center cursor={"pointer"} pr={4} onClick={onClose}>
+                <Box mr={3}>
+                  <FaArrowLeft />
+                </Box>
+                <Text>Go Back</Text>
+              </Center>
+            </Flex>
+          </ModalHeader>
+          <ModalCloseButton />
 
-            <ModalBody>
-              <VisuallyHiddenInput
-                type="text"
-                placeholder="pk"
-                value={projectPk}
-                readOnly
-              />
-              <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
-                <Box>
-                  <UnboundStatefulEditor
-                    title="Project Title"
-                    placeholder="Enter the project't title..."
-                    // helperText={"The academic organisation of the student"}
-                    showToolbar={true}
-                    showTitle={true}
-                    isRequired={true}
-                    value={projectTitle}
-                    setValueFunction={setProjectTitle}
-                    setValueAsPlainText={false}
-                  />
-                  {(details?.external as IExternalProjectDetails)?.project ? (
-                    <Grid
-                      gridTemplateColumns={"repeat(1, 1fr)"}
-                      gridGap={2}
-                      mt={2}
-                      pb={2}
-                    >
-                      <UnboundStatefulEditor
-                        title="Description"
-                        isRequired={true}
-                        helperText={
-                          "Description specific to this external project."
-                        }
-                        showToolbar={true}
-                        showTitle={true}
-                        value={externalDescription}
-                        setValueFunction={setExternalDescription}
-                        setValueAsPlainText={false}
-                      />
+          <ModalBody >
+            <VisuallyHiddenInput
+              type="text"
+              placeholder="pk"
+              value={projectPk}
+              readOnly
+            />
+            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
+              <Box>
+                <UnboundStatefulEditor
+                  title="Project Title"
+                  placeholder="Enter the project't title..."
+                  // helperText={"The academic organisation of the student"}
+                  showToolbar={true}
+                  showTitle={true}
+                  isRequired={true}
+                  value={projectTitle}
+                  setValueFunction={setProjectTitle}
+                  setValueAsPlainText={false}
+                />
+                {(details?.external as IExternalProjectDetails)?.project ? (
+                  <Grid
+                    gridTemplateColumns={"repeat(1, 1fr)"}
+                    gridGap={2}
+                    mt={2}
+                    pb={2}
+                  >
+                    <UnboundStatefulEditor
+                      title="Description"
+                      isRequired={true}
+                      helperText={
+                        "Description specific to this external project."
+                      }
+                      showToolbar={true}
+                      showTitle={true}
+                      value={externalDescription}
+                      setValueFunction={setExternalDescription}
+                      setValueAsPlainText={false}
+                    />
 
-                      {/* <UnboundStatefulEditor
+                    {/* <UnboundStatefulEditor
                         title="Collaboration With"
                         isRequired={true}
                         placeholder="Enter collaborating entities..."
@@ -527,47 +537,133 @@ export const EditProjectModal = ({
                         setValueFunction={setCollaborationWith}
                         setValueAsPlainText={true}
                       /> */}
-                      <AffiliationCreateSearchDropdown
-                        autoFocus
-                        isRequired
-                        isEditable
-                        hideTags
-                        array={collaboratingPartnersArray}
-                        arrayAddFunction={addCollaboratingPartnersPkToArray}
-                        arrayRemoveFunction={
-                          removeCollaboratingPartnersPkFromArray
-                        }
-                        arrayClearFunction={clearCollaboratingPartnersPkArray}
+                    <AffiliationCreateSearchDropdown
+                      autoFocus
+                      isRequired
+                      isEditable
+                      hideTags
+                      array={collaboratingPartnersArray}
+                      arrayAddFunction={addCollaboratingPartnersPkToArray}
+                      arrayRemoveFunction={
+                        removeCollaboratingPartnersPkFromArray
+                      }
+                      arrayClearFunction={clearCollaboratingPartnersPkArray}
 
-                        label="Collaboration With"
-                        placeholder="Search for or add a collaboration partner"
-                        helperText="The entity/s this project is in collaboration with"
-                      />
+                      label="Collaboration With"
+                      placeholder="Search for or add a collaboration partner"
+                      helperText="The entity/s this project is in collaboration with"
+                    />
 
-                      <Flex
-                        flexWrap="wrap"
-                        gap={2}
-                        pt={0
-                          // collaborationWith?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
-                        }
-                        pb={2}
-                      >
-                        {collaborationWith?.length > 0 && collaborationWith.split(', ').map(item => item.trim())?.map((aff, index) => (
-                          <Tag
-                            key={index}
-                            size="md"
-                            borderRadius="full"
-                            variant="solid"
-                            color={"white"}
-                            background={colorMode === "light" ? "blue.500" : "blue.600"}
-                            _hover={{
-                              background: colorMode === "light" ? "blue.400" : "blue.500",
+                    <Flex
+                      flexWrap="wrap"
+                      gap={2}
+                      pt={0
+                        // collaborationWith?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
+                      }
+                      pb={2}
+                    >
+                      {collaborationWith?.length > 0 && collaborationWith.split(', ').map(item => item.trim())?.map((aff, index) => (
+                        <Tag
+                          key={index}
+                          size="md"
+                          borderRadius="full"
+                          variant="solid"
+                          color={"white"}
+                          background={colorMode === "light" ? "blue.500" : "blue.600"}
+                          _hover={{
+                            background: colorMode === "light" ? "blue.400" : "blue.500",
+                          }}
+                        >
+                          <TagLabel pl={1}>{aff}</TagLabel>
+                          <TagCloseButton
+                            onClick={() => {
+                              setCollaboratingPartnersArray([]);
+                              setCollaborationWith(prevString => {
+                                // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
+                                // return prevString.replace(regex, '');
+                                // Remove affiliation name along with optional preceding characters
+                                const regex = new RegExp(`.{0,2}${aff}\\s*`, 'g');
+                                let modifiedString = prevString.replace(regex, '');
+
+                                // Check if the first two characters are a space and comma, remove them
+                                if (modifiedString.startsWith(", ")) {
+                                  modifiedString = modifiedString.substring(2);
+                                }
+                                // console.log("MOD:", modifiedString)
+                                return modifiedString;
+                              });
+
                             }}
-                          >
-                            <TagLabel pl={1}>{aff}</TagLabel>
-                            <TagCloseButton
-                              onClick={() => {
-                                setCollaboratingPartnersArray([]);
+                            userSelect={"none"}
+                            tabIndex={-1}
+                          />
+                        </Tag>
+                      ))}
+                    </Flex>
+
+
+                  </Grid>
+                ) : (details?.student as IStudentProjectDetails)
+                  ?.organisation ? (
+                  <Grid
+                    gridTemplateColumns={"repeat(1, 1fr)"}
+                    gridGap={2}
+                    mt={2}
+                    pb={2}
+                  >
+                    {/* <UnboundStatefulEditor
+                        title="Organisation"
+                        placeholder="Enter the academic organisation..."
+                        helperText={"The academic organisation of the student"}
+                        showToolbar={false}
+                        showTitle={true}
+                        isRequired={true}
+                        value={organisation}
+                        setValueFunction={setOrganisation}
+                        setValueAsPlainText={true}
+                      /> */}
+                    <AffiliationCreateSearchDropdown
+                      autoFocus
+                      isRequired
+                      isEditable
+                      hideTags
+                      array={collaboratingPartnersArray}
+                      arrayAddFunction={addCollaboratingPartnersPkToArray}
+                      arrayRemoveFunction={
+                        removeCollaboratingPartnersPkFromArray
+                      }
+                      arrayClearFunction={clearCollaboratingPartnersPkArray}
+
+                      label="Collaboration With"
+                      placeholder="Search for or add a collaboration partner"
+                      helperText="The entity/s this project is in collaboration with"
+                    />
+
+                    <Flex
+                      flexWrap="wrap"
+                      gap={2}
+                      pt={0
+                        // organisation?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
+                      }
+                      pb={2}
+                    >
+                      {organisation?.length > 0 && organisation.split(', ').map(item => item.trim())?.map((aff, index) => (
+                        <Tag
+                          key={index}
+                          size="md"
+                          borderRadius="full"
+                          variant="solid"
+                          color={"white"}
+                          background={colorMode === "light" ? "blue.500" : "blue.600"}
+                          _hover={{
+                            background: colorMode === "light" ? "blue.400" : "blue.500",
+                          }}
+                        >
+                          <TagLabel pl={1}>{aff}</TagLabel>
+                          <TagCloseButton
+                            onClick={() => {
+                              setCollaboratingPartnersArray([]);
+                              if (collaborationWith !== undefined) {
                                 setCollaborationWith(prevString => {
                                   // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
                                   // return prevString.replace(regex, '');
@@ -582,300 +678,214 @@ export const EditProjectModal = ({
                                   // console.log("MOD:", modifiedString)
                                   return modifiedString;
                                 });
+                              }
 
-                              }}
-                              userSelect={"none"}
-                              tabIndex={-1}
-                            />
-                          </Tag>
-                        ))}
-                      </Flex>
+                              if (organisation !== undefined) {
+                                setOrganisation(prevString => {
+                                  // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
+                                  // return prevString.replace(regex, '');
+                                  // Remove affiliation name along with optional preceding characters
+                                  const regex = new RegExp(`.{0,2}${aff}\\s*`, 'g');
+                                  let modifiedString = prevString.replace(regex, '');
+
+                                  // Check if the first two characters are a space and comma, remove them
+                                  if (modifiedString.startsWith(", ")) {
+                                    modifiedString = modifiedString.substring(2);
+                                  }
+                                  // console.log("MOD:", modifiedString)
+                                  return modifiedString;
+                                });
+                              }
 
 
-                    </Grid>
-                  ) : (details?.student as IStudentProjectDetails)
-                    ?.organisation ? (
-                    <Grid
-                      gridTemplateColumns={"repeat(1, 1fr)"}
-                      gridGap={2}
-                      mt={2}
-                      pb={2}
-                    >
-                      {/* <UnboundStatefulEditor
-                        title="Organisation"
-                        placeholder="Enter the academic organisation..."
-                        helperText={"The academic organisation of the student"}
-                        showToolbar={false}
-                        showTitle={true}
-                        isRequired={true}
-                        value={organisation}
-                        setValueFunction={setOrganisation}
-                        setValueAsPlainText={true}
-                      /> */}
-                      <AffiliationCreateSearchDropdown
-                        autoFocus
-                        isRequired
-                        isEditable
-                        hideTags
-                        array={collaboratingPartnersArray}
-                        arrayAddFunction={addCollaboratingPartnersPkToArray}
-                        arrayRemoveFunction={
-                          removeCollaboratingPartnersPkFromArray
-                        }
-                        arrayClearFunction={clearCollaboratingPartnersPkArray}
-
-                        label="Collaboration With"
-                        placeholder="Search for or add a collaboration partner"
-                        helperText="The entity/s this project is in collaboration with"
-                      />
-
-                      <Flex
-                        flexWrap="wrap"
-                        gap={2}
-                        pt={0
-                          // organisation?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
-                        }
-                        pb={2}
-                      >
-                        {organisation?.length > 0 && organisation.split(', ').map(item => item.trim())?.map((aff, index) => (
-                          <Tag
-                            key={index}
-                            size="md"
-                            borderRadius="full"
-                            variant="solid"
-                            color={"white"}
-                            background={colorMode === "light" ? "blue.500" : "blue.600"}
-                            _hover={{
-                              background: colorMode === "light" ? "blue.400" : "blue.500",
                             }}
-                          >
-                            <TagLabel pl={1}>{aff}</TagLabel>
-                            <TagCloseButton
-                              onClick={() => {
-                                setCollaboratingPartnersArray([]);
-                                if (collaborationWith !== undefined) {
-                                  setCollaborationWith(prevString => {
-                                    // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-                                    // return prevString.replace(regex, '');
-                                    // Remove affiliation name along with optional preceding characters
-                                    const regex = new RegExp(`.{0,2}${aff}\\s*`, 'g');
-                                    let modifiedString = prevString.replace(regex, '');
-
-                                    // Check if the first two characters are a space and comma, remove them
-                                    if (modifiedString.startsWith(", ")) {
-                                      modifiedString = modifiedString.substring(2);
-                                    }
-                                    // console.log("MOD:", modifiedString)
-                                    return modifiedString;
-                                  });
-                                }
-
-                                if (organisation !== undefined) {
-                                  setOrganisation(prevString => {
-                                    // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-                                    // return prevString.replace(regex, '');
-                                    // Remove affiliation name along with optional preceding characters
-                                    const regex = new RegExp(`.{0,2}${aff}\\s*`, 'g');
-                                    let modifiedString = prevString.replace(regex, '');
-
-                                    // Check if the first two characters are a space and comma, remove them
-                                    if (modifiedString.startsWith(", ")) {
-                                      modifiedString = modifiedString.substring(2);
-                                    }
-                                    // console.log("MOD:", modifiedString)
-                                    return modifiedString;
-                                  });
-                                }
+                            userSelect={"none"}
+                            tabIndex={-1}
+                          />
+                        </Tag>
+                      ))}
+                    </Flex>
 
 
-                              }}
-                              userSelect={"none"}
-                              tabIndex={-1}
-                            />
-                          </Tag>
-                        ))}
-                      </Flex>
+                  </Grid>
+                ) : null}
 
-
-                    </Grid>
-                  ) : null}
-
-                  <Box w={"100%"} h={"100%"} mt={2} mx={2}>
-                    <StartAndEndDateSelector
-                      startDate={startDate}
-                      endDate={endDate}
-                      setStartDate={setStartDate}
-                      setEndDate={setEndDate}
-                      helperText={"These can be changed at any time"}
-                    />
-
-                    <StatefulMediaChanger
-                      helperText={
-                        "Upload an image that represents the project."
-                      }
-                      selectedImageUrl={selectedImageUrl}
-                      setSelectedImageUrl={setSelectedImageUrl}
-                      selectedFile={selectedFile}
-                      setSelectedFile={setSelectedFile}
-                    />
-                  </Box>
-                </Box>
-
-                <Flex flexDir={"column"}>
-                  <TagInput
-                    setTagFunction={setKeywords}
-                    preExistingTags={keywords}
+                <Box w={"100%"} h={"100%"} mt={2} mx={2}>
+                  <StartAndEndDateSelector
+                    startDate={startDate}
+                    endDate={endDate}
+                    setStartDate={setStartDate}
+                    setEndDate={setEndDate}
+                    helperText={"These can be changed at any time"}
                   />
 
-                  {(details?.external as IExternalProjectDetails).project ? (
-                    <Grid
-                      gridTemplateColumns={"repeat(1, 1fr)"}
-                      gridGap={2}
-                      mt={2}
-                      pb={2}
-                    >
-                      <UnboundStatefulEditor
-                        title="Aims"
-                        value={aims}
-                        allowInsertButton
-                        helperText={"List out the aims of your project."}
-                        showToolbar={true}
-                        showTitle={true}
-                        isRequired={true}
-                        setValueFunction={setAims}
-                        setValueAsPlainText={false}
-                      />
-                      <UnboundStatefulEditor
-                        title="Budget"
-                        isRequired={true}
-                        placeholder="The estimated operating budget in dollars..."
-                        helperText={
-                          "The estimated budget for the project in dollars"
-                        }
-                        showToolbar={false}
-                        showTitle={true}
-                        value={budget}
-                        setValueFunction={setBudget}
-                        setValueAsPlainText={true}
-                      />
-                    </Grid>
-                  ) : (details?.student as IStudentProjectDetails)?.level ? (
-                    <Grid
-                      gridTemplateColumns={"repeat(1, 1fr)"}
-                      gridGap={2}
-                      mt={6}
-                      pb={6}
-                    >
-                      <FormControl isRequired userSelect={"none"}>
-                        <FormLabel
+                  <StatefulMediaChanger
+                    helperText={
+                      "Upload an image that represents the project."
+                    }
+                    selectedImageUrl={selectedImageUrl}
+                    setSelectedImageUrl={setSelectedImageUrl}
+                    selectedFile={selectedFile}
+                    setSelectedFile={setSelectedFile}
+                  />
+                </Box>
+              </Box>
+
+              <Flex flexDir={"column"}>
+                <TagInput
+                  setTagFunction={setKeywords}
+                  preExistingTags={keywords}
+                />
+
+                {(details?.external as IExternalProjectDetails).project ? (
+                  <Grid
+                    gridTemplateColumns={"repeat(1, 1fr)"}
+                    gridGap={2}
+                    mt={2}
+                    pb={2}
+                  >
+                    <UnboundStatefulEditor
+                      title="Aims"
+                      value={aims}
+                      allowInsertButton
+                      helperText={"List out the aims of your project."}
+                      showToolbar={true}
+                      showTitle={true}
+                      isRequired={true}
+                      setValueFunction={setAims}
+                      setValueAsPlainText={false}
+                    />
+                    <UnboundStatefulEditor
+                      title="Budget"
+                      isRequired={true}
+                      placeholder="The estimated operating budget in dollars..."
+                      helperText={
+                        "The estimated budget for the project in dollars"
+                      }
+                      showToolbar={false}
+                      showTitle={true}
+                      value={budget}
+                      setValueFunction={setBudget}
+                      setValueAsPlainText={true}
+                    />
+                  </Grid>
+                ) : (details?.student as IStudentProjectDetails)?.level ? (
+                  <Grid
+                    gridTemplateColumns={"repeat(1, 1fr)"}
+                    gridGap={2}
+                    mt={6}
+                    pb={6}
+                  >
+                    <FormControl isRequired userSelect={"none"}>
+                      <FormLabel
+                        onMouseEnter={() => setHoveredTitle(true)}
+                        onMouseLeave={() => setHoveredTitle(false)}
+                      >
+                        Level
+                      </FormLabel>
+                      <InputGroup>
+                        <InputLeftAddon
+                          left={0}
+                          bg={
+                            colorMode === "light"
+                              ? "gray.100"
+                              : "whiteAlpha.300"
+                          }
+                          px={4}
+                          zIndex={1}
+                          borderColor={titleBorderColor}
+                          borderTopRightRadius={"none"}
+                          borderBottomRightRadius={"none"}
+                          borderRight={"none"}
+                        // boxSize={10}
+                        >
+                          <Icon as={HiAcademicCap} boxSize={5} />
+                        </InputLeftAddon>
+
+                        <Select
+                          placeholder={"Select a level"}
+                          borderLeft={"none"}
+                          borderTopLeftRadius={"none"}
+                          borderBottomLeftRadius={"none"}
+                          pl={"2px"}
+                          borderLeftColor={"transparent"}
                           onMouseEnter={() => setHoveredTitle(true)}
                           onMouseLeave={() => setHoveredTitle(false)}
+                          // {...register("title", {
+                          //     value: data?.title,
+                          // })}
+                          onChange={(e) => {
+                            setLevel(e.target.value);
+                          }}
+                          value={level}
                         >
-                          Level
-                        </FormLabel>
-                        <InputGroup>
-                          <InputLeftAddon
-                            left={0}
-                            bg={
-                              colorMode === "light"
-                                ? "gray.100"
-                                : "whiteAlpha.300"
+                          <option value="phd">PhD</option>
+                          <option value="msc">MSc</option>
+                          <option value="honours">BSc Honours</option>
+                          <option value="fourth_year">Fourth Year</option>
+                          <option value="third_year">Third Year</option>
+                          <option value="undergrad">Undergradate</option>
+                        </Select>
+                      </InputGroup>
+
+                      <FormHelperText>
+                        The level of the student and the project
+                      </FormHelperText>
+                    </FormControl>
+                  </Grid>
+                ) : null}
+
+                <Box py={2}>
+                  <UserSearchDropdown
+                    {...register("dataCustodian", { required: true })}
+                    onlyInternal={false}
+                    isRequired={true}
+                    setUserFunction={setDataCustodian}
+                    isEditable
+                    preselectedUserPk={currentDataCustodian}
+                    label="Data Custodian"
+                    placeholder="Search for a user"
+                    helperText={"The user you would like to handle data."}
+                  />
+                </Box>
+
+                {!baLoading && baSet && (
+                  <>
+                    <FormControl isRequired>
+                      <FormLabel>Business Area</FormLabel>
+
+                      <InputGroup>
+                        <Select
+                          variant="filled"
+                          placeholder="Select a Business Area"
+                          onChange={(event) => {
+                            const pkVal = event.target.value;
+                            const relatedBa = businessAreaList.find(
+                              (ba) => Number(ba.pk) === Number(pkVal)
+                            );
+                            if (relatedBa !== undefined) {
+                              setBusinessArea(relatedBa);
                             }
-                            px={4}
-                            zIndex={1}
-                            borderColor={titleBorderColor}
-                            borderTopRightRadius={"none"}
-                            borderBottomRightRadius={"none"}
-                            borderRight={"none"}
-                          // boxSize={10}
-                          >
-                            <Icon as={HiAcademicCap} boxSize={5} />
-                          </InputLeftAddon>
+                          }}
+                          value={businessArea?.pk}
+                        >
+                          {orderedDivisionSlugs.flatMap((divSlug) => {
+                            // Filter business areas for the current division
+                            const divisionBusinessAreas = businessAreaList
+                              .filter((ba) => ba.division.slug === divSlug && ba.is_active)
+                              .sort((a, b) => a.name.localeCompare(b.name));
 
-                          <Select
-                            placeholder={"Select a level"}
-                            borderLeft={"none"}
-                            borderTopLeftRadius={"none"}
-                            borderBottomLeftRadius={"none"}
-                            pl={"2px"}
-                            borderLeftColor={"transparent"}
-                            onMouseEnter={() => setHoveredTitle(true)}
-                            onMouseLeave={() => setHoveredTitle(false)}
-                            // {...register("title", {
-                            //     value: data?.title,
-                            // })}
-                            onChange={(e) => {
-                              setLevel(e.target.value);
-                            }}
-                            value={level}
-                          >
-                            <option value="phd">PhD</option>
-                            <option value="msc">MSc</option>
-                            <option value="honours">BSc Honours</option>
-                            <option value="fourth_year">Fourth Year</option>
-                            <option value="third_year">Third Year</option>
-                            <option value="undergrad">Undergradate</option>
-                          </Select>
-                        </InputGroup>
+                            return divisionBusinessAreas.map((ba, index) => (
+                              <option key={`${ba.name}${index}`} value={ba.pk}>
+                                {ba?.division ? `[${ba?.division?.slug}] ` : ""}
+                                {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
+                                {ba.is_active ? "" : "(INACTIVE)"}
+                              </option>
+                            ));
+                          })}
+                        </Select>
 
-                        <FormHelperText>
-                          The level of the student and the project
-                        </FormHelperText>
-                      </FormControl>
-                    </Grid>
-                  ) : null}
-
-                  <Box py={2}>
-                    <UserSearchDropdown
-                      {...register("dataCustodian", { required: true })}
-                      onlyInternal={false}
-                      isRequired={true}
-                      setUserFunction={setDataCustodian}
-                      isEditable
-                      preselectedUserPk={currentDataCustodian}
-                      label="Data Custodian"
-                      placeholder="Search for a user"
-                      helperText={"The user you would like to handle data."}
-                    />
-                  </Box>
-
-                  {!baLoading && baSet && (
-                    <>
-                      <FormControl isRequired>
-                        <FormLabel>Business Area</FormLabel>
-
-                        <InputGroup>
-                          <Select
-                            variant="filled"
-                            placeholder="Select a Business Area"
-                            onChange={(event) => {
-                              const pkVal = event.target.value;
-                              const relatedBa = businessAreaList.find(
-                                (ba) => Number(ba.pk) === Number(pkVal)
-                              );
-                              if (relatedBa !== undefined) {
-                                setBusinessArea(relatedBa);
-                              }
-                            }}
-                            value={businessArea?.pk}
-                          >
-                            {orderedDivisionSlugs.flatMap((divSlug) => {
-                              // Filter business areas for the current division
-                              const divisionBusinessAreas = businessAreaList
-                                .filter((ba) => ba.division.slug === divSlug && ba.is_active)
-                                .sort((a, b) => a.name.localeCompare(b.name));
-
-                              return divisionBusinessAreas.map((ba, index) => (
-                                <option key={`${ba.name}${index}`} value={ba.pk}>
-                                  {ba?.division ? `[${ba?.division?.slug}] ` : ""}
-                                  {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
-                                  {ba.is_active ? "" : "(INACTIVE)"}
-                                </option>
-                              ));
-                            })}
-                          </Select>
-
-                          {/* <Select
+                        {/* <Select
                             variant="filled"
                             placeholder="Select a Business Area"
                             onChange={(event) => {
@@ -917,173 +927,208 @@ export const EditProjectModal = ({
                             })}
                           </Select> */}
 
-                        </InputGroup>
-                        <FormHelperText>
-                          The Business Area / Program that this project belongs to. Only active Business Areas are selectable.
-
-                        </FormHelperText>
-                      </FormControl>
-
-                      <FormControl mb={4}>
-                        <FormLabel>Departmental Service</FormLabel>
-                        <InputGroup>
-                          <Select
-                            variant="filled"
-                            placeholder="Select a Departmental Service"
-                            onChange={(event) => {
-                              const pkVal = event.target.value;
-                              const depService = servicesList.find(
-                                (serv) => Number(serv.pk) === Number(pkVal)
-                              );
-                              if (depService !== undefined) {
-                                setService(depService);
-                              }
-                            }}
-                            value={service?.pk}
+                      </InputGroup>
+                      <FormHelperText>
+                        The Business Area / Program that this project belongs to. Only active Business Areas are selectable.
+                      </FormHelperText>
+                      {
+                        !businessArea && (
+                          <Text
+                            color={"red.500"}
+                            fontWeight={"semibold"}
+                            mb={4}
                           >
-                            {servicesList.map((service, index) => {
-                              const checkIsHtml = (data: string) => {
-                                // Regular expression to check for HTML tags
-                                const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+                            No Business Area has been selected!
+                          </Text>
+                        )
+                      }
 
-                                // Check if the string contains any HTML tags
-                                return htmlRegex.test(data);
-                              };
+                    </FormControl>
 
-                              const isHtml = checkIsHtml(service.name);
-                              let serviceName = service?.name;
-                              if (isHtml === true) {
-                                const parser = new DOMParser();
-                                const dom = parser.parseFromString(
-                                  service.name,
-                                  "text/html"
-                                );
-                                const content = dom.body.textContent;
-                                serviceName = content;
-                              }
+                    <FormControl mb={4}>
+                      <FormLabel>Departmental Service</FormLabel>
+                      <InputGroup>
+                        <Select
+                          variant="filled"
+                          placeholder="Select a Departmental Service"
+                          onChange={(event) => {
+                            const pkVal = event.target.value;
+                            const depService = servicesList.find(
+                              (serv) => Number(serv.pk) === Number(pkVal)
+                            );
+                            if (depService !== undefined) {
+                              setService(depService);
+                            }
+                          }}
+                          value={service?.pk}
+                        >
+                          {servicesList.map((service, index) => {
+                            const checkIsHtml = (data: string) => {
+                              // Regular expression to check for HTML tags
+                              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
 
-                              return (
-                                <option key={index} value={service.pk}>
-                                  {serviceName}
-                                </option>
+                              // Check if the string contains any HTML tags
+                              return htmlRegex.test(data);
+                            };
+
+                            const isHtml = checkIsHtml(service.name);
+                            let serviceName = service?.name;
+                            if (isHtml === true) {
+                              const parser = new DOMParser();
+                              const dom = parser.parseFromString(
+                                service.name,
+                                "text/html"
                               );
-                            })}
-                          </Select>
-                        </InputGroup>
-                        <FormHelperText>
-                          The DBCA service that this project delivers outputs
-                          to.
-                        </FormHelperText>
-                      </FormControl>
-                    </>
-                  )}
-                </Flex>
-              </Grid>
+                              const content = dom.body.textContent;
+                              serviceName = content;
+                            }
 
-              <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4} mt={4}>
-                {!locationsLoading && (
-                  <>
-                    <Grid
-                      gridTemplateColumns={"repeat(2, 1fr)"}
-                      gridColumnGap={4}
-                      px={4}
-                      w={"100%"}
-                    >
-                      {dbcaDistricts && dbcaDistricts.length > 0 && (
-                        <AreaCheckAndMaps
-                          title="DBCA Districts"
-                          areas={dbcaDistricts}
-                          // required={false}
-                          selectedAreas={locationData}
-                          setSelectedAreas={setLocationData}
-                        />
-                      )}
-
-                      {imcra && imcra.length > 0 && (
-                        <AreaCheckAndMaps
-                          title="IMCRAs"
-                          areas={imcra}
-                          // required={false}
-                          selectedAreas={locationData}
-                          setSelectedAreas={setLocationData}
-                        />
-                      )}
-                      {dbcaRegions && dbcaRegions.length > 0 && (
-                        <AreaCheckAndMaps
-                          title="DBCA Regions"
-                          areas={dbcaRegions}
-                          // required={false}
-                          selectedAreas={locationData}
-                          setSelectedAreas={setLocationData}
-                        />
-                      )}
-                      {nrm && nrm.length > 0 && (
-                        <AreaCheckAndMaps
-                          title="Natural Resource Management Regions"
-                          areas={nrm}
-                          // required={false}
-                          selectedAreas={locationData}
-                          setSelectedAreas={setLocationData}
-                        />
-                      )}
-                      {ibra && ibra.length > 0 && (
-                        <AreaCheckAndMaps
-                          title="IBRAs"
-                          areas={ibra}
-                          // required={false}
-                          selectedAreas={locationData}
-                          setSelectedAreas={setLocationData}
-                        />
-                      )}
-                    </Grid>
+                            return (
+                              <option key={index} value={service.pk}>
+                                {serviceName}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                      </InputGroup>
+                      <FormHelperText>
+                        The DBCA service that this project delivers outputs
+                        to.
+                      </FormHelperText>
+                    </FormControl>
                   </>
                 )}
-              </Grid>
-            </ModalBody>
-            <ModalFooter>
-              <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-                <Button colorScheme="gray" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
-                  isLoading={updateProjectMutation.isPending}
-                  type="submit"
-                  ml={3}
-                  isDisabled={!canUpdate}
-                  onClick={async () => {
-                    updateProject({
-                      projectPk: projectPk,
-                      title: projectTitle,
-                      image: selectedFile,
-                      dataCustodian: dataCustodian,
-                      keywords: keywords,
-                      startDate: startDate,
-                      endDate: endDate,
-                      departmentalService: service?.pk,
-                      businessArea: businessArea?.pk,
-                      locations: locationData,
-                      selectedImageUrl: selectedImageUrl,
-                      externalDescription: externalDescription,
-                      aims: aims,
-                      budget: budget,
-                      collaborationWith: collaborationWith,
-                      level: level,
-                      organisation: organisation,
-                    });
-                  }}
+              </Flex>
+            </Grid>
+
+            <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4} mt={4}>
+              {!locationsLoading && (
+                <>
+                  <Grid
+                    gridTemplateColumns={"repeat(2, 1fr)"}
+                    gridColumnGap={4}
+                    px={4}
+                    w={"100%"}
+                  >
+                    {dbcaDistricts && dbcaDistricts.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="DBCA Districts"
+                        areas={dbcaDistricts}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
+
+                    {imcra && imcra.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="IMCRAs"
+                        areas={imcra}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
+                    {dbcaRegions && dbcaRegions.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="DBCA Regions"
+                        areas={dbcaRegions}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
+                    {nrm && nrm.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="Natural Resource Management Regions"
+                        areas={nrm}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
+                    {ibra && ibra.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="IBRAs"
+                        areas={ibra}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
+                  </Grid>
+                </>
+              )}
+            </Grid>
+          </ModalBody>
+          <ModalFooter>
+            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
+              <Button colorScheme="gray" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                // ref={updateButtonRef}
+                color={"white"}
+                background={colorMode === "light" ? "green.500" : "green.600"}
+                _hover={{
+                  background:
+                    colorMode === "light" ? "green.400" : "green.500",
+                }}
+                isLoading={updateProjectMutation.isPending}
+                type="submit"
+                ml={3}
+                isDisabled={!canUpdate}
+                onClick={async () => {
+                  updateProject({
+                    projectPk: projectPk,
+                    title: projectTitle,
+                    image: selectedFile,
+                    dataCustodian: dataCustodian,
+                    keywords: keywords,
+                    startDate: startDate,
+                    endDate: endDate,
+                    departmentalService: service?.pk,
+                    businessArea: businessArea?.pk,
+                    locations: locationData,
+                    selectedImageUrl: selectedImageUrl,
+                    externalDescription: externalDescription,
+                    aims: aims,
+                    budget: budget,
+                    collaborationWith: collaborationWith,
+                    level: level,
+                    organisation: organisation,
+                  });
+                }}
+              >
+                Update
+              </Button>
+            </Grid>
+          </ModalFooter>
+          {/* {
+            isButtonInView ? (
+              <Flex
+                pos={"sticky"}
+                bottom={"90px"}
+                justifyContent={"flex-end"}
+              >
+                <Box
+                  mr={4}
                 >
-                  Update
-                </Button>
-              </Grid>
-            </ModalFooter>
-          </ModalContent>
-        </Flex>
+                  <Center
+                    bg={"blue.500"}
+                    rounded={"full"}
+                    animation={"pulse 1.5s infinite"}
+                    pointerEvents={"none"}
+                    color={"white"}
+                    boxSize={"100px"}
+                  >
+                    <Icon as={FaAnglesDown} boxSize={"30px"} />
+                  </Center>
+                </Box>
+              </Flex>
+            ) : null
+          } */}
+        </ModalContent>
       </Modal>
     </>
   );
