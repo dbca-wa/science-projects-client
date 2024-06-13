@@ -52,7 +52,10 @@ import {
   MdOutlineSettingsSuggest,
   MdVerifiedUser,
 } from "react-icons/md";
-import { PiBookOpenTextFill } from "react-icons/pi";
+import {
+  PiBookOpenTextFill,
+  PiListMagnifyingGlassDuotone,
+} from "react-icons/pi";
 import { RiAdminFill, RiOrganizationChart, RiTeamFill } from "react-icons/ri";
 import { VscFeedback } from "react-icons/vsc";
 import { useUser } from "../../lib/hooks/tanstack/useUser";
@@ -244,14 +247,16 @@ interface AdminProps {
   handleNewReportCycle: () => void;
   handleBatchApproveReports: () => void;
   handleBatchApproveOldReports: () => void;
-  handleSendEmailToProjectLeads: () => void;
+  // handleSendEmailToProjectLeads: () => void;
+  handleReviewData: () => void;
 }
 const AdminMenuContents = ({
   // handleDataDump,
   handleNewReportCycle,
   handleBatchApproveReports,
   handleBatchApproveOldReports,
-  handleSendEmailToProjectLeads,
+  // handleSendEmailToProjectLeads,
+  handleReviewData,
 }: AdminProps) => {
   const navigate = useNavigate();
   return (
@@ -431,10 +436,14 @@ const AdminMenuContents = ({
           {<HiDocumentPlus />}
           <Text ml={2}>Open Annual Report Cycle</Text>
         </MenuItem>
-        <MenuItem onClick={handleSendEmailToProjectLeads}>
+        <MenuItem onClick={handleReviewData}>
+          {<PiListMagnifyingGlassDuotone />}
+          <Text ml={2}>Review Data</Text>
+        </MenuItem>
+        {/* <MenuItem onClick={handleSendEmailToProjectLeads}>
           {<MdEmail />}
           <Text ml={2}>Send Project Lead Email</Text>
-        </MenuItem>
+        </MenuItem> */}
       </MenuGroup>
     </>
   );
@@ -474,6 +483,10 @@ const OldHeader = () => {
 
   const handleBatchApproveOldReports = () => {
     onBatchApproveOldOpen();
+  };
+
+  const handleReviewData = () => {
+    navigate("/crud/data");
   };
 
   const [shouldShowHamburger, setShouldShowHamburger] = useState(false);
@@ -536,19 +549,19 @@ const OldHeader = () => {
 
   const { userLoading, userData } = useUser();
   // const { layout } = useLayoutSwitcher();
-  const {
-    isOpen: isProjectLeadEmailModalOpen,
-    onOpen: onProjectLeadEmailModalOpen,
-    onClose: onProjectLeadEmailModalClose,
-  } = useDisclosure();
+  // const {
+  //   isOpen: isProjectLeadEmailModalOpen,
+  //   onOpen: onProjectLeadEmailModalOpen,
+  //   onClose: onProjectLeadEmailModalClose,
+  // } = useDisclosure();
 
   return (
     <Box>
       {/* Nav background */}
-      <ProjectLeadEmailModal
+      {/* <ProjectLeadEmailModal
         isOpen={isProjectLeadEmailModalOpen}
         onClose={onProjectLeadEmailModalClose}
-      />
+      /> */}
       <BatchApproveModal
         isOpen={isBatchApproveOpen}
         onClose={onBatchApproveClose}
@@ -698,9 +711,10 @@ const OldHeader = () => {
                                   handleBatchApproveOldReports={
                                     handleBatchApproveOldReports
                                   }
-                                  handleSendEmailToProjectLeads={
-                                    onProjectLeadEmailModalOpen
-                                  }
+                                  // handleSendEmailToProjectLeads={
+                                  //   onProjectLeadEmailModalOpen
+                                  // }
+                                  handleReviewData={handleReviewData}
                                 />
                               }
                             />
@@ -734,21 +748,21 @@ const OldHeader = () => {
                 <NavMenu
                   menuName="Projects"
                   children={<ProjectMenuContents />}
-                // leftIcon={HiMiniSquares2X2}
+                  // leftIcon={HiMiniSquares2X2}
                 />
 
                 {/* Staff */}
                 <NavMenu
                   menuName="Users"
                   children={<UserMenuContents />}
-                // leftIcon={FaUsers}
+                  // leftIcon={FaUsers}
                 />
 
                 {/* Reports */}
                 <NavMenu
                   menuName="Reports"
                   children={<ReportMenuContents />}
-                // leftIcon={PiBookOpenTextFill}
+                  // leftIcon={PiBookOpenTextFill}
                 />
 
                 {!userLoading && userData.is_superuser && (
@@ -763,9 +777,10 @@ const OldHeader = () => {
                         handleBatchApproveOldReports={
                           handleBatchApproveOldReports
                         }
-                        handleSendEmailToProjectLeads={
-                          onProjectLeadEmailModalOpen
-                        }
+                        handleReviewData={handleReviewData}
+                        // handleSendEmailToProjectLeads={
+                        //   onProjectLeadEmailModalOpen
+                        // }
                       />
                     }
                   />
