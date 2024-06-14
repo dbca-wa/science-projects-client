@@ -29,6 +29,7 @@ import { TestEmailPage } from "./routes/TestEmailPage";
 import { Users } from "./routes/Users";
 import { UserGuide } from "./components/Pages/UserGuide/UserGuide";
 import { AdminDataLists } from "./components/Pages/Admin/AdminDataLists";
+import { MyBusinessArea } from "./components/Pages/MyBusinessArea/MyBusinessArea";
 
 export const router = createBrowserRouter([
   // Login
@@ -80,6 +81,17 @@ export const router = createBrowserRouter([
           </ContentWrapper>
         ),
       },
+
+      {
+        path: "my_business_area",
+        element: (
+          <ContentWrapper>
+            <MyBusinessArea />
+          </ContentWrapper>
+        ),
+      },
+
+
 
       // ADMIN
       {

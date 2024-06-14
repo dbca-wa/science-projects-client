@@ -6,6 +6,7 @@ import { BusinessAreaImage, EditorSections, EditorSubsections, EditorType, IAddL
 import { IConceptPlanGenerationData } from "../types";
 
 
+
 // INSTANCE SETUP ==================================================================
 
 const VITE_PRODUCTION_BACKEND_API_URL = import.meta.env.VITE_PRODUCTION_BACKEND_API_URL
@@ -660,6 +661,39 @@ export const updatePersonalInformation = async ({ userPk, title, phone, fax }: I
 //     const response = await instance.put(`projects/${project_id}/team`, data);
 //     return response.data; // Assuming your backend returns updated data
 // };
+
+
+export interface IMyBAUpdateSubmissionData {
+    pk: number;
+    introduction: string;
+    image: File | null
+}
+
+export const updateMyBa = async ({ pk, introduction, image }: IMyBAUpdateSubmissionData) => {
+
+    const formData = new FormData();
+
+    if (image instanceof File) {
+        formData.append('image', image);
+    } else if (typeof image === 'string') {
+        formData.append('image', image);
+    }
+
+
+    if (introduction !== null) {
+        formData.append('introduction', introduction);
+    }
+
+    const response = await instance.put(`agencies/business_areas/${pk}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    return response.data; // Assuming your response structure is similar to IProfileUpdateSuccess
+}
+
+
 
 export const updateProfile = async ({ userPk, image, about, expertise }: IProfileUpdateVariables) => {
 
@@ -2858,6 +2892,15 @@ export const deleteAffiliation = async (pk: number) => {
 
 export const getAllBusinessAreas = async () => {
     const res = instance.get(`agencies/business_areas`
+    ).then(res => {
+        return res.data
+    })
+    return res;
+}
+
+
+export const getMyBusinessAreas = async () => {
+    const res = instance.get(`agencies/business_areas/mine`
     ).then(res => {
         return res.data
     })

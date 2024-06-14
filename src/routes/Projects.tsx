@@ -25,6 +25,8 @@ import { useNavigate } from "react-router-dom";
 import { Head } from "../components/Base/Head";
 import { PaginatorProject } from "../components/Pages/Projects/PaginatorProject";
 import { useProjectSearchContext } from "../lib/hooks/helper/ProjectSearchContext";
+import { BreadCrumb } from "@/components/Base/BreadCrumb";
+import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
 
 export const Projects = () => {
   const { colorMode } = useColorMode();
@@ -185,12 +187,21 @@ export const Projects = () => {
     // () => downloadProjectsCSV()
     downloadProjectCSVMutation.mutate();
   };
+  const { layout } = useLayoutSwitcher();
 
   return (
     <>
+      {layout === "traditional" && (
+        <BreadCrumb
+          subDirOne={{
+            title: "Projects",
+            link: "/users",
+          }}
+        />
+      )}
       <Head title="Projects" />
 
-      <Flex width={"100%"} mb={6} flexDir={"row"}>
+      <Flex width={"100%"} mt={2} mb={6} flexDir={"row"}>
         <Flex flex={1} width={"100%"} flexDir={"column"}>
           <Text fontSize={"2xl"} fontWeight={"bold"}>
             Projects ({totalResults})
