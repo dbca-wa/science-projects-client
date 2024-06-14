@@ -14,6 +14,14 @@ export const BreadCrumb = ({
 
   const { colorMode } = useColorMode();
 
+  const handleUnderscores = (text: string) => {
+    let updated = text;
+    if (text.includes('_')) {
+      updated = updated.replaceAll('_', ' ');
+    }
+    return updated;
+  }
+
   return (
     <>
       <Flex
@@ -43,7 +51,7 @@ export const BreadCrumb = ({
             variant={"link"}
             colorScheme="blue"
           >
-            {subDirOne.title}
+            {handleUnderscores(subDirOne.title)}
           </Button>
           {subDirTwo ? (
             <>
@@ -55,7 +63,7 @@ export const BreadCrumb = ({
                 variant={"link"}
                 colorScheme="blue"
               >
-                {subDirTwo.title}
+                {handleUnderscores(subDirTwo.title)}
               </Button>
               {subDirThree ? (
                 <>
@@ -67,7 +75,7 @@ export const BreadCrumb = ({
                     variant={"link"}
                     colorScheme="blue"
                   >
-                    {subDirThree.title}
+                    {handleUnderscores(subDirThree.title)}
                   </Button>
                 </>
               ) : null}

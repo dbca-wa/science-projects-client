@@ -63,13 +63,14 @@ import { BatchApproveModal } from "../Modals/BatchApproveModal";
 import { BatchApproveOldModal } from "../Modals/BatchApproveOldModal";
 import { CreateUserModal } from "../Modals/CreateUserModal";
 import { NewCycleModal } from "../Modals/NewCycleModal";
-import { ProjectLeadEmailModal } from "../Modals/ProjectLeadEmailModal";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { NavButton } from "./NavButton";
 import { Navitar } from "./Navitar";
 import { SidebarNavButton } from "./SidebarNavButton";
 import { SidebarNavMenu } from "./SidebarNavMenu";
+
+
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
@@ -159,6 +160,7 @@ const ReportMenuContents = () => {
         color={"gray.500"}
         textAlign={"center"}
       >
+
         {userData?.is_superuser ? (
           <MenuItem
             onClick={(e) => {
@@ -248,7 +250,7 @@ interface AdminProps {
   handleBatchApproveReports: () => void;
   handleBatchApproveOldReports: () => void;
   // handleSendEmailToProjectLeads: () => void;
-  handleReviewData: () => void;
+  handleReviewData: (e) => void;
 }
 const AdminMenuContents = ({
   // handleDataDump,
@@ -411,6 +413,12 @@ const AdminMenuContents = ({
           {<VscFeedback />}
           <Text ml={2}>View Feedback</Text>
         </MenuItem>
+        <MenuItem onClick={handleReviewData}>
+          {<PiListMagnifyingGlassDuotone />}
+          <Text ml={2}>
+            View Data Lists
+          </Text>
+        </MenuItem>
       </MenuGroup>
 
       <MenuGroup
@@ -435,10 +443,6 @@ const AdminMenuContents = ({
         <MenuItem onClick={handleNewReportCycle}>
           {<HiDocumentPlus />}
           <Text ml={2}>Open Annual Report Cycle</Text>
-        </MenuItem>
-        <MenuItem onClick={handleReviewData}>
-          {<PiListMagnifyingGlassDuotone />}
-          <Text ml={2}>Review Data</Text>
         </MenuItem>
         {/* <MenuItem onClick={handleSendEmailToProjectLeads}>
           {<MdEmail />}
@@ -485,8 +489,14 @@ const OldHeader = () => {
     onBatchApproveOldOpen();
   };
 
-  const handleReviewData = () => {
-    navigate("/crud/data");
+  const handleReviewData = (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      // Handle Ctrl + Click (or Command + Click on Mac)
+      window.open(`/crud/data`, "_blank"); // Opens in a new tab
+    } else {
+      // Normal click handling
+      navigate("/crud/data");
+    }
   };
 
   const [shouldShowHamburger, setShouldShowHamburger] = useState(false);
@@ -549,19 +559,11 @@ const OldHeader = () => {
 
   const { userLoading, userData } = useUser();
   // const { layout } = useLayoutSwitcher();
-  // const {
-  //   isOpen: isProjectLeadEmailModalOpen,
-  //   onOpen: onProjectLeadEmailModalOpen,
-  //   onClose: onProjectLeadEmailModalClose,
-  // } = useDisclosure();
 
   return (
     <Box>
       {/* Nav background */}
-      {/* <ProjectLeadEmailModal
-        isOpen={isProjectLeadEmailModalOpen}
-        onClose={onProjectLeadEmailModalClose}
-      /> */}
+
       <BatchApproveModal
         isOpen={isBatchApproveOpen}
         onClose={onBatchApproveClose}
@@ -703,6 +705,7 @@ const OldHeader = () => {
                               leftIcon={<RiAdminFill />}
                               children={
                                 <AdminMenuContents
+                                  handleReviewData={handleReviewData}
                                   handleDataDump={handleDataDump}
                                   handleNewReportCycle={handleNewReportCycle}
                                   handleBatchApproveReports={
@@ -711,10 +714,6 @@ const OldHeader = () => {
                                   handleBatchApproveOldReports={
                                     handleBatchApproveOldReports
                                   }
-                                  // handleSendEmailToProjectLeads={
-                                  //   onProjectLeadEmailModalOpen
-                                  // }
-                                  handleReviewData={handleReviewData}
                                 />
                               }
                             />
@@ -727,6 +726,16 @@ const OldHeader = () => {
                             buttonName="Guide"
                             onClick={() => navigate("/guide")}
                           />
+                          {/* {
+                            userData?.business_areas_led?.length > 0 ? (
+
+                              <SidebarNavButton
+                                leftIcon={FaBookBookmark}
+                                buttonName="My Business Area"
+                                onClick={() => navigate("/my_business_area")}
+                              />
+                            ) : null
+                          } */}
                           {/* )} */}
                         </Grid>
                       </VStack>
@@ -748,21 +757,21 @@ const OldHeader = () => {
                 <NavMenu
                   menuName="Projects"
                   children={<ProjectMenuContents />}
-                  // leftIcon={HiMiniSquares2X2}
+                // leftIcon={HiMiniSquares2X2}
                 />
 
                 {/* Staff */}
                 <NavMenu
                   menuName="Users"
                   children={<UserMenuContents />}
-                  // leftIcon={FaUsers}
+                // leftIcon={FaUsers}
                 />
 
                 {/* Reports */}
                 <NavMenu
                   menuName="Reports"
                   children={<ReportMenuContents />}
-                  // leftIcon={PiBookOpenTextFill}
+                // leftIcon={PiBookOpenTextFill}
                 />
 
                 {!userLoading && userData.is_superuser && (
@@ -771,16 +780,13 @@ const OldHeader = () => {
                     // leftIcon={RiAdminFill}
                     children={
                       <AdminMenuContents
+                        handleReviewData={handleReviewData}
                         handleDataDump={handleDataDump}
                         handleNewReportCycle={handleNewReportCycle}
                         handleBatchApproveReports={handleBatchApproveReports}
                         handleBatchApproveOldReports={
                           handleBatchApproveOldReports
                         }
-                        handleReviewData={handleReviewData}
-                        // handleSendEmailToProjectLeads={
-                        //   onProjectLeadEmailModalOpen
-                        // }
                       />
                     }
                   />
@@ -803,6 +809,22 @@ const OldHeader = () => {
                     }}
                   />
                 ) : null}
+                {
+                  !userLoading && userData?.business_areas_led?.length > 0 ? (
+                    <NavButton
+                      buttonName="My Business Area"
+                      onClick={(e) => {
+                        if (e.ctrlKey || e.metaKey) {
+                          // Handle Ctrl + Click (or Command + Click on Mac)
+                          window.open(`/my_business_area`, "_blank"); // Opens in a new tab
+                        } else {
+                          // Normal click handling
+                          navigate("/my_business_area");
+                        }
+                      }}
+                    />
+                  ) : null
+                }
 
                 {/* )} */}
               </HStack>

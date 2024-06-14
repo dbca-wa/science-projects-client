@@ -54,7 +54,7 @@ import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
 import TagInput from "../Pages/CreateProject/TagInput";
 import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
-import { FaAnglesDown } from "react-icons/fa6";
+// import { FaAnglesDown } from "react-icons/fa6";
 
 interface Props {
   // thisUser: IUserMe;

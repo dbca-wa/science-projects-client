@@ -207,6 +207,7 @@ export interface IUserMe {
     affiliation: IAffiliation;
     branches?: IBranch[];
     businessAreas?: IBusinessArea[];
+    business_areas_led: number[];
 }
 
 export interface IMemberUserDetails {

@@ -13,12 +13,21 @@ export const ModernBreadcrumb = () => {
     updatePageContext("/");
   };
 
+  const handleUnderscores = (text: string) => {
+    let updated = text;
+    if (text.includes('_')) {
+      updated = updated.replaceAll('_', ' ');
+    }
+    return updated;
+  }
+
+
   const pages = currentPage.split("/").filter((page) => page !== "");
   const breadcrumbItems = pages.map((page, index) => {
     const isLast = index === pages.length - 1;
     const path = `/${pages.slice(0, index + 1).join("/")}`;
     const handleClick = () => updatePageContext(path);
-    const capitalizedPage = page.charAt(0).toUpperCase() + page.slice(1);
+    const capitalizedPage = handleUnderscores(page.charAt(0).toUpperCase() + page.slice(1));
 
     return (
       <React.Fragment key={page}>
