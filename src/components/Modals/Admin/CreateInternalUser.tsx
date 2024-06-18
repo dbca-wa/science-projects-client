@@ -1,5 +1,12 @@
 // Component/Route for handling user creation and the accomponying validation
 
+import { Head } from "@/components/Base/Head";
+import {
+	UserData,
+	createUser,
+	getDoesUserWithEmailExist,
+	getDoesUserWithFullNameExist,
+} from "@/lib/api";
 import {
 	Box,
 	Button,
@@ -21,20 +28,6 @@ import { useEffect, useState } from "react";
 import { GrMail } from "react-icons/gr";
 import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom";
-import { TypewriterText } from "../components/Animations/TypewriterText";
-import { Head } from "../components/Base/Head";
-import {
-	createUser,
-	getDoesUserWithEmailExist,
-	getDoesUserWithFullNameExist,
-} from "../lib/api";
-
-interface UserData {
-	username: string;
-	firstName: string;
-	lastName: string;
-	email: string;
-}
 
 const capitalizeAfterSpaceOrHyphen = (name: string) => {
 	return name.replace(/(?:^|\s|-)(\w)/g, function (match) {
@@ -48,7 +41,7 @@ interface IProps {
 	isModal?: boolean;
 }
 
-export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
+export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 	const { colorMode } = useColorMode();
 	const toast = useToast();
 	const navigate = useNavigate();
@@ -184,7 +177,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 		// Simple email validation regex pattern
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		const emailGood = emailRegex.test(email);
-		if (emailGood && email.endsWith("@dbca.wa.gov.au")) {
+		if (emailGood && !email.endsWith("@dbca.wa.gov.au")) {
 			return false;
 		}
 		return emailRegex.test(email);
@@ -221,6 +214,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 						username: generatedUsername,
 						firstName: capitalisedFirstName,
 						lastName: capitalisedLastName,
+						isStaff: true,
 						email,
 					};
 					await createUser(userData);
@@ -258,42 +252,22 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 	return (
 		<>
 			<Head title={"Add User"} />
-			<Box>
-				<Text mb={8} fontWeight={"bold"} fontSize={"2xl"}>
-					Add External User
-				</Text>
-			</Box>
-
-			{!isModal && (
-				<Box
-					bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
-					rounded={6}
-					flexDir={"column"}
-					p={6}
-					pos={"relative"}
-					mt={5}
-					mb={7}
-					color={
-						colorMode === "light"
-							? "blackAlpha.800"
-							: "whiteAlpha.800"
-					}
-					userSelect={"none"}
-				>
-					<TypewriterText
-						text={`This is for adding external users only. \nIf you are trying to add a DBCA staff member, please send them a link to this website and an account will be created when they visit.\nAll existing users can be found on the users page.\n`}
-					/>
-					{location.pathname !== "/users" && (
-						<Button
-							variant={"link"}
-							color={"blue.500"}
-							onClick={() => {
-								navigate(`/users`);
-							}}
-						>{`${VITE_PRODUCTION_BACKEND_BASE_URL}users`}</Button>
-					)}
+			{!isModal ?? (
+				<Box>
+					<Text mb={8} fontWeight={"bold"} fontSize={"2xl"}>
+						Add External User
+					</Text>
 				</Box>
 			)}
+
+			<Box mb={3}>
+				<Text color={colorMode === "light" ? "blue.500" : "blue.400"}>
+					Ideally, users should visit the SPMS with their DBCA account
+					for an account to be automatically created. In situations
+					that this is not possible, please use this form to manually
+					create users.
+				</Text>
+			</Box>
 
 			<form onSubmit={handleSubmit}>
 				<Grid gridColumnGap={8} gridTemplateColumns={"repeat(2, 1fr)"}>
@@ -310,7 +284,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 							</InputLeftElement>
 							<Input
 								type="text"
-								placeholder="First Name"
+								placeholder="John"
 								value={firstName}
 								onChange={handleFirstNameChange}
 								maxLength={30}
@@ -331,7 +305,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 							</InputLeftElement>
 							<Input
 								type="text"
-								placeholder="Last Name"
+								placeholder="Doe"
 								value={lastName}
 								onChange={handleLastNameChange}
 								maxLength={30}
@@ -374,7 +348,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 							</InputLeftElement>
 							<Input
 								type="email"
-								placeholder="Email"
+								placeholder="john.doe@dbca.wa.gov.au"
 								value={email}
 								onChange={handleEmailChange}
 								maxLength={40}
@@ -388,7 +362,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 							<InputLeftElement children={<Icon as={GrMail} />} />
 							<Input
 								type="email"
-								placeholder="Confirm Email"
+								placeholder="john.doe@dbca.wa.gov.au"
 								value={confirmEmail}
 								onChange={handleConfirmEmailChange}
 								maxLength={40}
@@ -401,8 +375,8 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 						)}
 						{email.length >= 5 && !isValidEmail && (
 							<FormHelperText color="red.500">
-								{email.endsWith("@dbca.wa.gov.au")
-									? "'@dbca.wa.gov.au' addresses are not valid for adding external users. Please enter a valid external email address."
+								{!email.endsWith("@dbca.wa.gov.au")
+									? "Needs to be a DBCA address."
 									: "Please enter a valid email address."}
 							</FormHelperText>
 						)}
@@ -435,39 +409,14 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 					</FormControl>
 				</Grid>
 
-				{isModal && (
-					<Box
-						bgColor={
-							colorMode === "light" ? "gray.100" : "gray.700"
-						}
-						rounded={6}
-						flexDir={"column"}
-						p={6}
-						pos={"relative"}
-						mt={5}
-						mb={7}
-						color={
-							colorMode === "light"
-								? "blackAlpha.800"
-								: "whiteAlpha.800"
-						}
-						userSelect={"none"}
-					>
-						<TypewriterText
-							text={`This is for adding external users only. \nIf you are trying to add a DBCA staff member, please send them a link to this website and an account will be created when they visit.\nAll existing users can be found on the users page.\n`}
-						/>
-						{location.pathname !== "/users" && (
-							<Button
-								variant={"link"}
-								color={"blue.500"}
-								onClick={() => {
-									navigate(`/users`);
-									onClose();
-								}}
-							>{`${VITE_PRODUCTION_BACKEND_BASE_URL}users`}</Button>
-						)}
-					</Box>
-				)}
+				<Box mt={4}>
+					<Text color={colorMode === "light" ? "red.500" : "red.400"}>
+						NOTE: If the information provided above is incorrect,
+						the user will be unable to log in with those details.
+						Instead a fresh account will be created if they visit
+						the site, which will NOT be connected to this account.
+					</Text>
+				</Box>
 
 				<Flex mt={5} justifyContent="end">
 					<Button
@@ -498,7 +447,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 							nameExists
 						}
 					>
-						Add User
+						Create
 					</Button>
 				</Flex>
 			</form>
