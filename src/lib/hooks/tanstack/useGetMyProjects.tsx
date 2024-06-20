@@ -9,8 +9,13 @@ export const useGetMyProjects = () => {
     queryFn: getMyProjects,
     retry: false,
   });
+
+  const dataSortedByCreatedAt = data?.sort(
+    (a, b) => b.created_at - a.created_at,
+  );
+
   return {
     projectsLoading: isPending,
-    projectData: data,
+    projectData: dataSortedByCreatedAt,
   };
 };
