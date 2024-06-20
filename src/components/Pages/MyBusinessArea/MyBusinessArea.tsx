@@ -47,7 +47,7 @@ export const MyBusinessArea = () => {
 								>
 									{myBusinessAreas.length < 1
 										? "You are not leading any business areas."
-										: "This section provides an idea of how your business area intro will look on the Annual Report"}
+										: "This section provides an idea of how your business area intro will look on the Annual Report before progress reports are shown"}
 								</Text>
 							</Box>
 
