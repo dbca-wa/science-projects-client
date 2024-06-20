@@ -377,7 +377,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 								placeholder="Email"
 								value={email}
 								onChange={handleEmailChange}
-								maxLength={40}
+								maxLength={50}
 							/>
 						</InputGroup>
 					</FormControl>
@@ -391,7 +391,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 								placeholder="Confirm Email"
 								value={confirmEmail}
 								onChange={handleConfirmEmailChange}
-								maxLength={40}
+								maxLength={50}
 							/>
 						</InputGroup>
 						{email.length > 0 && email.length < 5 && (
