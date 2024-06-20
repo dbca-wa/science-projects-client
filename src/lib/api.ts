@@ -172,6 +172,9 @@ export interface UserData {
 	lastName: string;
 	email: string;
 	isStaff?: boolean;
+	branch?: number;
+	businessArea?: number;
+	affiliation?: number;
 }
 
 export const createUser = async (userData: UserData) => {
