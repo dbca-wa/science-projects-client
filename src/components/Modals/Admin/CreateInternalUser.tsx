@@ -1,12 +1,16 @@
 // Component/Route for handling user creation and the accomponying validation
 
 import { Head } from "@/components/Base/Head";
+import { BranchSearchDropdown } from "@/components/Navigation/BranchSearchDropdown";
 import {
 	UserData,
 	createUser,
+	getAllBranches,
+	getAllBusinessAreas,
 	getDoesUserWithEmailExist,
 	getDoesUserWithFullNameExist,
 } from "@/lib/api";
+import { IBranch, IBusinessArea } from "@/types";
 import {
 	Box,
 	Button,
@@ -19,11 +23,13 @@ import {
 	Input,
 	InputGroup,
 	InputLeftElement,
+	Select,
 	Spinner,
 	Text,
 	useColorMode,
 	useToast,
 } from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { GrMail } from "react-icons/gr";
 import { RiNumber1, RiNumber2 } from "react-icons/ri";
@@ -50,6 +56,8 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 	const [lastName, setLastName] = useState("");
 	const [email, setEmail] = useState("");
 	const [confirmEmail, setConfirmEmail] = useState("");
+	const [selectedBranch, setSelectedBranch] = useState<number>();
+	const [selectedBusinessArea, setSelectedBusinessArea] = useState<number>();
 
 	// Validation states for conditionally rendering messages
 	const [emailsMatch, setEmailsMatch] = useState(false);
@@ -87,7 +95,14 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 			setIsCheckingName(false);
 			setNameExists(false);
 		}
-	}, [firstName, lastName, isFirstNameValid, isLastNameValid]);
+	}, [
+		firstName,
+		lastNameError,
+		firstNameError,
+		lastName,
+		isFirstNameValid,
+		isLastNameValid,
+	]);
 
 	const handleFirstNameChange = (
 		event: React.ChangeEvent<HTMLInputElement>
@@ -215,6 +230,9 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 						firstName: capitalisedFirstName,
 						lastName: capitalisedLastName,
 						isStaff: true,
+						branch: selectedBranch ?? null,
+						businessArea: selectedBusinessArea ?? null,
+						// affiliation: selectedAffiliation ?? null,
 						email,
 					};
 					await createUser(userData);
@@ -249,6 +267,44 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 		}
 	};
 
+	// Function to check if a string contains HTML tags
+	const checkIsHtml = (data) => {
+		const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+		return htmlRegex.test(data);
+	};
+
+	// Function to sanitize HTML content and extract text
+	const sanitizeHtml = (htmlString) => {
+		const doc = new DOMParser().parseFromString(htmlString, "text/html");
+		return doc.body.textContent || "";
+	};
+	const [businessAreas, setBusinessAreas] = useState<IBusinessArea[]>([]);
+	const [branches, setBranches] = useState<IBranch[]>([]);
+
+	const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
+	useEffect(() => {
+		const fetchBusinessAreas = async () => {
+			try {
+				const data = await getAllBusinessAreas();
+				setBusinessAreas(data);
+			} catch (error) {
+				console.error("Error fetching business areas:", error);
+			}
+		};
+
+		const fetchBranches = async () => {
+			try {
+				const data = await getAllBranches();
+				setBranches(data);
+			} catch (error) {
+				console.error("Error fetching branches:", error);
+			}
+		};
+
+		fetchBranches();
+		fetchBusinessAreas();
+	}, []);
+
 	return (
 		<>
 			<Head title={"Add User"} />
@@ -263,9 +319,10 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 			<Box mb={3}>
 				<Text color={colorMode === "light" ? "blue.500" : "blue.400"}>
 					Ideally, users should visit the SPMS with their DBCA account
-					for an account to be automatically created. In situations
-					that this is not possible, please use this form to manually
-					create users.
+					for an account to be automatically created using OIM's data.
+					In situations where this is not possible, please use this
+					form to manually create users. To avoid data inconsistencies
+					with OIM, please use this form sparingly.
 				</Text>
 			</Box>
 
@@ -409,14 +466,116 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 					</FormControl>
 				</Grid>
 
-				<Box mt={4}>
+				<Box my={4}>
 					<Text color={colorMode === "light" ? "red.500" : "red.400"}>
-						NOTE: If the information provided above is incorrect,
-						the user will be unable to log in with those details.
-						Instead a fresh account will be created if they visit
-						the site, which will NOT be connected to this account.
+						NOTE: If the information provided above does not match
+						OIM's data, the user will be unable to log in. Instead,
+						when they visit the site, a fresh account will be
+						created with OIM's data. That account will NOT be
+						connected to the account created here.
 					</Text>
 				</Box>
+
+				{/* ======================================================= */}
+				<FormControl mt={2} isRequired>
+					<FormLabel>Branch</FormLabel>
+					<Select
+						onChange={(e) => {
+							const strVal = e.target.value ?? null;
+							if (strVal) {
+								setSelectedBranch(Number(e.target.value));
+							}
+						}}
+						size={"sm"}
+						// mx={4}
+						rounded={"5px"}
+						style={
+							colorMode === "light"
+								? {
+										color: "black",
+										backgroundColor: "white",
+										borderColor: "gray.200",
+										caretColor: "black !important",
+									}
+								: {
+										color: "white",
+										borderColor: "white",
+										caretColor: "black !important",
+									}
+						}
+					>
+						<option key={"---"} value={null} color={"black"}>
+							---
+						</option>
+						{branches
+							?.sort((a, b) => a.name.localeCompare(b.name))
+							.map((branch, index) => (
+								<option
+									key={`${branch.name}${index}`}
+									value={branch.pk}
+								>
+									{branch.name}
+								</option>
+							))}
+						;
+					</Select>
+				</FormControl>
+
+				<FormControl mt={2} isRequired>
+					<FormLabel>Business Area</FormLabel>
+
+					<Select
+						onChange={(e) => {
+							const strVal = e.target.value ?? null;
+							if (strVal) {
+								setSelectedBusinessArea(Number(e.target.value));
+							}
+						}}
+						size={"sm"}
+						// mx={4}
+						rounded={"5px"}
+						style={
+							colorMode === "light"
+								? {
+										color: "black",
+										backgroundColor: "white",
+										borderColor: "gray.200",
+										caretColor: "black !important",
+									}
+								: {
+										color: "white",
+										borderColor: "white",
+										caretColor: "black !important",
+									}
+						}
+					>
+						<option key={"---"} value={null} color={"black"}>
+							---
+						</option>
+						{orderedDivisionSlugs.flatMap((divSlug) => {
+							// Filter business areas for the current division
+							const divisionBusinessAreas = businessAreas
+								.filter((ba) => ba.division.slug === divSlug)
+								.sort((a, b) => a.name.localeCompare(b.name));
+
+							return divisionBusinessAreas.map((ba, index) => (
+								<option
+									key={`${ba.name}${index}`}
+									value={ba.pk}
+								>
+									{ba?.division
+										? `[${ba?.division?.slug}] `
+										: ""}
+									{checkIsHtml(ba.name)
+										? sanitizeHtml(ba.name)
+										: ba.name}{" "}
+									{ba.is_active ? "" : "(INACTIVE)"}
+								</option>
+							));
+						})}
+					</Select>
+				</FormControl>
+				{/* ======================================================= */}
 
 				<Flex mt={5} justifyContent="end">
 					<Button
@@ -444,7 +603,9 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 							!email ||
 							!emailsMatch ||
 							emailExists ||
-							nameExists
+							nameExists ||
+							!selectedBranch ||
+							!selectedBusinessArea
 						}
 					>
 						Create

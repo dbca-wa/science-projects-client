@@ -24,17 +24,20 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { TypewriterText } from "../components/Animations/TypewriterText";
 import { Head } from "../components/Base/Head";
 import {
+	UserData,
 	createUser,
 	getDoesUserWithEmailExist,
 	getDoesUserWithFullNameExist,
 } from "../lib/api";
+import { AffiliationSearchDropdown } from "@/components/Navigation/AffiliationSearchDropdown";
+import { IAffiliation } from "@/types";
 
-interface UserData {
-	username: string;
-	firstName: string;
-	lastName: string;
-	email: string;
-}
+// interface UserData {
+// 	username: string;
+// 	firstName: string;
+// 	lastName: string;
+// 	email: string;
+// }
 
 const capitalizeAfterSpaceOrHyphen = (name: string) => {
 	return name.replace(/(?:^|\s|-)(\w)/g, function (match) {
@@ -221,6 +224,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 						username: generatedUsername,
 						firstName: capitalisedFirstName,
 						lastName: capitalisedLastName,
+						affiliation: selectedAffiliation?.pk ?? null,
 						email,
 					};
 					await createUser(userData);
@@ -254,6 +258,9 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 			}
 		}
 	};
+
+	const [selectedAffiliation, setSelectedAffiliation] =
+		useState<IAffiliation>();
 
 	return (
 		<>
@@ -434,6 +441,14 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
 							)}
 					</FormControl>
 				</Grid>
+
+				<AffiliationSearchDropdown
+					isRequired={false}
+					setterFunction={setSelectedAffiliation}
+					label={"Affiliation (Optional)"}
+					placeholder={"Set an affiliation (optional)"}
+					helperText={""}
+				/>
 
 				{isModal && (
 					<Box
