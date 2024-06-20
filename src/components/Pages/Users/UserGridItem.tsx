@@ -184,17 +184,25 @@ export const UserGridItem = ({
 								onClick={drawerFunction}
 								justifyContent={"start"}
 							>
-								{is_staff
+								{/* {is_staff
 									? isXlOrLarger
 										? fullName
+											: fullName.length > 16
+												? `${fullName.substring(0, 10)}...`
+												: fullName
+										: isXlOrLarger
+									? fullName?.startsWith("None")
+											? username
+											: `${fullName}`
+										: username} */}
+
+								{fullName
+									? fullName?.startsWith("None ")
+										? username
 										: fullName.length > 16
 											? `${fullName.substring(0, 10)}...`
 											: fullName
-									: isXlOrLarger
-										? fullName?.startsWith("None")
-											? username
-											: `${fullName}`
-										: username}
+									: username}
 							</Button>
 							<Text
 								fontSize={"sm"}
