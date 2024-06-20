@@ -252,7 +252,7 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 	return (
 		<>
 			<Head title={"Add User"} />
-			{!isModal ?? (
+			{!isModal && (
 				<Box>
 					<Text mb={8} fontWeight={"bold"} fontSize={"2xl"}>
 						Add External User
@@ -351,7 +351,7 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 								placeholder="john.doe@dbca.wa.gov.au"
 								value={email}
 								onChange={handleEmailChange}
-								maxLength={40}
+								maxLength={50}
 							/>
 						</InputGroup>
 					</FormControl>
@@ -365,7 +365,7 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
 								placeholder="john.doe@dbca.wa.gov.au"
 								value={confirmEmail}
 								onChange={handleConfirmEmailChange}
-								maxLength={40}
+								maxLength={50}
 							/>
 						</InputGroup>
 						{email.length > 0 && email.length < 5 && (
