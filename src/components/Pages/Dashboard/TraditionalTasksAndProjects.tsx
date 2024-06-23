@@ -23,16 +23,11 @@ import { FcHighPriority, FcOk } from "react-icons/fc";
 import { useGetDocumentsPendingMyAction } from "../../../lib/hooks/tanstack/useGetDocumentsPendingMyAction";
 import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
 import { useGetMyTasks } from "../../../lib/hooks/tanstack/useGetMyTasks";
-import { IProjectPlan, ITaskDisplayCard } from "../../../types";
+import { ITaskDisplayCard } from "../../../types";
+import { EndorsementsDataTable } from "./EndorsementsDataTable";
 import { ProjectsDataTable } from "./ProjectsDataTable";
 import { TraditionalDocumentTaskDisplay } from "./TraditionalDocumentTaskDisplay";
-import { TraditionalEndorsementTaskDisplay } from "./TraditionalEndorsementTaskDisplay";
 import { TraditionalPersonalTaskDisplay } from "./TraditionalPersonalTaskDisplay";
-
-interface IMiniEndorsement {
-  pk: number;
-  project_plan: IProjectPlan;
-}
 
 export const TraditionalTasksAndProjects = () => {
   const { colorMode } = useColorMode();
@@ -227,8 +222,8 @@ export const TraditionalTasksAndProjects = () => {
           )}
 
           {(me?.userData?.is_aec ||
-            me?.userData?.is_biometrician ||
-            me?.userData?.is_herbarium_curator ||
+            // me?.userData?.is_biometrician ||
+            // me?.userData?.is_herbarium_curator ||
             me?.userData?.is_superuser) ===
           false ? null : pendingEndorsementsDataLoading ? (
             <Center my={4}>
@@ -289,109 +284,63 @@ export const TraditionalTasksAndProjects = () => {
                 </AccordionButton>
 
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
-                  {pendingEndorsementsData?.aec?.length >=
-                  // +
-                  //   pendingEndorsementsData?.bm?.length +
-                  //   pendingEndorsementsData?.hc?.length
-                  1 ? (
-                    <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
-                      {!pendingEndorsementsDataLoading &&
-                      pendingEndorsementsData?.aec?.length >= 1
-                        ? pendingEndorsementsData?.aec?.map(
-                            (endorsement: IMiniEndorsement, index: number) => (
-                              <TraditionalEndorsementTaskDisplay
-                                key={index}
-                                document={endorsement?.project_plan?.document}
-                                endorsementKind={"animalEthics"}
-                              />
-                            ),
-                          )
-                        : null}
-                      {/* {!pendingEndorsementsDataLoading &&
-                        pendingEndorsementsData?.hc?.length >= 1
-                        ? pendingEndorsementsData?.hc?.map(
-                          (endorsement: IMiniEndorsement, index: number) => (
-                            <TraditionalEndorsementTaskDisplay
-                              key={index}
-                              document={endorsement?.project_plan?.document}
-                              endorsementKind={"herbarium"}
-                            />
-                          )
-                        )
-                        : null}
-                      {!pendingEndorsementsDataLoading &&
-                        pendingEndorsementsData?.bm?.length >= 1
-                        ? pendingEndorsementsData?.bm?.map(
-                          (endorsement: IMiniEndorsement, index: number) => (
-                            <TraditionalEndorsementTaskDisplay
-                              key={index}
-                              document={endorsement?.project_plan?.document}
-                              endorsementKind={"biometrician"}
-                            />
-                          )
-                        )
-                        : null} */}
-                    </Grid>
-                  ) : (
-                    <Center>
-                      <Flex>
-                        <Center pt={10}>
-                          <FcOk />
-                          &nbsp;
-                          <Text>No Endorsements Required From You!</Text>
-                        </Center>
-                      </Flex>
-                    </Center>
-                  )}
+                  <EndorsementsDataTable
+                    pendingEndorsementsData={pendingEndorsementsData}
+                  />
                 </AccordionPanel>
               </AccordionItem>
             </motion.div>
           )}
 
-          {projectsLoading ? null : (
-            <AccordionItem
-              borderColor={
-                colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
-              }
-              borderBottom={"none"}
+          {projectsLoading ? (
+            <Center my={4}>
+              <Spinner />
+            </Center>
+          ) : (
+            <motion.div
+              initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
+              animate={{
+                opacity: projectsLoading ? 0 : 1,
+              }}
+              transition={{ duration: 0.4 }} // Animation duration in seconds
             >
-              <AccordionButton
-                bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                color={colorMode === "light" ? "black" : "white"}
-                _hover={
-                  colorMode === "light"
-                    ? { bg: "gray.300", color: "black" }
-                    : { bg: "gray.500", color: "white" }
+              <AccordionItem
+                borderColor={
+                  colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
                 }
-                userSelect={"none"}
+                borderBottom={"none"}
               >
-                <Box as="span" flex="1" textAlign="left">
-                  My Projects
-                </Box>
-                {projectData?.length >= 1 ? (
-                  <Box
-                    display={"inline-flex"}
-                    justifyContent={"center"}
-                    alignItems={"center"}
-                  >
-                    <Box mr={2}>{projectData?.length}</Box>
-                    <AiFillProject />
+                <AccordionButton
+                  bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                  color={colorMode === "light" ? "black" : "white"}
+                  _hover={
+                    colorMode === "light"
+                      ? { bg: "gray.300", color: "black" }
+                      : { bg: "gray.500", color: "white" }
+                  }
+                  userSelect={"none"}
+                >
+                  <Box as="span" flex="1" textAlign="left">
+                    My Projects
                   </Box>
-                ) : null}
-                <AccordionIcon />
-              </AccordionButton>
+                  {projectData?.length >= 1 ? (
+                    <Box
+                      display={"inline-flex"}
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                    >
+                      <Box mr={2}>{projectData?.length}</Box>
+                      <AiFillProject />
+                    </Box>
+                  ) : null}
+                  <AccordionIcon />
+                </AccordionButton>
 
-              <AccordionPanel
-                pb={4}
-                userSelect={"none"}
-                // w={"100%"}
-                // bg={"red"}
-                px={0}
-                pt={0}
-              >
-                <ProjectsDataTable projectData={projectData} />
-              </AccordionPanel>
-            </AccordionItem>
+                <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+                  <ProjectsDataTable projectData={projectData} />
+                </AccordionPanel>
+              </AccordionItem>
+            </motion.div>
           )}
         </Accordion>
       </Box>

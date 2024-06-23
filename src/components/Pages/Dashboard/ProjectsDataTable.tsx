@@ -103,21 +103,25 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
     core_function: {
       color: "red",
       string: "Core Function",
+      tag: "CF",
       icon: GiMaterialsScience,
     },
     science: {
       color: "green",
       string: "Science",
+      tag: "SP",
       icon: MdScience,
     },
     student: {
       color: "blue",
       string: "Student",
+      tag: "STP",
       icon: RiBook3Fill,
     },
     external: {
       color: "gray",
       string: "External",
+      tag: "EXT",
       icon: FaUserFriends,
     },
   };
@@ -169,7 +173,11 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
         return (
           <Box className="text-center align-middle font-medium">
             {/* <Text>{formattedString}</Text> */}
-            <Icon as={formattedIcon} color={`${formattedColour}.500`} />
+            <Icon
+              as={formattedIcon}
+              color={`${formattedColour}.500`}
+              boxSize={"22px"}
+            />
             <Text color={`${formattedColour}.500`}>{formattedString}</Text>
           </Box>
         );
@@ -297,11 +305,21 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
             <Text
               color={"gray.400"}
               fontWeight={"semibold"}
+              fontSize={"small"}
+              // onClick={(e) => goToProject(e, row.original.id)}
+              px={4}
+            >
+              {kindDict[row.getValue("kind") as kinds].tag}-{row.original.year}-
+              {row.original.number}
+            </Text>
+            <Text
+              color={"gray.400"}
+              fontWeight={"semibold"}
               fontSize={"x-small"}
               // onClick={(e) => goToProject(e, row.original.id)}
               px={4}
             >
-              Created: {formatDate(row.getValue("created_at"))}
+              Created on {formatDate(row.getValue("created_at"))}
             </Text>
           </Box>
         );
