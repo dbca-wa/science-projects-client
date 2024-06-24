@@ -123,6 +123,7 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
             rightIcon={sortIcon}
             p={0}
             m={0}
+            px={"10px"}
             bg={"transparent"}
             _hover={
               colorMode === "dark"

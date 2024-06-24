@@ -45,8 +45,8 @@ export const ProgressReportDocActions = ({
   setToLastTab,
   isBaLead,
 }: // setSelectedProgressReport, setSelectedYear,
-  // , projectPk
-  IProgressDocumentActions) => {
+// , projectPk
+IProgressDocumentActions) => {
   const { colorMode } = useColorMode();
 
   const {
@@ -95,18 +95,18 @@ export const ProgressReportDocActions = ({
   const { userData, userLoading } = useUser();
 
   const { baData, baLoading } = useBusinessArea(
-    progressReportData?.document?.project?.business_area?.pk
+    progressReportData?.document?.project?.business_area?.pk,
   );
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
-    progressReportData?.document?.modifier
+    progressReportData?.document?.modifier,
   );
   const { userData: creator, userLoading: creatorLoading } = useFullUserByPk(
-    progressReportData?.document?.creator
+    progressReportData?.document?.creator,
   );
 
   const { teamData, isTeamLoading } = useProjectTeam(
-    String(progressReportData?.document?.project?.pk)
+    String(progressReportData?.document?.project?.pk),
   );
 
   const {
@@ -120,7 +120,7 @@ export const ProgressReportDocActions = ({
     : `document-${progressReportData?.document?.id}`;
 
   const creationDate = useFormattedDate(
-    progressReportData?.document?.created_at
+    progressReportData?.document?.created_at,
   );
   const modifyDate = useFormattedDate(progressReportData?.document?.updated_at);
 
@@ -192,6 +192,29 @@ export const ProgressReportDocActions = ({
     }
   };
 
+  const kindDict = {
+    core_function: {
+      color: "red",
+      string: "Core Function",
+      tag: "CF",
+    },
+    science: {
+      color: "green",
+      string: "Science",
+      tag: "SP",
+    },
+    student: {
+      color: "blue",
+      string: "Student",
+      tag: "STP",
+    },
+    external: {
+      color: "gray",
+      string: "External",
+      tag: "EXT",
+    },
+  };
+
   return (
     <>
       {actionsReady && leaderMember ? (
@@ -257,7 +280,7 @@ export const ProgressReportDocActions = ({
               </Box>
               <Grid
                 pt={2}
-              // gridGap={2}
+                // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -286,7 +309,7 @@ export const ProgressReportDocActions = ({
                             : progressReportData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                              colorMode === "light"
+                                colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -309,6 +332,72 @@ export const ProgressReportDocActions = ({
                   borderColor={"gray.300"}
                   // roundedTop={"2xl"}
                   borderBottom={"0px"}
+                  p={2}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Project Tag
+                  </Text>
+                  <Tag
+                    bg={
+                      colorMode === "light"
+                        ? `${kindDict[progressReportData?.document?.project?.kind].color}.400`
+                        : `${kindDict[progressReportData?.document?.project?.kind].color}.500`
+                    }
+                    color={"white"}
+                    size={"md"}
+                  >
+                    {kindDict[progressReportData?.document?.project?.kind].tag}-
+                    {progressReportData?.document?.project?.year}-
+                    {progressReportData?.document?.project?.number}
+                  </Tag>
+                </Flex>
+                <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedTop={"2xl"}
+                  p={2}
+                  borderBottom={"0px"}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Project ID
+                  </Text>
+                  <Text>{progressReportData?.document?.project?.pk}</Text>
+                </Flex>
+                {/* <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedTop={"2xl"}
+                  p={2}
+                  borderBottom={"0px"}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Selected PR ID
+                  </Text>
+                  <Text>{progressReportData?.pk}</Text>
+                </Flex> */}
+                <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedBottom={"2xl"}
+                  borderBottom={0}
+                  p={2}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Document ID
+                  </Text>
+                  <Text>
+                    {progressReportData?.document?.pk
+                      ? progressReportData?.document?.pk
+                      : progressReportData?.document?.id}{" "}
+                    (PR {progressReportData?.pk})
+                  </Text>
+                </Flex>
+                <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedTop={"2xl"}
+                  borderBottom={"0px"}
+                  // roundedBottom={"2xl"}
                   alignItems={"center"}
                   p={2}
                   flexDir={"column"}
@@ -357,7 +446,8 @@ export const ProgressReportDocActions = ({
                   borderColor={"gray.300"}
                   // roundedTop={"2xl"}
                   p={2}
-                  borderBottom={"0px"}
+                  // borderBottom={"0px"}
+                  roundedBottom={"2xl"}
                   alignItems={"center"}
                   flexDir={"column"}
                 >
@@ -396,45 +486,6 @@ export const ProgressReportDocActions = ({
                     </Button>
                   </Flex>
                 </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  // roundedTop={"2xl"}
-                  p={2}
-                  borderBottom={"0px"}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Project ID
-                  </Text>
-                  <Text>{progressReportData?.document?.project?.pk}</Text>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  // roundedTop={"2xl"}
-                  p={2}
-                  borderBottom={"0px"}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Selected PR ID
-                  </Text>
-                  <Text>{progressReportData?.pk}</Text>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  roundedBottom={"2xl"}
-                  p={2}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Document ID
-                  </Text>
-                  <Text>
-                    {progressReportData?.document?.pk
-                      ? progressReportData?.document?.pk
-                      : progressReportData?.document?.id}
-                  </Text>
-                </Flex>
               </Grid>
             </Box>
 
@@ -462,9 +513,9 @@ export const ProgressReportDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-              // gridGap={2}
-              // pt={4}
-              // pos={"relative"}
+                // gridGap={2}
+                // pt={4}
+                // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -518,7 +569,8 @@ export const ProgressReportDocActions = ({
                       progressReportData?.document
                         ?.project_lead_approval_granted === true &&
                       (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk || isBaLead) && (
+                        userData?.pk === leaderMember?.user?.pk ||
+                        isBaLead) && (
                         <Center justifyContent={"flex-end"}>
                           <ProgressReportActionModal
                             userData={userData}
@@ -555,7 +607,8 @@ export const ProgressReportDocActions = ({
                       progressReportData?.document
                         ?.project_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === leaderMember?.user?.pk || isBaLead) && (
+                        userData?.pk === leaderMember?.user?.pk ||
+                        isBaLead) && (
                         <Center justifyContent={"flex-end"}>
                           <ProgressReportActionModal
                             userData={userData}
@@ -645,7 +698,7 @@ export const ProgressReportDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                // pos={"relative"}
+                  // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -687,7 +740,7 @@ export const ProgressReportDocActions = ({
                         ? 3
                         : 0
                     }
-                  // gridTemplateColumns={"repeat(2, 1fr)"}
+                    // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {progressReportData?.document
                       ?.project_lead_approval_granted &&
