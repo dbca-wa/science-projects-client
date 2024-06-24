@@ -54,9 +54,9 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
         }
       } else {
         if (e.ctrlKey || e.metaKey) {
-          window.open(`projects/${pk}`, "_blank"); // Opens in a new tab
+          window.open(`projects/${pk}/project`, "_blank"); // Opens in a new tab
         } else {
-          navigate(`projects/${pk}`);
+          navigate(`projects/${pk}/project`);
         }
       }
     }
