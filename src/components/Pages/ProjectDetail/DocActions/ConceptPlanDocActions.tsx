@@ -50,9 +50,9 @@ interface IConceptDocumentActions {
 export const ConceptPlanDocActions = ({
   all_documents,
   conceptPlanData,
-  refetchData
+  refetchData,
 }: // , projectPk
-  IConceptDocumentActions) => {
+IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
 
   const {
@@ -101,18 +101,18 @@ export const ConceptPlanDocActions = ({
   const { userData, userLoading } = useUser();
 
   const { baData, baLoading } = useBusinessArea(
-    conceptPlanData?.document?.project?.business_area?.pk
+    conceptPlanData?.document?.project?.business_area?.pk,
   );
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
-    conceptPlanData?.document?.modifier
+    conceptPlanData?.document?.modifier,
   );
   const { userData: creator, userLoading: creatorLoading } = useFullUserByPk(
-    conceptPlanData?.document?.creator
+    conceptPlanData?.document?.creator,
   );
 
   const { teamData, isTeamLoading } = useProjectTeam(
-    String(conceptPlanData?.document?.project?.pk)
+    String(conceptPlanData?.document?.project?.pk),
   );
 
   const creationDate = useFormattedDate(conceptPlanData?.document?.created_at);
@@ -216,8 +216,9 @@ export const ConceptPlanDocActions = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Spawn Project Plan",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -230,6 +231,29 @@ export const ConceptPlanDocActions = ({
 
   const spawnDocumentFunc = (data: ISpawnDocument) => {
     spawnMutation.mutate(data);
+  };
+
+  const kindDict = {
+    core_function: {
+      color: "red",
+      string: "Core Function",
+      tag: "CF",
+    },
+    science: {
+      color: "green",
+      string: "Science",
+      tag: "SP",
+    },
+    student: {
+      color: "blue",
+      string: "Student",
+      tag: "STP",
+    },
+    external: {
+      color: "gray",
+      string: "External",
+      tag: "EXT",
+    },
   };
 
   return (
@@ -297,7 +321,7 @@ export const ConceptPlanDocActions = ({
               </Box>
               <Grid
                 pt={2}
-              // gridGap={2}
+                // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -326,7 +350,7 @@ export const ConceptPlanDocActions = ({
                             : conceptPlanData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                              colorMode === "light"
+                                colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -343,6 +367,61 @@ export const ConceptPlanDocActions = ({
                             ? "Revising"
                             : "New Document"}
                   </Tag>
+                </Flex>
+                <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedTop={"2xl"}
+                  borderBottom={"0px"}
+                  p={2}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Project Tag
+                  </Text>
+                  <Tag
+                    bg={
+                      colorMode === "light"
+                        ? `${kindDict[conceptPlanData?.document?.project?.kind].color}.400`
+                        : `${kindDict[conceptPlanData?.document?.project?.kind].color}.500`
+                    }
+                    color={"white"}
+                    size={"md"}
+                  >
+                    {kindDict[conceptPlanData?.document?.project?.kind].tag}-
+                    {conceptPlanData?.document?.project?.year}-
+                    {conceptPlanData?.document?.project?.number}
+                  </Tag>
+                </Flex>
+
+                <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedTop={"2xl"}
+                  p={2}
+                  borderBottom={"0px"}
+                  // roundedBottom={"2xl"}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Project ID
+                  </Text>
+                  <Text>{conceptPlanData?.document?.project?.pk}</Text>
+                </Flex>
+                <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedBottom={"2xl"}
+                  borderBottom={"0px"}
+                  p={2}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Document ID
+                  </Text>
+                  <Text>
+                    {conceptPlanData?.document?.pk
+                      ? conceptPlanData?.document?.pk
+                      : conceptPlanData?.document?.id}{" "}
+                    (CP {conceptPlanData?.pk})
+                  </Text>
                 </Flex>
                 <Flex
                   border={"1px solid"}
@@ -388,7 +467,8 @@ export const ConceptPlanDocActions = ({
                   border={"1px solid"}
                   borderColor={"gray.300"}
                   p={2}
-                  borderBottom={"0px"}
+                  // borderBottom={"0px"}
+                  roundedBottom={"2xl"}
                   alignItems={"center"}
                   flexDir={"column"}
                 >
@@ -427,19 +507,7 @@ export const ConceptPlanDocActions = ({
                     </Button>
                   </Flex>
                 </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  // roundedTop={"2xl"}
-                  p={2}
-                  borderBottom={"0px"}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Project ID
-                  </Text>
-                  <Text>{conceptPlanData?.document?.project?.pk}</Text>
-                </Flex>
-                <Flex
+                {/* <Flex
                   border={"1px solid"}
                   borderColor={"gray.300"}
                   // roundedTop={"2xl"}
@@ -450,22 +518,7 @@ export const ConceptPlanDocActions = ({
                     Selected CP ID
                   </Text>
                   <Text>{conceptPlanData?.pk}</Text>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  roundedBottom={"2xl"}
-                  p={2}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Document ID
-                  </Text>
-                  <Text>
-                    {conceptPlanData?.document?.pk
-                      ? conceptPlanData?.document?.pk
-                      : conceptPlanData?.document?.id}
-                  </Text>
-                </Flex>
+                </Flex> */}
               </Grid>
             </Box>
 
@@ -544,8 +597,7 @@ export const ConceptPlanDocActions = ({
                         ?.project_lead_approval_granted === true &&
                       (userData?.is_superuser ||
                         userData?.pk === leaderMember?.user?.pk ||
-                        userData?.pk === baLead?.pk
-                      ) && (
+                        userData?.pk === baLead?.pk) && (
                         <Center justifyContent={"flex-end"}>
                           <ConceptPlanActionModal
                             userData={userData}
@@ -635,7 +687,7 @@ export const ConceptPlanDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                // pos={"relative"}
+                  // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -674,12 +726,12 @@ export const ConceptPlanDocActions = ({
                     mt={
                       conceptPlanData?.document
                         ?.project_lead_approval_granted &&
-                        conceptPlanData?.document
-                          ?.directorate_approval_granted === false
+                      conceptPlanData?.document
+                        ?.directorate_approval_granted === false
                         ? 3
                         : 0
                     }
-                  // gridTemplateColumns={"repeat(2, 1fr)"}
+                    // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {conceptPlanData?.document?.project_lead_approval_granted &&
                       conceptPlanData?.document
@@ -1020,40 +1072,40 @@ export const ConceptPlanDocActions = ({
           </Grid>
         </>
       ) : // <Spinner/>
-        baLoading === false && baData === undefined ? (
-          <Grid
-            my={4}
-            gridTemplateColumns={"repeat(1, 1fr)"}
-            justifyContent={"center"}
-          >
-            <Text textAlign={"center"} fontWeight={"semibold"}>
-              Document Actions cannot be displayed as this project has no business
-              area.
-            </Text>
-            <Text textAlign={"center"} fontWeight={"semibold"}>
-              Please set a business area for this project from the project
-              settings.
-            </Text>
-          </Grid>
-        ) : actionsReady && !leaderMember ? (
-          <Grid
-            my={4}
-            gridTemplateColumns={"repeat(1, 1fr)"}
-            justifyContent={"center"}
-          >
-            <Text textAlign={"center"} fontWeight={"semibold"}>
-              This project has no members/leader so document actions are not shown
-              here.
-            </Text>
-            <Text textAlign={"center"} fontWeight={"semibold"}>
-              Please add members to adjust document actions.
-            </Text>
-          </Grid>
-        ) : (
-          <Center>
-            <Spinner />
-          </Center>
-        )}
+      baLoading === false && baData === undefined ? (
+        <Grid
+          my={4}
+          gridTemplateColumns={"repeat(1, 1fr)"}
+          justifyContent={"center"}
+        >
+          <Text textAlign={"center"} fontWeight={"semibold"}>
+            Document Actions cannot be displayed as this project has no business
+            area.
+          </Text>
+          <Text textAlign={"center"} fontWeight={"semibold"}>
+            Please set a business area for this project from the project
+            settings.
+          </Text>
+        </Grid>
+      ) : actionsReady && !leaderMember ? (
+        <Grid
+          my={4}
+          gridTemplateColumns={"repeat(1, 1fr)"}
+          justifyContent={"center"}
+        >
+          <Text textAlign={"center"} fontWeight={"semibold"}>
+            This project has no members/leader so document actions are not shown
+            here.
+          </Text>
+          <Text textAlign={"center"} fontWeight={"semibold"}>
+            Please add members to adjust document actions.
+          </Text>
+        </Grid>
+      ) : (
+        <Center>
+          <Spinner />
+        </Center>
+      )}
     </>
   );
 };

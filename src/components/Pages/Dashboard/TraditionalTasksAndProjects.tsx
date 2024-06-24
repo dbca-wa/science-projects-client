@@ -28,6 +28,7 @@ import { EndorsementsDataTable } from "./EndorsementsDataTable";
 import { ProjectsDataTable } from "./ProjectsDataTable";
 import { TraditionalDocumentTaskDisplay } from "./TraditionalDocumentTaskDisplay";
 import { TraditionalPersonalTaskDisplay } from "./TraditionalPersonalTaskDisplay";
+import { DocumentsDataTable } from "./DocumentsDataTable";
 
 export const TraditionalTasksAndProjects = () => {
   const { colorMode } = useColorMode();
@@ -150,7 +151,11 @@ export const TraditionalTasksAndProjects = () => {
                 </AccordionButton>
 
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
-                  {combinedData?.length +
+                  <DocumentsDataTable
+                    combinedData={combinedData}
+                    pendingProjectDocumentData={pendingProjectDocumentData}
+                  />
+                  {/* {combinedData?.length +
                     pendingProjectDocumentData?.all?.length >=
                   1 ? (
                     <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
@@ -215,7 +220,7 @@ export const TraditionalTasksAndProjects = () => {
                         </Center>
                       </Flex>
                     </Center>
-                  )}
+                  )} */}
                 </AccordionPanel>
               </AccordionItem>
             </motion.div>
