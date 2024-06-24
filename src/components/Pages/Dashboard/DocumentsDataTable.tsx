@@ -1,3 +1,4 @@
+import { TaskDetailsModal } from "@/components/Modals/TaskDetailsModal";
 import {
   Table,
   TableBody,
@@ -6,8 +7,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  MutationError,
+  MutationSuccess,
+  completeTask,
+  deletePersonalTask,
+} from "@/lib/api";
+import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
 import { IMainDoc, ITaskDisplayCard } from "@/types";
-import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Icon,
+  Text,
+  ToastId,
+  useColorMode,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   ColumnDef,
@@ -18,7 +39,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaUser, FaUserFriends } from "react-icons/fa";
 import { GiMaterialsScience } from "react-icons/gi";
 import { MdScience } from "react-icons/md";
@@ -389,31 +410,7 @@ export const DocumentsDataTable = ({
             </Box>
           );
         } else if (isPersonalTypeTask(row.original)) {
-          return (
-            <Box className="text-left font-medium">
-              <Text
-                color={colorMode === "dark" ? "blue.200" : "blue.400"}
-                fontWeight={"bold"}
-                _hover={{
-                  color: colorMode === "dark" ? "blue.100" : "blue.300",
-                  textDecoration:
-                    colorMode === "dark" ? "underline" : "undefined",
-                }}
-                cursor={"pointer"}
-                px={4}
-              >
-                {row.original.name}
-              </Text>
-              <Text
-                color={"gray.400"}
-                fontWeight={"semibold"}
-                fontSize={"small"}
-                px={4}
-              >
-                {row.original.description}
-              </Text>
-            </Box>
-          );
+          return <PersonalTaskDescriptionCell task={row.original} />;
         }
       },
       sortingFn: (rowA, rowB) => {
@@ -453,11 +450,13 @@ export const DocumentsDataTable = ({
 
   useEffect(() => {
     setData([
-      ...(combinedData?.map((personalTask) => ({
-        ...personalTask,
-        taskType: "personal" as const,
-        kind: "personal" as const,
-      })) || []),
+      ...(combinedData
+        ?.filter((personalTask) => personalTask.status !== "done")
+        .map((personalTask) => ({
+          ...personalTask,
+          taskType: "personal" as const,
+          kind: "personal" as const,
+        })) || []),
       ...(pendingProjectDocumentData?.lead?.map((leadTask) => ({
         ...leadTask,
         taskType: "lead" as const,
@@ -559,5 +558,204 @@ export const DocumentsDataTable = ({
         </TableBody>
       </Table>
     </div>
+  );
+};
+
+interface PersonalTaskDescriptionProps {
+  task: ITaskDisplayCard;
+}
+const PersonalTaskDescriptionCell = ({
+  task,
+}: PersonalTaskDescriptionProps) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const { isOnProjectsPage } = useProjectSearchContext();
+  const navigate = useNavigate();
+
+  const goToProject = (pk: number) => {
+    if (isOnProjectsPage) {
+      navigate(`${pk}`);
+    } else {
+      navigate(`projects/${pk}`);
+    }
+  };
+
+  const toast = useToast();
+  const toastIdRef = useRef<ToastId>();
+  const addToast = (data) => {
+    toastIdRef.current = toast(data);
+  };
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (isDeleting === true || isCompleting === true) {
+      setTimeout(() => {
+        setIsDeleting(false);
+        setIsCompleting(false);
+      }, 500);
+    }
+  }, [isDeleting, isCompleting]);
+
+  const handleDeleteClick = (pk: number) => {
+    setIsDeleting(true);
+    taskdeleteMutation.mutate({ pk });
+  };
+
+  const handleCompletion = (pk: number) => {
+    setIsCompleting(true);
+    taskCompletionMutation.mutate({ pk });
+  };
+
+  const taskdeleteMutation = useMutation<
+    MutationSuccess,
+    MutationError,
+    { pk: number }
+  >({
+    mutationFn: deletePersonalTask,
+    onMutate: () => {
+      addToast({
+        title: "Deleting Task...",
+        description: "One moment!",
+        status: "loading",
+        position: "top-right",
+        duration: 3000,
+      });
+    },
+    // Success handling based on API-file-declared interface
+    onSuccess: () => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: `Task Deleted`,
+          status: "info",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: [`mytasks`] });
+      }, 350);
+    },
+    // Error handling based on API-file-declared interface
+    onError: (error) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Could Not Delete Task",
+          description: `${error}`,
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
+
+  const taskCompletionMutation = useMutation<
+    MutationSuccess,
+    MutationError,
+    { pk: number }
+  >({
+    // Start of mutation handling
+    mutationFn: completeTask,
+    onMutate: () => {
+      addToast({
+        title: "Completing Task...",
+        description: "One moment!",
+        status: "loading",
+        position: "top-right",
+        duration: 3000,
+      });
+    },
+    // Success handling based on API-file-declared interface
+    onSuccess: () => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: `Task Completed`,
+          status: "success",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: [`mytasks`] });
+      }, 350);
+    },
+    // Error handling based on API-file-declared interface
+    onError: (error) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Could Not Complete Task",
+          description: `${error}`,
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
+
+  const { colorMode } = useColorMode();
+
+  const { isOpen, onClose } = useDisclosure();
+
+  return (
+    <>
+      <TaskDetailsModal isOpen={isOpen} onClose={onClose} task={task} />
+      <Box className="w-full text-left font-medium" pos={"relative"}>
+        <Text
+          color={colorMode === "dark" ? "blue.200" : "blue.400"}
+          fontWeight={"bold"}
+          _hover={{
+            color: colorMode === "dark" ? "blue.100" : "blue.300",
+            textDecoration: colorMode === "dark" ? "underline" : "undefined",
+          }}
+          cursor={"pointer"}
+          px={4}
+        >
+          {task.name}
+        </Text>
+        <Text
+          color={"gray.400"}
+          fontWeight={"semibold"}
+          fontSize={"small"}
+          px={4}
+        >
+          {task.description}
+        </Text>
+        {task.task_type === "personal" && (
+          // isHovered &&
+          <>
+            <Center pos={"absolute"} right={0} top={0}>
+              <Button
+                size="xs"
+                isDisabled={isDeleting}
+                onClick={() => handleDeleteClick(task.pk)}
+              >
+                <CloseIcon boxSize={2} />
+              </Button>
+              <Button
+                isDisabled={isCompleting}
+                ml={2}
+                size={"xs"}
+                bg={"green.500"}
+                color={"white"}
+                _hover={{
+                  bg: "green.400",
+                }}
+                onClick={() => handleCompletion(task.pk)}
+              >
+                <CheckIcon boxSize={2} />
+              </Button>
+            </Center>
+          </>
+        )}
+      </Box>
+    </>
   );
 };
