@@ -174,17 +174,30 @@ export const DocumentsDataTable = ({
 }: Props) => {
   const { colorMode } = useColorMode();
   const navigate = useNavigate();
-  const goToProject = (
+  const goToProjectDocument = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     pk: number | undefined,
+    docKind: string,
   ) => {
+    let docKindString;
+    if (docKind === "concept") {
+      docKindString = "concept";
+    } else if (docKind === "projectplan") {
+      docKindString = "project";
+    } else if (docKind === "progressreport") {
+      docKindString = "progress";
+    } else if (docKind === "studentreport") {
+      docKindString = "student";
+    } else if (docKind === "projectclosure") {
+      docKindString = "closure";
+    }
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else {
       if (e.ctrlKey || e.metaKey) {
-        window.open(`projects/${pk}`, "_blank"); // Opens in a new tab
+        window.open(`projects/${pk}/${docKindString}`, "_blank"); // Opens in a new tab
       } else {
-        navigate(`projects/${pk}`);
+        navigate(`projects/${pk}/${docKindString}`);
       }
     }
   };
@@ -519,7 +532,11 @@ export const DocumentsDataTable = ({
                 data-state={row.getIsSelected() && "selected"}
                 onClick={(e) => {
                   if (isDocTypeTask(row.original)) {
-                    goToProject(e, row.original.project.pk);
+                    goToProjectDocument(
+                      e,
+                      row.original.project.pk,
+                      row.original.kind,
+                    );
                   }
                 }}
               >
