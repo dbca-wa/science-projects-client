@@ -118,23 +118,23 @@ IConceptDocumentActions) => {
   const { userData, userLoading } = useUser();
 
   const { baData, baLoading } = useBusinessArea(
-    projectClosureData?.document?.project?.business_area?.pk
+    projectClosureData?.document?.project?.business_area?.pk,
   );
 
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
-    projectClosureData?.document?.modifier
+    projectClosureData?.document?.modifier,
   );
   const { userData: creator, userLoading: creatorLoading } = useFullUserByPk(
-    projectClosureData?.document?.creator
+    projectClosureData?.document?.creator,
   );
 
   const { teamData, isTeamLoading } = useProjectTeam(
-    String(projectClosureData?.document?.project?.pk)
+    String(projectClosureData?.document?.project?.pk),
   );
 
   const creationDate = useFormattedDate(
-    projectClosureData?.document?.created_at
+    projectClosureData?.document?.created_at,
   );
   const modifyDate = useFormattedDate(projectClosureData?.document?.updated_at);
 
@@ -212,7 +212,7 @@ IConceptDocumentActions) => {
       | "updating"
       | "terminated"
       | "suspended"
-      | "closed"
+      | "closed",
   ) => {
     const data: ISetProjectProps = {
       projectId: projectPk,
@@ -220,6 +220,29 @@ IConceptDocumentActions) => {
     };
 
     setProjectStatus(data);
+  };
+
+  const kindDict = {
+    core_function: {
+      color: "red",
+      string: "Core Function",
+      tag: "CF",
+    },
+    science: {
+      color: "green",
+      string: "Science",
+      tag: "SP",
+    },
+    student: {
+      color: "blue",
+      string: "Student",
+      tag: "STP",
+    },
+    external: {
+      color: "gray",
+      string: "External",
+      tag: "EXT",
+    },
   };
 
   return (
@@ -306,19 +329,19 @@ IConceptDocumentActions) => {
                           ? "green.500"
                           : "green.600"
                         : projectClosureData.document.status === "inapproval"
-                        ? colorMode === "light"
-                          ? "blue.500"
-                          : "blue.600"
-                        : projectClosureData.document.status === "inreview"
-                        ? colorMode === "light"
-                          ? "orange.500"
-                          : "orange.600"
-                        : projectClosureData.document.status === "revising"
-                        ? "orange.500"
-                        : // New
-                        colorMode === "light"
-                        ? "red.500"
-                        : "red.600"
+                          ? colorMode === "light"
+                            ? "blue.500"
+                            : "blue.600"
+                          : projectClosureData.document.status === "inreview"
+                            ? colorMode === "light"
+                              ? "orange.500"
+                              : "orange.600"
+                            : projectClosureData.document.status === "revising"
+                              ? "orange.500"
+                              : // New
+                                colorMode === "light"
+                                ? "red.500"
+                                : "red.600"
                     }
                     color={"white"}
                     size={"md"}
@@ -326,13 +349,78 @@ IConceptDocumentActions) => {
                     {projectClosureData.document.status === "inapproval"
                       ? "Approval Requested"
                       : projectClosureData.document.status === "approved"
-                      ? "Approved"
-                      : projectClosureData.document.status === "inreview"
-                      ? "Review Requested"
-                      : projectClosureData.document.status === "revising"
-                      ? "Revising"
-                      : "New Document"}
+                        ? "Approved"
+                        : projectClosureData.document.status === "inreview"
+                          ? "Review Requested"
+                          : projectClosureData.document.status === "revising"
+                            ? "Revising"
+                            : "New Document"}
                   </Tag>
+                </Flex>
+                <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedTop={"2xl"}
+                  borderBottom={"0px"}
+                  p={2}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Project Tag
+                  </Text>
+                  <Tag
+                    bg={
+                      colorMode === "light"
+                        ? `${kindDict[projectClosureData?.document?.project?.kind].color}.400`
+                        : `${kindDict[projectClosureData?.document?.project?.kind].color}.500`
+                    }
+                    color={"white"}
+                    size={"md"}
+                  >
+                    {kindDict[projectClosureData?.document?.project?.kind].tag}-
+                    {projectClosureData?.document?.project?.year}-
+                    {projectClosureData?.document?.project?.number}
+                  </Tag>
+                </Flex>
+                <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedTop={"2xl"}
+                  p={2}
+                  borderBottom={"0px"}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Project ID
+                  </Text>
+                  <Text>{projectClosureData?.document?.project?.pk}</Text>
+                </Flex>
+                {/* <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedTop={"2xl"}
+                  p={2}
+                  borderBottom={"0px"}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Selected PC ID
+                  </Text>
+                  <Text>{projectClosureData?.pk}</Text>
+                </Flex> */}
+                <Flex
+                  border={"1px solid"}
+                  borderColor={"gray.300"}
+                  // roundedBottom={"2xl"}
+                  borderBottom={0}
+                  p={2}
+                >
+                  <Text flex={1} fontWeight={"semibold"}>
+                    Document ID
+                  </Text>
+                  <Text>
+                    {projectClosureData?.document?.pk
+                      ? projectClosureData?.document?.pk
+                      : projectClosureData?.document?.id}{" "}
+                    (PC {projectClosureData?.pk})
+                  </Text>
                 </Flex>
                 <Flex
                   border={"1px solid"}
@@ -387,7 +475,8 @@ IConceptDocumentActions) => {
                   borderColor={"gray.300"}
                   // roundedTop={"2xl"}
                   p={2}
-                  borderBottom={"0px"}
+                  // borderBottom={"0px"}
+                  roundedBottom={"2xl"}
                   alignItems={"center"}
                   flexDir={"column"}
                 >
@@ -425,45 +514,6 @@ IConceptDocumentActions) => {
                       {modifier?.first_name} {modifier?.last_name}
                     </Button>
                   </Flex>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  // roundedTop={"2xl"}
-                  p={2}
-                  borderBottom={"0px"}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Project ID
-                  </Text>
-                  <Text>{projectClosureData?.document?.project?.pk}</Text>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  // roundedTop={"2xl"}
-                  p={2}
-                  borderBottom={"0px"}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Selected PC ID
-                  </Text>
-                  <Text>{projectClosureData?.pk}</Text>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  roundedBottom={"2xl"}
-                  p={2}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Document ID
-                  </Text>
-                  <Text>
-                    {projectClosureData?.document?.pk
-                      ? projectClosureData?.document?.pk
-                      : projectClosureData?.document?.id}
-                  </Text>
                 </Flex>
               </Grid>
             </Box>
@@ -562,12 +612,12 @@ IConceptDocumentActions) => {
                         "completed"
                           ? 3
                           : projectClosureData?.document
-                              ?.business_area_lead_approval_granted
-                          ? userData?.is_superuser ||
-                            userData?.pk === leaderMember?.pk
-                            ? 2
-                            : 0
-                          : 3
+                                ?.business_area_lead_approval_granted
+                            ? userData?.is_superuser ||
+                              userData?.pk === leaderMember?.pk
+                              ? 2
+                              : 0
+                            : 3
                       }
                     >
                       {userData?.is_superuser ||
@@ -720,7 +770,7 @@ IConceptDocumentActions) => {
                                           ?.pk
                                       : projectClosureData?.document?.project
                                           ?.id,
-                                    "updating"
+                                    "updating",
                                   );
                                 }}
                                 refetchData={refetchData}
@@ -840,9 +890,9 @@ IConceptDocumentActions) => {
                       "completed"
                         ? 3
                         : projectClosureData?.document
-                            ?.directorate_approval_granted
-                        ? 0
-                        : 3
+                              ?.directorate_approval_granted
+                          ? 0
+                          : 3
                     }
                     // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
