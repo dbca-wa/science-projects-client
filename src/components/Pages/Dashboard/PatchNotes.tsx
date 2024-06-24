@@ -33,7 +33,7 @@ export const PatchNotes = ({
   const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
     .VITE_PRODUCTION_BACKEND_BASE_URL;
 
-  const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.1.1";
+  const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.1.4";
 
   const [welcomeUser, setWelcomeUser] = useState("");
   const [spmsText, setSpmsText] = useState("Science Project Management System");
@@ -149,48 +149,14 @@ export const PatchNotes = ({
             {/* &#9881;&#65039; */}
           </Text>
           <List spacing={1} ml={2}>
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Change: Sorted project results - most recent projects first &
-              terminated, closed and suspended projects appear at the end
-            </ListItem> */}
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Change: Tasks for project lead also appear for team to ensure
-              entire team aware of status
-            </ListItem> */}
-
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug where some users who don't have a business area set
-              could not see their tasks (x2)
-            </ListItem> */}
-
-            {/* <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
-                            <ListIcon as={MdCheckCircle} color='green.500' />
-                            Fix: Ensure progress reports of closed projects for a FY appear on that year's report
-                        </ListItem> */}
-
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug causing business area to not update when editing a
-              project
+              Fix: Fixed bug causing projects to be duplicated across pages when
+              searching or filtering
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -198,8 +164,7 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug causing business area leader tasks to not display
-              in "My Tasks" section
+              Fix: Fixed bug causing user-generated table columns to all be 75px
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -207,8 +172,8 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Extended the length for email fields from 30 to 50
-              characters when creating an external user
+              Change: Added project tag to home page references and on each
+              project document, below status
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -216,8 +181,7 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Added ability to optionally set external user's
-              affiliation on creation
+              Change: Moved email lists to admin data page
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -225,8 +189,8 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Closed and Suspended project progress reports that exist
-              for current FY will appear on Annual Report
+              Feature: Added ability for admins to set a project status directly
+              to address legacy data issues
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -234,8 +198,9 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added button for printing Annual Report with unapproved
-              reports
+              Feature: Added lists of problematic projects to admin data page:
+              empty projects, multiple project leads, no leader tag set,
+              external leaders
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -243,8 +208,8 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added ability for admins to add DBCA internal users
-              (staff) without OIM data
+              Feature: Updated traditional layout 'Endorsements' and 'Documents'
+              tables to enable sorting on each field.
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -252,17 +217,7 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added "My Business Area" page for business area leaders
-              to update text and image regarding their area.
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Updated traditional layout 'My Projects' table to enable
-              sorting on each field. By default, sorted by status.
+              Feature: Added 'Involved Projects' section to user profile
             </ListItem>
           </List>
 
