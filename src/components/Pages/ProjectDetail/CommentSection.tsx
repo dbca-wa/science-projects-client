@@ -87,7 +87,7 @@ export const CommentSection = ({ documentID, userData, baseAPI }: Props) => {
                 // if (comment.is_public && !comment.is_removed) {
                 return (
                   <motion.div
-                    key={index}
+                    key={comment?.pk}
                     initial={{ y: -10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 10, opacity: 0 }}

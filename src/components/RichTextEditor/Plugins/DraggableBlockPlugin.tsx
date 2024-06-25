@@ -60,26 +60,26 @@ function getCollapsedMargins(elem: HTMLElement): {
 } {
   const getMargin = (
     element: Element | null,
-    margin: "marginTop" | "marginBottom"
+    margin: "marginTop" | "marginBottom",
   ): number =>
     element ? parseFloat(window.getComputedStyle(element)[margin]) : 0;
 
   const { marginTop, marginBottom } = window.getComputedStyle(elem);
   const prevElemSiblingMarginBottom = getMargin(
     elem.previousElementSibling,
-    "marginBottom"
+    "marginBottom",
   );
   const nextElemSiblingMarginTop = getMargin(
     elem.nextElementSibling,
-    "marginTop"
+    "marginTop",
   );
   const collapsedTopMargin = Math.max(
     parseFloat(marginTop),
-    prevElemSiblingMarginBottom
+    prevElemSiblingMarginBottom,
   );
   const collapsedBottomMargin = Math.max(
     parseFloat(marginBottom),
-    nextElemSiblingMarginTop
+    nextElemSiblingMarginTop,
   );
 
   return { marginBottom: collapsedBottomMargin, marginTop: collapsedTopMargin };
@@ -89,7 +89,7 @@ function getBlockElement(
   anchorElem: HTMLElement,
   editor: LexicalEditor,
   event: MouseEvent,
-  useEdgeAsDefault = false
+  useEdgeAsDefault = false,
 ): HTMLElement | null {
   const anchorElementRect = anchorElem.getBoundingClientRect();
   const topLevelNodeKeys = getTopLevelNodeKeys(editor);
@@ -198,7 +198,7 @@ function setMenuPosition(
   targetElem: HTMLElement | null,
   floatingElem: HTMLElement,
   anchorElem: HTMLElement,
-  toolbarHeight: number
+  toolbarHeight: number,
 ) {
   if (!targetElem) {
     floatingElem.style.opacity = "0";
@@ -225,7 +225,7 @@ function setMenuPosition(
 
 function setDragImage(
   dataTransfer: DataTransfer,
-  draggableBlockElem: HTMLElement
+  draggableBlockElem: HTMLElement,
 ) {
   const { transform } = draggableBlockElem.style;
 
@@ -243,7 +243,7 @@ function setTargetLine(
   targetBlockElem: HTMLElement,
   mouseY: number,
   anchorElem: HTMLElement,
-  toolbarHeight: number
+  toolbarHeight: number,
 ) {
   const { top: targetBlockElemTop, height: targetBlockElemHeight } =
     targetBlockElem.getBoundingClientRect();
@@ -279,7 +279,7 @@ function useDraggableBlockMenu(
   editor: LexicalEditor,
   anchorElem: HTMLElement,
   isEditable: boolean,
-  toolbarHeight: number
+  toolbarHeight: number,
 ): JSX.Element {
   const scrollerElem = anchorElem.parentElement;
   const { colorMode } = useColorMode();
@@ -326,7 +326,7 @@ function useDraggableBlockMenu(
         draggableBlockElem,
         menuRef.current,
         anchorElem,
-        toolbarHeight
+        toolbarHeight,
       );
     }
   }, [anchorElem, draggableBlockElem, toolbarHeight]);
@@ -354,7 +354,7 @@ function useDraggableBlockMenu(
         targetBlockElem,
         pageY,
         anchorElem,
-        toolbarHeight
+        toolbarHeight,
       );
       // Prevent default event to be able to trigger onDrop events
       event.preventDefault();
@@ -406,15 +406,15 @@ function useDraggableBlockMenu(
         (event) => {
           return onDragover(event);
         },
-        COMMAND_PRIORITY_LOW
+        COMMAND_PRIORITY_LOW,
       ),
       editor.registerCommand(
         DROP_COMMAND,
         (event) => {
           return onDrop(event);
         },
-        COMMAND_PRIORITY_HIGH
-      )
+        COMMAND_PRIORITY_HIGH,
+      ),
     );
   }, [anchorElem, editor]);
 
@@ -468,7 +468,7 @@ function useDraggableBlockMenu(
       </div>
       <div className="draggable-block-target-line" ref={targetLineRef} />
     </>,
-    anchorElem
+    anchorElem,
   );
 }
 
@@ -484,6 +484,6 @@ export default function DraggableBlockPlugin({
     editor,
     anchorElem,
     editor._editable,
-    toolbarHeight
+    toolbarHeight,
   );
 }
