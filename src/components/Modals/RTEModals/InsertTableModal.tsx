@@ -34,7 +34,7 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
   useEffect(() => {
     const row = Number(rows);
     const column = Number(columns);
-    if (row && row > 0 && row <= 50 && column && column > 0 && column <= 25) {
+    if (row && row > 0 && row <= 51 && column && column > 0 && column <= 7) {
       setIsDisabled(false);
     } else {
       setIsDisabled(true);
@@ -71,7 +71,7 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
               <FormLabel>Rows</FormLabel>
               <InputGroup>
                 <Input
-                  placeholder={"# of rows (1-50)"}
+                  placeholder={"# of rows (1-51)"}
                   //   label="Rows"
                   onChange={(e) => setRows(e.target.value)}
                   value={rows}
@@ -80,14 +80,15 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
                 />
               </InputGroup>
               <FormHelperText>
-                Enter the number of rows for the table
+                Enter the number of rows for the table (Max 51, including
+                header)
               </FormHelperText>
             </FormControl>
             <FormControl>
               <FormLabel>Columns</FormLabel>
               <InputGroup>
                 <Input
-                  placeholder={"# of columns (1-25)"}
+                  placeholder={"# of columns (1-7)"}
                   //   label="Columns"
                   onChange={(e) => setColumns(e.target.value)}
                   value={columns}
@@ -96,7 +97,8 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
                 />
               </InputGroup>
               <FormHelperText>
-                Enter the number of columns for the table
+                Enter the number of columns for the table (Max 7, including
+                header)
               </FormHelperText>
             </FormControl>
           </Grid>
@@ -107,7 +109,7 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
               Cancel
             </Button>
             <Button
-              disabled={isDisabled}
+              isDisabled={isDisabled}
               onClick={onClick}
               color={"white"}
               background={colorMode === "light" ? "green.500" : "green.600"}
