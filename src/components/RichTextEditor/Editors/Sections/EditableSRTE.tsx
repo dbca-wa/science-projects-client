@@ -32,6 +32,7 @@ import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialSta
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
 import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
 import { RevisedRichTextToolbar } from "../../Toolbar/RevisedRichTextToolbar";
+
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 // import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -154,7 +155,6 @@ export const EditableSRTE = ({
           }}
         />
 
-
         {/* Text Area */}
         <RichTextPlugin
           contentEditable={
@@ -186,7 +186,7 @@ export const EditableSRTE = ({
                       outline: "none",
                     }}
 
-                  // autoFocus
+                    // autoFocus
                   />
                 </Box>
               </Box>
@@ -210,10 +210,16 @@ export const EditableSRTE = ({
           ErrorBoundary={LexicalErrorBoundary}
         />
         {floatingAnchorElem !== null && (
-          <DraggableBlockPlugin
-            anchorElem={floatingAnchorElem}
-            toolbarHeight={toolBarHeight}
-          />
+          <>
+            <DraggableBlockPlugin
+              anchorElem={floatingAnchorElem}
+              toolbarHeight={toolBarHeight}
+            />
+            {/* <TableCellActionMenuPlugin
+              anchorElem={floatingAnchorElem}
+              cellMerge={true}
+            /> */}
+          </>
         )}
 
         <Box>
@@ -239,7 +245,7 @@ export const EditableSRTE = ({
             setIsEditorOpen={setIsEditorOpen}
             shouldCheckForPrepopulation={shouldCheckForPrepopulation}
             documentTypeCount={documentsCount}
-          // setDisplayData={setDisplayData}
+            // setDisplayData={setDisplayData}
           />
         </Box>
         {shouldShowTree ? <TreeViewPlugin /> : null}

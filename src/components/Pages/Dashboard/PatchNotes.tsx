@@ -155,8 +155,8 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug causing projects to be duplicated across pages when
-              searching or filtering
+              Fix: Fixed bug causing error message when sending email after
+              reopening projects closed without closure doc
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -164,8 +164,25 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug causing user-generated table columns to all be 75px
+              Fix: Fixed bug on comment likes preventing more than 1 like
             </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Fix: Fixed bug causing projects to be duplicated across pages when
+              searching or filtering
+            </ListItem>
+            {/* <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Fix: Fixed bug causing user-generated table columns to all be 75px
+            </ListItem> */}
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
@@ -183,7 +200,7 @@ export const PatchNotes = ({
               <ListIcon as={MdCheckCircle} color="green.500" />
               Change: Moved email lists to admin data page
             </ListItem>
-            <ListItem
+            {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
@@ -191,8 +208,8 @@ export const PatchNotes = ({
               <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Added ability for admins to set a project status directly
               to address legacy data issues
-            </ListItem>
-            <ListItem
+            </ListItem> */}
+            {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
@@ -201,7 +218,7 @@ export const PatchNotes = ({
               Feature: Added lists of problematic projects to admin data page:
               empty projects, multiple project leads, no leader tag set,
               external leaders
-            </ListItem>
+            </ListItem> */}
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
@@ -211,14 +228,14 @@ export const PatchNotes = ({
               Feature: Updated traditional layout 'Endorsements' and 'Documents'
               tables to enable sorting on each field.
             </ListItem>
-            <ListItem
+            {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Added 'Involved Projects' section to user profile
-            </ListItem>
+            </ListItem> */}
           </List>
 
           <span style={{ marginTop: 20 }}>

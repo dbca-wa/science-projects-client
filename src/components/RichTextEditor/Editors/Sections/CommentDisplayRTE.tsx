@@ -43,7 +43,8 @@ import { PrepopulateCommentDisplayPlugin } from "../../Plugins/PrepopulateCommen
 
 export interface ICommentReaction {
   pk?: number;
-  user: IUserData;
+  user: number;
+  // user: IUserData;
   comment?: number | null;
   direct_message?: number | null;
   reaction:
@@ -167,6 +168,7 @@ export const CommentDisplayRTE = ({
   const [likeCount, setLikeCount] = useState<number>(0);
 
   useEffect(() => {
+    // console.log(reactions);
     const likes = reactions?.map((r) => r.reaction === "thumbup");
     setLikeCount(likes?.length ? likes.length : 0);
   }, []);
@@ -252,20 +254,24 @@ export const CommentDisplayRTE = ({
 
   useEffect(() => {
     const userLiked = reactions.some(
-      (r) => Number(r.user) === Number(user.pk) && r.reaction === "thumbup"
+      (r) =>
+        Number(r.user) === Number(me?.userData?.pk) && r.reaction === "thumbup",
     );
     setUserHasLiked(userLiked);
-  }, [reactions, user.pk]);
+  }, [reactions, me?.userData?.pk]);
 
   return (
     <Box>
-      <DeleteCommentModal
-        commentPk={commentPk}
-        documentPk={documentPk}
-        refetchData={refetchComments}
-        isOpen={isDeleteCommentModalOpen}
-        onClose={onCloseDeleteCommentModal}
-      />
+      {(!otherUser || me?.userData?.is_superuser) && (
+        <DeleteCommentModal
+          commentPk={commentPk}
+          documentPk={documentPk}
+          refetchData={refetchComments}
+          isOpen={isDeleteCommentModalOpen}
+          onClose={onCloseDeleteCommentModal}
+        />
+      )}
+
       <Flex>
         <Box pb={2} w={"100%"} zIndex={2}>
           <Box
@@ -353,7 +359,7 @@ export const CommentDisplayRTE = ({
                       onClick={() => {
                         // console.log("liked");
                         onLike({
-                          user,
+                          user: me?.userData?.pk,
                           reaction: "thumbup",
                           comment: Number(commentPk),
                         });
