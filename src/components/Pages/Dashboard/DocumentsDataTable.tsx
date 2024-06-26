@@ -251,7 +251,7 @@ export const DocumentsDataTable = ({
                 : { bg: "blue.50", color: "black" }
             }
           >
-            Capacity
+            Level
           </Button>
         );
       },
@@ -511,9 +511,9 @@ export const DocumentsDataTable = ({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 );
               })}
