@@ -33,7 +33,7 @@ export const PatchNotes = ({
   const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
     .VITE_PRODUCTION_BACKEND_BASE_URL;
 
-  const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.1.4";
+  const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.1.5";
 
   const [welcomeUser, setWelcomeUser] = useState("");
   const [spmsText, setSpmsText] = useState("Science Project Management System");
@@ -149,32 +149,6 @@ export const PatchNotes = ({
             {/* &#9881;&#65039; */}
           </Text>
           <List spacing={1} ml={2}>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug causing error message when sending email after
-              reopening projects closed without closure doc
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug on comment likes preventing more than 1 like
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug causing projects to be duplicated across pages when
-              searching or filtering
-            </ListItem>
             {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
@@ -183,14 +157,16 @@ export const PatchNotes = ({
               <ListIcon as={MdCheckCircle} color="green.500" />
               Fix: Fixed bug causing user-generated table columns to all be 75px
             </ListItem> */}
+
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Change: Added project tag to home page references and on each
-              project document, below status
+              Update: Reject Image uploads over 10MB in size &#128517; Large
+              files slow load speeds and are unnecessary for final PDF output as
+              they are shrunk
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -198,9 +174,38 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Change: Moved email lists to admin data page
+              Update: Renamed 'Tasks and Milestones' to 'Milestones' on PDFs and
+              Rich Text Editor
             </ListItem>
-            {/* <ListItem
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Project PDFs revamped, concept and project plan no longer
+              show approvals. Additionally, orphans, widows, font and spacing
+              udpated across the board
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added tab to "My Business Area" page for viewing projects
+              which have not yet been approved by project leaders
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added admin ability to unapprove concept and project plan
+              final approval, even after next stage document created.
+            </ListItem>
+            <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
@@ -208,41 +213,51 @@ export const PatchNotes = ({
               <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Added ability for admins to set a project status directly
               to address legacy data issues
-            </ListItem> */}
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added lists of problematic projects to admin data page:
-              empty projects, multiple project leads, no leader tag set,
-              external leaders
-            </ListItem> */}
+            </ListItem>
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Updated traditional layout 'Endorsements' and 'Documents'
-              tables to enable sorting on each field.
+              Feature: Added 'Involved Projects' section to user profile - all a
+              user's projects can be viewed by clicking on their profile
             </ListItem>
-            {/* <ListItem
+            <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added 'Involved Projects' section to user profile
-            </ListItem> */}
+              Feature: Updated approver/s to better determine user providing
+              final sign off on documents/receiving Directorate level emails
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added admin ability to 'merge' users - for users who have
+              multiple accounts with projects tied to the older account
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added lists of problematic projects to admin data page:
+              empty projects, multiple project leader tags, no leader tag set,
+              external leaders, as well as a buttons and modals to remedy these
+            </ListItem>
           </List>
 
           <span style={{ marginTop: 20 }}>
             <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
               We are always looking for ways to improve, and value your
               feedback! If you notice something off, or would like to request a
-              change, please submit feedback here, send an email to{" "}
+              change, please send an email to{" "}
             </Text>
             <Link
               href={`mailto:jarid.prince@dbca.wa.gov.au&subject=SPMS Feedback`}
@@ -260,11 +275,11 @@ export const PatchNotes = ({
             >
               message on Teams.
             </Link>
-            <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
-              {" "}
-              Don't be shy, we can only make things better with your help!
-            </Text>
           </span>
+          <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
+            {" "}
+            Don't be shy, we can only make things better with your help!
+          </Text>
         </Flex>
         <Flex alignItems={"end"} flexDir={"row"} justifyContent={"right"}>
           <Button
