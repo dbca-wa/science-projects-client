@@ -121,9 +121,9 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="w-full text-center"
             rightIcon={sortIcon}
-            p={0}
-            m={0}
-            px={"10px"}
+            // p={0}
+            // m={0}
+            // px={"10px"}
             bg={"transparent"}
             _hover={
               colorMode === "dark"
@@ -289,9 +289,9 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 );
               })}

@@ -242,8 +242,8 @@ export const DocumentsDataTable = ({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="w-full text-center"
             rightIcon={sortIcon}
-            p={0}
-            m={0}
+            // p={0}
+            // m={0}
             bg={"transparent"}
             _hover={
               colorMode === "dark"
@@ -302,8 +302,8 @@ export const DocumentsDataTable = ({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="w-full text-center"
             rightIcon={sortIcon}
-            p={0}
-            m={0}
+            // p={0}
+            // m={0}
             bg={"transparent"}
             _hover={
               colorMode === "dark"
