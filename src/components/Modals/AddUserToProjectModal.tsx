@@ -147,8 +147,8 @@ export const AddUserToProjectModal = ({
           queryKey: [
             "projects",
             preselectedProject !== undefined &&
-              preselectedProject !== null &&
-              preselectedProject !== 0
+            preselectedProject !== null &&
+            preselectedProject !== 0
               ? preselectedProject
               : selectedProject,
           ],
@@ -156,12 +156,13 @@ export const AddUserToProjectModal = ({
         refetchTeamData && refetchTeamData();
         if (!location.pathname.includes("project")) {
           navigate(
-            `/projects/${preselectedProject !== undefined &&
+            `/projects/${
+              preselectedProject !== undefined &&
               preselectedProject !== null &&
               preselectedProject !== 0
-              ? preselectedProject
-              : selectedProject
-            }`
+                ? preselectedProject
+                : selectedProject
+            }`,
           );
         }
       }, 350);
@@ -171,9 +172,9 @@ export const AddUserToProjectModal = ({
         const nonFieldErrors = error?.response?.data?.non_field_errors;
         const errorMessage =
           nonFieldErrors &&
-            nonFieldErrors.includes(
-              "The fields project, user must make a unique set."
-            )
+          nonFieldErrors.includes(
+            "The fields project, user must make a unique set.",
+          )
             ? "Cannot add a user to a project they are already in."
             : nonFieldErrors?.join(", ") || "An error occurred";
 
@@ -196,7 +197,7 @@ export const AddUserToProjectModal = ({
   // State
   const [selectedUser, setSelectedUser] = useState<number>();
   const [selectedProject, setSelectedProject] = useState<number>(
-    preselectedProject ? preselectedProject : 0
+    preselectedProject ? preselectedProject : 0,
   );
 
   // Watched Variables
@@ -280,8 +281,8 @@ export const AddUserToProjectModal = ({
               )}
 
               {preselectedUser !== 0 &&
-                preselectedUser !== null &&
-                preselectedUser !== undefined ? (
+              preselectedUser !== null &&
+              preselectedUser !== undefined ? (
                 <UserSearchDropdown
                   {...register("user", { required: true })}
                   onlyInternal={false}
@@ -399,7 +400,7 @@ export const AddUserToProjectModal = ({
             </Button>
 
             <Button
-              isDisabled={selectedProject === 0}
+              isDisabled={selectedProject === 0 || !selectedUser}
               onClick={() => {
                 // console.log("clicked");
                 onSubmitMembershipCreation({
