@@ -28,7 +28,7 @@ export const useGetRTESectionPlaceholder = (section: string) => {
       case "knowledge_transfer":
         return "knowledge transfer";
       case "project_tasks":
-        return "tasks and milestones";
+        return "milestones";
       case "related_projects":
         return "names of related projects";
       case "listed_references":

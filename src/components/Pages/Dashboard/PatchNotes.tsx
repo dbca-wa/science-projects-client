@@ -158,7 +158,7 @@ export const PatchNotes = ({
               Fix: Fixed bug causing user-generated table columns to all be 75px
             </ListItem> */}
 
-            <ListItem
+            {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
@@ -167,7 +167,7 @@ export const PatchNotes = ({
               Update: Reject Image uploads over 10MB in size &#128517; Large
               files slow load speeds and are unnecessary for final PDF output as
               they are shrunk
-            </ListItem>
+            </ListItem> */}
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
@@ -214,7 +214,17 @@ export const PatchNotes = ({
               Feature: Added ability for admins to set a project status directly
               to address legacy data issues
             </ListItem>
-            <ListItem
+            {/* <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added lists of problematic projects to admin data page:
+              empty projects, multiple project leader tags, no leader tag set,
+              external leaders, as well as a buttons and modals to remedy these
+            </ListItem> */}
+            {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
@@ -240,17 +250,7 @@ export const PatchNotes = ({
               <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Added admin ability to 'merge' users - for users who have
               multiple accounts with projects tied to the older account
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added lists of problematic projects to admin data page:
-              empty projects, multiple project leader tags, no leader tag set,
-              external leaders, as well as a buttons and modals to remedy these
-            </ListItem>
+            </ListItem> */}
           </List>
 
           <span style={{ marginTop: 20 }}>

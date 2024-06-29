@@ -3,7 +3,7 @@ import { EditorSubsections } from "@/types";
 import { useState, useEffect } from "react";
 
 export const useGetRTESectionTitle = (
-  section: GuideSections | EditorSubsections
+  section: GuideSections | EditorSubsections,
 ) => {
   const [sectionText, setSectionText] = useState("");
 
@@ -37,7 +37,7 @@ export const useGetRTESectionTitle = (
         setSectionText("Knowledge Transfer");
         break;
       case "project_tasks":
-        setSectionText("Tasks and Milestones");
+        setSectionText("Milestones");
         break;
       case "related_projects":
         setSectionText("Related Science Projects");
