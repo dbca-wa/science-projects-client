@@ -6,19 +6,19 @@ import { getMyBusinessAreas } from "../../api";
 import { IBusinessArea } from "@/types";
 
 export const useMyBusinessAreas = () => {
-	const { isPending, data, refetch } = useQuery({
-		queryKey: ["myBusinessAreas"],
-		queryFn: getMyBusinessAreas,
-		retry: false,
-	});
-	// Sort the branches alphabetically
-	const sortedBA = data
-		? [...data].sort((a, b) => a.name.localeCompare(b.name))
-		: [];
+  const { isPending, data, refetch } = useQuery({
+    queryKey: ["myBusinessAreas"],
+    queryFn: getMyBusinessAreas,
+    retry: false,
+  });
+  // Sort the branches alphabetically
+  const sortedBA = data
+    ? [...data].sort((a, b) => a.name.localeCompare(b.name))
+    : [];
 
-	return {
-		basLoading: isPending,
-		baData: sortedBA as IBusinessArea[],
-		refetch: refetch,
-	};
+  return {
+    basLoading: isPending,
+    baData: sortedBA as IBusinessArea[],
+    refetch: refetch,
+  };
 };
