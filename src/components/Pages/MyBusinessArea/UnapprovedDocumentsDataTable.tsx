@@ -51,7 +51,7 @@ import {
 } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
-interface IPendingProjectDocumentData {
+export interface IPendingProjectDocumentData {
   all: IMainDoc[];
   team: IMainDoc[];
   ba: IMainDoc[];
@@ -60,7 +60,7 @@ interface IPendingProjectDocumentData {
 }
 
 interface Props {
-  combinedData: ITaskDisplayCard[];
+  combinedData?: ITaskDisplayCard[];
   pendingProjectDocumentData: IPendingProjectDocumentData;
 }
 
@@ -189,7 +189,7 @@ function isPersonalTypeTask(taskRow: any): taskRow is IPersonalTypeTask {
   return "name" in taskRow;
 }
 
-export const DocumentsDataTable = ({
+export const UnapprovedDocumentsDataTable = ({
   combinedData,
   pendingProjectDocumentData,
 }: Props) => {
@@ -216,9 +216,9 @@ export const DocumentsDataTable = ({
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else {
       if (e.ctrlKey || e.metaKey) {
-        window.open(`projects/${pk}/${docKindString}`, "_blank"); // Opens in a new tab
+        window.open(`/projects/${pk}/${docKindString}`, "_blank"); // Opens in a new tab
       } else {
-        navigate(`projects/${pk}/${docKindString}`);
+        navigate(`/projects/${pk}/${docKindString}`);
       }
     }
   };
