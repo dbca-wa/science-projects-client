@@ -403,6 +403,15 @@ export const getMe = async () => {
   return res;
 };
 
+export const getUsersProjects = async ({ queryKey }: QueryFunctionContext) => {
+  const [_, pk] = queryKey;
+  const res = instance.get(`users/${pk}/projects`).then((res) => {
+    // console.log(res.data)
+    return res.data;
+  });
+  return res;
+};
+
 export interface IApproveProgressReport {
   kind: "studentreport" | "progressreport";
   isActive: number;
@@ -445,7 +454,7 @@ export const getTeamLead = async ({ queryKey }: QueryFunctionContext) => {
     });
   return res;
 };
-getTeamLead;
+// getTeamLead;
 
 // interface IFullUserProps {
 //     pk: string;
