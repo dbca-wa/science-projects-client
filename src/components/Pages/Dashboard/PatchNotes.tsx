@@ -149,25 +149,6 @@ export const PatchNotes = ({
             {/* &#9881;&#65039; */}
           </Text>
           <List spacing={1} ml={2}>
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug causing user-generated table columns to all be 75px
-            </ListItem> */}
-
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Reject Image uploads over 10MB in size &#128517; Large
-              files slow load speeds and are unnecessary for final PDF output as
-              they are shrunk
-            </ListItem> */}
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
@@ -202,6 +183,17 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added lists of problematic projects to admin data and My
+              Business Area pages: empty projects, multiple project leader tags,
+              no leader tag set, external leaders, as well as a buttons and
+              modals to remedy these
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Added admin ability to unapprove concept and project plan
               final approval, even after next stage document created.
             </ListItem>
@@ -214,17 +206,7 @@ export const PatchNotes = ({
               Feature: Added ability for admins to set a project status directly
               to address legacy data issues
             </ListItem>
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added lists of problematic projects to admin data page:
-              empty projects, multiple project leader tags, no leader tag set,
-              external leaders, as well as a buttons and modals to remedy these
-            </ListItem> */}
-            {/* <ListItem
+            <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
@@ -233,6 +215,24 @@ export const PatchNotes = ({
               Feature: Added 'Involved Projects' section to user profile - all a
               user's projects can be viewed by clicking on their profile
             </ListItem>
+            {/* <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Fix: Fixed bug causing user-generated table columns to all be 75px
+            </ListItem> 
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Reject Image uploads over 10MB in size &#128517; Large
+              files slow load speeds and are unnecessary for final PDF output as
+              they are shrunk
+            </ListItem> 
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}

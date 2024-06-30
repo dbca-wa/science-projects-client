@@ -551,6 +551,14 @@ interface IProjectClosure {
   backup_location: string | null;
 }
 
+// Define the union type
+type IProjectDocument =
+  | IConceptPlan
+  | IProjectPlan
+  | IProgressReport
+  | IStudentReport
+  | IProjectClosure;
+
 interface IProjectDocuments {
   concept_plan: IConceptPlan | null;
   project_plan: IProjectPlan | null;
