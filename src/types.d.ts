@@ -581,6 +581,17 @@ interface IMiniEndorsement {
   project_plan: IProjectPlan;
 }
 
+interface ITinyProjectData {
+  pk?: number | undefined;
+  id?: number | undefined;
+  title: string;
+  image: ProjectImage;
+  tag: string;
+  // year: number;
+  // kind: string;
+  // number: number;
+}
+
 interface IProjectData {
   pk: number | undefined;
   id?: number;

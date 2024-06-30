@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 interface Props extends TextProps {
   htmlContent: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   textBefore?: string;
   extraText?: string;
 }
