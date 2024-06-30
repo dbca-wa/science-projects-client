@@ -1,9 +1,13 @@
+import {
+  getProblematicProjectsForBusinessAreas,
+  getUnapprovedDocsForBusinessAreas,
+} from "@/lib/api";
 import { useMyBusinessAreas } from "@/lib/hooks/tanstack/useMyBusinessAreas";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
+import { IMainDoc, IProjectData } from "@/types";
 import {
   Box,
   Center,
-  Grid,
   Tab,
   TabList,
   TabPanel,
@@ -12,14 +16,14 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { BusinessAreaEditableDisplay } from "./BusinessAreaEditableDisplay";
 import { useEffect, useState } from "react";
+import { BusinessAreaEditableDisplay } from "./BusinessAreaEditableDisplay";
+import { ProblematicProjectsDataTable } from "./ProblematicProjectsDataTable";
 import {
   IPendingProjectDocumentData,
   UnapprovedDocumentsDataTable,
 } from "./UnapprovedDocumentsDataTable";
-import { getUnapprovedDocsForBusinessAreas } from "@/lib/api";
-import { IMainDoc, IProjectDocument, IProjectDocuments } from "@/types";
+import { motion } from "framer-motion";
 // Show BAs how their BA will display on AR
 
 export const MyBusinessArea = () => {
@@ -39,14 +43,27 @@ export const MyBusinessArea = () => {
     [key: number]: IMainDoc[];
   };
 
+  type ProblematicProjectsInArea = {
+    [key: number]: IProjectData[];
+  };
+
   const [unapprovedDocumentsInAreas, setUnapprovedDocumentsInAreas] =
     useState<UnapprovedDocumentsInAreas>({});
 
+  const [problematicProjectsData, setProblematicProjectsData] =
+    useState<ProblematicProjectsInArea>({});
+
   useEffect(() => {
-    if (Object.keys(unapprovedDocumentsInAreas).length > 0) {
-      console.log(unapprovedDocumentsInAreas);
+    if (Object.keys(problematicProjectsData).length > 0) {
+      console.log(problematicProjectsData);
     }
-  }, [unapprovedDocumentsInAreas]);
+  }, [problematicProjectsData]);
+
+  //   useEffect(() => {
+  //     if (Object.keys(unapprovedDocumentsInAreas).length > 0) {
+  //       console.log(unapprovedDocumentsInAreas);
+  //     }
+  //   }, [unapprovedDocumentsInAreas]);
 
   useEffect(() => {
     const fetchUnapprovedDocs = async () => {
@@ -54,18 +71,29 @@ export const MyBusinessArea = () => {
         const flatPkList = myBusinessAreas.map((ba) => ba.pk);
         // console.log(flatPkList);
 
-        if (
-          flatPkList.length >= 1 &&
-          Object.keys(unapprovedDocumentsInAreas).length === 0
-        ) {
-          try {
-            const res = await getUnapprovedDocsForBusinessAreas({
-              baArray: flatPkList,
-            });
-            // console.log(res);
-            setUnapprovedDocumentsInAreas(res);
-          } catch (error) {
-            console.error("Error fetching unapproved documents:", error);
+        if (flatPkList.length >= 1) {
+          if (Object.keys(unapprovedDocumentsInAreas).length === 0) {
+            try {
+              const res = await getUnapprovedDocsForBusinessAreas({
+                baArray: flatPkList,
+              });
+              // console.log(res);
+              setUnapprovedDocumentsInAreas(res);
+            } catch (error) {
+              console.error("Error fetching unapproved documents:", error);
+            }
+          }
+
+          if (Object.keys(problematicProjectsData).length === 0) {
+            try {
+              const res = await getProblematicProjectsForBusinessAreas({
+                baArray: flatPkList,
+              });
+              // console.log(res);
+              setProblematicProjectsData(res);
+            } catch (error) {
+              console.error("Error fetching problematic projects:", error);
+            }
           }
         }
       }
@@ -92,6 +120,7 @@ export const MyBusinessArea = () => {
               <Tabs isFitted>
                 <TabList>
                   <Tab>Display</Tab>
+                  <Tab>Problematic Projects</Tab>
                   <Tab>Unapproved Project Documents</Tab>
                 </TabList>
                 <TabPanels>
@@ -122,6 +151,60 @@ export const MyBusinessArea = () => {
                         ))}
                       </Box>
                     </Center>
+                  </TabPanel>
+                  <TabPanel>
+                    <Box mb={4}>
+                      <Text
+                        color={colorMode === "light" ? "gray.500" : "gray.300"}
+                        mt={2}
+                      >
+                        This section shows all projects belonging to your
+                        Business Area which have some data problems which may
+                        prevent progressing to the annual report.
+                      </Text>
+                    </Box>
+
+                    {myBusinessAreas?.map((ba) => {
+                      return (
+                        <Box key={`${ba?.pk}problemProjects`}>
+                          <Text fontWeight={"bold"} fontSize={"larger"} py={4}>
+                            {ba?.name}
+                          </Text>
+                          {Object.keys(problematicProjectsData).length > 0 && (
+                            <>
+                              <ProblematicProjectsDataTable
+                                projectData={Object.keys(
+                                  problematicProjectsData[ba?.pk],
+                                ).reduce((acc, key) => {
+                                  const problemType =
+                                    key === "no_members"
+                                      ? "memberless"
+                                      : key === "no_leader"
+                                        ? "leaderless"
+                                        : key === "external_leader"
+                                          ? "externally_led"
+                                          : key === "multiple_leads"
+                                            ? "multiple_leaders"
+                                            : ""; // handle other cases if necessary
+
+                                  const projectsWithType =
+                                    problematicProjectsData[ba?.pk][key].map(
+                                      (project) => ({
+                                        ...project,
+                                        problemKind: problemType,
+                                      }),
+                                    );
+
+                                  return [...acc, ...projectsWithType];
+                                }, [])}
+                              />
+                            </>
+                          )}
+                        </Box>
+
+                        // problematicProjectsData[ba?.pk]
+                      );
+                    })}
                   </TabPanel>
                   <TabPanel>
                     <Box mb={4}>
@@ -172,7 +255,6 @@ export const MyBusinessArea = () => {
                         </Box>
                       );
                     })}
-                    <Box></Box>
                   </TabPanel>
                 </TabPanels>
               </Tabs>

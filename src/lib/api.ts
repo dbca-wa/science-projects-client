@@ -469,6 +469,18 @@ export const getUnapprovedDocsForBusinessAreas = ({
     });
   return res;
 };
+
+export const getProblematicProjectsForBusinessAreas = ({
+  baArray,
+}: IUnapprovedDocsForBAProps) => {
+  const res = instance
+    .post(`agencies/business_areas/problematic_projects`, { baArray: baArray })
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
+
 // getTeamLead;
 
 // interface IFullUserProps {

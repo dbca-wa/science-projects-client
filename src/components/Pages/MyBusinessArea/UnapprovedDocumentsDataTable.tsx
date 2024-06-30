@@ -20,7 +20,6 @@ import {
   Box,
   Button,
   Center,
-  Flex,
   Icon,
   Text,
   ToastId,
@@ -550,7 +549,8 @@ export const UnapprovedDocumentsDataTable = ({
             <TableRow>
               <TableCell colSpan={columns?.length} className="h-24 text-center">
                 {/* <Text mt={4} mx={2}> */}
-                All done!
+                No docs exist for this Business Area which Project Leads have
+                not approved.
                 {/* </Text> */}
               </TableCell>
             </TableRow>
