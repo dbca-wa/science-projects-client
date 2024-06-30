@@ -454,6 +454,21 @@ export const getTeamLead = async ({ queryKey }: QueryFunctionContext) => {
     });
   return res;
 };
+
+export interface IUnapprovedDocsForBAProps {
+  baArray: number[];
+}
+
+export const getUnapprovedDocsForBusinessAreas = ({
+  baArray,
+}: IUnapprovedDocsForBAProps) => {
+  const res = instance
+    .post(`agencies/business_areas/unapproved_docs`, { baArray: baArray })
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
 // getTeamLead;
 
 // interface IFullUserProps {
