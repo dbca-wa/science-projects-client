@@ -175,11 +175,11 @@ export interface ISendSingleEmail {
   project?: number;
   projectTitle?: string;
   projectDocumentKind?:
-    | "concept"
-    | "projectplan"
-    | "progressreport"
-    | "studentreport"
-    | "projectclosure";
+  | "concept"
+  | "projectplan"
+  | "progressreport"
+  | "studentreport"
+  | "projectclosure";
   stage?: number;
 }
 
@@ -618,6 +618,7 @@ interface IProjectData {
 
   created_at: Date;
   updated_at: Date;
+  tag?: string;
 }
 
 interface IFullProjectDetails {

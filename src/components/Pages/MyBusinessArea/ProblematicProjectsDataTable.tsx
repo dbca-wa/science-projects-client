@@ -29,15 +29,51 @@ import { useNavigate } from "react-router-dom";
 
 export interface IProblemProjectData extends IProjectData {
   problemKind:
-    | "memberless"
-    | "leaderless"
-    | "multiple_leaders"
-    | "externally_led";
+  | "memberless"
+  | "leaderless"
+  | "multiple_leaders"
+  | "externally_led";
 }
 
 interface Props {
   projectData: IProblemProjectData[];
 }
+
+type statuses =
+  | "pending"
+  | "closure_requested"
+  | "updating"
+  | "completed"
+  | "new"
+  | "active"
+  | "final_update"
+  | "terminated"
+  | "suspended";
+
+const statusOrder = [
+  "final_update",
+  "updating",
+  "active",
+  "pending",
+  "new",
+  "closure_requested",
+  "suspended",
+  "completed",
+  "terminated",
+];
+const statusMapping = {
+  pending: "Pending Project Plan",
+  closure_requested: "Closure Requested",
+  updating: "Update Requested",
+  completed: "Completed",
+  new: "New",
+  active: "Active (Approved)",
+  final_update: "Final Update Requested",
+  terminated: "Terminated and Closed",
+  suspended: "Suspended",
+};
+
+
 
 export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
   const { colorMode } = useColorMode();
@@ -52,59 +88,52 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
     if (pk === undefined) {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else {
-      if (isOnProjectsPage) {
-        if (e.ctrlKey || e.metaKey) {
-          window.open(`${pk}`, "_blank"); // Opens in a new tab
-        } else {
-          navigate(`${pk}`);
-        }
+      if (e.ctrlKey || e.metaKey) {
+        window.open(`/projects/${pk}`, "_blank"); // Opens in a new tab
       } else {
-        if (e.ctrlKey || e.metaKey) {
-          window.open(`projects/${pk}`, "_blank"); // Opens in a new tab
-        } else {
-          navigate(`projects/${pk}`);
-        }
+        navigate(`/projects/${pk}`);
       }
     }
   };
 
-  type statuses =
-    | "pending"
-    | "closure_requested"
-    | "updating"
-    | "completed"
-    | "new"
-    | "active"
-    | "final_update"
-    | "terminated"
-    | "suspended";
+  type problems =
+    | "memberless"
+    | "leaderless"
+    | "externally_led"
+    | "multiple_leaders";
 
   type kinds = "core_function" | "science" | "student" | "external";
 
-  const statusOrder = [
-    "final_update",
-    "updating",
-    "active",
-    "pending",
-    "new",
-    "closure_requested",
-    "suspended",
-    "completed",
-    "terminated",
+  const problemOrder = [
+    "memberless",
+    "externally_led",
+    "leaderless",
+    "multiple_leaders",
   ];
 
   const kindOrder = ["science", "student", "core_function", "external"];
 
-  const statusMapping = {
-    pending: "Pending Project Plan",
-    closure_requested: "Closure Requested",
-    updating: "Update Requested",
-    completed: "Completed",
-    new: "New",
-    active: "Active (Approved)",
-    final_update: "Final Update Requested",
-    terminated: "Terminated and Closed",
-    suspended: "Suspended",
+  const problemMapping = {
+    memberless: {
+      title: "No Members",
+      description: "This project has no members and cannot progress! Add members and set a leader to fix this problem",
+      color: "red",
+    },
+    leaderless: {
+      title: "No Leader Tag",
+      description: "The leader tag for this project has not been set. Projects with members always have a leader - if the tag isnt appearing, assign another user as leader then set it back to fix this problem.",
+      color: "orange",
+    },
+    externally_led: {
+      title: "Externally Led",
+      description: "This project is externally led and cannot progress! Each project needs a DBCA staff member set as the leader to fix the problem",
+      color: "red",
+    },
+    multiple_leaders: {
+      title: "Multiple Leader Tags",
+      description: "This project has multiple leader tags due to the renaming of 'Supervising Scientist' to 'Project Leader', set the tags appropriately to fix this issue.",
+      color: "yellow",
+    },
   };
 
   const kindDict = {
@@ -135,7 +164,7 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
   };
   const columns: ColumnDef<IProjectData>[] = [
     {
-      accessorKey: "kind",
+      accessorKey: "status",
       header: ({ column }) => {
         const isSorted = column.getIsSorted();
         let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
@@ -146,55 +175,60 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
           sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
         }
         return (
-          // <Text
-          //   className="m-0 p-0 text-center"
-          //   color={colorMode === "light" ? "black" : "white"}
+          // <Button
+          //   // variant="ghost"
+          //   bg={"transparent"}
+          //   onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          //   className="w-full text-left"
+          //   rightIcon={sortIcon}
+          //   _hover={
+          //     colorMode === "dark"
+          //       ? { bg: "blue.400", color: "white" }
+          //       : { bg: "blue.50", color: "black" }
+          //   }
           // >
-          //   Kind
-          // </Text>
+          //   Status
+          // </Button>
           <Button
             // variant="ghost"
+            bg={"transparent"}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
+            className="w-full text-right"
             rightIcon={sortIcon}
             // p={0}
             // m={0}
-            bg={"transparent"}
+            justifyContent={"flex-end"}
             _hover={
               colorMode === "dark"
                 ? { bg: "blue.400", color: "white" }
                 : { bg: "blue.50", color: "black" }
             }
           >
-            Kind
+            Status
           </Button>
         );
       },
+
       cell: ({ row }) => {
-        const originalKindData: kinds = row.getValue("kind");
+        const originalStatusData: statuses = row.getValue("status");
 
-        const formattedString = kindDict[originalKindData].string;
-        const formattedIcon = kindDict[originalKindData].icon;
-        const formattedColour = kindDict[originalKindData].color;
+        const formatted = statusMapping[originalStatusData] || "Other";
 
-        // console.log({ originalKindData, formattedString });
         return (
-          <Box className="text-center align-middle font-medium">
-            {/* <Text>{formattedString}</Text> */}
-            <Icon
-              as={formattedIcon}
-              color={`${formattedColour}.500`}
-              boxSize={"22px"}
-            />
-            <Text color={`${formattedColour}.500`}>{formattedString}</Text>
+          <Box
+            className="text-right font-medium"
+            color={colorMode === "light" ? "gray.500" : "gray.300"}
+            px={4}
+          >
+            {formatted}
           </Box>
         );
       },
       sortingFn: (rowA, rowB) => {
-        const kindA: kinds = rowA.getValue("kind");
-        const kindB: kinds = rowB.getValue("kind");
-        const indexA = kindOrder.indexOf(kindA);
-        const indexB = kindOrder.indexOf(kindB);
+        const statusA: statuses = rowA.getValue("status");
+        const statusB: statuses = rowB.getValue("status");
+        const indexA = statusOrder.indexOf(statusA);
+        const indexB = statusOrder.indexOf(statusB);
         return indexA - indexB;
       },
     },
@@ -294,6 +328,9 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
 
           return formattedDate;
         };
+
+
+        const tag = row.original.tag;
         return (
           <Box className="text-left font-medium">
             <Text
@@ -317,8 +354,7 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
               // onClick={(e) => goToProject(e, row.original.id)}
               px={4}
             >
-              {kindDict[row.getValue("kind") as kinds].tag}-{row.original.year}-
-              {row.original.number}
+              {tag}
             </Text>
             <Text
               color={"gray.400"}
@@ -342,6 +378,137 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
         return a.localeCompare(b);
       },
     },
+    {
+      accessorKey: "problemKind",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+        let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
+
+        if (isSorted === "asc") {
+          sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
+        } else if (isSorted === "desc") {
+          sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
+        }
+        return (
+          <Button
+            // variant="ghost"
+            bg={"transparent"}
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="w-full text-right"
+            rightIcon={sortIcon}
+            // p={0}
+            // m={0}
+            justifyContent={"flex-start"}
+            _hover={
+              colorMode === "dark"
+                ? { bg: "blue.400", color: "white" }
+                : { bg: "blue.50", color: "black" }
+            }
+          >
+            Problem
+          </Button>
+        );
+      },
+
+      cell: ({ row }) => {
+        const originalProblemData: problems = row.getValue("problemKind");
+        const formatted = problemMapping[originalProblemData].title || "Other";
+        const formattedProblem = problemMapping[originalProblemData].description;
+        return (
+          <Box
+            className="text-left font-medium"
+            color={colorMode === "light" ? `${problemMapping[originalProblemData].color}.500` : `${problemMapping[originalProblemData].color}.300`}
+            px={4}
+          >
+            {formatted}
+
+            <Text
+              color={"gray.500"}
+              fontWeight={"semibold"}
+              fontSize={"x-small"}
+            // onClick={(e) => goToProject(e, row.original.id)}
+            >
+              {formattedProblem}
+
+            </Text>
+
+          </Box>
+        );
+      },
+      sortingFn: (rowA, rowB) => {
+        const problemA: problems = rowA.getValue("problemKind");
+        const problemB: problems = rowB.getValue("problemKind");
+        const indexA = problemOrder.indexOf(problemA);
+        const indexB = problemOrder.indexOf(problemB);
+        return indexA - indexB;
+      },
+    },
+    // {
+    //   accessorKey: "kind",
+    //   header: ({ column }) => {
+    //     const isSorted = column.getIsSorted();
+    //     let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
+
+    //     if (isSorted === "asc") {
+    //       sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
+    //     } else if (isSorted === "desc") {
+    //       sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
+    //     }
+    //     return (
+    //       // <Text
+    //       //   className="m-0 p-0 text-center"
+    //       //   color={colorMode === "light" ? "black" : "white"}
+    //       // >
+    //       //   Kind
+    //       // </Text>
+    //       <Button
+    //         // variant="ghost"
+    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    //         className="w-full text-center"
+    //         rightIcon={sortIcon}
+    //         // p={0}
+    //         // m={0}
+    //         bg={"transparent"}
+    //         _hover={
+    //           colorMode === "dark"
+    //             ? { bg: "blue.400", color: "white" }
+    //             : { bg: "blue.50", color: "black" }
+    //         }
+    //       >
+    //         Kind
+    //       </Button>
+    //     );
+    //   },
+    //   cell: ({ row }) => {
+    //     const originalKindData: kinds = row.getValue("kind");
+
+    //     const formattedString = kindDict[originalKindData].string;
+    //     const formattedIcon = kindDict[originalKindData].icon;
+    //     const formattedColour = kindDict[originalKindData].color;
+
+    //     // console.log({ originalKindData, formattedString });
+    //     return (
+    //       <Box className="text-center align-middle font-medium">
+    //         {/* <Text>{formattedString}</Text> */}
+    //         <Icon
+    //           as={formattedIcon}
+    //           color={`${formattedColour}.500`}
+    //           boxSize={"22px"}
+    //         />
+    //         <Text color={`${formattedColour}.500`}>{formattedString}</Text>
+    //       </Box>
+    //     );
+    //   },
+    //   sortingFn: (rowA, rowB) => {
+    //     const kindA: kinds = rowA.getValue("kind");
+    //     const kindB: kinds = rowB.getValue("kind");
+    //     const indexA = kindOrder.indexOf(kindA);
+    //     const indexB = kindOrder.indexOf(kindB);
+    //     return indexA - indexB;
+    //   },
+    // },
+
+
     {
       accessorKey: "created_at",
       header: ({ column }) => {
@@ -405,75 +572,8 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
         return a.localeCompare(b);
       },
     },
-    {
-      accessorKey: "status",
-      header: ({ column }) => {
-        const isSorted = column.getIsSorted();
-        let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
 
-        if (isSorted === "asc") {
-          sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
-        } else if (isSorted === "desc") {
-          sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
-        }
-        return (
-          // <Button
-          //   // variant="ghost"
-          //   bg={"transparent"}
-          //   onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          //   className="w-full text-left"
-          //   rightIcon={sortIcon}
-          //   _hover={
-          //     colorMode === "dark"
-          //       ? { bg: "blue.400", color: "white" }
-          //       : { bg: "blue.50", color: "black" }
-          //   }
-          // >
-          //   Status
-          // </Button>
-          <Button
-            // variant="ghost"
-            bg={"transparent"}
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-right"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-end"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
-          >
-            Status
-          </Button>
-        );
-      },
 
-      cell: ({ row }) => {
-        const originalStatusData: statuses = row.getValue("status");
-
-        const formatted = statusMapping[originalStatusData] || "Other";
-
-        return (
-          <Box
-            className="text-right font-medium"
-            color={colorMode === "light" ? "gray.500" : "gray.300"}
-            px={4}
-          >
-            {formatted}
-          </Box>
-        );
-      },
-      sortingFn: (rowA, rowB) => {
-        const statusA: statuses = rowA.getValue("status");
-        const statusB: statuses = rowB.getValue("status");
-        const indexA = statusOrder.indexOf(statusA);
-        const indexB = statusOrder.indexOf(statusB);
-        return indexA - indexB;
-      },
-    },
   ];
 
   const returnHTMLTitle = (titleData) => {
@@ -487,7 +587,7 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "status",
+      id: "title",
       desc: false,
     },
   ]);
@@ -524,9 +624,9 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 );
               })}
@@ -542,7 +642,7 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
                   colorMode === "light" ? twRowClassLight : twRowClassDark
                 }
                 data-state={row.getIsSelected() && "selected"}
-                onClick={(e) => goToProject(e, row.original.id)}
+                onClick={(e) => goToProject(e, row.original.pk)}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

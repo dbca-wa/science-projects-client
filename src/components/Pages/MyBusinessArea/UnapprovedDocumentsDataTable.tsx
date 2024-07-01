@@ -59,7 +59,6 @@ export interface IPendingProjectDocumentData {
 }
 
 interface Props {
-  combinedData?: ITaskDisplayCard[];
   pendingProjectDocumentData: IPendingProjectDocumentData;
 }
 
@@ -178,7 +177,41 @@ const docKindsDict = {
   },
 };
 
-// Type Guards
+type statuses =
+  | "pending"
+  | "closure_requested"
+  | "updating"
+  | "completed"
+  | "new"
+  | "active"
+  | "final_update"
+  | "terminated"
+  | "suspended";
+
+const statusOrder = [
+  "final_update",
+  "updating",
+  "active",
+  "pending",
+  "new",
+  "closure_requested",
+  "suspended",
+  "completed",
+  "terminated",
+];
+const statusMapping = {
+  pending: "Pending Project Plan",
+  closure_requested: "Closure Requested",
+  updating: "Update Requested",
+  completed: "Completed",
+  new: "New",
+  active: "Active (Approved)",
+  final_update: "Final Update Requested",
+  terminated: "Terminated and Closed",
+  suspended: "Suspended",
+};
+
+
 // Type Guards
 function isDocTypeTask(taskRow: any): taskRow is IDocTypeTask {
   return "project" in taskRow;
@@ -189,7 +222,6 @@ function isPersonalTypeTask(taskRow: any): taskRow is IPersonalTypeTask {
 }
 
 export const UnapprovedDocumentsDataTable = ({
-  combinedData,
   pendingProjectDocumentData,
 }: Props) => {
   const { colorMode } = useColorMode();
@@ -280,62 +312,6 @@ export const UnapprovedDocumentsDataTable = ({
         // console.log(`A:${kindA}, B:${kindB}`);
         const indexA = taskKindsOrder.indexOf(kindA);
         const indexB = taskKindsOrder.indexOf(kindB);
-        return indexA - indexB;
-      },
-    },
-    {
-      accessorKey: "kind",
-      header: ({ column }) => {
-        const isSorted = column.getIsSorted();
-        let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
-
-        if (isSorted === "asc") {
-          sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
-        } else if (isSorted === "desc") {
-          sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
-        }
-
-        return (
-          <Button
-            // variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
-          >
-            Kind
-          </Button>
-        );
-      },
-      cell: ({ row }) => {
-        if (isDocTypeTask(row.original)) {
-          const originalKindData: docKinds = row.original.kind as docKinds;
-          //   console.log(originalKindData);
-          return (
-            <Box className="text-center align-middle font-medium">
-              {docKindsDict[originalKindData].title}
-            </Box>
-          );
-        } else {
-          return (
-            <Box className="text-center align-middle font-medium">
-              Personal Task
-            </Box>
-          );
-        }
-      },
-      sortingFn: (rowA, rowB) => {
-        const kindA: docKinds = rowA.getValue("kind");
-        const kindB: docKinds = rowB.getValue("kind");
-        const indexA = docKindsOrder.indexOf(kindA);
-        const indexB = docKindsOrder.indexOf(kindB);
         return indexA - indexB;
       },
     },
@@ -443,41 +419,134 @@ export const UnapprovedDocumentsDataTable = ({
         return a.localeCompare(b);
       },
     },
+    {
+      accessorKey: "kind",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+        let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
+
+        if (isSorted === "asc") {
+          sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
+        } else if (isSorted === "desc") {
+          sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
+        }
+
+        return (
+          <Button
+            // variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="w-full text-center"
+            rightIcon={sortIcon}
+            // p={0}
+            // m={0}
+            bg={"transparent"}
+            _hover={
+              colorMode === "dark"
+                ? { bg: "blue.400", color: "white" }
+                : { bg: "blue.50", color: "black" }
+            }
+          >
+            Kind
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        if (isDocTypeTask(row.original)) {
+          const originalKindData: docKinds = row.original.kind as docKinds;
+          //   console.log(originalKindData);
+          return (
+            <Box className="text-center align-middle font-medium">
+              {docKindsDict[originalKindData].title}
+            </Box>
+          );
+        } else {
+          return (
+            <Box className="text-center align-middle font-medium">
+              Personal Task
+            </Box>
+          );
+        }
+      },
+      sortingFn: (rowA, rowB) => {
+        const kindA: docKinds = rowA.getValue("kind");
+        const kindB: docKinds = rowB.getValue("kind");
+        const indexA = docKindsOrder.indexOf(kindA);
+        const indexB = docKindsOrder.indexOf(kindB);
+        return indexA - indexB;
+      },
+    },
+    {
+      accessorKey: "status",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+        let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
+
+        if (isSorted === "asc") {
+          sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
+        } else if (isSorted === "desc") {
+          sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
+        }
+        return (
+          <Button
+            // variant="ghost"
+            bg={"transparent"}
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="w-full text-right"
+            rightIcon={sortIcon}
+            // p={0}
+            // m={0}
+            justifyContent={"flex-end"}
+            _hover={
+              colorMode === "dark"
+                ? { bg: "blue.400", color: "white" }
+                : { bg: "blue.50", color: "black" }
+            }
+          >
+            Doc Status
+          </Button>
+        );
+      },
+
+      cell: ({ row }) => {
+        const originalStatusData: statuses = row.getValue("status");
+
+        const formatted = statusMapping[originalStatusData] || "Other";
+
+        return (
+          <Box
+            className="text-right font-medium"
+            color={colorMode === "light" ? "gray.500" : "gray.300"}
+            px={4}
+          >
+            {formatted}
+          </Box>
+        );
+      },
+      sortingFn: (rowA, rowB) => {
+        const statusA: statuses = rowA.getValue("status");
+        const statusB: statuses = rowB.getValue("status");
+        const indexA = statusOrder.indexOf(statusA);
+        const indexB = statusOrder.indexOf(statusB);
+        return indexA - indexB;
+      },
+    },
+
   ];
   //   console.log(combinedData);
   const [data, setData] = useState([]);
 
   useEffect(() => {
     setData([
-      ...(combinedData
-        ?.filter((personalTask) => personalTask.status !== "done")
-        .map((personalTask) => ({
-          ...personalTask,
-          taskType: "personal" as const,
-          kind: "personal" as const,
-        })) || []),
       ...(pendingProjectDocumentData?.lead?.map((leadTask) => ({
         ...leadTask,
         taskType: "lead" as const,
       })) || []),
-      ...(pendingProjectDocumentData?.team?.map((teamTask) => ({
-        ...teamTask,
-        taskType: "team" as const,
-      })) || []),
-      ...(pendingProjectDocumentData?.ba?.map((baTask) => ({
-        ...baTask,
-        taskType: "ba" as const,
-      })) || []),
-      ...(pendingProjectDocumentData?.directorate?.map((directorateTask) => ({
-        ...directorateTask,
-        taskType: "directorate" as const,
-      })) || []),
     ]);
-  }, [combinedData, pendingProjectDocumentData]);
+  }, [pendingProjectDocumentData]);
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "capacity",
+      id: "kind",
       desc: false,
     },
   ]);
@@ -510,9 +579,9 @@ export const UnapprovedDocumentsDataTable = ({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 );
               })}
@@ -569,16 +638,6 @@ const PersonalTaskDescriptionCell = ({
 }: PersonalTaskDescriptionProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
-  const { isOnProjectsPage } = useProjectSearchContext();
-  const navigate = useNavigate();
-
-  const goToProject = (pk: number) => {
-    if (isOnProjectsPage) {
-      navigate(`${pk}`);
-    } else {
-      navigate(`projects/${pk}`);
-    }
-  };
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
