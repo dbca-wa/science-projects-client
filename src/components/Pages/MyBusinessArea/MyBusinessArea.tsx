@@ -8,6 +8,8 @@ import { IMainDoc, IProjectData } from "@/types";
 import {
   Box,
   Center,
+  List,
+  ListItem,
   Tab,
   TabList,
   TabPanel,
@@ -39,13 +41,19 @@ export const MyBusinessArea = () => {
     setIsRepainting(false);
   };
 
+  interface baUnapprovedDocsSection {
+    linked: IMainDoc[];
+    unlinked: IMainDoc[];
+  }
+
   type UnapprovedDocumentsInAreas = {
-    [key: number]: IMainDoc[];
+    [key: number]: baUnapprovedDocsSection;
   };
 
   type ProblematicProjectsInArea = {
     [key: number]: IProjectData[];
   };
+  const [flatPkList, setFlatPkList] = useState<number[]>([]);
 
   const [unapprovedDocumentsInAreas, setUnapprovedDocumentsInAreas] =
     useState<UnapprovedDocumentsInAreas>({});
@@ -53,61 +61,81 @@ export const MyBusinessArea = () => {
   const [problematicProjectsData, setProblematicProjectsData] =
     useState<ProblematicProjectsInArea>({});
 
+  // useEffect(() => {
+  //   if (Object.keys(problematicProjectsData).length > 0) {
+  //     console.log(problematicProjectsData);
+  //   }
+  // }, [problematicProjectsData]);
+
   useEffect(() => {
-    if (Object.keys(problematicProjectsData).length > 0) {
-      console.log(problematicProjectsData);
+    if (Object.keys(unapprovedDocumentsInAreas).length > 0) {
+
+      flatPkList?.map((baPk) => console.log(`${baPk}: ${unapprovedDocumentsInAreas[baPk]?.linked?.length}`))
     }
-  }, [problematicProjectsData]);
+  }, [unapprovedDocumentsInAreas, flatPkList]);
 
-  //   useEffect(() => {
-  //     if (Object.keys(unapprovedDocumentsInAreas).length > 0) {
-  //       console.log(unapprovedDocumentsInAreas);
-  //     }
-  //   }, [unapprovedDocumentsInAreas]);
 
   useEffect(() => {
-    const fetchUnapprovedDocs = async () => {
-      if (!basLoading && myBusinessAreas?.length >= 1) {
-        const flatPkList = myBusinessAreas.map((ba) => ba.pk);
-        // console.log(flatPkList);
-
-        if (flatPkList.length >= 1) {
-          if (Object.keys(unapprovedDocumentsInAreas).length === 0) {
-            try {
-              const res = await getUnapprovedDocsForBusinessAreas({
-                baArray: flatPkList,
-              });
-              // console.log(res);
-              setUnapprovedDocumentsInAreas(res);
-            } catch (error) {
-              console.error("Error fetching unapproved documents:", error);
+    if (
+      basLoading || myBusinessAreas?.length < 1
+    ) {
+      return
+    } else {
+      if (flatPkList.length === 0) {
+        setFlatPkList(myBusinessAreas.map((ba) => ba.pk));
+      }
+      else {
+        const fetchUnapprovedDocs = async (flatPkList) => {
+          if (flatPkList.length >= 1) {
+            if (Object.keys(unapprovedDocumentsInAreas).length === 0) {
+              try {
+                const res = await getUnapprovedDocsForBusinessAreas({
+                  baArray: flatPkList,
+                });
+                // console.log(res);
+                setUnapprovedDocumentsInAreas(res);
+              } catch (error) {
+                console.error("Error fetching unapproved documents:", error);
+              }
             }
           }
+        };
 
-          if (Object.keys(problematicProjectsData).length === 0) {
-            try {
-              const res = await getProblematicProjectsForBusinessAreas({
-                baArray: flatPkList,
-              });
-              // console.log(res);
-              setProblematicProjectsData(res);
-            } catch (error) {
-              console.error("Error fetching problematic projects:", error);
+        const fetchProblemProjects = async (flatPkList) => {
+          if (flatPkList.length >= 1) {
+            if (Object.keys(problematicProjectsData).length === 0) {
+              try {
+                const res = await getProblematicProjectsForBusinessAreas({
+                  baArray: flatPkList,
+                });
+                // console.log(res);
+                setProblematicProjectsData(res);
+              } catch (error) {
+                console.error("Error fetching problematic projects:", error);
+              }
             }
           }
         }
-      }
-    };
 
-    fetchUnapprovedDocs();
-  }, [myBusinessAreas, basLoading]);
+        if (
+          Object.keys(problematicProjectsData).length === 0 &&
+          Object.keys(unapprovedDocumentsInAreas).length === 0
+        ) {
+          fetchUnapprovedDocs(flatPkList);
+          fetchProblemProjects(flatPkList);
+        }
+      }
+    }
+  }, [flatPkList, myBusinessAreas, basLoading, unapprovedDocumentsInAreas, problematicProjectsData])
+
+
 
   return (
     <>
       {!userLoading && (
         <Box maxW={"100%"} maxH={"100%"}>
           {/* Count of BAs Led and title */}
-          {!basLoading && !isRepainting && (
+          {!basLoading && !isRepainting && myBusinessAreas?.length >= 1 && (
             <>
               <Box mb={4}>
                 <Text fontWeight={"semibold"} fontSize={"lg"}>
@@ -165,44 +193,39 @@ export const MyBusinessArea = () => {
                     </Box>
 
                     {myBusinessAreas?.map((ba) => {
+                      const baData = problematicProjectsData[ba?.pk] || {};
+
+                      // Reduce problematic project data
+                      const problematicProjectsForBaData = Object.keys(baData).reduce((acc, key) => {
+                        const problemType =
+                          key === "no_members"
+                            ? "memberless"
+                            : key === "no_leader"
+                              ? "leaderless"
+                              : key === "external_leader"
+                                ? "externally_led"
+                                : key === "multiple_leads"
+                                  ? "multiple_leaders"
+                                  : ""; // handle other cases if necessary
+
+                        const projectsWithType = baData[key].map((project) => ({
+                          ...project,
+                          problemKind: problemType,
+                        }));
+
+                        return [...acc, ...projectsWithType];
+                      }, []);
+
+                      const problemsCount = problematicProjectsForBaData.length;
+
+
                       return (
                         <Box key={`${ba?.pk}problemProjects`}>
                           <Text fontWeight={"bold"} fontSize={"larger"} py={4}>
-                            {ba?.name}
+                            {ba?.name} ({problemsCount} problems)
                           </Text>
-                          {Object.keys(problematicProjectsData).length > 0 && (
-                            <>
-                              <ProblematicProjectsDataTable
-                                projectData={Object.keys(
-                                  problematicProjectsData[ba?.pk],
-                                ).reduce((acc, key) => {
-                                  const problemType =
-                                    key === "no_members"
-                                      ? "memberless"
-                                      : key === "no_leader"
-                                        ? "leaderless"
-                                        : key === "external_leader"
-                                          ? "externally_led"
-                                          : key === "multiple_leads"
-                                            ? "multiple_leaders"
-                                            : ""; // handle other cases if necessary
-
-                                  const projectsWithType =
-                                    problematicProjectsData[ba?.pk][key].map(
-                                      (project) => ({
-                                        ...project,
-                                        problemKind: problemType,
-                                      }),
-                                    );
-
-                                  return [...acc, ...projectsWithType];
-                                }, [])}
-                              />
-                            </>
-                          )}
+                          <ProblematicProjectsDataTable projectData={problematicProjectsForBaData} />
                         </Box>
-
-                        // problematicProjectsData[ba?.pk]
                       );
                     })}
                   </TabPanel>
@@ -216,24 +239,40 @@ export const MyBusinessArea = () => {
                           ? "You are not leading any business areas."
                           : "This section lists all projects documents in your area which have yet to be approved by Project Leads"}
                       </Text>
+                      <Box mt={2}
+                      >
+                        <Text
+                          color={"orange.500"}
+                          fontWeight={"semibold"}
+                        >
+                          There are some issues with older data. Please refrain from approving documents in the following situations:
+                        </Text>
+                        <List color={"red.500"}
+                        >
+                          <ListItem>- A concept plan requires approval, but a project plan already exists</ListItem>
+                          <ListItem>- A project plan requires approval, but a progress report already exists</ListItem>
+                        </List>
+
+                      </Box>
                     </Box>
 
                     {myBusinessAreas?.map((ba) => {
-                      const pendingProjectDocumentData: IPendingProjectDocumentData =
-                        {
-                          all: [],
-                          team: [],
-                          ba: [],
-                          lead: unapprovedDocumentsInAreas[`${ba?.pk}`] || [],
-                          directorate: [],
-                        };
+                      const pendingProjectDocumentData: IPendingProjectDocumentData = {
+                        all: [],
+                        team: [],
+                        ba: [],
+                        lead: unapprovedDocumentsInAreas[ba.pk]?.linked,
+                        directorate: [],
+                      };
+                      // console.log(unapprovedDocumentsInAreas[`${ba?.pk}`])
                       return (
-                        <Box key={`${ba?.pk}unapproveddocs`}>
-                          <Text fontWeight={"bold"} fontSize={"larger"} py={4}>
-                            {ba?.name}
-                          </Text>
-                          {Object.keys(unapprovedDocumentsInAreas).length >
-                            0 && (
+                        pendingProjectDocumentData ?
+                          <Box key={`${ba?.pk}unapproveddocs`}>
+                            <Text fontWeight={"bold"} fontSize={"larger"} py={4}>
+                              {ba?.name} ({unapprovedDocumentsInAreas[`${ba?.pk}`]?.linked?.length} Unapproved Documents)
+                            </Text>
+                            {/* {Object.keys(pendingProjectDocumentData['lead']).length >
+                              0 && ( */}
                             <>
                               {/* {unapprovedDocumentsInAreas[ba?.pk]?.map(
                                 (doc) => {
@@ -251,8 +290,9 @@ export const MyBusinessArea = () => {
                                 }
                               />
                             </>
-                          )}
-                        </Box>
+                            {/* )} */}
+                          </Box>
+                          : null
                       );
                     })}
                   </TabPanel>

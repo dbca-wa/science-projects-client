@@ -37,7 +37,7 @@ interface Props {
 export const PDFViewer = ({
 	thisReport,
 }: // refetchData
-Props) => {
+	Props) => {
 	const { register: genRegister, handleSubmit: handleGenSubmit } =
 		useForm<IDocGen>();
 	const { register: cancelGenRegister, handleSubmit: handleCancelGenSubmit } =
@@ -83,9 +83,8 @@ Props) => {
 				toast.update(toastIdRef.current, {
 					title: "Could Not Generate AR PDF",
 					description: error?.response?.data
-						? `${error.response.status}: ${
-								Object.values(error.response.data)[0]
-							}`
+						? `${error.response.status}: ${Object.values(error.response.data)[0]
+						}`
 						: "Error",
 					status: "error",
 					position: "top-right",
@@ -128,9 +127,8 @@ Props) => {
 				toast.update(toastIdRef.current, {
 					title: "Could Not Generate AR PDF",
 					description: error?.response?.data
-						? `${error.response.status}: ${
-								Object.values(error.response.data)[0]
-							}`
+						? `${error.response.status}: ${Object.values(error.response.data)[0]
+						}`
 						: "Error",
 					status: "error",
 					position: "top-right",
@@ -182,9 +180,8 @@ Props) => {
 				toast.update(toastIdRef.current, {
 					title: "Could Not Cancel",
 					description: error?.response?.data
-						? `${error.response.status}: ${
-								Object.values(error.response.data)[0]
-							}`
+						? `${error.response.status}: ${Object.values(error.response.data)[0]
+						}`
 						: "Error",
 					status: "error",
 					position: "top-right",
@@ -336,7 +333,7 @@ Props) => {
 					</Box>
 
 					{annualReportPDFGenerationMutation.isPending ||
-					pdfDocumentData?.report?.pdf_generation_in_progress ? (
+						pdfDocumentData?.report?.pdf_generation_in_progress ? (
 						<Button
 							size={"sm"}
 							ml={2}
@@ -450,14 +447,14 @@ Props) => {
 						isDisabled={
 							pdfDocumentData?.report
 								?.pdf_generation_in_progress ||
-							annualReportPDFGenerationMutation.isPending
+							annualReportPDFGenerationMutation.isPending || unapprovedAnnualReportPDFGenerationMutation.isPending
 						}
 						type="submit"
 						form="pdf-generation-form-unapproved"
 						isLoading={
 							pdfDocumentData?.report
 								?.pdf_generation_in_progress ||
-							annualReportPDFGenerationMutation.isPending
+							annualReportPDFGenerationMutation.isPending || unapprovedAnnualReportPDFGenerationMutation.isPending
 						}
 					>
 						<Box mr={2}>
@@ -471,8 +468,8 @@ Props) => {
 				pdfDocumentData !== undefined ? (
 					(pdfDocumentData?.report?.pdf_generation_in_progress &&
 						!cancelDocGenerationMutation.isSuccess) ||
-					(annualReportPDFGenerationMutation.isPending &&
-						!cancelDocGenerationMutation.isSuccess) ? (
+						(annualReportPDFGenerationMutation.isPending &&
+							!cancelDocGenerationMutation.isSuccess) ? (
 						<Center mt={100}>
 							<img
 								src="/bouncing-ball.svg"

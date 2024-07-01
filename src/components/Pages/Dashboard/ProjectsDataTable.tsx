@@ -71,8 +71,6 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
     | "terminated"
     | "suspended";
 
-  type kinds = "core_function" | "science" | "student" | "external";
-
   const statusOrder = [
     "final_update",
     "updating",
@@ -84,9 +82,6 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
     "completed",
     "terminated",
   ];
-
-  const kindOrder = ["science", "student", "core_function", "external"];
-
   const statusMapping = {
     pending: "Pending Project Plan",
     closure_requested: "Closure Requested",
@@ -98,6 +93,12 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
     terminated: "Terminated and Closed",
     suspended: "Suspended",
   };
+
+
+
+  type kinds = "core_function" | "science" | "student" | "external";
+
+  const kindOrder = ["science", "student", "core_function", "external"];
 
   const kindDict = {
     core_function: {
