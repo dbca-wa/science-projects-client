@@ -639,6 +639,8 @@ interface ITaskUser {
   last_name: string;
 }
 
+type ProjectStatus = "new" | "pending" | "active" | "updating" | "closure_requested" | "closing" | "final_update" | "completed" | "terminated" | "suspended";
+
 interface ITaskProject {
   pk: number;
   title: string;

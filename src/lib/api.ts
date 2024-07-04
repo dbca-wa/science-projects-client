@@ -30,6 +30,7 @@ import {
   ISearchTerm,
   ISimpleLocationData,
   OrganisedLocationData,
+  ProjectStatus,
 } from "../types";
 import { IConceptPlanGenerationData } from "../types";
 
@@ -895,22 +896,32 @@ export const getFullProjectSimple = async (preselectedProjectPk: number) => {
   }
 };
 
-export interface ISetProjectProps {
-  status:
-    | "new"
-    | "pending"
-    | "active"
-    | "updating"
-    | "terminated"
-    | "suspended"
-    | "closed";
+
+// export interface ISetProjectStatus {
+//   projectPk: number;
+//   status: ProjectStatus;
+// }
+
+// export const setProjectStatus = async({projectPk, status}) => {
+//   // console.log({ areas, projectPk })
+//   const url = `projects/${projectPk}/areas`;
+//   const params = {
+//     areas: areas,
+//   };
+//   return instance.put(url, params).then((res) => res.data);
+
+// }
+
+
+export interface ISetProjectStatusProps {
+  status: ProjectStatus;
   projectId: number | string;
 }
 
 export const setProjectStatus = async ({
   projectId,
   status,
-}: ISetProjectProps) => {
+}: ISetProjectStatusProps) => {
   const data = {
     status: status,
   };
@@ -1286,13 +1297,13 @@ export interface IEditProject {
   title: string;
   description?: string;
   status?:
-    | "new"
-    | "pending"
-    | "active"
-    | "updating"
-    | "terminated"
-    | "suspended"
-    | "closed";
+  | "new"
+  | "pending"
+  | "active"
+  | "updating"
+  | "terminated"
+  | "suspended"
+  | "closed";
   image?: File | null;
   selectedImageUrl: string | null;
   locations: number[];
@@ -2131,13 +2142,13 @@ export interface ISpawnDocument {
   year?: number;
   report_id?: number;
   kind:
-    | "concept"
-    | "projectplan"
-    | "progressreport"
-    | "studentreport"
-    | "studentreport"
-    | "projectclosure"
-    | string;
+  | "concept"
+  | "projectplan"
+  | "progressreport"
+  | "studentreport"
+  | "studentreport"
+  | "projectclosure"
+  | string;
 }
 
 export interface ICloseProjectProps {
@@ -2224,6 +2235,7 @@ export const deleteProjectCall = async ({ pk }: ISimplePkProp) => {
   }
 };
 
+
 export interface ISetProjectAreas {
   projectPk: number;
   areas: number[];
@@ -2245,11 +2257,11 @@ export interface IDeleteDocument {
   projectPk: number | string;
   documentPk: number | string;
   documentKind:
-    | "conceptplan"
-    | "projectplan"
-    | "progressreport"
-    | "studentreport"
-    | "projectclosure";
+  | "conceptplan"
+  | "projectplan"
+  | "progressreport"
+  | "studentreport"
+  | "projectclosure";
 }
 
 export const deleteDocumentCall = async ({
@@ -2666,15 +2678,15 @@ interface IReportMediaUploadProps {
   pk: number;
   file: File;
   section:
-    | "cover"
-    | "rear_cover"
-    | "sdchart"
-    | "service_delivery"
-    | "research"
-    | "partnerships"
-    | "collaborations"
-    | "student_projects"
-    | "publications";
+  | "cover"
+  | "rear_cover"
+  | "sdchart"
+  | "service_delivery"
+  | "research"
+  | "partnerships"
+  | "collaborations"
+  | "student_projects"
+  | "publications";
 }
 
 export const uploadReportMediaImage = async ({
@@ -2713,15 +2725,15 @@ export const uploadReportMediaImage = async ({
 interface IReportMediaDeleteProps {
   pk: number;
   section:
-    | "cover"
-    | "rear_cover"
-    | "sdchart"
-    | "service_delivery"
-    | "research"
-    | "partnerships"
-    | "collaborations"
-    | "student_projects"
-    | "publications";
+  | "cover"
+  | "rear_cover"
+  | "sdchart"
+  | "service_delivery"
+  | "research"
+  | "partnerships"
+  | "collaborations"
+  | "student_projects"
+  | "publications";
 }
 
 export const deleteReportMediaImage = async ({
