@@ -16,7 +16,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { ISetProjectProps, setProjectStatus } from "../../../../lib/api";
+import { ISetProjectStatusProps, setProjectStatus } from "../../../../lib/api";
 import { useFormattedDate } from "../../../../lib/hooks/helper/useFormattedDate";
 import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
@@ -26,6 +26,7 @@ import {
   IProjectClosure,
   IProjectDocuments,
   IProjectMember,
+  ProjectStatus,
 } from "../../../../types";
 import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { ProjectClosureActionModal } from "../../../Modals/DocumentActionModals/ProjectClosureActionModal";
@@ -47,7 +48,7 @@ export const ProjectClosureDocActions = ({
   setToLastTab,
   isBaLead,
 }: // , projectPk
-IConceptDocumentActions) => {
+  IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
 
   // useEffect(() => {
@@ -205,16 +206,9 @@ IConceptDocumentActions) => {
 
   const setStatusIfRequired = (
     projectPk,
-    desiredProjectState:
-      | "new"
-      | "pending"
-      | "active"
-      | "updating"
-      | "terminated"
-      | "suspended"
-      | "closed",
+    desiredProjectState: ProjectStatus
   ) => {
-    const data: ISetProjectProps = {
+    const data: ISetProjectStatusProps = {
       projectId: projectPk,
       status: desiredProjectState,
     };
@@ -310,7 +304,7 @@ IConceptDocumentActions) => {
               </Box>
               <Grid
                 pt={2}
-                // gridGap={2}
+              // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -339,7 +333,7 @@ IConceptDocumentActions) => {
                             : projectClosureData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                                colorMode === "light"
+                              colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -542,9 +536,9 @@ IConceptDocumentActions) => {
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-                // gridGap={2}
-                // pt={4}
-                // pos={"relative"}
+              // gridGap={2}
+              // pt={4}
+              // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -609,10 +603,10 @@ IConceptDocumentActions) => {
                       w={"100%"}
                       mt={
                         projectClosureData?.document?.project?.status ===
-                        "completed"
+                          "completed"
                           ? 3
                           : projectClosureData?.document
-                                ?.business_area_lead_approval_granted
+                            ?.business_area_lead_approval_granted
                             ? userData?.is_superuser ||
                               userData?.pk === leaderMember?.pk
                               ? 2
@@ -621,8 +615,8 @@ IConceptDocumentActions) => {
                       }
                     >
                       {userData?.is_superuser ||
-                      userData?.pk === leaderMember?.pk ||
-                      userData?.pk === baData?.leader ? (
+                        userData?.pk === leaderMember?.pk ||
+                        userData?.pk === baData?.leader ? (
                         <Button
                           color={"white"}
                           background={
@@ -636,7 +630,7 @@ IConceptDocumentActions) => {
                           }}
                           size={"sm"}
                           onClick={onS1ReopenModalOpen}
-                          // mr={3}
+                        // mr={3}
                         >
                           Delete Closure
                         </Button>
@@ -644,9 +638,9 @@ IConceptDocumentActions) => {
                         (projectClosureData?.document?.project?.status ===
                           "completed" ||
                           projectClosureData?.document?.project?.status ===
-                            "terminated" ||
+                          "terminated" ||
                           projectClosureData?.document?.project?.status ===
-                            "suspended") &&
+                          "suspended") &&
                         (isBaLead ||
                           leaderMember?.pk === userData?.pk ||
                           userData?.is_superuser) && (
@@ -682,7 +676,7 @@ IConceptDocumentActions) => {
                               }}
                               size={"sm"}
                               onClick={onS1ReopenModalOpen}
-                              // mr={3}
+                            // mr={3}
                             >
                               Reopen Project
                             </Button>
@@ -767,9 +761,9 @@ IConceptDocumentActions) => {
                                   setStatusIfRequired(
                                     projectClosureData?.document?.project?.pk
                                       ? projectClosureData?.document?.project
-                                          ?.pk
+                                        ?.pk
                                       : projectClosureData?.document?.project
-                                          ?.id,
+                                        ?.id,
                                     "updating",
                                   );
                                 }}
@@ -850,7 +844,7 @@ IConceptDocumentActions) => {
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
+                // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -887,14 +881,14 @@ IConceptDocumentActions) => {
                     w={"100%"}
                     mt={
                       projectClosureData?.document?.project?.status ===
-                      "completed"
+                        "completed"
                         ? 3
                         : projectClosureData?.document
-                              ?.directorate_approval_granted
+                          ?.directorate_approval_granted
                           ? 0
                           : 3
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
+                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     <ProjectClosureActionModal
                       userData={userData}
@@ -914,9 +908,9 @@ IConceptDocumentActions) => {
                     />
                     {projectClosureData?.document
                       ?.project_lead_approval_granted &&
-                    projectClosureData?.document
-                      ?.business_area_lead_approval_granted === false &&
-                    (userData?.is_superuser || userData?.pk === baLead?.pk) ? (
+                      projectClosureData?.document
+                        ?.business_area_lead_approval_granted === false &&
+                      (userData?.is_superuser || userData?.pk === baLead?.pk) ? (
                       <Center
                       // justifyContent={"flex-start"}
                       // ml={4}
@@ -976,11 +970,11 @@ IConceptDocumentActions) => {
                         </Button>
                       </Center>
                     ) : (projectClosureData?.document?.project?.status ===
-                        "completed" ||
-                        projectClosureData?.document?.project?.status ===
-                          "terminated" ||
-                        projectClosureData?.document?.project?.status ===
-                          "suspended") &&
+                      "completed" ||
+                      projectClosureData?.document?.project?.status ===
+                      "terminated" ||
+                      projectClosureData?.document?.project?.status ===
+                      "suspended") &&
                       (isBaLead || userData?.is_superuser) ? (
                       <Button
                         color={"white"}
@@ -1148,11 +1142,11 @@ IConceptDocumentActions) => {
                     {(projectClosureData?.document?.project?.status ===
                       "completed" ||
                       projectClosureData?.document?.project?.status ===
-                        "terminated" ||
+                      "terminated" ||
                       projectClosureData?.document?.project?.status ===
-                        "suspended") &&
-                    (userData?.is_superuser ||
-                      userData?.business_area?.name === "Directorate") ? (
+                      "suspended") &&
+                      (userData?.is_superuser ||
+                        userData?.business_area?.name === "Directorate") ? (
                       <Button
                         color={"white"}
                         background={
