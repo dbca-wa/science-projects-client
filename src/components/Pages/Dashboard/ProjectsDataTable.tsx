@@ -37,9 +37,13 @@ export type DisabledColumnsMap = {
   title: false; // Ensure "title" cannot be disabled/always set to false
 };
 
+type EnabledColumns<T extends DisabledColumnsMap> = {
+  [K in keyof T]: T[K] extends true ? never : K
+}[keyof T];
+
 export interface ProjectDataTableProps {
   projectData: IProjectData[];
-  defaultSorting: Exclude<ProjectColumnTypes, keyof DisabledColumnsMap>;
+  defaultSorting: EnabledColumns<DisabledColumnsMap>;
   disabledColumns: DisabledColumnsMap;
 }
 
