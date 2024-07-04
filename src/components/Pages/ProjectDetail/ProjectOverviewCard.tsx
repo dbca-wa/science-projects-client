@@ -44,7 +44,7 @@ import { BsCaretDownFill } from "react-icons/bs";
 import { CgOrganisation } from "react-icons/cg";
 import { FaSackDollar } from "react-icons/fa6";
 import { GiMaterialsScience } from "react-icons/gi";
-import { GrStatusInfo } from "react-icons/gr";
+import { GrStatusInfo, GrStatusWarning } from "react-icons/gr";
 import { IoIosStopwatch, IoMdSettings } from "react-icons/io";
 import { IoCreate } from "react-icons/io5";
 import { MdBusinessCenter, MdScience } from "react-icons/md";
@@ -65,6 +65,7 @@ import { ProjectClosureModal } from "../../Modals/ProjectClosureModal";
 import { ProjectReopenModal } from "../../Modals/ProjectReopenModal";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { ProjectSuspensionModal } from "@/components/Modals/ProjectSuspensionModal";
+import { SetProjectStatusModal } from "@/components/Modals/SetProjectStatusModal";
 
 interface IProjectOverviewCardProps {
   location: IProjectAreas;
@@ -94,6 +95,11 @@ export const ProjectOverviewCard = ({
   } = useDisclosure();
   const { colorMode } = useColorMode();
 
+  const {
+    isOpen: isSetStatusModalOpen,
+    onOpen: onOpenSetStatusModal,
+    onClose: onCloseSetStatusModal,
+  } = useDisclosure();
   const {
     isOpen: isDeleteModalOpen,
     onOpen: onOpenDeleteModal,
@@ -439,13 +445,25 @@ export const ProjectOverviewCard = ({
                 onClose={onCloseCreateStudentReportModal}
               />
             )}
-            <DeleteProjectModal
-              projectPk={
-                baseInformation?.pk ? baseInformation.pk : baseInformation.id
-              }
-              isOpen={isDeleteModalOpen}
-              onClose={onCloseDeleteModal}
-            />
+            {me?.userData?.is_superuser && (
+              <>
+                <DeleteProjectModal
+                  projectPk={
+                    baseInformation?.pk ? baseInformation.pk : baseInformation.id
+                  }
+                  isOpen={isDeleteModalOpen}
+                  onClose={onCloseDeleteModal}
+                />
+
+                <SetProjectStatusModal
+                  projectPk={baseInformation?.pk ? baseInformation.pk : baseInformation.id}
+                  isOpen={isSetStatusModalOpen}
+                  onClose={onCloseSetStatusModal}
+                  refetchData={refetchData}
+                />
+              </>
+            )}
+
           </>
         )}
 
@@ -1075,6 +1093,21 @@ export const ProjectOverviewCard = ({
                     </Flex>
                   </MenuItem> */}
 
+                  {me?.userData?.is_superuser ? (
+                    <MenuItem onClick={onOpenSetStatusModal}>
+                      <Flex
+                        alignItems={"center"}
+                      // color={"red"}
+                      >
+                        <Box mr={2}>
+                          <GrStatusWarning />
+                        </Box>
+                        <Box>
+                          <Text>Set Status</Text>
+                        </Box>
+                      </Flex>
+                    </MenuItem>
+                  ) : null}
                   {me?.userData?.is_superuser ? (
                     <MenuItem onClick={onOpenDeleteModal}>
                       <Flex
