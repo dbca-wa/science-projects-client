@@ -195,6 +195,31 @@ export const PatchNotes = ({
               Feature: Added 'Involved Projects' section to user profile - all a
               user's projects can be viewed by clicking on their profile
             </ListItem>
+
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added admin ability to delete unlinked docs
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added admin ability to clean up bad data/batch approve documents where the next stage already exists but the document doesnt have approval
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added directorate ability to unapprove concept and project plans even where next document exists
+            </ListItem>
             {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
