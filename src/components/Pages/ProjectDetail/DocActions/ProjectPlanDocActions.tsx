@@ -281,7 +281,7 @@ export const ProjectPlanDocActions = ({
               </Box>
               <Grid
                 pt={2}
-                // gridGap={2}
+              // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -310,7 +310,7 @@ export const ProjectPlanDocActions = ({
                             : projectPlanData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                                colorMode === "light"
+                              colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -513,9 +513,9 @@ export const ProjectPlanDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-                // gridGap={2}
-                // pt={4}
-                // pos={"relative"}
+              // gridGap={2}
+              // pt={4}
+              // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -738,14 +738,14 @@ export const ProjectPlanDocActions = ({
 
                     {projectPlanData?.document
                       ?.project_lead_approval_granted === true &&
-                    projectPlanData?.document
-                      ?.business_area_lead_approval_granted === true &&
-                    projectPlanData?.document?.directorate_approval_granted ===
+                      projectPlanData?.document
+                        ?.business_area_lead_approval_granted === true &&
+                      projectPlanData?.document?.directorate_approval_granted ===
                       true &&
-                    all_documents?.progress_reports?.length < 1 &&
-                    (userData?.is_superuser ||
-                      leaderMember?.user?.pk === userData?.pk ||
-                      isBaLead) ? (
+                      all_documents?.progress_reports?.length < 1 &&
+                      (userData?.is_superuser ||
+                        leaderMember?.user?.pk === userData?.pk ||
+                        isBaLead) ? (
                       <Flex justifyContent={"flex-end"}>
                         <Button
                           mt={3}
@@ -778,7 +778,7 @@ export const ProjectPlanDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                  // pos={"relative"}
+                // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -816,12 +816,12 @@ export const ProjectPlanDocActions = ({
                     mt={
                       projectPlanData?.document
                         ?.project_lead_approval_granted &&
-                      projectPlanData?.document
-                        ?.directorate_approval_granted === false
+                        projectPlanData?.document
+                          ?.directorate_approval_granted === false
                         ? 3
                         : 0
                     }
-                    // gridTemplateColumns={"repeat(2, 1fr)"}
+                  // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {projectPlanData?.document?.project_lead_approval_granted &&
                       projectPlanData?.document
@@ -959,14 +959,14 @@ export const ProjectPlanDocActions = ({
                       )}
                   </Flex>
                   {all_documents?.progress_reports?.length < 1 &&
-                  (userData?.is_superuser ||
-                    projectPlanData?.document?.project?.business_area
-                      ?.leader === userData?.pk) &&
-                  projectPlanData?.document?.project_lead_approval_granted ===
+                    (userData?.is_superuser ||
+                      projectPlanData?.document?.project?.business_area
+                        ?.leader === userData?.pk) &&
+                    projectPlanData?.document?.project_lead_approval_granted ===
                     true &&
-                  projectPlanData?.document
-                    ?.business_area_lead_approval_granted === true &&
-                  projectPlanData?.document?.directorate_approval_granted ===
+                    projectPlanData?.document
+                      ?.business_area_lead_approval_granted === true &&
+                    projectPlanData?.document?.directorate_approval_granted ===
                     true ? (
                     <Flex justifyContent={"flex-end"}>
                       {/* <CreateProgressReportModal
@@ -1095,52 +1095,52 @@ export const ProjectPlanDocActions = ({
                       (userData?.is_superuser ||
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-start"} ml={3}>
-                          {all_documents?.progress_reports.length >=
-                          1 ? null : (
-                            <>
-                              <ProjectPlanActionModal
-                                userData={userData}
-                                action={"recall"}
-                                refetchData={refetchData}
-                                baData={baData}
-                                isOpen={isS3RecallModalOpen}
-                                onClose={onS3RecallModalClose}
-                                projectPlanPk={projectPlanData?.pk}
-                                documentPk={
-                                  projectPlanData?.document?.pk
-                                    ? projectPlanData?.document?.pk
-                                    : projectPlanData?.document?.id
-                                }
-                                stage={3}
-                                projectData={projectPlanData?.document?.project}
-                              />
-                              <Button
-                                color={"white"}
-                                background={
+                          {/* {all_documents?.progress_reports.length >=
+                          1 ? null : ( */}
+                          <>
+                            <ProjectPlanActionModal
+                              userData={userData}
+                              action={"recall"}
+                              refetchData={refetchData}
+                              baData={baData}
+                              isOpen={isS3RecallModalOpen}
+                              onClose={onS3RecallModalClose}
+                              projectPlanPk={projectPlanData?.pk}
+                              documentPk={
+                                projectPlanData?.document?.pk
+                                  ? projectPlanData?.document?.pk
+                                  : projectPlanData?.document?.id
+                              }
+                              stage={3}
+                              projectData={projectPlanData?.document?.project}
+                            />
+                            <Button
+                              color={"white"}
+                              background={
+                                colorMode === "light"
+                                  ? "blue.500"
+                                  : "blue.600"
+                              }
+                              _hover={{
+                                background:
                                   colorMode === "light"
-                                    ? "blue.500"
-                                    : "blue.600"
-                                }
-                                _hover={{
-                                  background:
-                                    colorMode === "light"
-                                      ? "blue.400"
-                                      : "blue.500",
-                                }}
-                                size={"sm"}
-                                onClick={onS3RecallModalOpen}
-                              >
-                                Recall Approval
-                              </Button>
-                            </>
-                          )}
+                                    ? "blue.400"
+                                    : "blue.500",
+                              }}
+                              size={"sm"}
+                              onClick={onS3RecallModalOpen}
+                            >
+                              Recall Approval
+                            </Button>
+                          </>
+                          {/* )} */}
                           {all_documents?.progress_reports?.length < 1 &&
-                          projectPlanData?.document
-                            ?.project_lead_approval_granted === true &&
-                          projectPlanData?.document
-                            ?.business_area_lead_approval_granted === true &&
-                          projectPlanData?.document
-                            ?.directorate_approval_granted === true ? (
+                            projectPlanData?.document
+                              ?.project_lead_approval_granted === true &&
+                            projectPlanData?.document
+                              ?.business_area_lead_approval_granted === true &&
+                            projectPlanData?.document
+                              ?.directorate_approval_granted === true ? (
                             <>
                               {/* <CreateProgressReportModal
                                 projectPk={

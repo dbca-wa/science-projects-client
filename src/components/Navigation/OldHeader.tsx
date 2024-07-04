@@ -791,21 +791,21 @@ const OldHeader = () => {
 								<NavMenu
 									menuName="Projects"
 									children={<ProjectMenuContents />}
-									// leftIcon={HiMiniSquares2X2}
+								// leftIcon={HiMiniSquares2X2}
 								/>
 
 								{/* Staff */}
 								<NavMenu
 									menuName="Users"
 									children={<UserMenuContents />}
-									// leftIcon={FaUsers}
+								// leftIcon={FaUsers}
 								/>
 
 								{/* Reports */}
 								<NavMenu
 									menuName="Reports"
 									children={<ReportMenuContents />}
-									// leftIcon={PiBookOpenTextFill}
+								// leftIcon={PiBookOpenTextFill}
 								/>
 
 								{!userLoading && userData.is_superuser && (
@@ -832,6 +832,25 @@ const OldHeader = () => {
 									/>
 								)}
 
+								{!userLoading &&
+									userData?.business_areas_led?.length > 0 ? (
+									<NavButton
+										buttonName="My Business Area"
+										onClick={(e) => {
+											if (e.ctrlKey || e.metaKey) {
+												// Handle Ctrl + Click (or Command + Click on Mac)
+												window.open(
+													`/my_business_area`,
+													"_blank"
+												); // Opens in a new tab
+											} else {
+												// Normal click handling
+												navigate("/my_business_area");
+											}
+										}}
+									/>
+								) : null}
+
 								{/* Guide */}
 								{/* {!userLoading && !userData.is_superuser && ( */}
 								{shouldShowGuide ? (
@@ -849,24 +868,7 @@ const OldHeader = () => {
 										}}
 									/>
 								) : null}
-								{!userLoading &&
-								userData?.business_areas_led?.length > 0 ? (
-									<NavButton
-										buttonName="My Business Area"
-										onClick={(e) => {
-											if (e.ctrlKey || e.metaKey) {
-												// Handle Ctrl + Click (or Command + Click on Mac)
-												window.open(
-													`/my_business_area`,
-													"_blank"
-												); // Opens in a new tab
-											} else {
-												// Normal click handling
-												navigate("/my_business_area");
-											}
-										}}
-									/>
-								) : null}
+
 
 								{/* )} */}
 							</HStack>
