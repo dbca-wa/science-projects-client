@@ -6,8 +6,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IProjectData } from "@/types";
-import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
+import { IProjectData, ProjectRoles } from "@/types";
+import { Box, Button, Icon, Text, useColorMode, Image, Center, Flex } from "@chakra-ui/react";
 
 import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
 import {
@@ -26,15 +26,39 @@ import { GiMaterialsScience } from "react-icons/gi";
 import { MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 
-interface Props {
+export type ProjectColumnTypes = "kind" | "title" | "status" | "image" | "role";
+
+export type DisabledColumnsMap = {
+  [cType in ProjectColumnTypes]?: boolean;
+} & {
+  title: false; // Ensure "title" cannot be disabled/always set to false
+};
+
+export interface ProjectDataTableProps {
   projectData: IProjectData[];
+  defaultSorting: Exclude<ProjectColumnTypes, keyof DisabledColumnsMap>;
+  disabledColumns: DisabledColumnsMap;
 }
 
-export const ProjectsDataTable = ({ projectData }: Props) => {
+
+const returnHTMLTitle = (titleData) => {
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = titleData;
+  const tag = wrapper.querySelector("p, span");
+  if (tag) {
+    return tag.textContent;
+  }
+};
+
+
+export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns }: ProjectDataTableProps) => {
   const { colorMode } = useColorMode();
   // console.log(projectData);
-
+  const baseUrl = useApiEndpoint();
+  const noImage = useNoImage();
   const { isOnProjectsPage } = useProjectSearchContext();
   const navigate = useNavigate();
   const goToProject = (
@@ -52,9 +76,9 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
         }
       } else {
         if (e.ctrlKey || e.metaKey) {
-          window.open(`projects/${pk}`, "_blank"); // Opens in a new tab
+          window.open(`/projects/${pk}`, "_blank"); // Opens in a new tab
         } else {
-          navigate(`projects/${pk}`);
+          navigate(`/projects/${pk}`);
         }
       }
     }
@@ -95,6 +119,47 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
   };
 
 
+  const roleOrder = ["supervising", "research", "technical", "externalcol", "externalpeer", "academicsuper", "student", "consulted", "group"]
+
+  const roleDict = {
+    supervising: {
+      color: "orange",
+      string: "Leader",
+    },
+    research: {
+      color: "green",
+      string: "Science Support",
+    },
+    technical: {
+      color: "brown",
+      string: "Technical Support",
+    },
+    academicsuper: {
+      color: "blue",
+      string: "Academic Supervisor",
+    },
+    student: {
+      color: "blue",
+      string: "Supervised Student",
+    },
+    group: {
+      color: "gray",
+      string: "Involved Group",
+    },
+    externalcol: {
+      color: "gray",
+      string: "External Collaborator",
+    },
+    externalpeer: {
+      color: "gray",
+      string: "External Peer",
+    },
+    consulted: {
+      color: "gray",
+      string: "Consulted Peer",
+    },
+
+  };
 
   type kinds = "core_function" | "science" | "student" | "external";
 
@@ -126,7 +191,57 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
       icon: FaUserFriends,
     },
   };
-  const columns: ColumnDef<IProjectData>[] = [
+  const columnDefs: ColumnDef<IProjectData>[] = [
+
+    // // image
+    // {
+    //   accessorKey: "image",
+    //   header: ({ column }) => {
+    //     return (
+    //       // <Text
+    //       //   className="m-0 p-0 text-center"
+    //       //   color={colorMode === "light" ? "black" : "white"}
+    //       // >
+    //       //   Kind
+    //       // </Text>
+    //       <Button
+    //         variant="solid"
+    //         onClick={() => console.log("Nothing")}
+    //         className="w-full text-center"
+    //         p={0}
+    //         m={0}
+    //         bg={"transparent"}
+    //         _hover={
+    //           colorMode === "dark"
+    //             ? { bg: "blue.400", color: "white", cursor: "default" }
+    //             : { bg: "blue.50", color: "black", cursor: "default" }
+    //         }
+    //       >
+    //         Image
+    //       </Button>
+    //     );
+    //   },
+    //   cell: ({ row }) => {
+    //     const originalImageData = row.original.image;
+    //     return (
+    //       <Center>
+    //         <Image
+    //           objectFit={"cover"}
+    //           src={
+    //             originalImageData?.file
+    //               ? `${baseUrl}${originalImageData.file}`
+    //               : noImage
+    //           }
+    //           boxSize={"70px"}
+    //           rounded={"lg"}
+    //         />
+    //       </Center>
+
+
+    //     );
+    //   },
+    // },
+    // kind
     {
       accessorKey: "kind",
       header: ({ column }) => {
@@ -191,6 +306,7 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
         return indexA - indexB;
       },
     },
+    // title
     {
       accessorKey: "title",
       header: ({ column }) => {
@@ -223,7 +339,7 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
         );
       },
       cell: ({ row }) => {
-        const originalTitleData = row.getValue("title");
+        const originalTitleData = row.original.title;
         const formatted = returnHTMLTitle(originalTitleData);
         const formatDate = (dateData: Date) => {
           const inputDate = new Date(dateData);
@@ -287,54 +403,132 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
 
           return formattedDate;
         };
+        const originalImageData = row.original.image;
         return (
-          <Box className="text-left font-medium">
-            <Text
-              color={colorMode === "dark" ? "blue.200" : "blue.400"}
-              fontWeight={"bold"}
-              _hover={{
-                color: colorMode === "dark" ? "blue.100" : "blue.300",
-                textDecoration:
-                  colorMode === "dark" ? "underline" : "undefined",
-              }}
-              cursor={"pointer"}
-              // onClick={(e) => goToProject(e, row.original.id)}
-              px={4}
-            >
-              {formatted}
-            </Text>
-            <Text
-              color={"gray.400"}
-              fontWeight={"semibold"}
-              fontSize={"small"}
-              // onClick={(e) => goToProject(e, row.original.id)}
-              px={4}
-            >
-              {kindDict[row.getValue("kind") as kinds].tag}-{row.original.year}-
-              {row.original.number}
-            </Text>
-            <Text
-              color={"gray.400"}
-              fontWeight={"semibold"}
-              fontSize={"x-small"}
-              // onClick={(e) => goToProject(e, row.original.id)}
-              px={4}
-            >
-              Created on {formatDate(row.getValue("created_at"))}
-            </Text>
-          </Box>
+          <Flex className="text-left font-medium">
+            <Center>
+              <Image
+                objectFit={"cover"}
+                src={
+                  originalImageData !== null && originalImageData !== undefined ?
+                    originalImageData?.file
+                      ? `${baseUrl}${originalImageData.file}`
+                      : noImage : noImage
+                }
+                boxSize={"70px"}
+                rounded={"lg"}
+              />
+            </Center>
+            <Box>
+              <Text
+                color={colorMode === "dark" ? "blue.200" : "blue.400"}
+                fontWeight={"bold"}
+                _hover={{
+                  color: colorMode === "dark" ? "blue.100" : "blue.300",
+                  textDecoration:
+                    colorMode === "dark" ? "underline" : "undefined",
+                }}
+                cursor={"pointer"}
+                // onClick={(e) => goToProject(e, row.original.id)}
+                px={4}
+              >
+                {formatted}
+              </Text>
+              <Text
+                color={"gray.400"}
+                fontWeight={"semibold"}
+                fontSize={"small"}
+                // onClick={(e) => goToProject(e, row.original.id)}
+                px={4}
+              >
+                {kindDict[row.original.kind as kinds].tag}-{row.original.year}-
+                {row.original.number}
+              </Text>
+              <Text
+                color={"gray.400"}
+                fontWeight={"semibold"}
+                fontSize={"x-small"}
+                // onClick={(e) => goToProject(e, row.original.id)}
+                px={4}
+              >
+                Created on {formatDate(row.original.created_at)}
+              </Text>
+            </Box>
+
+          </Flex>
         );
       },
       sortingFn: (rowA, rowB) => {
-        const originalTitleDataA = rowA.getValue("title");
-        const originalTitleDataB = rowB.getValue("title");
+        const originalTitleDataA = rowA.original.title;
+        const originalTitleDataB = rowB.original.title;
         const formattedA = returnHTMLTitle(originalTitleDataA);
         const formattedB = returnHTMLTitle(originalTitleDataB);
         const a = formattedA.replace(/<\/?[^>]+(>|$)/g, "").trim();
         const b = formattedB.replace(/<\/?[^>]+(>|$)/g, "").trim();
         return a.localeCompare(b);
+
       },
     },
+    // role
+    {
+      accessorKey: "role",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+        let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
+
+        if (isSorted === "asc") {
+          sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
+        } else if (isSorted === "desc") {
+          sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
+        }
+        return (
+          // <Text
+          //   className="m-0 p-0 text-center"
+          //   color={colorMode === "light" ? "black" : "white"}
+          // >
+          //   Kind
+          // </Text>
+          <Button
+            // variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="w-full text-center"
+            rightIcon={sortIcon}
+            // p={0}
+            // m={0}
+            bg={"transparent"}
+            _hover={
+              colorMode === "dark"
+                ? { bg: "blue.400", color: "white" }
+                : { bg: "blue.50", color: "black" }
+            }
+          >
+            Role
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const originalRoleData: ProjectRoles = row.original.role;
+        console.log(row.original)
+
+        const formattedString = roleDict[originalRoleData].string;
+        const formattedColour = roleDict[originalRoleData].color;
+
+        // console.log({ originalKindData, formattedString });
+        return (
+          <Box className="text-center align-middle font-medium">
+            <Text color={`${formattedColour}.500`}>{formattedString}</Text>
+          </Box>
+        );
+      },
+      sortingFn: (rowA, rowB) => {
+        const roleA: ProjectRoles = rowA.original.role;
+        const roleB: ProjectRoles = rowB.original.role;
+        const indexA = roleOrder.indexOf(roleA);
+        const indexB = roleOrder.indexOf(roleB);
+        return indexA - indexB;
+      },
+    },
+    // created_at
     {
       accessorKey: "created_at",
       header: ({ column }) => {
@@ -389,8 +583,8 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
         );
       },
       sortingFn: (rowA, rowB) => {
-        const originalTitleDataA = rowA.getValue("title");
-        const originalTitleDataB = rowB.getValue("title");
+        const originalTitleDataA = rowA.original.title;
+        const originalTitleDataB = rowB.original.title;
         const formattedA = returnHTMLTitle(originalTitleDataA);
         const formattedB = returnHTMLTitle(originalTitleDataB);
         const a = formattedA.replace(/<\/?[^>]+(>|$)/g, "").trim();
@@ -398,6 +592,7 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
         return a.localeCompare(b);
       },
     },
+    // status
     {
       accessorKey: "status",
       header: ({ column }) => {
@@ -469,18 +664,15 @@ export const ProjectsDataTable = ({ projectData }: Props) => {
     },
   ];
 
-  const returnHTMLTitle = (titleData) => {
-    const wrapper = document.createElement("div");
-    wrapper.innerHTML = titleData;
-    const tag = wrapper.querySelector("p, span");
-    if (tag) {
-      return tag.textContent;
-    }
-  };
+  const columns = columnDefs.filter(
+    (column) => !disabledColumns[(column as any).accessorKey as ProjectColumnTypes]
+  );
+
+  // type columnTypes = "kind" | "title" | "status" | "image" | "role" | "created_at";
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "status",
+      id: defaultSorting,
       desc: false,
     },
   ]);
