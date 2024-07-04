@@ -600,6 +600,8 @@ interface ITinyProjectData {
   // number: number;
 }
 
+type ProjectRoles = "supervising" | "research" | "technical" | "externalcol" | "externalpeer" | "academicsuper" | "student" | "consulted" | "group";
+
 interface IProjectData {
   pk: number | undefined;
   id?: number;
@@ -619,6 +621,7 @@ interface IProjectData {
   created_at: Date;
   updated_at: Date;
   tag?: string;
+  role?: ProjectRoles;
 }
 
 interface IFullProjectDetails {

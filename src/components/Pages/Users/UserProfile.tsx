@@ -1,6 +1,5 @@
 // The drawer content that pops out when clicking on a user grid item
 
-import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import { DeactivateUserModal } from "@/components/Modals/DeactivateUserModal";
 import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
 import { useInvolvedProjects } from "@/lib/hooks/tanstack/useInvolvedProjects";
@@ -9,16 +8,14 @@ import {
   Box,
   Button,
   Center,
-  Divider,
   Flex,
   Grid,
   Image,
   Spacer,
   Spinner,
-  Tag,
   Text,
   useColorMode,
-  useDisclosure,
+  useDisclosure
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -35,8 +32,7 @@ import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
 import { DeleteUserModal } from "../../Modals/DeleteUserModal";
 import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
 import { PromoteUserModal } from "../../Modals/PromoteUserModal";
-import { useNoImage } from "@/lib/hooks/helper/useNoImage";
-import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { ProjectsDataTable } from "../Dashboard/ProjectsDataTable";
 
 interface Props {
   pk: number;
@@ -56,8 +52,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   const sectionTitleColor = colorMode === "light" ? "gray.600" : "gray.300";
   const subsectionTitleColor = colorMode === "light" ? "gray.500" : "gray.500";
 
-  let baseUrl = useApiEndpoint();
-  const noImage = useNoImage();
+  // let baseUrl = useApiEndpoint();
+  // const noImage = useNoImage();
 
   const copyEmail = useCopyText(user?.email);
   const openEmailAddressedToUser = () => {
@@ -92,8 +88,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
   const me = useUser();
 
-  const involvedProjects = useInvolvedProjects(pk);
-  useEffect(() => console.log(involvedProjects));
+  const { userProjectsLoading, userProjectsData } = useInvolvedProjects(pk);
+  useEffect(() => console.log(userProjectsData));
 
   const [userInQuestionIsSuperuser, setUserInQuestionIsSuperuser] =
     useState(false);
@@ -222,6 +218,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 ml={0}
                 rounded={4}
                 mt={2}
+                px={4}
+                w={"fit-content"}
               >
                 Copy Email
                 {/* <Icon as={FiCopy} /> */}
@@ -338,7 +336,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           </span>
                           <span
                             onClick={() => console.log(user)}
-                            // style={{ color: "blue.500" }}
+                          // style={{ color: "blue.500" }}
                           >
                             {user.business_area.name}
                           </span>
@@ -426,84 +424,92 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 Involved Projects
               </Text>
             </Flex>
-            <Grid gridTemplateColumns="1 1fr">
-              {involvedProjects?.userProjectsData?.length === 0 ? (
+            {!userProjectsLoading && (
+              userProjectsData?.length === 0 ? (
                 <p>No Projects</p>
               ) : (
-                involvedProjects?.userProjectsData
-                  ?.sort((a, b) => {
-                    const [aProjectKind, aYear, aNumber] = a.tag.split("-");
-                    const [bProjectKind, bYear, bNumber] = b.tag.split("-");
-                    // First, compare by year
-                    if (Number(aYear) !== Number(bYear)) {
-                      return Number(bYear) - Number(aYear);
-                    }
-                    // If the years are the same, compare by the last part
-                    return Number(bNumber) - Number(aNumber);
-                  })
-                  .map((p) => {
-                    return (
-                      <Box key={p.pk}>
-                        <Flex>
-                          <Image
-                            objectFit={"cover"}
-                            my={"7px"}
-                            src={
-                              p?.image?.file
-                                ? `${baseUrl}${p.image.file}`
-                                : noImage
-                            }
-                            boxSize={"70px"}
-                            rounded={"lg"}
-                            mr={3}
-                          />
-                          <Flex py={2} flexDir={"column"}>
-                            <Tag
-                              w={"fit-content"}
-                              right={0}
-                              size={"sm"}
-                              fontWeight={"bold"}
-                              bg={
-                                colorMode === "light"
-                                  ? `${kindDict[p.tag.split("-")[0]].color}.500`
-                                  : `${kindDict[p.tag.split("-")[0]].color}.400`
-                              }
-                              color={"white"}
-                            >
-                              {p.tag}
-                            </Tag>
-                            <ExtractedHTMLTitle
-                              htmlContent={p.title}
-                              onClick={(e) => {
-                                goToProject(e, p?.pk);
-                              }}
-                              userSelect={"none"}
-                              cursor={"pointer"}
-                              color={
-                                colorMode === "dark" ? "blue.200" : "blue.600"
-                              }
-                              _hover={
-                                colorMode === "dark"
-                                  ? {
-                                      color: "blue.100",
-                                      textDecoration: "underline",
-                                    }
-                                  : {
-                                      color: "blue.500",
-                                      textDecoration: "underline",
-                                    }
-                              }
-                            />
-                          </Flex>
-                        </Flex>
 
-                        <Divider />
-                      </Box>
-                    );
-                  })
-              )}{" "}
-              {/* <ExtractedHTMLTitle></ExtractedHTMLTitle> */}
-            </Grid>
+                <ProjectsDataTable
+                  projectData={userProjectsData}
+                  disabledColumns={{ role: false, kind: true, status: true, title: false, }}
+                  defaultSorting={"title"}
+                />
+                // involvedProjects?.userProjectsData
+                //   ?.sort((a, b) => {
+                //     const [aProjectKind, aYear, aNumber] = a.tag.split("-");
+                //     const [bProjectKind, bYear, bNumber] = b.tag.split("-");
+                //     // First, compare by year
+                //     if (Number(aYear) !== Number(bYear)) {
+                //       return Number(bYear) - Number(aYear);
+                //     }
+                //     // If the years are the same, compare by the last part
+                //     return Number(bNumber) - Number(aNumber);
+                //   })
+                //   .map((p) => {
+                //     return (
+                //       <Box key={p.pk}>
+                //         <Flex>
+                //           <Image
+                //             objectFit={"cover"}
+                //             my={"7px"}
+                //             src={
+                //               p?.image?.file
+                //                 ? `${baseUrl}${p.image.file}`
+                //                 : noImage
+                //             }
+                //             boxSize={"70px"}
+                //             rounded={"lg"}
+                //             mr={3}
+                //           />
+                //           <Flex py={2} flexDir={"column"}>
+                //             <Tag
+                //               w={"fit-content"}
+                //               right={0}
+                //               size={"sm"}
+                //               fontWeight={"bold"}
+                //               bg={
+                //                 colorMode === "light"
+                //                   ? `${kindDict[p.tag.split("-")[0]].color}.500`
+                //                   : `${kindDict[p.tag.split("-")[0]].color}.400`
+                //               }
+                //               color={"white"}
+                //             >
+                //               {p.tag}
+                //             </Tag>
+                //             <ExtractedHTMLTitle
+                //               htmlContent={p.title}
+                //               onClick={(e) => {
+                //                 goToProject(e, p?.pk);
+                //               }}
+                //               userSelect={"none"}
+                //               cursor={"pointer"}
+                //               color={
+                //                 colorMode === "dark" ? "blue.200" : "blue.600"
+                //               }
+                //               _hover={
+                //                 colorMode === "dark"
+                //                   ? {
+                //                     color: "blue.100",
+                //                     textDecoration: "underline",
+                //                   }
+                //                   : {
+                //                     color: "blue.500",
+                //                     textDecoration: "underline",
+                //                   }
+                //               }
+                //             />
+                //           </Flex>
+                //         </Flex>
+
+                //         <Divider />
+                //       </Box>
+                //     );
+                //   })
+              )
+
+            )}
+
+            {/* <ExtractedHTMLTitle></ExtractedHTMLTitle> */}
           </Flex>
 
           <Spacer />
@@ -647,8 +653,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   onClick={
                     user.email === me.userData.email
                       ? () => {
-                          navigate("/users/me");
-                        }
+                        navigate("/users/me");
+                      }
                       : onEditUserDetailsModalOpen
                   }
                   bg={user?.is_superuser ? "blue.600" : "blue.500"}

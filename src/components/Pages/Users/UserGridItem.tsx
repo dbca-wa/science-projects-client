@@ -107,7 +107,7 @@ export const UserGridItem = ({
 				isOpen={isUserOpen}
 				placement="right"
 				onClose={onUserClose}
-				size={"sm"} //by default is xs
+				size={"lg"} //by default is xs
 			>
 				<DrawerOverlay />
 				<DrawerContent>
@@ -152,7 +152,7 @@ export const UserGridItem = ({
 					// isXlOrLarger ?
 					<Flex
 						ml={2}
-						// bg={"red"}
+					// bg={"red"}
 					>
 						<Box minW={55} mr={4}>
 							<Avatar
@@ -214,7 +214,7 @@ export const UserGridItem = ({
 										: is_staff
 											? "green.500"
 											: // External user
-												"gray.500"
+											"gray.500"
 								}
 							>
 								{
@@ -224,11 +224,10 @@ export const UserGridItem = ({
 											? "Executive"
 											: "Admin"
 										: is_staff
-											? `Staff${
-													business_area?.leader === pk
-														? " (Business Area Leader)"
-														: ""
-												}`
+											? `Staff${business_area?.leader === pk
+												? " (Business Area Leader)"
+												: ""
+											}`
 											: "External User"
 								}
 								{is_active === false && ` (Inactive)`}

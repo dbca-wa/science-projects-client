@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { ITinyProjectData } from "../../../types";
+import { IProjectData, ITinyProjectData } from "../../../types";
 import { getUsersProjects } from "../../api";
 
 export const useInvolvedProjects = (pk: number) => {
@@ -10,6 +10,6 @@ export const useInvolvedProjects = (pk: number) => {
   });
   return {
     userProjectsLoading: isPending,
-    userProjectsData: data as ITinyProjectData[],
+    userProjectsData: data as IProjectData[],
   };
 };
