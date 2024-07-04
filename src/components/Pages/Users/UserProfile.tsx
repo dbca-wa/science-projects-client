@@ -32,7 +32,7 @@ import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
 import { DeleteUserModal } from "../../Modals/DeleteUserModal";
 import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
 import { PromoteUserModal } from "../../Modals/PromoteUserModal";
-import { ProjectsDataTable } from "../Dashboard/ProjectsDataTable";
+import { ProjectColumnTypes, ProjectsDataTable } from "../Dashboard/ProjectsDataTable";
 
 interface Props {
   pk: number;
@@ -136,6 +136,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
       color: "gray",
     },
   };
+
 
   return loading || !user || pk === undefined ? (
     <Center w={"100%"} h={"100%"}>
