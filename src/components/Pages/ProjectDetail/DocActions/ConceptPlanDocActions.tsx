@@ -21,7 +21,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
 import {
-  ISetProjectProps,
+  ISetProjectStatusProps,
   ISpawnDocument,
   // generateConceptPlan,
   setProjectStatus,
@@ -199,7 +199,7 @@ export const ConceptPlanDocActions = ({
           isClosable: true,
         });
       }
-      const updateData: ISetProjectProps = {
+      const updateData: ISetProjectStatusProps = {
         projectId: conceptPlanData?.document?.project.pk
           ? conceptPlanData.document.project.pk
           : conceptPlanData?.document?.project?.id,
