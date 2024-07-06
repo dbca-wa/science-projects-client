@@ -1,7 +1,6 @@
 // The drawer content that pops out when clicking on a user grid item
 
 import { DeactivateUserModal } from "@/components/Modals/DeactivateUserModal";
-import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
 import { useInvolvedProjects } from "@/lib/hooks/tanstack/useInvolvedProjects";
 import {
   Avatar,
@@ -15,7 +14,7 @@ import {
   Spinner,
   Text,
   useColorMode,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
@@ -32,7 +31,7 @@ import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
 import { DeleteUserModal } from "../../Modals/DeleteUserModal";
 import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
 import { PromoteUserModal } from "../../Modals/PromoteUserModal";
-import { ProjectColumnTypes, ProjectsDataTable } from "../Dashboard/ProjectsDataTable";
+import { UserProjectsDataTable } from "../Dashboard/UserProjectsDataTable";
 
 interface Props {
   pk: number;
@@ -45,7 +44,6 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   const formatted_date = useFormattedDate(user?.date_joined);
 
   const { currentPage } = useUpdatePage();
-  const { isOnProjectsPage } = useProjectSearchContext();
 
   const { colorMode } = useColorMode();
   const borderColor = colorMode === "light" ? "gray.300" : "gray.500";
@@ -104,39 +102,38 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
   const navigate = useNavigate();
 
-  const goToProject = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    pk: number | undefined,
-  ) => {
-    if (isOnProjectsPage) {
-      if (e.ctrlKey || e.metaKey) {
-        window.open(`${pk}`, "_blank"); // Opens in a new tab
-      } else {
-        navigate(`${pk}`);
-      }
-    } else {
-      if (e.ctrlKey || e.metaKey) {
-        window.open(`/projects/${pk}`, "_blank"); // Opens in a new tab
-      } else {
-        navigate(`/projects/${pk}`);
-      }
-    }
-  };
-  const kindDict = {
-    CF: {
-      color: "red",
-    },
-    SP: {
-      color: "green",
-    },
-    STP: {
-      color: "blue",
-    },
-    EXT: {
-      color: "gray",
-    },
-  };
-
+  // const goToProject = (
+  //   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  //   pk: number | undefined,
+  // ) => {
+  //   if (isOnProjectsPage) {
+  //     if (e.ctrlKey || e.metaKey) {
+  //       window.open(`${pk}`, "_blank"); // Opens in a new tab
+  //     } else {
+  //       navigate(`${pk}`);
+  //     }
+  //   } else {
+  //     if (e.ctrlKey || e.metaKey) {
+  //       window.open(`/projects/${pk}`, "_blank"); // Opens in a new tab
+  //     } else {
+  //       navigate(`/projects/${pk}`);
+  //     }
+  //   }
+  // };
+  // const kindDict = {
+  //   CF: {
+  //     color: "red",
+  //   },
+  //   SP: {
+  //     color: "green",
+  //   },
+  //   STP: {
+  //     color: "blue",
+  //   },
+  //   EXT: {
+  //     color: "gray",
+  //   },
+  // };
 
   return loading || !user || pk === undefined ? (
     <Center w={"100%"} h={"100%"}>
@@ -337,7 +334,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           </span>
                           <span
                             onClick={() => console.log(user)}
-                          // style={{ color: "blue.500" }}
+                            // style={{ color: "blue.500" }}
                           >
                             {user.business_area.name}
                           </span>
@@ -425,91 +422,25 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 Involved Projects
               </Text>
             </Flex>
-            {!userProjectsLoading && (
-              userProjectsData?.length === 0 ? (
+            {!userProjectsLoading &&
+              (userProjectsData?.length === 0 ? (
                 <p>No Projects</p>
               ) : (
-
-                <ProjectsDataTable
-                  projectData={userProjectsData}
-                  disabledColumns={{ role: false, kind: true, status: true, title: false, }}
-                  defaultSorting={"title"}
-                />
-                // involvedProjects?.userProjectsData
-                //   ?.sort((a, b) => {
-                //     const [aProjectKind, aYear, aNumber] = a.tag.split("-");
-                //     const [bProjectKind, bYear, bNumber] = b.tag.split("-");
-                //     // First, compare by year
-                //     if (Number(aYear) !== Number(bYear)) {
-                //       return Number(bYear) - Number(aYear);
-                //     }
-                //     // If the years are the same, compare by the last part
-                //     return Number(bNumber) - Number(aNumber);
-                //   })
-                //   .map((p) => {
-                //     return (
-                //       <Box key={p.pk}>
-                //         <Flex>
-                //           <Image
-                //             objectFit={"cover"}
-                //             my={"7px"}
-                //             src={
-                //               p?.image?.file
-                //                 ? `${baseUrl}${p.image.file}`
-                //                 : noImage
-                //             }
-                //             boxSize={"70px"}
-                //             rounded={"lg"}
-                //             mr={3}
-                //           />
-                //           <Flex py={2} flexDir={"column"}>
-                //             <Tag
-                //               w={"fit-content"}
-                //               right={0}
-                //               size={"sm"}
-                //               fontWeight={"bold"}
-                //               bg={
-                //                 colorMode === "light"
-                //                   ? `${kindDict[p.tag.split("-")[0]].color}.500`
-                //                   : `${kindDict[p.tag.split("-")[0]].color}.400`
-                //               }
-                //               color={"white"}
-                //             >
-                //               {p.tag}
-                //             </Tag>
-                //             <ExtractedHTMLTitle
-                //               htmlContent={p.title}
-                //               onClick={(e) => {
-                //                 goToProject(e, p?.pk);
-                //               }}
-                //               userSelect={"none"}
-                //               cursor={"pointer"}
-                //               color={
-                //                 colorMode === "dark" ? "blue.200" : "blue.600"
-                //               }
-                //               _hover={
-                //                 colorMode === "dark"
-                //                   ? {
-                //                     color: "blue.100",
-                //                     textDecoration: "underline",
-                //                   }
-                //                   : {
-                //                     color: "blue.500",
-                //                     textDecoration: "underline",
-                //                   }
-                //               }
-                //             />
-                //           </Flex>
-                //         </Flex>
-
-                //         <Divider />
-                //       </Box>
-                //     );
-                //   })
-              )
-
-            )}
-
+                <>
+                  <UserProjectsDataTable
+                    projectData={userProjectsData}
+                    disabledColumns={{
+                      kind: true,
+                      status: true,
+                      business_area: true,
+                      role: false,
+                      title: false,
+                    }}
+                    defaultSorting={"title"}
+                    noDataString="Not associated with any projects"
+                  />
+                </>
+              ))}
             {/* <ExtractedHTMLTitle></ExtractedHTMLTitle> */}
           </Flex>
 
@@ -654,8 +585,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   onClick={
                     user.email === me.userData.email
                       ? () => {
-                        navigate("/users/me");
-                      }
+                          navigate("/users/me");
+                        }
                       : onEditUserDetailsModalOpen
                   }
                   bg={user?.is_superuser ? "blue.600" : "blue.500"}

@@ -29,10 +29,10 @@ import { useNavigate } from "react-router-dom";
 
 export interface IProblemProjectData extends IProjectData {
   problemKind:
-  | "memberless"
-  | "leaderless"
-  | "multiple_leaders"
-  | "externally_led";
+    | "memberless"
+    | "leaderless"
+    | "multiple_leaders"
+    | "externally_led";
 }
 
 interface Props {
@@ -72,8 +72,6 @@ const statusMapping = {
   terminated: "Terminated and Closed",
   suspended: "Suspended",
 };
-
-
 
 export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
   const { colorMode } = useColorMode();
@@ -116,22 +114,26 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
   const problemMapping = {
     memberless: {
       title: "No Members",
-      description: "This project has no members and cannot progress! Add members and set a leader to fix this problem",
+      description:
+        "This project has no members and cannot progress! Add members and set a leader to fix this problem",
       color: "red",
     },
     leaderless: {
       title: "No Leader Tag",
-      description: "The leader tag for this project has not been set. Projects with members always have a leader - if the tag isnt appearing, assign another user as leader then set it back to fix this problem.",
+      description:
+        "The leader tag for this project has not been set. Projects with members always have a leader - if the tag isnt appearing, assign another user as leader then set it back to fix this problem.",
       color: "orange",
     },
     externally_led: {
       title: "Externally Led",
-      description: "This project is externally led and cannot progress! Each project needs a DBCA staff member set as the leader to fix the problem",
+      description:
+        "This project is externally led and cannot progress! Each project needs a DBCA staff member set as the leader to fix the problem",
       color: "red",
     },
     multiple_leaders: {
       title: "Multiple Leader Tags",
-      description: "This project has multiple leader tags due to the renaming of 'Supervising Scientist' to 'Project Leader', set the tags appropriately to fix this issue.",
+      description:
+        "This project has multiple leader tags due to the renaming of 'Supervising Scientist' to 'Project Leader', set the tags appropriately to fix this issue.",
       color: "yellow",
     },
   };
@@ -329,7 +331,6 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
           return formattedDate;
         };
 
-
         const tag = row.original.tag;
         return (
           <Box className="text-left font-medium">
@@ -413,11 +414,16 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
       cell: ({ row }) => {
         const originalProblemData: problems = row.getValue("problemKind");
         const formatted = problemMapping[originalProblemData].title || "Other";
-        const formattedProblem = problemMapping[originalProblemData].description;
+        const formattedProblem =
+          problemMapping[originalProblemData].description;
         return (
           <Box
             className="text-left font-medium"
-            color={colorMode === "light" ? `${problemMapping[originalProblemData].color}.500` : `${problemMapping[originalProblemData].color}.300`}
+            color={
+              colorMode === "light"
+                ? `${problemMapping[originalProblemData].color}.500`
+                : `${problemMapping[originalProblemData].color}.300`
+            }
             px={4}
           >
             {formatted}
@@ -426,12 +432,10 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
               color={"gray.500"}
               fontWeight={"semibold"}
               fontSize={"x-small"}
-            // onClick={(e) => goToProject(e, row.original.id)}
+              // onClick={(e) => goToProject(e, row.original.id)}
             >
               {formattedProblem}
-
             </Text>
-
           </Box>
         );
       },
@@ -508,7 +512,6 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
     //   },
     // },
 
-
     {
       accessorKey: "created_at",
       header: ({ column }) => {
@@ -572,19 +575,19 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
         return a.localeCompare(b);
       },
     },
-
-
   ];
 
   const returnHTMLTitle = (titleData) => {
     const wrapper = document.createElement("div");
     wrapper.innerHTML = titleData;
-    const tag = wrapper.querySelector("p, span");
+    const tag = wrapper.querySelector("p, span, h1, h2, h3, h4");
     if (tag) {
       return tag.textContent;
+    } else {
+      console.log(wrapper.innerHTML);
+      return wrapper.innerHTML;
     }
   };
-
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: "title",
@@ -624,9 +627,9 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 );
               })}

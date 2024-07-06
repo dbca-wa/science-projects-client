@@ -25,7 +25,6 @@ import {
   IPendingProjectDocumentData,
   UnapprovedDocumentsDataTable,
 } from "./UnapprovedDocumentsDataTable";
-import { motion } from "framer-motion";
 // Show BAs how their BA will display on AR
 
 export const MyBusinessArea = () => {
@@ -69,22 +68,21 @@ export const MyBusinessArea = () => {
 
   useEffect(() => {
     if (Object.keys(unapprovedDocumentsInAreas).length > 0) {
-
-      flatPkList?.map((baPk) => console.log(`${baPk}: ${unapprovedDocumentsInAreas[baPk]?.linked?.length}`))
+      flatPkList?.map((baPk) =>
+        console.log(
+          `${baPk}: ${unapprovedDocumentsInAreas[baPk]?.linked?.length}`,
+        ),
+      );
     }
   }, [unapprovedDocumentsInAreas, flatPkList]);
 
-
   useEffect(() => {
-    if (
-      basLoading || myBusinessAreas?.length < 1
-    ) {
-      return
+    if (basLoading || myBusinessAreas?.length < 1) {
+      return;
     } else {
       if (flatPkList.length === 0) {
         setFlatPkList(myBusinessAreas.map((ba) => ba.pk));
-      }
-      else {
+      } else {
         const fetchUnapprovedDocs = async (flatPkList) => {
           if (flatPkList.length >= 1) {
             if (Object.keys(unapprovedDocumentsInAreas).length === 0) {
@@ -115,7 +113,7 @@ export const MyBusinessArea = () => {
               }
             }
           }
-        }
+        };
 
         if (
           Object.keys(problematicProjectsData).length === 0 &&
@@ -126,9 +124,13 @@ export const MyBusinessArea = () => {
         }
       }
     }
-  }, [flatPkList, myBusinessAreas, basLoading, unapprovedDocumentsInAreas, problematicProjectsData])
-
-
+  }, [
+    flatPkList,
+    myBusinessAreas,
+    basLoading,
+    unapprovedDocumentsInAreas,
+    problematicProjectsData,
+  ]);
 
   return (
     <>
@@ -196,7 +198,9 @@ export const MyBusinessArea = () => {
                       const baData = problematicProjectsData[ba?.pk] || {};
 
                       // Reduce problematic project data
-                      const problematicProjectsForBaData = Object.keys(baData).reduce((acc, key) => {
+                      const problematicProjectsForBaData = Object.keys(
+                        baData,
+                      ).reduce((acc, key) => {
                         const problemType =
                           key === "no_members"
                             ? "memberless"
@@ -218,13 +222,14 @@ export const MyBusinessArea = () => {
 
                       const problemsCount = problematicProjectsForBaData.length;
 
-
                       return (
                         <Box key={`${ba?.pk}problemProjects`}>
                           <Text fontWeight={"bold"} fontSize={"larger"} py={4}>
                             {ba?.name} ({problemsCount} problems)
                           </Text>
-                          <ProblematicProjectsDataTable projectData={problematicProjectsForBaData} />
+                          <ProblematicProjectsDataTable
+                            projectData={problematicProjectsForBaData}
+                          />
                         </Box>
                       );
                     })}
@@ -237,44 +242,50 @@ export const MyBusinessArea = () => {
                       >
                         {myBusinessAreas.length < 1
                           ? "You are not leading any business areas."
-                          : "This section lists all projects documents in your area which have yet to be approved by Project Leads"}
+                          : "This section lists all projects documents in your area which have yet to be approved by Project Leads. Please check that the listed leader is a dbca member and confer with them to push the document through."}
                       </Text>
-                      <Box mt={2}
-                      >
-                        <Text
-                          color={"orange.500"}
-                          fontWeight={"semibold"}
-                        >
-                          There are some issues with older data. Please refrain from approving documents in the following situations:
+                      {/* <Box mt={2}>
+                        <Text color={"orange.500"} fontWeight={"semibold"}>
+                          There are some issues with older data. Please refrain
+                          from approving documents in the following situations:
                         </Text>
-                        <List color={"red.500"}
-                        >
-                          <ListItem>- A concept plan requires approval, but a project plan already exists</ListItem>
-                          <ListItem>- A project plan requires approval, but a progress report already exists</ListItem>
+                        <List color={"red.500"}>
+                          <ListItem>
+                            - A concept plan requires approval, but a project
+                            plan already exists
+                          </ListItem>
+                          <ListItem>
+                            - A project plan requires approval, but a progress
+                            report already exists
+                          </ListItem>
                         </List>
-
-                      </Box>
+                      </Box> */}
                     </Box>
 
                     {myBusinessAreas?.map((ba) => {
-                      const pendingProjectDocumentData: IPendingProjectDocumentData = {
-                        all: [],
-                        team: [],
-                        ba: [],
-                        lead: unapprovedDocumentsInAreas[ba.pk]?.linked,
-                        directorate: [],
-                      };
+                      const pendingProjectDocumentData: IPendingProjectDocumentData =
+                        {
+                          all: [],
+                          team: [],
+                          ba: [],
+                          lead: unapprovedDocumentsInAreas[ba.pk]?.linked,
+                          directorate: [],
+                        };
                       // console.log(unapprovedDocumentsInAreas[`${ba?.pk}`])
-                      return (
-                        pendingProjectDocumentData ?
-                          <Box key={`${ba?.pk}unapproveddocs`}>
-                            <Text fontWeight={"bold"} fontSize={"larger"} py={4}>
-                              {ba?.name} ({unapprovedDocumentsInAreas[`${ba?.pk}`]?.linked?.length} Unapproved Documents)
-                            </Text>
-                            {/* {Object.keys(pendingProjectDocumentData['lead']).length >
+                      return pendingProjectDocumentData ? (
+                        <Box key={`${ba?.pk}unapproveddocs`}>
+                          <Text fontWeight={"bold"} fontSize={"larger"} py={4}>
+                            {ba?.name} (
+                            {
+                              unapprovedDocumentsInAreas[`${ba?.pk}`]?.linked
+                                ?.length
+                            }{" "}
+                            Unapproved Documents)
+                          </Text>
+                          {/* {Object.keys(pendingProjectDocumentData['lead']).length >
                               0 && ( */}
-                            <>
-                              {/* {unapprovedDocumentsInAreas[ba?.pk]?.map(
+                          <>
+                            {/* {unapprovedDocumentsInAreas[ba?.pk]?.map(
                                 (doc) => {
                                   console.log(doc);
                                   return (
@@ -284,16 +295,15 @@ export const MyBusinessArea = () => {
                                   );
                                 },
                               )} */}
-                              <UnapprovedDocumentsDataTable
-                                pendingProjectDocumentData={
-                                  pendingProjectDocumentData
-                                }
-                              />
-                            </>
-                            {/* )} */}
-                          </Box>
-                          : null
-                      );
+                            <UnapprovedDocumentsDataTable
+                              pendingProjectDocumentData={
+                                pendingProjectDocumentData
+                              }
+                            />
+                          </>
+                          {/* )} */}
+                        </Box>
+                      ) : null;
                     })}
                   </TabPanel>
                 </TabPanels>
