@@ -65,9 +65,12 @@ interface Props {
 const returnHTMLTitle = (titleData) => {
   const wrapper = document.createElement("div");
   wrapper.innerHTML = titleData;
-  const tag = wrapper.querySelector("p, span");
+  const tag = wrapper.querySelector("p, span, h1, h2, h3, h4");
   if (tag) {
     return tag.textContent;
+  } else {
+    console.log(wrapper.innerHTML);
+    return wrapper.innerHTML;
   }
 };
 
@@ -210,7 +213,6 @@ const statusMapping = {
   terminated: "Terminated and Closed",
   suspended: "Suspended",
 };
-
 
 // Type Guards
 function isDocTypeTask(taskRow: any): taskRow is IDocTypeTask {
@@ -530,7 +532,6 @@ export const UnapprovedDocumentsDataTable = ({
         return indexA - indexB;
       },
     },
-
   ];
   //   console.log(combinedData);
   const [data, setData] = useState([]);
@@ -579,9 +580,9 @@ export const UnapprovedDocumentsDataTable = ({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 );
               })}
