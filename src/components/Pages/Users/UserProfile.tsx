@@ -433,6 +433,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                       kind: true,
                       status: true,
                       business_area: true,
+                      created_at: true,
                       role: false,
                       title: false,
                     }}
