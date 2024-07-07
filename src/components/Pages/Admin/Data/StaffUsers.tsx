@@ -7,6 +7,7 @@ import {
   Grid,
   useColorMode,
   useDisclosure,
+  Flex,
 } from "@chakra-ui/react";
 
 export const StaffUsers = () => {
@@ -23,11 +24,12 @@ export const StaffUsers = () => {
         isOpen={isAddDBCAUserModalOpen}
         onClose={onCloseAddDBCAUserModal}
       />
-      <Box mt={8} mb={4}>
-        <Text fontWeight={"semibold"} mb={3}>
-          Users (Actions)
-        </Text>
-        <Divider />
+      <Box>
+        <Flex alignItems={"center"} mt={4}>
+          <Text fontSize={"x-large"} py={4} flex={1}>
+            Staff User Actions
+          </Text>
+        </Flex>
       </Box>
 
       <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>

@@ -39,6 +39,7 @@ import { useNavigate } from "react-router-dom";
 
 export type ProjectColumnTypes =
   | "business_area"
+  | "created_at"
   | "kind"
   | "title"
   | "status"
@@ -108,7 +109,68 @@ export const UserProjectsDataTable = ({
       }
     }
   };
+  const formatDate = (dateData: Date) => {
+    const inputDate = new Date(dateData);
+    const getOrdinalIndicator = (day: number) => {
+      if (day > 10 && day < 20) {
+        return "th";
+      } else {
+        const lastDigit = day % 10;
+        switch (lastDigit) {
+          case 1:
+            return "st";
+          case 2:
+            return "nd";
+          case 3:
+            return "rd";
+          default:
+            return "th";
+        }
+      }
+    };
 
+    const dateOptions = {
+      year: "numeric" as const,
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      timeZone: "Australia/Perth",
+    };
+
+    const day = inputDate.getDate();
+    const ordinalIndicator = getOrdinalIndicator(day);
+    // eslint-disable-next-line
+    //@ts-ignore
+    let formattedDate = inputDate.toLocaleString("en-AU", dateOptions);
+    formattedDate = formattedDate.replace(
+      new RegExp(`\\b${day}\\b`),
+      `${day}${ordinalIndicator}`,
+    );
+    formattedDate = formattedDate.replace(
+      /\b(\d{1,2}:\d{1,2})\s*([ap]m)\b/gi,
+      (match, time, meridiem) => {
+        const [hour, minute] = time.split(":");
+        const hourInt = parseInt(hour);
+        const suffix = meridiem.toUpperCase();
+        const formattedHour =
+          hourInt === 0 || hourInt === 12 ? 12 : hourInt % 12;
+        return `${formattedHour}:${minute}${suffix}`;
+      },
+    );
+    formattedDate = formattedDate.replace("at", "@");
+
+    const month = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+    }).format(inputDate);
+    const monthIndex = formattedDate.indexOf(month);
+    formattedDate =
+      formattedDate.slice(0, monthIndex + month?.length) +
+      "," +
+      formattedDate.slice(monthIndex + month?.length);
+
+    return formattedDate;
+  };
   type statuses =
     | "pending"
     | "closure_requested"
@@ -436,68 +498,6 @@ export const UserProjectsDataTable = ({
       cell: ({ row }) => {
         const originalTitleData = row?.original?.title;
         const formatted = returnHTMLTitle(originalTitleData);
-        const formatDate = (dateData: Date) => {
-          const inputDate = new Date(dateData);
-          const getOrdinalIndicator = (day: number) => {
-            if (day > 10 && day < 20) {
-              return "th";
-            } else {
-              const lastDigit = day % 10;
-              switch (lastDigit) {
-                case 1:
-                  return "st";
-                case 2:
-                  return "nd";
-                case 3:
-                  return "rd";
-                default:
-                  return "th";
-              }
-            }
-          };
-
-          const dateOptions = {
-            year: "numeric" as const,
-            month: "long",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            timeZone: "Australia/Perth",
-          };
-
-          const day = inputDate.getDate();
-          const ordinalIndicator = getOrdinalIndicator(day);
-          // eslint-disable-next-line
-          //@ts-ignore
-          let formattedDate = inputDate.toLocaleString("en-AU", dateOptions);
-          formattedDate = formattedDate.replace(
-            new RegExp(`\\b${day}\\b`),
-            `${day}${ordinalIndicator}`,
-          );
-          formattedDate = formattedDate.replace(
-            /\b(\d{1,2}:\d{1,2})\s*([ap]m)\b/gi,
-            (match, time, meridiem) => {
-              const [hour, minute] = time.split(":");
-              const hourInt = parseInt(hour);
-              const suffix = meridiem.toUpperCase();
-              const formattedHour =
-                hourInt === 0 || hourInt === 12 ? 12 : hourInt % 12;
-              return `${formattedHour}:${minute}${suffix}`;
-            },
-          );
-          formattedDate = formattedDate.replace("at", "@");
-
-          const month = new Intl.DateTimeFormat("en-US", {
-            month: "long",
-          }).format(inputDate);
-          const monthIndex = formattedDate.indexOf(month);
-          formattedDate =
-            formattedDate.slice(0, monthIndex + month?.length) +
-            "," +
-            formattedDate.slice(monthIndex + month?.length);
-
-          return formattedDate;
-        };
         const originalImageData = row?.original?.image;
         return (
           <Flex
@@ -663,31 +663,21 @@ export const UserProjectsDataTable = ({
         // const formatted = returnHTMLTitle(originalTitleData);
         return (
           <Box className="text-left font-medium">
-            {/* <Text
-              color={colorMode === "dark" ? "blue.200" : "blue.400"}
-              fontWeight={"bold"}
-              _hover={{
-                color: colorMode === "dark" ? "blue.100" : "blue.300",
-                textDecoration: "underline",
-              }}
-              cursor={"pointer"}
-              // onClick={(e) => goToProject(e, row?.original?.id)}
-              px={4}
-            >
-              {date}
-            </Text> */}
-            <Text>{row.getValue("created_at")}</Text>
+            <Text>{formatDate(row.getValue("created_at"))}</Text>
           </Box>
         );
       },
       sortingFn: (rowA, rowB) => {
-        const originalTitleDataA = rowA.original.title;
-        const originalTitleDataB = rowB.original.title;
-        const formattedA = returnHTMLTitle(originalTitleDataA);
-        const formattedB = returnHTMLTitle(originalTitleDataB);
-        const a = formattedA.replace(/<\/?[^>]+(>|$)/g, "").trim();
-        const b = formattedB.replace(/<\/?[^>]+(>|$)/g, "").trim();
-        return a.localeCompare(b);
+        const originalCreatedAtDataA = rowA.original.created_at;
+        const originalCreatedAtDataB = rowB.original.created_at;
+
+        const dateA = new Date(originalCreatedAtDataA);
+        const dateB = new Date(originalCreatedAtDataB);
+
+        // Compare the Date objects
+        if (dateA < dateB) return 1;
+        if (dateA > dateB) return -1;
+        return 0;
       },
     },
     // status
@@ -703,28 +693,11 @@ export const UserProjectsDataTable = ({
           sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
         }
         return (
-          // <Button
-          //   // variant="ghost"
-          //   bg={"transparent"}
-          //   onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          //   className="w-full text-left"
-          //   rightIcon={sortIcon}
-          //   _hover={
-          //     colorMode === "dark"
-          //       ? { bg: "blue.400", color: "white" }
-          //       : { bg: "blue.50", color: "black" }
-          //   }
-          // >
-          //   Status
-          // </Button>
           <Button
-            // variant="ghost"
             bg={"transparent"}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="w-full text-right"
             rightIcon={sortIcon}
-            // p={0}
-            // m={0}
             justifyContent={"flex-end"}
             _hover={
               colorMode === "dark"
@@ -776,7 +749,7 @@ export const UserProjectsDataTable = ({
     },
   ]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    created_at: false,
+    // created_at: false,
   });
 
   const data = projectData;

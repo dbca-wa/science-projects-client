@@ -343,14 +343,14 @@ export const batchApproveOLDProgressAndStudentReports = async () => {
   return res;
 };
 
-export const sendEmailToProjectLeads = async ({
+export const getEmailProjectList = async ({
   shouldDownloadList,
 }: IProjectLeadsEmail) => {
   const data = {
     shouldDownloadList,
   };
   const res = instance
-    .post(`documents/send_email_to_project_leads`, data)
+    .post(`documents/get_project_lead_emails`, data)
     .then((res) => {
       return res.data;
     });
