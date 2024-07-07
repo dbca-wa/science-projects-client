@@ -343,6 +343,7 @@ export const TraditionalTasksAndProjects = () => {
                       projectData={projectData}
                       disabledColumns={{
                         business_area: true,
+                        created_at: true,
                         title: false,
                         role: false,
                         kind: false,

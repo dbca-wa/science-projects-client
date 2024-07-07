@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { sendEmailToProjectLeads } from "../../lib/api";
+import { getEmailProjectList } from "../../lib/api";
 import { AxiosError } from "axios";
 
 interface IModalProps {
@@ -59,7 +59,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
 
   const projectLeadEmailMutation = useMutation({
     // Start of mutation handling
-    mutationFn: sendEmailToProjectLeads,
+    mutationFn: getEmailProjectList,
     onMutate: () => {
       addToast({
         title: "Getting Email LIst...",
