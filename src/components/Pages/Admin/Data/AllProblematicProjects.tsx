@@ -21,6 +21,7 @@ import {
 import { AccordionItem } from "@radix-ui/react-accordion";
 import { useState } from "react";
 import { UserProjectsDataTable } from "../../Dashboard/UserProjectsDataTable";
+import { TbRefresh } from "react-icons/tb";
 
 export const AllProblematicProjects = () => {
   const { colorMode } = useColorMode();
@@ -71,6 +72,7 @@ export const AllProblematicProjects = () => {
                 }}
                 onClick={fetchProblematicProjects}
                 isDisabled={fetchingData}
+                leftIcon={<TbRefresh />}
               >
                 Refresh Data
               </Button>
@@ -194,7 +196,7 @@ export const AllProblematicProjects = () => {
                     </Text>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <Flex pb={8} justifyContent={"flex-end"}>
+                    {/* <Flex pb={8} justifyContent={"flex-end"}>
                       <Button
                         bg={colorMode === "light" ? "red.500" : "red.600"}
                         color={"white"}
@@ -205,7 +207,7 @@ export const AllProblematicProjects = () => {
                       >
                         Update External Leaders
                       </Button>
-                    </Flex>
+                    </Flex> */}
 
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.external_leader}
