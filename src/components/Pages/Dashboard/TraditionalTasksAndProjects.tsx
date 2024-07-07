@@ -10,10 +10,7 @@ import {
   AccordionPanel,
   Box,
   Center,
-  Flex,
-  Grid,
   Spinner,
-  Text,
   useColorMode,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
@@ -24,16 +21,15 @@ import { useGetDocumentsPendingMyAction } from "../../../lib/hooks/tanstack/useG
 import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
 import { useGetMyTasks } from "../../../lib/hooks/tanstack/useGetMyTasks";
 import { ITaskDisplayCard } from "../../../types";
-import { EndorsementsDataTable } from "./EndorsementsDataTable";
-import { ProjectsDataTable } from "./ProjectsDataTable";
-import { TraditionalDocumentTaskDisplay } from "./TraditionalDocumentTaskDisplay";
-import { TraditionalPersonalTaskDisplay } from "./TraditionalPersonalTaskDisplay";
 import { DocumentsDataTable } from "./DocumentsDataTable";
+import { EndorsementsDataTable } from "./EndorsementsDataTable";
+import { UserProjectsDataTable } from "./UserProjectsDataTable";
 
 export const TraditionalTasksAndProjects = () => {
   const { colorMode } = useColorMode();
   const me = useUser();
   const { projectData, projectsLoading } = useGetMyProjects();
+  useEffect(() => console.log(projectData));
 
   const { pendingProjectDocumentData, pendingProjectDocumentDataLoading } =
     useGetDocumentsPendingMyAction();
@@ -56,16 +52,16 @@ export const TraditionalTasksAndProjects = () => {
       // Check if data is available and then sort tasks
       const sortedTaskData = taskData
         ? {
-          done: sortTasksByStatus(
-            taskData?.filter((task) => task.status === "done"),
-          ),
-          todo: sortTasksByStatus(
-            taskData?.filter((task) => task.status === "todo"),
-          ),
-          inprogress: sortTasksByStatus(
-            taskData?.filter((task) => task.status === "inprogress"),
-          ),
-        }
+            done: sortTasksByStatus(
+              taskData?.filter((task) => task.status === "done"),
+            ),
+            todo: sortTasksByStatus(
+              taskData?.filter((task) => task.status === "todo"),
+            ),
+            inprogress: sortTasksByStatus(
+              taskData?.filter((task) => task.status === "inprogress"),
+            ),
+          }
         : null;
 
       setCombinedData([
@@ -130,17 +126,17 @@ export const TraditionalTasksAndProjects = () => {
                   </Box>
 
                   {/* </Box> */}
-                  {combinedData?.length +
+                  {combinedData?.filter((d) => d.status !== "done")?.length +
                     pendingProjectDocumentData?.all?.length >=
-                    1 ? (
+                  1 ? (
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
                       alignItems={"center"}
                     >
                       <Box mr={2}>
-                        {combinedData?.length +
-                          pendingProjectDocumentData?.all?.length}
+                        {combinedData?.filter((d) => d.status !== "done")
+                          ?.length + pendingProjectDocumentData?.all?.length}
                       </Box>
                       <FcHighPriority />
                     </Box>
@@ -230,11 +226,11 @@ export const TraditionalTasksAndProjects = () => {
             // me?.userData?.is_biometrician ||
             // me?.userData?.is_herbarium_curator ||
             me?.userData?.is_superuser) ===
-            false ? null : pendingEndorsementsDataLoading ? (
-              <Center my={4}>
-                <Spinner />
-              </Center>
-            ) : (
+          false ? null : pendingEndorsementsDataLoading ? (
+            <Center my={4}>
+              <Spinner />
+            </Center>
+          ) : (
             <motion.div
               initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
               animate={{
@@ -247,7 +243,7 @@ export const TraditionalTasksAndProjects = () => {
                   colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
                 }
                 borderBottom={"none"}
-              // borderTop={"none"}
+                // borderTop={"none"}
               >
                 <AccordionButton
                   bg={colorMode === "light" ? "gray.200" : "gray.700"}
@@ -263,10 +259,10 @@ export const TraditionalTasksAndProjects = () => {
                     Endorsement Tasks
                   </Box>
                   {pendingEndorsementsData?.aec?.length >=
-                    // +
-                    //   pendingEndorsementsData?.bm?.length +
-                    //   pendingEndorsementsData?.hc?.length
-                    1 ? (
+                  // +
+                  //   pendingEndorsementsData?.bm?.length +
+                  //   pendingEndorsementsData?.hc?.length
+                  1 ? (
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
@@ -341,15 +337,20 @@ export const TraditionalTasksAndProjects = () => {
                   <AccordionIcon />
                 </AccordionButton>
 
-
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
                   {!projectsLoading && (
-                    <ProjectsDataTable
+                    <UserProjectsDataTable
                       projectData={projectData}
-                      disabledColumns={{ title: false, role: false, kind: false }}
-                      defaultSorting={"status"} />
+                      disabledColumns={{
+                        business_area: true,
+                        title: false,
+                        role: false,
+                        kind: false,
+                      }}
+                      defaultSorting={"status"}
+                      noDataString={"You aren't associated with any projects"}
+                    />
                   )}
-
                 </AccordionPanel>
               </AccordionItem>
             </motion.div>

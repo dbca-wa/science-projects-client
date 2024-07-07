@@ -295,6 +295,7 @@ export const AddUserToProjectModal = ({
                 />
               ) : (
                 <UserSearchDropdown
+                  autoFocus
                   {...register("user", { required: true })}
                   onlyInternal={false}
                   isRequired={true}
