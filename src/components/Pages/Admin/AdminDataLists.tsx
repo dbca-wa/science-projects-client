@@ -8,7 +8,7 @@ export const AdminDataLists = () => {
   return (
     <>
       <Head title="Data" />
-      <Tabs isLazy isFitted variant={"enclosed"}>
+      <Tabs isFitted variant={"enclosed"}>
         <TabList>
           <Tab>Problematic Projects</Tab>
           <Tab>Email List</Tab>
