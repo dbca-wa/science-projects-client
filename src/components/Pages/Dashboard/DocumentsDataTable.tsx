@@ -67,9 +67,12 @@ interface Props {
 const returnHTMLTitle = (titleData) => {
   const wrapper = document.createElement("div");
   wrapper.innerHTML = titleData;
-  const tag = wrapper.querySelector("p, span");
+  const tag = wrapper.querySelector("p, span, h1, h2, h3, h4");
   if (tag) {
     return tag.textContent;
+  } else {
+    console.log(wrapper.innerHTML);
+    return wrapper.innerHTML;
   }
 };
 

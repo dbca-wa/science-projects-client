@@ -7,9 +7,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IProjectData, ProjectRoles } from "@/types";
-import { Box, Button, Icon, Text, useColorMode, Image, Center, Flex } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Image,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
 
 import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 import {
   ColumnDef,
   SortingState,
@@ -26,10 +36,14 @@ import { GiMaterialsScience } from "react-icons/gi";
 import { MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
-import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 
-export type ProjectColumnTypes = "kind" | "title" | "status" | "image" | "role";
+export type ProjectColumnTypes =
+  | "business_area"
+  | "kind"
+  | "title"
+  | "status"
+  | "image"
+  | "role";
 
 export type DisabledColumnsMap = {
   [cType in ProjectColumnTypes]?: boolean;
@@ -38,27 +52,34 @@ export type DisabledColumnsMap = {
 };
 
 type EnabledColumns<T extends DisabledColumnsMap> = {
-  [K in keyof T]: T[K] extends true ? never : K
+  [K in keyof T]: T[K] extends true ? never : K;
 }[keyof T];
 
 export interface ProjectDataTableProps {
   projectData: IProjectData[];
   defaultSorting: EnabledColumns<DisabledColumnsMap>;
   disabledColumns: DisabledColumnsMap;
+  noDataString: string;
 }
-
 
 const returnHTMLTitle = (titleData) => {
   const wrapper = document.createElement("div");
   wrapper.innerHTML = titleData;
-  const tag = wrapper.querySelector("p, span");
+  const tag = wrapper.querySelector("p, span, h1, h2, h3, h4");
   if (tag) {
     return tag.textContent;
+  } else {
+    // console.log(wrapper.innerHTML);
+    return wrapper.innerHTML;
   }
 };
 
-
-export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns }: ProjectDataTableProps) => {
+export const UserProjectsDataTable = ({
+  projectData,
+  defaultSorting,
+  disabledColumns,
+  noDataString,
+}: ProjectDataTableProps) => {
   const { colorMode } = useColorMode();
   // console.log(projectData);
   const baseUrl = useApiEndpoint();
@@ -122,8 +143,17 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
     suspended: "Suspended",
   };
 
-
-  const roleOrder = ["supervising", "research", "technical", "externalcol", "externalpeer", "academicsuper", "student", "consulted", "group"]
+  const roleOrder = [
+    "supervising",
+    "research",
+    "technical",
+    "externalcol",
+    "externalpeer",
+    "academicsuper",
+    "student",
+    "consulted",
+    "group",
+  ];
 
   const roleDict = {
     supervising: {
@@ -162,7 +192,6 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
       color: "gray",
       string: "Consulted Peer",
     },
-
   };
 
   type kinds = "core_function" | "science" | "student" | "external";
@@ -196,7 +225,6 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
     },
   };
   const columnDefs: ColumnDef<IProjectData>[] = [
-
     // // image
     // {
     //   accessorKey: "image",
@@ -226,7 +254,7 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
     //     );
     //   },
     //   cell: ({ row }) => {
-    //     const originalImageData = row.original.image;
+    //     const originalImageData = row?.original?.image;
     //     return (
     //       <Center>
     //         <Image
@@ -240,7 +268,6 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
     //           rounded={"lg"}
     //         />
     //       </Center>
-
 
     //     );
     //   },
@@ -310,6 +337,70 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
         return indexA - indexB;
       },
     },
+    // role
+    {
+      accessorKey: "business_area",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+        let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
+
+        if (isSorted === "asc") {
+          sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
+        } else if (isSorted === "desc") {
+          sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
+        }
+        return (
+          // <Text
+          //   className="m-0 p-0 text-center"
+          //   color={colorMode === "light" ? "black" : "white"}
+          // >
+          //   Kind
+          // </Text>
+          <Button
+            // variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="w-full text-center"
+            rightIcon={sortIcon}
+            // p={0}
+            // m={0}
+            bg={"transparent"}
+            _hover={
+              colorMode === "dark"
+                ? { bg: "blue.400", color: "white" }
+                : { bg: "blue.50", color: "black" }
+            }
+          >
+            Business Area
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const originalBaNameData = row?.original?.business_area?.name;
+        // console.log(row.original);
+
+        const formattedString = returnHTMLTitle(originalBaNameData);
+
+        // console.log({ originalKindData, formattedString });
+        return (
+          <Box className="text-center align-middle font-medium">
+            <Text>{formattedString}</Text>
+          </Box>
+        );
+      },
+      sortingFn: (rowA, rowB) => {
+        const businessAreaA = rowA.original.business_area?.name;
+        const businessAreaB = rowB.original.business_area?.name;
+        const formattedA = returnHTMLTitle(businessAreaA);
+        const formattedB = returnHTMLTitle(businessAreaB);
+        const a = formattedA.replace(/<\/?[^>]+(>|$)/g, "").trim();
+        const b = formattedB.replace(/<\/?[^>]+(>|$)/g, "").trim();
+        return a.localeCompare(b);
+
+        // const indexA = roleOrder.indexOf(businessAreaA);
+        // const indexB = roleOrder.indexOf(businessAreaB);
+        // return indexA - indexB;
+      },
+    },
     // title
     {
       accessorKey: "title",
@@ -343,7 +434,7 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
         );
       },
       cell: ({ row }) => {
-        const originalTitleData = row.original.title;
+        const originalTitleData = row?.original?.title;
         const formatted = returnHTMLTitle(originalTitleData);
         const formatDate = (dateData: Date) => {
           const inputDate = new Date(dateData);
@@ -401,28 +492,31 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
           }).format(inputDate);
           const monthIndex = formattedDate.indexOf(month);
           formattedDate =
-            formattedDate.slice(0, monthIndex + month.length) +
+            formattedDate.slice(0, monthIndex + month?.length) +
             "," +
-            formattedDate.slice(monthIndex + month.length);
+            formattedDate.slice(monthIndex + month?.length);
 
           return formattedDate;
         };
-        const originalImageData = row.original.image;
+        const originalImageData = row?.original?.image;
         return (
-          <Flex className="text-left font-medium">
-            <Center>
-              <Image
-                objectFit={"cover"}
-                src={
-                  originalImageData !== null && originalImageData !== undefined ?
-                    originalImageData?.file
-                      ? `${baseUrl}${originalImageData.file}`
-                      : noImage : noImage
-                }
-                boxSize={"70px"}
-                rounded={"lg"}
-              />
-            </Center>
+          <Flex
+            className="text-left font-medium"
+            // justifyContent={"center"}
+            alignItems={"center"}
+          >
+            <Image
+              objectFit={"cover"}
+              src={
+                originalImageData !== null && originalImageData !== undefined
+                  ? originalImageData?.file
+                    ? `${baseUrl}${originalImageData.file}`
+                    : noImage
+                  : noImage
+              }
+              boxSize={"70px"}
+              rounded={"lg"}
+            />
             <Box>
               <Text
                 color={colorMode === "dark" ? "blue.200" : "blue.400"}
@@ -433,7 +527,7 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
                     colorMode === "dark" ? "underline" : "undefined",
                 }}
                 cursor={"pointer"}
-                // onClick={(e) => goToProject(e, row.original.id)}
+                // onClick={(e) => goToProject(e, row?.original?.id)}
                 px={4}
               >
                 {formatted}
@@ -442,23 +536,23 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
                 color={"gray.400"}
                 fontWeight={"semibold"}
                 fontSize={"small"}
-                // onClick={(e) => goToProject(e, row.original.id)}
+                // onClick={(e) => goToProject(e, row?.original?.id)}
                 px={4}
               >
-                {kindDict[row.original.kind as kinds].tag}-{row.original.year}-
-                {row.original.number}
+                {/* {kindDict[row?.original?.kind as kinds].tag}-
+                {row?.original?.year}-{row?.original?.number} */}
+                {row.original.tag}
               </Text>
               <Text
                 color={"gray.400"}
                 fontWeight={"semibold"}
                 fontSize={"x-small"}
-                // onClick={(e) => goToProject(e, row.original.id)}
+                // onClick={(e) => goToProject(e, row?.original?.id)}
                 px={4}
               >
-                Created on {formatDate(row.original.created_at)}
+                Created on {formatDate(row?.original?.created_at)}
               </Text>
             </Box>
-
           </Flex>
         );
       },
@@ -470,7 +564,7 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
         const a = formattedA.replace(/<\/?[^>]+(>|$)/g, "").trim();
         const b = formattedB.replace(/<\/?[^>]+(>|$)/g, "").trim();
         return a.localeCompare(b);
-
+        // return formattedA.localeCompare(formattedB);
       },
     },
     // role
@@ -511,8 +605,8 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
         );
       },
       cell: ({ row }) => {
-        const originalRoleData: ProjectRoles = row.original.role;
-        console.log(row.original)
+        const originalRoleData: ProjectRoles = row?.original?.role;
+        // console.log(row.original);
 
         const formattedString = roleDict[originalRoleData].string;
         const formattedColour = roleDict[originalRoleData].color;
@@ -577,7 +671,7 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
                 textDecoration: "underline",
               }}
               cursor={"pointer"}
-              // onClick={(e) => goToProject(e, row.original.id)}
+              // onClick={(e) => goToProject(e, row?.original?.id)}
               px={4}
             >
               {date}
@@ -669,7 +763,8 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
   ];
 
   const columns = columnDefs.filter(
-    (column) => !disabledColumns[(column as any).accessorKey as ProjectColumnTypes]
+    (column) =>
+      !disabledColumns[(column as any).accessorKey as ProjectColumnTypes],
   );
 
   // type columnTypes = "kind" | "title" | "status" | "image" | "role" | "created_at";
@@ -713,9 +808,9 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 );
               })}
@@ -731,7 +826,12 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
                   colorMode === "light" ? twRowClassLight : twRowClassDark
                 }
                 data-state={row.getIsSelected() && "selected"}
-                onClick={(e) => goToProject(e, row.original.id)}
+                onClick={(e) =>
+                  goToProject(
+                    e,
+                    row?.original?.id ? row?.original?.id : row?.original?.pk,
+                  )
+                }
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
@@ -744,7 +844,7 @@ export const ProjectsDataTable = ({ projectData, defaultSorting, disabledColumns
             <TableRow>
               <TableCell colSpan={columns?.length} className="h-24 text-center">
                 {/* <Text mt={4} mx={2}> */}
-                You are currently not associated with any projects.
+                {noDataString}
                 {/* </Text> */}
               </TableCell>
             </TableRow>
