@@ -525,39 +525,43 @@ export const UserProjectsDataTable = ({
                 ml={4}
 
               />
-              <Text
-                color={colorMode === "dark" ? "blue.200" : "blue.400"}
-                fontWeight={"bold"}
-                _hover={{
-                  color: colorMode === "dark" ? "blue.100" : "blue.300",
-                  textDecoration:
-                    colorMode === "dark" ? "underline" : "undefined",
-                }}
-                cursor={"pointer"}
-                px={4}
-              >
-                {formatted}
-              </Text>
+              <Box display={"flex"} flexDir={"column"}>
+                <Text
+                  color={colorMode === "dark" ? "blue.200" : "blue.400"}
+                  fontWeight={"bold"}
+                  _hover={{
+                    color: colorMode === "dark" ? "blue.100" : "blue.300",
+                    textDecoration:
+                      colorMode === "dark" ? "underline" : "undefined",
+                  }}
+                  cursor={"pointer"}
+                  px={4}
+                >
+                  {formatted}
+                </Text>
+                <Text
+                  color={"gray.400"}
+                  fontWeight={"semibold"}
+                  fontSize={"small"}
+                  px={4}
+                >
+                  {row.original.tag}
+                </Text>
+                {disabledColumns.created_at === true ? (
+                  <Text
+                    color={"gray.400"}
+                    fontWeight={"semibold"}
+                    fontSize={"x-small"}
+                    px={4}
+                  >
+                    Created on {formatDate(row?.original?.created_at)}
+                  </Text>
+                ) : null}
+              </Box>
+
             </Box>
 
-            <Text
-              color={"gray.400"}
-              fontWeight={"semibold"}
-              fontSize={"small"}
-              px={4}
-            >
-              {row.original.tag}
-            </Text>
-            {disabledColumns.created_at === true ? (
-              <Text
-                color={"gray.400"}
-                fontWeight={"semibold"}
-                fontSize={"x-small"}
-                px={4}
-              >
-                Created on {formatDate(row?.original?.created_at)}
-              </Text>
-            ) : null}
+
 
           </Flex>
         );
