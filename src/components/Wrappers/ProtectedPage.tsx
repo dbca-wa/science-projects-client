@@ -24,7 +24,8 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
         ) {
           console.log("No user and not on login page. Navigating to login.");
           if (process.env.NODE_ENV === "production") {
-            window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin=/`;
+            // Originally sso/signedout?relogin=/
+            window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin`;
           } else {
             navigate("/login");
           }
