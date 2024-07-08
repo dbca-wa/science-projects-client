@@ -152,8 +152,7 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Renamed 'Tasks and Milestones' to 'Milestones' on PDFs and
-              Rich Text Editor
+              Update: Adding users to empty projects makes them the leader
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -161,9 +160,7 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Project PDFs revamped, concept and project plan no longer
-              show approvals. Additionally, orphans, widows, font and spacing
-              udpated across the board
+              Update: Adjusted the table for user projects
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -171,8 +168,7 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added tab to "My Business Area" page for viewing projects
-              which have not yet been approved by project leaders
+              Feature: Added admin ability to batch clean docs that already have next stage
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -180,29 +176,17 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added lists of problematic projects to My
-              Business Area page: empty projects, multiple project leader tags,
-              no leader tag set, external leaders
+              Feature: Added admin ability to unapprove concept and project plans where next document already exists
               {/* as well as a buttons and modals to remedy these */}
             </ListItem>
-
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added 'Involved Projects' section to user profile - all a
-              user's projects can be viewed by clicking on their profile
-            </ListItem>
-
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to delete unlinked docs
+              Feature: Added admin ability to batch delete unlinked docs and batch approve concept plans that already have project plans
+              {/* as well as a buttons and modals to remedy these */}
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -210,7 +194,7 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to clean up bad data/batch approve documents where the next stage already exists but the document doesnt have approval
+              Feature: Added set status button for admins
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -218,7 +202,15 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added directorate ability to unapprove concept and project plans even where next document exists
+              Feature: Created admin list for problematic projects
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added remedy buttons for problematic projects on admin page
             </ListItem>
             {/* <ListItem
               fontSize={"small"}

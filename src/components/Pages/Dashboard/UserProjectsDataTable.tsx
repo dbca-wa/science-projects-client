@@ -507,10 +507,10 @@ export const UserProjectsDataTable = ({
           >
 
             <Box
-              display={"block"}
+              display={"flex"}
             >
               <Image
-                float={"left"}
+                // float={"left"}
                 mr={4}
                 objectFit={"cover"}
                 src={
