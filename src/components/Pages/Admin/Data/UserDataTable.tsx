@@ -97,7 +97,8 @@ export const UserDataTable = ({
         return (
           <Button
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
+            className="flex w-full text-left"
+            justifyContent={"flex-start"}
             rightIcon={sortIcon}
             bg={"transparent"}
             _hover={
@@ -114,9 +115,10 @@ export const UserDataTable = ({
         const originalImageData = row?.original?.image;
         return (
           <Flex
-            className="text-left font-medium"
+            className="text-center font-medium"
             // justifyContent={"center"}
             alignItems={"center"}
+            pl={4}
           >
             <Image
               objectFit={"cover"}
@@ -125,10 +127,10 @@ export const UserDataTable = ({
                   ? `${baseUrl}${originalImageData}`
                   : noImage
               }
-              boxSize={"70px"}
-              rounded={"lg"}
+              boxSize={"50px"}
+              rounded={"full"}
             />
-            <Text>{row.original.name}</Text>
+            <Text px={4}>{row.original.name}</Text>
           </Flex>
         );
       },
@@ -365,18 +367,7 @@ const UserTableRow = ({ row }: UserTableRowProps) => {
   const { colorMode } = useColorMode();
 
   return (
-    <TableRow
-      key={row.id}
-      className={colorMode === "light" ? twRowClassLight : twRowClassDark}
-      data-state={row.getIsSelected() && "selected"}
-      onClick={drawerFunction}
-      // onClick={(e) =>
-      //     drawerFunction(
-      //     e,
-      //     row?.original?.id ? row?.original?.id : row?.original?.pk,
-      //   )
-      // }
-    >
+    <>
       <Drawer
         isOpen={isUserOpen}
         placement="right"
@@ -396,13 +387,26 @@ const UserTableRow = ({ row }: UserTableRowProps) => {
           <DrawerFooter></DrawerFooter>
         </DrawerContent>
       </Drawer>
-      {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>
-          {/* <UserProfile pk={row?.original?.id ? row?.original?.id : row?.original?.pk}                    
+      <TableRow
+        key={row.id}
+        className={colorMode === "light" ? twRowClassLight : twRowClassDark}
+        data-state={row.getIsSelected() && "selected"}
+        onClick={drawerFunction}
+        // onClick={(e) =>
+        //     drawerFunction(
+        //     e,
+        //     row?.original?.id ? row?.original?.id : row?.original?.pk,
+        //   )
+        // }
+      >
+        {row.getVisibleCells().map((cell) => (
+          <TableCell key={cell.id}>
+            {/* <UserProfile pk={row?.original?.id ? row?.original?.id : row?.original?.pk}                    
             /> */}
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </TableCell>
-      ))}
-    </TableRow>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </TableCell>
+        ))}
+      </TableRow>
+    </>
   );
 };

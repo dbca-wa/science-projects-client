@@ -53,6 +53,17 @@ export const StaffUsers = () => {
         >
           Set Caretaker
         </Button>
+
+        <Button
+          bg={colorMode === "light" ? "orange.600" : "orange.700"}
+          color={"white"}
+          _hover={{
+            bg: colorMode === "light" ? "orange.500" : "orange.600",
+          }}
+          isDisabled={true}
+        >
+          Set Maintainer
+        </Button>
       </Grid>
     </>
   );
