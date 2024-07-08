@@ -432,12 +432,12 @@ export const UserProjectsDataTable = ({
                 : { bg: "blue.50", color: "black" }
             }
           >
-            Business Area
+            Area
           </Button>
         );
       },
       cell: ({ row }) => {
-        const originalBaNameData = row?.original?.business_area?.name;
+        const originalBaNameData = row?.original?.business_area?.name || "Unset";
         // console.log(row.original);
 
         const formattedString = returnHTMLTitle(originalBaNameData);
@@ -450,8 +450,8 @@ export const UserProjectsDataTable = ({
         );
       },
       sortingFn: (rowA, rowB) => {
-        const businessAreaA = rowA.original.business_area?.name;
-        const businessAreaB = rowB.original.business_area?.name;
+        const businessAreaA = rowA?.original?.business_area?.name || "Unset";
+        const businessAreaB = rowB?.original?.business_area?.name || "Unset";
         const formattedA = returnHTMLTitle(businessAreaA);
         const formattedB = returnHTMLTitle(businessAreaB);
         const a = formattedA.replace(/<\/?[^>]+(>|$)/g, "").trim();
@@ -502,22 +502,29 @@ export const UserProjectsDataTable = ({
         return (
           <Flex
             className="text-left font-medium"
-            // justifyContent={"center"}
-            alignItems={"center"}
+            // alignItems={"center"}
+            flexDir={"column"}
           >
-            <Image
-              objectFit={"cover"}
-              src={
-                originalImageData !== null && originalImageData !== undefined
-                  ? originalImageData?.file
-                    ? `${baseUrl}${originalImageData.file}`
+
+            <Box
+              display={"block"}
+            >
+              <Image
+                float={"left"}
+                mr={4}
+                objectFit={"cover"}
+                src={
+                  originalImageData !== null && originalImageData !== undefined
+                    ? originalImageData?.file
+                      ? `${baseUrl}${originalImageData.file}`
+                      : noImage
                     : noImage
-                  : noImage
-              }
-              boxSize={"70px"}
-              rounded={"lg"}
-            />
-            <Box>
+                }
+                boxSize={"70px"}
+                rounded={"lg"}
+                ml={4}
+
+              />
               <Text
                 color={colorMode === "dark" ? "blue.200" : "blue.400"}
                 fontWeight={"bold"}
@@ -527,32 +534,31 @@ export const UserProjectsDataTable = ({
                     colorMode === "dark" ? "underline" : "undefined",
                 }}
                 cursor={"pointer"}
-                // onClick={(e) => goToProject(e, row?.original?.id)}
                 px={4}
               >
                 {formatted}
               </Text>
-              <Text
-                color={"gray.400"}
-                fontWeight={"semibold"}
-                fontSize={"small"}
-                // onClick={(e) => goToProject(e, row?.original?.id)}
-                px={4}
-              >
-                {/* {kindDict[row?.original?.kind as kinds].tag}-
-                {row?.original?.year}-{row?.original?.number} */}
-                {row.original.tag}
-              </Text>
+            </Box>
+
+            <Text
+              color={"gray.400"}
+              fontWeight={"semibold"}
+              fontSize={"small"}
+              px={4}
+            >
+              {row.original.tag}
+            </Text>
+            {disabledColumns.created_at === true ? (
               <Text
                 color={"gray.400"}
                 fontWeight={"semibold"}
                 fontSize={"x-small"}
-                // onClick={(e) => goToProject(e, row?.original?.id)}
                 px={4}
               >
                 Created on {formatDate(row?.original?.created_at)}
               </Text>
-            </Box>
+            ) : null}
+
           </Flex>
         );
       },
@@ -654,7 +660,7 @@ export const UserProjectsDataTable = ({
                 : { bg: "blue.50", color: "black" }
             }
           >
-            Created On
+            Created
           </Button>
         );
       },
@@ -663,7 +669,7 @@ export const UserProjectsDataTable = ({
         // const formatted = returnHTMLTitle(originalTitleData);
         return (
           <Box className="text-left font-medium">
-            <Text>{formatDate(row.getValue("created_at"))}</Text>
+            <Text fontSize={"x-small"}>{formatDate(row.getValue("created_at"))}</Text>
           </Box>
         );
       },
@@ -781,9 +787,9 @@ export const UserProjectsDataTable = ({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 );
               })}
