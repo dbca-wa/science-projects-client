@@ -22,6 +22,7 @@ import {
   IPersonalInformation,
   IProfile,
   IProgressReport,
+  IProjectData,
   IProjectLeadsEmail,
   IProjectMember,
   IQuickTask,
@@ -929,6 +930,45 @@ export const setProjectStatus = async ({
   return res;
 };
 
+
+export interface IRemedyProblematicProjects {
+  projects: number[];
+}
+
+export const remedyMemberlessProjects = async ({ projects }: IRemedyProblematicProjects) => {
+  console.log(projects);
+  const res = instance.post(`projects/remedy/memberless`, { "projects": projects }).then((res) => {
+    return res.data;
+  });
+  return res;
+}
+
+export const remedyLeaderlessProjects = async ({ projects }: IRemedyProblematicProjects) => {
+  console.log(projects);
+  const res = instance.post(`projects/remedy/leaderless`, { "projects": projects }).then((res) => {
+    return res.data;
+  });
+  return res;
+}
+
+export const remedyMultipleLeaderProjects = async ({ projects }: IRemedyProblematicProjects) => {
+  console.log(projects);
+  const res = instance.post(`projects/remedy/multiple_leaders`, { "projects": projects }).then((res) => {
+    return res.data;
+  });
+  return res;
+}
+
+
+export const remedyExternallyLedProjects = async ({ projects }: IRemedyProblematicProjects) => {
+  console.log(projects);
+  const res = instance.post(`projects/remedy/external_leaders`, { "projects": projects }).then((res) => {
+    return res.data;
+  });
+  return res;
+}
+
+
 export interface ISpecialEndorsement {
   projectPlanPk: number;
   shouldSendEmails?: boolean;
@@ -1295,13 +1335,13 @@ export interface IEditProject {
   title: string;
   description?: string;
   status?:
-    | "new"
-    | "pending"
-    | "active"
-    | "updating"
-    | "terminated"
-    | "suspended"
-    | "closed";
+  | "new"
+  | "pending"
+  | "active"
+  | "updating"
+  | "terminated"
+  | "suspended"
+  | "closed";
   image?: File | null;
   selectedImageUrl: string | null;
   locations: number[];
@@ -2140,13 +2180,13 @@ export interface ISpawnDocument {
   year?: number;
   report_id?: number;
   kind:
-    | "concept"
-    | "projectplan"
-    | "progressreport"
-    | "studentreport"
-    | "studentreport"
-    | "projectclosure"
-    | string;
+  | "concept"
+  | "projectplan"
+  | "progressreport"
+  | "studentreport"
+  | "studentreport"
+  | "projectclosure"
+  | string;
 }
 
 export interface ICloseProjectProps {
@@ -2254,11 +2294,11 @@ export interface IDeleteDocument {
   projectPk: number | string;
   documentPk: number | string;
   documentKind:
-    | "conceptplan"
-    | "projectplan"
-    | "progressreport"
-    | "studentreport"
-    | "projectclosure";
+  | "conceptplan"
+  | "projectplan"
+  | "progressreport"
+  | "studentreport"
+  | "projectclosure";
 }
 
 export const deleteDocumentCall = async ({
@@ -2675,15 +2715,15 @@ interface IReportMediaUploadProps {
   pk: number;
   file: File;
   section:
-    | "cover"
-    | "rear_cover"
-    | "sdchart"
-    | "service_delivery"
-    | "research"
-    | "partnerships"
-    | "collaborations"
-    | "student_projects"
-    | "publications";
+  | "cover"
+  | "rear_cover"
+  | "sdchart"
+  | "service_delivery"
+  | "research"
+  | "partnerships"
+  | "collaborations"
+  | "student_projects"
+  | "publications";
 }
 
 export const uploadReportMediaImage = async ({
@@ -2722,15 +2762,15 @@ export const uploadReportMediaImage = async ({
 interface IReportMediaDeleteProps {
   pk: number;
   section:
-    | "cover"
-    | "rear_cover"
-    | "sdchart"
-    | "service_delivery"
-    | "research"
-    | "partnerships"
-    | "collaborations"
-    | "student_projects"
-    | "publications";
+  | "cover"
+  | "rear_cover"
+  | "sdchart"
+  | "service_delivery"
+  | "research"
+  | "partnerships"
+  | "collaborations"
+  | "student_projects"
+  | "publications";
 }
 
 export const deleteReportMediaImage = async ({

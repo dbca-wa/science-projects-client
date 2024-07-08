@@ -77,7 +77,11 @@ export const AllProblematicProjects = () => {
         onClose={onCloseRemedyNoMembersModal}
         modalTitle="Remedy Memberless Projects"
       >
-        <RemedyMemberlessProjectsModalContent />
+        <RemedyMemberlessProjectsModalContent
+          projects={problematicProjectData?.no_members}
+          refreshDataFn={fetchProblematicProjects}
+          onClose={onCloseRemedyNoMembersModal}
+        />
       </BaseModal>
 
       {/* No Lead Projects */}
@@ -86,7 +90,11 @@ export const AllProblematicProjects = () => {
         onClose={onCloseRemedyNoLeadersModal}
         modalTitle="Remedy Members but No Lead Projects"
       >
-        <RemedyLeaderlessProjectsModalContent />
+        <RemedyLeaderlessProjectsModalContent
+          projects={problematicProjectData?.no_leader}
+          refreshDataFn={fetchProblematicProjects}
+          onClose={onCloseRemedyNoLeadersModal}
+        />
       </BaseModal>
 
       {/* Multiple Lead */}
@@ -95,7 +103,11 @@ export const AllProblematicProjects = () => {
         onClose={onCloseRemedyMultipleLeadersModal}
         modalTitle="Remedy Multiple Lead Projects"
       >
-        <RemedyMultipleLeaderProjectsModalContent />
+        <RemedyMultipleLeaderProjectsModalContent
+          projects={problematicProjectData?.multiple_leads}
+          refreshDataFn={fetchProblematicProjects}
+          onClose={onCloseRemedyMultipleLeadersModal}
+        />
       </BaseModal>
 
       {/* External */}
@@ -104,7 +116,11 @@ export const AllProblematicProjects = () => {
         onClose={onCloseRemedyExternalLeadersModal}
         modalTitle="Remedy External Leads Projects"
       >
-        <RemedyExternallyLedProjectsModalContent />
+        <RemedyExternallyLedProjectsModalContent
+          projects={problematicProjectData?.external_leader}
+          refreshDataFn={fetchProblematicProjects}
+          onClose={onCloseRemedyExternalLeadersModal}
+        />
       </BaseModal>
 
       <Box>
@@ -149,7 +165,7 @@ export const AllProblematicProjects = () => {
                 w={"100%"}
                 h={"500px"}
                 flexDir={"column"}
-                //   bg={"Red"}
+              //   bg={"Red"}
               >
                 <Button
                   bg={colorMode === "light" ? "blue.500" : "blue.500"}
@@ -291,7 +307,7 @@ export const AllProblematicProjects = () => {
                         }}
                         onClick={onOpenRemedyExternalLeadersModal}
                       >
-                        Update External Leaders
+                        Remedy
                       </Button>
                     </Flex>
 
