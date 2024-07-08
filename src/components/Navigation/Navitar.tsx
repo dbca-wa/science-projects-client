@@ -83,7 +83,7 @@ export const Navitar = ({
 					1
 				)}`;
 			}
-			// sso/signedout?relogin=/
+			// sso/signedout?relogin
 			else {
 				window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}`;
 			}
