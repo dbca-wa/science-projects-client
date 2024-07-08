@@ -1,4 +1,7 @@
-import { UpdateExternalLeadersModalContent } from "@/components/Modals/Admin/UpdateExternalLeadersModalContent";
+import { RemedyExternallyLedProjectsModalContent } from "@/components/Modals/Admin/RemedyExternallyLedProjectsModalContent";
+import { RemedyLeaderlessProjectsModalContent } from "@/components/Modals/Admin/RemedyLeaderlessProjectsModalContent";
+import { RemedyMemberlessProjectsModalContent } from "@/components/Modals/Admin/RemedyMemberlessProjectsModalContent";
+import { RemedyMultipleLeaderProjectsModalContent } from "@/components/Modals/Admin/RemedyMultipleLeaderProjectsModalContent";
 import { BaseModal } from "@/components/Modals/BaseModal";
 import {
   Accordion,
@@ -20,8 +23,8 @@ import {
 } from "@chakra-ui/react";
 import { AccordionItem } from "@radix-ui/react-accordion";
 import { useState } from "react";
-import { UserProjectsDataTable } from "../../Dashboard/UserProjectsDataTable";
 import { TbRefresh } from "react-icons/tb";
+import { UserProjectsDataTable } from "../../Dashboard/UserProjectsDataTable";
 
 export const AllProblematicProjects = () => {
   const { colorMode } = useColorMode();
@@ -29,12 +32,6 @@ export const AllProblematicProjects = () => {
   const [fetchingData, setFetchingData] = useState(false);
   const [problematicProjectData, setproblematicProjectData] =
     useState<IProblematicData>(null);
-
-  const {
-    isOpen: isUpdateExternalLeadsModalOpen,
-    onOpen: onOpenUpdateExternalLeadsModal,
-    onClose: onCloseUpdateExternalLeadsModal,
-  } = useDisclosure();
 
   const fetchProblematicProjects = async () => {
     setFetchingData(true);
@@ -48,15 +45,68 @@ export const AllProblematicProjects = () => {
     });
   };
 
+  const {
+    isOpen: isRemedyNoMembersModalOpen,
+    onOpen: onOpenRemedyNoMembersModal,
+    onClose: onCloseRemedyNoMembersModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isRemedyNoLeadersModalOpen,
+    onOpen: onOpenRemedyNoLeadersModal,
+    onClose: onCloseRemedyNoLeadersModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isRemedyMultipleLeadersModalOpen,
+    onOpen: onOpenRemedyMultipleLeadersModal,
+    onClose: onCloseRemedyMultipleLeadersModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isRemedyExternalLeadersModalOpen,
+    onOpen: onOpenRemedyExternalLeadersModal,
+    onClose: onCloseRemedyExternalLeadersModal,
+  } = useDisclosure();
+
   return (
     <>
+      {/* Memberless */}
       <BaseModal
-        isOpen={isUpdateExternalLeadsModalOpen}
-        onClose={onCloseUpdateExternalLeadsModal}
-        modalTitle="Update External Leaders"
+        isOpen={isRemedyNoMembersModalOpen}
+        onClose={onCloseRemedyNoMembersModal}
+        modalTitle="Remedy Memberless Projects"
       >
-        <UpdateExternalLeadersModalContent />
+        <RemedyMemberlessProjectsModalContent />
       </BaseModal>
+
+      {/* No Lead Projects */}
+      <BaseModal
+        isOpen={isRemedyNoLeadersModalOpen}
+        onClose={onCloseRemedyNoLeadersModal}
+        modalTitle="Remedy Members but No Lead Projects"
+      >
+        <RemedyLeaderlessProjectsModalContent />
+      </BaseModal>
+
+      {/* Multiple Lead */}
+      <BaseModal
+        isOpen={isRemedyMultipleLeadersModalOpen}
+        onClose={onCloseRemedyMultipleLeadersModal}
+        modalTitle="Remedy Multiple Lead Projects"
+      >
+        <RemedyMultipleLeaderProjectsModalContent />
+      </BaseModal>
+
+      {/* External */}
+      <BaseModal
+        isOpen={isRemedyExternalLeadersModalOpen}
+        onClose={onCloseRemedyExternalLeadersModal}
+        modalTitle="Remedy External Leads Projects"
+      >
+        <RemedyExternallyLedProjectsModalContent />
+      </BaseModal>
+
       <Box>
         <Flex alignItems={"center"} mt={4}>
           <Text fontSize={"x-large"} py={4} flex={1}>
@@ -133,6 +183,18 @@ export const AllProblematicProjects = () => {
                     </Text>
                   </AccordionTrigger>
                   <AccordionContent>
+                    <Flex pb={8} justifyContent={"flex-end"}>
+                      <Button
+                        bg={colorMode === "light" ? "green.500" : "green.600"}
+                        color={"white"}
+                        _hover={{
+                          bg: colorMode === "light" ? "green.400" : "green.500",
+                        }}
+                        onClick={onOpenRemedyNoMembersModal}
+                      >
+                        Remedy
+                      </Button>
+                    </Flex>
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.no_members}
                       defaultSorting={"business_area"}
@@ -154,6 +216,18 @@ export const AllProblematicProjects = () => {
                     </Text>
                   </AccordionTrigger>
                   <AccordionContent>
+                    <Flex pb={8} justifyContent={"flex-end"}>
+                      <Button
+                        bg={colorMode === "light" ? "green.500" : "green.600"}
+                        color={"white"}
+                        _hover={{
+                          bg: colorMode === "light" ? "green.400" : "green.500",
+                        }}
+                        onClick={onOpenRemedyNoLeadersModal}
+                      >
+                        Remedy
+                      </Button>
+                    </Flex>
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.no_leader}
                       defaultSorting={"business_area"}
@@ -175,6 +249,18 @@ export const AllProblematicProjects = () => {
                     </Text>
                   </AccordionTrigger>
                   <AccordionContent>
+                    <Flex pb={8} justifyContent={"flex-end"}>
+                      <Button
+                        bg={colorMode === "light" ? "green.500" : "green.600"}
+                        color={"white"}
+                        _hover={{
+                          bg: colorMode === "light" ? "green.400" : "green.500",
+                        }}
+                        onClick={onOpenRemedyMultipleLeadersModal}
+                      >
+                        Remedy
+                      </Button>
+                    </Flex>
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.multiple_leads}
                       defaultSorting={"business_area"}
@@ -196,18 +282,18 @@ export const AllProblematicProjects = () => {
                     </Text>
                   </AccordionTrigger>
                   <AccordionContent>
-                    {/* <Flex pb={8} justifyContent={"flex-end"}>
+                    <Flex pb={8} justifyContent={"flex-end"}>
                       <Button
-                        bg={colorMode === "light" ? "red.500" : "red.600"}
+                        bg={colorMode === "light" ? "green.500" : "green.600"}
                         color={"white"}
                         _hover={{
-                          bg: colorMode === "light" ? "red.400" : "red.500",
+                          bg: colorMode === "light" ? "green.400" : "green.500",
                         }}
-                        onClick={onOpenUpdateExternalLeadsModal}
+                        onClick={onOpenRemedyExternalLeadersModal}
                       >
                         Update External Leaders
                       </Button>
-                    </Flex> */}
+                    </Flex>
 
                     <UserProjectsDataTable
                       projectData={problematicProjectData?.external_leader}
