@@ -75,7 +75,9 @@ export const EmailLists = () => {
   };
 
   const sendEmailsToDBCALeads = async () => {
-    const emailString = activeProjectLeadEmailList.join(",");
+    const emailString = activeProjectLeadEmailList
+      ?.map((user) => user.email)
+      .join(",");
     // const mailToLink = `mailto:${emailString}&subject=${subject}`;
     // console.log(emailList);
     // console.log("EMAIL STRING: ", emailString);
@@ -209,7 +211,8 @@ export const EmailLists = () => {
               <AccordionItem value="item-1">
                 <AccordionTrigger>
                   <Text fontSize={"large"} py={4}>
-                    DBCA Leads ({activeProjectLeadEmailList?.length || 0})
+                    Project Leads with DBCA Email (
+                    {activeProjectLeadEmailList?.length || 0})
                   </Text>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -232,7 +235,8 @@ export const EmailLists = () => {
               <AccordionItem value="item-2">
                 <AccordionTrigger>
                   <Text fontSize={"large"} py={4}>
-                    Non-DBCA / Inactive Leads ({inactiveLeadList?.length || 0})
+                    Non-DBCA Email / Inactive Project Leads (
+                    {inactiveLeadList?.length || 0})
                   </Text>
                 </AccordionTrigger>
                 <AccordionContent>
