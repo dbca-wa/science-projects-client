@@ -163,7 +163,13 @@ export const EditableSRTE = ({
               maxW={"100%"}
             >
               {/* Toolbar */}
-              <RevisedRichTextToolbar />
+              <RevisedRichTextToolbar
+                allowTable={
+                  section === "progress" || section === "progress_report"
+                    ? false
+                    : true
+                }
+              />
 
               <Box className="editor-scroller">
                 <Box
