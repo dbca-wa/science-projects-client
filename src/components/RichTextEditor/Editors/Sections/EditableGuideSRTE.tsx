@@ -147,7 +147,7 @@ export const EditableGuideSRTE = ({
               maxW={"100%"}
             >
               {/* Toolbar */}
-              <RevisedRichTextToolbar />
+              <RevisedRichTextToolbar allowTable={true} />
 
               <Box className="editor-scroller">
                 <Box
