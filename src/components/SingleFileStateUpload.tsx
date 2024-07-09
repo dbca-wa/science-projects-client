@@ -11,6 +11,7 @@ import Dropzone from "react-dropzone";
 import { BsCloudArrowUp } from "react-icons/bs";
 import { FaFile, FaFilePdf } from "react-icons/fa";
 import { TbPhoto } from "react-icons/tb";
+import imageCompression from "browser-image-compression";
 
 export interface IFileType {
   fileType: "pdf" | "image";
@@ -51,11 +52,39 @@ export const FileDropzone = ({
     setIsUploading(true);
     const newProgressInterval = startSimulatedProgress();
     setProgressInterval(newProgressInterval);
-    const res = await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log(res);
-    clearInterval(progressInterval);
-    setUploadProgress(100);
-    setUploadedFile(acceptedFile[0]);
+
+    // Implement compression
+    let fileToUpload = acceptedFile[0];
+    const MAX_SIZE_MB = 3;
+    if (fileToUpload.size > MAX_SIZE_MB * 1024 * 1024) {
+      console.log(`${fileToUpload.size} size too large compressing`);
+      try {
+        const options = {
+          maxSizeMB: MAX_SIZE_MB,
+          useWebWorker: true,
+        };
+        fileToUpload = await imageCompression(fileToUpload, options);
+      } catch (error) {
+        console.error("Error during image compression:", error);
+        setIsError(true);
+        setIsUploading(false);
+        clearInterval(progressInterval);
+        return;
+      }
+    }
+
+    // const res = await new Promise((resolve) => setTimeout(resolve, 1500));
+    // console.log(res);
+    // clearInterval(progressInterval);
+    // setUploadProgress(100);
+    // setUploadedFile(acceptedFile[0]);
+
+    setTimeout(() => {
+      clearInterval(newProgressInterval);
+      setUploadProgress(100);
+      setUploadedFile(fileToUpload);
+      setIsUploading(false);
+    }, 1500);
   };
 
   const startSimulatedProgress = () => {

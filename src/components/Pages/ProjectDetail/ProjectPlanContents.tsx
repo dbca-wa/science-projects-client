@@ -52,15 +52,14 @@ export const ProjectPlanContents = ({
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
-    document?.methodology_image?.file
+    document?.methodology_image?.file,
   );
 
-  const isBaLead = mePk === baLead
-  const isFullyApproved = (
+  const isBaLead = mePk === baLead;
+  const isFullyApproved =
     all_documents?.project_plan?.document.project_lead_approval_granted &&
     all_documents?.project_plan?.document.business_area_lead_approval_granted &&
-    all_documents?.project_plan?.document.directorate_approval_granted
-  )
+    all_documents?.project_plan?.document.directorate_approval_granted;
 
   return (
     <motion.div
@@ -86,7 +85,10 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -99,7 +101,10 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -112,7 +117,10 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -124,7 +132,10 @@ export const ProjectPlanContents = ({
         section={"outcome"}
       />
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -136,7 +147,10 @@ export const ProjectPlanContents = ({
         section={"knowledge_transfer"}
       />
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -149,7 +163,10 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -162,7 +179,10 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -176,6 +196,7 @@ export const ProjectPlanContents = ({
 
       {/* <MethodologyImageDisplay /> */}
       <MethodologyImage
+        maxUploadSizeInMb={3}
         refetch={refetch}
         document={document}
         helperText={"Upload an image for the methodology (Optional)"}
@@ -186,7 +207,10 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -199,7 +223,10 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -212,7 +239,10 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+        canEdit={
+          ((userInTeam || isBaLead) && !isFullyApproved) ||
+          userData?.is_superuser
+        }
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -224,13 +254,16 @@ export const ProjectPlanContents = ({
         section={"related_projects"}
       />
 
-      <Box pb={6} mt={4} w={"100%"} >
+      <Box pb={6} mt={4} w={"100%"}>
         <Text fontWeight={"bold"} fontSize={"2xl"}>
           Funding
         </Text>
         <Grid mt={4} gridTemplateColumns={"repeat(1, 1fr)"} pos={"relative"}>
           <RichTextEditor
-            canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+            canEdit={
+              ((userInTeam || isBaLead) && !isFullyApproved) ||
+              userData?.is_superuser
+            }
             document_pk={document?.document?.pk}
             project_pk={document?.document?.project?.pk}
             writeable_document_kind={"Project Plan"}
@@ -243,7 +276,10 @@ export const ProjectPlanContents = ({
           />
 
           <RichTextEditor
-            canEdit={((userInTeam || isBaLead) && !isFullyApproved) || userData?.is_superuser}
+            canEdit={
+              ((userInTeam || isBaLead) && !isFullyApproved) ||
+              userData?.is_superuser
+            }
             document_pk={document?.document?.pk}
             project_pk={document?.document?.project?.pk}
             writeable_document_kind={"Project Plan"}
@@ -262,7 +298,7 @@ export const ProjectPlanContents = ({
         isBaLead={isBaLead}
         userData={userData}
         refetchDocument={refetch}
-      // isProjectLeader={}
+        // isProjectLeader={}
       />
 
       <Box pb={6} mt={4}>

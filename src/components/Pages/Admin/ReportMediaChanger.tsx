@@ -1,4 +1,5 @@
 import { deleteReportMediaImage, uploadReportMediaImage } from "@/lib/api";
+import { handleImageFileCompression } from "@/lib/hooks/helper/handleImageFileCompression";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import {
   Box,
@@ -60,6 +61,7 @@ export const ReportMediaChanger = ({
   const [isUploading, setIsUploading] = useState<boolean>(true);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [progressInterval, setProgressInterval] = useState(null);
+  const [selectedFile, setSelectedFile] = useState<File>(null);
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
@@ -74,12 +76,32 @@ export const ReportMediaChanger = ({
         setIsError(true);
         return;
       } else {
-        const mutationData = {
-          file: acceptedFile[0],
-          section: section,
-          pk: reportPk,
-        };
-        fileDropMutation.mutate(mutationData);
+        try {
+          handleImageFileCompression({
+            acceptedFile: acceptedFile,
+            acceptedImageTypes: acceptedImageTypes,
+            maxSizeMB: 3,
+            maxWidthOrHeight: 1920,
+            setIsErrorFn: setIsError,
+            setIsUploadingFn: setIsUploading,
+            setSelectedFileFn: setSelectedFile,
+            setSelectedImageUrlFn: setCurrentImage,
+            setUploadProgressFn: setUploadProgress,
+            setProgressIntervalFn: setProgressInterval,
+            startSimulatedProgressFn: startSimulatedProgress,
+            progressInterval: progressInterval,
+          }).then((fileData) => {
+            const mutationData = {
+              file: fileData,
+              section: section,
+              pk: reportPk,
+            };
+            fileDropMutation.mutate(mutationData);
+          });
+        } catch (error) {
+          console.error("Error during image compression:", error);
+          return;
+        }
       }
     }
   };
@@ -285,8 +307,8 @@ export const ReportMediaChanger = ({
                       acceptedFiles &&
                       !isError &&
                       currentImage !== null &&
-                      acceptedFiles[0] instanceof File
-                        ? URL.createObjectURL(acceptedFiles[0])
+                      selectedFile instanceof File
+                        ? URL.createObjectURL(selectedFile)
                         : currentImage && currentImage !== null
                           ? `${baseUrl}${currentImage}`
                           : undefined
