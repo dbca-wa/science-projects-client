@@ -155,112 +155,19 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Adding users to empty projects makes them the leader
+              Update: Compress Image uploads over 3MB in size. Large image files
+              (Some 100MB+ &#128517;) slow app load speeds and are unnecessary
+              for final PDF output as they are shrunk
             </ListItem>
+
+            {/* 
             <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Disabled table button for the "Progress" sections on
-              progress/student reports
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Temp. expanded word limit to 300 words on student reports.
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Reduced gap between paragraphs for generated PDFs.
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Adjusted the table for user projects
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to batch clean docs that already have
-              next stage
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to unapprove concept and project
-              plans where next document already exists
-              {/* as well as a buttons and modals to remedy these */}
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to batch delete unlinked docs and
-              batch approve concept plans that already have project plans
-              {/* as well as a buttons and modals to remedy these */}
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added set status button for admins
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Created admin list for problematic projects
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added remedy buttons for problematic projects on admin
-              page
-            </ListItem>
-            {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
               Fix: Fixed bug causing user-generated table columns to all be 75px
-            </ListItem> 
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Reject Image uploads over 10MB in size &#128517; Large
-              files slow load speeds and are unnecessary for final PDF output as
-              they are shrunk
             </ListItem> 
             <ListItem
               fontSize={"small"}
@@ -279,24 +186,6 @@ export const PatchNotes = ({
               <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Added admin ability to 'merge' users - for users who have
               multiple accounts with projects tied to the older account
-            </ListItem>
-             <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to unapprove concept and project plan
-              final approval, even after next stage document created.
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added ability for admins to set a project status directly
-              to address legacy data issues
             </ListItem> */}
           </List>
 
