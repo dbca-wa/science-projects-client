@@ -91,7 +91,7 @@ const useToolbar = ({
   const [canUndo, setCanUndo] = useState<boolean>(false);
   const [canRedo, setCanRedo] = useState<boolean>(false);
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
-    null
+    null,
   );
   // const [codeLanguage, setCodeLanguage] = useState<string>("");
   const blockTypeToBlockName = {
@@ -182,7 +182,7 @@ const useToolbar = ({
           if ($isListNode(element)) {
             const parentList = $getNearestNodeOfType<ListNode>(
               anchorNode,
-              ListNode
+              ListNode,
             );
             const type = parentList
               ? parentList.getListType()
@@ -232,7 +232,7 @@ const useToolbar = ({
           setCanUndo(payload);
           return false;
         },
-        COMMAND_PRIORITY_CRITICAL
+        COMMAND_PRIORITY_CRITICAL,
       ),
       editor.registerCommand<boolean>(
         CAN_REDO_COMMAND,
@@ -240,8 +240,8 @@ const useToolbar = ({
           setCanRedo(payload);
           return false;
         },
-        COMMAND_PRIORITY_CRITICAL
-      )
+        COMMAND_PRIORITY_CRITICAL,
+      ),
     );
   }, [editor, updatePopup]);
 
@@ -262,7 +262,11 @@ const useToolbar = ({
 //   anchorElem?: HTMLElement;
 // }
 
-export const RevisedRichTextToolbar = () =>
+interface Props {
+  allowTable: boolean;
+}
+
+export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
   // { anchorElem }: Props
   {
     // if (!anchorElem) {
@@ -493,7 +497,7 @@ export const RevisedRichTextToolbar = () =>
                           if (textNode.__format !== 0) {
                             textNode.setFormat(0);
                             $getNearestBlockElementAncestorOrThrow(
-                              textNode
+                              textNode,
                             ).setFormat("");
                           }
                           node = textNode;
@@ -511,20 +515,23 @@ export const RevisedRichTextToolbar = () =>
               >
                 <ImClearFormatting />
               </RevisedBaseToolbarButton>
-              <VerticalDivider />
+              {allowTable ? <VerticalDivider /> : null}
             </>
           ) : null}
-          <RevisedBaseToolbarButton
-            ariaLabel="Insert Table"
-            // isActive={isSuperscript}
-            variant={"ghost"}
-            isDisabled={false}
-            onClick={() => {
-              onAddTableOpen();
-            }}
-          >
-            <FaTable />
-          </RevisedBaseToolbarButton>
+
+          {allowTable ? (
+            <RevisedBaseToolbarButton
+              ariaLabel="Insert Table"
+              // isActive={isSuperscript}
+              variant={"ghost"}
+              isDisabled={false}
+              onClick={() => {
+                onAddTableOpen();
+              }}
+            >
+              <FaTable />
+            </RevisedBaseToolbarButton>
+          ) : null}
         </Flex>
       </>
     );
@@ -585,7 +592,7 @@ const ElementSelector = ({
       | "bullet"
       | "check"
       | "paragraph"
-      | "quote"
+      | "quote",
   ) => {
     const dict = {
       code: "Code",
@@ -617,7 +624,7 @@ const ElementSelector = ({
       | "bullet"
       | "check"
       | "paragraph"
-      | "quote"
+      | "quote",
   ) => {
     const dict = {
       code: <FaCode />,
