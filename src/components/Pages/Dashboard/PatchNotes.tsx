@@ -71,7 +71,8 @@ export const PatchNotes = ({
       setWelcomeUser("");
       setShouldConcat(true);
       setSpmsText(
-        `SPMS ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+        `SPMS ${
+          VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
         }`,
       );
       // setAnnualReportText("Report");
@@ -83,12 +84,14 @@ export const PatchNotes = ({
       // setAnnualReportText("Annual Report");
       if (window.innerWidth < 1350) {
         setSpmsText(
-          `Science Project <br/> Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project <br/> Management System ${
+            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`,
         );
       } else {
         setSpmsText(
-          `Science Project Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project Management System ${
+            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`,
         );
       }
@@ -138,7 +141,7 @@ export const PatchNotes = ({
             my={2}
             fontSize={"16px"}
             fontWeight={"semibold"}
-          // onClick={() => localStorage.removeItem("confettiCount")}
+            // onClick={() => localStorage.removeItem("confettiCount")}
           >
             {/* &#127881;  &#127881; */}
             {/* &#9881;&#65039; */}
@@ -160,6 +163,31 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Disabled table button for the "Progress" sections on
+              progress/student reports
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Temp. expanded word limit to 300 words on student reports.
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Reduced gap between paragraphs for generated PDFs.
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
               Update: Adjusted the table for user projects
             </ListItem>
             <ListItem
@@ -168,7 +196,8 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to batch clean docs that already have next stage
+              Feature: Added admin ability to batch clean docs that already have
+              next stage
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -176,7 +205,8 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to unapprove concept and project plans where next document already exists
+              Feature: Added admin ability to unapprove concept and project
+              plans where next document already exists
               {/* as well as a buttons and modals to remedy these */}
             </ListItem>
             <ListItem
@@ -185,7 +215,8 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to batch delete unlinked docs and batch approve concept plans that already have project plans
+              Feature: Added admin ability to batch delete unlinked docs and
+              batch approve concept plans that already have project plans
               {/* as well as a buttons and modals to remedy these */}
             </ListItem>
             <ListItem
@@ -210,7 +241,8 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added remedy buttons for problematic projects on admin page
+              Feature: Added remedy buttons for problematic projects on admin
+              page
             </ListItem>
             {/* <ListItem
               fontSize={"small"}
