@@ -5,7 +5,6 @@ import {
 	Avatar,
 	Box,
 	Center,
-	Flex,
 	Menu,
 	MenuButton,
 	MenuGroup,
@@ -14,7 +13,7 @@ import {
 	Text,
 	ToastId,
 	useColorMode,
-	useToast,
+	useToast
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -194,19 +193,20 @@ export const Navitar = ({
 						}
 						textAlign={"center"}
 						zIndex={isOpen ? 2 : 1}
-					>{userData?.pk === 101073 && (
-						<MenuItem
-							onClick={() => {
-								navigate("/crud/test");
-							}}
-							zIndex={isOpen ? 2 : 1}
-						>
-							{<FaGamepad />}
+					>
+						{userData?.pk === 101073 && (
+							<MenuItem
+								onClick={() => {
+									navigate("/crud/test");
+								}}
+								zIndex={isOpen ? 2 : 1}
+							>
+								{<FaGamepad />}
 
-							<Text ml={2}>Playground</Text>
-						</MenuItem>
+								<Text ml={2}>Playground</Text>
+							</MenuItem>
 
-					)}
+						)}
 						<MenuItem
 							onClick={() => {
 								navigate("/guide");

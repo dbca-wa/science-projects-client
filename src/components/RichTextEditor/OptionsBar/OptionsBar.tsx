@@ -88,8 +88,7 @@ export const OptionsBar = ({
           <Grid
             px={10}
             py={4}
-            gridTemplateColumns={`repeat(${
-              showPopulationButton
+            gridTemplateColumns={`repeat(${showPopulationButton
                 ? userData?.pk === maintainerData?.pk
                   ? editorText.length !== 0
                     ? 6
@@ -100,7 +99,7 @@ export const OptionsBar = ({
                 : userData?.pk === maintainerData?.pk
                   ? 6
                   : 2
-            }, 1fr)`}
+              }, 1fr)`}
             // width={"100%"}
             gridColumnGap={2}
           >

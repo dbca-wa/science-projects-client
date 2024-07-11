@@ -33,7 +33,7 @@ export const ConceptPlanContents = ({
   baseAPI,
   baLead,
 }: // setToLastTab,
-Props) => {
+  Props) => {
   const { colorMode } = useColorMode();
 
   const documentType = "conceptplan";
