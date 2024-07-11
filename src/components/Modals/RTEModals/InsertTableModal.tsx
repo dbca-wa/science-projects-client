@@ -34,7 +34,7 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
   useEffect(() => {
     const row = Number(rows);
     const column = Number(columns);
-    if (row && row > 0 && row <= 51 && column && column > 0 && column <= 7) {
+    if (row && row > 0 && row <= 11 && column && column > 0 && column <= 7) {
       setIsDisabled(false);
     } else {
       setIsDisabled(true);
@@ -58,7 +58,7 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
       isOpen={isOpen}
       onClose={onClose}
       size={"md"}
-      // isCentered={true}
+    // isCentered={true}
     >
       {" "}
       <ModalOverlay />
@@ -80,7 +80,7 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
                 />
               </InputGroup>
               <FormHelperText>
-                Enter the number of rows for the table (Max 51, including
+                Enter the number of rows for the table (Max 11, including
                 header)
               </FormHelperText>
             </FormControl>
