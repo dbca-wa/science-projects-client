@@ -30,6 +30,7 @@ import { Users } from "./routes/Users";
 import { UserGuide } from "./components/Pages/UserGuide/UserGuide";
 import { AdminDataLists } from "./components/Pages/Admin/AdminDataLists";
 import { MyBusinessArea } from "./components/Pages/MyBusinessArea/MyBusinessArea";
+import { TestPlayground } from "./routes/TestPlayground";
 
 export const router = createBrowserRouter([
   // Login
@@ -99,6 +100,16 @@ export const router = createBrowserRouter([
         element: (
           <ContentWrapper>
             <Dashboard activeTab={2} />
+          </ContentWrapper>
+        ),
+      },
+      {
+        path: "crud/test",
+        element: (
+          <ContentWrapper>
+            <AdminOnlyPage>
+              <TestPlayground />
+            </AdminOnlyPage>
           </ContentWrapper>
         ),
       },
