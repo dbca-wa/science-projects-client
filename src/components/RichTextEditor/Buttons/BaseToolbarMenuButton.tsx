@@ -8,15 +8,17 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  useColorMode,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IconType } from "react-icons";
 import { FaCaretDown } from "react-icons/fa";
 
 interface IMenuItem {
   leftIcon?: IconType;
-  text: string;
-  onClick: () => void;
+  text?: string;
+  component?: React.ReactNode;
+  onClick?: () => void;
 }
 
 export interface IBaseToolbarMenuButtonProps {
@@ -24,6 +26,7 @@ export interface IBaseToolbarMenuButtonProps {
   menuIcon?: IconType;
   menuItems: IMenuItem[];
   onClick?: () => void;
+  disableHoverBackground?: boolean;
 }
 
 export const BaseToolbarMenuButton = ({
@@ -31,6 +34,7 @@ export const BaseToolbarMenuButton = ({
   menuIcon: MenuIcon,
   menuItems,
   onClick,
+  disableHoverBackground,
 }: IBaseToolbarMenuButtonProps) => {
   const [buttonWidth, setButtonWidth] = useState(0);
   const buttonRef = useRef(null);
@@ -54,6 +58,8 @@ export const BaseToolbarMenuButton = ({
     };
   }, [buttonRef]);
 
+  const { colorMode } = useColorMode();
+
   return (
     <Menu isLazy>
       <MenuButton
@@ -66,13 +72,15 @@ export const BaseToolbarMenuButton = ({
         flex={1}
         ref={buttonRef}
         tabIndex={-1}
-        onClick={onClick}
+        onClick={() => { onClick && onClick() }}
       >
         {title ? title : null}
       </MenuButton>
       <MenuList
-        w={buttonWidth}
-        minW={"200px"}
+        w={"fit-content"}
+        // w={buttonWidth}
+        // minW={"200px"}
+        // maxW={"200px"}
         zIndex={9999999999999}
         pos={"absolute"}
       >
@@ -86,11 +94,15 @@ export const BaseToolbarMenuButton = ({
               alignItems={"center"}
               zIndex={2}
               // pos={"absolute"}
+              _hover={{ bg: disableHoverBackground ? undefined : colorMode === "light" ? "gray.100" : "gray.600" }}
             >
               {item.leftIcon ? <Icon as={item.leftIcon} /> : null}
-              <Box pl={4} zIndex={2}>
-                <span>{item.text}</span>
-              </Box>
+              {item?.text && (
+                <Box pl={4} zIndex={2}>
+                  <span>{item.text}</span>
+                </Box>
+              )}
+              {item?.component && (item?.component)}
             </MenuItem>
           );
         })}
