@@ -121,9 +121,9 @@ export const ProjectBaseInformation = ({
               type="text"
               placeholder="Year"
               value={currentYear}
-            // onChange={() => {
-            //   console.log(currentYear);
-            // }}
+              // onChange={() => {
+              //   console.log(currentYear);
+              // }}
             />
           </InputGroup>
 
@@ -132,9 +132,9 @@ export const ProjectBaseInformation = ({
               type="text"
               placeholder="Kind"
               value={projectKind}
-            // onChange={() => {
-            //   console.log(projectKind);
-            // }}
+              // onChange={() => {
+              //   console.log(projectKind);
+              // }}
             />
           </InputGroup>
 
@@ -154,7 +154,8 @@ export const ProjectBaseInformation = ({
             isRequired={true}
             value={projectTitle}
             setValueFunction={setProjectTitle}
-            setValueAsPlainText={false}
+            setValueAsPlainText={true}
+            // isPlain={true}
             shouldFocus={true}
           />
 
