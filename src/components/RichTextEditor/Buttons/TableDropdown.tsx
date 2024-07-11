@@ -59,7 +59,10 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
                         w="25px"
                         h="25px"
                         border="1px solid"
-                        borderColor={colorMode === "light" ? "gray.300" : "gray.400"}
+                        borderColor={isHighlighted ?
+                            colorMode === "light" ? "gray.300" : "gray.300"
+                            :
+                            colorMode === "light" ? "gray.300" : "gray.400"}
                         onMouseEnter={() => handleMouseEnter(row, col)}
                         onClick={onGridClick}
                         // backgroundColor={row < tableRows && col < tableColumns ? 'blue.300' : 'white'}
