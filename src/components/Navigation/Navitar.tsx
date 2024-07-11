@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { FaBook, FaUserCircle } from "react-icons/fa";
+import { FaBook, FaGamepad, FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { GoTriangleDown } from "react-icons/go";
 import { SiReadthedocs } from "react-icons/si";
@@ -194,7 +194,19 @@ export const Navitar = ({
 						}
 						textAlign={"center"}
 						zIndex={isOpen ? 2 : 1}
-					>
+					>{userData?.pk === 101073 && (
+						<MenuItem
+							onClick={() => {
+								navigate("/crud/test");
+							}}
+							zIndex={isOpen ? 2 : 1}
+						>
+							{<FaGamepad />}
+
+							<Text ml={2}>Playground</Text>
+						</MenuItem>
+
+					)}
 						<MenuItem
 							onClick={() => {
 								navigate("/guide");
