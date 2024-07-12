@@ -600,6 +600,11 @@ interface ITinyProjectData {
   // number: number;
 }
 
+export interface Position {
+  x: number;
+  y: number;
+}
+
 type ProjectRoles = "supervising" | "research" | "technical" | "externalcol" | "externalpeer" | "academicsuper" | "student" | "consulted" | "group";
 
 interface IProjectData {

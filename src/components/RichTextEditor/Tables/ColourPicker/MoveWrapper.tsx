@@ -1,10 +1,7 @@
 import { useRef } from "react";
 import { calculateZoomLevel } from "@lexical/utils";
 import { useColourPickerHelpers } from "@/lib/hooks/helper/useColourPickerHelpers";
-export interface Position {
-  x: number;
-  y: number;
-}
+import { Position } from "@/types";
 
 interface MoveWrapperProps {
   className?: string;

@@ -1,3 +1,9 @@
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import "@/styles/texteditor.css";
+import { Box } from "@chakra-ui/react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getTableCellNodeFromLexicalNode,
@@ -5,7 +11,7 @@ import {
 } from "@lexical/table";
 import { $getSelection, $isRangeSelection } from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TableActionMenu } from "./TableActionMenu";
+import { TableContextMenuContent } from "./TableContextMenuContent";
 
 interface Props {
   anchorElem: HTMLElement;
@@ -16,11 +22,11 @@ export const TableCellActionMenuContainer = ({
   anchorElem,
   cellMerge,
 }: Props) => {
+
   const [editor] = useLexicalComposerContext();
 
   const menuButtonRef = useRef(null);
   const menuRootRef = useRef(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [tableCellNode, setTableMenuCellNode] = useState<TableCellNode | null>(
     null,
@@ -89,8 +95,7 @@ export const TableCellActionMenuContainer = ({
         const anchorRect = anchorElem.getBoundingClientRect();
 
         const top = tableCellRect.top - anchorRect.top + 4;
-        const left =
-          tableCellRect.right - menuRect.width - 10 - anchorRect.left;
+        const left = tableCellRect.right - menuRect.width - 10 - anchorRect.left;
 
         menuButtonDOM.style.opacity = "1";
         menuButtonDOM.style.transform = `translate(${left}px, ${top}px)`;
@@ -104,29 +109,41 @@ export const TableCellActionMenuContainer = ({
   const prevTableCellDOM = useRef(tableCellNode);
 
   useEffect(() => {
-    if (prevTableCellDOM.current !== tableCellNode) {
-      setIsMenuOpen(false);
-    }
+    // if (prevTableCellDOM.current !== tableCellNode) {
+    //   setIsMenuOpen(false);
+    // }
 
     prevTableCellDOM.current = tableCellNode;
   }, [prevTableCellDOM, tableCellNode]);
 
   return (
-    <div className="table-cell-action-button-container" ref={menuButtonRef}>
+    <Box
+      pos={"absolute"}
+      bg={"red.500"}
+      top={0}
+      left={0}
+      willChange={"transform"}
+      ref={menuButtonRef}>
       {tableCellNode != null && (
-        <>
-          <button
-            type="button"
-            className="table-cell-action-button chevron-down"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMenuOpen(!isMenuOpen);
-            }}
-            ref={menuRootRef}
-          >
-            <i className="chevron-down" />
-          </button>
+        <Box pos={"relative"}>
+          <ContextMenu>
+            {/* Area to right click to make menu popup */}
+            <ContextMenuTrigger
+              className={`flex h-full w-full items-center justify-center rounded-md border border-dashed text-sm absolute`}
+              // style={{ background: backgroundColor }}
+              ref={menuRootRef}
+            >
+              Right click here
+            </ContextMenuTrigger>
 
+            {/* When right clicked the below appears */}
+            <TableContextMenuContent
+              tableCellNode={tableCellNode}
+              cellMerge={cellMerge}
+              contextRef={menuRootRef}
+            />
+          </ContextMenu>
+          {/* 
           {isMenuOpen && (
             <TableActionMenu
               contextRef={menuRootRef}
@@ -136,9 +153,37 @@ export const TableCellActionMenuContainer = ({
               cellMerge={cellMerge}
             // showColorPickerModal={showColorPickerModal}
             />
-          )}
-        </>
+          )} */}
+        </Box>
       )}
-    </div>
+    </Box>
+    // <div className="table-cell-action-button-container" ref={menuButtonRef}>
+    //   {tableCellNode != null && (
+    //     <>
+    //       <button
+    //         type="button"
+    //         className="table-cell-action-button chevron-down"
+    //         onClick={(e) => {
+    //           e.stopPropagation();
+    //           setIsMenuOpen(!isMenuOpen);
+    //         }}
+    //         ref={menuRootRef}
+    //       >
+    //         <i className="chevron-down" />
+    //       </button>
+
+    //       {isMenuOpen && (
+    //         <TableActionMenu
+    //           contextRef={menuRootRef}
+    //           setIsMenuOpen={setIsMenuOpen}
+    //           onClose={() => setIsMenuOpen(false)}
+    //           tableCellNode={tableCellNode}
+    //           cellMerge={cellMerge}
+    //         // showColorPickerModal={showColorPickerModal}
+    //         />
+    //       )}
+    //     </>
+    //   )}
+    // </div>
   );
 };

@@ -1,6 +1,21 @@
+import { Color } from "@/types";
 import React from "react";
 
-export const ColourPalettePicker = () => {
+interface Props {
+  selfColor: Color;
+  setSelfColor: React.Dispatch<React.SetStateAction<Color>>
+  setInputColor: React.Dispatch<React.SetStateAction<string>>;
+  transformColor: <M extends keyof Color, C extends Color[M]>(format: M, color: C) => Color;
+}
+
+export const ColourPalettePicker = (
+  {
+    selfColor,
+    setSelfColor,
+    setInputColor,
+    transformColor,
+  }: Props
+) => {
   const basicColors = [
     "#d0021b",
     "#f5a623",
