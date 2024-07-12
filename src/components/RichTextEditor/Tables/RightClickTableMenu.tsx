@@ -130,22 +130,6 @@ export const RightClickTableMenu = () => {
           <ContextMenuItem inset className={`${textColor}`}>
             Delete Table
           </ContextMenuItem>
-
-          {/* <ContextMenuSeparator className={`${seperatorColor}`}/>
-          <ContextMenuCheckboxItem checked>
-            Show Bookmarks Bar
-            <ContextMenuShortcut>⌘⇧B</ContextMenuShortcut>
-          </ContextMenuCheckboxItem>
-          <ContextMenuCheckboxItem>Show Full URLs</ContextMenuCheckboxItem>
-          <ContextMenuSeparator className={`${seperatorColor}`}/>
-          <ContextMenuRadioGroup value="pedro">
-            <ContextMenuLabel inset>People</ContextMenuLabel>
-            <ContextMenuSeparator className={`${seperatorColor}`}/>
-            <ContextMenuRadioItem value="pedro">
-              Pedro Duarte
-            </ContextMenuRadioItem>
-            <ContextMenuRadioItem value="colm">Colm Tuite</ContextMenuRadioItem>
-          </ContextMenuRadioGroup> */}
         </ContextMenuContent>
       </ContextMenu>
     </>

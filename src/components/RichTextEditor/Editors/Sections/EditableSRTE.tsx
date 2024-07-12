@@ -32,10 +32,7 @@ import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialSta
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
 import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
 import { RevisedRichTextToolbar } from "../../Toolbar/RevisedRichTextToolbar";
-
-// import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-// import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
-// import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import TableActionMenuPlugin from "../../Plugins/TableActionMenuPlugin";
 
 interface Props {
   initialConfig: InitialConfigType;
@@ -117,24 +114,6 @@ export const EditableSRTE = ({
     }
   }, [editorRef, setEditorText]);
 
-  // const blockTypeToBlockName = {
-  //   bullet: "Bulleted List",
-  //   check: "Check List",
-  //   code: "Code Block",
-  //   h1: "Heading 1",
-  //   h2: "Heading 2",
-  //   h3: "Heading 3",
-  //   h4: "Heading 4",
-  //   h5: "Heading 5",
-  //   h6: "Heading 6",
-  //   number: "Numbered List",
-  //   paragraph: "Normal",
-  //   quote: "Quote",
-  // };
-
-  // const [blockType, setBlockType] =
-  //   useState<keyof typeof blockTypeToBlockName>("paragraph");
-
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -192,7 +171,7 @@ export const EditableSRTE = ({
                       outline: "none",
                     }}
 
-                    // autoFocus
+                  // autoFocus
                   />
                 </Box>
               </Box>
@@ -221,10 +200,10 @@ export const EditableSRTE = ({
               anchorElem={floatingAnchorElem}
               toolbarHeight={toolBarHeight}
             />
-            {/* <TableCellActionMenuPlugin
+            <TableActionMenuPlugin
               anchorElem={floatingAnchorElem}
               cellMerge={true}
-            /> */}
+            />
           </>
         )}
 
@@ -251,7 +230,7 @@ export const EditableSRTE = ({
             setIsEditorOpen={setIsEditorOpen}
             shouldCheckForPrepopulation={shouldCheckForPrepopulation}
             documentTypeCount={documentsCount}
-            // setDisplayData={setDisplayData}
+          // setDisplayData={setDisplayData}
           />
         </Box>
         {shouldShowTree ? <TreeViewPlugin /> : null}
