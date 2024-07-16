@@ -65,14 +65,21 @@ export const ProjectBaseInformation = ({
   const meData = queryClient.getQueryData<IUserData>(["me"]);
 
   const [projectTitle, setProjectTitle] = useState("");
-  // useEffect(() => console.log(projectTitle), [projectTitle]);
+  const [titleContainsHTML, setTitleContainsHTML] = useState(false);
+
+  useEffect(() => {
+    console.log(projectTitle);
+    const htmlTagRegex = /<\/?[a-z][\s\S]*>/i;
+    setTitleContainsHTML(htmlTagRegex.test(projectTitle));
+  }, [projectTitle]);
 
   const [projectSummary, setProjectSummary] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [titleLengthError, setTitleLengthError] = useState(false);
-  const BASE_SIZE_WITH_ONE_CHARACTER = 84;
-  const MAX_TITLE_LENGTH = BASE_SIZE_WITH_ONE_CHARACTER + 150;
+
+  const BASE_SIZE_WITH_ONE_CHARACTER = titleContainsHTML ? 84 : 1;
   const MIN_TITLE_LENGTH = BASE_SIZE_WITH_ONE_CHARACTER + 6;
+  const MAX_TITLE_LENGTH = BASE_SIZE_WITH_ONE_CHARACTER + 150;
 
   useEffect(() => {
     // console.log(projectTitle.length);
@@ -115,29 +122,25 @@ export const ProjectBaseInformation = ({
     <>
       <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridColumnGap={10}>
         <Box>
-          {/* HIDING PROJECT YEAR */}
+          {/* ============================ HIDING PROJECT YEAR ============================ */}
           <InputGroup>
             <VisuallyHiddenInput
               type="text"
               placeholder="Year"
               value={currentYear}
-              // onChange={() => {
-              //   console.log(currentYear);
-              // }}
             />
           </InputGroup>
 
+          {/* ============================ HIDING PROJECT KIND ============================ */}
           <InputGroup>
             <VisuallyHiddenInput
               type="text"
               placeholder="Kind"
               value={projectKind}
-              // onChange={() => {
-              //   console.log(projectKind);
-              // }}
             />
           </InputGroup>
 
+          {/* ============================ PROJECT TITLE ============================ */}
           <UnboundStatefulEditor
             title="Project Title"
             // allowInsertButton
@@ -154,12 +157,15 @@ export const ProjectBaseInformation = ({
             isRequired={true}
             value={projectTitle}
             setValueFunction={setProjectTitle}
-            setValueAsPlainText={true}
+            setValueAsPlainText={false}
             // isPlain={true}
             shouldFocus={true}
           />
 
+          {/* ============================ TAGS ============================ */}
           <TagInput setTagFunction={setKeywords} />
+
+          {/* ============================ PROJECT SUMMARY ============================ */}
           <UnboundStatefulEditor
             title="Project Summary"
             // allowInsertButton
@@ -176,6 +182,7 @@ export const ProjectBaseInformation = ({
           />
         </Box>
 
+        {/* ============================ IMAGE ============================ */}
         <Box mb={4}>
           <StatefulMediaChanger
             helperText={"Upload an image that represents the project."}
@@ -184,49 +191,10 @@ export const ProjectBaseInformation = ({
             selectedFile={selectedFile}
             setSelectedFile={setSelectedFile}
           />
-          {/* <FormControl my={4}>
-            <FormLabel>Image</FormLabel>
-            <InputGroup>
-              <Input
-                autoComplete="off"
-                alignItems={"center"}
-                type="file"
-                // accept="image/*"
-                accept=".png, .jpeg, .jpg, image/png, image/jpeg"
-                onChange={handleFileInputChange}
-                border={"none"}
-                sx={{
-                  "::file-selector-button": {
-                    background: colorMode === "light" ? "gray.100" : "gray.600",
-                    borderRadius: "8px",
-                    padding: "2px",
-                    paddingX: "8px",
-                    mt: "1px",
-                    border: "1px solid",
-                    borderColor:
-                      colorMode === "light" ? "gray.400" : "gray.700",
-                    outline: "none",
-                    mr: "15px",
-                    ml: "-16px",
-                    cursor: "pointer",
-                  },
-                  pt: "3.5px",
-                  color: colorMode === "light" ? "gray.800" : "gray.200",
-                }}
-              />
-            </InputGroup>
-            <FormHelperText
-              color={colorMode === "light" ? "gray.500" : "gray.400"}
-            >
-              Upload an image that represents the project.
-            </FormHelperText>
-          </FormControl> */}
-          {/* <Flex justifyContent={"left"} w={"100%"} >
-            <ImagePreview selectedFile={selectedFile} />
-          </Flex> */}
         </Box>
       </Grid>
 
+      {/* ============================ SUBMISSION/CANCEL ============================ */}
       <Flex w={"100%"} justifyContent={"flex-end"} pb={4}>
         <Button onClick={onClose}>Cancel</Button>
         <motion.div
@@ -249,7 +217,6 @@ export const ProjectBaseInformation = ({
             ml={3}
             onClick={() => {
               if (baseInformationFilled) {
-                // console.log("going next");
                 nextClick({
                   kind: projectKind,
                   year: currentYear,
