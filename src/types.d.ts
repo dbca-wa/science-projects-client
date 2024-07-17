@@ -169,17 +169,17 @@ export interface ISendSingleEmail {
   fromUserPk: number;
   fromUserEmail: string;
   fromUserName: string;
-  toUserPk: number;
+  toUserPk?: number;
   toUserEmail: string;
-  toUserName: string;
+  toUserName?: string;
   project?: number;
   projectTitle?: string;
   projectDocumentKind?:
-  | "concept"
-  | "projectplan"
-  | "progressreport"
-  | "studentreport"
-  | "projectclosure";
+    | "concept"
+    | "projectplan"
+    | "progressreport"
+    | "studentreport"
+    | "projectclosure";
   stage?: number;
 }
 
@@ -605,7 +605,16 @@ export interface Position {
   y: number;
 }
 
-type ProjectRoles = "supervising" | "research" | "technical" | "externalcol" | "externalpeer" | "academicsuper" | "student" | "consulted" | "group";
+type ProjectRoles =
+  | "supervising"
+  | "research"
+  | "technical"
+  | "externalcol"
+  | "externalpeer"
+  | "academicsuper"
+  | "student"
+  | "consulted"
+  | "group";
 
 interface IProjectData {
   pk: number | undefined;
@@ -644,7 +653,17 @@ interface ITaskUser {
   last_name: string;
 }
 
-type ProjectStatus = "new" | "pending" | "active" | "updating" | "closure_requested" | "closing" | "final_update" | "completed" | "terminated" | "suspended";
+type ProjectStatus =
+  | "new"
+  | "pending"
+  | "active"
+  | "updating"
+  | "closure_requested"
+  | "closing"
+  | "final_update"
+  | "completed"
+  | "terminated"
+  | "suspended";
 
 interface ITaskProject {
   pk: number;
