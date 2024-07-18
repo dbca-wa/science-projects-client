@@ -472,7 +472,7 @@ export const ProjectOverviewCard = ({
         bg={colorMode === "light" ? "gray.100" : "gray.700"}
         color={colorMode === "light" ? "black" : "whiteAlpha.900"}
         rounded={"lg"}
-        overflow={"hidden"}
+      // overflow={"hidden"}
       >
         {(me?.userData?.is_superuser ||
           userIsLeader ||

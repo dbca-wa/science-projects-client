@@ -1,5 +1,5 @@
 import { Head } from "@/components/Base/Head";
-import { RightClickTableMenu } from "@/components/RichTextEditor/Tables/RightClickTableMenu";
+// import { RightClickTableMenu } from "@/components/RichTextEditor/Tables/RightClickTableMenu";
 import { Box, Text } from "@chakra-ui/react";
 
 export const TestPlayground = () => {
@@ -9,7 +9,7 @@ export const TestPlayground = () => {
             <Box>
                 <Text>Test</Text>
                 {/* Test */}
-                <RightClickTableMenu />
+                {/* <RightClickTableMenu /> */}
 
             </Box>
 

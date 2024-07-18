@@ -174,7 +174,7 @@ export const FloatingToolbar = ({
       //     "hidden"
       // }
       display={"flex"}
-      zIndex={10}
+      zIndex={99}
       padding={"4px"}
       verticalAlign={"middle"}
       pos={"absolute"}

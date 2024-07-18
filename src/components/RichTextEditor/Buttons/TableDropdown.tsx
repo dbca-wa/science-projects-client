@@ -2,7 +2,7 @@
 
 import { Box, Center, Grid, Text, useColorMode } from "@chakra-ui/react";
 import { INSERT_TABLE_COMMAND } from "@lexical/table";
-import { INSERT_LINE_BREAK_COMMAND, LexicalEditor } from "lexical";
+import { $getSelection, INSERT_LINE_BREAK_COMMAND, INSERT_PARAGRAPH_COMMAND, LexicalEditor } from "lexical";
 import { useState } from "react";
 import { FaTable } from "react-icons/fa";
 import "../../../styles/texteditor.css";
@@ -18,23 +18,31 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
     // const [isDisabled, setIsDisabled] = useState(true);
 
     const onGridClick = () => {
-        const columns: string = String(tableColumns);
-        const rows: string = String(tableRows);
+        activeEditor.update(() => {
+            const columns: string = String(tableColumns);
+            const rows: string = String(tableRows);
 
-        activeEditor.dispatchCommand(INSERT_TABLE_COMMAND, {
-            columns,
-            rows,
-        });
-        activeEditor.dispatchCommand(INSERT_LINE_BREAK_COMMAND, null);
+            // Check if the selected node is within a table cell
+            const selection = $getSelection();
+            const selectedNode = selection?.getNodes()[0];
+            if (selectedNode && selectedNode.getType() !== "root" && selectedNode.getParentOrThrow().getType() === 'tablecell') {
+                alert("You cannot insert a table within a table cell.");
+                return;
+            }
+            if (selectedNode.getType() !== "root") {
+                console.log(selectedNode.getParentOrThrow().getType())
+            } else {
+                console.log("rootnode")
+            }
+
+            activeEditor.dispatchCommand(INSERT_TABLE_COMMAND, {
+                columns: columns,
+                rows: rows,
+            });
+        })
+
+
     };
-
-    // useEffect(() => {
-    //     if (tableRows && tableRows > 0 && tableRows <= 11 && tableColumns && tableColumns > 0 && tableColumns <= 7) {
-    //         setIsDisabled(false);
-    //     } else {
-    //         setIsDisabled(true);
-    //     }
-    // }, [tableRows, tableColumns]);
 
     const { colorMode } = useColorMode();
 

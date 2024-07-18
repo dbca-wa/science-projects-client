@@ -34,6 +34,7 @@ interface IProps {
   documentsCount?: number;
 }
 
+
 export const RichTextEditor = ({
   canEdit,
   data,
@@ -208,7 +209,7 @@ export const RichTextEditor = ({
   const [shouldCheckForPrepopulation, setShouldCheckForPrepopulation] =
     useState(
       writeable_document_kind === "Student Report" ||
-        writeable_document_kind === "Progress Report",
+      writeable_document_kind === "Progress Report",
     );
 
   return (
@@ -223,8 +224,8 @@ export const RichTextEditor = ({
               ? "gray.200"
               : "gray.100"
             : section === "description" ||
-                section === "externalAims" ||
-                section === "externalDescription"
+              section === "externalAims" ||
+              section === "externalDescription"
               ? "gray.800"
               : "gray.700"
         }
@@ -325,13 +326,13 @@ export const RichTextEditor = ({
             // editorText={editorText}
             // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-            // setShouldShowTree={setShouldShowTree}
-            // isEditorOpen={isEditorOpen}
-            // setIsEditorOpen={setIsEditorOpen}
-            // setDisplayData={setDisplayData}
-            // textEditorName={
-            //   section === "description" ? "Description" : undefined
-            // }
+          // setShouldShowTree={setShouldShowTree}
+          // isEditorOpen={isEditorOpen}
+          // setIsEditorOpen={setIsEditorOpen}
+          // setDisplayData={setDisplayData}
+          // textEditorName={
+          //   section === "description" ? "Description" : undefined
+          // }
           />
         )}
       </Box>

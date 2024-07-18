@@ -32,7 +32,7 @@ import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialSta
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
 import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
 import { RevisedRichTextToolbar } from "../../Toolbar/RevisedRichTextToolbar";
-import TableActionMenuPlugin from "../../Plugins/TableActionMenuPlugin";
+// import TableActionMenuPlugin from "../../Plugins/TableActionMenuPlugin";
 
 interface Props {
   initialConfig: InitialConfigType;
@@ -144,7 +144,7 @@ export const EditableSRTE = ({
               {/* Toolbar */}
               <RevisedRichTextToolbar
                 allowTable={
-                  section === "progress" || section === "progress_report"
+                  writeable_document_kind === "Progress Report" || writeable_document_kind === "Student Report"
                     ? false
                     : true
                 }
@@ -169,6 +169,9 @@ export const EditableSRTE = ({
                       paddingBottom: "16px",
                       borderRadius: "0 0 25px 25px",
                       outline: "none",
+                      // overflow: "hidden"
+                      overflowY: "scroll",
+                      msOverflowY: "scroll"
                     }}
 
                   // autoFocus
@@ -200,10 +203,10 @@ export const EditableSRTE = ({
               anchorElem={floatingAnchorElem}
               toolbarHeight={toolBarHeight}
             />
-            <TableActionMenuPlugin
+            {/* <TableActionMenuPlugin
               anchorElem={floatingAnchorElem}
               cellMerge={true}
-            />
+            /> */}
           </>
         )}
 
