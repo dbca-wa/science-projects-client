@@ -32,10 +32,6 @@ export const AdminDataLists = () => {
           </TabPanel>
         </TabPanels>
       </Tabs>
-
-      {/* Test */}
-      {/* <RightClickTableMenu /> */}
-      {/* Other */}
     </>
   );
 };

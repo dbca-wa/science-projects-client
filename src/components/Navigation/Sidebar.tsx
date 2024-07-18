@@ -63,6 +63,7 @@ const textVariants = {
 };
 
 const sidebarVariants = {
+  // open: { width: "15rem", transition: { duration: 0.5 } },
   open: { width: "12.5rem", transition: { duration: 0.5 } },
   closed: { width: "5rem", transition: { duration: 0.5 } },
 };
@@ -91,66 +92,66 @@ export const Sidebar = () => {
 
   const Menus = userData?.is_superuser
     ? [
-        {
-          title: "Projects",
-          img: HiMiniSquares2X2,
-          route: "/projects",
-          section: "Projects",
-        },
-        { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
-        { title: "Users", img: FaUsers, route: "/users", section: "Users" },
-        { title: "Add user", img: FiUserPlus, route: "/users/add" },
-        {
-          title: `Latest Report`,
-          img: MdOutlineAccessTimeFilled,
-          route: "/reports/current",
-          section: "ARAR",
-        },
+      {
+        title: "Projects",
+        img: HiMiniSquares2X2,
+        route: "/projects",
+        section: "Projects",
+      },
+      { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
+      { title: "Users", img: FaUsers, route: "/users", section: "Users" },
+      { title: "Add user", img: FiUserPlus, route: "/users/add" },
+      {
+        title: `Latest Report`,
+        img: MdOutlineAccessTimeFilled,
+        route: "/reports/current",
+        section: "ARAR",
+      },
 
-        { title: "Reports", img: PiBookOpenTextFill, route: "/reports" },
-        {
-          title: "Quick Guide",
-          img: FaBookBookmark,
-          route: "/guide",
-          section: "Guide",
-        },
-        {
-          title: "Admin",
-          img: RiAdminFill,
-          route: "/crud",
-          section: "Admin",
-        },
-      ]
+      { title: "Reports", img: PiBookOpenTextFill, route: "/reports" },
+      {
+        title: "Quick Guide",
+        img: FaBookBookmark,
+        route: "/guide",
+        section: "Guide",
+      },
+      {
+        title: "Admin",
+        img: RiAdminFill,
+        route: "/crud",
+        section: "Admin",
+      },
+    ]
     : [
-        {
-          title: "Projects",
-          img: AiOutlineFundProjectionScreen,
-          route: "/projects",
-          section: "Projects",
-        },
-        { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
-        { title: "Users", img: ImUsers, route: "/users", section: "Users" },
-        { title: "Add user", img: FiUserPlus, route: "/users/add" },
-        // {
-        //   title: `Latest Report`,
-        //   img: MdOutlineAccessTimeFilled,
-        //   route: "/reports/current",
-        //   section: "ARAR",
-        // },
+      {
+        title: "Projects",
+        img: AiOutlineFundProjectionScreen,
+        route: "/projects",
+        section: "Projects",
+      },
+      { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
+      { title: "Users", img: ImUsers, route: "/users", section: "Users" },
+      { title: "Add user", img: FiUserPlus, route: "/users/add" },
+      // {
+      //   title: `Latest Report`,
+      //   img: MdOutlineAccessTimeFilled,
+      //   route: "/reports/current",
+      //   section: "ARAR",
+      // },
 
-        {
-          title: "Reports",
-          img: HiDocumentDuplicate,
-          route: "/reports",
-          section: "ARAR",
-        },
-        {
-          title: "Quick Guide",
-          img: SiReadthedocs,
-          route: "/guide",
-          section: "Guide",
-        },
-      ];
+      {
+        title: "Reports",
+        img: HiDocumentDuplicate,
+        route: "/reports",
+        section: "ARAR",
+      },
+      {
+        title: "Quick Guide",
+        img: SiReadthedocs,
+        route: "/guide",
+        section: "Guide",
+      },
+    ];
 
   const handleToggleSidebar = () => {
     setOpen(!open);
@@ -169,10 +170,10 @@ export const Sidebar = () => {
       variants={sidebarVariants}
       animate={open ? "open" : "closed"}
       pos={"relative"}
-      p={"1.25rem"}
+      p={"1.5rem"}
       px={open ? "1.25rem" : 4}
       pt={"0.5rem"}
-      maxW={"12.5rem"}
+      // maxW={"12.5rem"}
       minH={"100vh"}
       display={"flex"}
       flexDir={"column"}
@@ -271,8 +272,8 @@ export const Sidebar = () => {
                     ? "blue.500"
                     : undefined
                   : activeMenu === menu.title
-                  ? "blue.500"
-                  : undefined
+                    ? "blue.500"
+                    : undefined
               }
               color={
                 colorMode === "light"
@@ -280,26 +281,26 @@ export const Sidebar = () => {
                     ? "white"
                     : "blackAlpha.800"
                   : activeMenu === menu.title
-                  ? "whiteAlpha.800"
-                  : "whiteAlpha.800"
+                    ? "whiteAlpha.800"
+                    : "whiteAlpha.800"
               }
               _hover={
                 colorMode === "light"
                   ? activeMenu === menu.title
                     ? {
-                        color: "white",
-                        bg: "blue.500",
-                      }
+                      color: "white",
+                      bg: "blue.500",
+                    }
                     : {
-                        color: "black",
-                        bg: "gray.100",
-                      }
+                      color: "black",
+                      bg: "gray.100",
+                    }
                   : activeMenu === menu.title
-                  ? {
+                    ? {
                       color: "whiteAlpha.800",
                       bg: "blue.400",
                     }
-                  : {
+                    : {
                       color: "whiteAlpha.800",
                       bg: "blue.400",
                     }

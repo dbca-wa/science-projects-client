@@ -1,5 +1,8 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { debounce } from 'lodash-es';
+import { useMemo, useRef } from 'react';
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -22,5 +25,32 @@ export default function invariant(
     'Internal Lexical error: invariant() is meant to be replaced at compile ' +
     'time. There is no runtime version. Error: ' +
     message,
+  );
+}
+
+
+
+
+
+export function useDebounce<T extends (...args: never[]) => void>(
+  fn: T,
+  ms: number,
+  maxWait?: number,
+) {
+  const funcRef = useRef<T | null>(null);
+  funcRef.current = fn;
+
+  return useMemo(
+    () =>
+      debounce(
+        (...args: Parameters<T>) => {
+          if (funcRef.current) {
+            funcRef.current(...args);
+          }
+        },
+        ms,
+        { maxWait },
+      ),
+    [ms, maxWait],
   );
 }

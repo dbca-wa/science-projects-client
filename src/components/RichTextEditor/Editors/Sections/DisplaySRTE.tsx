@@ -49,6 +49,8 @@ export const DisplaySRTE = ({
                   paddingBottom: "16px",
                   borderRadius: "0 0 25px 25px",
                   outline: "none",
+                  overflowY: "scroll",
+                  msOverflowY: "scroll"
                 }}
               />
             </>

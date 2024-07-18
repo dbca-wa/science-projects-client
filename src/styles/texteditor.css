@@ -132,7 +132,9 @@ button.action-button:disabled {
 .table-cell-light {
   border: 1px solid #575757;
   /* background-color: #ffffff; */
+  min-width: 100px !important;
   width: fit-content !important;
+  max-width: fit-content !important;
 
   word-wrap: break-word;
   vertical-align: top;
@@ -145,7 +147,9 @@ button.action-button:disabled {
 .table-cell-dark {
   border: 1px solid #bbb;
   /* background-color: #2d3748; */
+  min-width: 100px !important;
   width: fit-content !important;
+  max-width: fit-content !important;
 
   word-wrap: break-word;
   vertical-align: top;
