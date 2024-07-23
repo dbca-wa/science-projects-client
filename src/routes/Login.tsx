@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../lib/hooks/tanstack/useUser";
-const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
+const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL.replace(/\/$/, '');
 
 interface ILoginData {
   username: string;
@@ -121,24 +121,25 @@ export const Login = ({ onClose }: IIsModal) => {
   // useEffect(() => console.log(process.env.NODE_ENV))
   const { userData, userLoading } = useUser();
   useEffect(() => {
-    if (!userLoading && userData?.pk !== undefined) {
-      // console.log(`User Present: `, userData)
-      navigate("/");
-      return;
-    } else {
-      // where user is loading and pk undefind
-      if (!userLoading && userData?.pk === undefined) {
+    if (!userLoading) {
+      // User exists
+      if (userData?.pk !== undefined) {
+        // console.log(`User Present: `, userData)
+        navigate("/");
+        // return;
+      }
+      // No user
+      else {
         if (buildType === "production") {
-          console.log(`navigating to ${VITE_PRODUCTION_BACKEND_BASE_URL}`)
-          window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin`;
+          console.log(`navigating to ${VITE_PRODUCTION_BACKEND_BASE_URL}/sso/signedout`)
+          window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}/sso/signedout`;
           // window.location.reload()
         }
         else {
           // window.location.assign('https://login.microsoftonline.com/7b934664-cdcf-4e28-a3ee-1a5bcca0a1b6/oauth2/authorize?client_id=eb1cb17e-6c3f-4318-875d-a5e1ed733928&redirect_uri=https%3a%2f%2fdbcab2c.b2clogin.com%2fdbcab2c.onmicrosoft.com%2foauth2%2fauthresp&response_type=code&scope=openid+profile&response_mode=form_post&nonce=rE29cA2zb0Ll5nB0BSvZKg%3d%3d&state=StateProperties%3deyJTSUQiOiJ4LW1zLWNwaW0tcmM6NDgzM2E2YzEtZDg1OS00NGQyLWJkYTktZGNlOTZlZDhiODUzIiwiVElEIjoiYzAwNGYzYjMtNzc4YS00M2VkLWE2NjQtYzRiMjdmMDhkNjgwIiwiVE9JRCI6IjY5NzE2N2IyLTYzMTctNDJhZi1hMTRjLWM5NzA4NjlhNTAwNyJ9')
-          console.log(`Would ordinarily navigate to ${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin, but in dev mode`)
+          console.log(`Would ordinarily navigate to ${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout, but in dev mode`)
         }
       }
-
     }
   }, [userLoading, userData, buildType]);
 
