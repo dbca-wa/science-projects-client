@@ -71,7 +71,8 @@ export const PatchNotes = ({
       setWelcomeUser("");
       setShouldConcat(true);
       setSpmsText(
-        `SPMS ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+        `SPMS ${
+          VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
         }`,
       );
       // setAnnualReportText("Report");
@@ -83,12 +84,14 @@ export const PatchNotes = ({
       // setAnnualReportText("Annual Report");
       if (window.innerWidth < 1350) {
         setSpmsText(
-          `Science Project <br/> Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project <br/> Management System ${
+            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`,
         );
       } else {
         setSpmsText(
-          `Science Project Management System ${VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+          `Science Project Management System ${
+            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`,
         );
       }
@@ -138,7 +141,7 @@ export const PatchNotes = ({
             my={2}
             fontSize={"16px"}
             fontWeight={"semibold"}
-          // onClick={() => localStorage.removeItem("confettiCount")}
+            // onClick={() => localStorage.removeItem("confettiCount")}
           >
             {/* &#127881;  &#127881; */}
             {/* &#9881;&#65039; */}
@@ -155,7 +158,6 @@ export const PatchNotes = ({
               Fix: Updated page numbering for project documents
             </ListItem>
 
-
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
@@ -164,7 +166,7 @@ export const PatchNotes = ({
               <ListIcon as={MdCheckCircle} color="green.500" />
               Update: Compress Image uploads over 3MB in size. Large image files
               (Some 100MB+ &#128517;) slow app load speeds and are unnecessary
-              for final PDF output as they are shrunk
+              for final PDF output as they are shrunk to fit on page
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -172,7 +174,7 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Temporarily extended word limit for student reports to 300 words
+              Update: Changed favicon to DBCA icon
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -204,7 +206,8 @@ export const PatchNotes = ({
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Made adding tables more intuitive with a grid. Removed table option from progress reports
+              Feature: Made adding tables more intuitive with a grid. Removed
+              table option from progress reports
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -213,8 +216,17 @@ export const PatchNotes = ({
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Enabled creating or inviting users when adding to project
+              (appears if no results for search)
             </ListItem>
-
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Added ability to add old published annual report pdfs
+              without a new cycle
+            </ListItem>
 
             {/* 
             <ListItem

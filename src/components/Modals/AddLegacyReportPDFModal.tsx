@@ -23,15 +23,15 @@ import { useGetARARsWithoputPDF } from "../../lib/hooks/tanstack/useGetARARsWith
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
 
 interface Props {
-  isAddPDFOpen: boolean;
-  onAddPDFClose: () => void;
-  refetchPDFs: () => void;
+  isAddLegacyPDFOpen: boolean;
+  onAddLegacyPDFClose: () => void;
+  refetchLegacyPDFs: () => void;
 }
 
-export const AddReportPDFModal = ({
-  isAddPDFOpen,
-  onAddPDFClose,
-  refetchPDFs,
+export const AddLegacyReportPDFModal = ({
+  isAddLegacyPDFOpen,
+  onAddLegacyPDFClose,
+  refetchLegacyPDFs,
 }: Props) => {
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
@@ -81,12 +81,12 @@ export const AddReportPDFModal = ({
           isClosable: true,
         });
       }
-      onAddPDFClose();
+      onAddLegacyPDFClose();
 
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["ararsWithoutPDFs"] });
         queryClient.invalidateQueries({ queryKey: ["ararsWithPDFs"] });
-        refetchPDFs();
+        refetchLegacyPDFs();
         refetchReportsWithoutPDFs();
       }, 350);
     },
@@ -114,18 +114,22 @@ export const AddReportPDFModal = ({
   };
 
   return (
-    <Modal isOpen={isAddPDFOpen} onClose={onAddPDFClose} size={"sm"}>
+    <Modal
+      isOpen={isAddLegacyPDFOpen}
+      onClose={onAddLegacyPDFClose}
+      size={"sm"}
+    >
       <ModalOverlay />
       <ModalContent
         color={colorMode === "light" ? "black" : "white"}
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
-        <ModalHeader>Add PDF to Report</ModalHeader>
+        <ModalHeader>Add Legacy PDF</ModalHeader>
         <ModalCloseButton />
 
         <ModalBody>
           <Text mb={4}>
-            Use this form to add the finalised pdf to the report.
+            Use this form to add the finalised pdf of ancient reports.
           </Text>
           {!reportsWithoutPDFLoading && reportsWithoutPDFData ? (
             <>
@@ -163,7 +167,7 @@ export const AddReportPDFModal = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button mr={3} onClick={onAddPDFClose}>
+          <Button mr={3} onClick={onAddLegacyPDFClose}>
             Cancel
           </Button>
           <Button

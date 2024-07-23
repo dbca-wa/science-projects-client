@@ -1961,6 +1961,17 @@ export const getArarsWithPDFs = async () => {
   }
 };
 
+export const getLegacyArarPDFs = async () => {
+  try {
+    const response = await instance.get(`documents/reports/legacyPDF`);
+    // console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching reports with pdfs:", error);
+    throw error;
+  }
+};
+
 export const getArarsWithoutPDFs = async () => {
   try {
     const response = await instance.get(`documents/reports/withoutPDF`);
