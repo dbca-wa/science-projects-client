@@ -18,9 +18,15 @@ interface Props {
   report: ISmallReport;
   refetchFunction: () => void;
   userData: IUserMe;
+  isLegacy: boolean;
 }
 
-export const AnnualReportPDFGridItem = ({ report, refetchFunction, userData }: Props) => {
+export const AnnualReportPDFGridItem = ({
+  report,
+  refetchFunction,
+  userData,
+  isLegacy,
+}: Props) => {
   const { colorMode } = useColorMode();
   const {
     isOpen: isChangePDFOpen,
@@ -29,16 +35,17 @@ export const AnnualReportPDFGridItem = ({ report, refetchFunction, userData }: P
   } = useDisclosure();
   const downloadPDF = (report) => {
     console.log(report);
-    console.log(report.pdf.file);
-    if (report.pdf.file) {
+    console.log(report?.pdf?.file ? report.pdf.file : report.file);
+    if (report?.pdf?.file || report?.file) {
       console.log("downloading file");
-      window.open(report.pdf.file, "_blank");
+      window.open(report?.pdf?.file ? report.pdf.file : report.file, "_blank");
     }
   };
 
   return (
     <>
       <ChangeReportPDFModal
+        isLegacy={isLegacy}
         isChangePDFOpen={isChangePDFOpen}
         onChangePDFClose={onChangePDFClose}
         report={report}
@@ -56,7 +63,8 @@ export const AnnualReportPDFGridItem = ({ report, refetchFunction, userData }: P
         pb={userData?.is_superuser ? 3 : 6}
         flexDir={"column"}
       >
-        <Center mb={8}
+        <Center
+          mb={8}
           onClick={() => {
             downloadPDF(report);
           }}
@@ -76,43 +84,49 @@ export const AnnualReportPDFGridItem = ({ report, refetchFunction, userData }: P
             bg={colorMode === "light" ? "white" : "gray.800"}
             px="4"
           >
-            {report?.year && (
-              `FY ${Number(String(report?.year).slice(2)) - 1}-${Number(String(report?.year).slice(2))}`
-            )}
+            {report?.year &&
+              (() => {
+                const yearStr = String(report.year).slice(2); // Get the last two digits of the year
+                const prevYearStr = String(report.year - 1).slice(2); // Get the last two digits of the previous year
 
+                const formattedPrevYear =
+                  prevYearStr.length === 1 ? `0${prevYearStr}` : prevYearStr;
+                const formattedYear =
+                  yearStr.length === 1 ? `0${yearStr}` : yearStr;
+
+                return `FY ${formattedPrevYear}-${formattedYear}`;
+              })()}
           </AbsoluteCenter>
         </Box>
-        {
-          userData?.is_superuser && (
-            <Grid
-              mt={4}
-              w={"100%"}
-              // gridTemplateColumns={"repeat(2, 1fr)"}
-              gridGap={8}
+        {userData?.is_superuser && (
+          <Grid
+            mt={4}
+            w={"100%"}
+            // gridTemplateColumns={"repeat(2, 1fr)"}
+            gridGap={8}
+          >
+            <Button
+              variant={"link"}
+              userSelect={"none"}
+              draggable={false}
+              onClick={onChangePDFOpen}
+              leftIcon={
+                <Box color={"blue.500"} mt={"2px"}>
+                  <FaEdit size={"14px"} />
+                </Box>
+              }
             >
-              <Button
-                variant={"link"}
-                userSelect={"none"}
-                draggable={false}
-                onClick={onChangePDFOpen}
-                leftIcon={
-                  <Box color={"blue.500"} mt={"2px"}>
-                    <FaEdit size={"14px"} />
-                  </Box>
-                }
-              >
-                Update
-              </Button>
-            </Grid>
-          )
-        }
+              Update
+            </Button>
+          </Grid>
+        )}
       </Flex>
     </>
   );
 };
 
-
-{/* <Button
+{
+  /* <Button
 variant={"link"}
 userSelect={"none"}
 draggable={false}
@@ -126,4 +140,5 @@ leftIcon={
 }
 >
 Download
-</Button> */}
+</Button> */
+}

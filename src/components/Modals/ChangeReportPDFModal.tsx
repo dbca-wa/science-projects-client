@@ -1,7 +1,11 @@
 // Modal for updating a report's pdf
+import { ISmallReport } from "@/types";
 import {
+  AbsoluteCenter,
+  Box,
   Button,
-  Text,
+  Divider,
+  Flex,
   FormControl,
   FormLabel,
   Modal,
@@ -12,31 +16,34 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Text,
   ToastId,
   useColorMode,
   useToast,
-  Box,
-  Flex,
-  Divider,
-  AbsoluteCenter,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { deleteFinalAnnualReportPDF, updateReportPDF } from "../../lib/api";
+import {
+  deleteFinalAnnualReportPDF,
+  deleteLegacyFinalAnnualReportPDF,
+  updateLegacyReportPDF,
+  updateReportPDF,
+} from "../../lib/api";
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
-import { ISmallReport } from "@/types";
 
 interface Props {
   isChangePDFOpen: boolean;
   report: ISmallReport;
   onChangePDFClose: () => void;
   refetchPDFs: () => void;
+  isLegacy: boolean;
 }
 
 export const ChangeReportPDFModal = ({
   isChangePDFOpen,
   onChangePDFClose,
   refetchPDFs,
+  isLegacy,
   report,
 }: Props) => {
   const { colorMode } = useColorMode();
@@ -54,11 +61,11 @@ export const ChangeReportPDFModal = ({
 
   useEffect(() => {
     // console.log(report);
-    setReportMediaId(report && report?.pdf?.pk);
-  }, [report]);
+    setReportMediaId(report && (!isLegacy ? report?.pdf?.pk : report?.pk));
+  }, [report, isLegacy]);
 
   const ararPDFChangeMutation = useMutation({
-    mutationFn: updateReportPDF,
+    mutationFn: isLegacy ? updateLegacyReportPDF : updateReportPDF,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -83,6 +90,7 @@ export const ChangeReportPDFModal = ({
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["ararsWithoutPDFs"] });
         queryClient.invalidateQueries({ queryKey: ["ararsWithPDFs"] });
+        queryClient.invalidateQueries({ queryKey: ["legacyARPDFs"] });
         refetchPDFs();
         // refetchReportsWithoutPDFs();
       }, 350);
@@ -102,7 +110,9 @@ export const ChangeReportPDFModal = ({
   });
 
   const deletePDFMutation = useMutation({
-    mutationFn: deleteFinalAnnualReportPDF,
+    mutationFn: isLegacy
+      ? deleteLegacyFinalAnnualReportPDF
+      : deleteFinalAnnualReportPDF,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -127,6 +137,7 @@ export const ChangeReportPDFModal = ({
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["ararsWithoutPDFs"] });
         queryClient.invalidateQueries({ queryKey: ["ararsWithPDFs"] });
+        queryClient.invalidateQueries({ queryKey: ["legacyARPDFs"] });
         refetchPDFs();
         // refetchReportsWithoutPDFs();
       }, 350);
@@ -147,7 +158,7 @@ export const ChangeReportPDFModal = ({
 
   const deleteFile = () => {
     // console.log("delete btn clicked");
-    deletePDFMutation.mutate(report?.pdf?.pk);
+    deletePDFMutation.mutate(!isLegacy ? report?.pdf?.pk : report?.pk);
   };
 
   const onSubmitPDFUpdate = () => {
@@ -161,13 +172,21 @@ export const ChangeReportPDFModal = ({
     ararPDFChangeMutation.mutate(formData);
   };
 
+  // useEffect(() =>
+  //   console.log({
+  //     uploadedPDF,
+  //     reportMediaId,
+  //     isError,
+  //   }),
+  // );
+
   return (
     <Modal
       isOpen={isChangePDFOpen}
       onClose={onChangePDFClose}
       size={"lg"}
-    // scrollBehavior="inside"
-    // isCentered={true}
+      // scrollBehavior="inside"
+      // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -249,6 +268,7 @@ export const ChangeReportPDFModal = ({
             _hover={{
               bg: colorMode === "dark" ? "green.400" : "green.300",
             }}
+            // report?.pdf?.pk ? report.pdf.pk : report?.pk
             isDisabled={
               !uploadedPDF || !reportMediaId || reportMediaId === 0 || isError
             }

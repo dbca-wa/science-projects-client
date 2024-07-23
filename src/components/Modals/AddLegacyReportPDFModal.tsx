@@ -1,6 +1,6 @@
+import { ILegacyPDF } from "@/types";
 import {
   Button,
-  Text,
   FormControl,
   FormLabel,
   Modal,
@@ -11,26 +11,28 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Text,
   ToastId,
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { addLegacyPDF } from "../../lib/api";
 import { useUser } from "../../lib/hooks/tanstack/useUser";
-import { addPDFToReport } from "../../lib/api";
-import { useGetARARsWithoputPDF } from "../../lib/hooks/tanstack/useGetARARsWithoputPDF";
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
 
 interface Props {
   isAddLegacyPDFOpen: boolean;
   onAddLegacyPDFClose: () => void;
   refetchLegacyPDFs: () => void;
+  legacyPDFData: ILegacyPDF[];
 }
 
 export const AddLegacyReportPDFModal = ({
   isAddLegacyPDFOpen,
   onAddLegacyPDFClose,
+  legacyPDFData,
   refetchLegacyPDFs,
 }: Props) => {
   const { colorMode } = useColorMode();
@@ -43,26 +45,14 @@ export const AddLegacyReportPDFModal = ({
   };
 
   const [uploadedPDF, setUploadedPDF] = useState<File>();
-  const [reportId, setReportId] = useState<number>();
+  const [reportYear, setReportYear] = useState<number>();
+  //   const [reportId, setReportId] = useState<number>();
   const [isError, setIsError] = useState(false);
 
   const { userData } = useUser();
-  const {
-    reportsWithoutPDFLoading,
-    reportsWithoutPDFData,
-    refetchReportsWithoutPDFs,
-  } = useGetARARsWithoputPDF();
-
-  useEffect(() => {
-    if (!reportsWithoutPDFLoading && reportsWithoutPDFData) {
-      setReportId(
-        reportsWithoutPDFData.length > 0 ? reportsWithoutPDFData[0]?.pk : 0,
-      );
-    }
-  }, [reportsWithoutPDFLoading, reportsWithoutPDFData]);
 
   const ararPDFAdditionMutation = useMutation({
-    mutationFn: addPDFToReport,
+    mutationFn: addLegacyPDF,
     onMutate: () => {
       addToast({
         status: "loading",
@@ -81,14 +71,13 @@ export const AddLegacyReportPDFModal = ({
           isClosable: true,
         });
       }
-      onAddLegacyPDFClose();
 
       setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ["ararsWithoutPDFs"] });
-        queryClient.invalidateQueries({ queryKey: ["ararsWithPDFs"] });
+        queryClient.invalidateQueries({ queryKey: ["legacyARPDFs"] });
         refetchLegacyPDFs();
-        refetchReportsWithoutPDFs();
       }, 350);
+
+      onAddLegacyPDFClose();
     },
     onError: (error) => {
       if (toastIdRef.current) {
@@ -107,11 +96,15 @@ export const AddLegacyReportPDFModal = ({
   const onSubmitPDFAdd = () => {
     const formData = {
       userId: userData?.pk ? userData.pk : userData.id,
-      reportId,
+      reportYear,
       pdfFile: uploadedPDF,
     };
     ararPDFAdditionMutation.mutate(formData);
   };
+
+  const availableYears = Array.from({ length: 9 }, (_, i) => 2005 + i).filter(
+    (year) => !legacyPDFData.some((report) => report.year === year),
+  );
 
   return (
     <Modal
@@ -131,24 +124,23 @@ export const AddLegacyReportPDFModal = ({
           <Text mb={4}>
             Use this form to add the finalised pdf of ancient reports.
           </Text>
-          {!reportsWithoutPDFLoading && reportsWithoutPDFData ? (
+          {legacyPDFData ? (
             <>
               <FormControl pb={6}>
-                <FormLabel>Selected Report</FormLabel>
+                <FormLabel>Report Year</FormLabel>
                 <Select
                   // value={
-                  //   reportsWithoutPDFData.length > 0
-                  //     ? reportsWithoutPDFData[0]?.pk
+                  //   legacyPDFData.length > 0
+                  //     ? legacyPDFData[0]?.pk
                   //     : 0
                   // }
-                  onChange={(e) => setReportId(Number(e.target.value))}
+                  onChange={(e) => setReportYear(Number(e.target.value))}
                 >
-                  {!reportsWithoutPDFLoading &&
-                    reportsWithoutPDFData.map((report, index) => (
-                      <option key={index} value={report?.pk}>
-                        {report?.year}
-                      </option>
-                    ))}
+                  {availableYears.map((year, index) => (
+                    <option key={index} value={year}>
+                      {year}
+                    </option>
+                  ))}
                 </Select>
               </FormControl>
             </>
@@ -177,7 +169,7 @@ export const AddLegacyReportPDFModal = ({
             _hover={{
               bg: colorMode === "dark" ? "green.400" : "green.300",
             }}
-            isDisabled={!uploadedPDF || !reportId || reportId === 0 || isError}
+            isDisabled={!uploadedPDF || !reportYear || isError}
             onClick={() => {
               onSubmitPDFAdd();
             }}

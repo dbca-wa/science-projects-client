@@ -225,7 +225,7 @@ export const PatchNotes = ({
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Added ability to add old published annual report pdfs
-              without a new cycle
+              that do not have data in system
             </ListItem>
 
             {/* 
