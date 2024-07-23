@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getLegacyArarPDFs } from "../../api";
+import { ILegacyPDF } from "@/types";
 
 export const useGetLegacyARPDFs = () => {
   const { isPending, data, refetch } = useQuery({
@@ -20,7 +21,7 @@ export const useGetLegacyARPDFs = () => {
 
   return {
     legacyPDFDataLoading: isPending,
-    legacyPDFData: data,
+    legacyPDFData: data as ILegacyPDF[],
     refetchLegacyPDFs,
   };
 };
