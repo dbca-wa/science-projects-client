@@ -1838,6 +1838,18 @@ export interface IUpdatePDF {
   pdfFile: File;
 }
 
+export const deleteLegacyFinalAnnualReportPDF = async (
+  annualReportPDFPk: number,
+) => {
+  // console.log(annualReportPDFPk);
+
+  const res = await instance.delete(
+    `medias/legacy_report_pdfs/${annualReportPDFPk}`,
+  );
+  // console.log(res);
+  return res.data;
+};
+
 export const deleteFinalAnnualReportPDF = async (annualReportPDFPk: number) => {
   // console.log(annualReportPDFPk);
 
@@ -1846,17 +1858,83 @@ export const deleteFinalAnnualReportPDF = async (annualReportPDFPk: number) => {
   return res.data;
 };
 
-export const updateReportPDF = async ({
+export const updateLegacyReportPDF = async ({
   reportMediaId,
-  // userId,
   pdfFile,
 }: IUpdatePDF) => {
-  // console.log({
-  //     // userId,
-  //     reportMediaId,
-  //     pdfFile
-  // })
+  const formData = new FormData();
+  function isFileArray(obj: any): obj is File[] {
+    return Array.isArray(obj) && obj.length > 0 && obj[0] instanceof File;
+  }
 
+  if (pdfFile instanceof File) {
+    formData.append("file", pdfFile);
+  } else if (isFileArray(pdfFile)) {
+    const firstFile = pdfFile[0];
+    formData.append("file", firstFile);
+  } else {
+    console.error(
+      "pdfFile is not a valid File object or array. Type:",
+      typeof pdfFile,
+    );
+  }
+
+  const res = await instance.put(
+    `medias/legacy_report_pdfs/${reportMediaId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
+  return res.data;
+};
+
+export const updateReportPDF = async ({
+  reportMediaId,
+  pdfFile,
+}: IUpdatePDF) => {
+  const formData = new FormData();
+  function isFileArray(obj: any): obj is File[] {
+    return Array.isArray(obj) && obj.length > 0 && obj[0] instanceof File;
+  }
+
+  if (pdfFile instanceof File) {
+    formData.append("file", pdfFile);
+  } else if (isFileArray(pdfFile)) {
+    const firstFile = pdfFile[0];
+    formData.append("file", firstFile);
+  } else {
+    console.error(
+      "pdfFile is not a valid File object or array. Type:",
+      typeof pdfFile,
+    );
+  }
+
+  const res = await instance.put(
+    `medias/report_pdfs/${reportMediaId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
+  return res.data;
+};
+
+interface IAddLegacyPDF {
+  pdfFile;
+  reportYear;
+  userId;
+}
+
+export const addLegacyPDF = async ({
+  reportYear,
+  userId,
+  pdfFile,
+}: IAddLegacyPDF) => {
   const formData = new FormData();
   function isFileArray(obj: any): obj is File[] {
     return Array.isArray(obj) && obj.length > 0 && obj[0] instanceof File;
@@ -1876,21 +1954,17 @@ export const updateReportPDF = async ({
   }
 
   // formData.append('file', pdfFile, pdfFile.name); // Make sure pdfFile is a File object
-  // formData.append('user', userId.toString());
-  // formData.append('report', reportMediaId.toString());
+  formData.append("user", userId.toString());
+  formData.append("year", reportYear.toString());
 
   // console.log(';formdata is')
   // console.log(formData)
 
-  const res = await instance.put(
-    `medias/report_pdfs/${reportMediaId}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  const res = await instance.post("medias/legacy_report_pdfs", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
     },
-  );
+  });
   // console.log(res);
   return res.data;
 };
@@ -1953,6 +2027,17 @@ export interface IUploadFile {
 export const getArarsWithPDFs = async () => {
   try {
     const response = await instance.get(`documents/reports/withPDF`);
+    // console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching reports with pdfs:", error);
+    throw error;
+  }
+};
+
+export const getLegacyArarPDFs = async () => {
+  try {
+    const response = await instance.get(`documents/reports/legacyPDF`);
     // console.log(response.data);
     return response.data;
   } catch (error) {

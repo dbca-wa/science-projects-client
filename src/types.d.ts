@@ -903,6 +903,13 @@ interface IDivision {
 
 // REPORT ============================================================================
 
+export interface ILegacyPDF {
+  pk: number;
+  file: string;
+  report: { id: number; year: number };
+  year: number;
+}
+
 interface ITinyReportMedia {
   pk: number;
   kind: string;
@@ -913,11 +920,11 @@ interface ITinyReportMedia {
 
 export interface ISmallReport {
   pk: number;
-  date_open: Date | null;
-  date_closed: Date | null;
+  date_open?: Date | null;
+  date_closed?: Date | null;
   year: number | null;
-  creator: number;
-  media: ITinyReportMedia;
+  creator?: number;
+  media?: ITinyReportMedia;
   pdf?: IReportPDF;
 }
 
