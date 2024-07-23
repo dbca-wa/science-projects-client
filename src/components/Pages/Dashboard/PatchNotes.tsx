@@ -213,7 +213,7 @@ export const PatchNotes = ({
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Enabled creating or inviting users when adding to project
-              (appears if no results when searching a user)
+              (buttons appear if there are no results when searching a user)
             </ListItem>
             <ListItem
               fontSize={"small"}
