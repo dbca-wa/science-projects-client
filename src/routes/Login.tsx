@@ -131,8 +131,11 @@ export const Login = ({ onClose }: IIsModal) => {
       // No user
       else {
         if (buildType === "production") {
-          console.log(`navigating to ${VITE_PRODUCTION_BACKEND_BASE_URL}/sso/signedout`)
-          window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}/sso/signedout`;
+          console.log("test")
+          console.log(userData)
+
+          // console.log(`navigating to ${VITE_PRODUCTION_BACKEND_BASE_URL}/sso/signedout`)
+          // window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}/sso/signedout`;
           // window.location.reload()
         }
         else {
