@@ -37,11 +37,11 @@ import { IConceptPlanGenerationData } from "../types";
 
 // INSTANCE SETUP ==================================================================
 
-const VITE_PRODUCTION_BACKEND_API_URL = import.meta.env
-  .VITE_PRODUCTION_BACKEND_API_URL;
+
 const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
   .VITE_PRODUCTION_BACKEND_BASE_URL;
 
+const VITE_PRODUCTION_BACKEND_API_URL = import.meta.env.VITE_PRODUCTION_BACKEND_API_URL;
 const baseBackendUrl =
   process.env.NODE_ENV === "development"
     ? "http://127.0.0.1:8000/api/v1/"
@@ -52,14 +52,11 @@ const instance = axios.create({
   withCredentials: true,
 });
 
-// Intercept and inject csrf every request (up to date and dynamic)
 instance.interceptors.request.use((config) => {
   const csrfToken = Cookie.get("csrftoken") || "";
   config.headers["X-CSRFToken"] = csrfToken;
-  // console.log(config.headers);
   return config;
 });
-
 // AUTHENTICATION ==============================================================
 
 export const getSSOMe = () => {
