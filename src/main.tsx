@@ -1,6 +1,7 @@
 import { createContext } from "react";
 import ReactDOM from "react-dom/client";
 import "@/main.css";
+import * as Sentry from "@sentry/browser";
 
 // Custom Providers and theme
 
@@ -31,7 +32,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // Prevents uneccessary refretching of API
-      retry: 2, retryDelay: 1000, refetchOnWindowFocus: false,
+      retry: 2,
+      retryDelay: 1000,
+      refetchOnWindowFocus: false,
     },
   },
 });
@@ -43,6 +46,14 @@ const queryClient = new QueryClient({
 //     router: typeof router;
 //   }
 // }
+
+Sentry.init({
+  dsn: "https://8dd0517876955893e7c6c13dda43ae8b@o4506736817405952.ingest.us.sentry.io/4507297807663104",
+  integrations: [Sentry.replayIntegration()],
+  // Session Replay
+  replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+  replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+});
 
 // Rendering
 const container = document.getElementById("app");
@@ -62,6 +73,6 @@ root.render(
         </UserSearchProvider>
       </LayoutSwitcherProvider>
     </ChakraProvider>
-  </QueryClientProvider>
+  </QueryClientProvider>,
   // </React.StrictMode>
 );
