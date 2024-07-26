@@ -37,11 +37,11 @@ import { IConceptPlanGenerationData } from "../types";
 
 // INSTANCE SETUP ==================================================================
 
-
 const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
   .VITE_PRODUCTION_BACKEND_BASE_URL;
 
-const VITE_PRODUCTION_BACKEND_API_URL = import.meta.env.VITE_PRODUCTION_BACKEND_API_URL;
+const VITE_PRODUCTION_BACKEND_API_URL = import.meta.env
+  .VITE_PRODUCTION_BACKEND_API_URL;
 const baseBackendUrl =
   process.env.NODE_ENV === "development"
     ? "http://127.0.0.1:8000/api/v1/"
@@ -54,7 +54,11 @@ const instance = axios.create({
 
 instance.interceptors.request.use((config) => {
   const csrfToken = Cookie.get("csrftoken") || "";
+  if (!csrfToken) {
+    console.error("CSRF token not found in cookies");
+  }
   config.headers["X-CSRFToken"] = csrfToken;
+  console.log(config.headers);
   return config;
 });
 // AUTHENTICATION ==============================================================
@@ -111,6 +115,7 @@ export const logOut = () => {
     .post(`users/log-out`, null)
     .then((response) => {
       if (response.data) {
+        console.log(response.data);
         // if (process.env.NODE_ENV !== "development") {
         return response.data;
         // window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/auth_logout`
@@ -399,7 +404,7 @@ export const getMe = async () => {
     // console.log(res.data)
     return res.data;
   });
-  console.log(res)
+  console.log(res);
   return res;
 };
 
@@ -1346,13 +1351,13 @@ export interface IEditProject {
   title: string;
   description?: string;
   status?:
-  | "new"
-  | "pending"
-  | "active"
-  | "updating"
-  | "terminated"
-  | "suspended"
-  | "closed";
+    | "new"
+    | "pending"
+    | "active"
+    | "updating"
+    | "terminated"
+    | "suspended"
+    | "closed";
   image?: File | null;
   selectedImageUrl: string | null;
   locations: number[];
@@ -2276,13 +2281,13 @@ export interface ISpawnDocument {
   year?: number;
   report_id?: number;
   kind:
-  | "concept"
-  | "projectplan"
-  | "progressreport"
-  | "studentreport"
-  | "studentreport"
-  | "projectclosure"
-  | string;
+    | "concept"
+    | "projectplan"
+    | "progressreport"
+    | "studentreport"
+    | "studentreport"
+    | "projectclosure"
+    | string;
 }
 
 export interface ICloseProjectProps {
@@ -2390,11 +2395,11 @@ export interface IDeleteDocument {
   projectPk: number | string;
   documentPk: number | string;
   documentKind:
-  | "conceptplan"
-  | "projectplan"
-  | "progressreport"
-  | "studentreport"
-  | "projectclosure";
+    | "conceptplan"
+    | "projectplan"
+    | "progressreport"
+    | "studentreport"
+    | "projectclosure";
 }
 
 export const deleteDocumentCall = async ({
@@ -2811,15 +2816,15 @@ interface IReportMediaUploadProps {
   pk: number;
   file: File;
   section:
-  | "cover"
-  | "rear_cover"
-  | "sdchart"
-  | "service_delivery"
-  | "research"
-  | "partnerships"
-  | "collaborations"
-  | "student_projects"
-  | "publications";
+    | "cover"
+    | "rear_cover"
+    | "sdchart"
+    | "service_delivery"
+    | "research"
+    | "partnerships"
+    | "collaborations"
+    | "student_projects"
+    | "publications";
 }
 
 export const uploadReportMediaImage = async ({
@@ -2858,15 +2863,15 @@ export const uploadReportMediaImage = async ({
 interface IReportMediaDeleteProps {
   pk: number;
   section:
-  | "cover"
-  | "rear_cover"
-  | "sdchart"
-  | "service_delivery"
-  | "research"
-  | "partnerships"
-  | "collaborations"
-  | "student_projects"
-  | "publications";
+    | "cover"
+    | "rear_cover"
+    | "sdchart"
+    | "service_delivery"
+    | "research"
+    | "partnerships"
+    | "collaborations"
+    | "student_projects"
+    | "publications";
 }
 
 export const deleteReportMediaImage = async ({
