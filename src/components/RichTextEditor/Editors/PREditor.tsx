@@ -329,11 +329,6 @@ IPREditorProps) => {
           isClosable: true,
         });
       }
-      // reset();
-
-      // setTimeout(() => {
-      //   queryClient.invalidateQueries(["mytasks"]);
-      // }, 350);
     },
     onError: (error) => {
       if (toastIdRef.current) {

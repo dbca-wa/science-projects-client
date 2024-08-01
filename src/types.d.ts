@@ -160,8 +160,7 @@ export interface IEmailModalProps {
       | IProjectClosureEmail
       | IDocumentReadyEmail
       | IDocumentApproved
-      | IDocumentRecalled
-      | IFeedbackReceived,
+      | IDocumentRecalled,
   ) => Promise<AxiosResponse | AxiosError>; // Allow props to be optional
 }
 
@@ -680,19 +679,6 @@ interface ITaskDocument {
   kind: string;
   status: string;
   project: ITaskProject;
-}
-
-export interface IQuickTask {
-  user: number; //pk
-  name: string;
-  description: string;
-}
-
-interface IFeedback {
-  user: number;
-  kind: "feedback" | "request";
-  status: "new" | "logged" | "inprogress" | "fixed";
-  text: string;
 }
 
 export interface IApproveDocument {

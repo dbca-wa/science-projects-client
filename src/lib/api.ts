@@ -17,7 +17,6 @@ import {
   IBusinessAreaCreate,
   IDepartmentalService,
   IDivision,
-  IFeedback,
   IMergeAffiliation,
   IPersonalInformation,
   IProfile,
@@ -25,7 +24,6 @@ import {
   IProjectData,
   IProjectLeadsEmail,
   IProjectMember,
-  IQuickTask,
   IReport,
   IReportCreation,
   ISearchTerm,
@@ -2550,64 +2548,6 @@ export const spawnNewEmptyDocument = async ({
   // }
 };
 
-export const getUserFeedback = async () => {
-  const res = instance.get(`tasks/feedback`).then((res) => {
-    return res.data;
-  });
-  return res;
-};
-
-export interface IUpdateFeedbackStatus {
-  pk: number;
-  status: string;
-}
-
-export const updateUserFeedbackStatus = async ({
-  pk,
-  status,
-}: IUpdateFeedbackStatus) => {
-  const res = instance
-    .put(`tasks/feedback/${pk}`, { status: status })
-    .then((res) => {
-      return res.data;
-    });
-  return res;
-};
-
-// TASKS =====================================================================================
-
-export const getMyTasks = async () => {
-  const res = instance.get(`tasks/mine`).then((res) => {
-    return res.data;
-  });
-  return res;
-};
-
-interface ITaskCompletionVariables {
-  pk: number;
-}
-
-export const createPersonalTask = async ({
-  user,
-  name,
-  description,
-}: IQuickTask) => {
-  const creator = user;
-
-  const res = instance
-    .post("tasks/", {
-      user: user,
-      creator: creator,
-      name: name,
-      description: description,
-      status: "todo",
-      task_type: "personal",
-    })
-    .then((res) => {
-      return res.data;
-    });
-  return res;
-};
 
 export const createCommentReaction = ({
   reaction,
@@ -2627,39 +2567,6 @@ export const createCommentReaction = ({
       return res;
     });
   return res;
-};
-
-export const createFeedbackItem = async ({
-  user,
-  text,
-  kind,
-  status,
-}: IFeedback) => {
-  // console.log({
-  //     user, text, kind, status
-  // })
-  const res = instance
-    .post("tasks/feedback", {
-      user: user,
-      text: text,
-      kind: kind,
-      status: status,
-    })
-    .then((res) => {
-      return res.data;
-    });
-  return res;
-};
-
-export const deletePersonalTask = async ({ pk }: ITaskCompletionVariables) => {
-  const res = await instance.delete(`tasks/${pk}`);
-  return res.data;
-};
-
-export const completeTask = async ({ pk }: ITaskCompletionVariables) => {
-  return instance
-    .put(`tasks/${pk}`, { status: "done" })
-    .then((res) => res.data);
 };
 
 // DOWNLOADS =====================================================================================
@@ -3497,21 +3404,6 @@ export const sendSPMSLinkEmail = async ({
     });
 };
 
-export interface IFeedbackReceived {
-  recipients_list: number[]; // array of pks
-}
-
-export const sendFeedbackReceivedEmail = async ({
-  recipients_list,
-}: IFeedbackReceived) => {
-  return instance
-    .post(`documents/feedback_received_email`, {
-      recipients_list: recipients_list,
-    })
-    .then((res) => {
-      return res.data;
-    });
-};
 
 export interface IDocumentRecalled {
   stage: number;

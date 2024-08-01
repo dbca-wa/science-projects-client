@@ -30,7 +30,6 @@ import {
   MdVerifiedUser,
 } from "react-icons/md";
 import { RiOrganizationChart, RiTeamFill } from "react-icons/ri";
-import { VscFeedback } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
 
 export const Admin = () => {
@@ -77,10 +76,6 @@ export const Admin = () => {
   const handleBatchApproveOldReports = () => {
     onBatchApproveOldOpen();
   };
-
-  // const handleViewFeedback = () => {
-  //   console.log("viewing feedback");
-  // };
 
   const adminActions = [
     {
@@ -157,12 +152,6 @@ export const Admin = () => {
       description: "CRUD operations for Branches",
       reactIcon: RiOrganizationChart,
       route: "/crud/branches",
-    },
-    {
-      name: "Feedback",
-      description: "Manage User Feedback",
-      reactIcon: VscFeedback,
-      route: "/crud/feedback",
     },
     {
       name: "Emails",
