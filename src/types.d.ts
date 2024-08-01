@@ -1033,3 +1033,20 @@ interface ISingleChatData {
 interface IDashProps {
   activeTab?: number;
 }
+
+// SCIENCE PORTFOLIO ================================================================================
+
+export interface IStaffUserResult {
+  title?: string;
+  position?: string;
+  address?: string;
+  branch?: string;
+
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
+export interface IStaffSectionProps {
+  isLoading: boolean;
+}

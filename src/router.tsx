@@ -1,6 +1,7 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import { Root } from "./components/Base/Root";
 import { AddressesCRUD } from "./components/Pages/Admin/AddressesCRUD";
+import { AdminDataLists } from "./components/Pages/Admin/AdminDataLists";
 import { AffiliationsCRUD } from "./components/Pages/Admin/AffiliationsCRUD";
 import { BranchesCRUD } from "./components/Pages/Admin/BranchesCRUD";
 import { BusinessAreasCRUD } from "./components/Pages/Admin/BusinessAreasCRUD";
@@ -8,6 +9,8 @@ import { DivisionsCRUD } from "./components/Pages/Admin/DivisionsCRUD";
 import { LocationsCRUD } from "./components/Pages/Admin/LocationsCRUD";
 import { ReportsCRUD } from "./components/Pages/Admin/ReportsCRUD";
 import { ServicesCRUD } from "./components/Pages/Admin/ServicesCRUD";
+import { MyBusinessArea } from "./components/Pages/MyBusinessArea/MyBusinessArea";
+import { UserGuide } from "./components/Pages/UserGuide/UserGuide";
 import { AdminOnlyPage } from "./components/Wrappers/AdminOnlyPage";
 import { ContentWrapper } from "./components/Wrappers/ContentWrapper";
 import { LayoutCheckWrapper } from "./components/Wrappers/LayoutCheckWrapper";
@@ -23,12 +26,12 @@ import { Login } from "./routes/Login";
 import { ProjectDetail } from "./routes/ProjectDetail";
 import { Projects } from "./routes/Projects";
 import { Reports } from "./routes/Reports";
+import { ScienceStaff } from "./routes/ScienceStaff";
 import { TestEmailPage } from "./routes/TestEmailPage";
-import { Users } from "./routes/Users";
-import { UserGuide } from "./components/Pages/UserGuide/UserGuide";
-import { AdminDataLists } from "./components/Pages/Admin/AdminDataLists";
-import { MyBusinessArea } from "./components/Pages/MyBusinessArea/MyBusinessArea";
 import { TestPlayground } from "./routes/TestPlayground";
+import { Users } from "./routes/Users";
+import { ScienceStaffLayout } from "./components/Science/ScienceStaffLayout";
+import ScienceStaffDetail from "./routes/ScienceStaffDetail";
 
 export const router = createBrowserRouter([
   // Login
@@ -36,6 +39,29 @@ export const router = createBrowserRouter([
     path: "login",
     element: <Login />,
   },
+  // HERE FOR TESTING MAIN CONTENT COMPONENT.
+  // ON UPDATE/MIGRATION, MOVE TO SEPARATE ROUTE AND UPDATE NGINX for
+  // https://science.dbca.wa.gov.au/ to use that route, add header/footer
+  // and adjust migration script
+
+  {
+    path: "/staff",
+    element: (
+      <ScienceStaffLayout>
+        <ScienceStaff />
+      </ScienceStaffLayout>
+    ),
+  },
+
+  {
+    path: "/staff/:staffId",
+    element: (
+      <ScienceStaffLayout>
+        <ScienceStaffDetail />
+      </ScienceStaffLayout>
+    ),
+  },
+
   // {
   //   path:"science",
   //   element: <Science />
@@ -58,19 +84,6 @@ export const router = createBrowserRouter([
           </ContentWrapper>
         ),
       },
-      // HERE FOR TESTING MAIN CONTENT COMPONENT.
-      // ON UPDATE/MIGRATION, MOVE TO SEPARATE ROUTE AND UPDATE NGINX for
-      // https://science.dbca.wa.gov.au/ to use that route, add header/footer
-      // and adjust migration script
-
-      // {
-      //   path: "/science",
-      //   element: (
-      //     <ContentWrapper>
-      //       <Science />
-      //     </ContentWrapper>
-      //   ),
-      // },
 
       {
         path: "guide",

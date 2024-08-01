@@ -287,6 +287,13 @@ export const getMyProjects = async () => {
   return res;
 };
 
+export const getScienceProfiles = async () => {
+  const res = instance.get(`users/scienceportfolios`).then((res) => {
+    return res.data;
+  });
+  return res;
+};
+
 export const getMyPartnerships = async () => {
   const res = instance.get(`partnerships/mine`).then((res) => {
     return res.data;
@@ -2548,7 +2555,6 @@ export const spawnNewEmptyDocument = async ({
   // }
 };
 
-
 export const createCommentReaction = ({
   reaction,
   comment,
@@ -3403,7 +3409,6 @@ export const sendSPMSLinkEmail = async ({
       return res.data;
     });
 };
-
 
 export interface IDocumentRecalled {
   stage: number;
