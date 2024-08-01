@@ -14,13 +14,11 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AiFillProject } from "react-icons/ai";
 import { FcHighPriority, FcOk } from "react-icons/fc";
 import { useGetDocumentsPendingMyAction } from "../../../lib/hooks/tanstack/useGetDocumentsPendingMyAction";
 import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
-import { useGetMyTasks } from "../../../lib/hooks/tanstack/useGetMyTasks";
-import { ITaskDisplayCard } from "../../../types";
 import { DocumentsDataTable } from "./DocumentsDataTable";
 import { EndorsementsDataTable } from "./EndorsementsDataTable";
 import { UserProjectsDataTable } from "./UserProjectsDataTable";
@@ -36,46 +34,6 @@ export const TraditionalTasksAndProjects = () => {
 
   const { pendingEndorsementsData, pendingEndorsementsDataLoading } =
     useGetEndorsementsPendingMyAction();
-
-  const { taskData, tasksLoading } = useGetMyTasks();
-
-  useEffect(() => {
-    if (!tasksLoading && taskData) {
-      // Function to sort tasks based on status
-      const sortTasksByStatus = (tasks) => {
-        return tasks.sort((a, b) => {
-          if (a.status === "done") return 1;
-          if (a.status === "inprogress" && b.status !== "done") return -1;
-          return 0;
-        });
-      };
-      // Check if data is available and then sort tasks
-      const sortedTaskData = taskData
-        ? {
-            done: sortTasksByStatus(
-              taskData?.filter((task) => task.status === "done"),
-            ),
-            todo: sortTasksByStatus(
-              taskData?.filter((task) => task.status === "todo"),
-            ),
-            inprogress: sortTasksByStatus(
-              taskData?.filter((task) => task.status === "inprogress"),
-            ),
-          }
-        : null;
-
-      setCombinedData([
-        ...sortedTaskData.inprogress,
-        ...sortedTaskData.todo,
-        ...sortedTaskData.done,
-      ]);
-    }
-  }, [tasksLoading, taskData]);
-  const [combinedData, setCombinedData] = useState<ITaskDisplayCard[]>([]);
-
-  //   useEffect(() => console.log(projectData), [projectData]);
-
-  //   const boxShadow = useBoxShadow();
 
   useEffect(() => {
     if (!pendingProjectDocumentDataLoading) {
@@ -126,17 +84,14 @@ export const TraditionalTasksAndProjects = () => {
                   </Box>
 
                   {/* </Box> */}
-                  {combinedData?.filter((d) => d.status !== "done")?.length +
-                    pendingProjectDocumentData?.all?.length >=
-                  1 ? (
+                  {pendingProjectDocumentData?.all?.length >= 1 ? (
                     <Box
                       display={"inline-flex"}
                       justifyContent={"center"}
                       alignItems={"center"}
                     >
                       <Box mr={2}>
-                        {combinedData?.filter((d) => d.status !== "done")
-                          ?.length + pendingProjectDocumentData?.all?.length}
+                        {pendingProjectDocumentData?.all?.length}
                       </Box>
                       <FcHighPriority />
                     </Box>
@@ -148,84 +103,14 @@ export const TraditionalTasksAndProjects = () => {
 
                 <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
                   <DocumentsDataTable
-                    combinedData={combinedData}
                     pendingProjectDocumentData={pendingProjectDocumentData}
                   />
-                  {/* {combinedData?.length +
-                    pendingProjectDocumentData?.all?.length >=
-                  1 ? (
-                    <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
-                      {combinedData.map(
-                        (task: ITaskDisplayCard, index: number) => {
-                          return (
-                            <TraditionalPersonalTaskDisplay
-                              key={index}
-                              task={task}
-                            />
-                          );
-                        },
-                      )}
-
-                      {!pendingProjectDocumentDataLoading &&
-                      pendingProjectDocumentData?.team?.length +
-                        pendingProjectDocumentData?.lead?.length +
-                        pendingProjectDocumentData?.ba?.length +
-                        pendingProjectDocumentData?.directorate?.length >=
-                        1
-                        ? [
-                            ...pendingProjectDocumentData.team.map(
-                              (document) => ({
-                                document,
-                                inputKind: "team_member",
-                              }),
-                            ),
-                            ...pendingProjectDocumentData.lead.map(
-                              (document) => ({
-                                document,
-                                inputKind: "project_lead",
-                              }),
-                            ),
-                            ...pendingProjectDocumentData.ba.map(
-                              (document) => ({
-                                document,
-                                inputKind: "business_area_lead",
-                              }),
-                            ),
-                            ...pendingProjectDocumentData.directorate.map(
-                              (document) => ({
-                                document,
-                                inputKind: "directorate",
-                              }),
-                            ),
-                          ]?.map(({ document, inputKind }, index: number) => (
-                            <TraditionalDocumentTaskDisplay
-                              key={index}
-                              document={document}
-                              inputKind={inputKind}
-                            />
-                          ))
-                        : null}
-                    </Grid>
-                  ) : (
-                    <Center>
-                      <Flex>
-                        <Center pt={10}>
-                          <FcOk />
-                          &nbsp;
-                          <Text>All done!</Text>
-                        </Center>
-                      </Flex>
-                    </Center>
-                  )} */}
                 </AccordionPanel>
               </AccordionItem>
             </motion.div>
           )}
 
-          {(me?.userData?.is_aec ||
-            // me?.userData?.is_biometrician ||
-            // me?.userData?.is_herbarium_curator ||
-            me?.userData?.is_superuser) ===
+          {(me?.userData?.is_aec || me?.userData?.is_superuser) ===
           false ? null : pendingEndorsementsDataLoading ? (
             <Center my={4}>
               <Spinner />

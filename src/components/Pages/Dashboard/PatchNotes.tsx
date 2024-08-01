@@ -21,15 +21,9 @@ import { MdCheckCircle } from "react-icons/md";
 
 interface IUserInterface {
   userData: IUserMe;
-  isLoggedIn: boolean;
-  userLoading: boolean;
 }
 
-export const PatchNotes = ({
-  userData,
-  isLoggedIn,
-  userLoading,
-}: IUserInterface) => {
+export const PatchNotes = ({ userData }: IUserInterface) => {
   const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
     .VITE_PRODUCTION_BACKEND_BASE_URL;
 
@@ -108,9 +102,6 @@ export const PatchNotes = ({
     <>
       <HomeConfetti />
       <UserFeedbackModal
-        userLoading={userLoading}
-        userData={userData}
-        isLoggedIn={isLoggedIn}
         isFeedbackModalOpen={isFeedbackModalOpen}
         onCloseFeedbackModal={onCloseFeedbackModal}
       />

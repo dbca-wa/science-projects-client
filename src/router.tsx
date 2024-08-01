@@ -8,7 +8,6 @@ import { DivisionsCRUD } from "./components/Pages/Admin/DivisionsCRUD";
 import { LocationsCRUD } from "./components/Pages/Admin/LocationsCRUD";
 import { ReportsCRUD } from "./components/Pages/Admin/ReportsCRUD";
 import { ServicesCRUD } from "./components/Pages/Admin/ServicesCRUD";
-import { UserFeedbackPage } from "./components/Pages/Admin/UserFeedbackPage";
 import { AdminOnlyPage } from "./components/Wrappers/AdminOnlyPage";
 import { ContentWrapper } from "./components/Wrappers/ContentWrapper";
 import { LayoutCheckWrapper } from "./components/Wrappers/LayoutCheckWrapper";
@@ -24,7 +23,6 @@ import { Login } from "./routes/Login";
 import { ProjectDetail } from "./routes/ProjectDetail";
 import { Projects } from "./routes/Projects";
 import { Reports } from "./routes/Reports";
-import { Tasks } from "./routes/Tasks";
 import { TestEmailPage } from "./routes/TestEmailPage";
 import { Users } from "./routes/Users";
 import { UserGuide } from "./components/Pages/UserGuide/UserGuide";
@@ -91,8 +89,6 @@ export const router = createBrowserRouter([
           </ContentWrapper>
         ),
       },
-
-
 
       // ADMIN
       {
@@ -215,18 +211,6 @@ export const router = createBrowserRouter([
         ),
       },
 
-      // Feedback
-      {
-        path: "crud/feedback",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <UserFeedbackPage />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-
       // Reports
       {
         path: "reports",
@@ -344,16 +328,6 @@ export const router = createBrowserRouter([
           <ContentWrapper>
             <LayoutCheckWrapper>
               <HowTo />
-            </LayoutCheckWrapper>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "tasks",
-        element: (
-          <ContentWrapper>
-            <LayoutCheckWrapper>
-              <Tasks />
             </LayoutCheckWrapper>
           </ContentWrapper>
         ),

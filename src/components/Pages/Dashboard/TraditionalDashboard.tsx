@@ -10,7 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   useColorMode,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
@@ -20,23 +20,16 @@ import theme from "@/theme";
 import { FaDatabase } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
-import { AddPersonalTaskModal } from "../../Modals/AddPersonalTaskModal";
 import { PatchNotes } from "./PatchNotes";
+import { CreateProjectPageModal } from "@/components/Modals/CreateProjectPageModal";
 
 export const TraditionalDashboard = () => {
+  const { isOpen, onClose, onOpen } = useDisclosure();
   const [shouldConcat, setShouldConcat] = useState(false);
 
-  const { userLoading, userData, isLoggedIn } = useUser();
+  const { userData } = useUser();
   const { colorMode } = useColorMode();
   const dataCatalogueDisabled = true;
-  const {
-    isOpen: isAddTaskOpen,
-    onOpen: onAddTaskOpen,
-    onClose: onAddTaskClose,
-  } = useDisclosure();
-  const handleAddTaskClick = () => {
-    onAddTaskOpen();
-  };
 
   const handleResize = useCallback(() => {
     // 1150 = the breakpoint at which issues occur with text overlaying
@@ -54,14 +47,8 @@ export const TraditionalDashboard = () => {
   }, [handleResize]);
   return (
     <>
-
-      <PatchNotes userData={userData} isLoggedIn={isLoggedIn} userLoading={userLoading} />
-      <AddPersonalTaskModal
-        userData={userData} isLoggedIn={isLoggedIn} userLoading={userLoading}
-        isAddTaskOpen={isAddTaskOpen}
-        onAddTaskClose={onAddTaskClose}
-      />
-
+      <PatchNotes userData={userData} />
+      <CreateProjectPageModal isOpen={isOpen} onClose={onClose} />
       <Grid
         my={5}
         templateColumns={{
@@ -88,7 +75,7 @@ export const TraditionalDashboard = () => {
                   window.open("https://data.dbca.wa.gov.au/", "_blank");
                 }
               }}
-            // isDisabled={dataCatalogueDisabled}
+              // isDisabled={dataCatalogueDisabled}
             >
               {shouldConcat ? "Data" : "Data Catalogue"}
             </Button>
@@ -127,9 +114,9 @@ export const TraditionalDashboard = () => {
             bg: colorMode === "light" ? `green.600` : `green.400`,
             color: colorMode === "light" ? `white` : `white`,
           }}
-          onClick={handleAddTaskClick}
+          onClick={onOpen}
         >
-          Add Quick Task
+          Create Project
         </Button>
       </Grid>
       <TraditionalTasksAndProjects
