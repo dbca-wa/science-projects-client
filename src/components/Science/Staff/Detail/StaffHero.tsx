@@ -3,6 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface IStaffHeroProps {
+  isLoading: boolean;
   fullName: string; // no titles
   positionTitle: string;
   branchName: string;
@@ -10,6 +11,7 @@ interface IStaffHeroProps {
 }
 
 const StaffHero = ({
+  isLoading,
   fullName,
   positionTitle,
   branchName,

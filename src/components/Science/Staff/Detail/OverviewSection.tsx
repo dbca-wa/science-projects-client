@@ -1,20 +1,8 @@
 import SimpleSkeletonSection from "@/components/Science/SimpleSkeletonSection";
-import { useEffect, useState } from "react";
-import Subsection from "./Subsection";
 import EducationEntry from "./EducationEntry";
+import Subsection from "./Subsection";
 
-const OverviewSection = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsLoading((prevState) => !prevState);
-    }, 5000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
-  }, []);
-
+const OverviewSection = ({ isLoading }: { isLoading: boolean }) => {
   return (
     <div className="">
       {/* Profile/About Me */}

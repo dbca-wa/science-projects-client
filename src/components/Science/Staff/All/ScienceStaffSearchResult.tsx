@@ -2,8 +2,10 @@ import { IStaffUserResult } from "@/types";
 import { Building, Mail, MapPin, User } from "lucide-react";
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
+  DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
@@ -19,25 +21,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const ScienceStaffSearchResult = ({
+  pk,
   first_name,
   last_name,
   email,
   title,
   branch,
   position,
-  address,
+  // address,
 }: IStaffUserResult) => {
   const navigate = useNavigate();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <div className="rounded-md border border-blue-100 p-2">
+    <div className="min-h-48 rounded-md border border-blue-100 p-2">
       <h4
         className="cursor-pointer text-balance text-lg font-bold text-blue-600 hover:text-blue-500 hover:underline"
         onClick={() => {
-          const staffId = 1;
+          const staffId = pk;
           navigate(`/staff/${staffId}`);
         }}
       >
@@ -50,18 +54,30 @@ const ScienceStaffSearchResult = ({
             <p className="ml-2 flex-1 text-balance text-sm">{position}</p>
           </span>
         )}
-        {branch && (
+        {branch?.name && (
           <span className="flex items-center">
             <Building className="mt-[2px] self-start" size={"15px"} />
-            <p className="ml-2 flex-1 text-sm">{branch}</p>
+            <p className="ml-2 flex-1 text-sm">{branch?.name}</p>
           </span>
         )}
-        {address && (
+        {branch?.address && (
           <span className="flex items-center">
             <MapPin className="mt-[2px] self-start" size={"15px"} />
-            <p className="ml-2 flex-1 text-sm">{address}</p>
+            <div className="ml-2 flex-1 text-sm">
+              {branch?.address?.street && (
+                <p>{`${branch?.address?.street?.trim()}`}</p>
+              )}
+              {branch?.address?.state &&
+                branch?.address?.city &&
+                branch?.address?.zipcode && (
+                  <p>{`${branch?.address?.city?.trim()}, ${branch?.address?.state?.trim()}. ${branch?.address?.zipcode}`}</p>
+                )}
+            </div>
           </span>
         )}
+        {/* {address && (
+    
+        )} */}
         {email &&
           (!isDesktop ? (
             <SendUserEmailMobileDrawer
@@ -70,7 +86,7 @@ const ScienceStaffSearchResult = ({
               email={email}
             />
           ) : (
-            <EmailStaffDialog
+            <SendUserEmailDialog
               first_name={first_name}
               last_name={last_name}
               email={email}
@@ -81,7 +97,7 @@ const ScienceStaffSearchResult = ({
   );
 };
 
-const EmailStaffDialog = ({
+const SendUserEmailDialog = ({
   first_name,
   last_name,
   email,
@@ -96,8 +112,19 @@ const EmailStaffDialog = ({
           </a>
         </span>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <EmailStaffMemberContent email={email} />
+      <DialogContent className="text-slate-800 sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="mb-2 mt-3">
+            Email {`${first_name} ${last_name}`}
+          </DialogTitle>
+        </DialogHeader>
+
+        <EmailStaffMemberContent
+          email={email}
+          first_name={first_name}
+          last_name={last_name}
+          kind={"dialog"}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -119,13 +146,19 @@ const SendUserEmailMobileDrawer = ({
         </span>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerTitle className="mb-2 mt-3">
-          Email {`${first_name} ${last_name}`}
-        </DrawerTitle>
-        <DrawerDescription className="hidden">
-          Emailing {`${first_name} ${last_name}`}
-        </DrawerDescription>
-        <EmailStaffMemberContent email={email} />
+        <div className="mx-auto w-full max-w-sm text-slate-800">
+          <DrawerHeader>
+            <DrawerTitle className="mb-2 mt-3">
+              Email {`${first_name} ${last_name}`}
+            </DrawerTitle>
+          </DrawerHeader>
+          <EmailStaffMemberContent
+            kind={"drawer"}
+            email={email}
+            first_name={first_name}
+            last_name={last_name}
+          />
+        </div>
       </DrawerContent>
     </Drawer>
   );

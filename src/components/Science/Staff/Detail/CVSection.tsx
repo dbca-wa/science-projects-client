@@ -1,19 +1,7 @@
-import { useEffect, useState } from "react";
 import EducationEntry from "./EducationEntry";
 import EmploymentEntry from "./EmploymentEntry";
 
-const CVSection = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsLoading((prevState) => !prevState);
-    }, 5000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
-  }, []);
-
+const CVSection = ({ isLoading }: { isLoading: boolean }) => {
   return (
     <>
       <div className="mb-6">

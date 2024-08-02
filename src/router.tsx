@@ -54,7 +54,7 @@ export const router = createBrowserRouter([
   },
 
   {
-    path: "/staff/:staffId",
+    path: "/staff/:staffProfilePk",
     element: (
       <ScienceStaffLayout>
         <ScienceStaffDetail />

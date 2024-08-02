@@ -287,8 +287,8 @@ export const getMyProjects = async () => {
   return res;
 };
 
-export const getScienceProfiles = async () => {
-  const res = instance.get(`users/scienceportfolios`).then((res) => {
+export const getStaffProfiles = async () => {
+  const res = instance.get(`users/staffprofiles`).then((res) => {
     return res.data;
   });
   return res;
@@ -879,6 +879,17 @@ export const updateProfile = async ({
 // return instance.put(
 //     `users/${userPk}/profile`,
 //     { image, about, expertise }).then(res => res.data);
+
+export const getFullStaffProfile = async ({
+  queryKey,
+}: QueryFunctionContext) => {
+  const [_, pk] = queryKey;
+  const res = instance.get(`users/staffprofiles/${pk}`).then((res) => {
+    // console.log(res.data)
+    return res.data;
+  });
+  return res;
+};
 
 // PROJECTS ==========================================================================
 
