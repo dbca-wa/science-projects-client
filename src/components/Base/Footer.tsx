@@ -9,15 +9,19 @@ export const Footer = () => {
 
   return (
     <Box
-      position="absolute"
-      bottom="0"
-      width="100%"
+      position="relative"
+      display={"flex"}
+      justifyContent={"center"}
+      // bottom="0"
+      // width="100%"
       color="whiteAlpha.600"
       bgColor="blackAlpha.900"
       py={4}
       userSelect={"none"}
     >
-      <Center fontSize="12px" textAlign="center"
+      <Center
+        fontSize="12px"
+        textAlign="center"
         onClick={() => console.log(VERSION)}
       >
         <Link

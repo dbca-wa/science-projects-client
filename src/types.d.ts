@@ -1036,11 +1036,27 @@ interface IDashProps {
 
 // SCIENCE PORTFOLIO ================================================================================
 
+export interface IStaffProfileAddress {
+  pk: number;
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zipcode: number;
+  pobox: string;
+}
+
+export interface IStaffProfileBranch {
+  name: string;
+  address: IStaffProfileAddress;
+}
+
 export interface IStaffUserResult {
+  pk?: number;
   title?: string;
   position?: string;
-  address?: string;
-  branch?: string;
+  // address?: string;
+  branch?: IStaffProfileBranch;
 
   first_name: string;
   last_name: string;

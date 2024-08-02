@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import Subsection from "./Subsection";
 import SimpleSkeletonSection from "@/components/Science/SimpleSkeletonSection";
 
 interface IProjectItemProps {
@@ -25,18 +23,7 @@ const ProjectItem = ({
   );
 };
 
-const ProjectsSection = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsLoading((prevState) => !prevState);
-    }, 5000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
-  }, []);
-
+const ProjectsSection = ({ isLoading }: { isLoading: boolean }) => {
   return (
     <>
       {isLoading ? (

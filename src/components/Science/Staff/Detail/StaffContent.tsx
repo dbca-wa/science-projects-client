@@ -45,7 +45,7 @@ const NavMenuItemButton = ({
   );
 };
 
-const StaffContent = () => {
+const StaffContent = ({ isLoading }: { isLoading: boolean }) => {
   const [selectedNav, setSelectedNav] = useState<string>("Overview");
   const { colorMode } = useColorMode();
 
@@ -101,13 +101,13 @@ const StaffContent = () => {
         // style={isDesktop ? { display: "flex", flexDirection: "column", justifyContent: "center", } : {}}
       >
         {selectedNav === "Overview" ? (
-          <OverviewSection />
+          <OverviewSection isLoading={isLoading} />
         ) : selectedNav === "Projects" ? (
-          <ProjectsSection />
+          <ProjectsSection isLoading={isLoading} />
         ) : selectedNav === "CV" ? (
-          <CVSection />
+          <CVSection isLoading={isLoading} />
         ) : (
-          <PublicationsSection />
+          <PublicationsSection isLoading={isLoading} />
         )}
       </div>
     </div>

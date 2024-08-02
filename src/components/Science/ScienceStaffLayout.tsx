@@ -4,6 +4,7 @@ import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import { Box, Flex } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import "@/main.css";
+import "@/components/Science/science_staff.css";
 
 export const ScienceStaffLayout = ({ children }: { children: ReactNode }) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");

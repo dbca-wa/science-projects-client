@@ -1,18 +1,6 @@
 import SimpleSkeletonSection from "@/components/Science/SimpleSkeletonSection";
-import { useEffect, useState } from "react";
 
-const PublicationsSection = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsLoading((prevState) => !prevState);
-    }, 5000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
-  }, []);
-
+const PublicationsSection = ({ isLoading }: { isLoading: boolean }) => {
   return (
     <>
       {isLoading ? (
