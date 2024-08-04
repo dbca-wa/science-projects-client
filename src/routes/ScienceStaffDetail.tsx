@@ -17,12 +17,13 @@ const ScienceStaffDetail = () => {
     <div className="flex flex-col">
       <StaffHero
         isLoading={isLoading}
+        staffProfileData={staffProfileData}
         branchName={"Kensington"}
         positionTitle={"Web and Data Development Officer"}
         fullName={"Jarid Prince"}
         tags={["React", "Django", "Docker", "Kubernetes", "ETL"]}
       />
-      <StaffContent isLoading={isLoading} />
+      <StaffContent isLoading={isLoading} staffProfileData={staffProfileData}/>
     </div>
   );
 };

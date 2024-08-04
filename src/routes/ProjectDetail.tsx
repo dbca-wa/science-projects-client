@@ -41,8 +41,8 @@ export const ProjectDetail = ({
 }: {
   selectedTab: string;
 }): React.ReactNode => {
-  const { projectPk } = useParams();
-  const { isLoading, projectData, refetch } = useProject(projectPk);
+  const { staffProfilePk } = useParams();
+  const { isLoading, projectData, refetch } = useStaffProfile(staffProfilePk);
 
   const [location, setLocation] = useState<IProjectAreas | null>();
   const [baseInformation, setBaseInformation] = useState<IProjectData | null>();
