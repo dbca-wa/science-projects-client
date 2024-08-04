@@ -45,7 +45,7 @@ const NavMenuItemButton = ({
   );
 };
 
-const StaffContent = ({ isLoading }: { isLoading: boolean }) => {
+const StaffContent = ({ isLoading, staffProfileData }: { isLoading: boolean;   staffProfileData: IStaffProfileData;}) => {
   const [selectedNav, setSelectedNav] = useState<string>("Overview");
   const { colorMode } = useColorMode();
 

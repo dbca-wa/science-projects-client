@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 interface IStaffHeroProps {
   isLoading: boolean;
+  staffProfileData: IStaffProfileData;
   fullName: string; // no titles
   positionTitle: string;
   branchName: string;
@@ -12,6 +13,7 @@ interface IStaffHeroProps {
 
 const StaffHero = ({
   isLoading,
+  staffProfileData,
   fullName,
   positionTitle,
   branchName,
