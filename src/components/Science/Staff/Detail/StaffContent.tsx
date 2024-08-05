@@ -5,6 +5,7 @@ import OverviewSection from "./OverviewSection";
 import ProjectsSection from "./ProjectsSection";
 import PublicationsSection from "./PublicationsSection";
 import ScrollArea from "./ScrollArea";
+import { IStaffProfileData } from "@/types";
 
 const NavMenuItemButton = ({
   title,
@@ -45,7 +46,13 @@ const NavMenuItemButton = ({
   );
 };
 
-const StaffContent = ({ isLoading, staffProfileData }: { isLoading: boolean;   staffProfileData: IStaffProfileData;}) => {
+const StaffContent = ({
+  isLoading,
+  staffProfileData,
+}: {
+  isLoading: boolean;
+  staffProfileData: IStaffProfileData;
+}) => {
   const [selectedNav, setSelectedNav] = useState<string>("Overview");
   const { colorMode } = useColorMode();
 

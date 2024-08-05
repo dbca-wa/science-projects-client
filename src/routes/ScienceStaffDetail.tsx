@@ -6,24 +6,27 @@ import { useParams } from "react-router-dom";
 
 const ScienceStaffDetail = () => {
   const { staffProfilePk } = useParams();
-  const { isLoading, staffProfileData, refetch } =
+  const { staffProfileLoading, staffProfileData, refetch } =
     useStaffProfile(staffProfilePk);
 
   useEffect(() => {
-    console.log({ staffProfileData, isLoading });
+    console.log({ staffProfileData, staffProfileLoading });
   });
 
   return (
     <div className="flex flex-col">
       <StaffHero
-        isLoading={isLoading}
+        isLoading={staffProfileLoading}
         staffProfileData={staffProfileData}
         branchName={"Kensington"}
         positionTitle={"Web and Data Development Officer"}
         fullName={"Jarid Prince"}
         tags={["React", "Django", "Docker", "Kubernetes", "ETL"]}
       />
-      <StaffContent isLoading={isLoading} staffProfileData={staffProfileData}/>
+      <StaffContent
+        isLoading={staffProfileLoading}
+        staffProfileData={staffProfileData}
+      />
     </div>
   );
 };

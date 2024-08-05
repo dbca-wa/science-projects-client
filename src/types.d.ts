@@ -1,3 +1,4 @@
+import { IOverviewData } from "./types.d";
 import { LexicalEditor } from "lexical";
 import { ReactNode } from "react";
 import { AxiosError, AxiosResponse } from "axios";
@@ -27,7 +28,7 @@ export interface Color {
 }
 
 // Editor ============================================================================
-
+type PubliProfileSection = "About Me" | "Expertise" | "";
 type AnnualReportSection =
   | "dm"
   | "service_delivery_intro"
@@ -197,12 +198,14 @@ export interface IAnnualReportPDFObject {
 }
 
 export type EditorType =
+  | "PublicProfile"
   | "ProjectDetail"
   | "ProjectDocument"
   | "AnnualReport"
   | "Comment"
   | "Guide";
 export type EditorSections =
+  | "Public Profile"
   | "Annual Report"
   | "Description"
   | "Concept Plan"
@@ -213,6 +216,7 @@ export type EditorSections =
   | "Comment";
 type EditorSubsections =
   | "Comment"
+  | PubliProfileSection
   | ProjectSection
   | ConceptPlanSection
   | ProjectPlanSection
@@ -961,6 +965,25 @@ export interface IReportCreation {
 }
 
 // QUOTE ====================================================================
+
+export interface IStaffSectionProps {
+  staffProfileData: IStaffProfileData;
+  staffProfileLoading: boolean;
+}
+
+export interface IStaffProfileData {
+  pk: number;
+  user_pk: number;
+  overview: IOverviewData;
+  projects: IProjectData[];
+  cv: string;
+  publications: string;
+}
+
+export interface IOverviewData {
+  about: string;
+  expertise: string;
+}
 
 export interface IQuote {
   text: string;

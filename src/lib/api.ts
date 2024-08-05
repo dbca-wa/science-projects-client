@@ -884,7 +884,18 @@ export const getFullStaffProfile = async ({
   queryKey,
 }: QueryFunctionContext) => {
   const [_, pk] = queryKey;
-  const res = instance.get(`users/staffprofiles/${pk}`).then((res) => {
+  const res = instance.get(`users/${pk}/staffprofiles`).then((res) => {
+    // console.log(res.data)
+    return res.data;
+  });
+  return res;
+};
+
+export const getPublicProfileOverviewData = async ({
+  queryKey,
+}: QueryFunctionContext) => {
+  const [_, pk] = queryKey;
+  const res = instance.get(`users/staffprofiles/${pk}/overview`).then((res) => {
     // console.log(res.data)
     return res.data;
   });

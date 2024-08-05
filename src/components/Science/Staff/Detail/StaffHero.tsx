@@ -1,3 +1,4 @@
+import { IStaffProfileData } from "@/types";
 import { useMediaQuery } from "@chakra-ui/react";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";

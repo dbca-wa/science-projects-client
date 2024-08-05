@@ -1,17 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { getFullStaffProfile } from "../../api";
+import { IStaffProfileData } from "@/types";
 
-export const useStaffProfile = (
-  staffProfilePk: undefined | string | number,
-) => {
+export const useStaffProfile = (userPk: undefined | string | number) => {
   const { isPending, data, refetch } = useQuery({
-    queryKey: ["staffProfile", staffProfilePk],
+    queryKey: ["staffProfile", userPk],
     queryFn: getFullStaffProfile,
     retry: false,
   });
   return {
-    isLoading: isPending,
-    staffProfileData: data,
+    staffProfileLoading: isPending,
+    staffProfileData: data as IStaffProfileData,
     refetch: refetch,
   };
 };
