@@ -1,6 +1,11 @@
 // Handles Profile Page view
 
+import { RichTextEditor } from "@/components/RichTextEditor/Editors/RichTextEditor";
+import Subsection from "@/components/Science/Staff/Detail/Subsection";
+import { useStaffProfile } from "@/lib/hooks/tanstack/useStaffProfile";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
+  Text,
   Box,
   Flex,
   Tab,
@@ -8,11 +13,12 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  useColorMode,
 } from "@chakra-ui/react";
-import EditableStaffOverview from "./Public Profile/EditableStaffOverview";
-import EditableStaffProjects from "./Public Profile/EditableStaffProjects";
 import EditableStaffCV from "./Public Profile/EditableStaffCV";
+import EditableStaffProjects from "./Public Profile/EditableStaffProjects";
 import EditableStaffPublications from "./Public Profile/EditableStaffPublications";
+import { useEffect } from "react";
 
 const StaffHeroEditable = () => {
   return (
@@ -39,31 +45,86 @@ const StaffHeroEditable = () => {
 };
 
 export const PublicProfilePage = () => {
+  const { userData, userLoading } = useUser();
+  const { staffProfileData, staffProfileLoading } = useStaffProfile(
+    userData?.pk,
+  );
+  const { colorMode } = useColorMode();
+  useEffect(() => console.log(staffProfileData));
+
   return (
     <Flex h={"100%"} minH={"88vh"} flexDir={"column"}>
-      <StaffHeroEditable />
-      <Tabs isLazy isFitted variant={"enclosed"}>
-        <TabList>
-          <Tab>Overview</Tab>
-          <Tab>Projects</Tab>
+      {staffProfileData ? (
+        <>
+          <StaffHeroEditable />
+          <Tabs isLazy isFitted variant={"enclosed"}>
+            <TabList>
+              <Tab>Overview</Tab>
+              {/* <Tab>Projects</Tab>
           <Tab>CV</Tab>
-          <Tab>Publications</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <EditableStaffOverview />
+          <Tab>Publications</Tab> */}
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <Subsection title="About Me">
+                  {!staffProfileLoading &&
+                    staffProfileData?.overview?.about && (
+                      <RichTextEditor
+                        key={`aboutMe${colorMode}`} // Change the key to force a re-render
+                        editorType="PublicProfile"
+                        section={"About Me"}
+                        canEdit={true}
+                        isUpdate={true}
+                        data={staffProfileData?.overview?.about}
+                        writeable_document_kind={"Public Profile"}
+                        writeable_document_pk={staffProfileData?.pk}
+                      />
+                    )}
+                </Subsection>
+                <Subsection title="Expertise">
+                  {!staffProfileLoading &&
+                    staffProfileData?.overview?.expertise && (
+                      <RichTextEditor
+                        key={`aboutMe${colorMode}`} // Change the key to force a re-render
+                        editorType="PublicProfile"
+                        section={"Expertise"}
+                        canEdit={true}
+                        isUpdate={true}
+                        data={staffProfileData?.overview?.expertise}
+                        writeable_document_kind={"Public Profile"}
+                        writeable_document_pk={staffProfileData?.pk}
+                      />
+                    )}
+                </Subsection>
+              </TabPanel>
+              {/* <TabPanel>
+            <EditableStaffProjects
+              staffProfileData={staffProfileData}
+              staffProfileLoading={staffProfileLoading}
+            />
           </TabPanel>
           <TabPanel>
-            <EditableStaffProjects />
+            <EditableStaffCV
+              staffProfileData={staffProfileData}
+              staffProfileLoading={staffProfileLoading}
+            />
           </TabPanel>
           <TabPanel>
-            <EditableStaffCV />
-          </TabPanel>
-          <TabPanel>
-            <EditableStaffPublications />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+            <EditableStaffPublications
+              staffProfileData={staffProfileData}
+              staffProfileLoading={staffProfileLoading}
+            />
+          </TabPanel> */}
+            </TabPanels>
+          </Tabs>
+        </>
+      ) : (
+        <>
+          <Box>
+            <Text>You have not set up a public staff profile yet.</Text>
+          </Box>
+        </>
+      )}
     </Flex>
   );
 };

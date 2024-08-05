@@ -41,8 +41,8 @@ export const ProjectDetail = ({
 }: {
   selectedTab: string;
 }): React.ReactNode => {
-  const { staffProfilePk } = useParams();
-  const { isLoading, projectData, refetch } = useStaffProfile(staffProfilePk);
+  const { projectPk } = useParams();
+  const { isLoading, projectData, refetch } = useProject(projectPk);
 
   const [location, setLocation] = useState<IProjectAreas | null>();
   const [baseInformation, setBaseInformation] = useState<IProjectData | null>();
@@ -64,7 +64,7 @@ export const ProjectDetail = ({
       const parser = new DOMParser();
       const doc = parser.parseFromString(
         projectData?.project?.title,
-        "text/html"
+        "text/html",
       );
       const pElement = doc.querySelector("p");
       const spanElement = pElement.querySelector("span")
@@ -132,11 +132,11 @@ export const ProjectDetail = ({
       documents?.concept_plan && "concept",
       documents?.project_plan && "project",
       documents?.progress_reports &&
-      documents.progress_reports.length > 0 &&
-      "progress",
+        documents.progress_reports.length > 0 &&
+        "progress",
       documents?.student_reports &&
-      documents.student_reports.length > 0 &&
-      "student",
+        documents.student_reports.length > 0 &&
+        "student",
       documents?.project_closure && "closure",
     ].filter(Boolean);
 
@@ -206,7 +206,9 @@ export const ProjectDetail = ({
             <Text mt={6}>
               This project has either been deleted or never existed.
             </Text>
-            <Text mt={3}>If you believe this is in error, please submit feedback</Text>
+            <Text mt={3}>
+              If you believe this is in error, please submit feedback
+            </Text>
             <Box mt={8}>
               <Button
                 color={"white"}
