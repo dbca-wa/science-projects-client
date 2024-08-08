@@ -828,7 +828,7 @@ export const UserProjectsDataTable = ({
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows?.length ? (
+          {table.getRowModel().rows?.length > 0 ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
@@ -854,7 +854,9 @@ export const UserProjectsDataTable = ({
             <TableRow>
               <TableCell colSpan={columns?.length} className="h-24 text-center">
                 {/* <Text mt={4} mx={2}> */}
-                {noDataString}
+                {!hideInactive
+                  ? noDataString
+                  : `${noDataString} that are active`}
                 {/* </Text> */}
               </TableCell>
             </TableRow>
