@@ -235,6 +235,7 @@ export const TraditionalTasksAndProjects = () => {
                       }}
                       defaultSorting={"status"}
                       noDataString={"You aren't associated with any projects"}
+                      filters
                     />
                   )}
                 </AccordionPanel>
