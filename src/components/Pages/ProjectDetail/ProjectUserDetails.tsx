@@ -399,13 +399,12 @@ export const ProjectUserDetails = ({
           <Text userSelect={"none"}>
             {user?.phone ? user.phone : "No Phone number"}
           </Text>
-          <Flex>
-            <Text userSelect={"none"}>
-              {user?.email?.startsWith("unset") ? "No Email" : user?.email}
-            </Text>
-            {!user?.email?.startsWith("unset") && (
+          <Flex
+          // mt={1}
+          >
+            {/* {!user?.email?.startsWith("unset") && (
               <Button
-                ml={2}
+                mr={2}
                 size={"xs"}
                 variant={"ghost"}
                 color={"white"}
@@ -417,8 +416,33 @@ export const ProjectUserDetails = ({
               >
                 <Icon as={FiCopy} />
               </Button>
-            )}
+            )} */}
+            <Text userSelect={"none"}>
+              {user?.email?.startsWith("unset") ? "No Email" : user?.email}
+            </Text>
           </Flex>
+          {!user?.email?.startsWith("unset") && (
+            <Button
+              // ml={2}
+              size={"xs"}
+              variant={"ghost"}
+              color={"white"}
+              background={colorMode === "light" ? "blue.500" : "blue.600"}
+              _hover={{
+                background: colorMode === "light" ? "blue.400" : "blue.500",
+              }}
+              onClick={copyEmail}
+              leftIcon={<FiCopy />}
+              ml={0}
+              rounded={4}
+              mt={2}
+              px={4}
+              w={"fit-content"}
+            >
+              Copy Email
+              {/* <Icon as={FiCopy} /> */}
+            </Button>
+          )}
         </Flex>
       </Flex>
 
