@@ -6,20 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IProjectData, ProjectRoles } from "@/types";
-import {
-  Box,
-  Button,
-  Flex,
-  Icon,
-  Image,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
-
-import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
-import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 import {
   ColumnDef,
   SortingState,
@@ -28,14 +14,33 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
+  ColumnFiltersState,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
+import { Input } from "@/components/ui/input";
+import { IProjectData, ProjectRoles } from "@/types";
+import {
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Image,
+  Text,
+  Tooltip,
+  useColorMode,
+} from "@chakra-ui/react";
+
+import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaUserFriends } from "react-icons/fa";
 import { GiMaterialsScience } from "react-icons/gi";
 import { MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export type ProjectColumnTypes =
   | "business_area"
@@ -61,6 +66,7 @@ export interface ProjectDataTableProps {
   defaultSorting: EnabledColumns<DisabledColumnsMap>;
   disabledColumns: DisabledColumnsMap;
   noDataString: string;
+  filters?: boolean;
 }
 
 const returnHTMLTitle = (titleData) => {
@@ -80,7 +86,10 @@ export const UserProjectsDataTable = ({
   defaultSorting,
   disabledColumns,
   noDataString,
+  filters,
 }: ProjectDataTableProps) => {
+  const [hideInactive, setHideInactive] = useState(true);
+
   const { colorMode } = useColorMode();
   // console.log(projectData);
   const baseUrl = useApiEndpoint();
@@ -287,119 +296,7 @@ export const UserProjectsDataTable = ({
     },
   };
   const columnDefs: ColumnDef<IProjectData>[] = [
-    // // image
-    // {
-    //   accessorKey: "image",
-    //   header: ({ column }) => {
-    //     return (
-    //       // <Text
-    //       //   className="m-0 p-0 text-center"
-    //       //   color={colorMode === "light" ? "black" : "white"}
-    //       // >
-    //       //   Kind
-    //       // </Text>
-    //       <Button
-    //         variant="solid"
-    //         onClick={() => console.log("Nothing")}
-    //         className="w-full text-center"
-    //         p={0}
-    //         m={0}
-    //         bg={"transparent"}
-    //         _hover={
-    //           colorMode === "dark"
-    //             ? { bg: "blue.400", color: "white", cursor: "default" }
-    //             : { bg: "blue.50", color: "black", cursor: "default" }
-    //         }
-    //       >
-    //         Image
-    //       </Button>
-    //     );
-    //   },
-    //   cell: ({ row }) => {
-    //     const originalImageData = row?.original?.image;
-    //     return (
-    //       <Center>
-    //         <Image
-    //           objectFit={"cover"}
-    //           src={
-    //             originalImageData?.file
-    //               ? `${baseUrl}${originalImageData.file}`
-    //               : noImage
-    //           }
-    //           boxSize={"70px"}
-    //           rounded={"lg"}
-    //         />
-    //       </Center>
-
-    //     );
-    //   },
-    // },
-    // kind
-    {
-      accessorKey: "kind",
-      header: ({ column }) => {
-        const isSorted = column.getIsSorted();
-        let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
-
-        if (isSorted === "asc") {
-          sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
-        } else if (isSorted === "desc") {
-          sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
-        }
-        return (
-          // <Text
-          //   className="m-0 p-0 text-center"
-          //   color={colorMode === "light" ? "black" : "white"}
-          // >
-          //   Kind
-          // </Text>
-          <Button
-            // variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
-          >
-            Kind
-          </Button>
-        );
-      },
-      cell: ({ row }) => {
-        const originalKindData: kinds = row.getValue("kind");
-
-        const formattedString = kindDict[originalKindData].string;
-        const formattedIcon = kindDict[originalKindData].icon;
-        const formattedColour = kindDict[originalKindData].color;
-
-        // console.log({ originalKindData, formattedString });
-        return (
-          <Box className="text-center align-middle font-medium">
-            {/* <Text>{formattedString}</Text> */}
-            <Icon
-              as={formattedIcon}
-              color={`${formattedColour}.500`}
-              boxSize={"22px"}
-            />
-            <Text color={`${formattedColour}.500`}>{formattedString}</Text>
-          </Box>
-        );
-      },
-      sortingFn: (rowA, rowB) => {
-        const kindA: kinds = rowA.getValue("kind");
-        const kindB: kinds = rowB.getValue("kind");
-        const indexA = kindOrder.indexOf(kindA);
-        const indexB = kindOrder.indexOf(kindB);
-        return indexA - indexB;
-      },
-    },
-    // role
+    // business area
     {
       accessorKey: "business_area",
       header: ({ column }) => {
@@ -437,7 +334,8 @@ export const UserProjectsDataTable = ({
         );
       },
       cell: ({ row }) => {
-        const originalBaNameData = row?.original?.business_area?.name || "Unset";
+        const originalBaNameData =
+          row?.original?.business_area?.name || "Unset";
         // console.log(row.original);
 
         const formattedString = returnHTMLTitle(originalBaNameData);
@@ -505,10 +403,7 @@ export const UserProjectsDataTable = ({
             // alignItems={"center"}
             flexDir={"column"}
           >
-
-            <Box
-              display={"flex"}
-            >
+            <Box display={"flex"}>
               <Image
                 // float={"left"}
                 mr={4}
@@ -523,7 +418,6 @@ export const UserProjectsDataTable = ({
                 boxSize={"70px"}
                 rounded={"lg"}
                 ml={4}
-
               />
               <Box display={"flex"} flexDir={"column"}>
                 <Text
@@ -558,11 +452,7 @@ export const UserProjectsDataTable = ({
                   </Text>
                 ) : null}
               </Box>
-
             </Box>
-
-
-
           </Flex>
         );
       },
@@ -575,6 +465,84 @@ export const UserProjectsDataTable = ({
         const b = formattedB.replace(/<\/?[^>]+(>|$)/g, "").trim();
         return a.localeCompare(b);
         // return formattedA.localeCompare(formattedB);
+      },
+      filterFn: (row, columnId, filterValue) => {
+        const cellValue = row.original.title;
+        function matchHTMLTitle(
+          htmlContent: string,
+          searchText: string,
+        ): boolean {
+          const extractedTitle = returnHTMLTitle(htmlContent);
+          return extractedTitle
+            .toLowerCase()
+            .includes(searchText.toLowerCase());
+        }
+        return matchHTMLTitle(cellValue, filterValue);
+      },
+    },
+    // kind
+    {
+      accessorKey: "kind",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+        let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
+
+        if (isSorted === "asc") {
+          sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
+        } else if (isSorted === "desc") {
+          sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
+        }
+        return (
+          // <Text
+          //   className="m-0 p-0 text-center"
+          //   color={colorMode === "light" ? "black" : "white"}
+          // >
+          //   Kind
+          // </Text>
+          <Button
+            // variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="w-full text-center"
+            rightIcon={sortIcon}
+            // p={0}
+            // m={0}
+            bg={"transparent"}
+            _hover={
+              colorMode === "dark"
+                ? { bg: "blue.400", color: "white" }
+                : { bg: "blue.50", color: "black" }
+            }
+          >
+            Kind
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const originalKindData: kinds = row.getValue("kind");
+
+        const formattedString = kindDict[originalKindData].string;
+        const formattedIcon = kindDict[originalKindData].icon;
+        const formattedColour = kindDict[originalKindData].color;
+
+        // console.log({ originalKindData, formattedString });
+        return (
+          <Box className="text-center align-middle font-medium">
+            {/* <Text>{formattedString}</Text> */}
+            <Icon
+              as={formattedIcon}
+              color={`${formattedColour}.500`}
+              boxSize={"22px"}
+            />
+            <Text color={`${formattedColour}.500`}>{formattedString}</Text>
+          </Box>
+        );
+      },
+      sortingFn: (rowA, rowB) => {
+        const kindA: kinds = rowA.getValue("kind");
+        const kindB: kinds = rowB.getValue("kind");
+        const indexA = kindOrder.indexOf(kindA);
+        const indexB = kindOrder.indexOf(kindB);
+        return indexA - indexB;
       },
     },
     // role
@@ -673,7 +641,9 @@ export const UserProjectsDataTable = ({
         // const formatted = returnHTMLTitle(originalTitleData);
         return (
           <Box className="text-left font-medium">
-            <Text fontSize={"x-small"}>{formatDate(row.getValue("created_at"))}</Text>
+            <Text fontSize={"x-small"}>
+              {formatDate(row.getValue("created_at"))}
+            </Text>
           </Box>
         );
       },
@@ -742,6 +712,16 @@ export const UserProjectsDataTable = ({
         const indexB = statusOrder.indexOf(statusB);
         return indexA - indexB;
       },
+      filterFn: (row, columnId, filterValue) => {
+        const originalStatus = row.getValue(columnId);
+        const inactiveStatuses = ["completed", "terminated", "suspended"];
+
+        if (filterValue) {
+          // If the checkbox is checked, filter out inactive statuses
+          return !inactiveStatuses.includes(originalStatus as string);
+        }
+        return true; // Otherwise, show all statuses
+      },
     },
   ];
 
@@ -758,6 +738,7 @@ export const UserProjectsDataTable = ({
       desc: false,
     },
   ]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     // created_at: false,
   });
@@ -770,17 +751,63 @@ export const UserProjectsDataTable = ({
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
       columnVisibility,
+      columnFilters,
     },
   });
 
   const twRowClassLight = "hover:cursor-pointer hover:bg-blue-50";
   const twRowClassDark = "hover:cursor-pointer hover:bg-inherit";
 
+  useEffect(() => {
+    table.getColumn("status")?.setFilterValue(hideInactive);
+  }, [table, hideInactive]);
+
   return (
     <div className="rounded-b-md border">
+      {filters && (
+        <div className="flex items-center justify-between px-4 py-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              // className="size-4 max-w-sm text-black"
+              id="hideInactive"
+              checked={hideInactive}
+              onCheckedChange={() => {
+                setHideInactive((prev) => !prev);
+                table.getColumn("status")?.setFilterValue(!hideInactive); // Toggle the filter value
+              }}
+              aria-label="Hide Inactive"
+            />
+            <Tooltip
+              label="Hides terminated, suspended and completed projects"
+              aria-label="A tooltip"
+            >
+              <label
+                htmlFor="hideInactive"
+                className={
+                  "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                }
+              >
+                Hide Inactive
+              </label>
+            </Tooltip>
+          </div>
+          <Input
+            placeholder="Filter projects by title..."
+            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            onChange={(e) => {
+              table
+                .getColumn("title")
+                ?.setFilterValue(returnHTMLTitle(e.target.value));
+            }}
+            className="max-w-sm text-black"
+          />
+        </div>
+      )}
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -791,9 +818,9 @@ export const UserProjectsDataTable = ({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 );
               })}
