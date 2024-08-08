@@ -561,9 +561,16 @@ const OldHeader = () => {
           md: 4,
           lg: 1,
         }}
+        px={{
+          base: 4,
+          sm: 6,
+          md: "10%",
+          lg: "15%",
+        }}
         roundedBottom={6}
         alignItems="center"
         justifyContent="space-between"
+        // className="w-screen"
       >
         <HStack spacing={2} flexGrow={1}>
           {/* SMPS Logo/Title */}

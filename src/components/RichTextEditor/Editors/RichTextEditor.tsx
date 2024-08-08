@@ -34,7 +34,6 @@ interface IProps {
   documentsCount?: number;
 }
 
-
 export const RichTextEditor = ({
   canEdit,
   data,
@@ -55,7 +54,7 @@ export const RichTextEditor = ({
   const { colorMode } = useColorMode();
   const [canSave, setCanSave] = useState<boolean>(true);
 
-  // const [lastSelectedNode, setLastSelectedNode] = useState();
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const generateTheme = (colorMode) => {
     return {
@@ -190,8 +189,6 @@ export const RichTextEditor = ({
     editable: false,
   };
 
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-
   useEffect(() => {
     if (data !== undefined && data !== null) {
       setDisplayData(data);
@@ -209,7 +206,7 @@ export const RichTextEditor = ({
   const [shouldCheckForPrepopulation, setShouldCheckForPrepopulation] =
     useState(
       writeable_document_kind === "Student Report" ||
-      writeable_document_kind === "Progress Report",
+        writeable_document_kind === "Progress Report",
     );
 
   return (
@@ -224,8 +221,8 @@ export const RichTextEditor = ({
               ? "gray.200"
               : "gray.100"
             : section === "description" ||
-              section === "externalAims" ||
-              section === "externalDescription"
+                section === "externalAims" ||
+                section === "externalDescription"
               ? "gray.800"
               : "gray.700"
         }
@@ -315,30 +312,12 @@ export const RichTextEditor = ({
           <DisplaySRTE
             key={prepopulationData}
             initialConfig={uneditableInitialCOnfig}
-            // editorRef={editorRef}
             data={prepopulationData}
             section={section}
-            // project_pk={project_pk}
-            // document_pk={document_pk}
-            // editorType={editorType}
-            // isUpdate={isUpdate}
-            // displayData={displayData}
-            // editorText={editorText}
-            // setEditorText={setEditorText}
             shouldShowTree={shouldShowTree}
-          // setShouldShowTree={setShouldShowTree}
-          // isEditorOpen={isEditorOpen}
-          // setIsEditorOpen={setIsEditorOpen}
-          // setDisplayData={setDisplayData}
-          // textEditorName={
-          //   section === "description" ? "Description" : undefined
-          // }
           />
         )}
       </Box>
-      {/* <p>Editor text is: {`${editorText}`}</p>
-            <p>Data is: {`${data}`}</p>
-            <p>Display Data is: {`${displayData}`}</p> */}
     </Box>
   );
 };

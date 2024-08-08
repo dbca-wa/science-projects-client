@@ -27,14 +27,15 @@ export const TraditionalLayout = () => {
   }
   return (
     <Box minH={"100vh"} minW={"720px"}>
+      <OldHeader />
+
       <TraditionalPageWrapper>
-        <OldHeader />
         <Box
-          mt={6}
-          minH={"500px"}
+          my={6}
+          minH={"1000px"}
           bgColor={"white"}
           rounded={6}
-          py={10}
+          py={4}
           bg={colorMode === "light" ? "white" : "blackAlpha.800"}
         >
           <Box mx={10}>

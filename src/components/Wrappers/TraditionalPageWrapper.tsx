@@ -17,7 +17,7 @@ export const TraditionalPageWrapper: React.FC<IPageWrapperProps> = ({
         md: "10%",
         lg: "15%",
       }}
-      pb={20}
+      py={2}
       // minW={"250mm"}
     >
       {children}
