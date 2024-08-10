@@ -24,7 +24,7 @@ const EditorContext = createContext<IEditorContext>({
     throw new Error("closeEditor function must be overridden");
   },
   manuallyCheckAndToggleDialog: () => {
-    throw new Error("checkAndToggleDialog function must be overridden");
+    throw new Error("manuallyCheckAndToggleDialog function must be overridden");
   },
 });
 

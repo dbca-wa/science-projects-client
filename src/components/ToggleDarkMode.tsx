@@ -1,5 +1,6 @@
 // A component for toggling the dark mode
 
+import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 import {
   Box,
   Button,
@@ -27,11 +28,19 @@ export const ToggleDarkMode = ({
   const iconButtonColorScheme = useColorModeValue("blue", "orange");
   const backgroundHoverColor = useColorModeValue(
     "whiteAlpha.400",
-    "whiteAlpha.500"
+    "whiteAlpha.500",
   );
 
+  const { manuallyCheckAndToggleDialog } = useEditorContext();
+
+  const handleClick = () => {
+    manuallyCheckAndToggleDialog(() => {
+      toggleColorMode();
+    });
+  };
+
   return asMenuItem ? (
-    <MenuItem onClick={toggleColorMode} zIndex={2}>
+    <MenuItem onClick={handleClick} zIndex={2}>
       {colorToggleIcon}
       <Text ml={2}> Toggle Dark Mode</Text>
     </MenuItem>
@@ -52,9 +61,7 @@ export const ToggleDarkMode = ({
             color={`${iconButtonColorScheme}.400`}
             size={"md"}
             rightIcon={colorToggleIcon}
-            onClick={() => {
-              toggleColorMode();
-            }}
+            onClick={handleClick}
             variant={"ghost"}
             aria-label="Toggle Dark Mode"
             _hover={{
@@ -68,9 +75,7 @@ export const ToggleDarkMode = ({
           <IconButton
             size={"md"}
             icon={colorToggleIcon}
-            onClick={() => {
-              toggleColorMode();
-            }}
+            onClick={handleClick}
             colorScheme={iconButtonColorScheme}
             variant={"ghost"}
             aria-label="Toggle Dark Mode"

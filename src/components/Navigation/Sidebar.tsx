@@ -1,5 +1,7 @@
 // Sidebar for modern version
 
+import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
   Box,
   Button,
@@ -13,21 +15,20 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { AiOutlineFundProjectionScreen, AiOutlineLeft } from "react-icons/ai";
+import { FaBookBookmark, FaUsers } from "react-icons/fa6";
 import { FiUserPlus } from "react-icons/fi";
 import { HiDocumentDuplicate } from "react-icons/hi";
+import { HiMiniSquares2X2 } from "react-icons/hi2";
 import { ImUsers } from "react-icons/im";
 import { MdOutlineAccessTimeFilled } from "react-icons/md";
+import { PiBookOpenTextFill } from "react-icons/pi";
+import { RiAdminFill } from "react-icons/ri";
+import { SiReadthedocs } from "react-icons/si";
 import { TbLayoutGridAdd } from "react-icons/tb";
 import { useUpdatePage } from "../../lib/hooks/helper/useUpdatePage";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { AnimatedToggleButton } from "./AnimatedToggleButton";
-import { SiReadthedocs } from "react-icons/si";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
-import { RiAdminFill } from "react-icons/ri";
-import { FaBookBookmark, FaUsers } from "react-icons/fa6";
-import { PiBookOpenTextFill } from "react-icons/pi";
-import { HiMiniSquares2X2 } from "react-icons/hi2";
 
 const buttonWidthVariants = {
   open: {
@@ -69,6 +70,8 @@ const sidebarVariants = {
 };
 
 export const Sidebar = () => {
+  const { manuallyCheckAndToggleDialog } = useEditorContext();
+
   const [buttonTransition, setButtonTransition] = useState("closed");
 
   const { updatePageContext, currentPage } = useUpdatePage();
@@ -88,70 +91,70 @@ export const Sidebar = () => {
     setActiveMenu(getMenuTitleByRoute(currentPage));
   }, [currentPage]);
 
-  const { userData, userLoading } = useUser();
+  const { userData } = useUser();
 
   const Menus = userData?.is_superuser
     ? [
-      {
-        title: "Projects",
-        img: HiMiniSquares2X2,
-        route: "/projects",
-        section: "Projects",
-      },
-      { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
-      { title: "Users", img: FaUsers, route: "/users", section: "Users" },
-      { title: "Add user", img: FiUserPlus, route: "/users/add" },
-      {
-        title: `Latest Report`,
-        img: MdOutlineAccessTimeFilled,
-        route: "/reports/current",
-        section: "ARAR",
-      },
+        {
+          title: "Projects",
+          img: HiMiniSquares2X2,
+          route: "/projects",
+          section: "Projects",
+        },
+        { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
+        { title: "Users", img: FaUsers, route: "/users", section: "Users" },
+        { title: "Add user", img: FiUserPlus, route: "/users/add" },
+        {
+          title: `Latest Report`,
+          img: MdOutlineAccessTimeFilled,
+          route: "/reports/current",
+          section: "ARAR",
+        },
 
-      { title: "Reports", img: PiBookOpenTextFill, route: "/reports" },
-      {
-        title: "Quick Guide",
-        img: FaBookBookmark,
-        route: "/guide",
-        section: "Guide",
-      },
-      {
-        title: "Admin",
-        img: RiAdminFill,
-        route: "/crud",
-        section: "Admin",
-      },
-    ]
+        { title: "Reports", img: PiBookOpenTextFill, route: "/reports" },
+        {
+          title: "Quick Guide",
+          img: FaBookBookmark,
+          route: "/guide",
+          section: "Guide",
+        },
+        {
+          title: "Admin",
+          img: RiAdminFill,
+          route: "/crud",
+          section: "Admin",
+        },
+      ]
     : [
-      {
-        title: "Projects",
-        img: AiOutlineFundProjectionScreen,
-        route: "/projects",
-        section: "Projects",
-      },
-      { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
-      { title: "Users", img: ImUsers, route: "/users", section: "Users" },
-      { title: "Add user", img: FiUserPlus, route: "/users/add" },
-      // {
-      //   title: `Latest Report`,
-      //   img: MdOutlineAccessTimeFilled,
-      //   route: "/reports/current",
-      //   section: "ARAR",
-      // },
+        {
+          title: "Projects",
+          img: AiOutlineFundProjectionScreen,
+          route: "/projects",
+          section: "Projects",
+        },
+        { title: "Add Project", img: TbLayoutGridAdd, route: "/projects/add" },
+        { title: "Users", img: ImUsers, route: "/users", section: "Users" },
+        { title: "Add user", img: FiUserPlus, route: "/users/add" },
+        // {
+        //   title: `Latest Report`,
+        //   img: MdOutlineAccessTimeFilled,
+        //   route: "/reports/current",
+        //   section: "ARAR",
+        // },
 
-      {
-        title: "Reports",
-        img: HiDocumentDuplicate,
-        route: "/reports",
-        section: "ARAR",
-      },
-      {
-        title: "Quick Guide",
-        img: SiReadthedocs,
-        route: "/guide",
-        section: "Guide",
-      },
-    ];
+        {
+          title: "Reports",
+          img: HiDocumentDuplicate,
+          route: "/reports",
+          section: "ARAR",
+        },
+        {
+          title: "Quick Guide",
+          img: SiReadthedocs,
+          route: "/guide",
+          section: "Guide",
+        },
+      ];
 
   const handleToggleSidebar = () => {
     setOpen(!open);
@@ -288,22 +291,22 @@ export const Sidebar = () => {
                 colorMode === "light"
                   ? activeMenu === menu.title
                     ? {
-                      color: "white",
-                      bg: "blue.500",
-                    }
+                        color: "white",
+                        bg: "blue.500",
+                      }
                     : {
-                      color: "black",
-                      bg: "gray.100",
-                    }
+                        color: "black",
+                        bg: "gray.100",
+                      }
                   : activeMenu === menu.title
                     ? {
-                      color: "whiteAlpha.800",
-                      bg: "blue.400",
-                    }
+                        color: "whiteAlpha.800",
+                        bg: "blue.400",
+                      }
                     : {
-                      color: "whiteAlpha.800",
-                      bg: "blue.400",
-                    }
+                        color: "whiteAlpha.800",
+                        bg: "blue.400",
+                      }
               }
               onClick={(e) => {
                 if (e.ctrlKey || e.metaKey) {
