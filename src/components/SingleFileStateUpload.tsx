@@ -55,7 +55,7 @@ export const FileDropzone = ({
 
     // Implement compression
     let fileToUpload = acceptedFile[0];
-    const MAX_SIZE_MB = 3;
+    const MAX_SIZE_MB = 2;
     if (fileToUpload.size > MAX_SIZE_MB * 1024 * 1024) {
       console.log(`${fileToUpload.size} size too large compressing`);
       try {
