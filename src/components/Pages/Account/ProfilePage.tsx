@@ -140,6 +140,8 @@ export const ProfilePage = () => {
                   email={me.email}
                   first_name={me.first_name}
                   last_name={me.last_name}
+                  display_first_name={me.display_first_name}
+                  display_last_name={me.display_last_name}
                   is_staff={me.is_staff}
                   is_superuser={me.is_superuser}
                   image={me.image}
@@ -196,8 +198,22 @@ export const ProfilePage = () => {
                 </Flex>
               )}
             </Flex>
+
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
+              {/* REPLACED WITH DISPLAY FIRST_NAME SO OIM SSO STILL WORKS BUT NAMES EDITABLE */}
               <Flex flexDir={"column"}>
+                <Text color={subsectionTitleColor} fontSize={"sm"}>
+                  First Name
+                </Text>
+                <Text>{me.display_first_name}</Text>
+              </Flex>
+              <Flex flexDir={"column"}>
+                <Text color={subsectionTitleColor} fontSize={"sm"}>
+                  Last Name
+                </Text>
+                <Text>{me.display_last_name}</Text>
+              </Flex>
+              {/* <Flex flexDir={"column"}>
                 <Text color={subsectionTitleColor} fontSize={"sm"}>
                   First Name
                 </Text>
@@ -208,7 +224,7 @@ export const ProfilePage = () => {
                   Last Name
                 </Text>
                 <Text>{me.last_name}</Text>
-              </Flex>
+              </Flex> */}
               <Flex flexDir={"column"}>
                 <Text color={subsectionTitleColor} fontSize={"sm"}>
                   Phone
@@ -230,14 +246,14 @@ export const ProfilePage = () => {
                     ? me.title === "mr"
                       ? "Mr."
                       : me.title === "mrs"
-                      ? "Mrs."
-                      : me.title === "ms"
-                      ? "Ms."
-                      : me.title === "master"
-                      ? "Master"
-                      : me.title === "dr"
-                      ? "Dr."
-                      : "Bad Title"
+                        ? "Mrs."
+                        : me.title === "ms"
+                          ? "Ms."
+                          : me.title === "master"
+                            ? "Master"
+                            : me.title === "dr"
+                              ? "Dr."
+                              : "Bad Title"
                     : "--"}
                 </Text>
               </Flex>
@@ -397,8 +413,8 @@ export const ProfilePage = () => {
                   {!me.is_staff
                     ? "External"
                     : me?.agency?.name
-                    ? me.agency.name
-                    : NoDataText}
+                      ? me.agency.name
+                      : NoDataText}
                 </Text>
               </Flex>
               {me.is_staff && (

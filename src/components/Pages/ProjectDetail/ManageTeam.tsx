@@ -42,7 +42,7 @@ export const ManageTeam = ({
   }>({});
 
   const { teamData, isTeamLoading, refetchTeamData } = useProjectTeam(
-    String(project_id)
+    String(project_id),
   );
 
   // useEffect(() => console.log(ba_leader, userData?.pk))
@@ -55,7 +55,7 @@ export const ManageTeam = ({
       const sortedTeam = [...teamData].sort((a, b) => a.position - b.position);
       // Find the leader member (assuming only one member has is_leader === true)
       const leaderMember = sortedTeam.find(
-        (member) => member.is_leader === true
+        (member) => member.is_leader === true,
       );
       if (leaderMember) {
         // Set the leader's pk
@@ -253,7 +253,7 @@ export const ManageTeam = ({
                               key={index}
                               leader_pk={leaderPk}
                               user_id={tm.user.pk}
-                              name={`${tm.user.first_name} ${tm.user.last_name}`}
+                              name={`${tm.user.display_first_name} ${tm.user.display_last_name}`}
                               username={tm.user.username}
                               image={tm.user.image}
                               is_leader={tm.is_leader}

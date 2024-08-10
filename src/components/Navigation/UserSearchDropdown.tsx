@@ -118,7 +118,9 @@ export const UserSearchDropdown = forwardRef(
           setUserEmailFunction(userData.email);
         }
         if (setUserNameFunction) {
-          setUserNameFunction(`${userData.first_name} ${userData.last_name}`);
+          setUserNameFunction(
+            `${userData.display_first_name} ${userData.display_last_name}`,
+          );
         }
         setIsMenuOpen(false);
         setSelectedUser(userData); // Update the selected user
@@ -132,7 +134,9 @@ export const UserSearchDropdown = forwardRef(
         setUserEmailFunction(user.email);
       }
       if (setUserNameFunction) {
-        setUserNameFunction(`${user.first_name} ${user.last_name}`);
+        setUserNameFunction(
+          `${user.display_first_name} ${user.display_last_name}`,
+        );
       }
       setIsMenuOpen(false);
       setSelectedUser(user); // Update the selected user
@@ -347,7 +351,7 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
                 : "gray.400"
           }
         >
-          {`${user.first_name === "None" ? user.username : user.first_name} ${
+          {`${user.display_first_name === "None" ? user.username : user.display_first_name} ${
             user.last_name === "None" ? "" : user.last_name
           } ${
             user.is_staff

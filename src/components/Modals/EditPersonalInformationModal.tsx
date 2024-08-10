@@ -150,8 +150,22 @@ export const EditPersonalInformationModal = ({
   });
 
   // When submitting form - starts the mutation
-  const onSubmit = ({ userPk, title, phone, fax }: IPIUpdateVariables) => {
-    mutation.mutate({ userPk, title, phone, fax });
+  const onSubmit = ({
+    userPk,
+    title,
+    phone,
+    fax,
+    display_first_name,
+    display_last_name,
+  }: IPIUpdateVariables) => {
+    mutation.mutate({
+      userPk,
+      title,
+      phone,
+      fax,
+      display_first_name,
+      display_last_name,
+    });
   };
 
   return (
@@ -294,9 +308,13 @@ export const EditPersonalInformationModal = ({
                   <Input
                     autoComplete="off"
                     type="text"
-                    placeholder={data?.first_name}
-                    value={data?.first_name}
-                    isDisabled={true}
+                    placeholder={data?.display_first_name}
+                    {...register("display_first_name", {
+                      value: data?.display_first_name,
+                    })}
+
+                    // value={data?.first_name}
+                    // isDisabled={true}
                   />
                 </InputGroup>
               </FormControl>
@@ -311,9 +329,13 @@ export const EditPersonalInformationModal = ({
                   <Input
                     autoComplete="off"
                     type="text"
-                    placeholder={data?.last_name}
-                    value={data?.last_name}
-                    isDisabled={true}
+                    placeholder={data?.display_last_name}
+                    {...register("display_last_name", {
+                      value: data?.display_last_name,
+                    })}
+                    // placeholder={data?.last_name}
+                    // value={data?.last_name}
+                    // isDisabled={true}
                   />
                 </InputGroup>
               </FormControl>

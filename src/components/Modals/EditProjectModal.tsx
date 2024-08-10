@@ -1,31 +1,31 @@
 import {
-	Box,
-	Button,
-	Center,
-	Flex,
-	FormControl,
-	FormHelperText,
-	FormLabel,
-	Grid,
-	Icon,
-	InputGroup,
-	InputLeftAddon,
-	Modal,
-	ModalBody,
-	ModalCloseButton,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-	ModalOverlay,
-	Select,
-	Tag,
-	TagCloseButton,
-	TagLabel,
-	Text,
-	ToastId,
-	VisuallyHiddenInput,
-	useColorMode,
-	useToast,
+  Box,
+  Button,
+  Center,
+  Flex,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Grid,
+  Icon,
+  InputGroup,
+  InputLeftAddon,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+  Tag,
+  TagCloseButton,
+  TagLabel,
+  Text,
+  ToastId,
+  VisuallyHiddenInput,
+  useColorMode,
+  useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -37,15 +37,15 @@ import { useBusinessAreas } from "../../lib/hooks/tanstack/useBusinessAreas";
 import { useDepartmentalServices } from "../../lib/hooks/tanstack/useDepartmentalServices";
 import { useGetLocations } from "../../lib/hooks/tanstack/useGetLocations";
 import {
-	IAffiliation,
-	IBusinessArea,
-	IDepartmentalService,
-	IExtendedProjectDetails,
-	IExternalProjectDetails,
-	ISimpleLocationData,
-	ISmallService,
-	IStudentProjectDetails,
-	ProjectImage,
+  IAffiliation,
+  IBusinessArea,
+  IDepartmentalService,
+  IExtendedProjectDetails,
+  IExternalProjectDetails,
+  ISimpleLocationData,
+  ISmallService,
+  IStudentProjectDetails,
+  ProjectImage,
 } from "../../types";
 import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
 import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
@@ -57,484 +57,468 @@ import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStateful
 // import { FaAnglesDown } from "react-icons/fa6";
 
 interface Props {
-	// thisUser: IUserMe;
-	// leaderPk: number;
-	projectPk: string | number;
-	currentTitle: string;
-	currentKeywords: string[];
-	currentDates: Date[];
-	currentBa: IBusinessArea;
-	currentService: ISmallService;
-	currentDataCustodian: number;
-	details: IExtendedProjectDetails | null | undefined;
+  // thisUser: IUserMe;
+  // leaderPk: number;
+  projectPk: string | number;
+  currentTitle: string;
+  currentKeywords: string[];
+  currentDates: Date[];
+  currentBa: IBusinessArea;
+  currentService: ISmallService;
+  currentDataCustodian: number;
+  details: IExtendedProjectDetails | null | undefined;
 
-	isOpen: boolean;
-	onClose: () => void;
-	refetchData: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  refetchData: () => void;
 
-	currentAreas: ISimpleLocationData[];
-	currentImage: ProjectImage;
+  currentAreas: ISimpleLocationData[];
+  currentImage: ProjectImage;
 }
 
 export const EditProjectModal = ({
-	projectPk,
-	currentTitle,
-	currentKeywords,
-	currentDates,
-	currentBa,
-	currentService,
-	currentAreas,
-	currentImage,
-	currentDataCustodian,
-	details,
-	isOpen,
-	onClose,
-	refetchData,
+  projectPk,
+  currentTitle,
+  currentKeywords,
+  currentDates,
+  currentBa,
+  currentService,
+  currentAreas,
+  currentImage,
+  currentDataCustodian,
+  details,
+  isOpen,
+  onClose,
+  refetchData,
 }: Props) => {
-	const { colorMode } = useColorMode();
-	// Function to check if a string contains HTML tags
-	const checkIsHtml = (data) => {
-		const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-		return htmlRegex.test(data);
-	};
+  const { colorMode } = useColorMode();
+  // Function to check if a string contains HTML tags
+  const checkIsHtml = (data) => {
+    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+    return htmlRegex.test(data);
+  };
 
-	// Function to sanitize HTML content and extract text
-	const sanitizeHtml = (htmlString) => {
-		const doc = new DOMParser().parseFromString(htmlString, "text/html");
-		return doc.body.textContent || "";
-	};
-	const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } =
-		useGetLocations();
-	const [locationData, setLocationData] = useState<number[]>(
-		currentAreas.map((area) => area.pk)
-	);
+  // Function to sanitize HTML content and extract text
+  const sanitizeHtml = (htmlString) => {
+    const doc = new DOMParser().parseFromString(htmlString, "text/html");
+    return doc.body.textContent || "";
+  };
+  const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } =
+    useGetLocations();
+  const [locationData, setLocationData] = useState<number[]>(
+    currentAreas.map((area) => area.pk),
+  );
 
-	// useEffect(() => {
-	//   console.log(details);
-	// });
+  // useEffect(() => {
+  //   console.log(details);
+  // });
 
-	useEffect(() => {
-		if (locationData.length === 0) {
-			setLocationData(currentAreas.map((area) => area.pk));
-		}
-	}, []);
+  useEffect(() => {
+    if (locationData.length === 0) {
+      setLocationData(currentAreas.map((area) => area.pk));
+    }
+  }, []);
 
-	const [businessAreaList, setBusinessAreaList] = useState<IBusinessArea[]>(
-		[]
-	);
-	const { baData: businessAreaDataFromAPI, baLoading } = useBusinessAreas();
-	const [baSet, setBaSet] = useState(false);
+  const [businessAreaList, setBusinessAreaList] = useState<IBusinessArea[]>([]);
+  const { baData: businessAreaDataFromAPI, baLoading } = useBusinessAreas();
+  const [baSet, setBaSet] = useState(false);
 
-	useEffect(() => {
-		if (!baLoading && baSet === false) {
-			const alphabetisedBA = [...businessAreaDataFromAPI];
-			alphabetisedBA.sort((a, b) => a.name.localeCompare(b.name));
-			setBusinessAreaList(alphabetisedBA);
-			setBaSet(true);
-		}
-	}, [baLoading, businessAreaDataFromAPI, baSet]);
+  useEffect(() => {
+    if (!baLoading && baSet === false) {
+      const alphabetisedBA = [...businessAreaDataFromAPI];
+      alphabetisedBA.sort((a, b) => a.name.localeCompare(b.name));
+      setBusinessAreaList(alphabetisedBA);
+      setBaSet(true);
+    }
+  }, [baLoading, businessAreaDataFromAPI, baSet]);
 
-	const [servicesList, setServicesList] = useState<IDepartmentalService[]>(
-		[]
-	);
-	const { dsData: servicesDataFromAPI, dsLoading } =
-		useDepartmentalServices();
-	const [dsSet, setDsSet] = useState(false);
-	useEffect(() => {
-		if (!dsLoading && dsSet === false) {
-			const alphabetisedDS = [...servicesDataFromAPI];
-			alphabetisedDS.sort((a, b) => a.name.localeCompare(b.name));
-			setServicesList(alphabetisedDS);
-			setDsSet(true);
-		}
-	}, [dsLoading, servicesDataFromAPI, dsSet]);
+  const [servicesList, setServicesList] = useState<IDepartmentalService[]>([]);
+  const { dsData: servicesDataFromAPI, dsLoading } = useDepartmentalServices();
+  const [dsSet, setDsSet] = useState(false);
+  useEffect(() => {
+    if (!dsLoading && dsSet === false) {
+      const alphabetisedDS = [...servicesDataFromAPI];
+      alphabetisedDS.sort((a, b) => a.name.localeCompare(b.name));
+      setServicesList(alphabetisedDS);
+      setDsSet(true);
+    }
+  }, [dsLoading, servicesDataFromAPI, dsSet]);
 
-	// id/pk
-	const [projectTitle, setProjectTitle] = useState(currentTitle);
+  // id/pk
+  const [projectTitle, setProjectTitle] = useState(currentTitle);
 
-	const [aims, setAims] = useState(
-		(details?.external as IExternalProjectDetails)?.aims
-	);
-	const [externalDescription, setExternalDescription] = useState(
-		(details?.external as IExternalProjectDetails)?.description
-	);
-	const [budget, setBudget] = useState(
-		(details?.external as IExternalProjectDetails)?.budget
-	);
+  const [aims, setAims] = useState(
+    (details?.external as IExternalProjectDetails)?.aims,
+  );
+  const [externalDescription, setExternalDescription] = useState(
+    (details?.external as IExternalProjectDetails)?.description,
+  );
+  const [budget, setBudget] = useState(
+    (details?.external as IExternalProjectDetails)?.budget,
+  );
 
-	const [organisation, setOrganisation] = useState(
-		(details?.student as IStudentProjectDetails)?.organisation
-	);
+  const [organisation, setOrganisation] = useState(
+    (details?.student as IStudentProjectDetails)?.organisation,
+  );
 
-	const [collaborationWith, setCollaborationWith] = useState(
-		(details?.external as IExternalProjectDetails)?.collaboration_with
-	);
+  const [collaborationWith, setCollaborationWith] = useState(
+    (details?.external as IExternalProjectDetails)?.collaboration_with,
+  );
 
-	// const [collaborationWith, setCollaborationWith] = useState<string>("");
+  // const [collaborationWith, setCollaborationWith] = useState<string>("");
 
-	const [collaboratingPartnersArray, setCollaboratingPartnersArray] =
-		useState<IAffiliation[] | null>([]);
+  const [collaboratingPartnersArray, setCollaboratingPartnersArray] = useState<
+    IAffiliation[] | null
+  >([]);
 
-	const addCollaboratingPartnersPkToArray = (affiliation: IAffiliation) => {
-		if (collaborationWith !== undefined) {
-			setCollaborationWith((prevString) => {
-				let updatedString = prevString.trim(); // Remove any leading or trailing spaces
+  const addCollaboratingPartnersPkToArray = (affiliation: IAffiliation) => {
+    if (collaborationWith !== undefined) {
+      setCollaborationWith((prevString) => {
+        let updatedString = prevString.trim(); // Remove any leading or trailing spaces
 
-				// Add a comma and a space if not already present
-				if (updatedString && !/,\s*$/.test(updatedString)) {
-					updatedString += ", ";
-				}
+        // Add a comma and a space if not already present
+        if (updatedString && !/,\s*$/.test(updatedString)) {
+          updatedString += ", ";
+        }
 
-				// Append affiliation name
-				updatedString += affiliation.name.trim();
+        // Append affiliation name
+        updatedString += affiliation.name.trim();
 
-				return updatedString;
-			});
-		}
-		if (organisation !== undefined) {
-			setOrganisation((prevString) => {
-				let updatedString = prevString.trim(); // Remove any leading or trailing spaces
+        return updatedString;
+      });
+    }
+    if (organisation !== undefined) {
+      setOrganisation((prevString) => {
+        let updatedString = prevString.trim(); // Remove any leading or trailing spaces
 
-				// Add a comma and a space if not already present
-				if (updatedString && !/,\s*$/.test(updatedString)) {
-					updatedString += ", ";
-				}
+        // Add a comma and a space if not already present
+        if (updatedString && !/,\s*$/.test(updatedString)) {
+          updatedString += ", ";
+        }
 
-				// Append affiliation name
-				updatedString += affiliation.name.trim();
+        // Append affiliation name
+        updatedString += affiliation.name.trim();
 
-				return updatedString;
-			});
-		}
+        return updatedString;
+      });
+    }
 
-		setCollaboratingPartnersArray((prev) => [...prev, affiliation]);
-	};
+    setCollaboratingPartnersArray((prev) => [...prev, affiliation]);
+  };
 
-	const removeCollaboratingPartnersPkFromArray = (
-		affiliation: IAffiliation
-	) => {
-		// console.log()
-		if (collaborationWith !== undefined) {
-			setCollaborationWith((prevString) => {
-				// const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-				// return prevString.replace(regex, '');
-				// Remove affiliation name along with optional preceding characters
-				const regex = new RegExp(
-					`.{0,2}${affiliation.name.trim()}\\s*`,
-					"g"
-				);
-				let modifiedString = prevString.replace(regex, "");
+  const removeCollaboratingPartnersPkFromArray = (
+    affiliation: IAffiliation,
+  ) => {
+    // console.log()
+    if (collaborationWith !== undefined) {
+      setCollaborationWith((prevString) => {
+        // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
+        // return prevString.replace(regex, '');
+        // Remove affiliation name along with optional preceding characters
+        const regex = new RegExp(`.{0,2}${affiliation.name.trim()}\\s*`, "g");
+        let modifiedString = prevString.replace(regex, "");
 
-				// Check if the first two characters are a space and comma, remove them
-				if (modifiedString?.startsWith(", ")) {
-					modifiedString = modifiedString.substring(2);
-				}
-				console.log("MOD:", modifiedString);
-				return modifiedString;
-			});
-		}
+        // Check if the first two characters are a space and comma, remove them
+        if (modifiedString?.startsWith(", ")) {
+          modifiedString = modifiedString.substring(2);
+        }
+        console.log("MOD:", modifiedString);
+        return modifiedString;
+      });
+    }
 
-		if (organisation !== undefined) {
-			setOrganisation((prevString) => {
-				// const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-				// return prevString.replace(regex, '');
-				// Remove affiliation name along with optional preceding characters
-				const regex = new RegExp(
-					`.{0,2}${affiliation.name.trim()}\\s*`,
-					"g"
-				);
-				let modifiedString = prevString.replace(regex, "");
+    if (organisation !== undefined) {
+      setOrganisation((prevString) => {
+        // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
+        // return prevString.replace(regex, '');
+        // Remove affiliation name along with optional preceding characters
+        const regex = new RegExp(`.{0,2}${affiliation.name.trim()}\\s*`, "g");
+        let modifiedString = prevString.replace(regex, "");
 
-				// Check if the first two characters are a space and comma, remove them
-				if (modifiedString?.startsWith(", ")) {
-					modifiedString = modifiedString.substring(2);
-				}
-				// console.log("MOD:", modifiedString)
-				return modifiedString;
-			});
-		}
-	};
+        // Check if the first two characters are a space and comma, remove them
+        if (modifiedString?.startsWith(", ")) {
+          modifiedString = modifiedString.substring(2);
+        }
+        // console.log("MOD:", modifiedString)
+        return modifiedString;
+      });
+    }
+  };
 
-	// const setCollaborationWith: (value: React.SetStateAction<string>) => void
-	// const setOrganisation: (value: React.SetStateAction<"string">) => void
+  // const setCollaborationWith: (value: React.SetStateAction<string>) => void
+  // const setOrganisation: (value: React.SetStateAction<"string">) => void
 
-	const clearCollaboratingPartnersPkArray = () => {
-		setCollaborationWith("");
-		setOrganisation("");
-		setCollaboratingPartnersArray([]);
-	};
+  const clearCollaboratingPartnersPkArray = () => {
+    setCollaborationWith("");
+    setOrganisation("");
+    setCollaboratingPartnersArray([]);
+  };
 
-	const [level, setLevel] = useState(
-		(details?.student as IStudentProjectDetails)?.level
-	);
-	const [hoveredTitle, setHoveredTitle] = useState(false);
-	const titleBorderColor = `${
-		colorMode === "light"
-			? hoveredTitle
-				? "blackAlpha.300"
-				: "blackAlpha.200"
-			: hoveredTitle
-				? "whiteAlpha.400"
-				: "whiteAlpha.300"
-	}`;
+  const [level, setLevel] = useState(
+    (details?.student as IStudentProjectDetails)?.level,
+  );
+  const [hoveredTitle, setHoveredTitle] = useState(false);
+  const titleBorderColor = `${
+    colorMode === "light"
+      ? hoveredTitle
+        ? "blackAlpha.300"
+        : "blackAlpha.200"
+      : hoveredTitle
+        ? "whiteAlpha.400"
+        : "whiteAlpha.300"
+  }`;
 
-	const [keywords, setKeywords] = useState(currentKeywords);
-	const [startDate, setStartDate] = useState(currentDates[0]);
-	const [endDate, setEndDate] = useState(currentDates[1]);
-	const [businessArea, setBusinessArea] = useState(currentBa);
-	const [service, setService] = useState<
-		ISmallService | IDepartmentalService
-	>(currentService);
-	const [dataCustodian, setDataCustodian] = useState(currentDataCustodian);
+  const [keywords, setKeywords] = useState(currentKeywords);
+  const [startDate, setStartDate] = useState(currentDates[0]);
+  const [endDate, setEndDate] = useState(currentDates[1]);
+  const [businessArea, setBusinessArea] = useState(currentBa);
+  const [service, setService] = useState<ISmallService | IDepartmentalService>(
+    currentService,
+  );
+  const [dataCustodian, setDataCustodian] = useState(currentDataCustodian);
 
-	const [selectedFile, setSelectedFile] = useState<File | null>(null);
-	const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
-		currentImage?.file
-	);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
+    currentImage?.file,
+  );
 
-	const [canUpdate, setCanUpdate] = useState(false);
+  const [canUpdate, setCanUpdate] = useState(false);
 
-	const getPlainTextFromHTML = (htmlString) => {
-		const wrapper = document.createElement("div");
-		wrapper.innerHTML = htmlString;
+  const getPlainTextFromHTML = (htmlString) => {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = htmlString;
 
-		// Find the first 'p' or 'span' tag and get its text content
-		const tag = wrapper.querySelector("p, span");
-		return tag ? tag.textContent : "";
-	};
+    // Find the first 'p' or 'span' tag and get its text content
+    const tag = wrapper.querySelector("p, span");
+    return tag ? tag.textContent : "";
+  };
 
-	useEffect(() => {
-		const plainTitle = getPlainTextFromHTML(projectTitle);
-		if (
-			plainTitle === "" ||
-			plainTitle.length === 0 ||
-			startDate === null ||
-			endDate === null ||
-			startDate === undefined ||
-			endDate === undefined ||
-			startDate > endDate ||
-			!businessArea ||
-			businessArea === null ||
-			businessArea === undefined ||
-			dataCustodian === null ||
-			dataCustodian === 0 ||
-			dataCustodian === undefined ||
-			keywords.length === 0
-		) {
-			setCanUpdate(false);
-		} else {
-			if ((details?.external as IExternalProjectDetails)?.description) {
-				// HANDLE EXTERNAL FIELDS
-				const parser = new DOMParser();
-				const descriptionDoc = parser.parseFromString(
-					externalDescription,
-					"text/html"
-				);
-				const descriptionContent = descriptionDoc.body.textContent;
-				const aimsDoc = parser.parseFromString(aims, "text/html");
-				const aimsContent = aimsDoc.body.textContent;
-				const collaborationDoc = parser.parseFromString(
-					collaborationWith,
-					"text/html"
-				);
-				const collaborationContent = collaborationDoc.body.textContent;
-				// console.log({ budget, collaborationContent, aims, descriptionContent });
+  useEffect(() => {
+    const plainTitle = getPlainTextFromHTML(projectTitle);
+    if (
+      plainTitle === "" ||
+      plainTitle.length === 0 ||
+      startDate === null ||
+      endDate === null ||
+      startDate === undefined ||
+      endDate === undefined ||
+      startDate > endDate ||
+      !businessArea ||
+      businessArea === null ||
+      businessArea === undefined ||
+      dataCustodian === null ||
+      dataCustodian === 0 ||
+      dataCustodian === undefined ||
+      keywords.length === 0
+    ) {
+      setCanUpdate(false);
+    } else {
+      if ((details?.external as IExternalProjectDetails)?.description) {
+        // HANDLE EXTERNAL FIELDS
+        const parser = new DOMParser();
+        const descriptionDoc = parser.parseFromString(
+          externalDescription,
+          "text/html",
+        );
+        const descriptionContent = descriptionDoc.body.textContent;
+        const aimsDoc = parser.parseFromString(aims, "text/html");
+        const aimsContent = aimsDoc.body.textContent;
+        const collaborationDoc = parser.parseFromString(
+          collaborationWith,
+          "text/html",
+        );
+        const collaborationContent = collaborationDoc.body.textContent;
+        // console.log({ budget, collaborationContent, aims, descriptionContent });
 
-				if (
-					descriptionContent.length > 0 &&
-					aimsContent.length > 0 &&
-					collaborationContent.length > 0 &&
-					budget.length > 0
-				) {
-					setCanUpdate(true);
-				} else {
-					setCanUpdate(false);
-				}
-			} else if ((details?.student as IStudentProjectDetails)?.level) {
-				// HANDLE STUDENT FIELDS
-				const parser = new DOMParser();
-				const organisationDoc = parser.parseFromString(
-					organisation,
-					"text/html"
-				);
-				const organisationContent = organisationDoc.body.textContent;
-				// console.log({
-				//   level,
-				//   organisation,
-				//   length: organisationContent.length,
-				// });
+        if (
+          descriptionContent.length > 0 &&
+          aimsContent.length > 0 &&
+          collaborationContent.length > 0 &&
+          budget.length > 0
+        ) {
+          setCanUpdate(true);
+        } else {
+          setCanUpdate(false);
+        }
+      } else if ((details?.student as IStudentProjectDetails)?.level) {
+        // HANDLE STUDENT FIELDS
+        const parser = new DOMParser();
+        const organisationDoc = parser.parseFromString(
+          organisation,
+          "text/html",
+        );
+        const organisationContent = organisationDoc.body.textContent;
+        // console.log({
+        //   level,
+        //   organisation,
+        //   length: organisationContent.length,
+        // });
 
-				if (level && organisationContent.length > 0) {
-					setCanUpdate(true);
-				} else {
-					setCanUpdate(false);
-				}
-			} else {
-				setCanUpdate(true);
-			}
-		}
-	}, [
-		aims,
-		budget,
-		collaborationWith,
-		organisation,
-		level,
-		externalDescription,
-		details,
-		projectTitle,
-		keywords,
-		startDate,
-		endDate,
-		businessArea,
-		service,
-		dataCustodian,
-		locationData,
-		selectedFile,
-		currentImage,
-	]);
+        if (level && organisationContent.length > 0) {
+          setCanUpdate(true);
+        } else {
+          setCanUpdate(false);
+        }
+      } else {
+        setCanUpdate(true);
+      }
+    }
+  }, [
+    aims,
+    budget,
+    collaborationWith,
+    organisation,
+    level,
+    externalDescription,
+    details,
+    projectTitle,
+    keywords,
+    startDate,
+    endDate,
+    businessArea,
+    service,
+    dataCustodian,
+    locationData,
+    selectedFile,
+    currentImage,
+  ]);
 
-	const { register } = useForm<IEditProject>();
-	const queryClient = useQueryClient();
-	const toast = useToast();
-	const toastIdRef = useRef<ToastId>();
-	const addToast = (data) => {
-		toastIdRef.current = toast(data);
-	};
+  const { register } = useForm<IEditProject>();
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const toastIdRef = useRef<ToastId>();
+  const addToast = (data) => {
+    toastIdRef.current = toast(data);
+  };
 
-	const updateProject = async (formData: IEditProject) => {
-		// console.log("updating project");
-		console.log(formData);
-		await updateProjectMutation.mutate(formData);
-	};
+  const updateProject = async (formData: IEditProject) => {
+    // console.log("updating project");
+    console.log(formData);
+    await updateProjectMutation.mutate(formData);
+  };
 
-	const updateProjectMutation = useMutation({
-		mutationFn: updateProjectDetails,
-		onMutate: () => {
-			addToast({
-				status: "loading",
-				title: `Updating Project`,
-				position: "top-right",
-			});
-		},
-		onSuccess: async () => {
-			if (toastIdRef.current) {
-				toast.update(toastIdRef.current, {
-					title: "Success",
-					description: `Project Updated`,
-					status: "success",
-					position: "top-right",
-					duration: 3000,
-					isClosable: true,
-				});
-			}
+  const updateProjectMutation = useMutation({
+    mutationFn: updateProjectDetails,
+    onMutate: () => {
+      addToast({
+        status: "loading",
+        title: `Updating Project`,
+        position: "top-right",
+      });
+    },
+    onSuccess: async () => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: `Project Updated`,
+          status: "success",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
 
-			setTimeout(() => {
-				queryClient.invalidateQueries({
-					queryKey: ["projects", projectPk],
-				});
-				refetchData();
-				onClose();
-			}, 350);
-		},
-		onError: (error) => {
-			if (toastIdRef.current) {
-				toast.update(toastIdRef.current, {
-					title: `Could Not udpate project`,
-					description: `${error}`,
-					status: "error",
-					position: "top-right",
-					duration: 3000,
-					isClosable: true,
-				});
-			}
-		},
-	});
-	const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectPk],
+        });
+        refetchData();
+        onClose();
+      }, 350);
+    },
+    onError: (error) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: `Could Not udpate project`,
+          description: `${error}`,
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
+  const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
 
-	// const arrayRemoveFunction = (affiliation) => {
-	//   setCollaborationWith(prevString => {
-	//     const regex = new RegExp(`.{0,2}${affiliation}\\s*`, 'g');
-	//     return prevString.replace(regex, '');
-	//   });
+  // const arrayRemoveFunction = (affiliation) => {
+  //   setCollaborationWith(prevString => {
+  //     const regex = new RegExp(`.{0,2}${affiliation}\\s*`, 'g');
+  //     return prevString.replace(regex, '');
+  //   });
 
-	// }
+  // }
 
-	// const modalContentRef = useRef<HTMLDivElement>(null);
-	// const updateButtonRef = useRef<HTMLButtonElement>(null);
-	// const [isButtonInView, setIsButtonInView] = useState(false);
-	// const [scrollPosition, setScrollPosition] = useState(0); // State for scroll position
+  // const modalContentRef = useRef<HTMLDivElement>(null);
+  // const updateButtonRef = useRef<HTMLButtonElement>(null);
+  // const [isButtonInView, setIsButtonInView] = useState(false);
+  // const [scrollPosition, setScrollPosition] = useState(0); // State for scroll position
 
-	return (
-		<>
-			<Modal isOpen={isOpen} onClose={onClose} size={"full"}>
-				<ModalOverlay />
-				<ModalContent
-					bg={colorMode === "light" ? "white" : "gray.800"}
-					// ref={modalContentRef}
-				>
-					<ModalHeader>
-						<Flex
-							alignItems={"center"}
-							w={"100%"}
-							justifyContent={"flex-start"}
-						>
-							<Center cursor={"pointer"} pr={4} onClick={onClose}>
-								<Box mr={3}>
-									<FaArrowLeft />
-								</Box>
-								<Text>Go Back</Text>
-							</Center>
-						</Flex>
-					</ModalHeader>
-					<ModalCloseButton />
+  return (
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
+        <ModalOverlay />
+        <ModalContent
+          bg={colorMode === "light" ? "white" : "gray.800"}
+          // ref={modalContentRef}
+        >
+          <ModalHeader>
+            <Flex
+              alignItems={"center"}
+              w={"100%"}
+              justifyContent={"flex-start"}
+            >
+              <Center cursor={"pointer"} pr={4} onClick={onClose}>
+                <Box mr={3}>
+                  <FaArrowLeft />
+                </Box>
+                <Text>Go Back</Text>
+              </Center>
+            </Flex>
+          </ModalHeader>
+          <ModalCloseButton />
 
-					<ModalBody>
-						<VisuallyHiddenInput
-							type="text"
-							placeholder="pk"
-							value={projectPk}
-							readOnly
-						/>
-						<Grid
-							gridTemplateColumns={"repeat(2, 1fr)"}
-							gridGap={8}
-						>
-							<Box>
-								<UnboundStatefulEditor
-									title="Project Title"
-									placeholder="Enter the project't title..."
-									// helperText={"The academic organisation of the student"}
-									showToolbar={true}
-									showTitle={true}
-									isRequired={true}
-									value={projectTitle}
-									setValueFunction={setProjectTitle}
-									setValueAsPlainText={false}
-								/>
-								{(details?.external as IExternalProjectDetails)
-									?.project ? (
-									<Grid
-										gridTemplateColumns={"repeat(1, 1fr)"}
-										gridGap={2}
-										mt={2}
-										pb={2}
-									>
-										<UnboundStatefulEditor
-											title="Description"
-											isRequired={true}
-											helperText={
-												"Description specific to this external project."
-											}
-											showToolbar={true}
-											showTitle={true}
-											value={externalDescription}
-											setValueFunction={
-												setExternalDescription
-											}
-											setValueAsPlainText={false}
-										/>
+          <ModalBody>
+            <VisuallyHiddenInput
+              type="text"
+              placeholder="pk"
+              value={projectPk}
+              readOnly
+            />
+            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
+              <Box>
+                <UnboundStatefulEditor
+                  title="Project Title"
+                  placeholder="Enter the project's title..."
+                  // helperText={"The academic organisation of the student"}
+                  showToolbar={true}
+                  showTitle={true}
+                  isRequired={true}
+                  value={projectTitle}
+                  setValueFunction={setProjectTitle}
+                  setValueAsPlainText={false}
+                />
+                {(details?.external as IExternalProjectDetails)?.project ? (
+                  <Grid
+                    gridTemplateColumns={"repeat(1, 1fr)"}
+                    gridGap={2}
+                    mt={2}
+                    pb={2}
+                  >
+                    <UnboundStatefulEditor
+                      title="Description"
+                      isRequired={true}
+                      helperText={
+                        "Description specific to this external project."
+                      }
+                      showToolbar={true}
+                      showTitle={true}
+                      value={externalDescription}
+                      setValueFunction={setExternalDescription}
+                      setValueAsPlainText={false}
+                    />
 
-										{/* <UnboundStatefulEditor
+                    {/* <UnboundStatefulEditor
                         title="Collaboration With"
                         isRequired={true}
                         placeholder="Enter collaborating entities..."
@@ -547,120 +531,94 @@ export const EditProjectModal = ({
                         setValueFunction={setCollaborationWith}
                         setValueAsPlainText={true}
                       /> */}
-										<AffiliationCreateSearchDropdown
-											autoFocus
-											isRequired
-											isEditable
-											hideTags
-											array={collaboratingPartnersArray}
-											arrayAddFunction={
-												addCollaboratingPartnersPkToArray
-											}
-											arrayRemoveFunction={
-												removeCollaboratingPartnersPkFromArray
-											}
-											arrayClearFunction={
-												clearCollaboratingPartnersPkArray
-											}
-											label="Collaboration With"
-											placeholder="Search for or add a collaboration partner"
-											helperText="The entity/s this project is in collaboration with"
-										/>
+                    <AffiliationCreateSearchDropdown
+                      autoFocus
+                      isRequired
+                      isEditable
+                      hideTags
+                      array={collaboratingPartnersArray}
+                      arrayAddFunction={addCollaboratingPartnersPkToArray}
+                      arrayRemoveFunction={
+                        removeCollaboratingPartnersPkFromArray
+                      }
+                      arrayClearFunction={clearCollaboratingPartnersPkArray}
+                      label="Collaboration With"
+                      placeholder="Search for or add a collaboration partner"
+                      helperText="The entity/s this project is in collaboration with"
+                    />
 
-										<Flex
-											flexWrap="wrap"
-											gap={2}
-											pt={
-												0
-												// collaborationWith?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
-											}
-											pb={2}
-										>
-											{collaborationWith?.length > 0 &&
-												collaborationWith
-													.split(", ")
-													.map((item) => item.trim())
-													?.map((aff, index) => (
-														<Tag
-															key={index}
-															size="md"
-															borderRadius="full"
-															variant="solid"
-															color={"white"}
-															background={
-																colorMode ===
-																"light"
-																	? "blue.500"
-																	: "blue.600"
-															}
-															_hover={{
-																background:
-																	colorMode ===
-																	"light"
-																		? "blue.400"
-																		: "blue.500",
-															}}
-														>
-															<TagLabel pl={1}>
-																{aff}
-															</TagLabel>
-															<TagCloseButton
-																onClick={() => {
-																	setCollaboratingPartnersArray(
-																		[]
-																	);
-																	setCollaborationWith(
-																		(
-																			prevString
-																		) => {
-																			// const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-																			// return prevString.replace(regex, '');
-																			// Remove affiliation name along with optional preceding characters
-																			const regex =
-																				new RegExp(
-																					`.{0,2}${aff}\\s*`,
-																					"g"
-																				);
-																			let modifiedString =
-																				prevString.replace(
-																					regex,
-																					""
-																				);
+                    <Flex
+                      flexWrap="wrap"
+                      gap={2}
+                      pt={
+                        0
+                        // collaborationWith?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
+                      }
+                      pb={2}
+                    >
+                      {collaborationWith?.length > 0 &&
+                        collaborationWith
+                          .split(", ")
+                          .map((item) => item.trim())
+                          ?.map((aff, index) => (
+                            <Tag
+                              key={index}
+                              size="md"
+                              borderRadius="full"
+                              variant="solid"
+                              color={"white"}
+                              background={
+                                colorMode === "light" ? "blue.500" : "blue.600"
+                              }
+                              _hover={{
+                                background:
+                                  colorMode === "light"
+                                    ? "blue.400"
+                                    : "blue.500",
+                              }}
+                            >
+                              <TagLabel pl={1}>{aff}</TagLabel>
+                              <TagCloseButton
+                                onClick={() => {
+                                  setCollaboratingPartnersArray([]);
+                                  setCollaborationWith((prevString) => {
+                                    // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
+                                    // return prevString.replace(regex, '');
+                                    // Remove affiliation name along with optional preceding characters
+                                    const regex = new RegExp(
+                                      `.{0,2}${aff}\\s*`,
+                                      "g",
+                                    );
+                                    let modifiedString = prevString.replace(
+                                      regex,
+                                      "",
+                                    );
 
-																			// Check if the first two characters are a space and comma, remove them
-																			if (
-																				modifiedString?.startsWith(
-																					", "
-																				)
-																			) {
-																				modifiedString =
-																					modifiedString.substring(
-																						2
-																					);
-																			}
-																			// console.log("MOD:", modifiedString)
-																			return modifiedString;
-																		}
-																	);
-																}}
-																userSelect={
-																	"none"
-																}
-																tabIndex={-1}
-															/>
-														</Tag>
-													))}
-										</Flex>
-									</Grid>
-								) : (details?.student as IStudentProjectDetails)
-										?.organisation ? (
-									<Grid
-										gridTemplateColumns={"repeat(1, 1fr)"}
-										gridGap={2}
-										mt={2}
-										pb={2}
-									>
-										{/* <UnboundStatefulEditor
+                                    // Check if the first two characters are a space and comma, remove them
+                                    if (modifiedString?.startsWith(", ")) {
+                                      modifiedString =
+                                        modifiedString.substring(2);
+                                    }
+                                    // console.log("MOD:", modifiedString)
+                                    return modifiedString;
+                                  });
+                                }}
+                                userSelect={"none"}
+                                tabIndex={-1}
+                              />
+                            </Tag>
+                          ))}
+                    </Flex>
+                  </Grid>
+                ) : (details?.student as IStudentProjectDetails)
+                    ?.organisation ? (
+                  <Grid
+                    gridTemplateColumns={"repeat(1, 1fr)"}
+                    gridGap={2}
+                    mt={2}
+                    pb={2}
+                  >
+                    {/* <UnboundStatefulEditor
                         title="Organisation"
                         placeholder="Enter the academic organisation..."
                         helperText={"The academic organisation of the student"}
@@ -671,434 +629,294 @@ export const EditProjectModal = ({
                         setValueFunction={setOrganisation}
                         setValueAsPlainText={true}
                       /> */}
-										<AffiliationCreateSearchDropdown
-											autoFocus
-											isRequired
-											isEditable
-											hideTags
-											array={collaboratingPartnersArray}
-											arrayAddFunction={
-												addCollaboratingPartnersPkToArray
-											}
-											arrayRemoveFunction={
-												removeCollaboratingPartnersPkFromArray
-											}
-											arrayClearFunction={
-												clearCollaboratingPartnersPkArray
-											}
-											label="Collaboration With"
-											placeholder="Search for or add a collaboration partner"
-											helperText="The entity/s this project is in collaboration with"
-										/>
+                    <AffiliationCreateSearchDropdown
+                      autoFocus
+                      isRequired
+                      isEditable
+                      hideTags
+                      array={collaboratingPartnersArray}
+                      arrayAddFunction={addCollaboratingPartnersPkToArray}
+                      arrayRemoveFunction={
+                        removeCollaboratingPartnersPkFromArray
+                      }
+                      arrayClearFunction={clearCollaboratingPartnersPkArray}
+                      label="Collaboration With"
+                      placeholder="Search for or add a collaboration partner"
+                      helperText="The entity/s this project is in collaboration with"
+                    />
 
-										<Flex
-											flexWrap="wrap"
-											gap={2}
-											pt={
-												0
-												// organisation?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
-											}
-											pb={2}
-										>
-											{organisation?.length > 0 &&
-												organisation
-													.split(", ")
-													.map((item) => item.trim())
-													?.map((aff, index) => (
-														<Tag
-															key={index}
-															size="md"
-															borderRadius="full"
-															variant="solid"
-															color={"white"}
-															background={
-																colorMode ===
-																"light"
-																	? "blue.500"
-																	: "blue.600"
-															}
-															_hover={{
-																background:
-																	colorMode ===
-																	"light"
-																		? "blue.400"
-																		: "blue.500",
-															}}
-														>
-															<TagLabel pl={1}>
-																{aff}
-															</TagLabel>
-															<TagCloseButton
-																onClick={() => {
-																	setCollaboratingPartnersArray(
-																		[]
-																	);
-																	if (
-																		collaborationWith !==
-																		undefined
-																	) {
-																		setCollaborationWith(
-																			(
-																				prevString
-																			) => {
-																				// const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-																				// return prevString.replace(regex, '');
-																				// Remove affiliation name along with optional preceding characters
-																				const regex =
-																					new RegExp(
-																						`.{0,2}${aff}\\s*`,
-																						"g"
-																					);
-																				let modifiedString =
-																					prevString.replace(
-																						regex,
-																						""
-																					);
+                    <Flex
+                      flexWrap="wrap"
+                      gap={2}
+                      pt={
+                        0
+                        // organisation?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
+                      }
+                      pb={2}
+                    >
+                      {organisation?.length > 0 &&
+                        organisation
+                          .split(", ")
+                          .map((item) => item.trim())
+                          ?.map((aff, index) => (
+                            <Tag
+                              key={index}
+                              size="md"
+                              borderRadius="full"
+                              variant="solid"
+                              color={"white"}
+                              background={
+                                colorMode === "light" ? "blue.500" : "blue.600"
+                              }
+                              _hover={{
+                                background:
+                                  colorMode === "light"
+                                    ? "blue.400"
+                                    : "blue.500",
+                              }}
+                            >
+                              <TagLabel pl={1}>{aff}</TagLabel>
+                              <TagCloseButton
+                                onClick={() => {
+                                  setCollaboratingPartnersArray([]);
+                                  if (collaborationWith !== undefined) {
+                                    setCollaborationWith((prevString) => {
+                                      // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
+                                      // return prevString.replace(regex, '');
+                                      // Remove affiliation name along with optional preceding characters
+                                      const regex = new RegExp(
+                                        `.{0,2}${aff}\\s*`,
+                                        "g",
+                                      );
+                                      let modifiedString = prevString.replace(
+                                        regex,
+                                        "",
+                                      );
 
-																				// Check if the first two characters are a space and comma, remove them
-																				if (
-																					modifiedString?.startsWith(
-																						", "
-																					)
-																				) {
-																					modifiedString =
-																						modifiedString.substring(
-																							2
-																						);
-																				}
-																				// console.log("MOD:", modifiedString)
-																				return modifiedString;
-																			}
-																		);
-																	}
+                                      // Check if the first two characters are a space and comma, remove them
+                                      if (modifiedString?.startsWith(", ")) {
+                                        modifiedString =
+                                          modifiedString.substring(2);
+                                      }
+                                      // console.log("MOD:", modifiedString)
+                                      return modifiedString;
+                                    });
+                                  }
 
-																	if (
-																		organisation !==
-																		undefined
-																	) {
-																		setOrganisation(
-																			(
-																				prevString
-																			) => {
-																				// const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-																				// return prevString.replace(regex, '');
-																				// Remove affiliation name along with optional preceding characters
-																				const regex =
-																					new RegExp(
-																						`.{0,2}${aff}\\s*`,
-																						"g"
-																					);
-																				let modifiedString =
-																					prevString.replace(
-																						regex,
-																						""
-																					);
+                                  if (organisation !== undefined) {
+                                    setOrganisation((prevString) => {
+                                      // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
+                                      // return prevString.replace(regex, '');
+                                      // Remove affiliation name along with optional preceding characters
+                                      const regex = new RegExp(
+                                        `.{0,2}${aff}\\s*`,
+                                        "g",
+                                      );
+                                      let modifiedString = prevString.replace(
+                                        regex,
+                                        "",
+                                      );
 
-																				// Check if the first two characters are a space and comma, remove them
-																				if (
-																					modifiedString?.startsWith(
-																						", "
-																					)
-																				) {
-																					modifiedString =
-																						modifiedString.substring(
-																							2
-																						);
-																				}
-																				// console.log("MOD:", modifiedString)
-																				return modifiedString;
-																			}
-																		);
-																	}
-																}}
-																userSelect={
-																	"none"
-																}
-																tabIndex={-1}
-															/>
-														</Tag>
-													))}
-										</Flex>
-									</Grid>
-								) : null}
+                                      // Check if the first two characters are a space and comma, remove them
+                                      if (modifiedString?.startsWith(", ")) {
+                                        modifiedString =
+                                          modifiedString.substring(2);
+                                      }
+                                      // console.log("MOD:", modifiedString)
+                                      return modifiedString;
+                                    });
+                                  }
+                                }}
+                                userSelect={"none"}
+                                tabIndex={-1}
+                              />
+                            </Tag>
+                          ))}
+                    </Flex>
+                  </Grid>
+                ) : null}
 
-								<Box w={"100%"} h={"100%"} mt={2} mx={2}>
-									<StartAndEndDateSelector
-										startDate={startDate}
-										endDate={endDate}
-										setStartDate={setStartDate}
-										setEndDate={setEndDate}
-										helperText={
-											"These can be changed at any time"
-										}
-									/>
+                <Box w={"100%"} h={"100%"} mt={2} mx={2}>
+                  <StartAndEndDateSelector
+                    startDate={startDate}
+                    endDate={endDate}
+                    setStartDate={setStartDate}
+                    setEndDate={setEndDate}
+                    helperText={"These can be changed at any time"}
+                  />
 
-									<StatefulMediaChanger
-										helperText={
-											"Upload an image that represents the project."
-										}
-										selectedImageUrl={selectedImageUrl}
-										setSelectedImageUrl={
-											setSelectedImageUrl
-										}
-										selectedFile={selectedFile}
-										setSelectedFile={setSelectedFile}
-									/>
-								</Box>
-							</Box>
+                  <StatefulMediaChanger
+                    helperText={"Upload an image that represents the project."}
+                    selectedImageUrl={selectedImageUrl}
+                    setSelectedImageUrl={setSelectedImageUrl}
+                    selectedFile={selectedFile}
+                    setSelectedFile={setSelectedFile}
+                  />
+                </Box>
+              </Box>
 
-							<Flex flexDir={"column"}>
-								<TagInput
-									setTagFunction={setKeywords}
-									preExistingTags={keywords}
-								/>
+              <Flex flexDir={"column"}>
+                <TagInput
+                  setTagFunction={setKeywords}
+                  preExistingTags={keywords}
+                />
 
-								{(details?.external as IExternalProjectDetails)
-									.project ? (
-									<Grid
-										gridTemplateColumns={"repeat(1, 1fr)"}
-										gridGap={2}
-										mt={2}
-										pb={2}
-									>
-										<UnboundStatefulEditor
-											title="Aims"
-											value={aims}
-											allowInsertButton
-											helperText={
-												"List out the aims of your project."
-											}
-											showToolbar={true}
-											showTitle={true}
-											isRequired={true}
-											setValueFunction={setAims}
-											setValueAsPlainText={false}
-										/>
-										<UnboundStatefulEditor
-											title="Budget"
-											isRequired={true}
-											placeholder="The estimated operating budget in dollars..."
-											helperText={
-												"The estimated budget for the project in dollars"
-											}
-											showToolbar={false}
-											showTitle={true}
-											value={budget}
-											setValueFunction={setBudget}
-											setValueAsPlainText={true}
-										/>
-									</Grid>
-								) : (details?.student as IStudentProjectDetails)
-										?.level ? (
-									<Grid
-										gridTemplateColumns={"repeat(1, 1fr)"}
-										gridGap={2}
-										mt={6}
-										pb={6}
-									>
-										<FormControl
-											isRequired
-											userSelect={"none"}
-										>
-											<FormLabel
-												onMouseEnter={() =>
-													setHoveredTitle(true)
-												}
-												onMouseLeave={() =>
-													setHoveredTitle(false)
-												}
-											>
-												Level
-											</FormLabel>
-											<InputGroup>
-												<InputLeftAddon
-													left={0}
-													bg={
-														colorMode === "light"
-															? "gray.100"
-															: "whiteAlpha.300"
-													}
-													px={4}
-													zIndex={1}
-													borderColor={
-														titleBorderColor
-													}
-													borderTopRightRadius={
-														"none"
-													}
-													borderBottomRightRadius={
-														"none"
-													}
-													borderRight={"none"}
-													// boxSize={10}
-												>
-													<Icon
-														as={HiAcademicCap}
-														boxSize={5}
-													/>
-												</InputLeftAddon>
+                {(details?.external as IExternalProjectDetails).project ? (
+                  <Grid
+                    gridTemplateColumns={"repeat(1, 1fr)"}
+                    gridGap={2}
+                    mt={2}
+                    pb={2}
+                  >
+                    <UnboundStatefulEditor
+                      title="Aims"
+                      value={aims}
+                      allowInsertButton
+                      helperText={"List out the aims of your project."}
+                      showToolbar={true}
+                      showTitle={true}
+                      isRequired={true}
+                      setValueFunction={setAims}
+                      setValueAsPlainText={false}
+                    />
+                    <UnboundStatefulEditor
+                      title="Budget"
+                      isRequired={true}
+                      placeholder="The estimated operating budget in dollars..."
+                      helperText={
+                        "The estimated budget for the project in dollars"
+                      }
+                      showToolbar={false}
+                      showTitle={true}
+                      value={budget}
+                      setValueFunction={setBudget}
+                      setValueAsPlainText={true}
+                    />
+                  </Grid>
+                ) : (details?.student as IStudentProjectDetails)?.level ? (
+                  <Grid
+                    gridTemplateColumns={"repeat(1, 1fr)"}
+                    gridGap={2}
+                    mt={6}
+                    pb={6}
+                  >
+                    <FormControl isRequired userSelect={"none"}>
+                      <FormLabel
+                        onMouseEnter={() => setHoveredTitle(true)}
+                        onMouseLeave={() => setHoveredTitle(false)}
+                      >
+                        Level
+                      </FormLabel>
+                      <InputGroup>
+                        <InputLeftAddon
+                          left={0}
+                          bg={
+                            colorMode === "light"
+                              ? "gray.100"
+                              : "whiteAlpha.300"
+                          }
+                          px={4}
+                          zIndex={1}
+                          borderColor={titleBorderColor}
+                          borderTopRightRadius={"none"}
+                          borderBottomRightRadius={"none"}
+                          borderRight={"none"}
+                          // boxSize={10}
+                        >
+                          <Icon as={HiAcademicCap} boxSize={5} />
+                        </InputLeftAddon>
 
-												<Select
-													placeholder={
-														"Select a level"
-													}
-													borderLeft={"none"}
-													borderTopLeftRadius={"none"}
-													borderBottomLeftRadius={
-														"none"
-													}
-													pl={"2px"}
-													borderLeftColor={
-														"transparent"
-													}
-													onMouseEnter={() =>
-														setHoveredTitle(true)
-													}
-													onMouseLeave={() =>
-														setHoveredTitle(false)
-													}
-													// {...register("title", {
-													//     value: data?.title,
-													// })}
-													onChange={(e) => {
-														setLevel(
-															e.target.value
-														);
-													}}
-													value={level}
-												>
-													<option value="phd">
-														PhD
-													</option>
-													<option value="msc">
-														MSc
-													</option>
-													<option value="honours">
-														BSc Honours
-													</option>
-													<option value="fourth_year">
-														Fourth Year
-													</option>
-													<option value="third_year">
-														Third Year
-													</option>
-													<option value="undergrad">
-														Undergradate
-													</option>
-												</Select>
-											</InputGroup>
+                        <Select
+                          placeholder={"Select a level"}
+                          borderLeft={"none"}
+                          borderTopLeftRadius={"none"}
+                          borderBottomLeftRadius={"none"}
+                          pl={"2px"}
+                          borderLeftColor={"transparent"}
+                          onMouseEnter={() => setHoveredTitle(true)}
+                          onMouseLeave={() => setHoveredTitle(false)}
+                          // {...register("title", {
+                          //     value: data?.title,
+                          // })}
+                          onChange={(e) => {
+                            setLevel(e.target.value);
+                          }}
+                          value={level}
+                        >
+                          <option value="phd">PhD</option>
+                          <option value="msc">MSc</option>
+                          <option value="honours">BSc Honours</option>
+                          <option value="fourth_year">Fourth Year</option>
+                          <option value="third_year">Third Year</option>
+                          <option value="undergrad">Undergradate</option>
+                        </Select>
+                      </InputGroup>
 
-											<FormHelperText>
-												The level of the student and the
-												project
-											</FormHelperText>
-										</FormControl>
-									</Grid>
-								) : null}
+                      <FormHelperText>
+                        The level of the student and the project
+                      </FormHelperText>
+                    </FormControl>
+                  </Grid>
+                ) : null}
 
-								<Box py={2}>
-									<UserSearchDropdown
-										{...register("dataCustodian", {
-											required: true,
-										})}
-										onlyInternal={false}
-										isRequired={true}
-										setUserFunction={setDataCustodian}
-										isEditable
-										preselectedUserPk={currentDataCustodian}
-										label="Data Custodian"
-										placeholder="Search for a user"
-										helperText={
-											"The user you would like to handle data."
-										}
-									/>
-								</Box>
+                <Box py={2}>
+                  <UserSearchDropdown
+                    {...register("dataCustodian", {
+                      required: true,
+                    })}
+                    onlyInternal={false}
+                    isRequired={true}
+                    setUserFunction={setDataCustodian}
+                    isEditable
+                    preselectedUserPk={currentDataCustodian}
+                    label="Data Custodian"
+                    placeholder="Search for a user"
+                    helperText={"The user you would like to handle data."}
+                  />
+                </Box>
 
-								{!baLoading && baSet && (
-									<>
-										<FormControl isRequired>
-											<FormLabel>Business Area</FormLabel>
+                {!baLoading && baSet && (
+                  <>
+                    <FormControl isRequired>
+                      <FormLabel>Business Area</FormLabel>
 
-											<InputGroup>
-												<Select
-													variant="filled"
-													placeholder="Select a Business Area"
-													onChange={(event) => {
-														const pkVal =
-															event.target.value;
-														const relatedBa =
-															businessAreaList.find(
-																(ba) =>
-																	Number(
-																		ba.pk
-																	) ===
-																	Number(
-																		pkVal
-																	)
-															);
-														if (
-															relatedBa !==
-															undefined
-														) {
-															setBusinessArea(
-																relatedBa
-															);
-														}
-													}}
-													value={businessArea?.pk}
-												>
-													{orderedDivisionSlugs.flatMap(
-														(divSlug) => {
-															// Filter business areas for the current division
-															const divisionBusinessAreas =
-																businessAreaList
-																	.filter(
-																		(ba) =>
-																			ba
-																				.division
-																				.slug ===
-																				divSlug &&
-																			ba.is_active
-																	)
-																	.sort(
-																		(
-																			a,
-																			b
-																		) =>
-																			a.name.localeCompare(
-																				b.name
-																			)
-																	);
+                      <InputGroup>
+                        <Select
+                          variant="filled"
+                          placeholder="Select a Business Area"
+                          onChange={(event) => {
+                            const pkVal = event.target.value;
+                            const relatedBa = businessAreaList.find(
+                              (ba) => Number(ba.pk) === Number(pkVal),
+                            );
+                            if (relatedBa !== undefined) {
+                              setBusinessArea(relatedBa);
+                            }
+                          }}
+                          value={businessArea?.pk}
+                        >
+                          {orderedDivisionSlugs.flatMap((divSlug) => {
+                            // Filter business areas for the current division
+                            const divisionBusinessAreas = businessAreaList
+                              .filter(
+                                (ba) =>
+                                  ba.division.slug === divSlug && ba.is_active,
+                              )
+                              .sort((a, b) => a.name.localeCompare(b.name));
 
-															return divisionBusinessAreas.map(
-																(ba, index) => (
-																	<option
-																		key={`${ba.name}${index}`}
-																		value={
-																			ba.pk
-																		}
-																	>
-																		{ba?.division
-																			? `[${ba?.division?.slug}] `
-																			: ""}
-																		{checkIsHtml(
-																			ba.name
-																		)
-																			? sanitizeHtml(
-																					ba.name
-																				)
-																			: ba.name}{" "}
-																		{ba.is_active
-																			? ""
-																			: "(INACTIVE)"}
-																	</option>
-																)
-															);
-														}
-													)}
-												</Select>
+                            return divisionBusinessAreas.map((ba, index) => (
+                              <option key={`${ba.name}${index}`} value={ba.pk}>
+                                {ba?.division ? `[${ba?.division?.slug}] ` : ""}
+                                {checkIsHtml(ba.name)
+                                  ? sanitizeHtml(ba.name)
+                                  : ba.name}{" "}
+                                {ba.is_active ? "" : "(INACTIVE)"}
+                              </option>
+                            ));
+                          })}
+                        </Select>
 
-												{/* <Select
+                        {/* <Select
                             variant="filled"
                             placeholder="Select a Business Area"
                             onChange={(event) => {
@@ -1139,252 +957,176 @@ export const EditProjectModal = ({
                               );
                             })}
                           </Select> */}
-											</InputGroup>
-											<FormHelperText>
-												The Business Area / Program that
-												this project belongs to. Only
-												active Business Areas are
-												selectable.
-											</FormHelperText>
-											{!businessArea && (
-												<Text
-													color={"red.500"}
-													fontWeight={"semibold"}
-													mb={4}
-												>
-													No Business Area has been
-													selected!
-												</Text>
-											)}
-										</FormControl>
+                      </InputGroup>
+                      <FormHelperText>
+                        The Business Area / Program that this project belongs
+                        to. Only active Business Areas are selectable.
+                      </FormHelperText>
+                      {!businessArea && (
+                        <Text color={"red.500"} fontWeight={"semibold"} mb={4}>
+                          No Business Area has been selected!
+                        </Text>
+                      )}
+                    </FormControl>
 
-										<FormControl mb={4}>
-											<FormLabel>
-												Departmental Service
-											</FormLabel>
-											<InputGroup>
-												<Select
-													variant="filled"
-													placeholder="Select a Departmental Service"
-													onChange={(event) => {
-														const pkVal =
-															event.target.value;
-														const depService =
-															servicesList.find(
-																(serv) =>
-																	Number(
-																		serv.pk
-																	) ===
-																	Number(
-																		pkVal
-																	)
-															);
-														if (
-															depService !==
-															undefined
-														) {
-															setService(
-																depService
-															);
-														}
-													}}
-													value={service?.pk}
-												>
-													{servicesList.map(
-														(service, index) => {
-															const checkIsHtml =
-																(
-																	data: string
-																) => {
-																	// Regular expression to check for HTML tags
-																	const htmlRegex =
-																		/<\/?[a-z][\s\S]*>/i;
+                    <FormControl mb={4}>
+                      <FormLabel>Departmental Service</FormLabel>
+                      <InputGroup>
+                        <Select
+                          variant="filled"
+                          placeholder="Select a Departmental Service"
+                          onChange={(event) => {
+                            const pkVal = event.target.value;
+                            const depService = servicesList.find(
+                              (serv) => Number(serv.pk) === Number(pkVal),
+                            );
+                            if (depService !== undefined) {
+                              setService(depService);
+                            }
+                          }}
+                          value={service?.pk}
+                        >
+                          {servicesList.map((service, index) => {
+                            const checkIsHtml = (data: string) => {
+                              // Regular expression to check for HTML tags
+                              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
 
-																	// Check if the string contains any HTML tags
-																	return htmlRegex.test(
-																		data
-																	);
-																};
+                              // Check if the string contains any HTML tags
+                              return htmlRegex.test(data);
+                            };
 
-															const isHtml =
-																checkIsHtml(
-																	service.name
-																);
-															let serviceName =
-																service?.name;
-															if (
-																isHtml === true
-															) {
-																const parser =
-																	new DOMParser();
-																const dom =
-																	parser.parseFromString(
-																		service.name,
-																		"text/html"
-																	);
-																const content =
-																	dom.body
-																		.textContent;
-																serviceName =
-																	content;
-															}
+                            const isHtml = checkIsHtml(service.name);
+                            let serviceName = service?.name;
+                            if (isHtml === true) {
+                              const parser = new DOMParser();
+                              const dom = parser.parseFromString(
+                                service.name,
+                                "text/html",
+                              );
+                              const content = dom.body.textContent;
+                              serviceName = content;
+                            }
 
-															return (
-																<option
-																	key={index}
-																	value={
-																		service.pk
-																	}
-																>
-																	{
-																		serviceName
-																	}
-																</option>
-															);
-														}
-													)}
-												</Select>
-											</InputGroup>
-											<FormHelperText>
-												The DBCA service that this
-												project delivers outputs to.
-											</FormHelperText>
-										</FormControl>
-									</>
-								)}
-							</Flex>
-						</Grid>
+                            return (
+                              <option key={index} value={service.pk}>
+                                {serviceName}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                      </InputGroup>
+                      <FormHelperText>
+                        The DBCA service that this project delivers outputs to.
+                      </FormHelperText>
+                    </FormControl>
+                  </>
+                )}
+              </Flex>
+            </Grid>
 
-						<Grid
-							gridTemplateColumns={"repeat(1, 1fr)"}
-							gridGap={4}
-							mt={4}
-						>
-							{!locationsLoading && (
-								<>
-									<Grid
-										gridTemplateColumns={"repeat(2, 1fr)"}
-										gridColumnGap={4}
-										px={4}
-										w={"100%"}
-									>
-										{dbcaDistricts &&
-											dbcaDistricts.length > 0 && (
-												<AreaCheckAndMaps
-													title="DBCA Districts"
-													areas={dbcaDistricts}
-													// required={false}
-													selectedAreas={locationData}
-													setSelectedAreas={
-														setLocationData
-													}
-												/>
-											)}
+            <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4} mt={4}>
+              {!locationsLoading && (
+                <>
+                  <Grid
+                    gridTemplateColumns={"repeat(2, 1fr)"}
+                    gridColumnGap={4}
+                    px={4}
+                    w={"100%"}
+                  >
+                    {dbcaDistricts && dbcaDistricts.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="DBCA Districts"
+                        areas={dbcaDistricts}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
 
-										{imcra && imcra.length > 0 && (
-											<AreaCheckAndMaps
-												title="IMCRAs"
-												areas={imcra}
-												// required={false}
-												selectedAreas={locationData}
-												setSelectedAreas={
-													setLocationData
-												}
-											/>
-										)}
-										{dbcaRegions &&
-											dbcaRegions.length > 0 && (
-												<AreaCheckAndMaps
-													title="DBCA Regions"
-													areas={dbcaRegions}
-													// required={false}
-													selectedAreas={locationData}
-													setSelectedAreas={
-														setLocationData
-													}
-												/>
-											)}
-										{nrm && nrm.length > 0 && (
-											<AreaCheckAndMaps
-												title="Natural Resource Management Regions"
-												areas={nrm}
-												// required={false}
-												selectedAreas={locationData}
-												setSelectedAreas={
-													setLocationData
-												}
-											/>
-										)}
-										{ibra && ibra.length > 0 && (
-											<AreaCheckAndMaps
-												title="IBRAs"
-												areas={ibra}
-												// required={false}
-												selectedAreas={locationData}
-												setSelectedAreas={
-													setLocationData
-												}
-											/>
-										)}
-									</Grid>
-								</>
-							)}
-						</Grid>
-					</ModalBody>
-					<ModalFooter>
-						<Grid
-							gridTemplateColumns={"repeat(2, 1fr)"}
-							gridGap={4}
-						>
-							<Button colorScheme="gray" onClick={onClose}>
-								Cancel
-							</Button>
-							<Button
-								// ref={updateButtonRef}
-								color={"white"}
-								background={
-									colorMode === "light"
-										? "green.500"
-										: "green.600"
-								}
-								_hover={{
-									background:
-										colorMode === "light"
-											? "green.400"
-											: "green.500",
-								}}
-								isLoading={updateProjectMutation.isPending}
-								type="submit"
-								ml={3}
-								isDisabled={!canUpdate}
-								onClick={async () => {
-									updateProject({
-										projectPk: projectPk,
-										title: projectTitle,
-										image: selectedFile,
-										dataCustodian: dataCustodian,
-										keywords: keywords,
-										startDate: startDate,
-										endDate: endDate,
-										departmentalService: service?.pk,
-										businessArea: businessArea?.pk,
-										locations: locationData,
-										selectedImageUrl: selectedImageUrl,
-										externalDescription:
-											externalDescription,
-										aims: aims,
-										budget: budget,
-										collaborationWith: collaborationWith,
-										level: level,
-										organisation: organisation,
-									});
-								}}
-							>
-								Update
-							</Button>
-						</Grid>
-					</ModalFooter>
-					{/* {
+                    {imcra && imcra.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="IMCRAs"
+                        areas={imcra}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
+                    {dbcaRegions && dbcaRegions.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="DBCA Regions"
+                        areas={dbcaRegions}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
+                    {nrm && nrm.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="Natural Resource Management Regions"
+                        areas={nrm}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
+                    {ibra && ibra.length > 0 && (
+                      <AreaCheckAndMaps
+                        title="IBRAs"
+                        areas={ibra}
+                        // required={false}
+                        selectedAreas={locationData}
+                        setSelectedAreas={setLocationData}
+                      />
+                    )}
+                  </Grid>
+                </>
+              )}
+            </Grid>
+          </ModalBody>
+          <ModalFooter>
+            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
+              <Button colorScheme="gray" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                // ref={updateButtonRef}
+                color={"white"}
+                background={colorMode === "light" ? "green.500" : "green.600"}
+                _hover={{
+                  background: colorMode === "light" ? "green.400" : "green.500",
+                }}
+                isLoading={updateProjectMutation.isPending}
+                type="submit"
+                ml={3}
+                isDisabled={!canUpdate}
+                onClick={async () => {
+                  updateProject({
+                    projectPk: projectPk,
+                    title: projectTitle,
+                    image: selectedFile,
+                    dataCustodian: dataCustodian,
+                    keywords: keywords,
+                    startDate: startDate,
+                    endDate: endDate,
+                    departmentalService: service?.pk,
+                    businessArea: businessArea?.pk,
+                    locations: locationData,
+                    selectedImageUrl: selectedImageUrl,
+                    externalDescription: externalDescription,
+                    aims: aims,
+                    budget: budget,
+                    collaborationWith: collaborationWith,
+                    level: level,
+                    organisation: organisation,
+                  });
+                }}
+              >
+                Update
+              </Button>
+            </Grid>
+          </ModalFooter>
+          {/* {
             isButtonInView ? (
               <Flex
                 pos={"sticky"}
@@ -1408,8 +1150,8 @@ export const EditProjectModal = ({
               </Flex>
             ) : null
           } */}
-				</ModalContent>
-			</Modal>
-		</>
-	);
+        </ModalContent>
+      </Modal>
+    </>
+  );
 };

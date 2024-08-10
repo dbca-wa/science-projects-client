@@ -239,6 +239,8 @@ export interface IUserData {
   pk: number;
   username: string;
   email: string;
+  display_first_name: string;
+  display_last_name: string;
   first_name: string;
   last_name: string;
   is_superuser: boolean;
@@ -256,6 +258,8 @@ export interface IUserData {
 export interface IUserMe {
   id?: number;
   pk?: number;
+  display_first_name: string;
+  display_last_name: string;
   about: string;
   agency: IAgency;
   branch: IBranch;
@@ -288,6 +292,8 @@ export interface IMemberUserDetails {
   is_staff: boolean;
   is_superuser: boolean;
   username: string | null;
+  display_first_name: string | null;
+  display_last_name: string | null;
   first_name: string | null;
   last_name: string | null;
   email: string;
@@ -298,6 +304,8 @@ export interface IMemberUserDetails {
 }
 
 export interface IPersonalInformation {
+  display_first_name: string | null;
+  display_last_name: string | null;
   first_name: string;
   last_name: string;
   email: string;
