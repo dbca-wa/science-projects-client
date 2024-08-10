@@ -173,8 +173,52 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Enabled updating first and last name to allow for special
+              characters - this will reflect throughout the app, on the Annual
+              Report and Project Documents
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Pressing back (on the browser) after changing a tab on a
+              project document will go back to the previous tab if there is one
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Allowed duplicate project names
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Removed "DUPLICATE" from some project titles
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
               Update: Added referenced Science Implementation document to create
               project page
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Display rich text of projects on project overview and
+              search
             </ListItem>
             <ListItem
               fontSize={"small"}
