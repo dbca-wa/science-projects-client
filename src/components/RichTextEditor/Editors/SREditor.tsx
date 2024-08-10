@@ -67,7 +67,7 @@ const SRProjDetails = ({ project, team_members }: ISRProjDetails) => {
       .filter((member: IProjectMember) => member.role === role)
       .map(
         (member: IProjectMember) =>
-          `${member.user.first_name} ${member.user.last_name}`,
+          `${member.user.display_first_name} ${member.user.display_last_name}`,
       );
   };
 

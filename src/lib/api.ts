@@ -607,6 +607,8 @@ export interface IProfileUpdateError {
   };
 }
 export interface IPIUpdateVariables {
+  display_first_name: string;
+  display_last_name: string;
   userPk: string;
   title: string;
   phone: string;
@@ -661,6 +663,8 @@ export const getProfile = ({
 };
 
 export interface IFullUserUpdateVariables {
+  display_first_name?: string;
+  display_last_name?: string;
   userPk: string | number;
   title: string;
   phone: string;
@@ -674,6 +678,8 @@ export interface IFullUserUpdateVariables {
 }
 
 export const adminUpdateUser = async ({
+  display_first_name,
+  display_last_name,
   userPk,
   title,
   phone,
@@ -686,6 +692,8 @@ export const adminUpdateUser = async ({
   affiliation,
 }: IFullUserUpdateVariables) => {
   console.log({
+    display_first_name,
+    display_last_name,
     userPk,
     title,
     phone,
@@ -701,7 +709,27 @@ export const adminUpdateUser = async ({
   try {
     // console.log(branch)
     // console.log(business_area)
-
+    console.log("ADMIN UPDATE USER");
+    console.log({
+      display_first_name,
+      display_last_name,
+      userPk,
+      title,
+      phone,
+      fax,
+      branch,
+      business_area,
+      image,
+      about,
+      expertise,
+      affiliation,
+    });
+    //     if req.data.get("display_first_name"):
+    //     display_first_name = req.data.get("display_first_name")
+    //     data_obj["display_first_name"] = display_first_name
+    // if req.data.get("display_last_name"):
+    //     display_last_name = req.data.get("display_last_name")
+    //     data_obj["display_last_name"] = display_last_name
     const membershipData = {
       affiliation:
         typeof affiliation === "string"
@@ -733,13 +761,22 @@ export const adminUpdateUser = async ({
       };
       await updateProfile(profileData);
     }
-
+    console.log({ display_first_name, display_last_name });
     const piData = {
       userPk: userPk.toString(),
+      display_first_name:
+        display_first_name !== undefined && display_first_name !== ""
+          ? display_first_name
+          : "",
+      display_last_name:
+        display_last_name !== undefined && display_last_name !== ""
+          ? display_last_name
+          : "",
       title: title !== undefined && title !== "" ? title : "",
       phone: phone !== undefined && phone !== "" ? phone : "",
       fax: fax !== undefined && fax !== "" ? fax : "",
     };
+    console.log("PIDATA", piData);
     await updatePersonalInformation(piData);
 
     return { ok: "Update successful" };
@@ -777,16 +814,29 @@ export const updateMembership = async ({
 };
 
 export const updatePersonalInformation = async ({
+  display_first_name,
+  display_last_name,
   userPk,
   title,
   phone,
   fax,
 }: IPIUpdateVariables) => {
-  // console.log(
-  //     userPk, title, phone, fax
-  // )
+  console.log("DATA", {
+    userPk,
+    title,
+    phone,
+    fax,
+    display_first_name,
+    display_last_name,
+  });
   return instance
-    .put(`users/${userPk}/pi`, { title, phone, fax })
+    .put(`users/${userPk}/pi`, {
+      display_first_name,
+      display_last_name,
+      title,
+      phone,
+      fax,
+    })
     .then((res) => res.data);
 };
 
@@ -3596,21 +3646,27 @@ export const sendConceptPlanEmail = async ({
 // }
 
 export const getLatestActiveStudentReports = async () => {
-  return instance
-    .get(`documents/latest_active_student_reports`)
-    .then((res) => res.data);
+  return instance.get(`documents/latest_active_student_reports`).then((res) => {
+    console.log(res.data);
+    return res.data;
+  });
 };
 
 export const getLatestActiveProgressReports = async () => {
+  console.log();
   return instance
     .get(`documents/latest_active_progress_reports`)
-    .then((res) => res.data);
+    .then((res) => {
+      console.log(res.data);
+      return res.data;
+    });
 };
 
 export const getLatestUnapprovedReports = async () => {
-  return instance
-    .get(`documents/latest_inactive_reports`)
-    .then((res) => res.data);
+  return instance.get(`documents/latest_inactive_reports`).then((res) => {
+    console.log(res.data);
+    return res.data;
+  });
 };
 
 export interface ISaveStudentReport {

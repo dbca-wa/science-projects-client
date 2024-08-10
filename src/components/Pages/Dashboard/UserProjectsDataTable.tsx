@@ -764,8 +764,10 @@ export const UserProjectsDataTable = ({
   const twRowClassDark = "hover:cursor-pointer hover:bg-inherit";
 
   useEffect(() => {
-    table.getColumn("status")?.setFilterValue(hideInactive);
-  }, [table, hideInactive]);
+    if (filters) {
+      table.getColumn("status")?.setFilterValue(hideInactive);
+    }
+  }, [table, hideInactive, filters]);
 
   return (
     <div className="rounded-b-md border">

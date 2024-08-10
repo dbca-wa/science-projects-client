@@ -2,7 +2,7 @@ import { $generateNodesFromDOM } from "@lexical/html";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useEffect, useState } from "react";
 // import { $generateNodesFromDOM, $getRoot, $getList, ListItemNode, ListNode } from "@lexical/html";
-import { $getRoot } from "lexical";
+import { $createParagraphNode, $getRoot } from "lexical";
 interface HTMLPrepopulationProp {
   data: string;
   setPopulationInProgress?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,11 +27,11 @@ export const PrepopulateCommentDisplayPlugin = ({
     if (!isHtml) {
       if (data === "") {
         setFixedText(
-          `<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;"></span></p>`
+          `<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;"></span></p>`,
         );
       } else {
         setFixedText(
-          `<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;">${data}</span></p>`
+          `<p class="editor-p-light" dir="ltr"><span style="white-space: pre-wrap;">${data}</span></p>`,
         );
       }
     }
@@ -44,11 +44,13 @@ export const PrepopulateCommentDisplayPlugin = ({
           `<tr>${row
             .map(
               (cell, colIndex) =>
-                `<${rowIndex === 0 || colIndex === 0 ? "th" : "td"
-                } class="table-cell-dark${rowIndex === 0 ? " table-cell-header-dark" : ""
-                }">${cell}</${rowIndex === 0 || colIndex === 0 ? "th" : "td"}>`
+                `<${
+                  rowIndex === 0 || colIndex === 0 ? "th" : "td"
+                } class="table-cell-dark${
+                  rowIndex === 0 ? " table-cell-header-dark" : ""
+                }">${cell}</${rowIndex === 0 || colIndex === 0 ? "th" : "td"}>`,
             )
-            .join("")}</tr>`
+            .join("")}</tr>`,
       )
       .join("");
 
@@ -92,7 +94,7 @@ export const PrepopulateCommentDisplayPlugin = ({
         const removableNulls = Array.from(dom.querySelectorAll("span")).filter(
           (span) => {
             return span.textContent === "null";
-          }
+          },
         );
 
         if (removableNulls.length > 0) {
@@ -125,7 +127,15 @@ export const PrepopulateCommentDisplayPlugin = ({
                 //
                 // console.log("BUNCHONODES", bunchOfNodes);
               } else {
-                root.append(node);
+                try {
+                  root.append(node);
+                } catch (e) {
+                  console.log(e);
+                  console.log(node);
+                  const paragraphNode = $createParagraphNode();
+                  paragraphNode.append(node);
+                  root.append(paragraphNode);
+                }
               }
             }
           }

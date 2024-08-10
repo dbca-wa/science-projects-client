@@ -108,7 +108,7 @@ const PRProjDetails = ({ project, team_members }: IPRProjDetails) => {
       })
       .map(
         (member: IProjectMember) =>
-          `${member.user.first_name} ${member.user.last_name}`,
+          `${member.user.display_first_name} ${member.user.display_last_name}`,
       );
   };
 
