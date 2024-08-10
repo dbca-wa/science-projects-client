@@ -254,7 +254,15 @@ export const ProjectDetail = ({
                 <Tab
                   fontSize="sm"
                   value="overview"
-                  onClick={() => setActiveTabIndex(tabs.indexOf("overview"))}
+                  onClick={() => {
+                    setActiveTabIndex(tabs.indexOf("overview"));
+                    // navigate(`/projects/${projectPk}/`);
+                    window.history.pushState(
+                      null,
+                      "",
+                      `/projects/${projectPk}/overview`,
+                    );
+                  }}
                 >
                   Overview
                 </Tab>
@@ -262,7 +270,15 @@ export const ProjectDetail = ({
                   <Tab
                     fontSize="sm"
                     value="concept"
-                    onClick={() => setActiveTabIndex(tabs.indexOf("concept"))}
+                    onClick={() => {
+                      setActiveTabIndex(tabs.indexOf("concept"));
+                      // navigate(`/projects/${projectPk}/concept`);
+                      window.history.pushState(
+                        null,
+                        "",
+                        `/projects/${projectPk}/concept`,
+                      );
+                    }}
                   >
                     Concept Plan
                   </Tab>
@@ -271,7 +287,15 @@ export const ProjectDetail = ({
                   <Tab
                     fontSize="sm"
                     value="project"
-                    onClick={() => setActiveTabIndex(tabs.indexOf("project"))}
+                    onClick={() => {
+                      setActiveTabIndex(tabs.indexOf("project"));
+                      // navigate(`/projects/${projectPk}/project`);
+                      window.history.pushState(
+                        null,
+                        "",
+                        `/projects/${projectPk}/project`,
+                      );
+                    }}
                   >
                     Project Plan
                   </Tab>
@@ -282,9 +306,15 @@ export const ProjectDetail = ({
                     <Tab
                       fontSize="sm"
                       value="progress"
-                      onClick={() =>
-                        setActiveTabIndex(tabs.indexOf("progress"))
-                      }
+                      onClick={() => {
+                        setActiveTabIndex(tabs.indexOf("progress"));
+                        // navigate(`/projects/${projectPk}/progress`);
+                        window.history.pushState(
+                          null,
+                          "",
+                          `/projects/${projectPk}/progress`,
+                        );
+                      }}
                     >
                       Progress Reports
                     </Tab>
@@ -295,7 +325,15 @@ export const ProjectDetail = ({
                     <Tab
                       fontSize="sm"
                       value="student"
-                      onClick={() => setActiveTabIndex(tabs.indexOf("student"))}
+                      onClick={() => {
+                        setActiveTabIndex(tabs.indexOf("student"));
+                        // navigate(`/projects/${projectPk}/student`);
+                        window.history.pushState(
+                          null,
+                          "",
+                          `/projects/${projectPk}/student`,
+                        );
+                      }}
                     >
                       Student Reports
                     </Tab>
@@ -304,7 +342,15 @@ export const ProjectDetail = ({
                   <Tab
                     fontSize="sm"
                     value="closure"
-                    onClick={() => setActiveTabIndex(tabs.indexOf("closure"))}
+                    onClick={() => {
+                      setActiveTabIndex(tabs.indexOf("closure"));
+                      // navigate(`/projects/${projectPk}/closure`);
+                      window.history.pushState(
+                        null,
+                        "",
+                        `/projects/${projectPk}/closure`,
+                      );
+                    }}
                   >
                     Project Closure
                   </Tab>

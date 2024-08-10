@@ -87,9 +87,9 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
       console.log("The Pk is undefined. Potentially use 'id' instead.");
     } else {
       if (e.ctrlKey || e.metaKey) {
-        window.open(`/projects/${pk}`, "_blank"); // Opens in a new tab
+        window.open(`/projects/${pk}/overview`, "_blank"); // Opens in a new tab
       } else {
-        navigate(`/projects/${pk}`);
+        navigate(`/projects/${pk}/overview`);
       }
     }
   };
