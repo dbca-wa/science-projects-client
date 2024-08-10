@@ -25,12 +25,13 @@ export const PaginatorProject = ({
     setCurrentProjectResultsPage(pageNumber);
   };
 
+  // useEffect(() => console.log(currentProjectResultsPage));
   const maxDisplayedPages = 8;
 
   // Calculate the start and end page numbers for rendering
   let startPage = Math.max(
     1,
-    currentProjectResultsPage - Math.floor(maxDisplayedPages / 2)
+    currentProjectResultsPage - Math.floor(maxDisplayedPages / 2),
   );
   const endPage = Math.min(totalPages, startPage + maxDisplayedPages - 1);
   if (endPage - startPage < maxDisplayedPages - 1) {
@@ -123,7 +124,7 @@ export const PaginatorProject = ({
       >
         {/* Render the pagination buttons */}
         <Button
-          disabled={currentProjectResultsPage === 1}
+          isDisabled={currentProjectResultsPage === 1}
           onClick={() => {
             handleClick(currentProjectResultsPage - 1);
             window.scrollTo(0, 0);
@@ -148,7 +149,7 @@ export const PaginatorProject = ({
           </Button>
         ))}
         <Button
-          disabled={currentProjectResultsPage === totalPages}
+          isDisabled={currentProjectResultsPage === totalPages}
           onClick={() => {
             handleClick(currentProjectResultsPage + 1);
             window.scrollTo(0, 0);

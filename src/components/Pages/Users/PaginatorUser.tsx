@@ -34,7 +34,7 @@ export const PaginatorUser = ({
   // Calculate the start and end page numbers for rendering
   let startPage = Math.max(
     1,
-    currentUserResultsPage - Math.floor(maxDisplayedPages / 2)
+    currentUserResultsPage - Math.floor(maxDisplayedPages / 2),
   );
   const endPage = Math.min(totalPages, startPage + maxDisplayedPages - 1);
   if (endPage - startPage < maxDisplayedPages - 1) {
@@ -91,7 +91,7 @@ export const PaginatorUser = ({
       <Box h={"100%"} mt={8} display="flex" justifyContent="center">
         {/* Render the pagination buttons */}
         <Button
-          disabled={currentUserResultsPage === 1}
+          isDisabled={currentUserResultsPage === 1}
           onClick={() => {
             handleClick(currentUserResultsPage - 1);
             window.scrollTo(0, 0);
@@ -116,7 +116,7 @@ export const PaginatorUser = ({
           </Button>
         ))}
         <Button
-          disabled={currentUserResultsPage === totalPages}
+          isDisabled={currentUserResultsPage === totalPages}
           onClick={() => {
             handleClick(currentUserResultsPage + 1);
             window.scrollTo(0, 0);
