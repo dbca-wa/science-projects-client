@@ -1,10 +1,10 @@
-import ScienceFooter from "@/components/Science/Footer/ScienceFooter";
-import ScienceHeader from "@/components/Science/Header/ScienceHeader";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import { Box, Flex } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import "@/main.css";
-import "@/components/Science/science_staff.css";
+import "@/components/StaffProfiles/science_staff.css";
+import ScienceHeader from "./Header/ScienceHeader";
+import ScienceFooter from "./Footer/ScienceFooter";
 
 export const ScienceStaffLayout = ({ children }: { children: ReactNode }) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");

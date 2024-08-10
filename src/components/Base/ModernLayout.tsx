@@ -9,6 +9,7 @@ import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext"
 import { ModernHeader } from "../Navigation/ModernHeader";
 import { Sidebar } from "../Navigation/Sidebar";
 import { ModernPageWrapper } from "../Wrappers/ModernPageWrapper";
+import { EditorProvider } from "@/lib/hooks/helper/EditorBlockerContext";
 
 export const ModernLayout = () => {
   const { loading } = useLayoutSwitcher();
@@ -39,7 +40,9 @@ export const ModernLayout = () => {
                 height: "100%",
               }}
             >
-              <Outlet />
+              <EditorProvider>
+                <Outlet />
+              </EditorProvider>
             </motion.div>
           )}
         </ModernPageWrapper>

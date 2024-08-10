@@ -1,6 +1,14 @@
 // Route for handling Project Creation
 
-import { Box, Grid, GridItem, useColorMode } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Button,
+  Grid,
+  GridItem,
+  useColorMode,
+  Flex,
+} from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { NewProjectCard } from "../components/Pages/CreateProject/NewProjectCard";
 import { Head } from "../components/Base/Head";
@@ -82,19 +90,58 @@ export const CreateProject = () => {
         <Box
           bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
           rounded={6}
-          flexDir={"column"}
           p={6}
-          pos={"relative"}
           mt={5}
           mb={7}
           color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
-          userSelect={"none"}
+          // userSelect={"none"}
+          // display={"inline"}
+          pos={"relative"}
         >
-          <TypewriterText
-            text={
-              "Projects differ by documentation structure, approval process, and reporting requirements. Make sure you choose the correct project type as you will not be able to change this after creation. If you need to change the project type, you will need to request that the project be deleted by an administrator and create a new project of the desired type. For further guidance on project types, refer to Corporate Guideline XX Science Implementation."
-            }
-          />
+          <TypewriterText>
+            <Text as="span" display="inline">
+              Projects differ by documentation structure, approval process, and
+              reporting requirements. Make sure you choose the correct project
+              type as you will not be able to change this after creation. If you
+              need to change the project type, you will need to request that the
+              project be deleted by an administrator and create a new project of
+              the desired type. For further guidance on project types, refer to
+            </Text>
+            {/* Button appears after text is animated */}
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{
+                delay: 2.1,
+                duration: 0.1,
+              }}
+              style={{ display: "inline", marginLeft: "0.2em" }}
+            >
+              <Button
+                variant={"link"}
+                color={colorMode === "light" ? "blue.500" : "blue.300"}
+                cursor={"pointer"}
+                onClick={() =>
+                  window.open(
+                    "https://dpaw.sharepoint.com/Key%20documents/Forms/AllItems.aspx?FilterField1=Category&FilterValue1=Corporate%20guideline&FilterType1=Choice&FilterDisplay1=Corporate%20guideline&id=%2FKey%20documents%2FCorporate%20Guideline%2048%20%2D%20Science%20Implementation%2Epdf&viewid=f605923d%2D172f%2D4d35%2Db8ee%2D3f0d60db0ef7&parent=%2FKey%20documents",
+                    "_blank",
+                  )
+                }
+              >
+                Corporate Guideline 48 - Science Implementation.
+              </Button>
+            </motion.span>
+          </TypewriterText>
+
+          {/* <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              delay: 4.1,
+              duration: 0.1,
+            }}
+            style={{ display: "inline" }}
+          ></motion.div> */}
         </Box>
       }
 

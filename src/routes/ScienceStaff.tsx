@@ -1,10 +1,10 @@
-import ScienceStaffSearchBar from "@/components/Science/Staff/All/ScienceStaffSearchBar";
-import ScienceStaffSearchResult from "@/components/Science/Staff/All/ScienceStaffSearchResult";
-import StaffResultSkeleton from "@/components/Science/StaffResultSkeleton";
+import ScienceStaffSearchBar from "@/components/StaffProfiles/Staff/All/ScienceStaffSearchBar";
+import ScienceStaffSearchResult from "@/components/StaffProfiles/Staff/All/ScienceStaffSearchResult";
+import StaffResultSkeleton from "@/components/StaffProfiles/StaffResultSkeleton";
 import { useScienceStaffProfileList } from "@/lib/hooks/tanstack/useScienceStaffProfileList";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import { Grid } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export const ScienceStaff = () => {
   const { scienceStaffData, scienceStaffLoading } =

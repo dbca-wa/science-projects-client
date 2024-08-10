@@ -27,13 +27,16 @@ import { ProjectDetail } from "./routes/ProjectDetail";
 import { Projects } from "./routes/Projects";
 import { Reports } from "./routes/Reports";
 import { ScienceStaff } from "./routes/ScienceStaff";
+import ScienceStaffDetail from "./routes/ScienceStaffDetail";
 import { TestEmailPage } from "./routes/TestEmailPage";
 import { TestPlayground } from "./routes/TestPlayground";
 import { Users } from "./routes/Users";
-import { ScienceStaffLayout } from "./components/Science/ScienceStaffLayout";
-import ScienceStaffDetail from "./routes/ScienceStaffDetail";
+import { ScienceStaffLayout } from "./components/StaffProfiles/ScienceStaffLayout";
 
-export const router = createBrowserRouter([
+const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
+  .VITE_PRODUCTION_BACKEND_BASE_URL;
+
+const inAppRouteArray = [
   // Login
   {
     path: "login",
@@ -43,24 +46,6 @@ export const router = createBrowserRouter([
   // ON UPDATE/MIGRATION, MOVE TO SEPARATE ROUTE AND UPDATE NGINX for
   // https://science.dbca.wa.gov.au/ to use that route, add header/footer
   // and adjust migration script
-
-  {
-    path: "/staff",
-    element: (
-      <ScienceStaffLayout>
-        <ScienceStaff />
-      </ScienceStaffLayout>
-    ),
-  },
-
-  {
-    path: "/staff/:staffProfilePk",
-    element: (
-      <ScienceStaffLayout>
-        <ScienceStaffDetail />
-      </ScienceStaffLayout>
-    ),
-  },
 
   // {
   //   path:"science",
@@ -365,4 +350,29 @@ export const router = createBrowserRouter([
       },
     ],
   },
-]);
+];
+
+const staffTestArray = [
+  {
+    path: "/staff",
+    element: (
+      <ScienceStaffLayout>
+        <ScienceStaff />
+      </ScienceStaffLayout>
+    ),
+  },
+  {
+    path: "/staff/:staffProfilePk",
+    element: (
+      <ScienceStaffLayout>
+        <ScienceStaffDetail />
+      </ScienceStaffLayout>
+    ),
+  },
+];
+
+export const router =
+  VITE_PRODUCTION_BACKEND_BASE_URL === undefined ||
+  VITE_PRODUCTION_BACKEND_BASE_URL?.includes("test")
+    ? createBrowserRouter([...inAppRouteArray, ...staffTestArray])
+    : createBrowserRouter(inAppRouteArray);

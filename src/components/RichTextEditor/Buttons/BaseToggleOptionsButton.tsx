@@ -3,6 +3,8 @@
 import { Button, Icon, useColorMode } from "@chakra-ui/react";
 import { IconType } from "react-icons";
 import "../../../styles/texteditor.css";
+import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
+import { useEffect } from "react";
 
 interface BaseToggleOptionsButtonProps {
   colorSchemeOne?: string;
@@ -24,7 +26,31 @@ export const BaseToggleOptionsButton = ({
   setCurrentState,
   toolTipText,
 }: BaseToggleOptionsButtonProps) => {
+  const { openEditor, closeEditor } = useEditorContext();
+
+  // useEffect(() => {
+  //   // Return a cleanup function that will call closeEditor when the component unmounts
+  //   return () => {
+  //     if (toolTipText === "Hide Editor") {
+  //       closeEditor();
+  //     }
+  //   };
+  // }, [toolTipText, closeEditor]);
+
   const handleClick = () => {
+    if (toolTipText === "Hide Editor" || toolTipText === "Show Editor") {
+      if (currentState) {
+        // hide editor
+        console.log("1");
+        closeEditor();
+      } else {
+        // show editor
+        console.log("2");
+
+        openEditor();
+      }
+    }
+
     setCurrentState(!currentState);
   };
 

@@ -1,26 +1,96 @@
-// Component for presenting text to users line by line with a fade in (based on breaks and \n)
-
 import { motion } from "framer-motion";
+import React, { ReactNode } from "react";
 
-interface IText {
-  text: string;
+interface ITypewriterProps {
+  children: ReactNode;
+  characterDelay?: number; // Time between characters in seconds
+  characterDuration?: number; // Duration for each character to fade in
 }
-export const TypewriterText = ({ text }: IText) => {
-  const lines = text.split(/\r?\n|\r|\n/);
+
+export const TypewriterText = ({
+  children,
+  characterDelay = 0.005,
+  characterDuration = 0.005,
+}: ITypewriterProps) => {
+  const childArray = React.Children.toArray(children);
+
+  let totalCharacters = 0;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      {lines.map((line, index) => (
-        <motion.div
-          key={index}
-          style={{ marginBottom: "0.5em" }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 + index * 0.3, duration: 0.5 }}
+    <motion.span
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      style={{ display: "inline", whiteSpace: "normal" }} // Ensure inline display
+    >
+      {childArray.map((child, lineIndex) => {
+        if (React.isValidElement(child)) {
+          const childText = child.props.children;
+
+          if (typeof childText === "string") {
+            const startDelay = totalCharacters * characterDelay;
+            totalCharacters += childText.length;
+
+            return (
+              <AnimatedText
+                key={lineIndex}
+                text={childText}
+                delayStart={startDelay}
+                characterDelay={characterDelay}
+                characterDuration={characterDuration}
+              />
+            );
+          } else {
+            // Non-string elements: render after the complete text animation
+            return (
+              <motion.span
+                key={lineIndex}
+                style={{ display: "inline", marginLeft: "0.2em" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  delay: totalCharacters * characterDelay,
+                  duration: characterDuration,
+                }}
+              >
+                {child}
+              </motion.span>
+            );
+          }
+        }
+        return null;
+      })}
+    </motion.span>
+  );
+};
+
+interface AnimatedTextProps {
+  text: string;
+  delayStart: number;
+  characterDelay: number;
+  characterDuration: number;
+}
+
+const AnimatedText = ({
+  text,
+  delayStart,
+  characterDelay,
+  characterDuration,
+}: AnimatedTextProps) => {
+  return (
+    <motion.span style={{ display: "inline" }}>
+      {text.split("").map((char, charIndex) => (
+        <motion.span
+          key={charIndex}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            delay: delayStart + charIndex * characterDelay,
+            duration: characterDuration,
+          }}
         >
-          {line}
-        </motion.div>
+          {char}
+        </motion.span>
       ))}
-    </motion.div>
+    </motion.span>
   );
 };

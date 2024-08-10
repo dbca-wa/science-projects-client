@@ -31,7 +31,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // Prevents uneccessary refretching of API
-      retry: 2, retryDelay: 1000, refetchOnWindowFocus: false,
+      retry: 2,
+      retryDelay: 1000,
+      refetchOnWindowFocus: false,
     },
   },
 });
@@ -62,6 +64,6 @@ root.render(
         </UserSearchProvider>
       </LayoutSwitcherProvider>
     </ChakraProvider>
-  </QueryClientProvider>
+  </QueryClientProvider>,
   // </React.StrictMode>
 );

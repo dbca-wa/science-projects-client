@@ -72,7 +72,11 @@ export const NewProjectCard = ({
         p={6}
         position={"relative"}
         cursor="pointer"
-        style={{ transformStyle: "preserve-3d" }}
+        style={{
+          transformStyle: "preserve-3d",
+          willChange: "transform",
+          backfaceVisibility: "hidden",
+        }}
         boxShadow="0px 14px 21px -7px rgba(0, 0, 0, 0.21), 0px 2.8px 3.5px -1.4px rgba(0, 0, 0, 0.042), -2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.07), 2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.07)"
         initial={"rest"}
         whileHover="hover" // Reference to the hover key in cardVariants
@@ -102,19 +106,36 @@ export const NewProjectCard = ({
           //   colorMode === "light" ? `${colorScheme}.500` : `${colorScheme}.600`
           // }
           background={color ? color : undefined}
-          color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.800"}
+          color={"white"}
           style={{
             transform: "translateZ(0)",
             transition: "transform 0.3s ease",
+            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
           }}
           _hover={{
             transform: "translateZ(50px)",
           }}
         >
-          <Center mr={4}>
-            <ButtonIcon size={"40px"} />
+          <Center
+            mr={4}
+            style={{
+              textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            <ButtonIcon
+              size={"40px"}
+              style={{
+                textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+              }}
+            />
           </Center>
-          <Heading size={"md"} colorScheme={colorScheme}>
+          <Heading
+            size={"md"}
+            colorScheme={colorScheme}
+            style={{
+              textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+            }}
+          >
             {title}
           </Heading>
         </Box>
