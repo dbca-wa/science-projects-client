@@ -284,7 +284,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
             <Text>
               This is for adding external users only. If you are trying to add a
               DBCA staff member, please send them a link to this website and an
-              account will be created when they visit.All existing users can be
+              account will be created when they visit. All existing users can be
               found on the users page.
             </Text>
             {location.pathname !== "/users" && (
@@ -461,19 +461,34 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
             color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
             userSelect={"none"}
           >
-            <TypewriterText
-              text={`This is for adding external users only. \nIf you are trying to add a DBCA staff member, please send them a link to this website and an account will be created when they visit.\nAll existing users can be found on the users page.\n`}
-            />
-            {location.pathname !== "/users" && (
-              <Button
-                variant={"link"}
-                color={"blue.500"}
-                onClick={() => {
-                  navigate(`/users`);
-                  onClose();
-                }}
-              >{`${VITE_PRODUCTION_BACKEND_BASE_URL}users`}</Button>
-            )}
+            <TypewriterText>
+              <Text>
+                This is for adding external users only. If you are trying to add
+                a DBCA staff member, please send them a link to this website and
+                an account will be created when they visit. All existing users
+                can be found on the users page.
+              </Text>
+              {location.pathname !== "/users" && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{
+                    delay: 1.5,
+                    duration: 0.1,
+                  }}
+                  style={{ display: "inline", marginLeft: "0.2em" }}
+                >
+                  <Button
+                    variant={"link"}
+                    color={colorMode === "light" ? "blue.500" : "blue.300"}
+                    cursor={"pointer"}
+                    onClick={() => {
+                      navigate(`/users`);
+                    }}
+                  >{`${VITE_PRODUCTION_BACKEND_BASE_URL}users`}</Button>
+                </motion.span>
+              )}
+            </TypewriterText>
           </Box>
         )}
 

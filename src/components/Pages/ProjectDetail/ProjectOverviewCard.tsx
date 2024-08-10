@@ -542,7 +542,7 @@ export const ProjectOverviewCard = ({
             overflow={"hidden"}
             position={"relative"}
           >
-            <Box pos={"absolute"} right={3} top={3} zIndex={110}>
+            <Box pos={"absolute"} right={3} top={3} zIndex={2}>
               <Tag
                 fontWeight={"bold"}
                 color={"white"}

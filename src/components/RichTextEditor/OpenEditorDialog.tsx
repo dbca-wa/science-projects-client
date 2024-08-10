@@ -38,7 +38,7 @@ export const OpenEditorDialog = ({
             Cancel
           </Button>
           <Button onClick={proceed} className="bg-red-800 hover:bg-red-600">
-            Discard changes
+            Proceed and discard changes
           </Button>
         </DialogFooter>
       </DialogContent>
