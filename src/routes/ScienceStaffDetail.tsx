@@ -1,5 +1,5 @@
-import StaffContent from "@/components/Science/Staff/Detail/StaffContent";
-import StaffHero from "@/components/Science/Staff/Detail/StaffHero";
+import StaffContent from "@/components/StaffProfiles/Staff/Detail/StaffContent";
+import StaffHero from "@/components/StaffProfiles/Staff/Detail/StaffHero";
 import { useStaffProfile } from "@/lib/hooks/tanstack/useStaffProfile";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";

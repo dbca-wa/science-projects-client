@@ -1,4 +1,4 @@
-import SimpleSkeletonSection from "@/components/Science/SimpleSkeletonSection";
+import SimpleSkeletonSection from "../../SimpleSkeletonSection";
 import EducationEntry from "./EducationEntry";
 import Subsection from "./Subsection";
 

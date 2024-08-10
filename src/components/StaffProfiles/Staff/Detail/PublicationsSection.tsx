@@ -1,4 +1,4 @@
-import SimpleSkeletonSection from "@/components/Science/SimpleSkeletonSection";
+import SimpleSkeletonSection from "../../SimpleSkeletonSection";
 
 const PublicationsSection = ({ isLoading }: { isLoading: boolean }) => {
   return (

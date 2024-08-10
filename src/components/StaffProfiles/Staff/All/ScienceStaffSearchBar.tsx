@@ -51,7 +51,7 @@ const ScienceStaffSearchBar = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <Button type="submit">
+      <Button type="submit" className="bg-[#2d2f32]">
         <Search />
       </Button>
     </form>

@@ -1,7 +1,6 @@
 // Handles Profile Page view
 
 import { RichTextEditor } from "@/components/RichTextEditor/Editors/RichTextEditor";
-import Subsection from "@/components/Science/Staff/Detail/Subsection";
 import { useStaffProfile } from "@/lib/hooks/tanstack/useStaffProfile";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
@@ -19,6 +18,7 @@ import EditableStaffCV from "./Public Profile/EditableStaffCV";
 import EditableStaffProjects from "./Public Profile/EditableStaffProjects";
 import EditableStaffPublications from "./Public Profile/EditableStaffPublications";
 import { useEffect } from "react";
+import Subsection from "@/components/StaffProfiles/Staff/Detail/Subsection";
 
 const StaffHeroEditable = () => {
   return (

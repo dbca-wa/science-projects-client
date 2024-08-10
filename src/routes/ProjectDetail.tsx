@@ -35,6 +35,7 @@ import {
 } from "../types";
 // import { ProgressReportSelector } from "../components/Pages/ProjectDetail/ProgressReportSelector";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 
 export const ProjectDetail = ({
   selectedTab,
@@ -179,6 +180,8 @@ export const ProjectDetail = ({
   // useEffect(() => console.log(documents))
   const baseAPI = useApiEndpoint();
 
+  const { manuallyCheckAndToggleDialog } = useEditorContext();
+
   return me?.userData && !me?.userLoading ? (
     <div
       key={
@@ -239,8 +242,10 @@ export const ProjectDetail = ({
               variant={"enclosed"}
               // onChange={(index) => setTabIndex(index)}
               onChange={(index) => {
-                refetch();
-                setActiveTabIndex(index);
+                manuallyCheckAndToggleDialog(() => {
+                  refetch();
+                  setActiveTabIndex(index);
+                });
               }}
               defaultIndex={activeTabIndex}
               index={activeTabIndex}

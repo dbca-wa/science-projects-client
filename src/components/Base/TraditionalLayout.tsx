@@ -8,6 +8,7 @@ import dayImage from "../../assets/80mile.jpg";
 import nightImage from "../../assets/night.webp";
 import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
 import OldHeader from "../Navigation/OldHeader";
+import { EditorProvider } from "@/lib/hooks/helper/EditorBlockerContext";
 
 export const TraditionalLayout = () => {
   const { colorMode } = useColorMode();
@@ -39,7 +40,9 @@ export const TraditionalLayout = () => {
           bg={colorMode === "light" ? "white" : "blackAlpha.800"}
         >
           <Box mx={10}>
-            <Outlet />
+            <EditorProvider>
+              <Outlet />
+            </EditorProvider>
           </Box>
         </Box>
 

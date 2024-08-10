@@ -54,8 +54,6 @@ export const RichTextEditor = ({
   const { colorMode } = useColorMode();
   const [canSave, setCanSave] = useState<boolean>(true);
 
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-
   const generateTheme = (colorMode) => {
     return {
       quote: "editor-quote",
@@ -209,9 +207,17 @@ export const RichTextEditor = ({
         writeable_document_kind === "Progress Report",
     );
 
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+
   return (
     // Wrapper
     <Box pb={6} maxW={"100%"}>
+      {/* <div>
+           <p>An editor is open. Are you sure you want to leave?</p>
+           <button onClick={blocker.proceed}>Yes, Leave</button>
+           <button onClick={blocker.reset}>Cancel</button>
+         </div> */}
+
       <Flex
         bg={
           colorMode === "light"
