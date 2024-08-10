@@ -25,8 +25,11 @@ export const ExtractedHTMLTitle: React.FC<Props> = ({
     // Find the first 'p' or 'span' tag and get its innerHTML
     const tag = wrapper.querySelector("p, span");
     if (tag) {
-      // Sanitize the HTML content using DOMPurify
-      const sanitizedHTML = DOMPurify.sanitize(tag.innerHTML);
+      // Configure DOMPurify to sanitize the HTML content
+      const sanitizedHTML = DOMPurify.sanitize(tag.innerHTML, {
+        ALLOWED_TAGS: ["i", "em"], // Allow desired tags
+        FORBID_ATTR: ["style", "class"], // Forbid the 'style' attribute to prevent color changes
+      });
       setContent(sanitizedHTML);
     }
   }, [htmlContent]);

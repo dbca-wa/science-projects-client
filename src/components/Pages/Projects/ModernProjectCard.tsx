@@ -34,6 +34,7 @@ export const ModernProjectCard = ({
 
   const { colorMode } = useColorMode();
   const imageurl = useServerImageUrl(image?.file);
+  // useEffect(() => console.log(title), []);
 
   const cardVariants = {
     rest: { scale: 1, rotateX: 0 },
