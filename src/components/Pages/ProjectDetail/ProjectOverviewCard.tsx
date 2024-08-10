@@ -610,7 +610,7 @@ export const ProjectOverviewCard = ({
                       baseInformation.pk !== undefined
                         ? baseInformation.pk
                         : baseInformation.id
-                    }`,
+                    }/overview`,
                   )
                 }
               >
