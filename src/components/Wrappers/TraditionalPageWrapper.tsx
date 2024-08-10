@@ -19,6 +19,9 @@ export const TraditionalPageWrapper: React.FC<IPageWrapperProps> = ({
       }}
       py={2}
       // minW={"250mm"}
+      flex="1"
+      display="flex"
+      flexDirection="column"
     >
       {children}
     </Box>

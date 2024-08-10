@@ -9,11 +9,11 @@ export const Footer = () => {
 
   return (
     <Box
-      position="relative"
+      // position="absolute"
       display={"flex"}
       justifyContent={"center"}
-      // bottom="0"
-      // width="100%"
+      bottom="0"
+      width="100%"
       color="whiteAlpha.600"
       bgColor="blackAlpha.900"
       py={4}
