@@ -146,7 +146,8 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Removed personal tasks and in-app feedback
+              Feature: Introduced a page blocker to prevent users leaving if an
+              editor is open (ensures changes are saved or discarded)
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -154,7 +155,9 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Minor adjustments to generated PDF style/content
+              Feature: Adjusted display of projects table and introduced a
+              search bar and toggle to show only active projects for "My
+              Projects" section.
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -162,18 +165,28 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Chore: Removed junk files
+              Feature: Added a section for public profile
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Added referenced Science Implementation document to create
+              project page
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Ensured projects are clickable when there are issues
+              loading the image
             </ListItem>
 
             {/* 
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Fixed bug causing user-generated table columns to all be 75px
-            </ListItem> 
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}

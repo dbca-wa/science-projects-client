@@ -28,8 +28,9 @@ export const OpenEditorDialog = ({
         <DialogHeader className="text-slate-200">
           <DialogTitle>Open Editor</DialogTitle>
           <DialogDescription className="pt-5 text-slate-300">
-            An editor is open! Make sure you have saved any changes you made.
-            Are you sure you want to leave?
+            You have an open editor on this page! If you navigate away, change
+            tabs, dark mode, or the layout any unsaved changes will be lost. Are
+            you sure you want to proceed?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="pt-2">
@@ -37,7 +38,7 @@ export const OpenEditorDialog = ({
             Cancel
           </Button>
           <Button onClick={proceed} className="bg-red-800 hover:bg-red-600">
-            Leave Page
+            Discard changes
           </Button>
         </DialogFooter>
       </DialogContent>

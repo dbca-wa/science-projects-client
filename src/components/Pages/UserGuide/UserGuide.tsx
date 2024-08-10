@@ -6,6 +6,7 @@ import { Box, Flex, useBreakpointValue, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { SideMenuButton } from "../Account/SideMenuButton";
 import { useAdminOptions } from "@/lib/hooks/tanstack/useAdminOptions";
+import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 
 interface ISectionProps {
   isSuperUser: boolean;
@@ -367,6 +368,8 @@ export const SideMenuSectionDivider = () => {
 };
 
 export const UserGuide = () => {
+  const { manuallyCheckAndToggleDialog } = useEditorContext();
+
   const { colorMode } = useColorMode();
   const { userData, userLoading } = useUser();
   const { adminOptionsData, adminOptionsLoading, refetch } = useAdminOptions(1);
@@ -375,7 +378,9 @@ export const UserGuide = () => {
   const [selected, setSelected] = useState("about");
   const [pageViewChildren, setPageViewChildren] = useState<React.ReactNode>();
   const handleSidebarMenuClick = (page: string) => {
-    setSelected(page);
+    manuallyCheckAndToggleDialog(() => {
+      setSelected(page);
+    });
   };
 
   useEffect(() => {

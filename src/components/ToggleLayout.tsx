@@ -11,6 +11,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { RiLayout3Fill, RiLayoutTopFill } from "react-icons/ri";
 import { useLayoutSwitcher } from "../lib/hooks/helper/LayoutSwitcherContext";
+import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 
 interface IOptionalToggleLayoutProps {
   showText?: boolean;
@@ -21,11 +22,13 @@ export const ToggleLayout = ({
   showText,
   asMenuItem,
 }: IOptionalToggleLayoutProps) => {
+  const { manuallyCheckAndToggleDialog } = useEditorContext();
+
   const { layout, switchLayout } = useLayoutSwitcher();
   const iconColor = useColorModeValue("gray.400", "gray.300");
   const backgroundHoverColor = useColorModeValue(
     "whiteAlpha.400",
-    "whiteAlpha.500"
+    "whiteAlpha.500",
   );
   const layouts = {
     traditional: {
@@ -43,8 +46,12 @@ export const ToggleLayout = ({
   };
   const currentLayout = layouts[layout];
 
+  const handleClick = () => {
+    manuallyCheckAndToggleDialog(() => switchLayout());
+  };
+
   return asMenuItem ? (
-    <MenuItem onClick={switchLayout} zIndex={2}>
+    <MenuItem onClick={handleClick} zIndex={2}>
       {layouts[layout].icon}
       <Text ml={2}>
         {" "}
@@ -72,7 +79,7 @@ export const ToggleLayout = ({
             color={iconColor}
             size={"md"}
             rightIcon={currentLayout.icon}
-            onClick={currentLayout.onclick}
+            onClick={handleClick}
             variant={"ghost"}
             aria-label="Toggle Layout"
             _hover={{
@@ -87,7 +94,7 @@ export const ToggleLayout = ({
             color={iconColor}
             size={"md"}
             icon={currentLayout.icon}
-            onClick={currentLayout.onclick}
+            onClick={handleClick}
             variant={"ghost"}
             aria-label="Toggle Layout"
           />
