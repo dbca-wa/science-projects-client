@@ -26,7 +26,7 @@ export const TraditionalLayout = () => {
     );
   }
   return (
-    <Box minH={"100vh"} minW={"720px"}>
+    <Box minH={"100vh"} minW={"720px"} display="flex" flexDirection="column">
       <OldHeader />
 
       <TraditionalPageWrapper>
@@ -55,6 +55,7 @@ export const TraditionalLayout = () => {
           userSelect={"none"}
         />
       </TraditionalPageWrapper>
+
       <Footer />
     </Box>
   );
