@@ -73,15 +73,15 @@ export const CreateProjectModal = ({
   const [baseInformationData, setBaseInformationData] =
     useState<ICreateProjectBaseInfo>({} as ICreateProjectBaseInfo);
   const [detailsData, setDetailsData] = useState<ICreateProjectDetails>(
-    {} as ICreateProjectDetails
+    {} as ICreateProjectDetails,
   );
   const [locationData, setLocationData] = useState([]);
   const [externalData, setExternalData] =
     useState<ICreateProjectExternalDetails>(
-      {} as ICreateProjectExternalDetails
+      {} as ICreateProjectExternalDetails,
     );
   const [studentData, setStudentData] = useState<ICreateProjectStudentDetails>(
-    {} as ICreateProjectStudentDetails
+    {} as ICreateProjectStudentDetails,
   );
 
   const goBack = () => {
@@ -186,7 +186,7 @@ export const CreateProjectModal = ({
       // }
 
       queryClient.refetchQueries({ queryKey: [`projects`] });
-      navigate(`/projects/${data.pk}`);
+      navigate(`/projects/${data.pk}/overview`);
     },
     // Error handling based on API-file-declared interface
     onError: (error) => {
@@ -306,7 +306,7 @@ export const CreateProjectModal = ({
               </TabPanel>
               <TabPanel>
                 {projectType.includes("External") ||
-                  projectType.includes("Student") ? (
+                projectType.includes("Student") ? (
                   <ProjectLocationSection
                     locationFilled={locationFilled}
                     locationData={locationData}

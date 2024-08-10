@@ -211,11 +211,12 @@ export const ProjectUserDetails = ({
           queryClient.invalidateQueries({
             queryKey: ["projects", project_id],
           });
-
-          refetchTeamData && refetchTeamData();
+          if (refetchTeamData) {
+            refetchTeamData();
+          }
           // const url =
           if (!location.pathname.includes("project")) {
-            navigate(`/projects/${project_id}`);
+            navigate(`/projects/${project_id}/overview`);
           } else {
             onClose();
           }
@@ -271,10 +272,11 @@ export const ProjectUserDetails = ({
             queryKey: ["projects", project_id],
           });
 
-          refetchTeamData && refetchTeamData();
-          // const url =
+          if (refetchTeamData) {
+            refetchTeamData();
+          } // const url =
           if (!location.pathname.includes("project")) {
-            navigate(`/projects/${project_id}`);
+            navigate(`/projects/${project_id}/overview`);
           } else {
             onClose();
           }
@@ -331,11 +333,12 @@ export const ProjectUserDetails = ({
           queryClient.invalidateQueries({
             queryKey: ["projects", project_id],
           });
-
-          refetchTeamData && refetchTeamData();
+          if (refetchTeamData) {
+            refetchTeamData();
+          }
           // const url =
           if (!location.pathname.includes("project")) {
-            navigate(`/projects/${project_id}`);
+            navigate(`/projects/${project_id}/overview`);
           } else {
             // onClose();
           }
