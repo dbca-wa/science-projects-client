@@ -105,15 +105,15 @@ export const UserProjectsDataTable = ({
     } else {
       if (isOnProjectsPage) {
         if (e.ctrlKey || e.metaKey) {
-          window.open(`${pk}`, "_blank"); // Opens in a new tab
+          window.open(`${pk}/overview`, "_blank"); // Opens in a new tab
         } else {
-          navigate(`${pk}`);
+          navigate(`${pk}/overview`);
         }
       } else {
         if (e.ctrlKey || e.metaKey) {
-          window.open(`/projects/${pk}`, "_blank"); // Opens in a new tab
+          window.open(`/projects/${pk}/overview`, "_blank"); // Opens in a new tab
         } else {
-          navigate(`/projects/${pk}`);
+          navigate(`/projects/${pk}/overview`);
         }
       }
     }

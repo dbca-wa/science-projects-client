@@ -74,13 +74,13 @@ export const ModernProjectCard = ({
   const goToProject = (e) => {
     if (e.ctrlKey || e.metaKey) {
       // Handle Ctrl + Click (or Command + Click on Mac)
-      window.open(`/projects/${pk}`, "_blank"); // Opens in a new tab
+      window.open(`/projects/${pk}/overview`, "_blank"); // Opens in a new tab
     } else {
       // Normal click handling
       if (isOnProjectsPage || window.location.pathname.endsWith("/projects")) {
-        navigate(`${pk}`);
+        navigate(`${pk}/overview`);
       } else {
-        navigate(`projects/${pk}`);
+        navigate(`projects/${pk}/overview`);
       }
     }
   };

@@ -247,7 +247,7 @@ const inAppRouteArray = [
         ),
       },
       {
-        path: "projects/:projectPk",
+        path: "projects/:projectPk/overview",
         element: (
           <ContentWrapper>
             <ProjectDetail selectedTab="overview" />
