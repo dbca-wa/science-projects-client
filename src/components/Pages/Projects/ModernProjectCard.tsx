@@ -1,5 +1,6 @@
 // Modern implementation of project cards for display when searching projects and on the projects tab of dashboard
 
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   Box,
   Flex,
@@ -17,7 +18,6 @@ import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
 import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
 import { IProjectData } from "../../../types";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 export const ModernProjectCard = ({
   pk,
@@ -71,6 +71,7 @@ export const ModernProjectCard = ({
 
   const navigate = useNavigate();
 
+  // useEffect(() => console.log(title), [title]);
   const goToProject = (e) => {
     if (e.ctrlKey || e.metaKey) {
       // Handle Ctrl + Click (or Command + Click on Mac)
@@ -96,7 +97,7 @@ export const ModernProjectCard = ({
         overflow={"hidden"}
         cursor={"pointer"}
         style={{ transformStyle: "preserve-3d" }}
-        boxShadow="0px 10px 15px -5px rgba(0, 0, 0, 0.3), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.06), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.1), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.1)"
+        boxShadow="0px 15px 30px -10px rgba(0, 0, 0, 0.5), 0px 5px 10px -5px rgba(0, 0, 0, 0.1), -2px 0px 10px -2px rgba(0, 0, 0, 0.2), 2px 0px 10px -2px rgba(0, 0, 0, 0.2)"
         border={colorMode === "dark" ? "1px solid" : undefined}
         borderColor={"gray.700"}
       >
@@ -198,7 +199,7 @@ export const ModernProjectCard = ({
             overflow={"hidden"}
             cursor={"pointer"}
             style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-            boxShadow="0px 10px 15px -5px rgba(0, 0, 0, 0.3), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.06), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.1), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.1)"
+            boxShadow="0px 15px 30px -10px rgba(0, 0, 0, 0.5), 0px 5px 10px -5px rgba(0, 0, 0, 0.1), -2px 0px 10px -2px rgba(0, 0, 0, 0.2), 2px 0px 10px -2px rgba(0, 0, 0, 0.2)"
             // onClick={goToProject}
             borderColor={"gray.700"}
             background={colorMode === "dark" ? "black" : undefined}
@@ -219,8 +220,8 @@ export const ModernProjectCard = ({
               left={0}
               bottom={0}
               w="100%"
-              h="30%"
-              bgGradient="linear(to-t, rgba(0,0,0,0.55), transparent)" // Add gradient overlay
+              h="50%" // Increase the height of the gradient
+              bgGradient="linear(to-t, rgba(0,0,0,0.75), transparent)" // Strengthened gradient overlay
             />
           </Box>
         </AspectRatio>
