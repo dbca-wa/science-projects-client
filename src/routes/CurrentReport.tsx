@@ -23,6 +23,7 @@ import { ParticipatingProjectReports } from "../components/Pages/CurrentReport/P
 import { getLatestReportingYear } from "../lib/api";
 import { IReport } from "../types";
 import { PDFViewer } from "@/components/HTMLPDFs/PDFViewer";
+import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 // import { CeleryTest } from "@/components/HTMLPDFs/CeleryTest";
 
 export const CurrentReport = () => {
@@ -61,12 +62,14 @@ export const CurrentReport = () => {
   const formattedLatestYear = latestYear?.toString().substring(2);
   const formattedYearBefore = yearBefore?.toString().substring(2);
   const financialYearString = `FY ${formattedYearBefore}-${formattedLatestYear}`;
+  const { manuallyCheckAndToggleDialog } = useEditorContext();
+
+  const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+  const tabs = ["details", "media", "pending", "approved", "preview"];
 
   return isLoading ? (
     <Center mt={4}>
-
       <Spinner size={"lg"} />
-
     </Center>
   ) : (
     <>
@@ -79,13 +82,60 @@ export const CurrentReport = () => {
         </Flex>
 
         {thisReport !== null && thisReport !== undefined && (
-          <Tabs isLazy isFitted variant={"enclosed"}>
+          <Tabs
+            isLazy
+            isFitted
+            variant={"enclosed"}
+            onChange={(index) => {
+              manuallyCheckAndToggleDialog(() => {
+                console.log("changed");
+                setActiveTabIndex(index);
+              });
+            }}
+            defaultIndex={activeTabIndex}
+            index={activeTabIndex}
+          >
             <TabList>
-              <Tab>Details</Tab>
-              <Tab>Media</Tab>
-              <Tab>Pending Reports</Tab>
-              <Tab>Approved Progress Reports</Tab>
-              <Tab>Print Preview</Tab>
+              <Tab
+                value="details"
+                onClick={() => {
+                  setActiveTabIndex(tabs.indexOf("details"));
+                }}
+              >
+                Details
+              </Tab>
+              <Tab
+                value="media"
+                onClick={() => {
+                  setActiveTabIndex(tabs.indexOf("media"));
+                }}
+              >
+                Media
+              </Tab>
+              <Tab
+                value="pending"
+                onClick={() => {
+                  setActiveTabIndex(tabs.indexOf("pending"));
+                }}
+              >
+                Pending Reports
+              </Tab>
+              <Tab
+                value="approved"
+                onClick={() => {
+                  setActiveTabIndex(tabs.indexOf("approved"));
+                }}
+              >
+                Approved Progress Reports
+              </Tab>
+              <Tab
+                value="preview"
+                onClick={() => {
+                  setActiveTabIndex(tabs.indexOf("preview"));
+                }}
+              >
+                Print Preview
+              </Tab>
               {/* <Tab>Test</Tab> */}
             </TabList>
             <TabPanels>
