@@ -25,13 +25,12 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
           // && location.pathname !== "/science"
         ) {
           console.log("No user and not on login page. Navigating to login.");
-          // if (process.env.NODE_ENV === "production") {
-          //   // Originally sso/signedout?relogin=/
-          //   window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin`;
-          // }
-          // else {
-          navigate("/login");
-          // }
+          if (process.env.NODE_ENV === "production") {
+            // Originally sso/signedout?relogin=/
+            window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin`;
+          } else {
+            navigate("/login");
+          }
         }
       } else {
         setShowContent(true);
