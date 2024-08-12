@@ -153,9 +153,11 @@ export const EditProjectModal = ({
   const [externalDescription, setExternalDescription] = useState(
     (details?.external as IExternalProjectDetails)?.description,
   );
-  const [budget, setBudget] = useState(
+  const [budget, setBudget] = useState<string>(
     (details?.external as IExternalProjectDetails)?.budget,
   );
+
+  useEffect(() => console.log(details), [details]);
 
   const [organisation, setOrganisation] = useState(
     (details?.student as IStudentProjectDetails)?.organisation,
@@ -331,10 +333,10 @@ export const EditProjectModal = ({
         // console.log({ budget, collaborationContent, aims, descriptionContent });
 
         if (
-          descriptionContent.length > 0 &&
-          aimsContent.length > 0 &&
-          collaborationContent.length > 0 &&
-          budget.length > 0
+          descriptionContent?.length > 0 &&
+          aimsContent?.length > 0 &&
+          collaborationContent?.length > 0 &&
+          budget?.length > 0
         ) {
           setCanUpdate(true);
         } else {
@@ -781,14 +783,14 @@ export const EditProjectModal = ({
                     />
                     <UnboundStatefulEditor
                       title="Budget"
-                      isRequired={true}
+                      value={budget}
                       placeholder="The estimated operating budget in dollars..."
                       helperText={
                         "The estimated budget for the project in dollars"
                       }
                       showToolbar={false}
                       showTitle={true}
-                      value={budget}
+                      isRequired={true}
                       setValueFunction={setBudget}
                       setValueAsPlainText={true}
                     />
