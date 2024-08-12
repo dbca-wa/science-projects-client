@@ -13,29 +13,31 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
   const navigate = useNavigate();
   const [showContent, setShowContent] = useState(false);
   const location = useLocation();
-  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
+  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
+    .VITE_PRODUCTION_BACKEND_BASE_URL;
 
   useEffect(() => {
     if (!userLoading) {
       // console.log(location.pathname)
       if (!isLoggedIn || userData?.pk === undefined) {
-        if (location.pathname !== "/login"
+        if (
+          location.pathname !== "/login"
           // && location.pathname !== "/science"
         ) {
           console.log("No user and not on login page. Navigating to login.");
-          if (process.env.NODE_ENV === "production") {
-            // Originally sso/signedout?relogin=/
-            window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin`;
-          } else {
-            navigate("/login");
-          }
+          // if (process.env.NODE_ENV === "production") {
+          //   // Originally sso/signedout?relogin=/
+          //   window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin`;
+          // }
+          // else {
+          navigate("/login");
+          // }
         }
-      }
-      else {
+      } else {
         setShowContent(true);
       }
     }
-  }, [userLoading, location, isLoggedIn,]);
+  }, [userLoading, location, isLoggedIn]);
 
   return <>{showContent ? children : null}</>;
 };
