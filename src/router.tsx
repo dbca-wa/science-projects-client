@@ -373,6 +373,7 @@ const staffTestArray = [
 
 export const router =
   VITE_PRODUCTION_BACKEND_BASE_URL === undefined ||
-  VITE_PRODUCTION_BACKEND_BASE_URL?.includes("test")
+  VITE_PRODUCTION_BACKEND_BASE_URL?.includes("test") ||
+  VITE_PRODUCTION_BACKEND_BASE_URL?.includes("migrated")
     ? createBrowserRouter([...inAppRouteArray, ...staffTestArray])
     : createBrowserRouter(inAppRouteArray);
