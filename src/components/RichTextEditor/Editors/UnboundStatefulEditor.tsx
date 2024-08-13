@@ -29,6 +29,7 @@ interface IProps {
   shouldFocus?: boolean;
   helperTextColor?: string;
   isPlain?: boolean;
+  buttonSize?: "sm" | "md" | "lg";
 }
 
 export const UnboundStatefulEditor = ({
@@ -45,6 +46,7 @@ export const UnboundStatefulEditor = ({
   shouldFocus,
   helperTextColor,
   isPlain,
+  buttonSize,
 }: IProps) => {
   const { colorMode } = useColorMode();
 
@@ -147,6 +149,7 @@ export const UnboundStatefulEditor = ({
               setValueAsPlainText={setValueAsPlainText}
               setValueFunction={setValueFunction}
               shouldFocus={shouldFocus ? shouldFocus : undefined}
+              buttonSize={buttonSize}
             />
           )}
         </Box>

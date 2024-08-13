@@ -11,11 +11,12 @@ interface IBaseToolbarButtonProps {
   isActive?: boolean;
   isDisabled?: boolean;
   onClick?: () => void;
-
+  buttonSize?: "sm" | "md" | "lg";
   children: ReactNode;
 }
 
 export const RevisedBaseToolbarButton = ({
+  buttonSize,
   children,
   ariaLabel,
   isDisabled,
@@ -31,6 +32,7 @@ export const RevisedBaseToolbarButton = ({
       className="tooltip-container"
     >
       <Button
+        size={buttonSize}
         aria-label={ariaLabel}
         variant={variant ? variant : "ghost"}
         isDisabled={isDisabled}
