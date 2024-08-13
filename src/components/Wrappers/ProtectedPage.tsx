@@ -16,27 +16,43 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
   const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
     .VITE_PRODUCTION_BACKEND_BASE_URL;
 
+  const getBaseUrl = () => {
+    const { hostname, port } = window.location;
+    return hostname;
+  };
+
+  const [baseUrl, setBaseUrl] = useState(getBaseUrl());
+  useEffect(() => {
+    setBaseUrl(getBaseUrl());
+  }, [location]);
+
   useEffect(() => {
     if (!userLoading) {
       // console.log(location.pathname)
       if (!isLoggedIn || userData?.pk === undefined) {
         if (
-          location.pathname !== "/login"
+          location.pathname !== "/login" &&
+          location.pathname !== "/staff" &&
+          baseUrl !== "profiles.dbca.wa.gov.au" &&
+          baseUrl !== "profiles-test.dbca.wa.gov.au" &&
+          baseUrl !== "profiles.migrated.dbca.wa.gov.au"
           // && location.pathname !== "/science"
         ) {
-          console.log("No user and not on login page. Navigating to login.");
-          if (process.env.NODE_ENV === "production") {
-            // Originally sso/signedout?relogin=/
-            window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin`;
-          } else {
-            navigate("/login");
-          }
+          console.log(
+            "No user and not on login/staff page. Navigating to login.",
+          );
+          // if (process.env.NODE_ENV === "production") {
+          //   // Originally sso/signedout?relogin=/
+          //   window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}sso/signedout?relogin`;
+          // } else {
+          //   navigate("/login");
+          // }
         }
       } else {
         setShowContent(true);
       }
     }
-  }, [userLoading, location, isLoggedIn]);
+  }, [userLoading, location, isLoggedIn, baseUrl]);
 
   return <>{showContent ? children : null}</>;
 };
