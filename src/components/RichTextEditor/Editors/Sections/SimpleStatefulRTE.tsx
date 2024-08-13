@@ -26,6 +26,7 @@ interface Props {
   setValueFunction: React.Dispatch<React.SetStateAction<string>>;
   initialConfig: InitialConfigType;
   shouldFocus?: boolean;
+  buttonSize?: "sm" | "md" | "lg";
   // editorRef: any;
 }
 
@@ -39,6 +40,7 @@ export const SimpleStatefulRTE = ({
   value,
   setValueFunction,
   shouldFocus,
+  buttonSize,
 }: Props) => {
   const [firstRender, setFirstRender] = useState(true);
 
@@ -84,6 +86,7 @@ export const SimpleStatefulRTE = ({
 
               {showToolbar ? (
                 <RevisedSimpleRichTextToolbar
+                  buttonSize={buttonSize}
                   allowInserts={allowInsertButton}
                 />
               ) : null}

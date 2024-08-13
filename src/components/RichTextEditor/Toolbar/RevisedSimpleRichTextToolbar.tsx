@@ -77,7 +77,7 @@ const useToolbar = ({
   const [canUndo, setCanUndo] = useState<boolean>(false);
   const [canRedo, setCanRedo] = useState<boolean>(false);
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
-    null
+    null,
   );
   // const [codeLanguage, setCodeLanguage] = useState<string>("");
   const blockTypeToBlockName = {
@@ -168,7 +168,7 @@ const useToolbar = ({
           if ($isListNode(element)) {
             const parentList = $getNearestNodeOfType<ListNode>(
               anchorNode,
-              ListNode
+              ListNode,
             );
             const type = parentList
               ? parentList.getListType()
@@ -218,7 +218,7 @@ const useToolbar = ({
           setCanUndo(payload);
           return false;
         },
-        COMMAND_PRIORITY_CRITICAL
+        COMMAND_PRIORITY_CRITICAL,
       ),
       editor.registerCommand<boolean>(
         CAN_REDO_COMMAND,
@@ -226,8 +226,8 @@ const useToolbar = ({
           setCanRedo(payload);
           return false;
         },
-        COMMAND_PRIORITY_CRITICAL
-      )
+        COMMAND_PRIORITY_CRITICAL,
+      ),
     );
   }, [editor, updatePopup]);
 
@@ -245,10 +245,14 @@ const useToolbar = ({
 };
 
 interface Props {
+  buttonSize?: "sm" | "md" | "lg";
   allowInserts?: boolean;
 }
 
-export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
+export const RevisedSimpleRichTextToolbar = ({
+  allowInserts,
+  buttonSize,
+}: Props) => {
   const [editor] = useLexicalComposerContext();
   const [
     isBold,
@@ -304,14 +308,15 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
       />
 
       <Flex
-        px={5}
-        py={0.5}
+        px={buttonSize && buttonSize === "sm" ? 1 : 5}
+        py={buttonSize && buttonSize === "sm" ? 1 : 0.5}
         bg={colorMode === "light" ? undefined : "gray.900"}
         roundedTop={20}
         borderBottom={"1px solid"}
         borderColor={colorMode === "dark" ? "gray.700" : "gray.200"}
       >
         <RevisedBaseToolbarButton
+          buttonSize={buttonSize}
           ariaLabel="Undo"
           // isActive={isBold}
           variant={"ghost"}
@@ -323,6 +328,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
           <FaUndo />
         </RevisedBaseToolbarButton>
         <RevisedBaseToolbarButton
+          buttonSize={buttonSize}
           ariaLabel="Undo"
           // isActive={isBold}
           variant={"ghost"}
@@ -337,6 +343,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
 
         <>
           <RevisedBaseToolbarButton
+            buttonSize={buttonSize}
             ariaLabel="Format text as Bold"
             isActive={isBold}
             variant={"ghost"}
@@ -348,6 +355,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
             <FaBold />
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
+            buttonSize={buttonSize}
             ariaLabel="Format text as Italic"
             isActive={isItalic}
             variant={"ghost"}
@@ -359,6 +367,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
             <FaItalic />
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
+            buttonSize={buttonSize}
             ariaLabel="Format text as Underlined"
             isActive={isUnderline}
             variant={"ghost"}
@@ -373,6 +382,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
         </>
 
         <ElementSelector
+          buttonSize={buttonSize}
           formatBulletList={formatBulletList}
           formatNumberList={formatNumberedList}
           formatParagraph={formatParagraph}
@@ -383,6 +393,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
         <VerticalDivider />
         <>
           <RevisedBaseToolbarButton
+            buttonSize={buttonSize}
             ariaLabel="Format Subscript"
             isActive={isSubscript}
             variant={"ghost"}
@@ -394,6 +405,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
             <MdSubscript />
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
+            buttonSize={buttonSize}
             ariaLabel="Format Superscript"
             isActive={isSuperscript}
             variant={"ghost"}
@@ -405,6 +417,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
             <MdSuperscript />
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
+            buttonSize={buttonSize}
             ariaLabel="Clear Formatting"
             variant={"ghost"}
             isDisabled={false}
@@ -443,7 +456,7 @@ export const RevisedSimpleRichTextToolbar = ({ allowInserts }: Props) => {
                       if (textNode.__format !== 0) {
                         textNode.setFormat(0);
                         $getNearestBlockElementAncestorOrThrow(
-                          textNode
+                          textNode,
                         ).setFormat("");
                       }
                       node = textNode;
@@ -483,6 +496,7 @@ import { MdFormatListBulleted, MdFormatListNumbered } from "react-icons/md";
 import { TbChecklist } from "react-icons/tb";
 
 interface ElementProps {
+  buttonSize?: "sm" | "md" | "lg";
   formatParagraph: () => void;
   formatBulletList: () => void;
   formatNumberList: () => void;
@@ -508,6 +522,7 @@ const ElementSelector = ({
   formatNumberList,
   blockType,
   allowInserts,
+  buttonSize,
 }: ElementProps) => {
   // blockType: "number" | "code" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "bullet" | "check" | "paragraph" | "quote"
 
@@ -524,7 +539,7 @@ const ElementSelector = ({
       | "bullet"
       | "check"
       | "paragraph"
-      | "quote"
+      | "quote",
   ) => {
     const dict = {
       code: "Code",
@@ -556,7 +571,7 @@ const ElementSelector = ({
       | "bullet"
       | "check"
       | "paragraph"
-      | "quote"
+      | "quote",
   ) => {
     const dict = {
       code: <FaCode />,
@@ -603,6 +618,7 @@ const ElementSelector = ({
       // placement="bottom"
     >
       <MenuButton
+        size={buttonSize}
         as={Button}
         variant={"ghost"}
         leftIcon={blockTypeToBlockIcon(blockType)}
@@ -612,6 +628,7 @@ const ElementSelector = ({
         flex={1}
         tabIndex={-1}
       >
+        {/* {buttonSize} */}
         {blockTypeToBlockName(blockType)}
       </MenuButton>
       <MenuList

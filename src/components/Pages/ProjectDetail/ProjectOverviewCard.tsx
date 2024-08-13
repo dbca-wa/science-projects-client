@@ -1191,7 +1191,7 @@ export const ProjectOverviewCard = ({
 
                         /> */}
 
-            {(details?.external as IExternalProjectDetails)?.aims ? (
+            {(details?.external as IExternalProjectDetails)?.project ? (
               <>
                 <RichTextEditor
                   // wordLimit={500}

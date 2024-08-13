@@ -315,7 +315,7 @@ export const EditProjectModal = ({
     ) {
       setCanUpdate(false);
     } else {
-      if ((details?.external as IExternalProjectDetails)?.description) {
+      if ((details?.external as IExternalProjectDetails)?.project) {
         // HANDLE EXTERNAL FIELDS
         const parser = new DOMParser();
         const descriptionDoc = parser.parseFromString(
@@ -462,6 +462,8 @@ export const EditProjectModal = ({
         <ModalOverlay />
         <ModalContent
           bg={colorMode === "light" ? "white" : "gray.800"}
+          overflow={"hidden"}
+          w={"100%"}
           // ref={modalContentRef}
         >
           <ModalHeader>
@@ -480,16 +482,22 @@ export const EditProjectModal = ({
           </ModalHeader>
           <ModalCloseButton />
 
-          <ModalBody>
+          <ModalBody maxW={"100%"}>
             <VisuallyHiddenInput
               type="text"
               placeholder="pk"
               value={projectPk}
               readOnly
             />
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
+            <Grid
+              gridTemplateColumns={"repeat(2, 1fr)"}
+              gridGap={8}
+              maxW={"100%"}
+              // overflow={"hidden"}
+            >
               <Box>
                 <UnboundStatefulEditor
+                  buttonSize="sm"
                   title="Project Title"
                   placeholder="Enter the project's title..."
                   // helperText={"The academic organisation of the student"}
@@ -508,7 +516,8 @@ export const EditProjectModal = ({
                     pb={2}
                   >
                     <UnboundStatefulEditor
-                      title="Description"
+                      buttonSize="sm"
+                      title="External Description"
                       isRequired={true}
                       helperText={
                         "Description specific to this external project."
@@ -771,7 +780,8 @@ export const EditProjectModal = ({
                     pb={2}
                   >
                     <UnboundStatefulEditor
-                      title="Aims"
+                      buttonSize="sm"
+                      title="External Aims"
                       value={aims}
                       allowInsertButton
                       helperText={"List out the aims of your project."}
@@ -782,6 +792,7 @@ export const EditProjectModal = ({
                       setValueAsPlainText={false}
                     />
                     <UnboundStatefulEditor
+                      buttonSize="sm"
                       title="Budget"
                       value={budget}
                       placeholder="The estimated operating budget in dollars..."
