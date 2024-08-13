@@ -4,6 +4,7 @@ import { Button, Icon, useColorMode } from "@chakra-ui/react";
 import { IconType } from "react-icons";
 
 import "../../../styles/texteditor.css";
+import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 
 interface BaseOptionsButtonProps {
   colorScheme?: string;
@@ -21,6 +22,16 @@ export const BaseOptionsButton = ({
   canRunFunction,
 }: BaseOptionsButtonProps) => {
   const { colorMode } = useColorMode();
+  const { closeEditor } = useEditorContext();
+
+  const handleClick = () => {
+    if (toolTipText === "Save changes") {
+      closeEditor();
+      onClick();
+    } else {
+      onClick();
+    }
+  };
 
   return (
     <div className="tooltip-container">
@@ -30,15 +41,15 @@ export const BaseOptionsButton = ({
         _hover={
           colorMode === "light"
             ? {
-              bg: `${colorScheme}.600`,
-              color: `white`,
-            }
+                bg: `${colorScheme}.600`,
+                color: `white`,
+              }
             : {
-              bg: `${colorScheme}.500`,
-              color: `white`,
-            }
+                bg: `${colorScheme}.500`,
+                color: `white`,
+              }
         }
-        onClick={onClick}
+        onClick={handleClick}
         rounded={"full"}
         w={"35px"}
         h={"40px"}
