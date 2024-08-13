@@ -146,6 +146,15 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
+              Fix: Updated popup appearance - should not appear if saving or
+              hiding editor
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: Added search bar and toggle for inactive projects on "My
               Projects" section
             </ListItem>
