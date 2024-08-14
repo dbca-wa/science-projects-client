@@ -84,7 +84,12 @@ export const EditorProvider = ({ children }: IEditorProviderProps) => {
     }
   };
 
-  useEffect(() => console.log(openEditorsCount), [openEditorsCount]);
+  useEffect(() => {
+    console.log(openEditorsCount);
+    if (openEditorsCount === 0 && isDialogOpen === true) {
+      setIsDialogOpen(false);
+    }
+  }, [openEditorsCount, isDialogOpen]);
 
   return (
     <EditorContext.Provider
