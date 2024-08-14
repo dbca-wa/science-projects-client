@@ -47,18 +47,19 @@ const baseBackendUrl =
 
 const instance = axios.create({
   baseURL: baseBackendUrl,
-  withCredentials: process.env.NODE_ENV === "development",
+  withCredentials: true,
+  // process.env.NODE_ENV === "development",
 });
 
-// turned off for built app (used in docker image) as not present in nginx headers
-if (process.env.NODE_ENV === "development") {
-  // Intercept and inject csrf every request (up to date and dynamic)
-  instance.interceptors.request.use((config) => {
-    const csrfToken = Cookie.get("csrftoken") || "";
-    config.headers["X-CSRFToken"] = csrfToken;
-    return config;
-  });
-}
+// // turned off for built app (used in docker image) as not present in nginx headers
+// if (process.env.NODE_ENV === "development") {
+// Intercept and inject csrf every request (up to date and dynamic)
+instance.interceptors.request.use((config) => {
+  const csrfToken = Cookie.get("csrftoken") || "";
+  config.headers["X-CSRFToken"] = csrfToken;
+  return config;
+});
+// }
 
 // AUTHENTICATION ==============================================================
 
