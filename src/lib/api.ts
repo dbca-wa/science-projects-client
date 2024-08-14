@@ -47,10 +47,11 @@ const baseBackendUrl =
 
 const instance = axios.create({
   baseURL: baseBackendUrl,
-  withCredentials: true,
+  withCredentials: process.env.NODE_ENV === "development",
 });
 
-if (process.env.NODE_ENV !== "development") {
+// turned off for built app (used in docker image) as not present in nginx headers
+if (process.env.NODE_ENV === "development") {
   // Intercept and inject csrf every request (up to date and dynamic)
   instance.interceptors.request.use((config) => {
     const csrfToken = Cookie.get("csrftoken") || "";
