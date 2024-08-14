@@ -50,12 +50,14 @@ const instance = axios.create({
   withCredentials: true,
 });
 
-// Intercept and inject csrf every request (up to date and dynamic)
-instance.interceptors.request.use((config) => {
-  const csrfToken = Cookie.get("csrftoken") || "";
-  config.headers["X-CSRFToken"] = csrfToken;
-  return config;
-});
+if (process.env.NODE_ENV !== "development") {
+  // Intercept and inject csrf every request (up to date and dynamic)
+  instance.interceptors.request.use((config) => {
+    const csrfToken = Cookie.get("csrftoken") || "";
+    config.headers["X-CSRFToken"] = csrfToken;
+    return config;
+  });
+}
 
 // AUTHENTICATION ==============================================================
 
