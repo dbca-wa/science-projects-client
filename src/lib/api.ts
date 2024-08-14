@@ -47,8 +47,7 @@ const baseBackendUrl =
 
 const instance = axios.create({
   baseURL: baseBackendUrl,
-  withCredentials: true,
-  // process.env.NODE_ENV === "development",
+  withCredentials: process.env.NODE_ENV === "development",
 });
 
 // turned off for built app (used in docker image) as not present in nginx headers
