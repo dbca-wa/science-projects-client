@@ -19,6 +19,7 @@ import EditableStaffProjects from "./Public Profile/EditableStaffProjects";
 import EditableStaffPublications from "./Public Profile/EditableStaffPublications";
 import { useEffect } from "react";
 import Subsection from "@/components/StaffProfiles/Staff/Detail/Subsection";
+import { useITAssetsUser } from "@/lib/hooks/tanstack/useITAssetsUser";
 
 const StaffHeroEditable = () => {
   return (
@@ -51,6 +52,11 @@ export const PublicProfilePage = () => {
   );
   const { colorMode } = useColorMode();
   useEffect(() => console.log(staffProfileData));
+
+  const { userITData, userITLoading } = useITAssetsUser(userData?.pk);
+  useEffect(() => {
+    console.log(userITData);
+  }, [userITData, userITLoading]);
 
   return (
     <Flex h={"100%"} minH={"88vh"} flexDir={"column"}>
