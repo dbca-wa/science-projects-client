@@ -13,13 +13,13 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { ICreateProjectExternalDetails } from "../../../lib/api";
+// import { ICreateProjectExternalDetails } from "../../../lib/api";
 import "../../../styles/modalscrollbar.css";
 
 interface IProjectExternalProps {
-  externalFilled: boolean;
-  setExternalFilled: React.Dispatch<React.SetStateAction<boolean>>;
-  externalData: ICreateProjectExternalDetails;
+  //   externalFilled: boolean;
+  //   setExternalFilled: React.Dispatch<React.SetStateAction<boolean>>;
+  //   externalData: ICreateProjectExternalDetails;
   setExternalData: (data) => void;
   createClick: () => void;
   onClose: () => void;
@@ -29,9 +29,9 @@ interface IProjectExternalProps {
 export const ProjectExternalSection = ({
   backClick,
   createClick,
-  externalFilled,
-  setExternalFilled,
-  externalData,
+  //   externalFilled,
+  //   setExternalFilled,
+  //   externalData,
   setExternalData,
 }: IProjectExternalProps) => {
   const [externalDescription, setExternalDescription] = useState<string>("");
@@ -95,32 +95,32 @@ export const ProjectExternalSection = ({
     });
   }, [externalDescription, aims, budget, collaborationWith]);
 
-  useEffect(() => {
-    if (
-      externalDescription.length > 0 &&
-      aims.length > 0 &&
-      budget.length > 0 &&
-      collaborationWith.length > 0
-    ) {
-      // console.log(externalData);
-      setExternalFilled(true);
-    } else {
-      // console.log(
-      //   externalDescription.length,
-      //   budget.length,
-      //   aims.length,
-      //   collaborationWith.length
-      // );
-      setExternalFilled(false);
-    }
-  }, [
-    externalData,
-    aims,
-    budget,
-    collaborationWith,
-    externalDescription,
-    setExternalFilled,
-  ]);
+  //   useEffect(() => {
+  //     if (
+  //       externalDescription.length > 0 &&
+  //       aims.length > 0 &&
+  //       budget.length > 0 &&
+  //       collaborationWith.length > 0
+  //     ) {
+  //       // console.log(externalData);
+  //       setExternalFilled(true);
+  //     } else {
+  //       // console.log(
+  //       //   externalDescription.length,
+  //       //   budget.length,
+  //       //   aims.length,
+  //       //   collaborationWith.length
+  //       // );
+  //       setExternalFilled(false);
+  //     }
+  //   }, [
+  //     externalData,
+  //     aims,
+  //     budget,
+  //     collaborationWith,
+  //     externalDescription,
+  //     setExternalFilled,
+  //   ]);
 
   const { colorMode } = useColorMode();
 
@@ -145,7 +145,7 @@ export const ProjectExternalSection = ({
       <FormControl>
         <AffiliationCreateSearchDropdown
           autoFocus
-          isRequired
+          isRequired={false}
           isEditable
           array={collaboratingPartnersArray}
           arrayAddFunction={addCollaboratingPartnersPkToArray}
@@ -165,7 +165,7 @@ export const ProjectExternalSection = ({
         helperText={"The estimated budget for the project in dollars"}
         showToolbar={false}
         showTitle={true}
-        isRequired={true}
+        isRequired={false}
         value={budget}
         setValueFunction={setBudget}
         setValueAsPlainText={true}
@@ -176,7 +176,7 @@ export const ProjectExternalSection = ({
         helperText={"Description specific to this external project."}
         showToolbar={true}
         showTitle={true}
-        isRequired={true}
+        isRequired={false}
         value={externalDescription}
         setValueFunction={setExternalDescription}
         setValueAsPlainText={false}
@@ -188,7 +188,7 @@ export const ProjectExternalSection = ({
         helperText={"List out the aims of your project."}
         showToolbar={true}
         showTitle={true}
-        isRequired={true}
+        isRequired={false}
         value={aims}
         setValueFunction={setAims}
         setValueAsPlainText={false}
@@ -208,7 +208,7 @@ export const ProjectExternalSection = ({
             _hover={{
               background: colorMode === "light" ? "blue.400" : "blue.500",
             }}
-            isDisabled={!externalFilled}
+            // isDisabled={!externalFilled}
             onClick={() => {
               createClick();
             }}

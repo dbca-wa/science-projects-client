@@ -66,7 +66,7 @@ export const CreateProjectModal = ({
   const [projectDetailsFilled, setProjectDetailsFilled] =
     useState<boolean>(false);
   const [locationFilled, setLocationFilled] = useState<boolean>(false);
-  const [externalFilled, setExternalFilled] = useState<boolean>(false);
+  // const [externalFilled, setExternalFilled] = useState<boolean>(false);
   const [studentFilled, setStudentFilled] = useState<boolean>(false);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
@@ -340,10 +340,10 @@ export const CreateProjectModal = ({
               {projectType.includes("External") && (
                 <TabPanel>
                   <ProjectExternalSection
-                    externalFilled={externalFilled}
-                    externalData={externalData}
+                    // externalFilled={externalFilled}
+                    // externalData={externalData}
                     setExternalData={setExternalData}
-                    setExternalFilled={setExternalFilled}
+                    // setExternalFilled={setExternalFilled}
                     onClose={onClose}
                     backClick={goBack}
                     createClick={kickOffMutation}
