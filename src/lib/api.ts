@@ -502,6 +502,16 @@ export const getFullUser = async ({ queryKey }: QueryFunctionContext) => {
   } else return null;
 };
 
+export const getITAssetUser = async ({ queryKey }: QueryFunctionContext) => {
+  const [_, pk] = queryKey;
+  if (pk !== undefined && pk !== null && pk !== 0) {
+    const res = instance.get(`users/${pk}/itassets`).then((res) => {
+      return res.data;
+    });
+    return res;
+  } else return null;
+};
+
 export const getSingleUser = async ({ queryKey }: QueryFunctionContext) => {
   const [_, userPk] = queryKey;
   return instance.get(`users/${userPk}`).then((res) => {

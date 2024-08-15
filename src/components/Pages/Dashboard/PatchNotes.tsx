@@ -140,15 +140,23 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             {/* &#9881;&#65039; */}
           </Text>
           <List spacing={1} ml={2}>
-          <ListItem
+            <ListItem
+                fontSize={"small"}
+                textIndent={"-21px"}
+                marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Fix: Prevent popup appearing twice when navigating away with an open / unsaved editor
+            </ListItem>
+            <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Prevent popup appearing twice when navigating away with an open / unsaved editor
+              Fix: Reflect changes of external description and aims immediately on updating
             </ListItem>
-          <ListItem
+            <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
