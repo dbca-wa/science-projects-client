@@ -1213,7 +1213,7 @@ export const ProjectOverviewCard = ({
                   section={"externalDescription"}
                   isUpdate={true}
                   titleTextSize={"20px"}
-                  key={`externalDescription${colorMode}`} // Change the key to force a re-render
+                  key={`externalDescription${colorMode}${(details?.external as IExternalProjectDetails)?.description}`} // Change the key to force a re-render
                 />
                 <RichTextEditor
                   // wordLimit={500}
@@ -1233,7 +1233,7 @@ export const ProjectOverviewCard = ({
                   section={"externalAims"}
                   isUpdate={true}
                   titleTextSize={"20px"}
-                  key={`externalAims${colorMode}`} // Change the key to force a re-render
+                  key={`externalAims${colorMode}${(details?.external as IExternalProjectDetails)?.aims}`} // Change the key to force a re-render
                 />
               </>
             ) : (
