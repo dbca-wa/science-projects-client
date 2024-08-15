@@ -315,34 +315,35 @@ export const EditProjectModal = ({
     ) {
       setCanUpdate(false);
     } else {
-      if ((details?.external as IExternalProjectDetails)?.project) {
-        // HANDLE EXTERNAL FIELDS
-        const parser = new DOMParser();
-        const descriptionDoc = parser.parseFromString(
-          externalDescription,
-          "text/html",
-        );
-        const descriptionContent = descriptionDoc.body.textContent;
-        const aimsDoc = parser.parseFromString(aims, "text/html");
-        const aimsContent = aimsDoc.body.textContent;
-        const collaborationDoc = parser.parseFromString(
-          collaborationWith,
-          "text/html",
-        );
-        const collaborationContent = collaborationDoc.body.textContent;
-        // console.log({ budget, collaborationContent, aims, descriptionContent });
+      // if ((details?.external as IExternalProjectDetails)?.project) {
+      //   // HANDLE EXTERNAL FIELDS
+      //   const parser = new DOMParser();
+      //   const descriptionDoc = parser.parseFromString(
+      //     externalDescription,
+      //     "text/html",
+      //   );
+      //   const descriptionContent = descriptionDoc.body.textContent;
+      //   const aimsDoc = parser.parseFromString(aims, "text/html");
+      //   const aimsContent = aimsDoc.body.textContent;
+      //   const collaborationDoc = parser.parseFromString(
+      //     collaborationWith,
+      //     "text/html",
+      //   );
+      //   const collaborationContent = collaborationDoc.body.textContent;
+      //   // console.log({ budget, collaborationContent, aims, descriptionContent });
 
-        if (
-          descriptionContent?.length > 0 &&
-          aimsContent?.length > 0 &&
-          collaborationContent?.length > 0 &&
-          budget?.length > 0
-        ) {
-          setCanUpdate(true);
-        } else {
-          setCanUpdate(false);
-        }
-      } else if ((details?.student as IStudentProjectDetails)?.level) {
+      //   if (
+      //     descriptionContent?.length > 0 &&
+      //     aimsContent?.length > 0 &&
+      //     collaborationContent?.length > 0 &&
+      //     budget?.length > 0
+      //   ) {
+      //     setCanUpdate(true);
+      //   } else {
+      //     setCanUpdate(false);
+      //   }
+      // } else
+      if ((details?.student as IStudentProjectDetails)?.level) {
         // HANDLE STUDENT FIELDS
         const parser = new DOMParser();
         const organisationDoc = parser.parseFromString(
