@@ -28,7 +28,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaArrowLeft } from "react-icons/fa";
 import { HiAcademicCap } from "react-icons/hi";
@@ -54,6 +54,7 @@ import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
 import TagInput from "../Pages/CreateProject/TagInput";
 import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
+import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 // import { FaAnglesDown } from "react-icons/fa6";
 
 interface Props {
@@ -108,6 +109,8 @@ export const EditProjectModal = ({
   const [locationData, setLocationData] = useState<number[]>(
     currentAreas.map((area) => area.pk),
   );
+
+  const { openEditorsCount, closeEditor } = useEditorContext();
 
   // useEffect(() => {
   //   console.log(details);
@@ -394,11 +397,25 @@ export const EditProjectModal = ({
     toastIdRef.current = toast(data);
   };
 
+  const [isUpdating, setIsUpdating] = useState(false);
+  const closeAllEditors = useCallback(() => {
+    if (openEditorsCount > 0) {
+      closeEditor();
+      setTimeout(closeAllEditors, 0); // Schedule the next call after a short delay
+    }
+  }, [openEditorsCount, closeEditor]);
   const updateProject = async (formData: IEditProject) => {
-    // console.log("updating project");
+    setIsUpdating(true);
     console.log(formData);
     await updateProjectMutation.mutate(formData);
+    setIsUpdating(false);
   };
+
+  useEffect(() => {
+    if (isUpdating) {
+      closeAllEditors();
+    }
+  }, [isUpdating, closeAllEditors]);
 
   const updateProjectMutation = useMutation({
     mutationFn: updateProjectDetails,
@@ -519,7 +536,7 @@ export const EditProjectModal = ({
                     <UnboundStatefulEditor
                       buttonSize="sm"
                       title="External Description"
-                      isRequired={true}
+                      isRequired={false}
                       helperText={
                         "Description specific to this external project."
                       }
@@ -545,7 +562,7 @@ export const EditProjectModal = ({
                       /> */}
                     <AffiliationCreateSearchDropdown
                       autoFocus
-                      isRequired
+                      isRequired={false}
                       isEditable
                       hideTags
                       array={collaboratingPartnersArray}
@@ -788,7 +805,7 @@ export const EditProjectModal = ({
                       helperText={"List out the aims of your project."}
                       showToolbar={true}
                       showTitle={true}
-                      isRequired={true}
+                      isRequired={false}
                       setValueFunction={setAims}
                       setValueAsPlainText={false}
                     />
@@ -802,7 +819,7 @@ export const EditProjectModal = ({
                       }
                       showToolbar={false}
                       showTitle={true}
-                      isRequired={true}
+                      isRequired={false}
                       setValueFunction={setBudget}
                       setValueAsPlainText={true}
                     />
