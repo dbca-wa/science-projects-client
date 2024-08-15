@@ -140,14 +140,21 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             {/* &#9881;&#65039; */}
           </Text>
           <List spacing={1} ml={2}>
-            <ListItem
+          <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Updated popup appearance - should not appear if saving or
-              hiding editor
+              Fix: Prevent popup appearing twice when navigating away with an open / unsaved editor
+            </ListItem>
+          <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Annual Report design fixes (negative margins on RHS projects / widows and orphans)
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -155,8 +162,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added search bar and toggle for inactive projects on "My
-              Projects" section
+              Update: Allow creation of external report without immediately filling in description and aims
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -164,8 +170,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Introduced a page blocker to prevent users leaving if an
-              editor is open (ensures changes are saved or discarded)
+              Update: Allow updating external projects without requiring data for description and aims
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -173,9 +178,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Adjusted display of projects table and introduced a
-              search bar and toggle to show only active projects for "My
-              Projects" section.
+              Update: Scientific names/italics of project titles appear on annual report as typed
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -183,7 +186,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added a section for public profile
+              Update: Professions and First name initials have a period following them (Dr / J Prince -> Dr. / J. Prince)
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -191,82 +194,9 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Enabled updating first and last name to allow for special
-              characters - this will reflect throughout the app, on the Annual
-              Report and Project Documents
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Pressing back (on the browser) after changing a tab on a
-              project document will go back to the previous tab if there is one
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Allowed duplicate project names
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Removed "DUPLICATE" from some project titles
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Added referenced Science Implementation document to create
-              project page
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Display rich text of projects on project overview and
-              search
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Ensured projects are clickable when there are issues
-              loading the image
+              Feature: Users can now edit their first and last name to ensure it is correctly displayed on annual report. Accented user names appear as such on annual report
             </ListItem>
 
-            {/* 
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Updated approver/s to better determine user providing
-              final sign off on documents/receiving Directorate level emails
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Added admin ability to 'merge' users - for users who have
-              multiple accounts with projects tied to the older account
-            </ListItem> */}
           </List>
 
           <span style={{ marginTop: 20 }}>
