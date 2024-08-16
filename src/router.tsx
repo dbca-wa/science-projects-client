@@ -33,8 +33,7 @@ import { TestPlayground } from "./routes/TestPlayground";
 import { Users } from "./routes/Users";
 import { ScienceStaffLayout } from "./components/StaffProfiles/ScienceStaffLayout";
 
-const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
-  .VITE_PRODUCTION_BACKEND_BASE_URL;
+const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
 const inAppRouteArray = [
   // Login
@@ -372,8 +371,8 @@ const staffTestArray = [
 ];
 
 export const router =
-  VITE_PRODUCTION_BACKEND_BASE_URL === undefined ||
-  VITE_PRODUCTION_BACKEND_BASE_URL?.includes("test") ||
-  VITE_PRODUCTION_BACKEND_BASE_URL?.includes("migrated")
+  VITE_PRODUCTION_BASE_URL === undefined ||
+  VITE_PRODUCTION_BASE_URL?.includes("test") ||
+  VITE_PRODUCTION_BASE_URL?.includes("migrated")
     ? createBrowserRouter([...inAppRouteArray, ...staffTestArray])
     : createBrowserRouter(inAppRouteArray);

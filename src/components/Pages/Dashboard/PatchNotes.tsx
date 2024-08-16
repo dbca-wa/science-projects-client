@@ -24,8 +24,7 @@ interface IUserInterface {
 }
 
 export const PatchNotes = ({ userData }: IUserInterface) => {
-  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
-    .VITE_PRODUCTION_BACKEND_BASE_URL;
+  const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
   const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.1.5";
 
@@ -65,9 +64,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
       setWelcomeUser("");
       setShouldConcat(true);
       setSpmsText(
-        `SPMS ${
-          VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
-        }`,
+        `SPMS ${VITE_PRODUCTION_BASE_URL?.includes("-test") ? "(TEST)" : ""}`,
       );
       // setAnnualReportText("Report");
     } else {
@@ -79,13 +76,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
       if (window.innerWidth < 1350) {
         setSpmsText(
           `Science Project <br/> Management System ${
-            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+            VITE_PRODUCTION_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`,
         );
       } else {
         setSpmsText(
           `Science Project Management System ${
-            VITE_PRODUCTION_BACKEND_BASE_URL?.includes("-test") ? "(TEST)" : ""
+            VITE_PRODUCTION_BASE_URL?.includes("-test") ? "(TEST)" : ""
           }`,
         );
       }
@@ -141,12 +138,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2}>
             <ListItem
-                fontSize={"small"}
-                textIndent={"-21px"}
-                marginLeft={"21px"}
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Prevent popup appearing twice when navigating away with an open / unsaved editor
+              Fix: Prevent popup appearing twice when navigating away with an
+              open / unsaved editor
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -154,7 +152,8 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Reflect changes of external description and aims immediately on updating
+              Fix: Reflect changes of external description and aims immediately
+              on updating
             </ListItem>
             {/* <ListItem
               fontSize={"small"}
@@ -170,7 +169,8 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Allow creation of external report without immediately filling in description and aims
+              Update: Allow creation of external report without immediately
+              filling in description and aims
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -178,7 +178,8 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Allow updating external projects without requiring data for description and aims
+              Update: Allow updating external projects without requiring data
+              for description and aims
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -186,7 +187,8 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Scientific names/italics of project titles appear on annual report as typed
+              Update: Scientific names/italics of project titles appear on
+              annual report as typed
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -194,7 +196,8 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Professions and First name initials have a period following them (Dr / J Prince -> Dr. / J. Prince)
+              Update: Professions and First name initials have a period
+              following them (Dr / J Prince -&gt; Dr. / J. Prince)
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -202,9 +205,10 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Users can now edit their first and last name to ensure it is correctly displayed on annual report. Accented user names appear as such on annual report
+              Feature: Users can now edit their first and last name to ensure it
+              is correctly displayed on annual report. Accented user names
+              appear as such on annual report
             </ListItem>
-
           </List>
 
           <span style={{ marginTop: 20 }}>

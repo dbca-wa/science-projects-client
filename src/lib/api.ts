@@ -37,8 +37,7 @@ import { IConceptPlanGenerationData } from "../types";
 
 const VITE_PRODUCTION_BACKEND_API_URL = import.meta.env
   .VITE_PRODUCTION_BACKEND_API_URL;
-const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
-  .VITE_PRODUCTION_BACKEND_BASE_URL;
+const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
 const baseBackendUrl =
   process.env.NODE_ENV === "development"

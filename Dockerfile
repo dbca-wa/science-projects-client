@@ -13,13 +13,15 @@ ENV PATH="./node_modules/.bin:$PATH"
 COPY . .
 
 # Set default values for environment variables (This is set on github action for production test and main builds)
-ARG VITE_PRODUCTION_BACKEND_BASE_URL=https://127.0.0.1:8000/
+ARG VITE_PRODUCTION_BASE_URL=https://127.0.0.1:3000/
 ARG VITE_PRODUCTION_BACKEND_API_URL=https://127.0.0.1:8000/v1/api/
+ARG VITE_PRODUCTION_PROFILES_BASE_URL=https://127.0.0.1:3000/staff/
 ARG VITE_SPMS_VERSION=3.0.0
 
 # Set environment variables for runtime access
-ENV VITE_PRODUCTION_BACKEND_BASE_URL=$VITE_PRODUCTION_BACKEND_BASE_URL
+ENV VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL
 ENV VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL
+ENV VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL
 ENV VITE_SPMS_VERSION=$VITE_SPMS_VERSION
 
 # This command runs the "npm build" script inside the container (it will use above env variables).

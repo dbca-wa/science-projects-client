@@ -20,15 +20,15 @@ interface Props {
 }
 
 export const DocumentRecalledEmail = ({ userData }: Props) => {
-  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_BASE_URL
+  const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
   return (
     <Html>
       <Head />
       <Preview>SPMS: Document Recalled</Preview>
       <Tailwind>
-        <Body className="bg-white my-auto mx-auto font-sans px-2">
-          <Container className=" rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
+        <Body className="mx-auto my-auto bg-white px-2 font-sans">
+          <Container className="mx-auto my-[40px] max-w-[465px] rounded p-[20px]">
             {/* border border-solid border-[#eaeaea] */}
             <Section className="mt-[32px]">
               <Img
@@ -36,17 +36,17 @@ export const DocumentRecalledEmail = ({ userData }: Props) => {
                 width="180"
                 height="107"
                 alt="DBCA"
-                className="my-0 mx-auto"
+                className="mx-auto my-0"
               />
             </Section>
-            <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mt-4 mx-0">
+            <Heading className="mx-0 my-[30px] mt-4 p-0 text-center text-[24px] font-normal text-black">
               Document Recalled
             </Heading>
-            <Text className="text-black text-[14px] leading-[24px]">
+            <Text className="text-[14px] leading-[24px] text-black">
               {/* Hello {username}, */}
               Hello {userData?.first_name} {userData?.last_name},
             </Text>
-            <Text className="text-black text-[14px] leading-[24px]">
+            <Text className="text-[14px] leading-[24px] text-black">
               {/* <strong>{invitedByUsername}</strong>  */}
               <strong>Jarid Prince</strong> (
               <Link
@@ -60,21 +60,21 @@ export const DocumentRecalledEmail = ({ userData }: Props) => {
               ) has recalled a document from approval for project{" "}
               <strong>'{"Some Project"}'</strong>.
             </Text>
-            <Section className="text-center mt-[32px] mb-[32px]">
+            <Section className="mb-[32px] mt-[32px] text-center">
               <Button
-                className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3"
+                className="rounded bg-[#000000] px-5 py-3 text-center text-[12px] font-semibold text-white no-underline"
                 // href={inviteLink}
-                href={VITE_PRODUCTION_BACKEND_BASE_URL}
+                href={VITE_PRODUCTION_BASE_URL}
               >
                 {/* Join the team */}
                 View Document
               </Button>
             </Section>
-            <Text className="text-black text-[14px] leading-[24px]">
+            <Text className="text-[14px] leading-[24px] text-black">
               You can view the document by clicking the button above.
             </Text>
-            <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
-            <Text className="text-[#666666] text-[12px] leading-[24px]">
+            <Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
+            <Text className="text-[12px] leading-[24px] text-[#666666]">
               This automated message was intended for{" "}
               <span className="text-black">
                 {userData?.first_name} {userData?.last_name}

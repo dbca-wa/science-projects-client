@@ -31,10 +31,12 @@ const ScienceStaffSearchResult = ({
   title,
   branch,
   position,
+  disableEmailButton,
   // address,
 }: IStaffUserResult) => {
   const navigate = useNavigate();
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const ignoredTitles = ["ms", "mrs", "mr"];
 
   return (
     <div className="min-h-48 rounded-md border border-blue-100 p-6">
@@ -42,10 +44,15 @@ const ScienceStaffSearchResult = ({
         className="cursor-pointer text-balance text-lg font-bold text-blue-600 hover:text-blue-500 hover:underline"
         onClick={() => {
           const staffId = pk;
-          navigate(`/staff/${staffId}`);
+          if (!disableEmailButton) {
+            navigate(`/staff/${staffId}`);
+          }
         }}
       >
-        {title && `${title} `} {first_name} {last_name}
+        {title &&
+          !ignoredTitles.includes(title) &&
+          `${title[0].toLocaleUpperCase()}${title.slice(1)}. `}{" "}
+        {first_name} {last_name}
       </h4>
       <div className="my-3">
         {position && (
@@ -80,11 +87,27 @@ const ScienceStaffSearchResult = ({
         )} */}
         {email &&
           (!isDesktop ? (
-            <SendUserEmailMobileDrawer
-              first_name={first_name}
-              last_name={last_name}
-              email={email}
-            />
+            disableEmailButton === true ? (
+              <span className="flex items-center">
+                <Mail className="mt-[2px] self-start" size={"15px"} />
+                <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
+                  Email {`${first_name} ${last_name}`}
+                </a>
+              </span>
+            ) : (
+              <SendUserEmailMobileDrawer
+                first_name={first_name}
+                last_name={last_name}
+                email={email}
+              />
+            )
+          ) : disableEmailButton === true ? (
+            <span className="flex items-center">
+              <Mail className="mt-[2px] self-start" size={"15px"} />
+              <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
+                Email {`${first_name} ${last_name}`}
+              </a>
+            </span>
           ) : (
             <SendUserEmailDialog
               first_name={first_name}

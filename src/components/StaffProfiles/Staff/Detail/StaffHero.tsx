@@ -1,3 +1,4 @@
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { IStaffProfileData } from "@/types";
 import { useMediaQuery } from "@chakra-ui/react";
 import { ChevronLeft } from "lucide-react";
@@ -22,9 +23,32 @@ const StaffHero = ({
 }: IStaffHeroProps) => {
   const navigate = useNavigate();
   const isDesktop = useMediaQuery("(min-width: 768px");
+
+  const { userData, userLoading } = useUser();
+  const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
+
+  const setHref = (url: string) => {
+    window.location.href = url;
+  };
+
   return isDesktop ? (
     <div className="flex flex-col">
       {/* Back button */}
+      {!userLoading && userData?.pk ? (
+        <div
+          className="flex cursor-pointer justify-center pt-5 hover:underline"
+          onClick={() => {
+            if (process.env.NODE_ENV === "development") {
+              navigate("/users/me");
+            } else {
+              setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);
+            }
+          }}
+        >
+          <ChevronLeft />
+          <p className="font-semibold">Back to SPMS</p>
+        </div>
+      ) : null}
       <div
         className="flex cursor-pointer justify-center py-5 hover:underline"
         onClick={() => navigate("/staff")}

@@ -1092,6 +1092,7 @@ export interface IStaffUserResult {
   first_name: string;
   last_name: string;
   email: string;
+  disableEmailButton?: boolean;
 }
 
 export interface IStaffSectionProps {
