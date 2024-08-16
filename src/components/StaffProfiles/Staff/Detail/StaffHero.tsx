@@ -1,11 +1,13 @@
+import { Button } from "@/components/ui/button";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { IStaffProfileData } from "@/types";
-import { useMediaQuery } from "@chakra-ui/react";
+import { Center, Spinner, useMediaQuery } from "@chakra-ui/react";
 import { ChevronLeft } from "lucide-react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface IStaffHeroProps {
-  isLoading: boolean;
+  staffProfileDataLoading: boolean;
   staffProfileData: IStaffProfileData;
   fullName: string; // no titles
   positionTitle: string;
@@ -14,7 +16,7 @@ interface IStaffHeroProps {
 }
 
 const StaffHero = ({
-  isLoading,
+  staffProfileDataLoading,
   staffProfileData,
   fullName,
   positionTitle,
@@ -25,73 +27,85 @@ const StaffHero = ({
   const isDesktop = useMediaQuery("(min-width: 768px");
 
   const { userData, userLoading } = useUser();
+  useEffect(() => {
+    console.log({ staffProfileData, userData, userLoading });
+  }, [staffProfileData, userData, userLoading]);
+
   const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
   const setHref = (url: string) => {
     window.location.href = url;
   };
 
-  return isDesktop ? (
-    <div className="flex flex-col">
-      {/* Back button */}
-      {!userLoading && userData?.pk ? (
+  return !staffProfileDataLoading && !userLoading ? (
+    isDesktop ? (
+      <div className="flex flex-col">
+        {/* Back button */}
+        {!userLoading && userData?.pk ? (
+          <div
+            className="flex cursor-pointer justify-center pt-5 hover:underline"
+            onClick={() => {
+              if (process.env.NODE_ENV === "development") {
+                navigate("/users/me");
+              } else {
+                setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);
+              }
+            }}
+          >
+            <Button>Back to SPMS</Button>
+          </div>
+        ) : null}
         <div
-          className="flex cursor-pointer justify-center pt-5 hover:underline"
-          onClick={() => {
-            if (process.env.NODE_ENV === "development") {
-              navigate("/users/me");
-            } else {
-              setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);
-            }
-          }}
+          className="flex cursor-pointer justify-center py-5 hover:underline"
+          onClick={() => navigate("/staff")}
         >
           <ChevronLeft />
-          <p className="font-semibold">Back to SPMS</p>
+          <p className="font-semibold">Back to Search</p>
         </div>
-      ) : null}
-      <div
-        className="flex cursor-pointer justify-center py-5 hover:underline"
-        onClick={() => navigate("/staff")}
-      >
-        <ChevronLeft />
-        <p className="font-semibold">Back to Search</p>
-      </div>
 
-      {/* Name, Title and Tag */}
-      <div className="flex w-full flex-col justify-center p-4 text-center">
-        <p className="text-2xl font-bold">{fullName}</p>
-        <p className="mt-4 text-balance font-semibold text-slate-700 dark:text-slate-400">
-          {positionTitle}
-          {branchName && `, ${branchName}`}
-        </p>
-        <p className="mt-4 text-balance text-muted-foreground">
-          {tags?.map((word: string) => word).join(" | ")}
-        </p>
+        {/* Name, Title and Tag */}
+        <div className="flex w-full flex-col justify-center p-4 text-center">
+          <p className="text-2xl font-bold">{fullName}</p>
+          <p className="mt-4 text-balance font-semibold text-slate-700 dark:text-slate-400">
+            {positionTitle}
+            {branchName && `, ${branchName}`}
+          </p>
+          <div className="mt-4 flex items-center justify-center">
+            <p className="text-balance text-muted-foreground">
+              {tags?.map((word: string) => word).join(" | ")}
+            </p>
+            {userData?.pk ? <Button className="ml-4">Edit</Button> : null}
+          </div>
+        </div>
       </div>
-    </div>
+    ) : (
+      <div className="flex flex-col">
+        {/* Back button */}
+        <div
+          className="flex cursor-pointer justify-center py-5 hover:underline"
+          onClick={() => navigate("/staff")}
+        >
+          <ChevronLeft />
+          <p className="font-semibold dark:text-slate-300">Back to Search</p>
+        </div>
+
+        {/* Name, Title and Tag */}
+        <div className="flex w-full flex-col justify-center p-4 text-center dark:text-slate-300">
+          <p className="text-2xl font-bold">{fullName}</p>
+          <p className="mt-4 text-balance font-semibold text-slate-700 dark:text-slate-400">
+            {positionTitle}
+            {branchName && `, ${branchName}`}
+          </p>
+          <p className="mt-4 text-balance text-muted-foreground">
+            {tags?.map((word: string) => word).join(" | ")}
+          </p>
+        </div>
+      </div>
+    )
   ) : (
-    <div className="flex flex-col">
-      {/* Back button */}
-      <div
-        className="flex cursor-pointer justify-center py-5 hover:underline"
-        onClick={() => navigate("/staff")}
-      >
-        <ChevronLeft />
-        <p className="font-semibold dark:text-slate-300">Back to Search</p>
-      </div>
-
-      {/* Name, Title and Tag */}
-      <div className="flex w-full flex-col justify-center p-4 text-center dark:text-slate-300">
-        <p className="text-2xl font-bold">{fullName}</p>
-        <p className="mt-4 text-balance font-semibold text-slate-700 dark:text-slate-400">
-          {positionTitle}
-          {branchName && `, ${branchName}`}
-        </p>
-        <p className="mt-4 text-balance text-muted-foreground">
-          {tags?.map((word: string) => word).join(" | ")}
-        </p>
-      </div>
-    </div>
+    <Center p={4}>
+      <Spinner />
+    </Center>
   );
 };
 export default StaffHero;
