@@ -49,16 +49,6 @@ const OverviewSection = ({ isLoading }: { isLoading: boolean }) => {
           </ul>
         </Subsection>
       )}
-      {/* Education */}
-      {isLoading ? (
-        <SimpleSkeletonSection education />
-      ) : (
-        <Subsection title="Education">
-          <EducationEntry />
-          <EducationEntry />
-          <EducationEntry />
-        </Subsection>
-      )}
     </div>
   );
 };

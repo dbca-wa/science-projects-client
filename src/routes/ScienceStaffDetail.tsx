@@ -16,7 +16,7 @@ const ScienceStaffDetail = () => {
   return (
     <div className="flex flex-col">
       <StaffHero
-        isLoading={staffProfileLoading}
+        staffProfileDataLoading={staffProfileLoading}
         staffProfileData={staffProfileData}
         branchName={"Kensington"}
         positionTitle={"Web and Data Development Officer"}
