@@ -156,14 +156,14 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               <ListIcon as={MdCheckCircle} color="green.500" />
               Fix: Reflect changes of external description and aims immediately on updating
             </ListItem>
-            <ListItem
+            {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
               Update: Annual Report design fixes (negative margins on RHS projects / widows and orphans)
-            </ListItem>
+            </ListItem> */}
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
