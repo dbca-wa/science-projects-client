@@ -2,7 +2,15 @@ import SimpleSkeletonSection from "../../SimpleSkeletonSection";
 import EducationEntry from "./EducationEntry";
 import Subsection from "./Subsection";
 
-const OverviewSection = ({ isLoading }: { isLoading: boolean }) => {
+const OverviewSection = ({
+  isLoading,
+  userId,
+  buttonsVisible,
+}: {
+  isLoading: boolean;
+  userId: number;
+  buttonsVisible: boolean;
+}) => {
   return (
     <div className="">
       {/* Profile/About Me */}

@@ -49,9 +49,13 @@ const NavMenuItemButton = ({
 const StaffContent = ({
   isLoading,
   staffProfileData,
+  buttonsVisible,
+  usersPk,
 }: {
   isLoading: boolean;
   staffProfileData: IStaffProfileData;
+  buttonsVisible: boolean;
+  usersPk: number;
 }) => {
   const [selectedNav, setSelectedNav] = useState<string>("Overview");
   const { colorMode } = useColorMode();
@@ -108,13 +112,25 @@ const StaffContent = ({
         // style={isDesktop ? { display: "flex", flexDirection: "column", justifyContent: "center", } : {}}
       >
         {selectedNav === "Overview" ? (
-          <OverviewSection isLoading={isLoading} />
+          <OverviewSection
+            isLoading={isLoading}
+            userId={usersPk}
+            buttonsVisible={buttonsVisible}
+          />
         ) : selectedNav === "Projects" ? (
-          <ProjectsSection isLoading={isLoading} />
+          <ProjectsSection userId={usersPk} />
         ) : selectedNav === "CV" ? (
-          <CVSection isLoading={isLoading} />
+          <CVSection
+            isLoading={isLoading}
+            userId={usersPk}
+            buttonsVisible={buttonsVisible}
+          />
         ) : (
-          <PublicationsSection isLoading={isLoading} />
+          <PublicationsSection
+            isLoading={isLoading}
+            userId={usersPk}
+            buttonsVisible={buttonsVisible}
+          />
         )}
       </div>
     </div>
