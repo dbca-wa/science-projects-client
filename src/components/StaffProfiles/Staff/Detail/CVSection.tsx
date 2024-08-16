@@ -1,7 +1,15 @@
 import EducationEntry from "./EducationEntry";
 import EmploymentEntry from "./EmploymentEntry";
 
-const CVSection = ({ isLoading }: { isLoading: boolean }) => {
+const CVSection = ({
+  isLoading,
+  userId,
+  buttonsVisible,
+}: {
+  isLoading: boolean;
+  userId: number;
+  buttonsVisible: boolean;
+}) => {
   return (
     <>
       <div className="mb-6">

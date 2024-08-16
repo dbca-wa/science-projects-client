@@ -1,6 +1,14 @@
 import SimpleSkeletonSection from "../../SimpleSkeletonSection";
 
-const PublicationsSection = ({ isLoading }: { isLoading: boolean }) => {
+const PublicationsSection = ({
+  isLoading,
+  userId,
+  buttonsVisible,
+}: {
+  isLoading: boolean;
+  userId: number;
+  buttonsVisible: boolean;
+}) => {
   return (
     <>
       {isLoading ? (
