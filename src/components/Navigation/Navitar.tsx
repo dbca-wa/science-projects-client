@@ -52,8 +52,7 @@ export const Navitar = ({
   const addToast = (data) => {
     toastIdRef.current = toast(data);
   };
-  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
-    .VITE_PRODUCTION_BACKEND_BASE_URL;
+  const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
   const mutation = useMutation({
     mutationFn: logOut,
@@ -81,22 +80,22 @@ export const Navitar = ({
       queryClient.invalidateQueries({ queryKey: ["me"] });
       console.log("DATA IS:", data);
       if (data?.logoutUrl) {
-        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}${data.logoutUrl.slice(
+        window.location.href = `${VITE_PRODUCTION_BASE_URL}${data.logoutUrl.slice(
           1,
         )}`;
       }
       // sso/signedout?relogin
       else {
-        window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}`;
+        window.location.href = `${VITE_PRODUCTION_BASE_URL}`;
       }
       // navigate("/login");
-      // window.location.href = VITE_PRODUCTION_BACKEND_BASE_URL;
+      // window.location.href = VITE_PRODUCTION_BASE_URL;
       // window.location.assign('https://dbcab2c.b2clogin.com/dbcab2c.onmicrosoft.com/B2C_1A_Default_uat/oauth2/v2.0/logout?post_logout_redirect_uri=https%3A//login.microsoftonline.com/7b934664-cdcf-4e28-a3ee-1a5bcca0a1b6/oauth2/logout')
     },
     onError: (error) => {
       console.log("logout error, navigating to login");
       console.log(error);
-      window.location.href = `${VITE_PRODUCTION_BACKEND_BASE_URL}login`;
+      window.location.href = `${VITE_PRODUCTION_BASE_URL}login`;
     },
   });
 

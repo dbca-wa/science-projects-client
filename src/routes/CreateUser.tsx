@@ -75,8 +75,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
   const [lastNameError, setLastNameError] = useState("");
 
   const location = useLocation();
-  const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
-    .VITE_PRODUCTION_BACKEND_BASE_URL;
+  const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
   useEffect(() => {
     if (
@@ -304,7 +303,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
                   onClick={() => {
                     navigate(`/users`);
                   }}
-                >{`${VITE_PRODUCTION_BACKEND_BASE_URL}users`}</Button>
+                >{`${VITE_PRODUCTION_BASE_URL}users`}</Button>
               </motion.span>
             )}
           </TypewriterText>
@@ -485,7 +484,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
                     onClick={() => {
                       navigate(`/users`);
                     }}
-                  >{`${VITE_PRODUCTION_BACKEND_BASE_URL}users`}</Button>
+                  >{`${VITE_PRODUCTION_BASE_URL}users`}</Button>
                 </motion.span>
               )}
             </TypewriterText>
