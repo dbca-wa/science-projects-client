@@ -5,7 +5,6 @@ import OverviewSection from "./OverviewSection";
 import ProjectsSection from "./ProjectsSection";
 import PublicationsSection from "./PublicationsSection";
 import ScrollArea from "./ScrollArea";
-import { IStaffProfileData } from "@/types";
 
 const NavMenuItemButton = ({
   title,
@@ -47,13 +46,9 @@ const NavMenuItemButton = ({
 };
 
 const StaffContent = ({
-  isLoading,
-  staffProfileData,
   buttonsVisible,
   usersPk,
 }: {
-  isLoading: boolean;
-  staffProfileData: IStaffProfileData;
   buttonsVisible: boolean;
   usersPk: number;
 }) => {
@@ -112,22 +107,13 @@ const StaffContent = ({
         // style={isDesktop ? { display: "flex", flexDirection: "column", justifyContent: "center", } : {}}
       >
         {selectedNav === "Overview" ? (
-          <OverviewSection
-            isLoading={isLoading}
-            userId={usersPk}
-            buttonsVisible={buttonsVisible}
-          />
+          <OverviewSection userId={usersPk} buttonsVisible={buttonsVisible} />
         ) : selectedNav === "Projects" ? (
-          <ProjectsSection userId={usersPk} />
+          <ProjectsSection userId={usersPk} buttonsVisible={buttonsVisible} />
         ) : selectedNav === "CV" ? (
-          <CVSection
-            isLoading={isLoading}
-            userId={usersPk}
-            buttonsVisible={buttonsVisible}
-          />
+          <CVSection userId={usersPk} buttonsVisible={buttonsVisible} />
         ) : (
           <PublicationsSection
-            isLoading={isLoading}
             userId={usersPk}
             buttonsVisible={buttonsVisible}
           />

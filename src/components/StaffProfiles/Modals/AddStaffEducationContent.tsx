@@ -1,0 +1,207 @@
+import { Button } from "@/components/ui/button";
+import { DrawerClose } from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { createEducation } from "@/lib/api";
+import { IStaffEducationEntry } from "@/types";
+import { useToast } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm, Controller } from "react-hook-form";
+
+const AddStaffEducationContent = ({
+  usersPk,
+  refetch,
+  kind,
+  staffProfilePk,
+  onClose,
+}: {
+  usersPk: number;
+  refetch: () => void;
+  staffProfilePk: number;
+  kind: "drawer" | "dialog";
+  onClose: () => void;
+}) => {
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { isValid },
+  } = useForm<IStaffEducationEntry>({
+    mode: "onChange", // or "onBlur"
+  });
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: createEducation,
+    onSuccess: async () => {
+      toast({
+        status: "success",
+        title: "Created",
+        position: "top-right",
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["education", usersPk],
+      });
+      await refetch();
+      onClose();
+    },
+    onError: () => {
+      console.log("error");
+      toast({
+        status: "error",
+        title: "Failed",
+        position: "top-right",
+      });
+    },
+    onMutate: () => {
+      console.log("mutation");
+    },
+  });
+  const onSubmit = (formData: IStaffEducationEntry) => {
+    mutation.mutate(formData);
+  };
+
+  const qualificationKindOptions = [
+    { value: "postdoc", label: "Postdoctoral in" },
+    { value: "doc", label: "Doctor of" },
+    { value: "master", label: "Master of" },
+    { value: "graddip", label: "Graduate Diploma in" },
+    { value: "bachelor", label: "Bachelor of" },
+    { value: "assdegree", label: "Associate Degree in" },
+    { value: "diploma", label: "Diploma in" },
+    { value: "cert", label: "Certificate in" },
+    { value: "nano", label: "Nanodegree in" },
+  ];
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit(onSubmit)} className="text-slate-800">
+        <Input
+          type="hidden"
+          {...register("public_profile", {
+            required: true,
+            value: staffProfilePk,
+          })}
+          readOnly
+        />
+        <Label htmlFor="qualification_kind" className="">
+          Qualification Type
+        </Label>
+        <Controller
+          name="qualification_kind"
+          control={control}
+          defaultValue="bachelor"
+          render={({ field }) => (
+            <Select onValueChange={field.onChange} value={field.value}>
+              <SelectTrigger className="my-1 w-full">
+                <SelectValue placeholder="Enter the type of the qualification" />
+              </SelectTrigger>
+              <SelectContent>
+                {qualificationKindOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+
+        <Label htmlFor="qualification_name" className="">
+          Qualification
+        </Label>
+        <Input
+          type="text"
+          id="section"
+          placeholder="Enter the name of the qualification"
+          className="my-1"
+          {...register("qualification_name", { required: false })}
+        />
+
+        <Label htmlFor="qualification_field">Field</Label>
+        <Input
+          type="text"
+          id="qualification_field"
+          placeholder="Enter the subject matter of the qualification"
+          className="my-1"
+          {...register("qualification_field", { required: true })}
+        />
+
+        <div className="mt-1 flex flex-col">
+          <Label htmlFor="institution" className="my-2">
+            Institution
+          </Label>
+
+          <Input
+            type="text"
+            id="institution"
+            placeholder="Enter the institution"
+            className="w-full"
+            {...register("institution", { required: true })}
+          />
+        </div>
+        <div className="mt-1 flex flex-col">
+          <Label htmlFor="location" className="my-2">
+            Location
+          </Label>
+
+          <Input
+            type="text"
+            id="location"
+            placeholder="Enter the location"
+            className="w-full"
+            {...register("location", { required: true })}
+          />
+        </div>
+
+        <div className="mt-1 flex flex-col">
+          <Label htmlFor="start_year" className="my-2">
+            Start Year
+          </Label>
+
+          <Input
+            type="number"
+            id="start_year"
+            placeholder="Enter the start year"
+            className="w-full"
+            {...register("start_year", { required: true })}
+          />
+        </div>
+
+        <div className="mt-1 flex flex-col">
+          <Label htmlFor="start_year" className="my-2">
+            End Year
+          </Label>
+
+          <Input
+            type="number"
+            id="end_year"
+            placeholder="Enter the end year"
+            className="w-full"
+            {...register("end_year", { required: true })}
+          />
+        </div>
+
+        <div className="flex w-full justify-end">
+          {kind === "drawer" && (
+            <DrawerClose asChild className="mr-3 mt-8">
+              <Button variant="outline">Cancel</Button>
+            </DrawerClose>
+          )}
+
+          <Button type="submit" disabled={!isValid} className="mt-8">
+            Create
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+};
+export default AddStaffEducationContent;
