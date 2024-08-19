@@ -7,13 +7,15 @@ import { useEffect, useState } from "react";
 
 const EmailStaffMemberContent = ({
   kind,
-  first_name,
-  last_name,
+  // first_name,
+  // last_name,
+  name,
   email,
 }: {
   kind: "drawer" | "dialog";
-  first_name: string;
-  last_name: string;
+  name: string;
+  // first_name: string;
+  // last_name: string;
   email: string;
 }) => {
   const [senderEmail, setSenderEmail] = useState<string>("");
@@ -60,7 +62,7 @@ const EmailStaffMemberContent = ({
         onChange={(e) => setMessage(e.target.value)}
       />
       <p className="mb-2 p-1 text-xs text-muted-foreground">
-        {`Your message will be emailed to ${first_name} ${last_name}.`}
+        {`Your message will be emailed to ${name}.`}
       </p>
       <div className="flex w-full justify-end">
         {kind === "drawer" && (

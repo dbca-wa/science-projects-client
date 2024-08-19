@@ -1,65 +1,263 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { useStaffOverview } from "@/lib/hooks/tanstack/useStaffOverview";
+import { useMediaQuery } from "@/lib/utils/useMediaQuery";
+import { useEffect } from "react";
+import { MdEdit } from "react-icons/md";
+import EditStaffAboutContent from "../../Modals/EditStaffAboutContent";
+import EditStaffExpertiseContent from "../../Modals/EditStaffExpertiseContent";
 import SimpleSkeletonSection from "../../SimpleSkeletonSection";
-import EducationEntry from "./EducationEntry";
+import AddItemButton from "./AddItemButton";
 import Subsection from "./Subsection";
 
 const OverviewSection = ({
-  isLoading,
   userId,
   buttonsVisible,
 }: {
-  isLoading: boolean;
   userId: number;
   buttonsVisible: boolean;
 }) => {
+  const { staffOverviewLoading, staffOverviewData } = useStaffOverview(userId);
+
+  useEffect(() => {
+    console.log(buttonsVisible);
+  }, [buttonsVisible]);
+  const isDesktop = useMediaQuery("(min-width: 768px");
+
   return (
     <div className="">
       {/* Profile/About Me */}
-      {isLoading ? (
-        <SimpleSkeletonSection />
-      ) : (
-        <Subsection title="About Me">
-          <p className="text-balance">
-            I have been engaging in research in Japanese history and culture in
-            the 19th century (the late Edo to early Meiji periods) with a
-            special interest in centre-periphery interplay in the areas of
-          </p>
-          <ul className="ml-12 mt-4 list-disc text-balance">
-            <li>
-              provincial elite commoners - everyday life, arts and networks
-            </li>
-            <li>print culture and the publishing industry</li>
-            <li>education, communication and popular literature</li>
-            <li>Western Studies, and</li>
-            <li>modernisation.</li>
-          </ul>
-        </Subsection>
-      )}
-      {/* Expertise */}
-      {isLoading ? (
-        <SimpleSkeletonSection />
-      ) : (
-        <Subsection title="Expertise">
-          <ul className="ml-12 mt-2 list-disc text-balance">
-            <li>
-              Impacts of logging and fire on frogs, reptiles and mammals in
-              south-west forests
-            </li>
-            <li>
-              Biology and ecology of the koomal (common brushtail possum,
-              Trichosurus vulpecula hypoleucus) and the ngwayir (western
-              ringtail possum, Pseudocheirus occidentalis)
-            </li>
-            <li>Diagnosis of the declines of native mammals</li>
-            <li>
-              Vertebrate fauna ecology, conservation and in the south-west
-              forests
-            </li>
-          </ul>
-        </Subsection>
-      )}
+      {staffOverviewLoading ? (
+        <>
+          <SimpleSkeletonSection />
+          <SimpleSkeletonSection />
+        </>
+      ) : staffOverviewData ? (
+        <>
+          {/* About Me */}
+          <Subsection
+            title="About Me"
+            divider
+            button={
+              buttonsVisible ? (
+                isDesktop ? (
+                  <EditAboutDialog userPk={userId} />
+                ) : (
+                  <EditAboutDrawer userPk={userId} />
+                )
+              ) : undefined
+            }
+          >
+            {staffOverviewData?.about ? (
+              <div>
+                <div
+                  dangerouslySetInnerHTML={{ __html: staffOverviewData?.about }}
+                />
+              </div>
+            ) : (
+              <div>
+                <p>No information available.</p>
+              </div>
+            )}
+          </Subsection>
+
+          {/* Expertise */}
+          <Subsection
+            title="Expertise"
+            divider
+            button={
+              buttonsVisible ? (
+                isDesktop ? (
+                  <EditExpertiseDialog userPk={userId} />
+                ) : (
+                  <EditExpertiseDrawer userPk={userId} />
+                )
+              ) : undefined
+            }
+          >
+            {staffOverviewData?.expertise ? (
+              <div>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: staffOverviewData?.expertise,
+                  }}
+                />
+              </div>
+            ) : (
+              <div>
+                <p>No information available.</p>
+              </div>
+            )}
+          </Subsection>
+        </>
+      ) : null}
     </div>
   );
 };
-// Joining of Contact (email, phone, address), Profile and Expertise
 
 export default OverviewSection;
+
+const EditAboutDialog = ({ userPk }: { userPk: number }) => {
+  return (
+    <Dialog>
+      <DialogTrigger
+      // asChild
+      >
+        <span className="flex items-center">
+          <AddItemButton
+            icon={MdEdit}
+            as={"div"}
+            ariaLabel={"Edit About Button"}
+            label={"Click to edit your About"}
+            onClick={() => {}}
+            innerItemSize={"20px"}
+            p={1}
+          />
+        </span>
+      </DialogTrigger>
+      <DialogContent className="text-slate-800 sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="mb-2 mt-3">Edit About</DialogTitle>
+        </DialogHeader>
+
+        <EditStaffAboutContent
+          staffProfilePk={0}
+          usersPk={0}
+          refetch={function (): void {
+            throw new Error("Function not implemented.");
+          }}
+          onClose={function (): void {
+            throw new Error("Function not implemented.");
+          }}
+          kind={"dialog"}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const EditAboutDrawer = ({ userPk }: { userPk: number }) => {
+  return (
+    <Drawer>
+      <DrawerTrigger>
+        <span className="flex items-center">
+          <AddItemButton
+            icon={MdEdit}
+            as={"div"}
+            ariaLabel={"Edit About Button"}
+            label={"Click to edit your About"}
+            onClick={() => {}}
+            innerItemSize={"20px"}
+            p={1}
+          />
+        </span>
+      </DrawerTrigger>
+      <DrawerContent>
+        <div className="mx-auto w-full max-w-sm text-slate-800">
+          <DrawerHeader>
+            <DrawerTitle className="mb-2 mt-3">Edit About</DrawerTitle>
+          </DrawerHeader>
+          <EditStaffAboutContent
+            staffProfilePk={0}
+            usersPk={0}
+            refetch={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+            onClose={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+            kind={"dialog"}
+          />{" "}
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
+const EditExpertiseDialog = ({ userPk }: { userPk: number }) => {
+  return (
+    <Dialog>
+      <DialogTrigger
+      // asChild
+      >
+        <span className="flex items-center">
+          <AddItemButton
+            icon={MdEdit}
+            as={"div"}
+            ariaLabel={"Edit Expertise Button"}
+            label={"Click to edit your Expertise"}
+            onClick={() => {}}
+            innerItemSize={"20px"}
+            p={1}
+          />
+        </span>
+      </DialogTrigger>
+      <DialogContent className="text-slate-800 sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="mb-2 mt-3">Edit Expertise</DialogTitle>
+        </DialogHeader>
+        <EditStaffAboutContent
+          staffProfilePk={0}
+          usersPk={0}
+          refetch={function (): void {
+            throw new Error("Function not implemented.");
+          }}
+          onClose={function (): void {
+            throw new Error("Function not implemented.");
+          }}
+          kind={"dialog"}
+        />{" "}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const EditExpertiseDrawer = ({ userPk }: { userPk: number }) => {
+  return (
+    <Drawer>
+      <DrawerTrigger>
+        <span className="flex items-center">
+          <AddItemButton
+            icon={MdEdit}
+            as={"div"}
+            ariaLabel={"Edit Expertise Button"}
+            label={"Click to edit your Expertise"}
+            onClick={() => {}}
+            innerItemSize={"20px"}
+            p={1}
+          />
+        </span>
+      </DrawerTrigger>
+      <DrawerContent>
+        <div className="mx-auto w-full max-w-sm text-slate-800">
+          <DrawerHeader>
+            <DrawerTitle className="mb-2 mt-3">Edit Expertise</DrawerTitle>
+          </DrawerHeader>
+          <EditStaffAboutContent
+            staffProfilePk={0}
+            usersPk={0}
+            refetch={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+            onClose={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+            kind={"dialog"}
+          />{" "}
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+};

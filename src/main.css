@@ -73,6 +73,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  html {
+    overflow-y: scroll; /* Enables vertical scrolling */
+    overflow-x: hidden; /* Hides horizontal overflow if needed */
+    scrollbar-width: none; /* Hides scrollbar in Firefox */
+  }
 }
 
 @keyframes pulse {

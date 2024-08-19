@@ -2,18 +2,20 @@
 
 import {
   Box,
+  Button,
   Center,
   Flex,
   Grid,
   Image,
   Spinner,
   Text,
+  Tooltip,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { AiFillCloseCircle } from "react-icons/ai";
+import { AiFillCloseCircle, AiFillEdit, AiFillEye } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
@@ -130,16 +132,7 @@ export const ProfilePage = () => {
               padding={4}
               mb={4}
               flexDir={"column"}
-              onClick={() => {
-                if (process.env.NODE_ENV === "development") {
-                  navigate(`/staff/${me?.pk}`);
-                } else {
-                  setHref(
-                    `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${me?.pk}`,
-                  );
-                }
-              }}
-              cursor={"pointer"}
+              // cursor={"pointer"}
               onMouseEnter={() => handleMouseEnter("public appearance")}
               onMouseLeave={handleMouseLeave}
               _hover={{
@@ -159,7 +152,7 @@ export const ProfilePage = () => {
                 >
                   Public Appearance
                 </Text>
-                {hoveredItem === "public appearance" && (
+                {/* {hoveredItem === "public appearance" && (
                   <Flex
                     flex={1}
                     // bg={"pink"}
@@ -169,7 +162,7 @@ export const ProfilePage = () => {
                   >
                     <AnimatedClickToEdit />
                   </Flex>
-                )}
+                )} */}
               </Flex>
 
               <Box mb={4}>
@@ -177,23 +170,92 @@ export const ProfilePage = () => {
                   color={colorMode === "light" ? "gray.500" : "gray.500"}
                   fontSize={"xs"}
                 >
-                  This is how your account will appear when searhed on the
-                  public database. Click edit for a detailed view.
+                  This is how your account will appear when searched on the
+                  public database.
                 </Text>
               </Box>
 
-              <Flex>
+              <Flex
+                justifyContent={"center"}
+                w={"100%"}
+                // bg={"red"}
+              >
                 {/* CARD */}
-                <ScienceStaffSearchResult
-                  first_name={me.display_first_name}
-                  last_name={me.display_last_name}
-                  email={me.email}
-                  title={me.title}
-                  branch={me.branch}
-                  position={me.about}
-                  disableEmailButton={true}
-                />
+                <Flex
+                // flex={1} w={"100%"} justifyContent={"center"}
+                >
+                  <ScienceStaffSearchResult
+                    first_name={me.display_first_name}
+                    last_name={me.display_last_name}
+                    email={me.email}
+                    title={me.title}
+                    branch={me.branch}
+                    position={me.about}
+                    disableEmailButton={true}
+                  />
+                </Flex>
+
                 {/* View Public Profile Button */}
+                <Flex
+                  flexDir={"column"}
+                  justifyContent={"center"}
+                  flex={1}
+                  w={"100%"}
+                  // bg={"red"}
+                >
+                  {/* Edit/View */}
+
+                  {/* Set Profile to Hidden */}
+                  <Flex
+                    justifyContent={"end"}
+                    alignItems={"center"}
+                    w={"100%"}
+                    py={2}
+                  >
+                    <Tooltip
+                      label="Change the visibility of your staff profile"
+                      aria-label="A tooltip"
+                    >
+                      <Button
+                        onClick={() => console.log("Setting hidden")}
+                        leftIcon={<AiFillEye />}
+                      >
+                        Hide Profile
+                      </Button>
+                    </Tooltip>
+                  </Flex>
+                  <Flex
+                    justifyContent={"end"}
+                    alignItems={"center"}
+                    w={"100%"}
+                    py={8}
+                  >
+                    <Tooltip
+                      label="See and edit your staff profile"
+                      aria-label="A tooltip"
+                    >
+                      <Button
+                        bg={colorMode === "light" ? "blue.500" : "blue.500"}
+                        _hover={{
+                          bg: colorMode === "light" ? "blue.500" : "blue.500",
+                        }}
+                        color={"white"}
+                        leftIcon={<AiFillEdit />}
+                        onClick={() => {
+                          if (process.env.NODE_ENV === "development") {
+                            navigate(`/staff/${me?.pk}`);
+                          } else {
+                            setHref(
+                              `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${me?.pk}`,
+                            );
+                          }
+                        }}
+                      >
+                        Edit Profile
+                      </Button>
+                    </Tooltip>
+                  </Flex>
+                </Flex>
               </Flex>
             </Flex>
           ) : null}
@@ -206,6 +268,15 @@ export const ProfilePage = () => {
             padding={4}
             mb={4}
             flexDir={"column"}
+            onMouseEnter={() => handleMouseEnter("spms appearance")}
+            onMouseLeave={handleMouseLeave}
+            _hover={{
+              scale: 1.1,
+              boxShadow:
+                colorMode === "light"
+                  ? "0px 12px 18px -6px rgba(0, 0, 0, 0.18), 0px 2.4px 3px -1.2px rgba(0, 0, 0, 0.036), -2.4px 0px 6px -1.2px rgba(0, 0, 0, 0.072), 2.4px 0px 6px -1.2px rgba(0, 0, 0, 0.072)"
+                  : "0px 2.4px 3.6px -0.6px rgba(255, 255, 255, 0.06), 0px 1.2px 2.4px -0.6px rgba(255, 255, 255, 0.036)",
+            }}
           >
             <Flex>
               <Text
@@ -227,23 +298,30 @@ export const ProfilePage = () => {
             </Box>
             <Flex>
               <Flex w={"100%"} p={2}>
-                <UserGridItem
-                  pk={me.pk}
-                  username={me.username}
-                  email={me.email}
-                  first_name={me.first_name}
-                  last_name={me.last_name}
-                  display_first_name={me.display_first_name}
-                  display_last_name={me.display_last_name}
-                  is_staff={me.is_staff}
-                  is_superuser={me.is_superuser}
-                  image={me.image}
-                  business_area={me.business_area}
-                  role={me.role}
-                  branch={me.branch}
-                  is_active={me.is_active}
-                  affiliation={me.affiliation}
-                />
+                <Tooltip
+                  label="Click to view your SPMS profile"
+                  aria-label="A tooltip"
+                >
+                  <Box>
+                    <UserGridItem
+                      pk={me.pk}
+                      username={me.username}
+                      email={me.email}
+                      first_name={me.first_name}
+                      last_name={me.last_name}
+                      display_first_name={me.display_first_name}
+                      display_last_name={me.display_last_name}
+                      is_staff={me.is_staff}
+                      is_superuser={me.is_superuser}
+                      image={me.image}
+                      business_area={me.business_area}
+                      role={me.role}
+                      branch={me.branch}
+                      is_active={me.is_active}
+                      affiliation={me.affiliation}
+                    />
+                  </Box>
+                </Tooltip>
               </Flex>
             </Flex>
           </Flex>
