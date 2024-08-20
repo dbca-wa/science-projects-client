@@ -1,6 +1,18 @@
+import { useEffect } from "react";
 import SimpleSkeletonSection from "../../SimpleSkeletonSection";
 
-const PublicationsSection = ({ isLoading }: { isLoading: boolean }) => {
+const PublicationsSection = ({
+  userId,
+  buttonsVisible,
+}: {
+  userId: number;
+  buttonsVisible: boolean;
+}) => {
+  const isLoading = true;
+  useEffect(
+    () => console.log(userId, buttonsVisible),
+    [userId, buttonsVisible],
+  );
   return (
     <>
       {isLoading ? (

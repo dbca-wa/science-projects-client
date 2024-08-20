@@ -21,6 +21,7 @@ import { useEffect } from "react";
 import { FcCancel } from "react-icons/fc";
 import { GiConfirmed } from "react-icons/gi";
 import { useFormattedDate } from "../../lib/hooks/helper/useFormattedDate";
+import { replaceDarkWithLight } from "@/lib/hooks/helper/replaceDarkWithLight";
 
 interface IProps {
   concept_plan_pk: number;
@@ -48,32 +49,32 @@ export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
   let baseUrl = useApiEndpoint();
   baseUrl = baseUrl.replace(":8000", ":3000");
 
-  function replaceDarkWithLight(htmlString) {
-    // Replace 'dark' with 'light' in class attributes
-    const modifiedHTML = htmlString.replace(
-      /class\s*=\s*["']([^"']*dark[^"']*)["']/gi,
-      (match, group) => {
-        return `class="${group.replace(/\bdark\b/g, "light")}"`;
-      }
-    );
+  // function replaceDarkWithLight(htmlString) {
+  //   // Replace 'dark' with 'light' in class attributes
+  //   const modifiedHTML = htmlString.replace(
+  //     /class\s*=\s*["']([^"']*dark[^"']*)["']/gi,
+  //     (match, group) => {
+  //       return `class="${group.replace(/\bdark\b/g, "light")}"`;
+  //     }
+  //   );
 
-    // Add margin-right: 4px to all <li> elements
-    const finalHTML = modifiedHTML.replace(
-      /<li/g,
-      '<li style="margin-left: 36px;"'
-    );
+  //   // Add margin-right: 4px to all <li> elements
+  //   const finalHTML = modifiedHTML.replace(
+  //     /<li/g,
+  //     '<li style="margin-left: 36px;"'
+  //   );
 
-    return finalHTML;
-  }
+  //   return finalHTML;
+  // }
 
   return (
     <>
       <Html>
         <Head />
         <Tailwind>
-          <Body className="bg-white my-auto mx-auto font-sans px-2">
-            <Container className=" rounded my-[40px] mx-auto p-[20px] max-w-[190mm]">
-              <Text className="text-center mt-10 mb-14">
+          <Body className="mx-auto my-auto bg-white px-2 font-sans">
+            <Container className="mx-auto my-[40px] max-w-[190mm] rounded p-[20px]">
+              <Text className="mb-14 mt-10 text-center">
                 Document Current as of {formattedDate}
               </Text>
 
@@ -81,35 +82,35 @@ export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
                 src={`${imageUrl}`}
                 width="100%"
                 alt="Project Image"
-                className="my-0 mx-auto rounded-2xl"
+                className="mx-auto my-0 rounded-2xl"
               />
-              <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mt-10 mx-0">
+              <Heading className="mx-0 my-[30px] mt-10 p-0 text-center text-[24px] font-normal text-black">
                 {title}
               </Heading>
-              <Heading className="text-black text-[14px] font-bold text-center p-0 my-[30px] mt-4 mx-0">
+              <Heading className="mx-0 my-[30px] mt-4 p-0 text-center text-[14px] font-bold text-black">
                 {conceptPlanData?.document_tag}
               </Heading>
 
-              <Heading className="text-black text-[14px] font-bold text-center p-0 my-[30px] mt-2 mx-0">
+              <Heading className="mx-0 my-[30px] mt-2 p-0 text-center text-[14px] font-bold text-black">
                 {conceptPlanData?.business_area_name}
               </Heading>
 
-              <Heading className="text-black text-[14px] font-bold text-center p-0 mt-2 mx-0  mt-20">
+              <Heading className="mx-0 mt-2 mt-20 p-0 text-center text-[14px] font-bold text-black">
                 Team
               </Heading>
 
-              <Heading className="text-black text-[14px] p-0 my-[30px] text-center mt-10 mx-0">
+              <Heading className="mx-0 my-[30px] mt-10 p-0 text-center text-[14px] text-black">
                 {conceptPlanData?.project_team?.join(", ")}
               </Heading>
 
-              <table className="w-full mt-40">
+              <table className="mt-40 w-full">
                 <tr className="">
                   <td className="py-2">
-                    <Text className="text-black text-[14px] m-0 font-bold text-right">
+                    <Text className="m-0 text-right text-[14px] font-bold text-black">
                       Project Lead Approval
                     </Text>
                   </td>
-                  <td className="py-2 flex items-center justify-center">
+                  <td className="flex items-center justify-center py-2">
                     {conceptPlanData?.project_lead_approval_granted === true ? (
                       <Box color={"green.500"}>
                         <GiConfirmed size={"30px"} />
@@ -123,11 +124,11 @@ export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
                 </tr>
                 <tr className="">
                   <td className="py-2">
-                    <Text className="text-black text-[14px] m-0 font-bold text-right">
+                    <Text className="m-0 text-right text-[14px] font-bold text-black">
                       Business Area Lead Approval
                     </Text>
                   </td>
-                  <td className="py-2 flex items-center justify-center">
+                  <td className="flex items-center justify-center py-2">
                     {conceptPlanData?.business_area_lead_approval_granted ===
                     true ? (
                       <Box color={"green.500"}>
@@ -149,11 +150,11 @@ export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
                 </tr>
                 <tr className="">
                   <td className="py-2">
-                    <Text className="text-black text-[14px] m-0 font-bold text-right">
+                    <Text className="m-0 text-right text-[14px] font-bold text-black">
                       Directorate Approval
                     </Text>
                   </td>
-                  <td className="py-2 flex items-center justify-center">
+                  <td className="flex items-center justify-center py-2">
                     {conceptPlanData?.directorate_approval_granted === true ? (
                       <Box color={"green.500"}>
                         <GiConfirmed size={"30px"} />
@@ -168,20 +169,20 @@ export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
               </table>
 
               <Section className="my-[32px] max-w-[190mm]">
-                <Heading className="text-black text-[14px] font-bold p-0 my-[30px] mt-2 mx-0">
+                <Heading className="mx-0 my-[30px] mt-2 p-0 text-[14px] font-bold text-black">
                   Background:
                 </Heading>
                 <div
                   dangerouslySetInnerHTML={{
                     __html: replaceDarkWithLight(
-                      conceptPlanData?.background || ""
+                      conceptPlanData?.background || "",
                     ),
                   }}
                 />
               </Section>
 
               <Section className="my-[32px] max-w-[190mm]">
-                <Heading className="text-black text-[14px] font-bold p-0 my-[30px] mt-2 mx-0">
+                <Heading className="mx-0 my-[30px] mt-2 p-0 text-[14px] font-bold text-black">
                   Aims:
                 </Heading>
                 <div
@@ -192,81 +193,81 @@ export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
               </Section>
 
               <Section className="my-[32px] max-w-[190mm]">
-                <Heading className="text-black text-[14px] font-bold p-0 my-[30px] mt-2 mx-0">
+                <Heading className="mx-0 my-[30px] mt-2 p-0 text-[14px] font-bold text-black">
                   Expected Outcomes:
                 </Heading>
                 <div
                   dangerouslySetInnerHTML={{
                     __html: replaceDarkWithLight(
-                      conceptPlanData?.expected_outcomes || ""
+                      conceptPlanData?.expected_outcomes || "",
                     ),
                   }}
                 />
               </Section>
 
               <Section className="my-[32px] max-w-[190mm]">
-                <Heading className="text-black text-[14px] font-bold p-0 my-[30px] mt-2 mx-0">
+                <Heading className="mx-0 my-[30px] mt-2 p-0 text-[14px] font-bold text-black">
                   Strategic Context:
                 </Heading>
                 <div
                   dangerouslySetInnerHTML={{
                     __html: replaceDarkWithLight(
-                      conceptPlanData?.strategic_context || ""
+                      conceptPlanData?.strategic_context || "",
                     ),
                   }}
                 />
               </Section>
 
               <Section className="my-[32px] max-w-[190mm]">
-                <Heading className="text-black text-[14px] font-bold p-0 my-[30px] mt-2 mx-0">
+                <Heading className="mx-0 my-[30px] mt-2 p-0 text-[14px] font-bold text-black">
                   Expected Collaborations:
                 </Heading>
                 <div
                   dangerouslySetInnerHTML={{
                     __html: replaceDarkWithLight(
-                      conceptPlanData?.collaborations || ""
+                      conceptPlanData?.collaborations || "",
                     ),
                   }}
                 />
               </Section>
 
               <Section className="my-[32px] max-w-[190mm]">
-                <Heading className="text-black text-[14px] font-bold p-0 my-[30px] mt-2 mx-0">
+                <Heading className="mx-0 my-[30px] mt-2 p-0 text-[14px] font-bold text-black">
                   Staff Time Allocation:
                 </Heading>
                 <div
                   dangerouslySetInnerHTML={{
                     __html: replaceDarkWithLight(
-                      conceptPlanData?.staff_time_allocation || ""
+                      conceptPlanData?.staff_time_allocation || "",
                     ),
                   }}
                 />
               </Section>
 
               <Section className="my-[32px] max-w-[190mm]">
-                <Heading className="text-black text-[14px] font-bold p-0 my-[30px] mt-2 mx-0">
+                <Heading className="mx-0 my-[30px] mt-2 p-0 text-[14px] font-bold text-black">
                   Budget:
                 </Heading>
                 <div
                   dangerouslySetInnerHTML={{
                     __html: replaceDarkWithLight(
-                      conceptPlanData?.indicative_operating_budget || ""
+                      conceptPlanData?.indicative_operating_budget || "",
                     ),
                   }}
                 />
               </Section>
 
-              <Section className="text-right mt-[32px] mb-[32px]">
+              <Section className="mb-[32px] mt-[32px] text-right">
                 <Button
-                  className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3"
+                  className="rounded bg-[#000000] px-5 py-3 text-center text-[12px] font-semibold text-white no-underline"
                   href={`${baseUrl}/projects/${conceptPlanData?.project_pk}/concept`}
                 >
                   View Document
                 </Button>
               </Section>
 
-              <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
-              <Text className="text-[#666666] text-[12px] leading-[24px]">
+              <Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
+              <Text className="text-[12px] leading-[24px] text-[#666666]">
                 This automated message was intended for{" "}
                 <span className="text-black">Jarid Prince</span>. If you believe
                 this was sent by mistake, you can ignore this email.

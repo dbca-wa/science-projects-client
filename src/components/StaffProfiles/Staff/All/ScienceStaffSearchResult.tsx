@@ -1,40 +1,34 @@
-import { IStaffUserResult } from "@/types";
-import { Building, Mail, MapPin, User } from "lucide-react";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import EmailStaffMemberContent from "../../Modals/EmailStaffMemberContent";
-import { useNavigate } from "react-router-dom";
-import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { useMediaQuery } from "@/lib/utils/useMediaQuery";
+import { IStaffUserResult } from "@/types";
+import { Building, Mail, MapPin, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import EmailStaffMemberContent from "../../Modals/EmailStaffMemberContent";
 
 const ScienceStaffSearchResult = ({
   pk,
-  first_name,
-  last_name,
-  email,
+  name,
   title,
   branch,
   position,
-  // address,
+  disableEmailButton,
 }: IStaffUserResult) => {
   const navigate = useNavigate();
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const ignoredTitles = ["ms", "mrs", "mr", "master"];
 
   return (
     <div className="min-h-48 rounded-md border border-blue-100 p-6">
@@ -42,10 +36,15 @@ const ScienceStaffSearchResult = ({
         className="cursor-pointer text-balance text-lg font-bold text-blue-600 hover:text-blue-500 hover:underline"
         onClick={() => {
           const staffId = pk;
-          navigate(`/staff/${staffId}`);
+          if (!disableEmailButton) {
+            navigate(`/staff/${staffId}`);
+          }
         }}
       >
-        {title && `${title} `} {first_name} {last_name}
+        {title &&
+          !ignoredTitles.includes(title) &&
+          `${title[0].toLocaleUpperCase()}${title.slice(1)}. `}{" "}
+        {name}
       </h4>
       <div className="my-3">
         {position && (
@@ -75,89 +74,67 @@ const ScienceStaffSearchResult = ({
             </div>
           </span>
         )}
-        {/* {address && (
-    
-        )} */}
-        {email &&
-          (!isDesktop ? (
-            <SendUserEmailMobileDrawer
-              first_name={first_name}
-              last_name={last_name}
-              email={email}
-            />
-          ) : (
-            <SendUserEmailDialog
-              first_name={first_name}
-              last_name={last_name}
-              email={email}
-            />
-          ))}
+
+        {disableEmailButton === true ? (
+          <span className="flex items-center">
+            <Mail className="mt-[2px] self-start" size={"15px"} />
+            <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
+              Email {`${name}`}
+            </a>
+          </span>
+        ) : isDesktop ? (
+          <SendUserEmailDialog name={`${name}`} pk={pk} />
+        ) : (
+          <SendUserEmailMobileDrawer name={`${name}`} pk={pk} />
+        )}
       </div>
     </div>
   );
 };
 
-const SendUserEmailDialog = ({
-  first_name,
-  last_name,
-  email,
-}: IStaffUserResult) => {
+export const SendUserEmailDialog = ({ name, pk }: IStaffUserResult) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
         <span className="flex items-center">
           <Mail className="mt-[2px] self-start" size={"15px"} />
-          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
-            Email {`${first_name} ${last_name}`}
+          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600 hover:underline">
+            Email {`${name}`}
           </a>
         </span>
       </DialogTrigger>
-      <DialogContent className="text-slate-800 sm:max-w-[425px]">
+      <DialogContent className="p-4 text-slate-800 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="mb-2 mt-3">
-            Email {`${first_name} ${last_name}`}
-          </DialogTitle>
+          <DialogTitle className="mb-2 mt-3">Email {`${name}`}</DialogTitle>
         </DialogHeader>
 
-        <EmailStaffMemberContent
-          email={email}
-          first_name={first_name}
-          last_name={last_name}
-          kind={"dialog"}
-        />
+        <EmailStaffMemberContent pk={pk} name={name} kind={"dialog"} />
       </DialogContent>
     </Dialog>
   );
 };
 
-const SendUserEmailMobileDrawer = ({
-  first_name,
-  last_name,
-  email,
+export const SendUserEmailMobileDrawer = ({
+  name,
+  pk,
+  // email,
 }: IStaffUserResult) => {
   return (
     <Drawer>
       <DrawerTrigger>
         <span className="flex items-center">
           <Mail className="mt-[2px] self-start" size={"15px"} />
-          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
-            Email {`${first_name} ${last_name}`}
+          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600 hover:underline">
+            Email {`${name}`}
           </a>
         </span>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="p-4">
         <div className="mx-auto w-full max-w-sm text-slate-800">
           <DrawerHeader>
-            <DrawerTitle className="mb-2 mt-3">
-              Email {`${first_name} ${last_name}`}
-            </DrawerTitle>
+            <DrawerTitle className="mb-2 mt-3">Email {`${name}`}</DrawerTitle>
           </DrawerHeader>
-          <EmailStaffMemberContent
-            kind={"drawer"}
-            email={email}
-            first_name={first_name}
-            last_name={last_name}
-          />
+          <EmailStaffMemberContent kind={"drawer"} pk={pk} name={name} />
         </div>
       </DrawerContent>
     </Drawer>

@@ -24,7 +24,7 @@ export const ScienceStaff = () => {
   //   return () => clearInterval(interval);
   // }, []);
 
-  const isDesktop = useMediaQuery("(min-width: 768px");
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
     <div className="p-4">
@@ -64,12 +64,18 @@ export const ScienceStaff = () => {
               <ScienceStaffSearchResult
                 key={index}
                 pk={user?.pk}
-                first_name={user?.first_name}
-                last_name={user?.last_name}
-                email={user?.email}
+                name={`${user?.first_name} ${user?.last_name}`}
+                // email={user?.email}
                 position={user?.role}
                 branch={user?.branch}
               />
+              // pk,
+              // name,
+              // email,
+              // title,
+              // branch,
+              // position,
+              // disableEmailButton,
             ))}
           </Grid>
         </div>
@@ -77,139 +83,3 @@ export const ScienceStaff = () => {
     </div>
   );
 };
-
-{
-  /* <ScienceStaffSearchResult
-              first_name="Ben"
-              last_name="Richardson"
-              email="ben.richardson@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Senior Technical Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              title="Dr."
-              first_name="Rory"
-              last_name="Mcauley"
-              email="rory.mcauley@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Research Scientist (Monitoring)"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Jarid"
-              last_name="Prince"
-              email="jarid.prince@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Web Application and Data Development Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Ben"
-              last_name="Richardson"
-              email="ben.richardson@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Senior Technical Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              title="Dr."
-              first_name="Rory"
-              last_name="Mcauley"
-              email="rory.mcauley@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Research Scientist (Monitoring)"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Jarid"
-              last_name="Prince"
-              email="jarid.prince@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Web Application and Data Development Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Ben"
-              last_name="Richardson"
-              email="ben.richardson@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Senior Technical Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              title="Dr."
-              first_name="Rory"
-              last_name="Mcauley"
-              email="rory.mcauley@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Research Scientist (Monitoring)"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Jarid"
-              last_name="Prince"
-              email="jarid.prince@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Web Application and Data Development Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Ben"
-              last_name="Richardson"
-              email="ben.richardson@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Senior Technical Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              title="Dr."
-              first_name="Rory"
-              last_name="Mcauley"
-              email="rory.mcauley@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Research Scientist (Monitoring)"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Jarid"
-              last_name="Prince"
-              email="jarid.prince@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Web Application and Data Development Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Jarid"
-              last_name="Prince"
-              email="jarid.prince@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Web Application and Data Development Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Ben"
-              last_name="Richardson"
-              email="ben.richardson@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Senior Technical Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              title="Dr."
-              first_name="Rory"
-              last_name="Mcauley"
-              email="rory.mcauley@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Research Scientist (Monitoring)"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            />
-            <ScienceStaffSearchResult
-              first_name="Jarid"
-              last_name="Prince"
-              email="jarid.prince@dbca.wa.gov.au"
-              branch="Kensington"
-              position="Web Application and Data Development Officer"
-              address="17 Dick Perry Avenue, WA. Perth. 6164"
-            /> */
-}

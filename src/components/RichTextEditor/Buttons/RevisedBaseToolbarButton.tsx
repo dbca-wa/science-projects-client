@@ -47,6 +47,7 @@ export const RevisedBaseToolbarButton = ({
         tabIndex={-1}
         border={0}
         display={"flex"}
+        minWidth="auto" // Ensure buttons have a natural minimum width
       >
         {children}
       </Button>

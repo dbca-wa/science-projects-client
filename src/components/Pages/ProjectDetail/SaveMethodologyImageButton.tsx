@@ -141,15 +141,25 @@ export const SaveMethodologyImageButton = ({
           });
         }}
         rounded={"full"}
-        w={"35px"}
-        h={"40px"}
+        p={0}
+        m={0}
+        maxW={{ base: "35px", lg: "35px" }}
+        maxH={{ base: "40px", lg: "40px" }}
       >
         {handleMethImageMutation.isPending ? (
           <Center>
             <Spinner size="sm" />
           </Center>
         ) : (
-          <Icon as={buttonType === "delete" ? FaTrash : FaSave} boxSize={6} />
+          <Icon
+            as={buttonType === "delete" ? FaTrash : FaSave}
+            boxSize={{
+              base: 5,
+              lg: 6,
+            }}
+            w={{ base: "20px", lg: "20px" }}
+            h={{ base: "20px", lg: "20px" }}
+          />
         )}
       </Button>
       {toolTipText && <span className="tooltip-text">{toolTipText}</span>}

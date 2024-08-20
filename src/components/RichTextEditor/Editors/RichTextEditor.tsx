@@ -235,11 +235,12 @@ export const RichTextEditor = ({
         // roundedTop={"8px"}
         roundedTop={20}
         maxW={"100%"}
+        px={4}
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
           <Text
             // pt={1}
-            pl={8}
+            // pl={4}
             // paddingBottom={"12px"}
             my={0}
             py={2}
@@ -252,7 +253,7 @@ export const RichTextEditor = ({
 
         <Flex justifyContent="flex-end" flex={1}>
           <Grid
-            pr={8}
+            // pr={8}
             py={2}
             gridTemplateColumns={"repeat(1, 1fr)"}
             gridColumnGap={2}

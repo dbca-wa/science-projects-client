@@ -2,18 +2,20 @@
 
 import {
   Box,
+  Button,
   Center,
   Flex,
   Grid,
   Image,
   Spinner,
   Text,
+  Tooltip,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { AiFillCloseCircle } from "react-icons/ai";
+import { AiFillCloseCircle, AiFillEdit, AiFillEye } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
@@ -21,6 +23,8 @@ import { EditMembershipModal } from "../../Modals/EditMembershipModal";
 import { EditPersonalInformationModal } from "../../Modals/EditPersonalInformationModal";
 import { EditProfileModal } from "../../Modals/EditProfileModal";
 import { UserGridItem } from "../Users/UserGridItem";
+import ScienceStaffSearchResult from "@/components/StaffProfiles/Staff/All/ScienceStaffSearchResult";
+import { useNavigate } from "react-router-dom";
 
 const AnimatedClickToEdit = () => {
   return (
@@ -41,6 +45,10 @@ const AnimatedClickToEdit = () => {
 
 export const ProfilePage = () => {
   const { userLoading: loading, userData: me } = useUser();
+  const VITE_PRODUCTION_PROFILES_BASE_URL = import.meta.env
+    .VITE_PRODUCTION_PROFILES_BASE_URL;
+  const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
+
   useEffect(() => {
     if (!loading) {
       console.log(me);
@@ -82,7 +90,10 @@ export const ProfilePage = () => {
   };
 
   const imageUrl = useServerImageUrl(me?.image?.file);
-
+  const navigate = useNavigate();
+  const setHref = (url: string) => {
+    window.location.href = url;
+  };
   return (
     <Box h={"100%"}>
       {loading || me.pk === undefined ? (
@@ -112,7 +123,143 @@ export const ProfilePage = () => {
             onClose={onCloseEditMembershipModal}
           />
 
-          {/* APPEARANCE */}
+          {/* ACCESS PUBLIC PROFILE */}
+          {me?.is_superuser ? (
+            <Flex
+              border={"1px solid"}
+              rounded={"xl"}
+              borderColor={borderColor}
+              padding={4}
+              mb={4}
+              flexDir={"column"}
+              // cursor={"pointer"}
+              onMouseEnter={() => handleMouseEnter("public appearance")}
+              onMouseLeave={handleMouseLeave}
+              _hover={{
+                scale: 1.1,
+                boxShadow:
+                  colorMode === "light"
+                    ? "0px 12px 18px -6px rgba(0, 0, 0, 0.18), 0px 2.4px 3px -1.2px rgba(0, 0, 0, 0.036), -2.4px 0px 6px -1.2px rgba(0, 0, 0, 0.072), 2.4px 0px 6px -1.2px rgba(0, 0, 0, 0.072)"
+                    : "0px 2.4px 3.6px -0.6px rgba(255, 255, 255, 0.06), 0px 1.2px 2.4px -0.6px rgba(255, 255, 255, 0.036)",
+              }}
+            >
+              <Flex>
+                <Text
+                  fontWeight={"bold"}
+                  fontSize={"lg"}
+                  mb={1}
+                  color={sectionTitleColor}
+                >
+                  Public Appearance
+                </Text>
+                {/* {hoveredItem === "public appearance" && (
+                  <Flex
+                    flex={1}
+                    // bg={"pink"}
+                    justifyContent={"flex-end"}
+                    alignItems={"center"}
+                    px={4}
+                  >
+                    <AnimatedClickToEdit />
+                  </Flex>
+                )} */}
+              </Flex>
+
+              <Box mb={4}>
+                <Text
+                  color={colorMode === "light" ? "gray.500" : "gray.500"}
+                  fontSize={"xs"}
+                >
+                  This is how your account will appear when searched on the
+                  public database.
+                </Text>
+              </Box>
+
+              <Flex
+                justifyContent={"center"}
+                w={"100%"}
+                // bg={"red"}
+              >
+                {/* CARD */}
+                <Flex
+                // flex={1} w={"100%"} justifyContent={"center"}
+                >
+                  <ScienceStaffSearchResult
+                    pk={me?.pk}
+                    name={`${me.display_first_name} ${me.display_last_name}`}
+                    title={me.title}
+                    position={me.about}
+                    branch={me?.branch}
+                    disableEmailButton={true}
+                  />
+                </Flex>
+
+                {/* View Public Profile Button */}
+                <Flex
+                  flexDir={"column"}
+                  // justifyContent={"center"}
+                  flex={1}
+                  w={"100%"}
+                  // bg={"red"}
+                >
+                  {/* Edit/View */}
+                  <Flex
+                    justifyContent={"end"}
+                    alignItems={"center"}
+                    w={"100%"}
+                    py={8}
+                  >
+                    <Tooltip
+                      label="See and edit your staff profile"
+                      aria-label="A tooltip"
+                    >
+                      <Button
+                        bg={colorMode === "light" ? "blue.500" : "blue.500"}
+                        _hover={{
+                          bg: colorMode === "light" ? "blue.500" : "blue.500",
+                        }}
+                        color={"white"}
+                        leftIcon={<AiFillEdit />}
+                        onClick={() => {
+                          if (process.env.NODE_ENV === "development") {
+                            navigate(`/staff/${me?.pk}`);
+                          } else {
+                            setHref(
+                              `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${me?.pk}`,
+                            );
+                          }
+                        }}
+                      >
+                        Edit Profile
+                      </Button>
+                    </Tooltip>
+                  </Flex>
+
+                  {/* Set Profile to Hidden */}
+                  {/* <Flex
+                    justifyContent={"end"}
+                    alignItems={"center"}
+                    w={"100%"}
+                    py={2}
+                  >
+                    <Tooltip
+                      label="Change the visibility of your staff profile"
+                      aria-label="A tooltip"
+                    >
+                      <Button
+                        onClick={() => console.log("Setting hidden")}
+                        leftIcon={<AiFillEye />}
+                      >
+                        Hide Profile
+                      </Button>
+                    </Tooltip>
+                  </Flex> */}
+                </Flex>
+              </Flex>
+            </Flex>
+          ) : null}
+
+          {/* IN APP APPEARANCE */}
           <Flex
             border={"1px solid"}
             rounded={"xl"}
@@ -120,37 +267,60 @@ export const ProfilePage = () => {
             padding={4}
             mb={4}
             flexDir={"column"}
+            onMouseEnter={() => handleMouseEnter("spms appearance")}
+            onMouseLeave={handleMouseLeave}
+            _hover={{
+              scale: 1.1,
+              boxShadow:
+                colorMode === "light"
+                  ? "0px 12px 18px -6px rgba(0, 0, 0, 0.18), 0px 2.4px 3px -1.2px rgba(0, 0, 0, 0.036), -2.4px 0px 6px -1.2px rgba(0, 0, 0, 0.072), 2.4px 0px 6px -1.2px rgba(0, 0, 0, 0.072)"
+                  : "0px 2.4px 3.6px -0.6px rgba(255, 255, 255, 0.06), 0px 1.2px 2.4px -0.6px rgba(255, 255, 255, 0.036)",
+            }}
           >
             <Flex>
               <Text
                 fontWeight={"bold"}
                 fontSize={"lg"}
-                mb={4}
+                mb={1}
                 color={sectionTitleColor}
               >
-                Search Appearance
+                In-App Search Appearance
               </Text>
             </Flex>
-
+            <Box mb={4}>
+              <Text
+                color={colorMode === "light" ? "gray.500" : "gray.500"}
+                fontSize={"xs"}
+              >
+                This is how your account will appear when searched within SPMS
+              </Text>
+            </Box>
             <Flex>
               <Flex w={"100%"} p={2}>
-                <UserGridItem
-                  pk={me.pk}
-                  username={me.username}
-                  email={me.email}
-                  first_name={me.first_name}
-                  last_name={me.last_name}
-                  display_first_name={me.display_first_name}
-                  display_last_name={me.display_last_name}
-                  is_staff={me.is_staff}
-                  is_superuser={me.is_superuser}
-                  image={me.image}
-                  business_area={me.business_area}
-                  role={me.role}
-                  branch={me.branch}
-                  is_active={me.is_active}
-                  affiliation={me.affiliation}
-                />
+                <Tooltip
+                  label="Click to view your SPMS profile"
+                  aria-label="A tooltip"
+                >
+                  <Box>
+                    <UserGridItem
+                      pk={me.pk}
+                      username={me.username}
+                      email={me.email}
+                      first_name={me.first_name}
+                      last_name={me.last_name}
+                      display_first_name={me.display_first_name}
+                      display_last_name={me.display_last_name}
+                      is_staff={me.is_staff}
+                      is_superuser={me.is_superuser}
+                      image={me.image}
+                      business_area={me.business_area}
+                      role={me.role}
+                      branch={me.branch}
+                      is_active={me.is_active}
+                      affiliation={me.affiliation}
+                    />
+                  </Box>
+                </Tooltip>
               </Flex>
             </Flex>
           </Flex>
@@ -180,7 +350,7 @@ export const ProfilePage = () => {
                 <Text
                   fontWeight={"bold"}
                   fontSize={"lg"}
-                  mb={4}
+                  mb={1}
                   color={sectionTitleColor}
                 >
                   Personal Information
@@ -198,6 +368,16 @@ export const ProfilePage = () => {
                 </Flex>
               )}
             </Flex>
+
+            <Box mb={4}>
+              <Text
+                color={colorMode === "light" ? "gray.500" : "gray.500"}
+                fontSize={"xs"}
+              >
+                Optionally adjust these details for in-app and PDF display
+                (including annual report). Your email cannot be changed.
+              </Text>
+            </Box>
 
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
               {/* REPLACED WITH DISPLAY FIRST_NAME SO OIM SSO STILL WORKS BUT NAMES EDITABLE */}
@@ -291,7 +471,7 @@ export const ProfilePage = () => {
                 <Text
                   fontWeight={"bold"}
                   fontSize={"lg"}
-                  mb={4}
+                  mb={1}
                   color={sectionTitleColor}
                 >
                   Profile
@@ -308,6 +488,17 @@ export const ProfilePage = () => {
                 </Flex>
               )}
             </Flex>
+
+            <Box mb={4}>
+              <Text
+                color={colorMode === "light" ? "gray.500" : "gray.500"}
+                fontSize={"xs"}
+              >
+                Optionally adjust these details for in-app and public display.
+                Your image will only be used in-app.
+              </Text>
+            </Box>
+
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
               <Flex flexDir={"column"}>
                 <Text color={subsectionTitleColor} fontSize={"sm"}>
@@ -387,7 +578,7 @@ export const ProfilePage = () => {
                 <Text
                   fontWeight={"bold"}
                   fontSize={"lg"}
-                  mb={4}
+                  mb={1}
                   color={sectionTitleColor}
                 >
                   Membership
@@ -404,6 +595,15 @@ export const ProfilePage = () => {
                 </Flex>
               )}
             </Flex>
+            <Box mb={4}>
+              <Text
+                color={colorMode === "light" ? "gray.500" : "gray.500"}
+                fontSize={"xs"}
+              >
+                Set your branch and business area for in-app and public display.
+                Optionally set an affiliation.
+              </Text>
+            </Box>
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
               <Flex flexDir={"column"}>
                 <Text color={subsectionTitleColor} fontSize={"sm"}>

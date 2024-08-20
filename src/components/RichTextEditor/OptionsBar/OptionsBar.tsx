@@ -86,20 +86,37 @@ export const OptionsBar = ({
 
         <Flex justifyContent="flex-end" alignItems="center" flex={1}>
           <Grid
-            px={10}
-            py={4}
-            gridTemplateColumns={`repeat(${showPopulationButton
-                ? userData?.pk === maintainerData?.pk
-                  ? editorText.length !== 0
+            p={4}
+            // px={10}
+            // py={4}
+            gridTemplateColumns={{
+              base: `repeat(${
+                showPopulationButton
+                  ? userData?.pk === maintainerData?.pk
+                    ? editorText.length !== 0
+                      ? 6
+                      : 7
+                    : editorText.length !== 0
+                      ? 2
+                      : 3
+                  : userData?.pk === maintainerData?.pk
+                    ? 3
+                    : 2
+              }, 1fr)`,
+              lg: `repeat(${
+                showPopulationButton
+                  ? userData?.pk === maintainerData?.pk
+                    ? editorText.length !== 0
+                      ? 6
+                      : 7
+                    : editorText.length !== 0
+                      ? 2
+                      : 3
+                  : userData?.pk === maintainerData?.pk
                     ? 6
-                    : 7
-                  : editorText.length !== 0
-                    ? 2
-                    : 3
-                : userData?.pk === maintainerData?.pk
-                  ? 6
-                  : 2
-              }, 1fr)`}
+                    : 2
+              }, 1fr)`,
+            }}
             // width={"100%"}
             gridColumnGap={2}
           >

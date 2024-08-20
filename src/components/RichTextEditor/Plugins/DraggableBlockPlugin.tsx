@@ -215,6 +215,7 @@ function setMenuPosition(
     targetRect.top +
     (parseInt(targetStyle.lineHeight, 10) - floatingElemRect.height) / 2 -
     anchorElementRect.top +
+    1 +
     toolbarHeight;
 
   const left = SPACE;
@@ -262,8 +263,9 @@ function setTargetLine(
   const left = TEXT_BOX_HORIZONTAL_PADDING - SPACE;
 
   targetLineElem.style.transform = `translate(${left}px, ${top}px)`;
-  targetLineElem.style.width = `${anchorWidth - (TEXT_BOX_HORIZONTAL_PADDING - SPACE) * 2
-    }px`;
+  targetLineElem.style.width = `${
+    anchorWidth - (TEXT_BOX_HORIZONTAL_PADDING - SPACE) * 2
+  }px`;
   targetLineElem.style.opacity = ".4";
 }
 
@@ -442,10 +444,11 @@ function useDraggableBlockMenu(
   return createPortal(
     <>
       <div
-        className={`icon ${colorMode === "light"
+        className={`icon ${
+          colorMode === "light"
             ? "draggable-block-menu-light"
             : "draggable-block-menu-dark"
-          }`}
+        }`}
         ref={menuRef}
         draggable={true}
         onDragStart={onDragStart}

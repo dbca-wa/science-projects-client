@@ -1,6 +1,12 @@
 // Toolbar for the simple rich text editor
 
-import { Box, Flex, useBreakpointValue, useColorMode } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Flex,
+  useBreakpointValue,
+  useColorMode,
+} from "@chakra-ui/react";
 
 import { useCallback, useEffect, useState } from "react";
 import { FaBold, FaItalic, FaRedo, FaUnderline, FaUndo } from "react-icons/fa";
@@ -303,11 +309,11 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
     };
 
     const boldEtcCanRender = useBreakpointValue({
-      base: false,
-      sm: false,
-      md: false,
-      "768px": false,
-      mdlg: false,
+      base: true,
+      sm: true,
+      md: true,
+      "768px": true,
+      mdlg: true,
       lg: true,
       xl: true,
     });
@@ -317,9 +323,20 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
       sm: false,
       md: false,
       "768px": false,
-      mdlg: false,
-      lg: false,
+      mdlg: true,
+      lg: true,
+
       "1200px": true,
+    });
+
+    const tableCanRender = useBreakpointValue({
+      base: false,
+      sm: false,
+      md: false,
+      "768px": false,
+      mdlg: false,
+      lg: true,
+      xl: true,
     });
 
     const { colorMode } = useColorMode();
@@ -333,13 +350,17 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
       /> */}
 
         <Flex
-          px={5}
+          flexWrap="wrap"
+          justifyContent="flex-start"
+          px={1}
           py={0.5}
           bg={colorMode === "light" ? undefined : "gray.900"}
           borderBottom={"1px solid"}
           borderColor={colorMode === "dark" ? "gray.700" : "gray.200"}
+          width="100%" // Ensure the container takes up the full width
         >
           <RevisedBaseToolbarButton
+            buttonSize="sm"
             ariaLabel="Undo"
             // isActive={isBold}
             variant={"ghost"}
@@ -351,6 +372,7 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
             <FaUndo />
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
+            buttonSize="sm"
             ariaLabel="Undo"
             // isActive={isBold}
             variant={"ghost"}
@@ -366,6 +388,7 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
           {boldEtcCanRender ? (
             <>
               <RevisedBaseToolbarButton
+                buttonSize="sm"
                 ariaLabel="Format text as Bold"
                 isActive={isBold}
                 variant={"ghost"}
@@ -377,6 +400,7 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
                 <FaBold />
               </RevisedBaseToolbarButton>
               <RevisedBaseToolbarButton
+                buttonSize="sm"
                 ariaLabel="Format text as Italic"
                 isActive={isItalic}
                 variant={"ghost"}
@@ -388,6 +412,7 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
                 <FaItalic />
               </RevisedBaseToolbarButton>
               <RevisedBaseToolbarButton
+                buttonSize="sm"
                 ariaLabel="Format text as Underlined"
                 isActive={isUnderline}
                 variant={"ghost"}
@@ -398,6 +423,99 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
               >
                 <FaUnderline />
               </RevisedBaseToolbarButton>
+              {formattingCanRender ? (
+                <>
+                  <RevisedBaseToolbarButton
+                    buttonSize="sm"
+                    ariaLabel="Format Subscript"
+                    isActive={isSubscript}
+                    variant={"ghost"}
+                    isDisabled={false}
+                    onClick={() => {
+                      editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript");
+                    }}
+                  >
+                    <MdSubscript />
+                  </RevisedBaseToolbarButton>
+                  <RevisedBaseToolbarButton
+                    buttonSize="sm"
+                    ariaLabel="Format Superscript"
+                    isActive={isSuperscript}
+                    variant={"ghost"}
+                    isDisabled={false}
+                    onClick={() => {
+                      editor.dispatchCommand(
+                        FORMAT_TEXT_COMMAND,
+                        "superscript",
+                      );
+                    }}
+                  >
+                    <MdSuperscript />
+                  </RevisedBaseToolbarButton>
+                  <RevisedBaseToolbarButton
+                    buttonSize="sm"
+                    ariaLabel="Clear Formatting"
+                    variant={"ghost"}
+                    isDisabled={false}
+                    onClick={() => {
+                      editor.update(() => {
+                        const selection = $getSelection();
+                        if ($isRangeSelection(selection)) {
+                          const anchor = selection.anchor;
+                          const focus = selection.focus;
+                          const nodes = selection.getNodes();
+
+                          if (
+                            anchor.key === focus.key &&
+                            anchor.offset === focus.offset
+                          ) {
+                            return;
+                          }
+
+                          // Iterate4 over each node
+                          nodes.forEach((node, index) => {
+                            if ($isTextNode(node)) {
+                              let textNode = node;
+                              if (index === 0 && anchor.offset !== 0) {
+                                textNode =
+                                  textNode.splitText(anchor.offset)[1] ||
+                                  textNode;
+                              }
+                              if (index === nodes.length - 1) {
+                                textNode =
+                                  textNode.splitText(focus.offset)[0] ||
+                                  textNode;
+                              }
+
+                              if (textNode.__style !== "") {
+                                textNode.setStyle("");
+                              }
+
+                              if (textNode.__format !== 0) {
+                                textNode.setFormat(0);
+                                $getNearestBlockElementAncestorOrThrow(
+                                  textNode,
+                                ).setFormat("");
+                              }
+                              node = textNode;
+                            }
+                            // Potentially unused in SPMS as we are not allowing heading/quite/decor nodes
+                            // else if ($isHeadingNode(node) || $isQuoteNode(node)) {
+                            //     node.replace($createParagraphNode(), true);
+                            // } else if ($isDecoratorBlockNode(node)) {
+                            //     node.setFormat('');
+                            // }
+                          });
+                        }
+                      });
+                    }}
+                  >
+                    <ImClearFormatting />
+                  </RevisedBaseToolbarButton>
+                  {/* {allowTable ? <VerticalDivider /> : null} */}
+                </>
+              ) : null}
+
               <VerticalDivider />
             </>
           ) : null}
@@ -409,9 +527,10 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
             blockType={blockType}
           />
 
-          <VerticalDivider />
+          {/* {tableCanRender && <VerticalDivider />} */}
 
           {/* <RevisedBaseToolbarButton
+          buttonSize="sm"
                         ariaLabel="Format text with a strikethrough"
                         isActive={isStrikethrough}
                         variant={"ghost"}
@@ -420,92 +539,12 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
                     >
                         Strike
                     </RevisedBaseToolbarButton> */}
-          {formattingCanRender ? (
-            <>
-              <RevisedBaseToolbarButton
-                ariaLabel="Format Subscript"
-                isActive={isSubscript}
-                variant={"ghost"}
-                isDisabled={false}
-                onClick={() => {
-                  editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript");
-                }}
-              >
-                <MdSubscript />
-              </RevisedBaseToolbarButton>
-              <RevisedBaseToolbarButton
-                ariaLabel="Format Superscript"
-                isActive={isSuperscript}
-                variant={"ghost"}
-                isDisabled={false}
-                onClick={() => {
-                  editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript");
-                }}
-              >
-                <MdSuperscript />
-              </RevisedBaseToolbarButton>
-              <RevisedBaseToolbarButton
-                ariaLabel="Clear Formatting"
-                variant={"ghost"}
-                isDisabled={false}
-                onClick={() => {
-                  editor.update(() => {
-                    const selection = $getSelection();
-                    if ($isRangeSelection(selection)) {
-                      const anchor = selection.anchor;
-                      const focus = selection.focus;
-                      const nodes = selection.getNodes();
 
-                      if (
-                        anchor.key === focus.key &&
-                        anchor.offset === focus.offset
-                      ) {
-                        return;
-                      }
-
-                      // Iterate4 over each node
-                      nodes.forEach((node, index) => {
-                        if ($isTextNode(node)) {
-                          let textNode = node;
-                          if (index === 0 && anchor.offset !== 0) {
-                            textNode =
-                              textNode.splitText(anchor.offset)[1] || textNode;
-                          }
-                          if (index === nodes.length - 1) {
-                            textNode =
-                              textNode.splitText(focus.offset)[0] || textNode;
-                          }
-
-                          if (textNode.__style !== "") {
-                            textNode.setStyle("");
-                          }
-
-                          if (textNode.__format !== 0) {
-                            textNode.setFormat(0);
-                            $getNearestBlockElementAncestorOrThrow(
-                              textNode,
-                            ).setFormat("");
-                          }
-                          node = textNode;
-                        }
-                        // Potentially unused in SPMS as we are not allowing heading/quite/decor nodes
-                        // else if ($isHeadingNode(node) || $isQuoteNode(node)) {
-                        //     node.replace($createParagraphNode(), true);
-                        // } else if ($isDecoratorBlockNode(node)) {
-                        //     node.setFormat('');
-                        // }
-                      });
-                    }
-                  });
-                }}
-              >
-                <ImClearFormatting />
-              </RevisedBaseToolbarButton>
-              {allowTable ? <VerticalDivider /> : null}
-            </>
+          {allowTable ? (
+            tableCanRender ? (
+              <TableDropdown activeEditor={editor} />
+            ) : null
           ) : null}
-
-          {allowTable ? <TableDropdown activeEditor={editor} /> : null}
         </Flex>
       </>
     );
@@ -645,66 +684,71 @@ const ElementSelector = ({
       isLazy
       // placement="bottom"
     >
-      <MenuButton
-        as={Button}
-        variant={"ghost"}
-        leftIcon={blockTypeToBlockIcon(blockType)}
-        rightIcon={<FaCaretDown />}
-        // px={8}
-        mx={1}
-        flex={1}
-        tabIndex={-1}
-      >
-        {/* {blockTypeToBlockName(blockType)} */}
-      </MenuButton>
-      <MenuList
-        // minW={"200px"}
-        zIndex={9999999999999}
-        w={buttonWidth}
-        minW={"200px"}
-        pos={"absolute"}
-        // right={-500}
-      >
-        <MenuItem
-          onClick={formatParagraph}
-          // w={"100%"}
-          display={"inline-flex"}
-          alignItems={"center"}
-          zIndex={2}
-        >
-          <BsTextParagraph />
-
-          <Box pl={4} zIndex={2}>
-            <span>Normal</span>
-          </Box>
-        </MenuItem>
-        <MenuItem
-          onClick={formatBulletList}
+      <Box className="tooltip-container flex-grow">
+        <MenuButton
+          size={"sm"}
+          as={Button}
+          variant={"ghost"}
+          leftIcon={blockTypeToBlockIcon(blockType)}
+          rightIcon={<FaCaretDown />}
+          // px={8}
+          mx={1}
+          flex={1}
+          tabIndex={-1}
           w={"100%"}
-          display={"inline-flex"}
-          alignItems={"center"}
-          zIndex={2}
         >
-          <MdFormatListBulleted />
-
-          <Box pl={4} zIndex={2}>
-            <span>Bullet List</span>
-          </Box>
-        </MenuItem>
-        <MenuItem
-          onClick={formatNumberList}
-          w={"100%"}
-          display={"inline-flex"}
-          alignItems={"center"}
-          zIndex={2}
+          {blockTypeToBlockName(blockType)}
+        </MenuButton>
+        <MenuList
+          // minW={"200px"}
+          zIndex={9999999999999}
+          w={buttonWidth}
+          minW={"200px"}
+          pos={"absolute"}
+          // right={-500}
         >
-          <MdFormatListNumbered />
+          <MenuItem
+            onClick={formatParagraph}
+            // w={"100%"}
+            display={"inline-flex"}
+            alignItems={"center"}
+            zIndex={2}
+          >
+            <BsTextParagraph />
 
-          <Box pl={4} zIndex={2}>
-            <span>Numbered List</span>
-          </Box>
-        </MenuItem>
-      </MenuList>
+            <Box pl={4} zIndex={2}>
+              <span>Normal</span>
+            </Box>
+          </MenuItem>
+          <MenuItem
+            onClick={formatBulletList}
+            w={"100%"}
+            display={"inline-flex"}
+            alignItems={"center"}
+            zIndex={2}
+          >
+            <MdFormatListBulleted />
+
+            <Box pl={4} zIndex={2}>
+              <span>Bullet List</span>
+            </Box>
+          </MenuItem>
+          <MenuItem
+            onClick={formatNumberList}
+            w={"100%"}
+            display={"inline-flex"}
+            alignItems={"center"}
+            zIndex={2}
+          >
+            <MdFormatListNumbered />
+
+            <Box pl={4} zIndex={2}>
+              <span>Numbered List</span>
+            </Box>
+          </MenuItem>
+        </MenuList>
+        <Text className="tooltip-text">Select Type</Text>
+      </Box>
     </Menu>
   );
 };
