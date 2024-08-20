@@ -1,9 +1,24 @@
-import { ReactNode } from "react";
+import { Divider } from "@chakra-ui/react";
+import { ReactElement, ReactNode } from "react";
 
-const Subsection = ({ title, children }: { title: string; children: ReactNode }) => (
-    <div className="py-4">
-        <p className="font-semibold text-lg">{title}</p>
-        {children}
+const Subsection = ({
+  title,
+  button,
+  children,
+  divider,
+}: {
+  title: string;
+  children: ReactNode;
+  button?: ReactElement;
+  divider?: boolean;
+}) => (
+  <div className="py-4">
+    <div className="flex min-w-[270px] justify-between">
+      <p className="text-lg font-semibold">{title}</p>
+      {button && button}
     </div>
-)
-export default Subsection
+    {divider && <Divider mt={2} mb={1} bg={"gray.300"} />}
+    {children}
+  </div>
+);
+export default Subsection;

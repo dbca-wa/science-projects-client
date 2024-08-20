@@ -13,7 +13,7 @@ export const AccountEdit = () => {
 
   const [selected, setSelected] = useState("spmsprofile");
   const [pageViewChildren, setPageViewChildren] = useState<React.ReactNode>(
-    <>Test</>
+    <>Test</>,
   );
   const handleSidebarMenuClick = (page: string) => {
     setSelected(page);
@@ -25,9 +25,9 @@ export const AccountEdit = () => {
       case "spmsprofile":
         content = <ProfilePage />;
         break;
-      case "publicprofile":
-        content = <PublicProfilePage />;
-        break;
+      // case "publicprofile":
+      //   content = <PublicProfilePage />;
+      //   break;
       default:
         content = null;
         break;
@@ -61,11 +61,11 @@ export const AccountEdit = () => {
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("spmsprofile")}
           />
-          <SideMenuButton
+          {/* <SideMenuButton
             pageName={"Public Profile"}
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("publicprofile")}
-          />
+          /> */}
         </Box>
       </Flex>
     </>

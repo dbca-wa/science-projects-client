@@ -3,30 +3,30 @@ import { DrawerClose } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { publicEmailStaffMember } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 const EmailStaffMemberContent = ({
   kind,
-  first_name,
-  last_name,
-  email,
+  pk,
+  name,
 }: {
   kind: "drawer" | "dialog";
-  first_name: string;
-  last_name: string;
-  email: string;
+  name: string;
+  pk: number;
 }) => {
   const [senderEmail, setSenderEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [canSend, setCanSend] = useState(false);
 
-  const sendEmail = (e: React.FormEvent) => {
+  const sendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log({
-      email,
+      pk,
       senderEmail,
       message,
     });
+    await publicEmailStaffMember({ pk, senderEmail, message });
   };
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const EmailStaffMemberContent = ({
         onChange={(e) => setMessage(e.target.value)}
       />
       <p className="mb-2 p-1 text-xs text-muted-foreground">
-        {`Your message will be emailed to ${first_name} ${last_name}.`}
+        {`Your message will be emailed to ${name}.`}
       </p>
       <div className="flex w-full justify-end">
         {kind === "drawer" && (

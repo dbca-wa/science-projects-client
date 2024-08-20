@@ -95,7 +95,7 @@ export const EditableSRTE = ({
   documentsCount,
 }: Props) => {
   const dragBtnMargin = 10;
-  const toolBarHeight = 45;
+  const toolBarHeight = 37;
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
@@ -144,7 +144,8 @@ export const EditableSRTE = ({
               {/* Toolbar */}
               <RevisedRichTextToolbar
                 allowTable={
-                  writeable_document_kind === "Progress Report" || writeable_document_kind === "Student Report"
+                  writeable_document_kind === "Progress Report" ||
+                  writeable_document_kind === "Student Report"
                     ? false
                     : true
                 }
@@ -171,10 +172,10 @@ export const EditableSRTE = ({
                       outline: "none",
                       // overflow: "hidden"
                       overflowY: "scroll",
-                      msOverflowY: "scroll"
+                      msOverflowY: "scroll",
                     }}
 
-                  // autoFocus
+                    // autoFocus
                   />
                 </Box>
               </Box>
@@ -233,7 +234,7 @@ export const EditableSRTE = ({
             setIsEditorOpen={setIsEditorOpen}
             shouldCheckForPrepopulation={shouldCheckForPrepopulation}
             documentTypeCount={documentsCount}
-          // setDisplayData={setDisplayData}
+            // setDisplayData={setDisplayData}
           />
         </Box>
         {shouldShowTree ? <TreeViewPlugin /> : null}

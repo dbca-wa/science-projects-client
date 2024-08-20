@@ -972,26 +972,114 @@ export interface IReportCreation {
   seek_update: boolean;
 }
 
-// QUOTE ====================================================================
+// Staff Profiles ====================================================================
 
-export interface IStaffSectionProps {
-  staffProfileData: IStaffProfileData;
-  staffProfileLoading: boolean;
-}
-
-export interface IStaffProfileData {
+// User List =========================
+export interface IStaffProfileAddress {
   pk: number;
-  user_pk: number;
-  overview: IOverviewData;
-  projects: IProjectData[];
-  cv: string;
-  publications: string;
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zipcode: number;
+  pobox: string;
 }
 
-export interface IOverviewData {
+export interface IStaffProfileBranch {
+  name: string;
+  address: IStaffProfileAddress;
+}
+
+export interface IStaffUserResult {
+  pk?: number;
+  title?: string;
+  position?: string;
+  // address?: string;
+  branch?: IStaffProfileBranch;
+
+  name: string;
+  // email: string;
+  disableEmailButton?: boolean;
+}
+
+// User Detail =========================
+
+export interface IStaffUser {
+  pk: number;
+  display_first_name: string;
+  display_last_name: string;
+  email: string;
+}
+
+export interface KeywordTag {
+  pk: number;
+  name: string;
+}
+
+export interface IStaffProfileHeroData {
+  pk: number;
+  user: IStaffUser;
+  title?: string; // optional
+  name: string; // no titles
+  // positionTitle: string;
+  // branch: string;
+  keyword_tags: KeywordTag[]; // make this max of 5
+}
+
+// Overview
+
+export interface IStaffOverviewData {
+  pk: number;
+  user: IStaffUser;
   about: string;
   expertise: string;
 }
+
+// Projects (Handled elsewhere - user projects)
+
+// CV
+
+export interface IStaffEmploymentEntry {
+  pk: number;
+  public_profile: number;
+  position_title: string;
+  start_year: string;
+  end_year: string;
+  section?: boolean;
+  employer: string;
+}
+
+export type QualificationKind =
+  | "postdoc"
+  | "doc"
+  | "master"
+  | "graddip"
+  | "bachelor"
+  | "assdegree"
+  | "diploma"
+  | "cert"
+  | "nano";
+
+export interface IStaffEducationEntry {
+  pk: number;
+  public_profile: number;
+  qualification_field: string;
+  qualification_kind: QualificationKind;
+  qualification_name: string;
+  start_year: string;
+  end_year: string;
+  institution: string;
+  location: string;
+}
+
+export interface IStaffCVData {
+  pk: number;
+  user_pk: number;
+  employment: IStaffEmploymentEntry[];
+  education: IStaffEducationEntry[];
+}
+
+// QUOTE ====================================================================
 
 export interface IQuote {
   text: string;
@@ -1066,34 +1154,3 @@ interface IDashProps {
 }
 
 // SCIENCE PORTFOLIO ================================================================================
-
-export interface IStaffProfileAddress {
-  pk: number;
-  street: string;
-  city: string;
-  state: string;
-  country: string;
-  zipcode: number;
-  pobox: string;
-}
-
-export interface IStaffProfileBranch {
-  name: string;
-  address: IStaffProfileAddress;
-}
-
-export interface IStaffUserResult {
-  pk?: number;
-  title?: string;
-  position?: string;
-  // address?: string;
-  branch?: IStaffProfileBranch;
-
-  first_name: string;
-  last_name: string;
-  email: string;
-}
-
-export interface IStaffSectionProps {
-  isLoading: boolean;
-}

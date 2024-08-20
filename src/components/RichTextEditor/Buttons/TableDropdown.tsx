@@ -146,9 +146,10 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
 export const TableDropdown = ({ activeEditor }: TableGridProps) => {
   return (
     <BaseToolbarMenuButton
+      tooltipText="Add Table"
       menuIcon={FaTable}
       disableHoverBackground
-      // title="Table"
+      title="Table"
       menuItems={[
         {
           component: <TableGrid activeEditor={activeEditor} />,

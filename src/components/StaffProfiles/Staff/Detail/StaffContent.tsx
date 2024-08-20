@@ -5,7 +5,7 @@ import OverviewSection from "./OverviewSection";
 import ProjectsSection from "./ProjectsSection";
 import PublicationsSection from "./PublicationsSection";
 import ScrollArea from "./ScrollArea";
-import { IStaffProfileData } from "@/types";
+import { IUserMe } from "@/types";
 
 const NavMenuItemButton = ({
   title,
@@ -47,11 +47,13 @@ const NavMenuItemButton = ({
 };
 
 const StaffContent = ({
-  isLoading,
-  staffProfileData,
+  buttonsVisible,
+  usersPk,
+  viewingUser,
 }: {
-  isLoading: boolean;
-  staffProfileData: IStaffProfileData;
+  buttonsVisible: boolean;
+  usersPk: number;
+  viewingUser: IUserMe;
 }) => {
   const [selectedNav, setSelectedNav] = useState<string>("Overview");
   const { colorMode } = useColorMode();
@@ -91,11 +93,11 @@ const StaffContent = ({
                 selected={selectedNav}
                 title={"CV"}
               />
-              <NavMenuItemButton
+              {/* <NavMenuItemButton
                 setterFn={setSelectedNav}
                 selected={selectedNav}
                 title={"Publications"}
-              />
+              /> */}
             </div>
           </ScrollArea>
         </div>
@@ -108,13 +110,24 @@ const StaffContent = ({
         // style={isDesktop ? { display: "flex", flexDirection: "column", justifyContent: "center", } : {}}
       >
         {selectedNav === "Overview" ? (
-          <OverviewSection isLoading={isLoading} />
+          <OverviewSection
+            userId={usersPk}
+            buttonsVisible={buttonsVisible}
+            viewingUser={viewingUser}
+          />
         ) : selectedNav === "Projects" ? (
-          <ProjectsSection isLoading={isLoading} />
+          <ProjectsSection userId={usersPk} buttonsVisible={buttonsVisible} />
         ) : selectedNav === "CV" ? (
-          <CVSection isLoading={isLoading} />
+          <CVSection
+            userId={usersPk}
+            buttonsVisible={buttonsVisible}
+            viewingUser={viewingUser}
+          />
         ) : (
-          <PublicationsSection isLoading={isLoading} />
+          <PublicationsSection
+            userId={usersPk}
+            buttonsVisible={buttonsVisible}
+          />
         )}
       </div>
     </div>

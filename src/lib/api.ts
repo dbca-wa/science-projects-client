@@ -28,6 +28,9 @@ import {
   IReportCreation,
   ISearchTerm,
   ISimpleLocationData,
+  IStaffEducationEntry,
+  IStaffEmploymentEntry,
+  KeywordTag,
   OrganisedLocationData,
   ProjectStatus,
 } from "../types";
@@ -37,8 +40,7 @@ import { IConceptPlanGenerationData } from "../types";
 
 const VITE_PRODUCTION_BACKEND_API_URL = import.meta.env
   .VITE_PRODUCTION_BACKEND_API_URL;
-const VITE_PRODUCTION_BACKEND_BASE_URL = import.meta.env
-  .VITE_PRODUCTION_BACKEND_BASE_URL;
+const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
 const baseBackendUrl =
   process.env.NODE_ENV === "development"
@@ -938,6 +940,202 @@ export const updateProfile = async ({
 //     `users/${userPk}/profile`,
 //     { image, about, expertise }).then(res => res.data);
 
+export interface IUpdateStaffOverviewSection {
+  pk: number;
+  about?: string;
+  expertise?: string;
+}
+
+export const updateStaffProfileOverviewSection = async ({
+  pk,
+  about,
+  expertise,
+}: IUpdateStaffOverviewSection) => {
+  const res = instance
+    .put(`users/staffprofiles/${pk}`, {
+      about,
+      expertise,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export interface IUpdateStaffHeroSection {
+  pk: number;
+  keyword_tags?: KeywordTag[];
+}
+
+export const updateStaffHeroSection = async ({
+  pk,
+  keyword_tags,
+}: IUpdateStaffHeroSection) => {
+  const res = instance
+    .put(`users/staffprofiles/${pk}`, {
+      keyword_tags,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export interface IStaffPublicEmail {
+  pk: number;
+  senderEmail: string;
+  message: string;
+}
+
+export const publicEmailStaffMember = async ({
+  pk,
+  senderEmail,
+  message,
+}: IStaffPublicEmail) => {
+  const res = instance
+    .post(`users/${pk}/public_email_staff_member`, {
+      senderEmail,
+      message,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export const createEmployment = async ({
+  // pk,
+  public_profile,
+  position_title,
+  start_year,
+  end_year,
+  section,
+  employer,
+}: IStaffEmploymentEntry) => {
+  const res = instance
+    .post(`users/employment_entries/`, {
+      // pk,
+      public_profile,
+      position_title,
+      start_year,
+      end_year,
+      section,
+      employer,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export const createEducation = async ({
+  // pk,
+  public_profile,
+  qualification_kind,
+  qualification_field,
+  qualification_name,
+  start_year,
+  end_year,
+  institution,
+  location,
+}: IStaffEducationEntry) => {
+  const res = instance
+    .post(`users/education_entries/`, {
+      // pk,
+      public_profile,
+      qualification_kind,
+      qualification_field,
+      qualification_name,
+
+      start_year,
+      end_year,
+      institution,
+      location,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export const editEmployment = async ({
+  pk,
+  // public_profile,
+  position_title,
+  start_year,
+  end_year,
+  section,
+  employer,
+}: IStaffEmploymentEntry) => {
+  const res = instance
+    .put(`users/employment_entries/${pk}`, {
+      // pk,
+      // public_profile,
+      position_title,
+      start_year,
+      end_year,
+      section,
+      employer,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export const editEducation = async ({
+  pk,
+  // public_profile,
+  qualification_kind,
+  qualification_field,
+  qualification_name,
+  start_year,
+  end_year,
+  institution,
+  location,
+}: IStaffEducationEntry) => {
+  const res = instance
+    .put(`users/education_entries/${pk}`, {
+      // pk,
+      // public_profile,
+      qualification_kind,
+      qualification_field,
+      qualification_name,
+
+      start_year,
+      end_year,
+      institution,
+      location,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export const deleteEmployment = async ({ pk }: ISimplePkProp) => {
+  const res = instance.delete(`users/employment_entries/${pk}`).then((res) => {
+    // console.log(res.data)
+    return res.data;
+  });
+  return res;
+};
+
+export const deleteEducation = async ({ pk }: ISimplePkProp) => {
+  const res = instance.delete(`users/education_entries/${pk}`).then((res) => {
+    // console.log(res.data)
+    return res.data;
+  });
+  return res;
+};
+
 export const getFullStaffProfile = async ({
   queryKey,
 }: QueryFunctionContext) => {
@@ -949,11 +1147,33 @@ export const getFullStaffProfile = async ({
   return res;
 };
 
+export const getPublicProfileHeroData = async ({
+  queryKey,
+}: QueryFunctionContext) => {
+  const [_, pk] = queryKey;
+  const res = instance.get(`users/staffprofiles/${pk}/hero`).then((res) => {
+    // console.log(res.data)
+    return res.data;
+  });
+  return res;
+};
+
 export const getPublicProfileOverviewData = async ({
   queryKey,
 }: QueryFunctionContext) => {
   const [_, pk] = queryKey;
   const res = instance.get(`users/staffprofiles/${pk}/overview`).then((res) => {
+    // console.log(res.data)
+    return res.data;
+  });
+  return res;
+};
+
+export const getPublicProfileCVData = async ({
+  queryKey,
+}: QueryFunctionContext) => {
+  const [_, pk] = queryKey;
+  const res = instance.get(`users/staffprofiles/${pk}/cv`).then((res) => {
     // console.log(res.data)
     return res.data;
   });
