@@ -30,6 +30,7 @@ import {
   ISimpleLocationData,
   IStaffEducationEntry,
   IStaffEmploymentEntry,
+  KeywordTag,
   OrganisedLocationData,
   ProjectStatus,
 } from "../types";
@@ -938,6 +939,72 @@ export const updateProfile = async ({
 // return instance.put(
 //     `users/${userPk}/profile`,
 //     { image, about, expertise }).then(res => res.data);
+
+export interface IUpdateStaffOverviewSection {
+  pk: number;
+  about?: string;
+  expertise?: string;
+}
+
+export const updateStaffProfileOverviewSection = async ({
+  pk,
+  about,
+  expertise,
+}: IUpdateStaffOverviewSection) => {
+  const res = instance
+    .put(`users/staffprofiles/${pk}`, {
+      about,
+      expertise,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export interface IUpdateStaffHeroSection {
+  pk: number;
+  keyword_tags?: KeywordTag[];
+}
+
+export const updateStaffHeroSection = async ({
+  pk,
+  keyword_tags,
+}: IUpdateStaffHeroSection) => {
+  const res = instance
+    .put(`users/staffprofiles/${pk}`, {
+      keyword_tags,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export interface IStaffPublicEmail {
+  pk: number;
+  senderEmail: string;
+  message: string;
+}
+
+export const publicEmailStaffMember = async ({
+  pk,
+  senderEmail,
+  message,
+}: IStaffPublicEmail) => {
+  const res = instance
+    .post(`users/${pk}/public_email_staff_member`, {
+      senderEmail,
+      message,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
 
 export const createEmployment = async ({
   // pk,

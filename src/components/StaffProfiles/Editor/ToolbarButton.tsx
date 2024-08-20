@@ -2,7 +2,7 @@
 
 import { Box, Button, Text, useColorMode } from "@chakra-ui/react";
 import { ReactNode } from "react";
-import "../../../styles/texteditor.css";
+import "./staffprofileeditor.css";
 
 interface IBaseToolbarButtonProps {
   ariaLabel: string;
@@ -11,12 +11,10 @@ interface IBaseToolbarButtonProps {
   isActive?: boolean;
   isDisabled?: boolean;
   onClick?: () => void;
-  buttonSize?: "sm" | "md" | "lg";
   children: ReactNode;
 }
 
-export const RevisedBaseToolbarButton = ({
-  buttonSize,
+export const ToolbarButton = ({
   children,
   ariaLabel,
   isDisabled,
@@ -32,7 +30,7 @@ export const RevisedBaseToolbarButton = ({
       className="tooltip-container"
     >
       <Button
-        size={buttonSize}
+        size={"sm"}
         aria-label={ariaLabel}
         variant={variant ? variant : "ghost"}
         isDisabled={isDisabled}
@@ -47,7 +45,6 @@ export const RevisedBaseToolbarButton = ({
         tabIndex={-1}
         border={0}
         display={"flex"}
-        minWidth="auto" // Ensure buttons have a natural minimum width
       >
         {children}
       </Button>

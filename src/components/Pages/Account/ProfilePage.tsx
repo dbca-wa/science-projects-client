@@ -185,12 +185,11 @@ export const ProfilePage = () => {
                 // flex={1} w={"100%"} justifyContent={"center"}
                 >
                   <ScienceStaffSearchResult
-                    first_name={me.display_first_name}
-                    last_name={me.display_last_name}
-                    email={me.email}
+                    pk={me?.pk}
+                    name={`${me.display_first_name} ${me.display_last_name}`}
                     title={me.title}
-                    branch={me.branch}
                     position={me.about}
+                    branch={me?.branch}
                     disableEmailButton={true}
                   />
                 </Flex>
@@ -198,32 +197,12 @@ export const ProfilePage = () => {
                 {/* View Public Profile Button */}
                 <Flex
                   flexDir={"column"}
-                  justifyContent={"center"}
+                  // justifyContent={"center"}
                   flex={1}
                   w={"100%"}
                   // bg={"red"}
                 >
                   {/* Edit/View */}
-
-                  {/* Set Profile to Hidden */}
-                  <Flex
-                    justifyContent={"end"}
-                    alignItems={"center"}
-                    w={"100%"}
-                    py={2}
-                  >
-                    <Tooltip
-                      label="Change the visibility of your staff profile"
-                      aria-label="A tooltip"
-                    >
-                      <Button
-                        onClick={() => console.log("Setting hidden")}
-                        leftIcon={<AiFillEye />}
-                      >
-                        Hide Profile
-                      </Button>
-                    </Tooltip>
-                  </Flex>
                   <Flex
                     justifyContent={"end"}
                     alignItems={"center"}
@@ -255,6 +234,26 @@ export const ProfilePage = () => {
                       </Button>
                     </Tooltip>
                   </Flex>
+
+                  {/* Set Profile to Hidden */}
+                  {/* <Flex
+                    justifyContent={"end"}
+                    alignItems={"center"}
+                    w={"100%"}
+                    py={2}
+                  >
+                    <Tooltip
+                      label="Change the visibility of your staff profile"
+                      aria-label="A tooltip"
+                    >
+                      <Button
+                        onClick={() => console.log("Setting hidden")}
+                        leftIcon={<AiFillEye />}
+                      >
+                        Hide Profile
+                      </Button>
+                    </Tooltip>
+                  </Flex> */}
                 </Flex>
               </Flex>
             </Flex>

@@ -998,7 +998,7 @@ export interface IStaffUserResult {
   branch?: IStaffProfileBranch;
 
   name: string;
-  email: string;
+  // email: string;
   disableEmailButton?: boolean;
 }
 
@@ -1011,19 +1011,25 @@ export interface IStaffUser {
   email: string;
 }
 
+export interface KeywordTag {
+  pk: number;
+  name: string;
+}
+
 export interface IStaffProfileHeroData {
   pk: number;
   user: IStaffUser;
   title?: string; // optional
   name: string; // no titles
-  positionTitle: string;
-  branch: string;
-  tags: string[]; // make this max of 5
+  // positionTitle: string;
+  // branch: string;
+  keyword_tags: KeywordTag[]; // make this max of 5
 }
 
 // Overview
 
 export interface IStaffOverviewData {
+  pk: number;
   user: IStaffUser;
   about: string;
   expertise: string;

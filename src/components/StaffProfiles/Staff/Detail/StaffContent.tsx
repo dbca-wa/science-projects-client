@@ -5,6 +5,7 @@ import OverviewSection from "./OverviewSection";
 import ProjectsSection from "./ProjectsSection";
 import PublicationsSection from "./PublicationsSection";
 import ScrollArea from "./ScrollArea";
+import { IUserMe } from "@/types";
 
 const NavMenuItemButton = ({
   title,
@@ -48,9 +49,11 @@ const NavMenuItemButton = ({
 const StaffContent = ({
   buttonsVisible,
   usersPk,
+  viewingUser,
 }: {
   buttonsVisible: boolean;
   usersPk: number;
+  viewingUser: IUserMe;
 }) => {
   const [selectedNav, setSelectedNav] = useState<string>("Overview");
   const { colorMode } = useColorMode();
@@ -107,11 +110,19 @@ const StaffContent = ({
         // style={isDesktop ? { display: "flex", flexDirection: "column", justifyContent: "center", } : {}}
       >
         {selectedNav === "Overview" ? (
-          <OverviewSection userId={usersPk} buttonsVisible={buttonsVisible} />
+          <OverviewSection
+            userId={usersPk}
+            buttonsVisible={buttonsVisible}
+            viewingUser={viewingUser}
+          />
         ) : selectedNav === "Projects" ? (
           <ProjectsSection userId={usersPk} buttonsVisible={buttonsVisible} />
         ) : selectedNav === "CV" ? (
-          <CVSection userId={usersPk} buttonsVisible={buttonsVisible} />
+          <CVSection
+            userId={usersPk}
+            buttonsVisible={buttonsVisible}
+            viewingUser={viewingUser}
+          />
         ) : (
           <PublicationsSection
             userId={usersPk}

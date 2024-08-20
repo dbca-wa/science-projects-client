@@ -1,11 +1,6 @@
 import { useStaffProfileHero } from "@/lib/hooks/tanstack/useStaffProfileHero";
-import { IUserMe } from "@/types";
-import {
-  Center,
-  Button as ChakraButton,
-  Spinner,
-  useMediaQuery,
-} from "@chakra-ui/react";
+import { IStaffProfileHeroData, IUserMe } from "@/types";
+import { Center, Button as ChakraButton, Spinner } from "@chakra-ui/react";
 import { ChevronLeft } from "lucide-react";
 import { MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +9,24 @@ import {
   SendUserEmailMobileDrawer,
 } from "../All/ScienceStaffSearchResult";
 import AddItemButton from "./AddItemButton";
+import { useMediaQuery } from "@/lib/utils/useMediaQuery";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import EditStaffHeroContent from "../../Modals/EditStaffHeroContent";
+import React from "react";
 
 interface IStaffHeroProp {
   viewingUser: IUserMe;
@@ -27,9 +40,10 @@ const StaffHero = ({
   viewingUser,
 }: IStaffHeroProp) => {
   const navigate = useNavigate();
-  const isDesktop = useMediaQuery("(min-width: 768px");
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const { staffHeroData, staffHeroLoading } = useStaffProfileHero(usersPk);
+  const { staffHeroData, staffHeroLoading, refetch } =
+    useStaffProfileHero(usersPk);
 
   // branchName={"Kensington"}
   // positionTitle={"Web and Data Development Officer"}
@@ -37,7 +51,7 @@ const StaffHero = ({
   // tags={["React", "Django", "Docker", "Kubernetes", "ETL"]}
 
   return !staffHeroLoading ? (
-    isDesktop ? (
+    <>
       <div className="flex flex-col">
         {/* Back button */}
 
@@ -67,72 +81,85 @@ const StaffHero = ({
               ? `, ${staffHeroData?.branch}`
               : ", No branch set"}
           </p>
-          <div className="mt-4 flex items-center justify-center">
-            <p className="text-balance text-muted-foreground">
-              {staffHeroData?.tags?.map((word: string) => word).join(" | ")}
+          {/* <div
+            className={`flex items-center justify-center ${staffHeroData?.keyword_tags?.length > 0 && "mb-1 mt-1"}`}
+          >
+            <p
+              className={`text-balance text-muted-foreground ${staffHeroData?.keyword_tags?.length > 0 && "mt-3"}`}
+            >
+              {staffHeroData?.keyword_tags
+                ?.map((tag: { pk: number; name: string }) => tag.name)
+                ?.join(" | ")}
+            </p> */}
+          <div
+            className={`flex flex-col items-center justify-center ${staffHeroData?.keyword_tags.length > 0 && "mb-1 mt-1"}`}
+          >
+            <p
+              className={`text-balance text-muted-foreground ${staffHeroData?.keyword_tags?.length > 0 && "mt-3"}`}
+            >
+              {staffHeroData?.keyword_tags?.map(
+                (tag: { pk: number; name: string }, idx: number) => {
+                  return (
+                    <React.Fragment key={tag.pk}>
+                      {tag.name}
+                      {(idx + 1) % 5 !== 0 &&
+                        idx < staffHeroData.keyword_tags.length - 1 &&
+                        " | "}
+                      {(idx + 1) % 5 === 0 && <br />}
+                    </React.Fragment>
+                  );
+                },
+              )}
             </p>
-            {staffHeroData?.tags?.length === 0 ||
-              (!staffHeroData?.tags && (
-                <p className="text-balance text-muted-foreground">
-                  No keywords
-                </p>
-              ))}
-            {String(viewingUser?.pk) === usersPk && buttonsVisible ? (
-              <AddItemButton
-                ml={4}
-                icon={MdEdit}
-                ariaLabel={"Edit Tags Button"}
-                label={"Edit Tags"}
-                onClick={() => {}}
-                innerItemSize={"20px"}
-                p={1}
-              />
+            {(String(viewingUser?.pk) === usersPk ||
+              viewingUser?.is_superuser) &&
+            buttonsVisible ? (
+              <>
+                <div className="mt-4 flex">
+                  {(staffHeroData?.keyword_tags?.length === 0 ||
+                    !staffHeroData?.keyword_tags) && (
+                    <p className="text-balance text-muted-foreground">
+                      No keywords
+                    </p>
+                  )}
+                  {isDesktop ? (
+                    <EditKeywordsDialog
+                      userPk={Number(usersPk)}
+                      refetch={refetch}
+                      staffHeroData={staffHeroData}
+                    />
+                  ) : (
+                    <EditKeywordsDrawer
+                      userPk={Number(usersPk)}
+                      refetch={refetch}
+                      staffHeroData={staffHeroData}
+                    />
+                  )}
+                </div>
+              </>
             ) : null}
           </div>
-          {!buttonsVisible && (
-            <div className="mt-4 flex justify-center">
-              {!isDesktop ? (
-                <SendUserEmailMobileDrawer
-                  name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
-                  email={staffHeroData?.user?.email}
-                />
-              ) : (
-                <SendUserEmailDialog
-                  name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
-                  email={staffHeroData?.user?.email}
-                />
-              )}
-            </div>
-          )}
         </div>
       </div>
-    ) : (
-      <div className="flex flex-col">
-        {/* Back button */}
-        <div
-          className="flex cursor-pointer justify-center py-5 hover:underline"
-          onClick={() => navigate("/staff")}
-        >
-          <ChevronLeft />
-          <p className="font-semibold dark:text-slate-300">Back to Search</p>
-        </div>
 
-        {/* Name, Title and Tag */}
-        <div className="flex w-full flex-col justify-center p-4 text-center dark:text-slate-300">
-          <p className="text-2xl font-bold">
-            {staffHeroData?.title && `${staffHeroData?.title}. `}
-            {staffHeroData?.name}
-          </p>
-          <p className="mt-4 text-balance font-semibold text-slate-700 dark:text-slate-400">
-            {staffHeroData?.positionTitle}
-            {staffHeroData?.branch && `, ${staffHeroData?.branch}`}
-          </p>
-          <p className="mt-4 text-balance text-muted-foreground">
-            {staffHeroData?.tags?.map((word: string) => word).join(" | ")}
-          </p>
-        </div>
-      </div>
-    )
+      {!buttonsVisible ? (
+        isDesktop ? (
+          <div className="mt-2 flex justify-center">
+            <SendUserEmailDialog
+              name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
+              pk={staffHeroData?.user?.pk}
+            />
+          </div>
+        ) : (
+          <div className="mt-2 flex justify-center">
+            <SendUserEmailMobileDrawer
+              name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
+              pk={staffHeroData?.user?.pk}
+            />
+          </div>
+        )
+      ) : null}
+    </>
   ) : (
     <Center p={4}>
       <Spinner />
@@ -140,3 +167,104 @@ const StaffHero = ({
   );
 };
 export default StaffHero;
+
+const EditKeywordsDialog = ({
+  userPk,
+  refetch,
+  staffHeroData,
+}: {
+  userPk: number;
+  refetch: () => void;
+  staffHeroData: IStaffProfileHeroData;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger
+      // asChild
+      >
+        <span className="flex items-center">
+          <AddItemButton
+            ml={4}
+            // mt={-3}
+            icon={MdEdit}
+            ariaLabel={"Edit Tags Button"}
+            label={"Edit Tags"}
+            onClick={() => {}}
+            innerItemSize={"20px"}
+            p={1}
+          />
+        </span>
+      </DialogTrigger>
+      <DialogContent className="max-h-[80vh] w-[700px] max-w-[700px] overflow-y-auto text-slate-800">
+        <DialogHeader>
+          <DialogTitle className="mb-2 mt-3">Edit Keywords</DialogTitle>
+        </DialogHeader>
+        <EditStaffHeroContent
+          sectionKind="keyword_tags"
+          staffHeroData={staffHeroData}
+          usersPk={userPk}
+          refetch={refetch}
+          onClose={handleClose}
+          kind={"dialog"}
+        />{" "}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const EditKeywordsDrawer = ({
+  userPk,
+  refetch,
+  staffHeroData,
+}: {
+  userPk: number;
+  refetch: () => void;
+  staffHeroData: IStaffProfileHeroData;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
+  return (
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <DrawerTrigger>
+        <span className="flex items-center">
+          <AddItemButton
+            ml={4}
+            // mt={-3}
+            icon={MdEdit}
+            ariaLabel={"Edit Tags Button"}
+            label={"Edit Tags"}
+            onClick={() => {}}
+            innerItemSize={"20px"}
+            p={1}
+            outline={"none"}
+          />
+        </span>
+      </DrawerTrigger>
+      <DrawerContent className="p-3">
+        <div className="mx-auto w-full max-w-sm text-slate-800">
+          <div className="no-scrollbar max-h-screen overflow-x-hidden overflow-y-scroll">
+            <DrawerHeader>
+              <DrawerTitle className="mb-2 mt-3">Edit Keywords</DrawerTitle>
+            </DrawerHeader>
+            <EditStaffHeroContent
+              sectionKind="keyword_tags"
+              staffHeroData={staffHeroData}
+              usersPk={userPk}
+              refetch={refetch}
+              onClose={handleClose}
+              kind={"drawer"}
+            />{" "}
+          </div>
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+};

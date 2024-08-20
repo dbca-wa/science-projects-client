@@ -24,7 +24,7 @@ import { createPortal } from "react-dom";
 import { isHTMLElement } from "@/lib/utils/guard";
 import { Point } from "@/lib/utils/point";
 import { Rect } from "@/lib/utils/rect";
-import { Box, useColorMode } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { MdDragIndicator } from "react-icons/md";
 
 const SPACE = 4;
@@ -283,7 +283,6 @@ function useDraggableBlockMenu(
   toolbarHeight: number,
 ): JSX.Element {
   const scrollerElem = anchorElem.parentElement;
-  const { colorMode } = useColorMode();
   const menuRef = useRef<HTMLDivElement>(null);
   const targetLineRef = useRef<HTMLDivElement>(null);
   const isDraggingBlockRef = useRef<boolean>(false);
@@ -444,24 +443,14 @@ function useDraggableBlockMenu(
   return createPortal(
     <>
       <div
-        className={`icon ${
-          colorMode === "light"
-            ? "draggable-block-menu-light"
-            : "draggable-block-menu-dark"
-        }`}
+        className={`icon ${"draggable-block-menu-light"}`}
         ref={menuRef}
         draggable={true}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       >
         <Box
-          className={
-            isEditable
-              ? colorMode === "light"
-                ? "icon-light"
-                : "icon-dark"
-              : ""
-          }
+          className={isEditable ? "icon-light" : ""}
           style={{ pointerEvents: "none" }}
         >
           <MdDragIndicator style={{ userSelect: "none" }} />
@@ -473,7 +462,7 @@ function useDraggableBlockMenu(
   );
 }
 
-export default function DraggableBlockPlugin({
+export default function RTEDragPlugin({
   anchorElem = document.body,
   toolbarHeight,
 }: {

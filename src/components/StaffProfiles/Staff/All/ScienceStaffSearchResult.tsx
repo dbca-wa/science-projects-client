@@ -21,12 +21,10 @@ import EmailStaffMemberContent from "../../Modals/EmailStaffMemberContent";
 const ScienceStaffSearchResult = ({
   pk,
   name,
-  email,
   title,
   branch,
   position,
   disableEmailButton,
-  // address,
 }: IStaffUserResult) => {
   const navigate = useNavigate();
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -76,53 +74,41 @@ const ScienceStaffSearchResult = ({
             </div>
           </span>
         )}
-        {/* {address && (
-    
-        )} */}
-        {email &&
-          (!isDesktop ? (
-            disableEmailButton === true ? (
-              <span className="flex items-center">
-                <Mail className="mt-[2px] self-start" size={"15px"} />
-                <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
-                  Email {`${name}`}
-                </a>
-              </span>
-            ) : (
-              <SendUserEmailMobileDrawer name={`${name}`} email={email} />
-            )
-          ) : disableEmailButton === true ? (
-            <span className="flex items-center">
-              <Mail className="mt-[2px] self-start" size={"15px"} />
-              <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
-                Email {`${name}`}
-              </a>
-            </span>
-          ) : (
-            <SendUserEmailDialog name={`${name}`} email={email} />
-          ))}
+
+        {disableEmailButton === true ? (
+          <span className="flex items-center">
+            <Mail className="mt-[2px] self-start" size={"15px"} />
+            <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
+              Email {`${name}`}
+            </a>
+          </span>
+        ) : isDesktop ? (
+          <SendUserEmailDialog name={`${name}`} pk={pk} />
+        ) : (
+          <SendUserEmailMobileDrawer name={`${name}`} pk={pk} />
+        )}
       </div>
     </div>
   );
 };
 
-export const SendUserEmailDialog = ({ name, email }: IStaffUserResult) => {
+export const SendUserEmailDialog = ({ name, pk }: IStaffUserResult) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
         <span className="flex items-center">
           <Mail className="mt-[2px] self-start" size={"15px"} />
-          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
+          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600 hover:underline">
             Email {`${name}`}
           </a>
         </span>
       </DialogTrigger>
-      <DialogContent className="text-slate-800 sm:max-w-[425px]">
+      <DialogContent className="p-4 text-slate-800 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="mb-2 mt-3">Email {`${name}`}</DialogTitle>
         </DialogHeader>
 
-        <EmailStaffMemberContent email={email} name={name} kind={"dialog"} />
+        <EmailStaffMemberContent pk={pk} name={name} kind={"dialog"} />
       </DialogContent>
     </Dialog>
   );
@@ -130,24 +116,25 @@ export const SendUserEmailDialog = ({ name, email }: IStaffUserResult) => {
 
 export const SendUserEmailMobileDrawer = ({
   name,
-  email,
+  pk,
+  // email,
 }: IStaffUserResult) => {
   return (
     <Drawer>
       <DrawerTrigger>
         <span className="flex items-center">
           <Mail className="mt-[2px] self-start" size={"15px"} />
-          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600">
+          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600 hover:underline">
             Email {`${name}`}
           </a>
         </span>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="p-4">
         <div className="mx-auto w-full max-w-sm text-slate-800">
           <DrawerHeader>
             <DrawerTitle className="mb-2 mt-3">Email {`${name}`}</DrawerTitle>
           </DrawerHeader>
-          <EmailStaffMemberContent kind={"drawer"} email={email} name={name} />
+          <EmailStaffMemberContent kind={"drawer"} pk={pk} name={name} />
         </div>
       </DrawerContent>
     </Drawer>

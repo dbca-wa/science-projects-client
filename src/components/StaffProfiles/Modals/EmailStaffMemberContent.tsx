@@ -3,32 +3,30 @@ import { DrawerClose } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { publicEmailStaffMember } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 const EmailStaffMemberContent = ({
   kind,
-  // first_name,
-  // last_name,
+  pk,
   name,
-  email,
 }: {
   kind: "drawer" | "dialog";
   name: string;
-  // first_name: string;
-  // last_name: string;
-  email: string;
+  pk: number;
 }) => {
   const [senderEmail, setSenderEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [canSend, setCanSend] = useState(false);
 
-  const sendEmail = (e: React.FormEvent) => {
+  const sendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log({
-      email,
+      pk,
       senderEmail,
       message,
     });
+    await publicEmailStaffMember({ pk, senderEmail, message });
   };
 
   useEffect(() => {

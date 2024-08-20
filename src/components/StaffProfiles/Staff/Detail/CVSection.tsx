@@ -27,18 +27,20 @@ import AddItemButton from "./AddItemButton";
 import EducationEntry from "./EducationEntry";
 import EmploymentEntry from "./EmploymentEntry";
 import Subsection from "./Subsection";
-import { IStaffEducationEntry, IStaffEmploymentEntry } from "@/types";
+import { IStaffEducationEntry, IStaffEmploymentEntry, IUserMe } from "@/types";
 
 const CVSection = ({
   userId,
   buttonsVisible,
+  viewingUser,
 }: {
+  viewingUser: IUserMe;
   userId: number;
   buttonsVisible: boolean;
 }) => {
   const { staffCVData, staffCVLoading, refetch } = useStaffCV(userId);
   useEffect(() => console.log(buttonsVisible), [buttonsVisible]);
-  const isDesktop = useMediaQuery("(min-width: 768px");
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
     <>
@@ -48,6 +50,7 @@ const CVSection = ({
             title="Employment"
             divider
             button={
+              (viewingUser?.pk === userId || viewingUser?.is_superuser) &&
               buttonsVisible ? (
                 isDesktop ? (
                   <>
@@ -111,6 +114,7 @@ const CVSection = ({
             title="Education"
             divider
             button={
+              (viewingUser?.pk === userId || viewingUser?.is_superuser) &&
               buttonsVisible ? (
                 isDesktop ? (
                   <>
