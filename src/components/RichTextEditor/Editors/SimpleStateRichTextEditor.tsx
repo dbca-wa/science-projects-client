@@ -8,8 +8,8 @@ import { Box, useColorMode } from "@chakra-ui/react";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
-import "../../../styles/texteditor.css";
-import { EditorSubsections, EditorType } from "../../../types";
+import "@/styles/texteditor.css";
+import { EditorSubsections, EditorType } from "@/types";
 import { SimpleEditableRTE } from "./Sections/SimpleEditableRTE";
 
 interface IProps {

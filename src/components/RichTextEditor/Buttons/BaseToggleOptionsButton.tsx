@@ -101,9 +101,25 @@ export const BaseToggleOptionsButton = ({
         h={"40px"}
       >
         {currentState === false ? (
-          <Icon as={IconOne} boxSize={6} />
+          <Icon
+            as={IconOne}
+            boxSize={{
+              base: 5,
+              lg: 6,
+            }}
+            w={{ base: "20px", lg: "20px" }}
+            h={{ base: "20px", lg: "20px" }}
+          />
         ) : (
-          <Icon as={IconTwo} boxSize={6} />
+          <Icon
+            as={IconTwo}
+            boxSize={{
+              base: 5,
+              lg: 6,
+            }}
+            w={{ base: "20px", lg: "20px" }}
+            h={{ base: "20px", lg: "20px" }}
+          />
         )}
       </Button>
       {toolTipText && <span className="tooltip-text">{toolTipText}</span>}

@@ -1,0 +1,584 @@
+/* #region TEXT ============================================= */
+
+.editor-p-light {
+  font-size: 14px !important;
+  color: #333 !important;
+  margin-bottom: 4px !important;
+  position: relative !important;
+}
+
+.editor-bold-light {
+  font-weight: bold !important;
+  color: black !important;
+}
+
+.editor-italics-light {
+  font-style: italic !important;
+  color: #333 !important;
+}
+
+.editor-underline-light {
+  text-decoration: underline !important;
+  color: #333 !important;
+}
+
+.editor-underline-strikethrough-light {
+  text-decoration: underline line-through !important;
+  color: #333 !important;
+}
+
+.editor-strikethrough-light {
+  text-decoration: line-through !important;
+  color: #333 !important;
+}
+
+.rtl {
+}
+
+.ltr {
+}
+
+.editor-h1-light {
+  font-size: 30px !important;
+  color: #333 !important;
+}
+
+.editor-h2-light {
+  font-size: 26px !important;
+  color: #333 !important;
+}
+
+.editor-h3-light {
+  font-size: 22px !important;
+  color: #333 !important;
+}
+/* #endregion */
+
+/* #region LINKS ============================================= */
+
+.link-editor .link-input {
+  display: block !important;
+  width: calc(100% - 24px) !important;
+  box-sizing: border-box !important;
+  margin: 8px 12px !important;
+  padding: 8px 12px !important;
+  border-radius: 15px !important;
+  background-color: #eee !important;
+  font-size: 15px !important;
+  color: rgb(5, 5, 5) !important;
+  border: 0 !important;
+  outline: 0 !important;
+  position: relative !important;
+  font-family: inherit !important;
+}
+
+.link-editor div.link-edit {
+  background-size: 16px !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  width: 35px !important;
+  vertical-align: -0.25em !important;
+  position: absolute !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  cursor: pointer !important;
+}
+
+.link-editor .link-input a {
+  color: rgb(33, 111, 219) !important;
+  text-decoration: none !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  margin-right: 30px !important;
+  text-overflow: ellipsis !important;
+}
+
+.link-editor .link-input a:hover {
+  text-decoration: underline !important;
+}
+
+.link-editor .button {
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-block !important;
+  padding: 6px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  margin: 0 2px !important;
+}
+
+.link-editor .button.hovered {
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-block !important;
+  background-color: #eee !important;
+}
+
+/* #endregion */
+
+/* #region LISTS ============================================= */
+
+ul li,
+ol li {
+  list-style-position: outside !important; /* Adjust to inside if needed */
+  text-indent: 2px;
+}
+
+ol li {
+  text-indent: 5px;
+}
+
+ol.editor-ol-light li::before {
+  font-weight: 400 !important; /* Semibold for the custom marker */
+}
+
+.editor-ol1,
+.editor-ol2,
+.editor-ol3,
+.editor-ul1,
+.editor-ul2,
+.editor-ul3 {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.editor-ol1 {
+  margin-left: 32px !important;
+}
+
+.editor-ul1 {
+  visibility: visible !important;
+  margin-left: 32px !important;
+}
+
+.editor-ol2 {
+  margin-left: 20px !important;
+  list-style-type: lower-alpha !important;
+}
+
+.editor-ul2 {
+  margin-left: 20px !important;
+  list-style-type: circle !important;
+}
+
+.editor-ol3 {
+  margin-left: 20px !important;
+  list-style-type: lower-roman !important;
+}
+
+.editor-ul3 {
+  margin-left: 20px !important;
+  list-style-type: square !important;
+}
+
+.editor-li-light {
+  font-size: 14px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-bottom: 4px !important;
+  /* margin-left: 30px; */
+  color: #333 !important;
+  list-style-position: outside !important; /* Ensures bullets are outside the content box */
+  padding-left: 0px !important; /* Adjust this value to control the spacing */
+}
+
+/* #endregion */
+
+/* #region CHECK LISTS ======================================= */
+
+.editor-list-item-checked,
+.editor-list-item-unchecked {
+  position: relative !important;
+  margin-left: 8px !important;
+  margin-right: 8px !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  list-style-type: none !important;
+  outline: none !important;
+}
+.editor-list-item-checked {
+  text-decoration: line-through !important;
+}
+.editor-list-item-unchecked:before,
+.editor-list-item-checked:before {
+  content: "" !important;
+  width: 16px !important;
+  height: 16px !important;
+  top: 2px !important;
+  left: 0 !important;
+  cursor: pointer !important;
+  display: block !important;
+  background-size: cover !important;
+  position: absolute !important;
+}
+.editor-list-item-unchecked[dir="rtl"]:before,
+.editor-list-item-checked[dir="rtl"]:before {
+  left: auto !important;
+  right: 0 !important;
+}
+.editor-list-item-unchecked:focus:before,
+.editor-list-item-checked:focus:before {
+  box-shadow: 0 0 0 2px #a6cdfe !important;
+  border-radius: 2px !important;
+}
+.editor-list-item-unchecked:before {
+  border: 1px solid #999 !important;
+  border-radius: 2px !important;
+}
+.editor-list-item-checked:before {
+  border: 1px solid rgb(61, 135, 245) !important;
+  border-radius: 2px !important;
+  background-color: #3d87f5 !important;
+  background-repeat: no-repeat !important;
+}
+.editor-list-item-checked:after {
+  content: "" !important;
+  cursor: pointer !important;
+  border-color: #fff !important;
+  border-style: solid !important;
+  position: absolute !important;
+  display: block !important;
+  top: 6px !important;
+  width: 3px !important;
+  left: 7px !important;
+  right: 7px !important;
+  height: 6px !important;
+  transform: rotate(45deg) !important;
+  border-width: 0 2px 2px 0 !important;
+}
+/* #endregion */
+
+/* #region QUOTES ============================================ */
+
+.editor-quote {
+  margin: 0 !important;
+  margin-left: 20px !important;
+  font-size: 15px !important;
+  color: rgb(101, 103, 107) !important;
+  border-left-color: rgb(206, 208, 212) !important;
+  border-left-width: 4px !important;
+  border-left-style: solid !important;
+  padding-left: 16px !important;
+}
+/* #endregion */
+
+/* #region TABLES ============================================ */
+
+.table-light {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  overflow-y: scroll !important;
+  overflow-x: scroll !important;
+  table-layout: fixed !important;
+  justify-self: center !important;
+  align-self: center !important;
+  margin: 30px 0 !important;
+  width: "100%" !important;
+}
+
+/* Table sizing */
+.table-light th,
+.table-light td,
+.table-light tr {
+  min-width: 100% !important;
+  /* width: 100% !important; */
+  /* max-width: fit-content; */
+}
+
+/* Borders */
+.table-light th,
+.table-light td,
+.table-light tr {
+  border: 1px solid black !important;
+}
+
+.table-cell-light {
+  border: 1px solid #575757 !important;
+  /* background-color: #ffffff; */
+  min-width: 100px !important;
+  width: fit-content !important;
+  max-width: fit-content !important;
+  word-wrap: break-word !important;
+  vertical-align: top !important;
+  text-align: start !important;
+  padding: 6px 8px !important;
+  position: relative !important;
+  outline: none !important;
+}
+
+.table-cell-light p {
+  text-wrap: balance !important;
+  color: black !important;
+}
+
+.table-cell-header-light {
+  /* background-color: rgb(245, 245, 245); */
+  text-align: start !important;
+}
+
+.table-selection-light *::selection {
+  background-color: transparent !important;
+}
+
+.table-selected-light {
+  outline: 2px solid rgb(60, 132, 244) !important;
+}
+
+.table-cell-sorted-indicator-light {
+  display: block !important;
+  opacity: 0.5 !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 4px !important;
+  background-color: #999 !important;
+}
+
+.table-cell-resizer-light {
+  position: absolute !important;
+  right: -4px !important;
+  height: 100% !important;
+  width: 8px !important;
+  cursor: ew-resize !important;
+  z-index: 10 !important;
+  top: 0 !important;
+}
+
+.table-cell-selected-light {
+  background-color: #c9dbf0 !important;
+}
+
+.table-cell-primary-selected-light {
+  border: 2px solid rgb(60, 132, 244) !important;
+  display: block !important;
+  height: calc(100% - 2px) !important;
+  position: absolute !important;
+  width: calc(100% - 2px) !important;
+  left: -1px !important;
+  top: -1px !important;
+  z-index: 2 !important;
+}
+
+.table-cell-editing-light {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 3px !important;
+}
+
+.table-add-columns-light {
+  position: absolute !important;
+  top: 0 !important;
+  width: 20px !important;
+  background-color: #eee !important;
+  height: 100% !important;
+  right: -25px !important;
+  animation: table-controls 0.2s ease !important;
+  border: 0 !important;
+  cursor: pointer !important;
+}
+
+.table-add-columns-light:after {
+  background-image: url(../images/icons/plus.svg) !important;
+  background-size: contain !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  display: block !important;
+  content: " " !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0.4 !important;
+}
+
+.table-add-columns-light:hover {
+  background-color: #c9dbf0 !important;
+}
+
+.table-add-rows-light {
+  position: absolute !important;
+  bottom: -25px !important;
+  width: calc(100% - 25px) !important;
+  background-color: #eee !important;
+  height: 20px !important;
+  left: 0 !important;
+  animation: table-controls 0.2s ease !important;
+  border: 0 !important;
+  cursor: pointer !important;
+}
+
+.table-add-rows-light:after {
+  background-image: url(../images/icons/plus.svg) !important;
+  background-size: contain !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  display: block !important;
+  content: " " !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0.4 !important;
+}
+
+.table-add-rows-light:hover {
+  background-color: #c9dbf0 !important;
+}
+
+@keyframes table-controls {
+  0% {
+    opacity: 0 !important;
+  }
+  100% {
+    opacity: 1 !important;
+  }
+}
+
+.table-cell-resize-ruler-light {
+  display: block !important;
+  position: absolute !important;
+  width: 1px !important;
+  background-color: rgb(60, 132, 244) !important;
+  height: 100% !important;
+  top: 0 !important;
+}
+
+.table-action-button-container-light {
+  display: block !important;
+  right: 5px !important;
+  top: 6px !important;
+  position: absolute !important;
+  z-index: 4 !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.table-action-button-light {
+  background-color: #eee !important;
+  display: block !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  color: #222 !important;
+  cursor: pointer !important;
+}
+
+.table-action-button-light:hover {
+  background-color: #ddd !important;
+}
+
+.table-cell-action-button-container {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  will-change: transform !important;
+}
+
+.table-cell-action-button {
+  background-color: none !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border: 0 !important;
+  position: relative !important;
+  border-radius: 15px !important;
+  color: #222 !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+}
+
+i.chevron-down {
+  background-color: transparent !important;
+  background-size: contain !important;
+  display: inline-block !important;
+  height: 8px !important;
+  width: 8px !important;
+  background-image: url(images/icons/chevron-down.svg) !important;
+}
+
+.action-button {
+  background-color: #eee !important;
+  border: 0 !important;
+  padding: 8px 12px !important;
+  position: relative !important;
+  margin-left: 5px !important;
+  border-radius: 15px !important;
+  color: #222 !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+}
+
+.action-button:hover {
+  background-color: #ddd !important;
+  color: #000 !important;
+}
+
+.action-button-mic.active {
+  animation: mic-pulsate-color 3s infinite !important;
+}
+
+button.action-button:disabled {
+  opacity: 0.6 !important;
+  background: #eee !important;
+  cursor: not-allowed !important;
+}
+
+@keyframes mic-pulsate-color {
+  0% {
+    background-color: #ffdcdc !important;
+  }
+
+  50% {
+    background-color: #ff8585 !important;
+  }
+
+  100% {
+    background-color: #ffdcdc !important;
+  }
+}
+
+@keyframes table-controls {
+  0% {
+    opacity: 0 !important;
+  }
+  100% {
+    opacity: 1 !important;
+  }
+}
+
+/*  TOOLTIP ============================================= */
+
+.tooltip-container {
+  position: relative !important;
+  display: inline-block !important;
+}
+
+.tooltip-text {
+  visibility: hidden !important;
+  width: 120px !important;
+  background-color: #333 !important;
+  color: #fff !important;
+  text-align: center !important;
+  border-radius: 5px !important;
+  padding: 5px !important;
+  position: absolute !important;
+  z-index: 1 !important;
+  bottom: 115% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  opacity: 0 !important;
+  transition: opacity 0.3s !important;
+  user-select: none !important;
+  backface-visibility: hidden !important;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+/* #endregion */

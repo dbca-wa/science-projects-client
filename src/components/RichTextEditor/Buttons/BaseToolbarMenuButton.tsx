@@ -9,6 +9,7 @@ import {
   MenuItem,
   MenuList,
   useColorMode,
+  Text,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { IconType } from "react-icons";
@@ -22,6 +23,7 @@ interface IMenuItem {
 }
 
 export interface IBaseToolbarMenuButtonProps {
+  tooltipText?: string;
   title?: string;
   menuIcon?: IconType;
   menuItems: IMenuItem[];
@@ -30,6 +32,7 @@ export interface IBaseToolbarMenuButtonProps {
 }
 
 export const BaseToolbarMenuButton = ({
+  tooltipText,
   title,
   menuIcon: MenuIcon,
   menuItems,
@@ -62,52 +65,62 @@ export const BaseToolbarMenuButton = ({
 
   return (
     <Menu isLazy>
-      <MenuButton
-        as={Button}
-        variant={"ghost"}
-        leftIcon={MenuIcon ? <MenuIcon /> : undefined}
-        rightIcon={<FaCaretDown />}
-        // px={8}
-        mx={1}
-        flex={1}
-        ref={buttonRef}
-        tabIndex={-1}
-        onClick={() => { onClick && onClick() }}
-      >
-        {title ? title : null}
-      </MenuButton>
-      <MenuList
-        w={"fit-content"}
-        // w={buttonWidth}
-        // minW={"200px"}
-        // maxW={"200px"}
-        zIndex={9999999999999}
-        pos={"absolute"}
-
-      >
-        {menuItems.map((item, index) => {
-          return (
-            <MenuItem
-              key={index}
-              onClick={item.onClick}
-              w={"100%"}
-              display={"inline-flex"}
-              alignItems={"center"}
-              zIndex={2}
-              // pos={"absolute"}
-              _hover={{ bg: disableHoverBackground ? undefined : colorMode === "light" ? "gray.100" : "gray.600" }}
-            >
-              {item.leftIcon ? <Icon as={item.leftIcon} /> : null}
-              {item?.text && (
-                <Box pl={4} zIndex={2}>
-                  <span>{item.text}</span>
-                </Box>
-              )}
-              {item?.component && (item?.component)}
-            </MenuItem>
-          );
-        })}
-      </MenuList>
+      <Box className="tooltip-container flex-grow">
+        <MenuButton
+          as={Button}
+          variant={"ghost"}
+          leftIcon={MenuIcon ? <MenuIcon /> : undefined}
+          rightIcon={<FaCaretDown />}
+          // px={8}
+          mx={1}
+          flex={1}
+          ref={buttonRef}
+          tabIndex={-1}
+          onClick={() => onClick?.()}
+          size={"sm"}
+          w={"100%"}
+        >
+          {title ? title : null}
+        </MenuButton>
+        <MenuList
+          w={"fit-content"}
+          // w={buttonWidth}
+          // minW={"200px"}
+          // maxW={"200px"}
+          zIndex={9999999999999}
+          pos={"absolute"}
+        >
+          {menuItems.map((item, index) => {
+            return (
+              <MenuItem
+                key={index}
+                onClick={item.onClick}
+                w={"100%"}
+                display={"inline-flex"}
+                alignItems={"center"}
+                zIndex={2}
+                // pos={"absolute"}
+                _hover={{
+                  bg: disableHoverBackground
+                    ? undefined
+                    : colorMode === "light"
+                      ? "gray.100"
+                      : "gray.600",
+                }}
+              >
+                {item.leftIcon ? <Icon as={item.leftIcon} /> : null}
+                {item?.text && (
+                  <Box pl={4} zIndex={2}>
+                    <span>{item.text}</span>
+                  </Box>
+                )}
+                {item?.component && item?.component}
+              </MenuItem>
+            );
+          })}
+        </MenuList>
+        {tooltipText && <Text className="tooltip-text">{tooltipText}</Text>}
+      </Box>
     </Menu>
   );
 };

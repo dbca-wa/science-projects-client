@@ -51,12 +51,22 @@ export const BaseOptionsButton = ({
         }
         onClick={handleClick}
         rounded={"full"}
-        w={"35px"}
-        h={"40px"}
         data-tip="Click to Save"
         isDisabled={!canRunFunction}
+        p={0}
+        m={0}
+        maxW={{ base: "35px", lg: "35px" }}
+        maxH={{ base: "40px", lg: "40px" }}
       >
-        <Icon as={buttonIcon} boxSize={6} />
+        <Icon
+          as={buttonIcon}
+          boxSize={{
+            base: 5,
+            lg: 6,
+          }}
+          w={{ base: "20px", lg: "20px" }}
+          h={{ base: "20px", lg: "20px" }}
+        />
       </Button>
       <span className="tooltip-text">{toolTipText}</span>
     </div>

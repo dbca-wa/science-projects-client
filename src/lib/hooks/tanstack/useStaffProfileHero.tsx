@@ -8,6 +8,7 @@ export const useStaffProfileHero = (userPk: undefined | string | number) => {
     queryFn: getPublicProfileHeroData,
     retry: false,
   });
+  // console.log(data);
   return {
     staffHeroLoading: isPending,
     staffHeroData: data as IStaffProfileHeroData,

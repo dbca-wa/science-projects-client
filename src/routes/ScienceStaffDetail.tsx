@@ -30,7 +30,7 @@ const ScienceStaffDetail = () => {
     window.location.href = url;
   };
   const { userData: viewingUser, userLoading } = useUser();
-  const isDesktop = useMediaQuery("(min-width: 768px");
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
     <div className="relative h-full w-full">
@@ -65,28 +65,34 @@ const ScienceStaffDetail = () => {
             <StaffContent
               usersPk={Number(usersPk)}
               buttonsVisible={buttonsVisible}
+              viewingUser={viewingUser}
             />
           </div>
           <div
             className={`absolute right-0 top-3 flex overflow-hidden px-8 md:px-10 lg:px-11 ${!isDesktop && "flex-col"}`}
           >
-            <Tooltip aria-label="toggle-tooltip" label="Toggle Edit/View">
-              <Box>
-                <BaseToggleOptionsButton
-                  iconOne={AiFillEye}
-                  colorSchemeOne="green"
-                  iconTwo={AiFillEyeInvisible}
-                  colorSchemeTwo="blue"
-                  currentState={buttonsVisible}
-                  setCurrentState={setButtonsVisible}
-                  // toolTipText={
-                  //   !buttonsVisible ? "Show Edit Buttons" : "Hide Edit Buttons"
-                  // }
-                  //  editorIsOpen={editorIsOpen}
-                />
-              </Box>
-            </Tooltip>
-            {!userLoading && viewingUser?.pk && buttonsVisible ? (
+            {!isDesktop && (
+              <Tooltip aria-label="toggle-tooltip" label="Toggle Edit/View">
+                <Box>
+                  <BaseToggleOptionsButton
+                    iconOne={AiFillEye}
+                    colorSchemeOne="green"
+                    iconTwo={AiFillEyeInvisible}
+                    colorSchemeTwo="blue"
+                    currentState={buttonsVisible}
+                    setCurrentState={setButtonsVisible}
+                    // toolTipText={
+                    //   !buttonsVisible ? "Show Edit Buttons" : "Hide Edit Buttons"
+                    // }
+                    //  editorIsOpen={editorIsOpen}
+                  />
+                </Box>
+              </Tooltip>
+            )}
+            {!userLoading &&
+            (viewingUser?.pk === Number(usersPk) ||
+              viewingUser?.is_superuser) &&
+            buttonsVisible ? (
               <div className={`flex justify-center`}>
                 <Tooltip aria-label="toggle-tooltip" label="Back to SPMS">
                   {isDesktop ? (
@@ -103,7 +109,7 @@ const ScienceStaffDetail = () => {
                       bg={"green.500"}
                       _hover={{ bg: "green.400" }}
                       color={"white"}
-                      ml={2}
+                      mr={2}
                     >
                       SPMS
                     </ChakraButton>
@@ -131,6 +137,24 @@ const ScienceStaffDetail = () => {
                 </Tooltip>
               </div>
             ) : null}
+            {isDesktop && (
+              <Tooltip aria-label="toggle-tooltip" label="Toggle Edit/View">
+                <Box>
+                  <BaseToggleOptionsButton
+                    iconOne={AiFillEye}
+                    colorSchemeOne="green"
+                    iconTwo={AiFillEyeInvisible}
+                    colorSchemeTwo="blue"
+                    currentState={buttonsVisible}
+                    setCurrentState={setButtonsVisible}
+                    // toolTipText={
+                    //   !buttonsVisible ? "Show Edit Buttons" : "Hide Edit Buttons"
+                    // }
+                    //  editorIsOpen={editorIsOpen}
+                  />
+                </Box>
+              </Tooltip>
+            )}
           </div>
         </>
       ) : (
