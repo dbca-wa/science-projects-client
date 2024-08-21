@@ -33,6 +33,7 @@ const ProjectsSection = ({
         userProjectsData?.map((proj, index) => {
           return (
             <ProjectItem
+              pk={proj.pk}
               key={index}
               title={proj.title}
               datesString={
@@ -56,6 +57,7 @@ const ProjectsSection = ({
 };
 
 interface IProjectItemProps {
+  pk: number;
   title: string;
   datesString: string;
   description: string;
@@ -63,6 +65,7 @@ interface IProjectItemProps {
   buttonsVisible: boolean;
 }
 const ProjectItem = ({
+  pk,
   title,
   datesString,
   description,
@@ -126,9 +129,9 @@ const ProjectItem = ({
           }}
           onClick={() => {
             if (process.env.NODE_ENV === "development") {
-              navigate("/users/me");
+              navigate(`/projects/${pk}/overview`);
             } else {
-              setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);
+              setHref(`${VITE_PRODUCTION_BASE_URL}projects/${pk}/overview`);
             }
           }}
         />
