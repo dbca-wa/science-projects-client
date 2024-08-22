@@ -1,4 +1,3 @@
-import { IOverviewData } from "./types.d";
 import { LexicalEditor } from "lexical";
 import { ReactNode } from "react";
 import { AxiosError, AxiosResponse } from "axios";
@@ -1016,13 +1015,27 @@ export interface KeywordTag {
   name: string;
 }
 
+export interface IStaffProfileData {
+  pk: number;
+  user: number;
+  title: string;
+  name: string;
+  positionTitle: string;
+  branch: string;
+  overview: {
+    about: string;
+    expertise: string;
+  };
+  keyword_tags: KeywordTag[];
+}
+
 export interface IStaffProfileHeroData {
   pk: number;
   user: IStaffUser;
   title?: string; // optional
   name: string; // no titles
-  // positionTitle: string;
-  // branch: string;
+  positionTitle?: string;
+  branch?: string;
   keyword_tags: KeywordTag[]; // make this max of 5
 }
 
