@@ -327,7 +327,7 @@ export const DatabaseRichTextToolbar = ({
             editor.dispatchCommand(UNDO_COMMAND, undefined);
           }}
         >
-          <FaUndo size={"12px"} />
+          <FaUndo size={"12px"} color={"white"} />
         </ToolbarButton>
         <ToolbarButton
           ariaLabel="Redo"
@@ -337,7 +337,7 @@ export const DatabaseRichTextToolbar = ({
             editor.dispatchCommand(REDO_COMMAND, undefined);
           }}
         >
-          <FaRedo size={"12px"} />
+          <FaRedo size={"12px"} color={"white"} />
         </ToolbarButton>
         <VerticalDivider />
 
@@ -351,7 +351,7 @@ export const DatabaseRichTextToolbar = ({
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
             }}
           >
-            <FaBold size={"12px"} />
+            <FaBold size={"12px"} color={"white"} />
           </ToolbarButton>
           <ToolbarButton
             ariaLabel="Format text as Italic"
@@ -362,7 +362,7 @@ export const DatabaseRichTextToolbar = ({
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
             }}
           >
-            <FaItalic size={"12px"} />
+            <FaItalic size={"12px"} color={"white"} />
           </ToolbarButton>
           <ToolbarButton
             ariaLabel="Format text as Underlined"
@@ -373,7 +373,7 @@ export const DatabaseRichTextToolbar = ({
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
             }}
           >
-            <FaUnderline size={"12px"} />
+            <FaUnderline size={"12px"} color={"white"} />
           </ToolbarButton>
           <ToolbarButton
             ariaLabel="Format Subscript"
@@ -384,7 +384,7 @@ export const DatabaseRichTextToolbar = ({
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript");
             }}
           >
-            <MdSubscript size={"12px"} />
+            <MdSubscript size={"12px"} color={"white"} />
           </ToolbarButton>
           <ToolbarButton
             ariaLabel="Format Superscript"
@@ -395,7 +395,7 @@ export const DatabaseRichTextToolbar = ({
               editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript");
             }}
           >
-            <MdSuperscript size={"12px"} />
+            <MdSuperscript size={"12px"} color={"white"} />
           </ToolbarButton>
           <ToolbarButton
             ariaLabel="Clear Formatting"
@@ -452,7 +452,7 @@ export const DatabaseRichTextToolbar = ({
               });
             }}
           >
-            <ImClearFormatting size={"12px"} />
+            <ImClearFormatting size={"12px"} color={"white"} />
           </ToolbarButton>
         </>
 
@@ -624,11 +624,11 @@ const ElementSelector = ({
           mx={1}
           ref={buttonRef}
           w={"100%"}
-
           // // px={8}
           // mx={1}
           // flex={1}
           // tabIndex={-1}
+          color={"white"}
         >
           {/* {buttonSize} */}
           {blockTypeToBlockName(blockType)}
@@ -852,7 +852,7 @@ const TableDropdown = ({ activeEditor }: TableGridProps) => {
           component: <TableGrid activeEditor={activeEditor} />,
         },
       ]}
-    ></BaseToolbarMenuButton>
+    />
   );
 };
 
@@ -921,6 +921,7 @@ export const BaseToolbarMenuButton = ({
         ref={buttonRef}
         tabIndex={-1}
         onClick={() => onClick?.()}
+        color={"white"}
       >
         {title ? title : null}
       </MenuButton>

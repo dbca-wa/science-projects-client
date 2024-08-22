@@ -74,7 +74,7 @@ const EditStaffEmploymentContent = ({
   };
 
   return (
-    <div>
+    <div className="px-3">
       <form onSubmit={handleSubmit(onSubmit)} className="text-slate-800">
         <Input
           type="hidden"

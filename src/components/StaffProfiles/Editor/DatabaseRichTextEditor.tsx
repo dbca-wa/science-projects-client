@@ -111,7 +111,7 @@ const DatabaseRichTextEditor = <T,>({
   const componentRef = useRef<HTMLDivElement | null>(null);
 
   const dragBtnMargin = 1;
-  const toolBarHeight = isEdit ? (isMobile ? 39 * 2 + 2 : 39) : -1;
+  const toolBarHeight = isEdit ? (isMobile ? 39 * 2 + 2 : 41) : -1;
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
@@ -201,8 +201,8 @@ const DatabaseRichTextEditor = <T,>({
                   // left: "34px",
                   // top: "145px",
                   // position: "sticky",
-                  left: "10px",
-                  top: "43px",
+                  left: "27px",
+                  top: "52px",
                   userSelect: "none",
                   pointerEvents: "none",
                 }}

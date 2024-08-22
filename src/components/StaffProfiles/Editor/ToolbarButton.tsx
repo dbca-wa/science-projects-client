@@ -45,6 +45,7 @@ export const ToolbarButton = ({
         tabIndex={-1}
         border={0}
         display={"flex"}
+        color={"white"}
       >
         {children}
       </Button>
