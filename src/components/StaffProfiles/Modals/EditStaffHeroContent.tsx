@@ -90,7 +90,7 @@ const EditStaffHeroContent = ({
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit(onSubmit)} className="text-slate-800">
-        <div className="">
+        <div className="px-4">
           <Input
             type="hidden"
             {...register("pk", {
