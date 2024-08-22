@@ -54,7 +54,7 @@ jobs:
           docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:migration
           docker push ghcr.io/dbca-wa/science-projects-client:migration
 
-  build_and_push_production:
+  build_production:
     runs-on: ubuntu-latest
     outputs:
       TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
@@ -78,21 +78,35 @@ jobs:
         run: |
           docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
 
-  finalize_production:
-    needs: build_and_push_production
+      - name: Save Docker Image as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-image
+          path: |
+            $(docker save ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }} | tee /tmp/production-image.tar)
+
+  push_production:
+    needs: build_production
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up Docker
         run: docker login --username idabblewith --password ${{ secrets.GH_PAT }} ghcr.io
 
-      - name: Verify Docker Images
-        run: |
-          echo "Listing Docker images:"
-          docker images
+      - name: Download Docker Image Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: production-image
 
-      - name: Finalize Production Image
+      - name: Load Docker Image
+        run: |
+          docker load -i production-image.tar
+
+      - name: Push Production Image
         env:
-          TAG_NAME: ${{ needs.build_and_push_production.outputs.TAG_NAME }}
+          TAG_NAME: ${{ needs.build_production.outputs.TAG_NAME }}
         run: |
           echo "Pushing image with tag: $TAG_NAME"
           docker push ghcr.io/dbca-wa/science-projects-client:${TAG_NAME}
