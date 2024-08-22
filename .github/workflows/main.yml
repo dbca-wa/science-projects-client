@@ -56,6 +56,8 @@ jobs:
 
   build_and_push_production:
     runs-on: ubuntu-latest
+    outputs:
+      TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -67,7 +69,7 @@ jobs:
         id: tag
         run: echo "::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}"
 
-      - name: Build and Push Production Image
+      - name: Build Production Image
         env:
           VITE_PRODUCTION_BASE_URL: "https://scienceprojects.dbca.wa.gov.au/"
           VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects.dbca.wa.gov.au/api/v1/"
@@ -87,6 +89,6 @@ jobs:
         env:
           TAG_NAME: ${{ needs.build_and_push_production.outputs.TAG_NAME }}
         run: |
-          docker push ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
+          docker push ghcr.io/dbca-wa/science-projects-client:${TAG_NAME}
           docker tag ghcr.io/dbca-wa/science-projects-client:${TAG_NAME} ghcr.io/dbca-wa/science-projects-client:latest
           docker push ghcr.io/dbca-wa/science-projects-client:latest
