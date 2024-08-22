@@ -57,7 +57,7 @@ const instance = axios.create({
 // if (process.env.NODE_ENV === "development") {
 // Intercept and inject csrf every request (up to date and dynamic)
 instance.interceptors.request.use((config) => {
-  const csrfToken = Cookie.get("csrftoken") || "POTATOES";
+  const csrfToken = Cookie.get("spmscsrf") || "POTATOES";
   // console.log(csrfToken);
   if (csrfToken !== "POTATOES") {
     config.headers["X-CSRFToken"] = csrfToken;
