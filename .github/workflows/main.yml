@@ -57,9 +57,6 @@ jobs:
   build_and_push_production:
     runs-on: ubuntu-latest
     steps:
-      - name: Delay Start
-        run: sleep 40
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -78,6 +75,18 @@ jobs:
           VITE_SPMS_VERSION: ${{ steps.tag.outputs.TAG_NAME }}
         run: |
           docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
+
+  finalize_production:
+    needs: build_and_push_production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker
+        run: docker login --username idabblewith --password ${{ secrets.GH_PAT }} ghcr.io
+
+      - name: Finalize Production Image
+        env:
+          TAG_NAME: ${{ needs.build_and_push_production.outputs.TAG_NAME }}
+        run: |
           docker push ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
-          docker tag ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }} ghcr.io/dbca-wa/science-projects-client:latest
+          docker tag ghcr.io/dbca-wa/science-projects-client:${TAG_NAME} ghcr.io/dbca-wa/science-projects-client:latest
           docker push ghcr.io/dbca-wa/science-projects-client:latest
