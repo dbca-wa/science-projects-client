@@ -137,24 +137,6 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             {/* &#9881;&#65039; */}
           </Text>
           <List spacing={1} ml={2}>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Prevent popup appearing twice when navigating away with an
-              open / unsaved editor
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Reflect changes of external description and aims immediately
-              on updating
-            </ListItem>
             {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
@@ -163,6 +145,29 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               <ListIcon as={MdCheckCircle} color="green.500" />
               Update: Annual Report design fixes (negative margins on RHS projects / widows and orphans)
             </ListItem> */}
+
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: (Major) Staff Profile functionality from
+              science.dbca.wa.gov.au has been redeveloped and tied into SPMS and
+              is working in test. Migrator ready and prepped for production
+              pending RFC with OIM. Development to continue for integrating
+              ORCID and Library publication data.
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Feature: Users can now edit their first and last name to ensure it
+              is correctly displayed on annual report. Accented user names
+              appear as such on annual report
+            </ListItem>
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
@@ -205,9 +210,17 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Users can now edit their first and last name to ensure it
-              is correctly displayed on annual report. Accented user names
-              appear as such on annual report
+              Fix: Prevent popup appearing twice when navigating away with an
+              open / unsaved editor
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Fix: Reflect changes of external description and aims immediately
+              on updating
             </ListItem>
           </List>
 

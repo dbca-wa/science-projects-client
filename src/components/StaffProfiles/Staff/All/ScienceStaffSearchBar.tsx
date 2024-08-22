@@ -3,41 +3,18 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { FormEvent, useState } from "react";
 
-const usersInDb = [
-  {
-    first_name: "Jarid",
-    last_name: "Prince",
-    email: "jarid.prince@dbca.wa.gov.au",
-  },
-  {
-    first_name: "Ben",
-    last_name: "Richardson",
-    email: "ben.richardson@dbca.wa.gov.au",
-  },
-  {
-    first_name: "Rory",
-    last_name: "McAuley",
-    email: "rory.mcauley@dbca.wa.gov.au",
-  },
-];
-
-const ScienceStaffSearchBar = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+const ScienceStaffSearchBar = ({
+  searchTerm: initialSearchTerm,
+  onSearch,
+}: {
+  searchTerm: string;
+  onSearch: (searchTerm: string) => void;
+}) => {
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const filteredUsers = usersInDb.filter((user) => {
-      const combinedName = `${user.first_name} ${user.last_name}`.toLowerCase();
-
-      return (
-        user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        combinedName.includes(searchTerm.toLowerCase())
-      );
-    });
-    console.log(filteredUsers);
+    onSearch(searchTerm);
   };
 
   return (
