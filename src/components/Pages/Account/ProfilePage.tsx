@@ -1,5 +1,6 @@
 // Handles Profile Page view
 
+import ScienceStaffSearchResult from "@/components/StaffProfiles/Staff/All/ScienceStaffSearchResult";
 import {
   Box,
   Button,
@@ -15,16 +16,15 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { AiFillCloseCircle, AiFillEdit, AiFillEye } from "react-icons/ai";
+import { AiFillCloseCircle, AiFillEdit } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
 import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
 import { EditMembershipModal } from "../../Modals/EditMembershipModal";
 import { EditPersonalInformationModal } from "../../Modals/EditPersonalInformationModal";
 import { EditProfileModal } from "../../Modals/EditProfileModal";
 import { UserGridItem } from "../Users/UserGridItem";
-import ScienceStaffSearchResult from "@/components/StaffProfiles/Staff/All/ScienceStaffSearchResult";
-import { useNavigate } from "react-router-dom";
 
 const AnimatedClickToEdit = () => {
   return (
@@ -189,7 +189,7 @@ export const ProfilePage = () => {
                     name={`${me.display_first_name} ${me.display_last_name}`}
                     title={me.title}
                     position={me.about}
-                    branch={me?.branch}
+                    // branch={me?.branch}
                     disableEmailButton={true}
                   />
                 </Flex>

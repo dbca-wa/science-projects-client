@@ -69,18 +69,18 @@ export const ProjectDetailEditModal = ({
     useState<ICreateProjectBaseInfo>({} as ICreateProjectBaseInfo);
 
   const [detailsData, setDetailsData] = useState<ICreateProjectDetails>(
-    {} as ICreateProjectDetails
+    {} as ICreateProjectDetails,
   );
 
   const [locationData, setLocationData] = useState([]);
 
   const [externalData, setExternalData] =
     useState<ICreateProjectExternalDetails>(
-      {} as ICreateProjectExternalDetails
+      {} as ICreateProjectExternalDetails,
     );
 
   const [studentData, setStudentData] = useState<ICreateProjectStudentDetails>(
-    {} as ICreateProjectStudentDetails
+    {} as ICreateProjectStudentDetails,
   );
 
   const goBack = () => {
@@ -127,7 +127,7 @@ export const ProjectDetailEditModal = ({
           display={"inline-flex"}
           // justifyContent={"center"}
           alignItems={"center"}
-        // pb={6}
+          // pb={6}
         >
           <Box
             color={
@@ -197,7 +197,7 @@ export const ProjectDetailEditModal = ({
             </TabPanel>
             <TabPanel>
               {projectType.includes("External") ||
-                projectType.includes("Student") ? (
+              projectType.includes("Student") ? (
                 <ProjectLocationSection
                   locationFilled={locationFilled}
                   locationData={locationData}
@@ -229,14 +229,14 @@ export const ProjectDetailEditModal = ({
             {projectType.includes("External") && (
               <TabPanel>
                 <ProjectExternalSection
-                  externalFilled={externalFilled}
-                  externalData={externalData}
+                  // externalFilled={externalFilled}
+                  // externalData={externalData}
                   setExternalData={setExternalData}
-                  setExternalFilled={setExternalFilled}
+                  // setExternalFilled={setExternalFilled}
                   onClose={onClose}
                   backClick={goBack}
                   createClick={kickOffMutation}
-                // projectPk={}
+                  // projectPk={}
                 />
               </TabPanel>
             )}
@@ -251,7 +251,7 @@ export const ProjectDetailEditModal = ({
                   onClose={onClose}
                   backClick={goBack}
                   createClick={kickOffMutation}
-                // projectPk={}
+                  // projectPk={}
                 />
               </TabPanel>
             )}
