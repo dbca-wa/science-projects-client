@@ -18,13 +18,13 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { FaBook, FaGamepad, FaUserCircle } from "react-icons/fa";
+import { FaBook, FaGamepad, FaQuestion, FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { GoTriangleDown } from "react-icons/go";
 import { SiReadthedocs } from "react-icons/si";
 import { TbWorldWww } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-import { logOut } from "../../lib/api";
+import { logITAssets, logOut, logUserITAssets } from "../../lib/api";
 import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
 import useApiEndpoint from "../../lib/hooks/helper/useApiEndpoint";
 import { useUser } from "../../lib/hooks/tanstack/useUser";
@@ -193,16 +193,38 @@ export const Navitar = ({
             zIndex={isOpen ? 2 : 1}
           >
             {userData?.pk === 101073 && (
-              <MenuItem
-                onClick={() => {
-                  navigate("/crud/test");
-                }}
-                zIndex={isOpen ? 2 : 1}
-              >
-                {<FaGamepad />}
+              <>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/crud/test");
+                  }}
+                  zIndex={isOpen ? 2 : 1}
+                >
+                  {<FaGamepad />}
 
-                <Text ml={2}>Playground</Text>
-              </MenuItem>
+                  <Text ml={2}>Playground</Text>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    logITAssets();
+                  }}
+                  zIndex={isOpen ? 2 : 1}
+                >
+                  {<FaQuestion />}
+
+                  <Text ml={2}>Log IT Assets</Text>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    logUserITAssets("1324012");
+                  }}
+                  zIndex={isOpen ? 2 : 1}
+                >
+                  {<FaQuestion />}
+
+                  <Text ml={2}>Log IT Assets</Text>
+                </MenuItem>
+              </>
             )}
             <MenuItem
               onClick={() => {
