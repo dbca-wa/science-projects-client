@@ -17,6 +17,7 @@ import { IStaffUserResult } from "@/types";
 import { Building, Mail, MapPin, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EmailStaffMemberContent from "../../Modals/EmailStaffMemberContent";
+import { useState } from "react";
 
 const ScienceStaffSearchResult = ({
   pk,
@@ -93,8 +94,11 @@ const ScienceStaffSearchResult = ({
 };
 
 export const SendUserEmailDialog = ({ name, pk }: IStaffUserResult) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const handleClose = () => setIsOpen(false);
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <span className="flex items-center">
           <Mail className="mt-[2px] self-start" size={"15px"} />
@@ -108,7 +112,12 @@ export const SendUserEmailDialog = ({ name, pk }: IStaffUserResult) => {
           <DialogTitle className="mb-2 mt-3">Email {`${name}`}</DialogTitle>
         </DialogHeader>
 
-        <EmailStaffMemberContent pk={pk} name={name} kind={"dialog"} />
+        <EmailStaffMemberContent
+          pk={pk}
+          name={name}
+          kind={"dialog"}
+          onClose={handleClose}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -119,8 +128,11 @@ export const SendUserEmailMobileDrawer = ({
   pk,
   // email,
 }: IStaffUserResult) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const handleClose = () => setIsOpen(false);
+
   return (
-    <Drawer>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger>
         <span className="flex items-center">
           <Mail className="mt-[2px] self-start" size={"15px"} />
@@ -134,7 +146,12 @@ export const SendUserEmailMobileDrawer = ({
           <DrawerHeader>
             <DrawerTitle className="mb-2 mt-3">Email {`${name}`}</DrawerTitle>
           </DrawerHeader>
-          <EmailStaffMemberContent kind={"drawer"} pk={pk} name={name} />
+          <EmailStaffMemberContent
+            kind={"drawer"}
+            pk={pk}
+            name={name}
+            onClose={handleClose}
+          />
         </div>
       </DrawerContent>
     </Drawer>
