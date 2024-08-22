@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup
     steps:
+      - name: Verify Docker Login
+        run: docker info
       - name: Build and Push Test Image
         env:
           VITE_PRODUCTION_BASE_URL: "https://scienceprojects-test.dbca.wa.gov.au/"
@@ -32,7 +34,7 @@ jobs:
           VITE_PRODUCTION_PROFILES_BASE_URL: "https://profiles-test.dbca.wa.gov.au/"
           VITE_SPMS_VERSION: ${{ needs.setup.outputs.TAG_NAME }}
         run: |
-          docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:test${{ needs.setup.outputs.TAG_NAME }}
+          docker build -f ./Dockerfile . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:test${{ needs.setup.outputs.TAG_NAME }}
           docker push ghcr.io/dbca-wa/science-projects-client:test${{ needs.setup.outputs.TAG_NAME }}
           docker tag ghcr.io/dbca-wa/science-projects-client:test${{ needs.setup.outputs.TAG_NAME }} ghcr.io/dbca-wa/science-projects-client:test
           docker push ghcr.io/dbca-wa/science-projects-client:test
@@ -41,6 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup
     steps:
+      - name: Verify Docker Login
+        run: docker info
       - name: Build and Push Migration Image
         env:
           VITE_PRODUCTION_BASE_URL: "https://scienceprojects-migrated.dbca.wa.gov.au/"
@@ -48,13 +52,15 @@ jobs:
           VITE_PRODUCTION_PROFILES_BASE_URL: "https://profiles-migrated.dbca.wa.gov.au/"
           VITE_SPMS_VERSION: ${{ needs.setup.outputs.TAG_NAME }}
         run: |
-          docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:migration
+          docker build -f ./Dockerfile . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:migration
           docker push ghcr.io/dbca-wa/science-projects-client:migration
 
   build_and_push_production:
     runs-on: ubuntu-latest
     needs: setup
     steps:
+      - name: Verify Docker Login
+        run: docker info
       - name: Build and Push Production Image
         env:
           VITE_PRODUCTION_BASE_URL: "https://scienceprojects.dbca.wa.gov.au/"
@@ -62,7 +68,7 @@ jobs:
           VITE_PRODUCTION_PROFILES_BASE_URL: "https://profiles.dbca.wa.gov.au/"
           VITE_SPMS_VERSION: ${{ needs.setup.outputs.TAG_NAME }}
         run: |
-          docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL  --tag ghcr.io/dbca-wa/science-projects-client:${{ needs.setup.outputs.TAG_NAME }}
+          docker build -f ./Dockerfile . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL  --tag ghcr.io/dbca-wa/science-projects-client:${{ needs.setup.outputs.TAG_NAME }}
           docker push ghcr.io/dbca-wa/science-projects-client:${{ needs.setup.outputs.TAG_NAME }}
           docker tag ghcr.io/dbca-wa/science-projects-client:${{ needs.setup.outputs.TAG_NAME }} ghcr.io/dbca-wa/science-projects-client:latest
           docker push ghcr.io/dbca-wa/science-projects-client:latest
