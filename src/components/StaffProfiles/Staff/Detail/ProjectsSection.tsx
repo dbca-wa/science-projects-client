@@ -26,7 +26,7 @@ const ProjectsSection = ({
   };
 
   return (
-    <>
+    <div className="mt-4">
       {userProjectsLoading ? (
         <SimpleSkeletonSection project />
       ) : userProjectsData?.length > 0 ? (
@@ -52,7 +52,7 @@ const ProjectsSection = ({
           <p>No projects registered.</p>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
