@@ -5,24 +5,33 @@ import { useScienceStaffProfileList } from "@/lib/hooks/tanstack/useScienceStaff
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import { Grid } from "@chakra-ui/react";
 import { useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 export const ScienceStaff = () => {
-  const { scienceStaffData, scienceStaffLoading } =
-    useScienceStaffProfileList();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const searchTerm = searchParams.get("searchTerm") || "";
+  const page = parseInt(searchParams.get("page") || "1", 10);
+
+  const { scienceStaffData, scienceStaffLoading } = useScienceStaffProfileList({
+    searchTerm,
+    page,
+  });
+
+  const handlePageChange = (newPage: number) => {
+    setSearchParams({
+      searchTerm,
+      page: newPage.toString(),
+    });
+  };
+
+  // const { scienceStaffData, scienceStaffLoading } =
+  //   useScienceStaffProfileList();
 
   useEffect(() => {
     console.log({ scienceStaffData, scienceStaffLoading });
   }, [scienceStaffLoading, scienceStaffData]);
-  // const [isLoading, setIsLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setIsLoading((prevState) => !prevState);
-  //   }, 5000);
-
-  //   // Cleanup interval on component unmount
-  //   return () => clearInterval(interval);
-  // }, []);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -30,11 +39,13 @@ export const ScienceStaff = () => {
     <div className="p-4">
       <h2 className="mb-4 text-center text-xl font-bold">Search BCS Staff</h2>
       <div className={`flex justify-center pt-4`}>
-        {/* ${isDesktop ? "justify-end" : "justify-center"} */}
-        <ScienceStaffSearchBar />
+        <ScienceStaffSearchBar
+          searchTerm={searchTerm}
+          onSearch={(newSearchTerm) =>
+            setSearchParams({ searchTerm: newSearchTerm, page: "1" })
+          }
+        />
       </div>
-      {/* Search Results */}
-      {/* {isLoading ? ( */}
       {scienceStaffLoading || !scienceStaffData ? (
         <StaffResultSkeleton />
       ) : (
@@ -45,7 +56,7 @@ export const ScienceStaff = () => {
               : scienceStaffData?.page === scienceStaffData?.total_pages
                 ? scienceStaffData?.total_results - 16
                 : scienceStaffData?.page * 16 + 1
-          }-${scienceStaffData?.page * 16} out of ${scienceStaffData?.total_results} results`}</p>
+          }-${scienceStaffData?.page * 16} out of ${scienceStaffData?.total_results} results ${searchTerm && "for "}${searchTerm && `'${searchTerm}'`}`}</p>
           <Grid
             gridTemplateColumns={
               isDesktop
@@ -59,27 +70,99 @@ export const ScienceStaff = () => {
             gridGap={4}
             py={4}
           >
-            {/* ADD SORT BY FIRST AND LAST NAME TOGGLES */}
             {scienceStaffData?.users?.map((user, index) => (
               <ScienceStaffSearchResult
                 key={index}
                 pk={user?.pk}
                 name={`${user?.first_name} ${user?.last_name}`}
-                // email={user?.email}
                 position={user?.role}
                 branch={user?.branch}
               />
-              // pk,
-              // name,
-              // email,
-              // title,
-              // branch,
-              // position,
-              // disableEmailButton,
             ))}
           </Grid>
+          <Pagination
+            currentPage={page}
+            totalPages={scienceStaffData?.total_pages}
+            onPageChange={handlePageChange}
+          />
+          {/* <div className="mt-4 flex justify-between">
+            <button
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page <= 1}
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page >= scienceStaffData.total_pages}
+            >
+              Next
+            </button>
+          </div> */}
         </div>
       )}
+    </div>
+  );
+};
+
+import { Button } from "@/components/ui/button";
+
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+const Pagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: PaginationProps) => {
+  const pageNumbers = [];
+
+  // Determine the start and end page numbers
+  let startPage = Math.max(currentPage - 2, 1);
+  let endPage = Math.min(startPage + 4, totalPages);
+
+  if (endPage - startPage < 4) {
+    startPage = Math.max(endPage - 4, 1);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <div className="mt-4 flex items-center justify-center space-x-2">
+      <Button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="bg-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+      >
+        Previous
+      </Button>
+
+      {pageNumbers.map((pageNumber) => (
+        <Button
+          key={pageNumber}
+          onClick={() => onPageChange(pageNumber)}
+          className={`${
+            pageNumber === currentPage
+              ? "bg-blue-500 text-white hover:bg-blue-400"
+              : "bg-gray-300 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          {pageNumber}
+        </Button>
+      ))}
+
+      <Button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="bg-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+      >
+        Next
+      </Button>
     </div>
   );
 };

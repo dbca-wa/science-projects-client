@@ -287,12 +287,25 @@ export const getMyProjects = async () => {
   return res;
 };
 
-export const getStaffProfiles = async () => {
-  const res = instance.get(`users/staffprofiles`).then((res) => {
-    return res.data;
-  });
+export const getStaffProfiles = async ({ searchTerm, page }) => {
+  const params = new URLSearchParams();
+  if (searchTerm) params.append("searchTerm", searchTerm);
+  params.append("page", page.toString());
+
+  const res = await instance
+    .get(`users/staffprofiles?${params}`)
+    .then((res) => {
+      return res.data;
+    });
   return res;
 };
+
+// export const getStaffProfiles = async () => {
+//   const res = instance.get(`users/staffprofiles`).then((res) => {
+//     return res.data;
+//   });
+//   return res;
+// };
 
 export const getMyPartnerships = async () => {
   const res = instance.get(`partnerships/mine`).then((res) => {
