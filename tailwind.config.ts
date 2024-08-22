@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config = {
+  important: true, // This adds `!important` to all Tailwind utilities
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
