@@ -82,9 +82,9 @@ const EditStaffOverviewContent = ({
         position: "top-right",
       });
     },
-    onMutate: () => {
-      console.log("mutation");
-    },
+    // onMutate: () => {
+    //   console.log("mutation");
+    // },
   });
   const onSubmit = (formData: IUpdateStaffOverviewSection) => {
     mutation.mutate(formData);
@@ -151,7 +151,11 @@ const EditStaffOverviewContent = ({
             </DrawerClose>
           )}
 
-          <Button type="submit" disabled={!isValid} className="mt-3">
+          <Button
+            type="submit"
+            disabled={!isValid || mutation.isPending}
+            className="mt-3"
+          >
             Update
           </Button>
         </div>

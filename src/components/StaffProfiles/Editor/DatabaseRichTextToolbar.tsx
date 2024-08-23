@@ -742,9 +742,9 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
         return;
       }
       if (selectedNode.getType() !== "root") {
-        console.log(selectedNode.getParentOrThrow().getType());
+        // console.log(selectedNode.getParentOrThrow().getType());
       } else {
-        console.log("rootnode");
+        // console.log("rootnode");
       }
 
       activeEditor.dispatchCommand(INSERT_TABLE_COMMAND, {

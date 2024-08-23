@@ -4,12 +4,10 @@ import StaffResultSkeleton from "@/components/StaffProfiles/StaffResultSkeleton"
 import { useScienceStaffProfileList } from "@/lib/hooks/tanstack/useScienceStaffProfileList";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import { Grid } from "@chakra-ui/react";
-import { useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 export const ScienceStaff = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const searchTerm = searchParams.get("searchTerm") || "";
   const page = parseInt(searchParams.get("page") || "1", 10);
@@ -29,9 +27,9 @@ export const ScienceStaff = () => {
   // const { scienceStaffData, scienceStaffLoading } =
   //   useScienceStaffProfileList();
 
-  useEffect(() => {
-    console.log({ scienceStaffData, scienceStaffLoading });
-  }, [scienceStaffLoading, scienceStaffData]);
+  // useEffect(() => {
+  //   console.log({ scienceStaffData, scienceStaffLoading });
+  // }, [scienceStaffLoading, scienceStaffData]);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -106,8 +104,8 @@ export const ScienceStaff = () => {
   );
 };
 
-import { Button } from "@/components/ui/button";
 import { Head } from "@/components/Base/Head";
+import { Button } from "@/components/ui/button";
 
 interface PaginationProps {
   currentPage: number;
@@ -124,7 +122,7 @@ const Pagination = ({
 
   // Determine the start and end page numbers
   let startPage = Math.max(currentPage - 2, 1);
-  let endPage = Math.min(startPage + 4, totalPages);
+  const endPage = Math.min(startPage + 4, totalPages);
 
   if (endPage - startPage < 4) {
     startPage = Math.max(endPage - 4, 1);

@@ -119,6 +119,11 @@ export const Navitar = ({
   const { layout } = useLayoutSwitcher();
 
   // useEffect(() => console.log(userData), [userData])
+  const setHref = (url: string) => {
+    window.location.href = url;
+  };
+  const VITE_PRODUCTION_PROFILES_BASE_URL = import.meta.env
+    .VITE_PRODUCTION_PROFILES_BASE_URL;
 
   return (
     <Box userSelect={"none"} zIndex={isOpen ? 2 : 1}>
@@ -260,8 +265,17 @@ export const Navitar = ({
               </Text>
             </MenuItem>
             <MenuItem
+              // onClick={() => {
+              //   window.open("https://sww.dpaw.wa.gov.au/", "_blank");
+              // }}
               onClick={() => {
-                window.open("https://sww.dpaw.wa.gov.au/", "_blank");
+                if (process.env.NODE_ENV === "development") {
+                  navigate(`/staff/${userData?.pk}`);
+                } else {
+                  setHref(
+                    `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${userData?.pk}`,
+                  );
+                }
               }}
               zIndex={isOpen ? 2 : 1}
             >

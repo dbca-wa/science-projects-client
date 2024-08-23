@@ -178,12 +178,14 @@ export const ProfilePage = () => {
               <Flex
                 justifyContent={"center"}
                 w={"100%"}
+                flexDir={{
+                  base: "column",
+                  lg: "row",
+                }}
                 // bg={"red"}
               >
                 {/* CARD */}
-                <Flex
-                // flex={1} w={"100%"} justifyContent={"center"}
-                >
+                <Flex flex={1} w={"100%"} justifyContent={"center"}>
                   <ScienceStaffSearchResult
                     pk={me?.pk}
                     name={`${me.display_first_name} ${me.display_last_name}`}
@@ -204,7 +206,7 @@ export const ProfilePage = () => {
                 >
                   {/* Edit/View */}
                   <Flex
-                    justifyContent={"end"}
+                    justifyContent={{ base: "center" }}
                     alignItems={"center"}
                     w={"100%"}
                     py={8}

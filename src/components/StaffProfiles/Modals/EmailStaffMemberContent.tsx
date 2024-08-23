@@ -45,9 +45,9 @@ const EmailStaffMemberContent = ({
         position: "top-right",
       });
     },
-    onMutate: () => {
-      console.log("mutation");
-    },
+    // onMutate: () => {
+    //   console.log("mutation");
+    // },
   });
   const onSubmit = (formData: IStaffPublicEmail) => {
     mutation.mutate(formData);
@@ -105,7 +105,7 @@ const EmailStaffMemberContent = ({
           </DrawerClose>
         )}
 
-        <Button type="submit" disabled={!isValid}>
+        <Button type="submit" disabled={!isValid || mutation.isPending}>
           Send
         </Button>
       </div>
