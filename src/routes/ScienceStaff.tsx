@@ -37,6 +37,7 @@ export const ScienceStaff = () => {
 
   return (
     <div className="p-4">
+      <Head title="DBCA | Staff Profiles" isStandalone />
       <h2 className="mb-4 text-center text-xl font-bold">Search BCS Staff</h2>
       <div className={`flex justify-center pt-4`}>
         <ScienceStaffSearchBar
@@ -106,6 +107,7 @@ export const ScienceStaff = () => {
 };
 
 import { Button } from "@/components/ui/button";
+import { Head } from "@/components/Base/Head";
 
 interface PaginationProps {
   currentPage: number;

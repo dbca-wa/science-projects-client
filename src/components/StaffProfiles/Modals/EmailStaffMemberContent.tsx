@@ -53,6 +53,11 @@ const EmailStaffMemberContent = ({
     mutation.mutate(formData);
   };
 
+  const validateEmail = (value: string) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(value) || "Please enter a valid email address.";
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="text-slate-800">
       <Input
@@ -73,6 +78,7 @@ const EmailStaffMemberContent = ({
         className="mt-1"
         {...register("senderEmail", {
           required: true,
+          validate: validateEmail,
         })}
       />
       <p className="mb-2 p-1 text-xs text-muted-foreground">

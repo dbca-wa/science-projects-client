@@ -61,6 +61,10 @@ instance.interceptors.request.use((config) => {
   // console.log(csrfToken);
   if (csrfToken !== "POTATOES") {
     config.headers["X-CSRFToken"] = csrfToken;
+  } else {
+    // Forces a login and removes old cookie by its older name
+    Cookie.remove("csrf");
+    Cookie.remove("sessionid");
   }
   return config;
 });
