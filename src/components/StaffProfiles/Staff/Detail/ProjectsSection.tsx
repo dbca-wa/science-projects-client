@@ -56,6 +56,8 @@ const ProjectsSection = ({
   );
 };
 
+import DOMPurify from "dompurify";
+
 interface IProjectItemProps {
   pk: number;
   title: string;
@@ -117,6 +119,31 @@ const ProjectItem = ({
   };
   const navigate = useNavigate();
 
+  const sanitizeHtml = (htmlString: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+
+    const elements = doc.body.querySelectorAll("*");
+
+    elements.forEach((element) => {
+      element.removeAttribute("class");
+      element.removeAttribute("style");
+
+      if (
+        element.tagName.toLowerCase() === "b" ||
+        element.tagName.toLowerCase() === "strong"
+      ) {
+        const parent = element.parentNode;
+        while (element.firstChild) {
+          parent.insertBefore(element.firstChild, element);
+        }
+        parent.removeChild(element);
+      }
+    });
+
+    return doc.body.innerHTML;
+  };
+
   return (
     <div className="text-balance pb-6 pt-2">
       {/* border border-x-0 border-b-[1px] border-t-0  */}
@@ -125,7 +152,7 @@ const ProjectItem = ({
         <a
           className="font-bold text-blue-500 hover:cursor-pointer hover:underline dark:text-slate-400"
           dangerouslySetInnerHTML={{
-            __html: replaceDarkWithLight(title || ""),
+            __html: sanitizeHtml(replaceDarkWithLight(title || "")),
           }}
           onClick={() => {
             if (process.env.NODE_ENV === "development") {
@@ -139,7 +166,7 @@ const ProjectItem = ({
         <p
           className="font-bold text-slate-700 dark:text-slate-400"
           dangerouslySetInnerHTML={{
-            __html: replaceDarkWithLight(title || ""),
+            __html: sanitizeHtml(replaceDarkWithLight(title || "")),
           }}
         />
       )}
@@ -152,7 +179,7 @@ const ProjectItem = ({
       <p
         className="mt-4 text-slate-600 dark:text-slate-500"
         dangerouslySetInnerHTML={{
-          __html: replaceDarkWithLight(description || ""),
+          __html: sanitizeHtml(replaceDarkWithLight(description || "")),
         }}
       />
       <hr className="mt-8" />

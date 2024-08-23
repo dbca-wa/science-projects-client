@@ -4,16 +4,23 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 
 interface IProps {
   title?: string;
+  isStandalone?: boolean;
 }
 
-export const Head = ({ title }: IProps) => {
+export const Head = ({ title, isStandalone }: IProps) => {
   return (
     <HelmetProvider>
       <Helmet>
         {/* <title>{title ? `${layout === "traditional" ? "SPMS" : "Cycle"} | ${title}` : "Loading..."}</title> */}
-        <title>{title ? `SPMS | ${title}` : "Loading..."}</title>
+        <title>
+          {title
+            ? isStandalone
+              ? `${title}`
+              : `SPMS | ${title}`
+            : "Loading..."}
+        </title>
 
-        <link rel="icon" type="image/ico" href="/favicon.ico" />
+        <link rel="icon" type="image/jpg" href="/dbca.jpg" />
       </Helmet>
     </HelmetProvider>
   );

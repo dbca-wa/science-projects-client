@@ -1,3 +1,4 @@
+import { Head } from "@/components/Base/Head";
 import { BaseToggleOptionsButton } from "@/components/RichTextEditor/Buttons/BaseToggleOptionsButton";
 import StaffContent from "@/components/StaffProfiles/Staff/Detail/StaffContent";
 import StaffHero from "@/components/StaffProfiles/Staff/Detail/StaffHero";
@@ -20,7 +21,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const ScienceStaffDetail = () => {
   const { staffProfilePk: usersPk } = useParams();
-  const [buttonsVisible, setButtonsVisible] = useState(true);
+  const [buttonsVisible, setButtonsVisible] = useState(false);
   const isNumeric = /^[0-9]+$/.test(usersPk || "");
   const VITE_PRODUCTION_PROFILES_BASE_URL = import.meta.env
     .VITE_PRODUCTION_PROFILES_BASE_URL;
@@ -34,6 +35,8 @@ const ScienceStaffDetail = () => {
 
   return (
     <div className="relative h-full w-full">
+      <Head title={`DBCA | Staff Details`} isStandalone />
+
       {!isNumeric ? (
         <div
           className={`flex h-full w-full flex-col items-center justify-center p-8`}
@@ -71,24 +74,26 @@ const ScienceStaffDetail = () => {
           <div
             className={`absolute right-0 top-3 flex overflow-hidden px-8 md:px-10 lg:px-11 ${!isDesktop && "flex-col"}`}
           >
-            {!isDesktop && (
-              <Tooltip aria-label="toggle-tooltip" label="Toggle Edit/View">
-                <Box>
-                  <BaseToggleOptionsButton
-                    iconOne={AiFillEye}
-                    colorSchemeOne="green"
-                    iconTwo={AiFillEyeInvisible}
-                    colorSchemeTwo="blue"
-                    currentState={buttonsVisible}
-                    setCurrentState={setButtonsVisible}
-                    // toolTipText={
-                    //   !buttonsVisible ? "Show Edit Buttons" : "Hide Edit Buttons"
-                    // }
-                    //  editorIsOpen={editorIsOpen}
-                  />
-                </Box>
-              </Tooltip>
-            )}
+            {!isDesktop &&
+              (viewingUser?.pk === Number(usersPk) ||
+                viewingUser?.is_superuser) && (
+                <Tooltip aria-label="toggle-tooltip" label="Toggle Edit/View">
+                  <Box>
+                    <BaseToggleOptionsButton
+                      iconOne={AiFillEye}
+                      colorSchemeOne="green"
+                      iconTwo={AiFillEyeInvisible}
+                      colorSchemeTwo="blue"
+                      currentState={buttonsVisible}
+                      setCurrentState={setButtonsVisible}
+                      // toolTipText={
+                      //   !buttonsVisible ? "Show Edit Buttons" : "Hide Edit Buttons"
+                      // }
+                      //  editorIsOpen={editorIsOpen}
+                    />
+                  </Box>
+                </Tooltip>
+              )}
             {!userLoading &&
             (viewingUser?.pk === Number(usersPk) ||
               viewingUser?.is_superuser) &&
@@ -137,24 +142,26 @@ const ScienceStaffDetail = () => {
                 </Tooltip>
               </div>
             ) : null}
-            {isDesktop && (
-              <Tooltip aria-label="toggle-tooltip" label="Toggle Edit/View">
-                <Box>
-                  <BaseToggleOptionsButton
-                    iconOne={AiFillEye}
-                    colorSchemeOne="green"
-                    iconTwo={AiFillEyeInvisible}
-                    colorSchemeTwo="blue"
-                    currentState={buttonsVisible}
-                    setCurrentState={setButtonsVisible}
-                    // toolTipText={
-                    //   !buttonsVisible ? "Show Edit Buttons" : "Hide Edit Buttons"
-                    // }
-                    //  editorIsOpen={editorIsOpen}
-                  />
-                </Box>
-              </Tooltip>
-            )}
+            {isDesktop &&
+              (viewingUser?.pk === Number(usersPk) ||
+                viewingUser?.is_superuser) && (
+                <Tooltip aria-label="toggle-tooltip" label="Toggle Edit/View">
+                  <Box>
+                    <BaseToggleOptionsButton
+                      iconOne={AiFillEye}
+                      colorSchemeOne="green"
+                      iconTwo={AiFillEyeInvisible}
+                      colorSchemeTwo="blue"
+                      currentState={buttonsVisible}
+                      setCurrentState={setButtonsVisible}
+                      // toolTipText={
+                      //   !buttonsVisible ? "Show Edit Buttons" : "Hide Edit Buttons"
+                      // }
+                      //  editorIsOpen={editorIsOpen}
+                    />
+                  </Box>
+                </Tooltip>
+              )}
           </div>
         </>
       ) : (
