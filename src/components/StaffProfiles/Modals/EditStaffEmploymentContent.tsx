@@ -12,7 +12,6 @@ export interface EditEmploymentProps {
   employmentItem: IStaffEmploymentEntry;
   usersPk: number;
   refetch: () => void;
-  //   staffProfilePk: number;
   kind: "drawer" | "dialog";
   onClose: () => void;
 }
@@ -22,13 +21,13 @@ const EditStaffEmploymentContent = ({
   usersPk,
   refetch,
   kind,
-  //   staffProfilePk,
   onClose,
 }: EditEmploymentProps) => {
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, errors },
+    getValues,
   } = useForm<IStaffEmploymentEntry>({
     mode: "onChange",
     defaultValues: {
@@ -41,6 +40,7 @@ const EditStaffEmploymentContent = ({
       employer: employmentItem?.employer,
     },
   });
+
   const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -52,7 +52,7 @@ const EditStaffEmploymentContent = ({
         position: "top-right",
       });
       await queryClient.invalidateQueries({
-        queryKey: ["education", usersPk],
+        queryKey: ["employment", usersPk],
       });
       await refetch();
       onClose();
@@ -69,12 +69,13 @@ const EditStaffEmploymentContent = ({
       console.log("mutation");
     },
   });
+
   const onSubmit = (formData: IStaffEmploymentEntry) => {
     mutation.mutate(formData);
   };
 
   return (
-    <div className="px-3">
+    <div className="px-3 py-4">
       <form onSubmit={handleSubmit(onSubmit)} className="text-slate-800">
         <Input
           type="hidden"
@@ -102,10 +103,6 @@ const EditStaffEmploymentContent = ({
           className="my-1"
           {...register("section", { required: false })}
         />
-        {/* <p className="mb-2 p-1 text-xs text-muted-foreground">
-          You should verify that you have typed your email address correctly
-          before sending the message, otherwise we cannot reply.
-        </p> */}
         <div className="mt-1 flex flex-col">
           <Label htmlFor="employer" className="my-2">
             Employer
@@ -130,12 +127,25 @@ const EditStaffEmploymentContent = ({
             id="start_year"
             placeholder="Enter the start year"
             className="w-full"
-            {...register("start_year", { required: true })}
+            {...register("start_year", {
+              required: true,
+              validate: (value) => {
+                const endYear = getValues("end_year");
+                return (
+                  !endYear ||
+                  value <= endYear ||
+                  "Start year cannot be after end year"
+                );
+              },
+            })}
           />
+          {errors.start_year && (
+            <p className="text-sm text-red-600">{errors.start_year.message}</p>
+          )}
         </div>
 
         <div className="mt-1 flex flex-col">
-          <Label htmlFor="start_year" className="my-2">
+          <Label htmlFor="end_year" className="my-2">
             End Year
           </Label>
 
@@ -144,8 +154,21 @@ const EditStaffEmploymentContent = ({
             id="end_year"
             placeholder="Enter the end year"
             className="w-full"
-            {...register("end_year", { required: true })}
+            {...register("end_year", {
+              required: true,
+              validate: (value) => {
+                const startYear = getValues("start_year");
+                return (
+                  !startYear ||
+                  value >= startYear ||
+                  "End year cannot be before start year"
+                );
+              },
+            })}
           />
+          {errors.end_year && (
+            <p className="text-sm text-red-600">{errors.end_year.message}</p>
+          )}
         </div>
 
         <div className="flex w-full justify-end">

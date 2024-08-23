@@ -629,6 +629,11 @@ const ElementSelector = ({
           // flex={1}
           // tabIndex={-1}
           color={"white"}
+          bg={"gray.900"}
+          _hover={{ bg: "gray.600" }}
+          _active={{ bg: "gray.600" }}
+          _selected={{ bg: "gray.600" }}
+          _expanded={{ bg: "gray.600" }}
         >
           {/* {buttonSize} */}
           {blockTypeToBlockName(blockType)}
@@ -749,7 +754,7 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
     });
   };
 
-  const { colorMode } = useColorMode();
+  // const { colorMode } = useColorMode();
 
   const handleMouseEnter = (row: number, column: number) => {
     setTableRows(row + 1);
@@ -774,42 +779,42 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
             border="1px solid"
             borderColor={
               isHighlighted
-                ? colorMode === "light"
-                  ? "gray.300"
-                  : "gray.300"
-                : colorMode === "light"
-                  ? "gray.300"
-                  : "gray.400"
+                ? // ? colorMode === "light"
+                  "gray.300"
+                : // : "gray.300"
+                  // : colorMode === "light"
+                  // ?
+                  "gray.300"
+              //   : "gray.400"
             }
             onMouseEnter={() => handleMouseEnter(row, col)}
             onClick={onGridClick}
             // backgroundColor={row < tableRows && col < tableColumns ? 'blue.300' : 'white'}
             backgroundColor={
-              colorMode === "light"
-                ? isFirstRowOrColumn
-                  ? isHighlighted
-                    ? "blue.300"
-                    : "gray.200"
-                  : isHighlighted
-                    ? "blue.200"
-                    : "white"
-                : isFirstRowOrColumn
-                  ? isHighlighted
-                    ? "blue.400"
-                    : "gray.300"
-                  : isHighlighted
-                    ? "blue.300"
-                    : "white"
+              // colorMode === "light"
+              //   ?
+              isFirstRowOrColumn
+                ? isHighlighted
+                  ? "blue.300"
+                  : "gray.200"
+                : isHighlighted
+                  ? "blue.200"
+                  : "white"
+              // : isFirstRowOrColumn
+              //   ? isHighlighted
+              //     ? "blue.400"
+              //     : "gray.300"
+              //   : isHighlighted
+              //     ? "blue.300"
+              //     : "white"
             }
             _hover={{
               backgroundColor:
-                colorMode === "light"
-                  ? isFirstRowOrColumn
-                    ? "blue.400"
-                    : "green.100"
-                  : isFirstRowOrColumn
-                    ? "blue.500"
-                    : "green.200",
+                // colorMode === "light" ?
+                isFirstRowOrColumn ? "blue.400" : "green.100",
+              // : isFirstRowOrColumn
+              //   ? "blue.500"
+              //   : "green.200",
             }}
           />,
         );
@@ -906,7 +911,7 @@ export const BaseToolbarMenuButton = ({
     };
   }, [buttonRef]);
 
-  const { colorMode } = useColorMode();
+  // const { colorMode } = useColorMode();
 
   return (
     <Menu isLazy>
@@ -922,6 +927,9 @@ export const BaseToolbarMenuButton = ({
         tabIndex={-1}
         onClick={() => onClick?.()}
         color={"white"}
+        _active={{ bg: "gray.600" }}
+        _selected={{ bg: "gray.600" }}
+        _expanded={{ bg: "gray.600" }}
       >
         {title ? title : null}
       </MenuButton>
@@ -946,10 +954,14 @@ export const BaseToolbarMenuButton = ({
               _hover={{
                 bg: disableHoverBackground
                   ? undefined
-                  : colorMode === "light"
-                    ? "gray.100"
-                    : "gray.600",
+                  : // colorMode === "light" ?
+                    // "gray.100",
+                    // :
+                    "gray.600",
               }}
+              _active={{ bg: "gray.600" }}
+              _selected={{ bg: "gray.600" }}
+              _expanded={{ bg: "gray.600" }}
             >
               {item.leftIcon ? <Icon as={item.leftIcon} /> : null}
               {item?.text && (

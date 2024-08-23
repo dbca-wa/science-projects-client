@@ -32,10 +32,12 @@ const AddStaffEducationContent = ({
     register,
     handleSubmit,
     control,
-    formState: { isValid },
+    formState: { isValid, errors },
+    getValues,
   } = useForm<IStaffEducationEntry>({
     mode: "onChange", // or "onBlur"
   });
+
   const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -64,6 +66,7 @@ const AddStaffEducationContent = ({
       console.log("mutation");
     },
   });
+
   const onSubmit = (formData: IStaffEducationEntry) => {
     mutation.mutate(formData);
   };
@@ -81,7 +84,7 @@ const AddStaffEducationContent = ({
   ];
 
   return (
-    <div>
+    <div className="px-3 py-4">
       <form onSubmit={handleSubmit(onSubmit)} className="text-slate-800">
         <Input
           type="hidden"
@@ -171,12 +174,25 @@ const AddStaffEducationContent = ({
             id="start_year"
             placeholder="Enter the start year"
             className="w-full"
-            {...register("start_year", { required: true })}
+            {...register("start_year", {
+              required: true,
+              validate: (value) => {
+                const endYear = getValues("end_year");
+                return (
+                  !endYear ||
+                  value <= endYear ||
+                  "Start year cannot be after end year"
+                );
+              },
+            })}
           />
+          {errors.start_year && (
+            <p className="text-sm text-red-600">{errors.start_year.message}</p>
+          )}
         </div>
 
         <div className="mt-1 flex flex-col">
-          <Label htmlFor="start_year" className="my-2">
+          <Label htmlFor="end_year" className="my-2">
             End Year
           </Label>
 
@@ -185,8 +201,21 @@ const AddStaffEducationContent = ({
             id="end_year"
             placeholder="Enter the end year"
             className="w-full"
-            {...register("end_year", { required: true })}
+            {...register("end_year", {
+              required: true,
+              validate: (value) => {
+                const startYear = getValues("start_year");
+                return (
+                  !startYear ||
+                  value >= startYear ||
+                  "End year cannot be before start year"
+                );
+              },
+            })}
           />
+          {errors.end_year && (
+            <p className="text-sm text-red-600">{errors.end_year.message}</p>
+          )}
         </div>
 
         <div className="flex w-full justify-end">
