@@ -2,18 +2,19 @@ import { Button } from "@/components/ui/button";
 import { DrawerClose } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { deleteEmployment, ISimplePkProp } from "@/lib/api";
+import { IStaffEmploymentEntry } from "@/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
 const DeleteStaffEmploymentContent = ({
-  itemPk,
+  employmentItem,
   usersPk,
   refetch,
   kind,
   onClose,
 }: {
-  itemPk: number;
+  employmentItem: IStaffEmploymentEntry;
   usersPk: number;
   refetch: () => void;
   onClose: () => void;
@@ -59,13 +60,13 @@ const DeleteStaffEmploymentContent = ({
   };
 
   return (
-    <div>
+    <div className="px-3 py-4">
       <form onSubmit={handleSubmit(onSubmit)} className="text-slate-800">
         <Input
           type="hidden"
           {...register("pk", {
             required: true,
-            value: itemPk,
+            value: employmentItem?.pk,
           })}
           readOnly
         />

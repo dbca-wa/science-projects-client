@@ -271,7 +271,7 @@ export const EmploymentDialog = ({
           <DeleteStaffEmploymentContent
             // staffProfilePk={staffProfilePk}
             usersPk={userPk}
-            itemPk={itemPk}
+            employmentItem={employmentItem}
             refetch={refetch}
             kind="dialog"
             onClose={handleClose}
@@ -367,7 +367,7 @@ export const EmploymentDrawer = ({
           )}
           {kind === "delete" && (
             <DeleteStaffEmploymentContent
-              itemPk={itemPk}
+              employmentItem={employmentItem}
               // staffProfilePk={staffProfilePk}
               usersPk={userPk}
               refetch={refetch}
@@ -491,7 +491,7 @@ export const EducationDialog = ({
         )}
         {kind === "delete" && (
           <DeleteStaffEducationContent
-            itemPk={itemPk}
+            educationItem={educationItem}
             // staffProfilePk={staffProfilePk}
             usersPk={userPk}
             refetch={refetch}
@@ -589,7 +589,7 @@ export const EducationDrawer = ({
           )}
           {kind === "delete" && (
             <DeleteStaffEducationContent
-              itemPk={itemPk}
+              educationItem={educationItem}
               // staffProfilePk={staffProfilePk}
               usersPk={userPk}
               refetch={refetch}

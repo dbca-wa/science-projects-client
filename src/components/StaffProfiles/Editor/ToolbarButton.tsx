@@ -22,7 +22,7 @@ export const ToolbarButton = ({
   isActive,
   onClick,
 }: IBaseToolbarButtonProps) => {
-  const { colorMode } = useColorMode();
+  // const { colorMode } = useColorMode();
   return (
     <Box
       // pos={"relative"}
@@ -36,11 +36,15 @@ export const ToolbarButton = ({
         isDisabled={isDisabled}
         bg={
           isActive
-            ? colorMode === "light"
-              ? "gray.200"
-              : "gray.700"
+            ? // ? colorMode === "light"
+              //   ? "gray.200"
+              //   :
+              "gray.700"
             : undefined
         }
+        _hover={{
+          bg: "gray.600",
+        }}
         onClick={onClick}
         tabIndex={-1}
         border={0}

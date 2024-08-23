@@ -202,7 +202,7 @@ const DatabaseRichTextEditor = <T,>({
                   // top: "145px",
                   // position: "sticky",
                   left: "27px",
-                  top: "52px",
+                  top: `${toolBarHeight + 10}px`,
                   userSelect: "none",
                   pointerEvents: "none",
                 }}
