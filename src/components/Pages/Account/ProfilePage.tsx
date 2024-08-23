@@ -303,7 +303,7 @@ export const ProfilePage = () => {
                   label="Click to view your SPMS profile"
                   aria-label="A tooltip"
                 >
-                  <Box>
+                  <Box w={"100%"}>
                     <UserGridItem
                       pk={me.pk}
                       username={me.username}
