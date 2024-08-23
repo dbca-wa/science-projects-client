@@ -62,9 +62,9 @@ const AddStaffEducationContent = ({
         position: "top-right",
       });
     },
-    onMutate: () => {
-      console.log("mutation");
-    },
+    // onMutate: () => {
+    //   console.log("mutation");
+    // },
   });
 
   const onSubmit = (formData: IStaffEducationEntry) => {
@@ -225,7 +225,11 @@ const AddStaffEducationContent = ({
             </DrawerClose>
           )}
 
-          <Button type="submit" disabled={!isValid} className="mt-8">
+          <Button
+            type="submit"
+            disabled={!isValid || mutation.isPending}
+            className="mt-8"
+          >
             Create
           </Button>
         </div>

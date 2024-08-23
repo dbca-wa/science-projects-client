@@ -35,9 +35,9 @@ const OverviewSection = ({
   const { staffOverviewLoading, staffOverviewData, refetch } =
     useStaffOverview(userId);
 
-  useEffect(() => {
-    console.log(buttonsVisible);
-  }, [buttonsVisible]);
+  // useEffect(() => {
+  //   console.log(buttonsVisible);
+  // }, [buttonsVisible]);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (

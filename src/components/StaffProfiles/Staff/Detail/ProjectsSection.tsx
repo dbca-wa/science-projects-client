@@ -13,9 +13,9 @@ const ProjectsSection = ({
   buttonsVisible;
 }) => {
   const { userProjectsLoading, userProjectsData } = useInvolvedProjects(userId);
-  useEffect(() => {
-    console.log(userProjectsData);
-  }, [userProjectsData, userProjectsLoading]);
+  // useEffect(() => {
+  //   console.log(userProjectsData);
+  // }, [userProjectsData, userProjectsLoading]);
   const currentYear = useCurrentYear();
 
   const checkYearForPresent = (thisYear: number, value: number) => {

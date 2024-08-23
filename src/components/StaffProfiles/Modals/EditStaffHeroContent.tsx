@@ -42,18 +42,18 @@ const EditStaffHeroContent = ({
   });
   //   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const pkData = watch("pk");
-  const keywordsData = watch("keyword_tags");
+  // const pkData = watch("pk");
+  // const keywordsData = watch("keyword_tags");
 
-  useEffect(() => {
-    // console.log({
-    //   staffHeroData,
-    // });
-    console.log({
-      pkData,
-      keywordsData,
-    });
-  }, [pkData, keywordsData]);
+  // useEffect(() => {
+  //   // console.log({
+  //   //   staffHeroData,
+  //   // });
+  //   console.log({
+  //     pkData,
+  //     keywordsData,
+  //   });
+  // }, [pkData, keywordsData]);
 
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -79,9 +79,9 @@ const EditStaffHeroContent = ({
         position: "top-right",
       });
     },
-    onMutate: () => {
-      console.log("mutation");
-    },
+    // onMutate: () => {
+    //   console.log("mutation");
+    // },
   });
   const onSubmit = (formData: IUpdateStaffHeroSection) => {
     mutation.mutate(formData);
@@ -119,7 +119,11 @@ const EditStaffHeroContent = ({
             </DrawerClose>
           )}
 
-          <Button type="submit" disabled={!isValid} className="mt-3">
+          <Button
+            type="submit"
+            disabled={!isValid || mutation.isPending}
+            className="mt-3"
+          >
             Update
           </Button>
         </div>

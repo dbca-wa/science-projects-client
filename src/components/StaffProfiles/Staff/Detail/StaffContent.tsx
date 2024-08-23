@@ -27,7 +27,7 @@ const NavMenuItemButton = ({
     <div>
       <button
         onClick={() => {
-          console.log(`Setting to ${title}`);
+          // console.log(`Setting to ${title}`);
           setterFn(title);
         }}
         className={`-mb-[1px] mr-2 cursor-pointer appearance-none rounded-sm border-none px-4 py-2 text-lg outline-none hover:text-black/50 dark:hover:text-gray-100`}

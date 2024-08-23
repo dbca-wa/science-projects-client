@@ -39,7 +39,7 @@ const CVSection = ({
   buttonsVisible: boolean;
 }) => {
   const { staffCVData, staffCVLoading, refetch } = useStaffCV(userId);
-  useEffect(() => console.log(buttonsVisible), [buttonsVisible]);
+  // useEffect(() => console.log(buttonsVisible), [buttonsVisible]);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
