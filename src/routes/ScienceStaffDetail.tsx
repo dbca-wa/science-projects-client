@@ -34,7 +34,7 @@ const ScienceStaffDetail = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative flex h-full w-full justify-center">
       <Head title={`DBCA | Staff Details`} isStandalone />
 
       {!isNumeric ? (
@@ -58,7 +58,7 @@ const ScienceStaffDetail = () => {
           </Button>
         </div>
       ) : !userLoading ? (
-        <>
+        <div className="max-w-[600px] justify-center">
           <div className="flex flex-col">
             <StaffHero
               usersPk={usersPk}
@@ -163,7 +163,7 @@ const ScienceStaffDetail = () => {
                 </Tooltip>
               )}
           </div>
-        </>
+        </div>
       ) : (
         <Center my={4}>
           <Spinner />
