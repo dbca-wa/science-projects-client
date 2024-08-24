@@ -171,6 +171,7 @@ const DatabaseRichTextEditor = <T,>({
                   >
                     <ContentEditable
                       style={{
+                        background: isEdit ? "white" : undefined,
                         minHeight: "50px",
                         width: "100%",
                         height: "auto",
