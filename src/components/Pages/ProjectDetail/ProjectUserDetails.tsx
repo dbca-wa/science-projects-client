@@ -738,10 +738,7 @@ export const ProjectUserDetails = ({
             mt={1}
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(
-                replaceDarkWithLight(
-                  user?.about ??
-                    "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis pulvinar lectus. Nam vitae volutpat ante. Duis convallis odio at ornare interdum. Fusce faucibus, velit id ullamcorper egestas, dui elit fermentum leo, eget aliquam leo felis quis arcu. Donec vitae ornare eros. Nam lobortis hendrerit diam, ac molestie ipsum tempus sit amet. In ac nulla tellus. (Not Provided)</p>",
-                ),
+                replaceDarkWithLight(user?.about ?? "<p>(Not Provided)</p>"),
               ),
             }}
           />
@@ -766,8 +763,7 @@ export const ProjectUserDetails = ({
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(
                 replaceDarkWithLight(
-                  user?.expertise ??
-                    "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis pulvinar lectus. Nam vitae volutpat ante. Duis convallis odio at ornare interdum. Fusce faucibus, velit id ullamcorper egestas, dui elit fermentum leo, eget aliquam leo felis quis arcu. Donec vitae ornare eros. Nam lobortis hendrerit diam, ac molestie ipsum tempus sit amet. In ac nulla tellus. (Not Provided)</p>",
+                  user?.expertise ?? "<p>(Not Provided)</p>",
                 ),
               ),
             }}
