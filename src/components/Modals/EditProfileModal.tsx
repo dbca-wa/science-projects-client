@@ -4,13 +4,9 @@ import { useProfile } from "@/lib/hooks/tanstack/useProfile";
 import {
   Box,
   Button,
-  Center,
   FormControl,
-  FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Grid,
-  Image,
   Input,
   InputGroup,
   Modal,
@@ -20,14 +16,13 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Textarea,
   ToastId,
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   IProfileUpdateError,
   IProfileUpdateSuccess,
@@ -39,6 +34,7 @@ import { useNoImage } from "../../lib/hooks/helper/useNoImage";
 import useServerImageUrl from "../../lib/hooks/helper/useServerImageUrl";
 import { IProfile } from "../../types";
 import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
+import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";
 
 interface IEditProfileModalProps {
   isOpen: boolean;
@@ -62,7 +58,7 @@ export const EditProfileModal = ({
   const { colorMode } = useColorMode();
 
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
-    currentImage
+    currentImage,
   );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -84,12 +80,18 @@ export const EditProfileModal = ({
     return data ? data[fieldName] !== fieldValue : false;
   };
 
-  //  React Hook Form
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IProfileUpdateVariables>();
+    control,
+    watch,
+  } = useForm<IProfileUpdateVariables>({
+    defaultValues: {
+      about: initialData?.about,
+      expertise: initialData?.expertise,
+    },
+  });
 
   // Toast
   const toast = useToast();
@@ -98,6 +100,13 @@ export const EditProfileModal = ({
     toastIdRef.current = toast(data);
   };
 
+  const aboutValue = watch("about");
+  const expertiseValue = watch("expertise");
+  useEffect(() => {
+    console.log("Initial Data:", initialData);
+    console.log("About Value:", aboutValue);
+    console.log("Expertise Value:", expertiseValue);
+  }, [initialData, aboutValue, expertiseValue]);
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
@@ -166,65 +175,17 @@ export const EditProfileModal = ({
     const expertiseChanged =
       expertise !== undefined && isFieldChanged("expertise", expertise);
 
-    if (selectedFile !== null || aboutChanged || expertiseChanged) {
-      if (aboutChanged && expertiseChanged) {
-        // console.log("image + about and expertise changed");
-        await mutation.mutateAsync({ userPk, image, about, expertise });
-      } else if (aboutChanged) {
-        // console.log("image + about changed");
-        await mutation.mutateAsync({ userPk, image, about });
-      } else if (expertiseChanged) {
-        // console.log("image + expertise changed");
-        await mutation.mutateAsync({ userPk, image, expertise });
-      } else if (!expertiseChanged && !aboutChanged) {
-        // console.log("only image changed");
-        await mutation.mutateAsync({ userPk, image });
-      }
-      // onClose();
-    } else {
-      if (aboutChanged && expertiseChanged) {
-        // console.log("about + expertise changed");
-        await mutation.mutateAsync({ userPk, about, expertise });
-      } else if (aboutChanged) {
-        // console.log("about changed");
-
-        await mutation.mutateAsync({ userPk, about });
-      } else if (expertiseChanged) {
-        // console.log("expertise changed");
-
-        await mutation.mutateAsync({ userPk, expertise });
-      } else {
-        // console.log("Nothing changed");
-      }
+    const updateData: IProfileUpdateVariables = {
+      userPk: userPk,
+      about: aboutChanged ? about : undefined,
+      expertise: expertiseChanged ? expertise : undefined,
+    };
+    if (image) {
+      updateData.image = image;
     }
+
+    await mutation.mutateAsync(updateData);
   };
-
-  const [aboutValue, setAboutValue] = useState(data?.about || "");
-  const [expertiseValue, setExpertiseValue] = useState(data?.expertise || "");
-
-  useEffect(() => {
-    if (!isLoading) {
-      setAboutValue(data?.about || "");
-      setExpertiseValue(data?.expertise || "");
-    }
-  }, [data, isLoading]);
-
-  // useEffect(() => {
-  //   console.log({
-  //     selectedImageUrl: selectedImageUrl,
-  //     selectedFile: selectedFile,
-  //     imageUrl: imageUrl,
-  //     currentImage: currentImage,
-  //   });
-  // }, [selectedImageUrl, selectedFile, imageUrl, currentImage]);
-
-  // useEffect(() => {
-  //   console.log({
-  //     // https://archives.bulbagarden.net/media/upload/thumb/4/4a/0025Pikachu.png/250px-0025Pikachu.png
-  //     imageUrl,
-  //     selectedFile,
-  //   });
-  // });
 
   return (
     <Modal
@@ -254,40 +215,41 @@ export const EditProfileModal = ({
                 </InputGroup>
               </FormControl>
               <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
-                <Box>
-                  <FormControl userSelect="none">
-                    <FormLabel>Position</FormLabel>
-                    <InputGroup>
-                      <Textarea
-                        placeholder="Tell us about your role at DBCA..."
-                        {...register("about")}
-                        value={aboutValue}
-                        onChange={(e) => setAboutValue(e.target.value)}
-                      />
-                    </InputGroup>
-                    {errors.about && (
-                      <FormErrorMessage>
-                        {errors.about.message}
-                      </FormErrorMessage>
-                    )}
-                  </FormControl>
-                </Box>
-                <Box>
-                  <FormControl userSelect="none">
-                    <FormLabel>Expertise</FormLabel>
-                    <Textarea
-                      placeholder="Briefly, what do you focus on..."
-                      {...register("expertise")}
-                      value={expertiseValue}
-                      onChange={(e) => setExpertiseValue(e.target.value)}
+                <Controller
+                  name="about"
+                  control={control}
+                  defaultValue={initialData?.about}
+                  render={({ field }) => (
+                    <DatabaseRichTextEditor
+                      populationData={initialData?.about}
+                      label="About"
+                      hideLabel
+                      htmlFor="about"
+                      isEdit
+                      field={field}
+                      registerFn={register}
+                      // isMobile={!isDesktop}
                     />
-                    {errors.expertise && (
-                      <FormErrorMessage>
-                        {errors.expertise.message}
-                      </FormErrorMessage>
-                    )}
-                  </FormControl>
-                </Box>
+                  )}
+                />
+                <Controller
+                  name="expertise"
+                  control={control}
+                  defaultValue={initialData?.expertise}
+                  render={({ field }) => (
+                    <DatabaseRichTextEditor
+                      populationData={initialData?.expertise}
+                      label="Expertise"
+                      hideLabel
+                      htmlFor="expertise"
+                      isEdit
+                      field={field}
+                      registerFn={register}
+                      // isMobile={!isDesktop}
+                    />
+                  )}
+                />
+
                 <Grid>
                   <Box>
                     <FormLabel>Image</FormLabel>
@@ -305,62 +267,6 @@ export const EditProfileModal = ({
                       }}
                     />
                   </Box>
-
-                  {/* <FormControl ml={4} mt={10}>
-                    <InputGroup>
-                      <Grid gridGap={2} ml={4}>
-                        <FormControl>
-                          <Input
-                            autoComplete="off"
-                            alignItems={"center"}
-                            type="file"
-                            // accept="image/*"
-                            accept=".png, .jpeg, .jpg, image/png, image/jpeg"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                setSelectedFile(file);
-                                setSelectedImageUrl(URL.createObjectURL(file));
-                              }
-                            }}
-                            border={"none"}
-                            sx={{
-                              "::file-selector-button": {
-                                background:
-                                  colorMode === "light"
-                                    ? "gray.100"
-                                    : "gray.600",
-                                borderRadius: "8px",
-                                padding: "2px",
-                                paddingX: "8px",
-                                mt: "1px",
-                                border: "1px solid",
-                                borderColor:
-                                  colorMode === "light"
-                                    ? "gray.400"
-                                    : "gray.700",
-                                outline: "none",
-                                mr: "15px",
-                                ml: "-16px",
-                                cursor: "pointer",
-                              },
-                              pt: "3.5px",
-                              color:
-                                colorMode === "light" ? "gray.800" : "gray.200",
-                            }}
-                          />
-                        </FormControl>
-                        <FormHelperText>
-                          Upload an image for your display picture.
-                        </FormHelperText>
-                        {errors.image && (
-                          <FormErrorMessage>
-                            {errors.image.message}
-                          </FormErrorMessage>
-                        )}
-                      </Grid>
-                    </InputGroup>
-                  </FormControl> */}
                 </Grid>
               </Grid>
             </ModalBody>
@@ -391,3 +297,34 @@ export const EditProfileModal = ({
     </Modal>
   );
 };
+
+// if (selectedFile !== null || aboutChanged || expertiseChanged) {
+//   if (aboutChanged && expertiseChanged) {
+//     // console.log("image + about and expertise changed");
+//     await mutation.mutateAsync({ userPk, image, about, expertise });
+//   } else if (aboutChanged) {
+//     // console.log("image + about changed");
+//     await mutation.mutateAsync({ userPk, image, about });
+//   } else if (expertiseChanged) {
+//     // console.log("image + expertise changed");
+//     await mutation.mutateAsync({ userPk, image, expertise });
+//   } else if (!expertiseChanged && !aboutChanged) {
+//     // console.log("only image changed");
+//     await mutation.mutateAsync({ userPk, image });
+//   }
+//   // onClose();
+// } else {
+//   if (aboutChanged && expertiseChanged) {
+//     // console.log("about + expertise changed");
+//     await mutation.mutateAsync({ userPk, about, expertise });
+//   } else if (aboutChanged) {
+//     // console.log("about changed");
+
+//     await mutation.mutateAsync({ userPk, about });
+//   } else if (expertiseChanged) {
+//     // console.log("expertise changed");
+
+//     await mutation.mutateAsync({ userPk, expertise });
+//   } else {
+//     // console.log("Nothing changed");
+//   }

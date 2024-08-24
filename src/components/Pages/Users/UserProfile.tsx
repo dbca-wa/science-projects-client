@@ -49,6 +49,47 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   const borderColor = colorMode === "light" ? "gray.300" : "gray.500";
   const sectionTitleColor = colorMode === "light" ? "gray.600" : "gray.300";
   const subsectionTitleColor = colorMode === "light" ? "gray.500" : "gray.500";
+  const replaceDarkWithLight = (htmlString: string): string => {
+    // Replace 'dark' with 'light' in class attributes
+    const modifiedHTML = htmlString.replace(
+      /class\s*=\s*["']([^"']*dark[^"']*)["']/gi,
+      (match, group) => {
+        return `class="${group.replace(/\bdark\b/g, "light")}"`;
+      },
+    );
+
+    // Add margin-right: 4px to all <li> elements
+    const finalHTML = modifiedHTML.replace(
+      /<li/g,
+      '<li style="margin-left: 36px;"',
+    );
+
+    return finalHTML;
+  };
+  const sanitizeHtml = (htmlString: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+
+    const elements = doc.body.querySelectorAll("*");
+
+    elements.forEach((element) => {
+      element.removeAttribute("class");
+      element.removeAttribute("style");
+
+      if (
+        element.tagName.toLowerCase() === "b" ||
+        element.tagName.toLowerCase() === "strong"
+      ) {
+        const parent = element.parentNode;
+        while (element.firstChild) {
+          parent.insertBefore(element.firstChild, element);
+        }
+        parent.removeChild(element);
+      }
+    });
+
+    return doc.body.innerHTML;
+  };
 
   // let baseUrl = useApiEndpoint();
   // const noImage = useNoImage();
@@ -373,14 +414,26 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 color={sectionTitleColor}
                 userSelect={"none"}
               >
-                Position
+                About
               </Text>
             </Flex>
-            <Text>
+            <Box
+              mt={1}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(
+                  replaceDarkWithLight(
+                    user?.about ??
+                      "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis pulvinar lectus. Nam vitae volutpat ante. Duis convallis odio at ornare interdum. Fusce faucibus, velit id ullamcorper egestas, dui elit fermentum leo, eget aliquam leo felis quis arcu. Donec vitae ornare eros. Nam lobortis hendrerit diam, ac molestie ipsum tempus sit amet. In ac nulla tellus. (Not Provided)</p>",
+                  ),
+                ),
+              }}
+            />
+
+            {/* <Text>
               {user.about
                 ? user.about
                 : "This user has not filled in this section."}
-            </Text>
+            </Text> */}
             <Flex mt={4}>
               <Text
                 fontWeight={"bold"}
@@ -392,11 +445,23 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 Expertise
               </Text>
             </Flex>
-            <Text>
+            <Box
+              mt={1}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(
+                  replaceDarkWithLight(
+                    user?.expertise ??
+                      "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis pulvinar lectus. Nam vitae volutpat ante. Duis convallis odio at ornare interdum. Fusce faucibus, velit id ullamcorper egestas, dui elit fermentum leo, eget aliquam leo felis quis arcu. Donec vitae ornare eros. Nam lobortis hendrerit diam, ac molestie ipsum tempus sit amet. In ac nulla tellus. (Not Provided)</p>",
+                  ),
+                ),
+              }}
+            />
+
+            {/* <Text>
               {user?.expertise
                 ? user.expertise
                 : "This user has not filled in this section."}
-            </Text>
+            </Text> */}
           </Flex>
 
           <Spacer />

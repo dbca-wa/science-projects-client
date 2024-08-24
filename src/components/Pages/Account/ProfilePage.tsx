@@ -48,6 +48,47 @@ export const ProfilePage = () => {
   const VITE_PRODUCTION_PROFILES_BASE_URL = import.meta.env
     .VITE_PRODUCTION_PROFILES_BASE_URL;
   const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
+  const replaceDarkWithLight = (htmlString: string): string => {
+    // Replace 'dark' with 'light' in class attributes
+    const modifiedHTML = htmlString.replace(
+      /class\s*=\s*["']([^"']*dark[^"']*)["']/gi,
+      (match, group) => {
+        return `class="${group.replace(/\bdark\b/g, "light")}"`;
+      },
+    );
+
+    // Add margin-right: 4px to all <li> elements
+    const finalHTML = modifiedHTML.replace(
+      /<li/g,
+      '<li style="margin-left: 36px;"',
+    );
+
+    return finalHTML;
+  };
+  const sanitizeHtml = (htmlString: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+
+    const elements = doc.body.querySelectorAll("*");
+
+    elements.forEach((element) => {
+      element.removeAttribute("class");
+      element.removeAttribute("style");
+
+      if (
+        element.tagName.toLowerCase() === "b" ||
+        element.tagName.toLowerCase() === "strong"
+      ) {
+        const parent = element.parentNode;
+        while (element.firstChild) {
+          parent.insertBefore(element.firstChild, element);
+        }
+        parent.removeChild(element);
+      }
+    });
+
+    return doc.body.innerHTML;
+  };
 
   useEffect(() => {
     if (!loading) {
@@ -190,7 +231,7 @@ export const ProfilePage = () => {
                     pk={me?.pk}
                     name={`${me.display_first_name} ${me.display_last_name}`}
                     title={me.title}
-                    position={me.about}
+                    // position={me.about}
                     // branch={me?.branch}
                     disableEmailButton={true}
                   />
@@ -531,25 +572,33 @@ export const ProfilePage = () => {
                   <Text color={subsectionTitleColor} fontSize={"sm"}>
                     Position
                   </Text>
-                  <Box mt={1}>
-                    <Text>
-                      {me?.about
-                        ? me?.about
-                        : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis pulvinar lectus. Nam vitae volutpat ante. Duis convallis odio at ornare interdum. Fusce faucibus, velit id ullamcorper egestas, dui elit fermentum leo, eget aliquam leo felis quis arcu. Donec vitae ornare eros. Nam lobortis hendrerit diam, ac molestie ipsum tempus sit amet. In ac nulla tellus. (Not Provided)"}
-                    </Text>
-                  </Box>
+                  <Box
+                    mt={1}
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHtml(
+                        replaceDarkWithLight(
+                          me?.about ??
+                            "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis pulvinar lectus. Nam vitae volutpat ante. Duis convallis odio at ornare interdum. Fusce faucibus, velit id ullamcorper egestas, dui elit fermentum leo, eget aliquam leo felis quis arcu. Donec vitae ornare eros. Nam lobortis hendrerit diam, ac molestie ipsum tempus sit amet. In ac nulla tellus. (Not Provided)</p>",
+                        ),
+                      ),
+                    }}
+                  />
                 </Box>
                 <Box mt={8}>
                   <Text color={subsectionTitleColor} fontSize={"sm"}>
                     Expertise
                   </Text>
-                  <Box mt={1}>
-                    <Text>
-                      {me?.expertise
-                        ? me?.expertise
-                        : "Sed vitae semper tellus, vel rutrum purus. Fusce lobortis eleifend fringilla.  (Not Provided)"}
-                    </Text>
-                  </Box>
+                  <Box
+                    mt={1}
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHtml(
+                        replaceDarkWithLight(
+                          me?.expertise ??
+                            "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis pulvinar lectus. Nam vitae volutpat ante. Duis convallis odio at ornare interdum. Fusce faucibus, velit id ullamcorper egestas, dui elit fermentum leo, eget aliquam leo felis quis arcu. Donec vitae ornare eros. Nam lobortis hendrerit diam, ac molestie ipsum tempus sit amet. In ac nulla tellus. (Not Provided)</p>",
+                        ),
+                      ),
+                    }}
+                  />
                 </Box>
               </Flex>
             </Grid>
