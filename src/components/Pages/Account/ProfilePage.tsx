@@ -577,8 +577,7 @@ export const ProfilePage = () => {
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHtml(
                         replaceDarkWithLight(
-                          me?.about ??
-                            "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis pulvinar lectus. Nam vitae volutpat ante. Duis convallis odio at ornare interdum. Fusce faucibus, velit id ullamcorper egestas, dui elit fermentum leo, eget aliquam leo felis quis arcu. Donec vitae ornare eros. Nam lobortis hendrerit diam, ac molestie ipsum tempus sit amet. In ac nulla tellus. (Not Provided)</p>",
+                          me?.about ?? "<p>(Not Provided)</p>",
                         ),
                       ),
                     }}
@@ -593,8 +592,7 @@ export const ProfilePage = () => {
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHtml(
                         replaceDarkWithLight(
-                          me?.expertise ??
-                            "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis pulvinar lectus. Nam vitae volutpat ante. Duis convallis odio at ornare interdum. Fusce faucibus, velit id ullamcorper egestas, dui elit fermentum leo, eget aliquam leo felis quis arcu. Donec vitae ornare eros. Nam lobortis hendrerit diam, ac molestie ipsum tempus sit amet. In ac nulla tellus. (Not Provided)</p>",
+                          me?.expertise ?? "<p>(Not Provided)</p>",
                         ),
                       ),
                     }}
