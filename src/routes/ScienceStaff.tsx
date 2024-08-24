@@ -49,13 +49,16 @@ export const ScienceStaff = () => {
         <StaffResultSkeleton />
       ) : (
         <div className="my-4 min-h-[450px] w-full min-w-[300px] px-4">
-          <p>{`Showing ${
-            scienceStaffData?.page === 1
-              ? 1
-              : scienceStaffData?.page === scienceStaffData?.total_pages
-                ? scienceStaffData?.total_results - 16
-                : scienceStaffData?.page * 16 + 1
-          }-${scienceStaffData?.page * 16} out of ${scienceStaffData?.total_results} results ${searchTerm && "for "}${searchTerm && `'${searchTerm}'`}`}</p>
+          <p>
+            {scienceStaffData?.total_results === 0
+              ? `No results for '${searchTerm}'`
+              : `Showing ${(scienceStaffData?.page - 1) * 16 + 1}-${Math.min(
+                  scienceStaffData?.page * 16,
+                  scienceStaffData?.total_results,
+                )} out of ${scienceStaffData?.total_results} results${
+                  searchTerm ? ` for '${searchTerm}'` : ""
+                }`}
+          </p>{" "}
           <Grid
             gridTemplateColumns={
               isDesktop
@@ -80,6 +83,7 @@ export const ScienceStaff = () => {
             ))}
           </Grid>
           <Pagination
+            totalResults={scienceStaffData?.total_results}
             currentPage={page}
             totalPages={scienceStaffData?.total_pages}
             onPageChange={handlePageChange}
@@ -111,12 +115,14 @@ interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  totalResults: number;
 }
 
 const Pagination = ({
   currentPage,
   totalPages,
   onPageChange,
+  totalResults, // Destructure the prop
 }: PaginationProps) => {
   const pageNumbers = [];
 
@@ -136,7 +142,7 @@ const Pagination = ({
     <div className="mt-4 flex items-center justify-center space-x-2">
       <Button
         onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
+        disabled={currentPage === 1 || totalResults === 0}
         className="bg-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
       >
         Previous
@@ -146,6 +152,7 @@ const Pagination = ({
         <Button
           key={pageNumber}
           onClick={() => onPageChange(pageNumber)}
+          disabled={totalResults === 0}
           className={`${
             pageNumber === currentPage
               ? "bg-blue-500 text-white hover:bg-blue-400"
@@ -158,7 +165,7 @@ const Pagination = ({
 
       <Button
         onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        disabled={currentPage === totalPages || totalResults === 0}
         className="bg-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
       >
         Next
