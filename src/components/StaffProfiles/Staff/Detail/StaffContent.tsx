@@ -59,7 +59,7 @@ const StaffContent = ({
   const { colorMode } = useColorMode();
 
   return (
-    <div className="mx-auto w-full max-w-[600px] bg-red-500 px-2 dark:text-slate-300">
+    <div className="mx-auto w-full max-w-[600px] px-2 dark:text-slate-300">
       {/* Scrollbar / Navigation */}
       <div className="flex justify-center">
         <div
