@@ -154,19 +154,9 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               <ListIcon as={MdCheckCircle} color="green.500" />
               Feature: (Major) Staff Profile functionality from
               science.dbca.wa.gov.au has been redeveloped and tied into SPMS and
-              is working in test. Migrator ready and prepped for production
-              pending RFC with OIM. Development to continue for integrating
-              ORCID and Library publication data.
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Users can now edit their first and last name to ensure it
-              is correctly displayed on annual report. Accented user names
-              appear as such on annual report
+              is working in test. Development to continue for integrating ORCID
+              and Library publication data. Note: This feature is currently
+              disabled pending RFC with OIM.
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -211,7 +201,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
               Fix: Prevent popup appearing twice when navigating away with an
-              open / unsaved editor
+              open / unsaved rich text editor
             </ListItem>
             <ListItem
               fontSize={"small"}

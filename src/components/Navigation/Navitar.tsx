@@ -264,24 +264,27 @@ export const Navitar = ({
                 {layout === "modern" ? "My Profile" : "My SPMS Profile"}
               </Text>
             </MenuItem>
-            <MenuItem
-              // onClick={() => {
-              //   window.open("https://sww.dpaw.wa.gov.au/", "_blank");
-              // }}
-              onClick={() => {
-                if (process.env.NODE_ENV === "development") {
-                  navigate(`/staff/${userData?.pk}`);
-                } else {
-                  setHref(
-                    `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${userData?.pk}`,
-                  );
-                }
-              }}
-              zIndex={isOpen ? 2 : 1}
-            >
-              {<FaUserCircle />}
-              <Text ml={2}>My Public Profile</Text>
-            </MenuItem>
+            {userData?.is_superuser && (
+              <MenuItem
+                // onClick={() => {
+                //   window.open("https://sww.dpaw.wa.gov.au/", "_blank");
+                // }}
+                onClick={() => {
+                  if (process.env.NODE_ENV === "development") {
+                    navigate(`/staff/${userData?.pk}`);
+                  } else {
+                    setHref(
+                      `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${userData?.pk}`,
+                    );
+                  }
+                }}
+                zIndex={isOpen ? 2 : 1}
+              >
+                {<FaUserCircle />}
+                <Text ml={2}>My Public Profile</Text>
+              </MenuItem>
+            )}
+
             {userData?.is_superuser && (
               <MenuItem onClick={onLogOut} zIndex={isOpen ? 2 : 1}>
                 {<FiLogOut />}
