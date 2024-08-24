@@ -35,14 +35,12 @@ const OverviewSection = ({
   const { staffOverviewLoading, staffOverviewData, refetch } =
     useStaffOverview(userId);
 
-  // useEffect(() => {
-  //   console.log(buttonsVisible);
-  // }, [buttonsVisible]);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <div className="">
-      {/* Profile/About Me */}
+    <div className="w-full">
+      {" "}
+      {/* Ensure full width */}
       {staffOverviewLoading ? (
         <>
           <SimpleSkeletonSection />
@@ -50,7 +48,6 @@ const OverviewSection = ({
         </>
       ) : staffOverviewData ? (
         <>
-          {/* About Me */}
           <Subsection
             title="About Me"
             divider
@@ -74,24 +71,20 @@ const OverviewSection = ({
             }
           >
             {staffOverviewData?.about ? (
-              <div className="pt-2">
+              <div className="w-full pt-2">
                 <DatabaseRichTextEditor
                   label={"About"}
                   htmlFor={"about"}
                   populationData={staffOverviewData?.about}
                 />
-                {/* <div
-                  dangerouslySetInnerHTML={{ __html: staffOverviewData?.about }}
-                /> */}
               </div>
             ) : (
-              <div>
+              <div className="w-full">
                 <p>No information available.</p>
               </div>
             )}
           </Subsection>
 
-          {/* Expertise */}
           <Subsection
             title="Expertise"
             divider
@@ -115,7 +108,7 @@ const OverviewSection = ({
             }
           >
             {staffOverviewData?.expertise ? (
-              <div className="pt-2">
+              <div className="w-full pt-2">
                 <DatabaseRichTextEditor
                   label={"Expertise"}
                   htmlFor={"expertise"}
@@ -123,7 +116,7 @@ const OverviewSection = ({
                 />
               </div>
             ) : (
-              <div>
+              <div className="w-full">
                 <p>No information available.</p>
               </div>
             )}
@@ -214,7 +207,7 @@ const EditAboutDrawer = ({
           />
         </span>
       </DrawerTrigger>
-      <DrawerContent className="p-3">
+      <DrawerContent className="w-full px-3 py-4">
         <div className="mx-auto w-full max-w-sm text-slate-800">
           <div className="no-scrollbar max-h-screen overflow-x-hidden overflow-y-scroll">
             <DrawerHeader>
@@ -312,7 +305,7 @@ const EditExpertiseDrawer = ({
           />
         </span>
       </DrawerTrigger>
-      <DrawerContent className="p-3">
+      <DrawerContent className="w-full px-3 py-4">
         <div className="mx-auto w-full max-w-sm text-slate-800">
           <div className="no-scrollbar max-h-screen overflow-x-hidden overflow-y-scroll">
             <DrawerHeader>

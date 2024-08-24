@@ -26,7 +26,7 @@ const ProjectsSection = ({
   };
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 w-full">
       {userProjectsLoading ? (
         <SimpleSkeletonSection project />
       ) : userProjectsData?.length > 0 ? (
@@ -48,7 +48,7 @@ const ProjectsSection = ({
           );
         })
       ) : (
-        <div>
+        <div className="w-full">
           <p>No projects registered.</p>
         </div>
       )}

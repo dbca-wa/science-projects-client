@@ -59,8 +59,7 @@ const StaffContent = ({
   const { colorMode } = useColorMode();
 
   return (
-    <div className="mx-auto flex flex-col justify-center dark:text-slate-300 md:px-60 lg:px-60 xl:px-[28rem]">
-      {/* bg-orange-500 */}
+    <div className="mx-auto w-full max-w-[600px] bg-red-500 px-2 dark:text-slate-300">
       {/* Scrollbar / Navigation */}
       <div className="flex justify-center">
         <div
@@ -74,7 +73,6 @@ const StaffContent = ({
             indicatorColor={
               colorMode === "light" ? "rgb(241 245 249)" : "black"
             }
-            // onScroll={(e) => console.log('')}
           >
             <div className="relative flex pb-2">
               <NavMenuItemButton
@@ -87,7 +85,6 @@ const StaffContent = ({
                 selected={selectedNav}
                 title={"Projects"}
               />
-
               <NavMenuItemButton
                 setterFn={setSelectedNav}
                 selected={selectedNav}
@@ -104,11 +101,7 @@ const StaffContent = ({
       </div>
 
       {/* Content */}
-      <div
-        className="px-8 py-4"
-        // bg-blue-600
-        // style={isDesktop ? { display: "flex", flexDirection: "column", justifyContent: "center", } : {}}
-      >
+      <div className="w-full min-w-[360px]">
         {selectedNav === "Overview" ? (
           <OverviewSection
             userId={usersPk}
@@ -133,4 +126,5 @@ const StaffContent = ({
     </div>
   );
 };
+
 export default StaffContent;
