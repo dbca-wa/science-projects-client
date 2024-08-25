@@ -30,6 +30,7 @@ export interface Color {
 type PubliProfileSection = "About Me" | "Expertise" | "";
 type AnnualReportSection =
   | "dm"
+  | "dm_sign"
   | "service_delivery_intro"
   | "research_intro"
   | "student_intro"

@@ -101,6 +101,19 @@ export const AnnualReportDetails = () => {
                 canEdit={userData?.is_superuser}
                 isUpdate={true}
                 editorType="AnnualReport"
+                key={`dm_sign${editorKey}`} // Change the key to force a re-render
+                data={reportData?.dm_sign}
+                section={"dm_sign"}
+                writeable_document_kind={"Annual Report"}
+                writeable_document_pk={reportData?.id}
+              />
+            </FormControl>
+
+            <FormControl>
+              <RichTextEditor
+                canEdit={userData?.is_superuser}
+                isUpdate={true}
+                editorType="AnnualReport"
                 key={`service_delivery_intro${editorKey}`} // Change the key to force a re-render
                 data={reportData?.service_delivery_intro}
                 section={"service_delivery_intro"}
