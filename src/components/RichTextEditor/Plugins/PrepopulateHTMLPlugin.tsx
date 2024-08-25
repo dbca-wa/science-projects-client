@@ -14,11 +14,13 @@ export const PrepopulateHTMLPlugin = ({ data }: HTMLPrepopulationProp) => {
           `<tr>${row
             .map(
               (cell, colIndex) =>
-                `<${rowIndex === 0 || colIndex === 0 ? "th" : "td"
-                } class="table-cell-dark${rowIndex === 0 ? " table-cell-header-dark" : ""
-                }">${cell}</${rowIndex === 0 || colIndex === 0 ? "th" : "td"}>`
+                `<${
+                  rowIndex === 0 || colIndex === 0 ? "th" : "td"
+                } class="table-cell-dark${
+                  rowIndex === 0 ? " table-cell-header-dark" : ""
+                }">${cell}</${rowIndex === 0 || colIndex === 0 ? "th" : "td"}>`,
             )
-            .join("")}</tr>`
+            .join("")}</tr>`,
       )
       .join("");
 

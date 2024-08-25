@@ -11,6 +11,12 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode } from "@lexical/rich-text";
+import {
+  AutoLinkPlugin,
+  createLinkMatcherWithRegExp,
+} from "@lexical/react/LexicalAutoLinkPlugin";
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
+import { AutoLinkNode, LinkNode } from "@lexical/link";
 
 // Design, React & Other ====================================================================
 
@@ -79,6 +85,7 @@ const generateTheme = () => {
       underlineStrikethrough: "editor-underline-strikethrough-light",
       // boldItalics: "editor-bold-light editor-italics-light",
     },
+    link: "editor-link",
   };
 };
 
@@ -100,13 +107,17 @@ const DatabaseRichTextEditor = <T,>({
   allowTable,
   isMobile,
 }: DatabaseRichTextEditorProps<T>) => {
+  const urlRegex = /https?:\/\/[^\s/$.?#].[^\s]*/i;
+
+  const matchers = [createLinkMatcherWithRegExp(urlRegex)];
+
   const theme = generateTheme();
   const initialConfig = {
     namespace: "Staff Profile Section Editor",
     editable: isEdit ?? false,
     theme,
     onError,
-    nodes: [ListNode, ListItemNode, HeadingNode],
+    nodes: [ListNode, ListItemNode, HeadingNode, LinkNode, AutoLinkNode],
   };
   const componentRef = useRef<HTMLDivElement | null>(null);
 
@@ -143,7 +154,6 @@ const DatabaseRichTextEditor = <T,>({
         {populationData !== undefined && populationData !== null && (
           <PrepopulateHTMLPlugin data={populationData} />
         )}
-
         {/* Text Area */}
         <div className="relative w-full">
           <RichTextPlugin
@@ -222,6 +232,9 @@ const DatabaseRichTextEditor = <T,>({
           />
         )}
         <SaveOnCtrlSPlugin />
+        <LinkPlugin />
+        <AutoLinkPlugin matchers={matchers} /> {/* Include AutoLinkPlugin */}
+        {/* <AddLinkPlugin /> */}
       </LexicalComposer>
     </>
   );

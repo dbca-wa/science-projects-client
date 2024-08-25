@@ -582,3 +582,8 @@ button.action-button:disabled {
   opacity: 1 !important;
 }
 /* #endregion */
+
+.editor-link {
+  text-decoration: underline !important;
+  color: #3d87f5 !important;
+}
