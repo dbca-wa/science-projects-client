@@ -93,6 +93,9 @@ export const useGetRTESectionTitle = (
       case "dm":
         setSectionText("Director's Message");
         break;
+      case "dm_sign":
+        setSectionText("Director's Message Sign-Off");
+        break;
       case "service_delivery_intro":
         setSectionText("Service Delivery Intro");
         break;
