@@ -49,6 +49,22 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   const borderColor = colorMode === "light" ? "gray.300" : "gray.500";
   const sectionTitleColor = colorMode === "light" ? "gray.600" : "gray.300";
   const subsectionTitleColor = colorMode === "light" ? "gray.500" : "gray.500";
+  const replaceLightWithDark = (htmlString: string): string => {
+    // Replace 'light' with 'dark' in class attributes
+    const modifiedHTML = htmlString.replace(
+      /class\s*=\s*["']([^"']*light[^"']*)["']/gi,
+      (match, group) => `class="${group.replace(/\blight\b/g, "dark")}"`,
+    );
+
+    // Add margin-right: 4px to all <li> elements (or modify as needed)
+    const finalHTML = modifiedHTML.replace(
+      /<li/g,
+      '<li style="margin-right: 4px;"',
+    );
+
+    return finalHTML;
+  };
+
   const replaceDarkWithLight = (htmlString: string): string => {
     // Replace 'dark' with 'light' in class attributes
     const modifiedHTML = htmlString.replace(
@@ -66,6 +82,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
     return finalHTML;
   };
+
   const sanitizeHtml = (htmlString: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
@@ -73,9 +90,6 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     const elements = doc.body.querySelectorAll("*");
 
     elements.forEach((element) => {
-      element.removeAttribute("class");
-      element.removeAttribute("style");
-
       if (
         element.tagName.toLowerCase() === "b" ||
         element.tagName.toLowerCase() === "strong"
@@ -85,6 +99,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           parent.insertBefore(element.firstChild, element);
         }
         parent.removeChild(element);
+      } else {
+        element.removeAttribute("style"); // Keep class if necessary for layout
       }
     });
 
@@ -421,7 +437,13 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               mt={1}
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(
-                  replaceDarkWithLight(user?.about ?? "<p>(Not Provided)</p>"),
+                  colorMode === "dark"
+                    ? replaceLightWithDark(
+                        user?.about ?? "<p>(Not Provided)</p>",
+                      )
+                    : replaceDarkWithLight(
+                        user?.about ?? "<p>(Not Provided)</p>",
+                      ),
                 ),
               }}
             />
@@ -446,9 +468,13 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               mt={1}
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(
-                  replaceDarkWithLight(
-                    user?.expertise ?? "<p>(Not Provided)</p>",
-                  ),
+                  colorMode === "dark"
+                    ? replaceLightWithDark(
+                        user?.expertise ?? "<p>(Not Provided)</p>",
+                      )
+                    : replaceDarkWithLight(
+                        user?.expertise ?? "<p>(Not Provided)</p>",
+                      ),
                 ),
               }}
             />

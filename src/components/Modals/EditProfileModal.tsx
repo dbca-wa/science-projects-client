@@ -86,12 +86,13 @@ export const EditProfileModal = ({
     formState: { errors },
     control,
     watch,
-  } = useForm<IProfileUpdateVariables>({
-    defaultValues: {
-      about: initialData?.about,
-      expertise: initialData?.expertise,
-    },
-  });
+  } = useForm<IProfileUpdateVariables>();
+  //   {
+  //   defaultValues: {
+  //     about: initialData?.about,
+  //     expertise: initialData?.expertise,
+  //   },
+  // }
 
   // Toast
   const toast = useToast();
@@ -100,13 +101,6 @@ export const EditProfileModal = ({
     toastIdRef.current = toast(data);
   };
 
-  const aboutValue = watch("about");
-  const expertiseValue = watch("expertise");
-  useEffect(() => {
-    console.log("Initial Data:", initialData);
-    console.log("About Value:", aboutValue);
-    console.log("Expertise Value:", expertiseValue);
-  }, [initialData, aboutValue, expertiseValue]);
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
@@ -187,6 +181,16 @@ export const EditProfileModal = ({
     await mutation.mutateAsync(updateData);
   };
 
+  const aboutValue = watch("about");
+  const expertiseValue = watch("expertise");
+  useEffect(() => {
+    if (selectedFile) {
+      const objectURL = URL.createObjectURL(selectedFile);
+      setSelectedImageUrl(objectURL);
+      return () => URL.revokeObjectURL(objectURL);
+    }
+  }, [selectedFile]);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -215,41 +219,43 @@ export const EditProfileModal = ({
                 </InputGroup>
               </FormControl>
               <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
-                <Controller
-                  name="about"
-                  control={control}
-                  defaultValue={initialData?.about}
-                  render={({ field }) => (
-                    <DatabaseRichTextEditor
-                      populationData={initialData?.about}
-                      label="About"
-                      hideLabel
-                      htmlFor="about"
-                      isEdit
-                      field={field}
-                      registerFn={register}
-                      // isMobile={!isDesktop}
-                    />
-                  )}
-                />
-                <Controller
-                  name="expertise"
-                  control={control}
-                  defaultValue={initialData?.expertise}
-                  render={({ field }) => (
-                    <DatabaseRichTextEditor
-                      populationData={initialData?.expertise}
-                      label="Expertise"
-                      hideLabel
-                      htmlFor="expertise"
-                      isEdit
-                      field={field}
-                      registerFn={register}
-                      // isMobile={!isDesktop}
-                    />
-                  )}
-                />
+                <FormControl>
+                  <Controller
+                    name="about"
+                    control={control}
+                    defaultValue={initialData?.about}
+                    render={({ field }) => (
+                      <DatabaseRichTextEditor
+                        populationData={initialData?.about}
+                        label="About"
+                        htmlFor="about"
+                        isEdit
+                        field={field}
+                        registerFn={register}
+                        // isMobile={!isDesktop}
+                      />
+                    )}
+                  />
+                </FormControl>
 
+                <FormControl>
+                  <Controller
+                    name="expertise"
+                    control={control}
+                    defaultValue={initialData?.expertise}
+                    render={({ field }) => (
+                      <DatabaseRichTextEditor
+                        populationData={initialData?.expertise}
+                        label="Expertise"
+                        htmlFor="expertise"
+                        isEdit
+                        field={field}
+                        registerFn={register}
+                        // isMobile={!isDesktop}
+                      />
+                    )}
+                  />
+                </FormControl>
                 <Grid>
                   <Box>
                     <FormLabel>Image</FormLabel>

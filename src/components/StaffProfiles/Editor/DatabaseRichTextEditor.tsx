@@ -134,9 +134,9 @@ const DatabaseRichTextEditor = <T,>({
   return (
     <>
       {isEdit && !hideLabel && (
-        <Label htmlFor={htmlFor as string} className="">
-          {label}
-        </Label>
+        <Box className="mb-2">
+          <Label htmlFor={htmlFor as string}>{label}</Label>
+        </Box>
       )}
 
       <LexicalComposer initialConfig={initialConfig} key={populationData}>
@@ -208,6 +208,7 @@ const DatabaseRichTextEditor = <T,>({
             placeholder={
               <div
                 style={{
+                  color: "gray",
                   position: "absolute",
                   // left: "34px",
                   // top: "145px",
