@@ -657,6 +657,7 @@ const ElementSelector = ({
             _hover={{
               bg: "gray.100",
             }}
+            color={"black"}
           >
             <BsTextParagraph />
 
@@ -676,6 +677,7 @@ const ElementSelector = ({
                 _hover={{
                   bg: "gray.100",
                 }}
+                color={"black"}
               >
                 <MdFormatListBulleted />
 
@@ -693,6 +695,7 @@ const ElementSelector = ({
                 _hover={{
                   bg: "gray.100",
                 }}
+                color={"black"}
               >
                 <MdFormatListNumbered />
 
@@ -962,11 +965,12 @@ export const BaseToolbarMenuButton = ({
               _active={{ bg: "gray.600" }}
               _selected={{ bg: "gray.600" }}
               _expanded={{ bg: "gray.600" }}
+              color={"black"}
             >
               {item.leftIcon ? <Icon as={item.leftIcon} /> : null}
               {item?.text && (
-                <Box pl={4} zIndex={2}>
-                  <span>{item.text}</span>
+                <Box pl={4} zIndex={2} color={"black"}>
+                  <span className="text-black">{item.text}</span>
                 </Box>
               )}
               {item?.component && item?.component}

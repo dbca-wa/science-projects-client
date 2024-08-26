@@ -70,6 +70,22 @@ export const ProjectUserDetails = ({
   refetchTeamData,
   ba_leader,
 }: Props) => {
+  const replaceLightWithDark = (htmlString: string): string => {
+    // Replace 'light' with 'dark' in class attributes
+    const modifiedHTML = htmlString.replace(
+      /class\s*=\s*["']([^"']*light[^"']*)["']/gi,
+      (match, group) => `class="${group.replace(/\blight\b/g, "dark")}"`,
+    );
+
+    // Add margin-right: 4px to all <li> elements (or modify as needed)
+    const finalHTML = modifiedHTML.replace(
+      /<li/g,
+      '<li style="margin-right: 4px;"',
+    );
+
+    return finalHTML;
+  };
+
   const replaceDarkWithLight = (htmlString: string): string => {
     // Replace 'dark' with 'light' in class attributes
     const modifiedHTML = htmlString.replace(
@@ -87,6 +103,7 @@ export const ProjectUserDetails = ({
 
     return finalHTML;
   };
+
   const sanitizeHtml = (htmlString: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
@@ -94,9 +111,6 @@ export const ProjectUserDetails = ({
     const elements = doc.body.querySelectorAll("*");
 
     elements.forEach((element) => {
-      element.removeAttribute("class");
-      element.removeAttribute("style");
-
       if (
         element.tagName.toLowerCase() === "b" ||
         element.tagName.toLowerCase() === "strong"
@@ -106,6 +120,8 @@ export const ProjectUserDetails = ({
           parent.insertBefore(element.firstChild, element);
         }
         parent.removeChild(element);
+      } else {
+        element.removeAttribute("style"); // Keep class if necessary for layout
       }
     });
 
@@ -738,7 +754,11 @@ export const ProjectUserDetails = ({
             mt={1}
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(
-                replaceDarkWithLight(user?.about ?? "<p>(Not Provided)</p>"),
+                colorMode === "dark"
+                  ? replaceLightWithDark(user?.about ?? "<p>(Not Provided)</p>")
+                  : replaceDarkWithLight(
+                      user?.about ?? "<p>(Not Provided)</p>",
+                    ),
               ),
             }}
           />
@@ -762,9 +782,13 @@ export const ProjectUserDetails = ({
             mt={1}
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(
-                replaceDarkWithLight(
-                  user?.expertise ?? "<p>(Not Provided)</p>",
-                ),
+                colorMode === "dark"
+                  ? replaceLightWithDark(
+                      user?.expertise ?? "<p>(Not Provided)</p>",
+                    )
+                  : replaceDarkWithLight(
+                      user?.expertise ?? "<p>(Not Provided)</p>",
+                    ),
               ),
             }}
           />

@@ -50,7 +50,7 @@ import {
   adminUpdateUser,
   removeUserAvatar,
 } from "../../lib/api";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { MdFax } from "react-icons/md";
 import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
 import noImageLink from "/sad-face.png";
@@ -58,6 +58,7 @@ import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
 import { useAffiliations } from "@/lib/hooks/tanstack/useAffiliations";
 import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
+import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";
 
 interface IModalProps {
   isOpen: boolean;
@@ -95,7 +96,22 @@ export const EditUserDetailsModal = ({
     register,
     handleSubmit,
     formState: { errors },
+    control,
+    watch,
   } = useForm<IFullUserUpdateVariables>();
+
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   formState: { errors },
+  //   control,
+  //   watch,
+  // } = useForm<IProfileUpdateVariables>({
+  //   defaultValues: {
+  //     about: initialData?.about,
+  //     expertise: initialData?.expertise,
+  //   },
+  // });
 
   // PI ====================================================
   const [hoveredTitle, setHoveredTitle] = useState(false);
@@ -506,9 +522,48 @@ export const EditUserDetailsModal = ({
                   <TabPanel>
                     {!userLoading && (
                       <Grid>
-                        <Box>
+                        <Box my={2}>
+                          <Controller
+                            name="about"
+                            control={control}
+                            defaultValue={userData?.about}
+                            render={({ field }) => (
+                              <DatabaseRichTextEditor
+                                populationData={userData?.about}
+                                label="About"
+                                // hideLabel
+                                htmlFor="about"
+                                isEdit
+                                field={field}
+                                registerFn={register}
+                                // isMobile={!isDesktop}
+                              />
+                            )}
+                          />
+                        </Box>
+                        <Box my={2}>
+                          <Controller
+                            name="expertise"
+                            control={control}
+                            defaultValue={userData?.expertise}
+                            render={({ field }) => (
+                              <DatabaseRichTextEditor
+                                populationData={userData?.expertise}
+                                label="Expertise"
+                                // hideLabel
+                                htmlFor="expertise"
+                                isEdit
+                                field={field}
+                                registerFn={register}
+                                // isMobile={!isDesktop}
+                              />
+                            )}
+                          />
+                        </Box>
+
+                        {/* <Box>
                           <FormControl userSelect="none">
-                            <FormLabel>Position</FormLabel>
+                            <FormLabel>About</FormLabel>
                             <InputGroup>
                               <Textarea
                                 placeholder="Tell us about your role at DBCA..."
@@ -541,7 +596,7 @@ export const EditUserDetailsModal = ({
                               </FormErrorMessage>
                             )}
                           </FormControl>
-                        </Box>
+                        </Box> */}
 
                         <Grid
                           gridTemplateColumns={{

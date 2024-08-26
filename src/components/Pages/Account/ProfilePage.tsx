@@ -48,6 +48,22 @@ export const ProfilePage = () => {
   const VITE_PRODUCTION_PROFILES_BASE_URL = import.meta.env
     .VITE_PRODUCTION_PROFILES_BASE_URL;
   const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
+  const replaceLightWithDark = (htmlString: string): string => {
+    // Replace 'light' with 'dark' in class attributes
+    const modifiedHTML = htmlString.replace(
+      /class\s*=\s*["']([^"']*light[^"']*)["']/gi,
+      (match, group) => `class="${group.replace(/\blight\b/g, "dark")}"`,
+    );
+
+    // Add margin-right: 4px to all <li> elements (or modify as needed)
+    const finalHTML = modifiedHTML.replace(
+      /<li/g,
+      '<li style="margin-right: 4px;"',
+    );
+
+    return finalHTML;
+  };
+
   const replaceDarkWithLight = (htmlString: string): string => {
     // Replace 'dark' with 'light' in class attributes
     const modifiedHTML = htmlString.replace(
@@ -65,6 +81,7 @@ export const ProfilePage = () => {
 
     return finalHTML;
   };
+
   const sanitizeHtml = (htmlString: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
@@ -72,9 +89,6 @@ export const ProfilePage = () => {
     const elements = doc.body.querySelectorAll("*");
 
     elements.forEach((element) => {
-      element.removeAttribute("class");
-      element.removeAttribute("style");
-
       if (
         element.tagName.toLowerCase() === "b" ||
         element.tagName.toLowerCase() === "strong"
@@ -84,6 +98,8 @@ export const ProfilePage = () => {
           parent.insertBefore(element.firstChild, element);
         }
         parent.removeChild(element);
+      } else {
+        element.removeAttribute("style"); // Keep class if necessary for layout
       }
     });
 
@@ -570,15 +586,19 @@ export const ProfilePage = () => {
               <Flex flexDir={"column"}>
                 <Box>
                   <Text color={subsectionTitleColor} fontSize={"sm"}>
-                    Position
+                    About
                   </Text>
                   <Box
                     mt={1}
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHtml(
-                        replaceDarkWithLight(
-                          me?.about ?? "<p>(Not Provided)</p>",
-                        ),
+                        colorMode === "dark"
+                          ? replaceLightWithDark(
+                              me?.about ?? "<p>(Not Provided)</p>",
+                            )
+                          : replaceDarkWithLight(
+                              me?.about ?? "<p>(Not Provided)</p>",
+                            ),
                       ),
                     }}
                   />
@@ -591,9 +611,13 @@ export const ProfilePage = () => {
                     mt={1}
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHtml(
-                        replaceDarkWithLight(
-                          me?.expertise ?? "<p>(Not Provided)</p>",
-                        ),
+                        colorMode === "dark"
+                          ? replaceLightWithDark(
+                              me?.expertise ?? "<p>(Not Provided)</p>",
+                            )
+                          : replaceDarkWithLight(
+                              me?.expertise ?? "<p>(Not Provided)</p>",
+                            ),
                       ),
                     }}
                   />
