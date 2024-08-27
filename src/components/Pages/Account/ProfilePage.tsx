@@ -596,10 +596,24 @@ export const ProfilePage = () => {
                       __html: sanitizeHtml(
                         colorMode === "dark"
                           ? replaceLightWithDark(
-                              me?.about ?? "<p>(Not Provided)</p>",
+                              me?.about === "" ||
+                                me?.about === "<p></p>" ||
+                                me?.about ===
+                                  '<p class="editor-p-light"><br></p>' ||
+                                me?.about ===
+                                  '<p class="editor-p-dark"><br></p>'
+                                ? "<p>(Not Provided)</p>"
+                                : (me?.about ?? "<p>(Not Provided)</p>"),
                             )
                           : replaceDarkWithLight(
-                              me?.about ?? "<p>(Not Provided)</p>",
+                              me?.about === "" ||
+                                me?.about === "<p></p>" ||
+                                me?.about ===
+                                  '<p class="editor-p-light"><br></p>' ||
+                                me?.about ===
+                                  '<p class="editor-p-dark"><br></p>'
+                                ? "<p>(Not Provided)</p>"
+                                : (me?.about ?? "<p>(Not Provided)</p>"),
                             ),
                       ),
                     }}
@@ -615,10 +629,24 @@ export const ProfilePage = () => {
                       __html: sanitizeHtml(
                         colorMode === "dark"
                           ? replaceLightWithDark(
-                              me?.expertise ?? "<p>(Not Provided)</p>",
+                              me?.expertise === "" ||
+                                me?.expertise === "<p></p>" ||
+                                me?.expertise ===
+                                  '<p class="editor-p-light"><br></p>' ||
+                                me?.expertise ===
+                                  '<p class="editor-p-dark"><br></p>'
+                                ? "<p>(Not Provided)</p>"
+                                : (me?.expertise ?? "<p>(Not Provided)</p>"),
                             )
                           : replaceDarkWithLight(
-                              me?.expertise ?? "<p>(Not Provided)</p>",
+                              me?.expertise === "" ||
+                                me?.expertise === "<p></p>" ||
+                                me?.expertise ===
+                                  '<p class="editor-p-light"><br></p>' ||
+                                me?.expertise ===
+                                  '<p class="editor-p-dark"><br></p>'
+                                ? "<p>(Not Provided)</p>"
+                                : (me?.expertise ?? "<p>(Not Provided)</p>"),
                             ),
                       ),
                     }}
