@@ -192,9 +192,25 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Adjusted ordering of projects on Annual Report
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Added dropdown for affiliations to user edit pages
+            </ListItem>
+            {/* <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
               Update: Professions and First name initials have a period
               following them (Dr / J Prince -&gt; Dr. / J. Prince)
-            </ListItem>
+            </ListItem> */}
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
