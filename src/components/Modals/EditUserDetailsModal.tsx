@@ -59,6 +59,7 @@ import { useAffiliations } from "@/lib/hooks/tanstack/useAffiliations";
 import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";
+import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
 
 interface IModalProps {
   isOpen: boolean;
@@ -95,6 +96,7 @@ export const EditUserDetailsModal = ({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
     control,
     watch,
@@ -293,7 +295,7 @@ export const EditUserDetailsModal = ({
     });
   };
 
-  const { affiliationsLoading, affiliationsData } = useAffiliations();
+  // const { affiliationsLoading, affiliationsData } = useAffiliations();
 
   const me = useUser();
 
@@ -889,7 +891,30 @@ export const EditUserDetailsModal = ({
                           </InputGroup>
                         </FormControl>
 
-                        <FormControl my={4} mb={4} userSelect={"none"}>
+                        {/* Affiliation */}
+                        <FormControl my={2} mb={4} userSelect={"none"}>
+                          <AffiliationCreateSearchDropdown
+                            // autoFocus
+                            isRequired={false}
+                            preselectedAffiliationPk={userData?.affiliation?.pk}
+                            setterFunction={(
+                              selectedAffiliation: IAffiliation | undefined,
+                            ) => {
+                              if (selectedAffiliation) {
+                                setValue("affiliation", selectedAffiliation.pk);
+                              } else {
+                                setValue("affiliation", undefined); // Clear the affiliation in the form
+                              }
+                            }}
+                            isEditable
+                            hideTags
+                            label="Affiliation"
+                            placeholder="Search for or an affiliation"
+                            helperText="The entity this user is affiliated with"
+                          />
+                        </FormControl>
+
+                        {/* <FormControl my={4} mb={4} userSelect={"none"}>
                           <FormLabel>Affiliation</FormLabel>
                           <InputGroup>
                             {!affiliationsLoading && affiliationsData && (
@@ -912,7 +937,7 @@ export const EditUserDetailsModal = ({
                               </Select>
                             )}
                           </InputGroup>
-                        </FormControl>
+                        </FormControl> */}
                       </Grid>
                     )}
 
@@ -923,7 +948,29 @@ export const EditUserDetailsModal = ({
                           affiliation.
                         </Text>
 
-                        <FormControl my={4} mb={4} userSelect={"none"}>
+                        <FormControl my={2} mb={4} userSelect={"none"}>
+                          <AffiliationCreateSearchDropdown
+                            // autoFocus
+                            isRequired={false}
+                            preselectedAffiliationPk={userData?.affiliation?.pk}
+                            setterFunction={(
+                              selectedAffiliation: IAffiliation | undefined,
+                            ) => {
+                              if (selectedAffiliation) {
+                                setValue("affiliation", selectedAffiliation.pk);
+                              } else {
+                                setValue("affiliation", undefined); // Clear the affiliation in the form
+                              }
+                            }}
+                            isEditable
+                            hideTags
+                            label="Affiliation"
+                            placeholder="Search for or an affiliation"
+                            helperText="The entity this user is affiliated with"
+                          />
+                        </FormControl>
+
+                        {/* <FormControl my={4} mb={4} userSelect={"none"}>
                           <FormLabel>Affiliation</FormLabel>
                           <InputGroup>
                             {!affiliationsLoading && affiliationsData && (
@@ -946,7 +993,7 @@ export const EditUserDetailsModal = ({
                               </Select>
                             )}
                           </InputGroup>
-                        </FormControl>
+                        </FormControl> */}
                       </>
                     )}
                   </TabPanel>

@@ -144,7 +144,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   const me = useUser();
 
   const { userProjectsLoading, userProjectsData } = useInvolvedProjects(pk);
-  useEffect(() => console.log(userProjectsData));
+  // useEffect(() => console.log(userProjectsData));
 
   const [userInQuestionIsSuperuser, setUserInQuestionIsSuperuser] =
     useState(false);
