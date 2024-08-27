@@ -483,16 +483,18 @@ export const ProfilePage = () => {
                 <Text>
                   {me.title
                     ? me.title === "mr"
-                      ? "Mr."
+                      ? "Mr"
                       : me.title === "mrs"
-                        ? "Mrs."
+                        ? "Mrs"
                         : me.title === "ms"
-                          ? "Ms."
-                          : me.title === "master"
-                            ? "Master"
-                            : me.title === "dr"
-                              ? "Dr."
-                              : "Bad Title"
+                          ? "Ms"
+                          : me.title === "aprof"
+                            ? "A/Prof"
+                            : me.title === "prof"
+                              ? "Prof"
+                              : me.title === "dr"
+                                ? "Dr"
+                                : "Bad Title"
                     : "--"}
                 </Text>
               </Flex>

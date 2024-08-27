@@ -376,11 +376,12 @@ export const EditUserDetailsModal = ({
                                   value: userData?.title,
                                 })}
                               >
-                                <option value="dr">Dr.</option>
-                                <option value="mr">Mr.</option>
-                                <option value="mrs">Mrs.</option>
-                                <option value="ms">Ms.</option>
-                                <option value="master">Master</option>
+                                <option value="dr">Dr</option>
+                                <option value="mr">Mr</option>
+                                <option value="mrs">Mrs</option>
+                                <option value="ms">Ms</option>
+                                <option value="aprof">A/Prof</option>
+                                <option value="prof">Prof</option>
                               </Select>
                             </InputGroup>
                             {errors.title && (
