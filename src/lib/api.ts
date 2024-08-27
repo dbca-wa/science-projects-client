@@ -697,11 +697,11 @@ export interface IFullUserUpdateVariables {
   display_first_name?: string;
   display_last_name?: string;
   userPk: string | number;
-  title: string;
-  phone: string;
-  fax: string;
-  branch: number | string;
-  business_area: number | string;
+  title?: string;
+  phone?: string;
+  fax?: string;
+  branch?: number | string;
+  business_area?: number | string;
   image?: File | string | null | undefined;
   about?: string;
   expertise?: string;
@@ -764,14 +764,13 @@ export const adminUpdateUser = async ({
 
     const handleAffiliation = (affiliation) => {
       if (typeof affiliation === "string") {
-        return Number(affiliation);
-      } else {
-        if (affiliation === undefined) {
-          return affiliation;
-        } else {
-          return (affiliation as IAffiliation)?.pk;
-        }
+        return Number(affiliation); // Convert string to number
+      } else if (typeof affiliation === "number") {
+        return affiliation; // Return the number as-is
+      } else if (affiliation === undefined) {
+        return affiliation; // Return undefined as-is
       }
+      return (affiliation as IAffiliation)?.pk; // Return pk if affiliation is an object
     };
     const membershipData = {
       affiliation: handleAffiliation(affiliation),
