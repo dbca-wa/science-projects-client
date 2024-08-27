@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditStaffHeroContent from "../../Modals/EditStaffHeroContent";
 import React from "react";
 
@@ -44,6 +44,8 @@ const StaffHero = ({
 
   const { staffHeroData, staffHeroLoading, refetch } =
     useStaffProfileHero(usersPk);
+
+  useEffect(() => console.log(staffHeroData), [staffHeroData]);
 
   // branchName={"Kensington"}
   // positionTitle={"Web and Data Development Officer"}
@@ -74,23 +76,24 @@ const StaffHero = ({
           </p>
 
           <p className="mt-4 text-balance font-semibold text-slate-700 dark:text-slate-400">
-            {staffHeroData?.positionTitle
-              ? staffHeroData?.positionTitle
+            {staffHeroData?.it_asset_data.title
+              ? staffHeroData?.it_asset_data.title
               : "Staff Member"}
-            {staffHeroData?.branch
-              ? `, ${staffHeroData?.branch}`
-              : ", No branch set"}
           </p>
-          {/* <div
-            className={`flex items-center justify-center ${staffHeroData?.keyword_tags?.length > 0 && "mb-1 mt-1"}`}
-          >
-            <p
-              className={`text-balance text-muted-foreground ${staffHeroData?.keyword_tags?.length > 0 && "mt-3"}`}
-            >
-              {staffHeroData?.keyword_tags
-                ?.map((tag: { pk: number; name: string }) => tag.name)
-                ?.join(" | ")}
-            </p> */}
+
+          <p className="mt-2 text-balance text-sm font-semibold text-slate-700 dark:text-slate-400">
+            {staffHeroData?.it_asset_data.division
+              ? staffHeroData?.it_asset_data.division
+              : ""}
+            {staffHeroData?.it_asset_data.unit
+              ? `, ${staffHeroData?.it_asset_data.unit}`
+              : ""}
+          </p>
+          <p className="mt-2 text-balance text-sm font-semibold text-slate-600 dark:text-slate-400">
+            {staffHeroData?.it_asset_data.location.name
+              ? `${staffHeroData?.it_asset_data.location.name}`
+              : "No branch set"}
+          </p>
           <div
             className={`flex flex-col items-center justify-center ${staffHeroData?.keyword_tags.length > 0 && "mb-1 mt-1"}`}
           >

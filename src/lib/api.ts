@@ -989,29 +989,6 @@ export interface IUpdateStaffHeroSection {
   keyword_tags?: KeywordTag[];
 }
 
-// Function to log all IT assets
-export const logITAssets = async () => {
-  const IT_ASSET_URL = "https://itassets.dbca.wa.gov.au/api/v3/departmentuser/";
-  try {
-    const response = await axios.get(IT_ASSET_URL);
-    console.log("IT Assets:", response.data);
-  } catch (error) {
-    console.error("Error fetching IT assets:", error);
-  }
-};
-
-// Function to log a specific user's IT assets by user ID
-export const logUserITAssets = async (userId: string) => {
-  const IT_ASSET_URL = "https://itassets.dbca.wa.gov.au/api/v3/departmentuser/";
-
-  try {
-    const response = await axios.get(`${IT_ASSET_URL}${userId}`);
-    console.log(`IT Assets for user ${userId}:`, response.data);
-  } catch (error) {
-    console.error(`Error fetching IT assets for user ${userId}:`, error);
-  }
-};
-
 export const updateStaffHeroSection = async ({
   pk,
   keyword_tags,
