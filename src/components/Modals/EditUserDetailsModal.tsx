@@ -97,7 +97,7 @@ export const EditUserDetailsModal = ({
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
     control,
     watch,
   } = useForm<IFullUserUpdateVariables>();
@@ -294,6 +294,12 @@ export const EditUserDetailsModal = ({
       affiliation,
     });
   };
+
+  useEffect(() => {
+    if (!isValid) {
+      console.log("Form validation errors:", errors);
+    }
+  }, [errors, isValid]);
 
   // const { affiliationsLoading, affiliationsData } = useAffiliations();
 
@@ -529,10 +535,10 @@ export const EditUserDetailsModal = ({
                           <Controller
                             name="about"
                             control={control}
-                            defaultValue={userData?.about}
+                            defaultValue={userData?.about || ""}
                             render={({ field }) => (
                               <DatabaseRichTextEditor
-                                populationData={userData?.about}
+                                populationData={userData?.about || ""}
                                 label="About"
                                 // hideLabel
                                 htmlFor="about"
@@ -548,10 +554,10 @@ export const EditUserDetailsModal = ({
                           <Controller
                             name="expertise"
                             control={control}
-                            defaultValue={userData?.expertise}
+                            defaultValue={userData?.expertise || ""}
                             render={({ field }) => (
                               <DatabaseRichTextEditor
-                                populationData={userData?.expertise}
+                                populationData={userData?.expertise || ""}
                                 label="Expertise"
                                 // hideLabel
                                 htmlFor="expertise"
@@ -1009,6 +1015,7 @@ export const EditUserDetailsModal = ({
               Cancel
             </Button>
             <Button
+              isDisabled={!isValid}
               isLoading={fullMutation.isPending}
               form="edit-details"
               type="submit"
