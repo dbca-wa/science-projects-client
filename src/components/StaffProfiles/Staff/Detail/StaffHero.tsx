@@ -75,25 +75,28 @@ const StaffHero = ({
             {staffHeroData?.name}
           </p>
 
-          <p className="mt-4 text-balance font-semibold text-slate-700 dark:text-slate-400">
-            {staffHeroData?.it_asset_data.title
-              ? staffHeroData?.it_asset_data.title
-              : "Staff Member"}
-          </p>
-
-          <p className="mt-2 text-balance text-sm font-semibold text-slate-700 dark:text-slate-400">
-            {staffHeroData?.it_asset_data.division
-              ? staffHeroData?.it_asset_data.division
-              : ""}
-            {staffHeroData?.it_asset_data.unit
-              ? `, ${staffHeroData?.it_asset_data.unit}`
-              : ""}
-          </p>
-          <p className="mt-2 text-balance text-sm font-semibold text-slate-600 dark:text-slate-400">
-            {staffHeroData?.it_asset_data.location.name
-              ? `${staffHeroData?.it_asset_data.location.name}`
-              : "No branch set"}
-          </p>
+          {staffHeroData?.it_asset_data && (
+            <>
+              <p className="mt-4 text-balance font-semibold text-slate-700 dark:text-slate-400">
+                {staffHeroData?.it_asset_data?.title
+                  ? staffHeroData?.it_asset_data?.title
+                  : "Staff Member"}
+              </p>
+              <p className="mt-2 text-balance text-sm font-semibold text-slate-700 dark:text-slate-400">
+                {staffHeroData?.it_asset_data?.division
+                  ? staffHeroData?.it_asset_data?.division
+                  : ""}
+                {staffHeroData?.it_asset_data?.unit
+                  ? `, ${staffHeroData?.it_asset_data?.unit}`
+                  : ""}
+              </p>
+              <p className="mt-2 text-balance text-sm font-semibold text-slate-600 dark:text-slate-400">
+                {staffHeroData?.it_asset_data?.location?.name
+                  ? `${staffHeroData?.it_asset_data?.location?.name}`
+                  : ""}
+              </p>
+            </>
+          )}
           <div
             className={`flex flex-col items-center justify-center ${staffHeroData?.keyword_tags.length > 0 && "mb-1 mt-1"}`}
           >
