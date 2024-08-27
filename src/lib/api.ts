@@ -761,11 +761,20 @@ export const adminUpdateUser = async ({
     // if req.data.get("display_last_name"):
     //     display_last_name = req.data.get("display_last_name")
     //     data_obj["display_last_name"] = display_last_name
+
+    const handleAffiliation = (affiliation) => {
+      if (typeof affiliation === "string") {
+        return Number(affiliation);
+      } else {
+        if (affiliation === undefined) {
+          return affiliation;
+        } else {
+          return (affiliation as IAffiliation)?.pk;
+        }
+      }
+    };
     const membershipData = {
-      affiliation:
-        typeof affiliation === "string"
-          ? Number(affiliation)
-          : (affiliation as IAffiliation)?.pk,
+      affiliation: handleAffiliation(affiliation),
       userPk: userPk,
       branch: branch !== null && branch !== "" ? Number(branch) : 0,
       business_area:

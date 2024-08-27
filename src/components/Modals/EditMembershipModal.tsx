@@ -33,6 +33,7 @@ import { IAffiliation, IBranch, IBusinessArea } from "../../types";
 import { useBusinessAreas } from "../../lib/hooks/tanstack/useBusinessAreas";
 import { useBranches } from "../../lib/hooks/tanstack/useBranches";
 import { useAffiliations } from "@/lib/hooks/tanstack/useAffiliations";
+import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
 
 interface IEditMembershipModalProps {
   isOpen: boolean;
@@ -153,7 +154,8 @@ export const EditMembershipModal = ({
   });
 
   //  React Hook Form
-  const { register, handleSubmit } = useForm<IMembershipUpdateVariables>();
+  const { register, handleSubmit, setValue } =
+    useForm<IMembershipUpdateVariables>();
 
   //  When submitting form - starts the mutation
   const onSubmit = async ({
@@ -192,7 +194,7 @@ export const EditMembershipModal = ({
                 />
               </InputGroup>
             </FormControl>
-            <Grid gridColumnGap={8} gridTemplateColumns={"repeat(2, 1fr)"}>
+            <Grid gridColumnGap={8} gridTemplateColumns={"repeat(1, 1fr)"}>
               {/* Organisation */}
               <FormControl my={2} mb={4} userSelect={"none"}>
                 <FormLabel>Organisation</FormLabel>
@@ -208,6 +210,29 @@ export const EditMembershipModal = ({
                     </option>
                   </Select>
                 </InputGroup>
+              </FormControl>
+
+              {/* Affiliation */}
+              <FormControl my={2} mb={4} userSelect={"none"}>
+                <AffiliationCreateSearchDropdown
+                  // autoFocus
+                  isRequired={false}
+                  preselectedAffiliationPk={currentAffiliationData?.pk}
+                  setterFunction={(
+                    selectedAffiliation: IAffiliation | undefined,
+                  ) => {
+                    if (selectedAffiliation) {
+                      setValue("affiliation", selectedAffiliation.pk);
+                    } else {
+                      setValue("affiliation", undefined); // Clear the affiliation in the form
+                    }
+                  }}
+                  isEditable
+                  hideTags
+                  label="Affiliation"
+                  placeholder="Search for or an affiliation"
+                  helperText="The entity this user is affiliated with"
+                />
               </FormControl>
 
               {/* Branch */}
@@ -254,8 +279,7 @@ export const EditMembershipModal = ({
                 </InputGroup>
               </FormControl>
 
-              {/* Affiliation */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
+              {/* <FormControl my={2} mb={4} userSelect={"none"}>
                 <FormLabel>Affiliation</FormLabel>
                 <InputGroup>
                   {!affiliationsLoading && affiliationsData && (
@@ -271,12 +295,12 @@ export const EditMembershipModal = ({
                               {aff.name}
                             </option>
                           );
-                        }
+                        },
                       )}
                     </Select>
                   )}
                 </InputGroup>
-              </FormControl>
+              </FormControl> */}
             </Grid>
           </ModalBody>
           <ModalFooter>
