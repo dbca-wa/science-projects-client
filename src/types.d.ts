@@ -10,6 +10,15 @@ import {
   IReviewDocumentEmail,
 } from "@/lib/api";
 
+export interface ITAssetData {
+  id: number;
+  email?: string;
+  title: string;
+  division: string;
+  unit: string;
+  location: { id: number; name: string };
+}
+
 export interface RGB {
   b: number;
   g: number;
@@ -1021,23 +1030,26 @@ export interface IStaffProfileData {
   user: number;
   title: string;
   name: string;
-  positionTitle: string;
-  branch: string;
+  // positionTitle: string;
+  // branch: string;
   overview: {
     about: string;
     expertise: string;
   };
   keyword_tags: KeywordTag[];
+  it_asset_data?: ITAssetData;
+  it_asset_id?: number;
+  aucode?: string;
 }
 
 export interface IStaffProfileHeroData {
   pk: number;
   user: IStaffUser;
-  title?: string; // optional
-  name: string; // no titles
-  positionTitle?: string;
-  branch?: string;
+  title: string;
+  name: string;
   keyword_tags: KeywordTag[]; // make this max of 5
+  it_asset_data: ITAssetData;
+  it_asset_id: number;
 }
 
 // Overview

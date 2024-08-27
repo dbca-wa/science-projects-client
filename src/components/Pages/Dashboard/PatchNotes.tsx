@@ -156,7 +156,8 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               science.dbca.wa.gov.au has been redeveloped and tied into SPMS and
               is working in test. Development to continue for integrating ORCID
               and Library publication data. Note: This feature is currently
-              disabled pending RFC with OIM.
+              disabled pending RFC with OIM (Update: IT Assets API implemented,
+              system token pending).
             </ListItem>
             <ListItem
               fontSize={"small"}
