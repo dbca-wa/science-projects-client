@@ -439,10 +439,22 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 __html: sanitizeHtml(
                   colorMode === "dark"
                     ? replaceLightWithDark(
-                        user?.about ?? "<p>(Not Provided)</p>",
+                        user?.about === "" ||
+                          user?.about === "<p></p>" ||
+                          user?.about ===
+                            '<p class="editor-p-light"><br></p>' ||
+                          user?.about === '<p class="editor-p-dark"><br></p>'
+                          ? "<p>(Not Provided)</p>"
+                          : (user?.about ?? "<p>(Not Provided)</p>"),
                       )
                     : replaceDarkWithLight(
-                        user?.about ?? "<p>(Not Provided)</p>",
+                        user?.about === "" ||
+                          user?.about === "<p></p>" ||
+                          user?.about ===
+                            '<p class="editor-p-light"><br></p>' ||
+                          user?.about === '<p class="editor-p-dark"><br></p>'
+                          ? "<p>(Not Provided)</p>"
+                          : (user?.about ?? "<p>(Not Provided)</p>"),
                       ),
                 ),
               }}
@@ -470,10 +482,24 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 __html: sanitizeHtml(
                   colorMode === "dark"
                     ? replaceLightWithDark(
-                        user?.expertise ?? "<p>(Not Provided)</p>",
+                        user?.expertise === "" ||
+                          user?.expertise === "<p></p>" ||
+                          user?.expertise ===
+                            '<p class="editor-p-light"><br></p>' ||
+                          user?.expertise ===
+                            '<p class="editor-p-dark"><br></p>'
+                          ? "<p>(Not Provided)</p>"
+                          : (user?.expertise ?? "<p>(Not Provided)</p>"),
                       )
                     : replaceDarkWithLight(
-                        user?.expertise ?? "<p>(Not Provided)</p>",
+                        user?.expertise === "" ||
+                          user?.expertise === "<p></p>" ||
+                          user?.expertise ===
+                            '<p class="editor-p-light"><br></p>' ||
+                          user?.expertise ===
+                            '<p class="editor-p-dark"><br></p>'
+                          ? "<p>(Not Provided)</p>"
+                          : (user?.expertise ?? "<p>(Not Provided)</p>"),
                       ),
                 ),
               }}
