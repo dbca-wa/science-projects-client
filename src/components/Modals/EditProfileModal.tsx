@@ -4,7 +4,7 @@ import { useProfile } from "@/lib/hooks/tanstack/useProfile";
 import {
   Box,
   Button,
-  FormControl,
+  // Box,
   FormLabel,
   Grid,
   Input,
@@ -83,9 +83,9 @@ export const EditProfileModal = ({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     control,
-    watch,
+    // watch,
   } = useForm<IProfileUpdateVariables>();
   //   {
   //   defaultValues: {
@@ -181,8 +181,8 @@ export const EditProfileModal = ({
     await mutation.mutateAsync(updateData);
   };
 
-  const aboutValue = watch("about");
-  const expertiseValue = watch("expertise");
+  // const aboutValue = watch("about");
+  // const expertiseValue = watch("expertise");
   useEffect(() => {
     if (selectedFile) {
       const objectURL = URL.createObjectURL(selectedFile);
@@ -209,7 +209,7 @@ export const EditProfileModal = ({
         {!isLoading && (
           <>
             <ModalBody pos="relative" flex={1}>
-              <FormControl my={2} mb={4} userSelect="none">
+              <Box my={2} mb={4} userSelect="none">
                 <InputGroup>
                   <Input
                     type="hidden"
@@ -217,17 +217,18 @@ export const EditProfileModal = ({
                     readOnly
                   />
                 </InputGroup>
-              </FormControl>
+              </Box>
               <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
-                <FormControl>
+                <Box my={2}>
                   <Controller
                     name="about"
                     control={control}
-                    defaultValue={initialData?.about}
+                    defaultValue={initialData?.about || ""}
                     render={({ field }) => (
                       <DatabaseRichTextEditor
-                        populationData={initialData?.about}
+                        populationData={initialData?.about || ""}
                         label="About"
+                        // hideLabel
                         htmlFor="about"
                         isEdit
                         field={field}
@@ -236,17 +237,17 @@ export const EditProfileModal = ({
                       />
                     )}
                   />
-                </FormControl>
-
-                <FormControl>
+                </Box>
+                <Box my={2}>
                   <Controller
                     name="expertise"
                     control={control}
-                    defaultValue={initialData?.expertise}
+                    defaultValue={initialData?.expertise || ""}
                     render={({ field }) => (
                       <DatabaseRichTextEditor
-                        populationData={initialData?.expertise}
+                        populationData={initialData?.expertise || ""}
                         label="Expertise"
+                        // hideLabel
                         htmlFor="expertise"
                         isEdit
                         field={field}
@@ -255,7 +256,8 @@ export const EditProfileModal = ({
                       />
                     )}
                   />
-                </FormControl>
+                </Box>
+
                 <Grid>
                   <Box>
                     <FormLabel>Image</FormLabel>
@@ -288,9 +290,11 @@ export const EditProfileModal = ({
                 }}
                 ml={3}
                 isDisabled={
-                  selectedFile === null &&
-                  aboutValue === initialData.about &&
-                  expertiseValue === initialData.expertise
+                  !isValid
+                  // selectedFile === null
+                  // &&
+                  // aboutValue === initialData.about &&
+                  // expertiseValue === initialData.expertise
                 }
               >
                 Update
@@ -303,34 +307,3 @@ export const EditProfileModal = ({
     </Modal>
   );
 };
-
-// if (selectedFile !== null || aboutChanged || expertiseChanged) {
-//   if (aboutChanged && expertiseChanged) {
-//     // console.log("image + about and expertise changed");
-//     await mutation.mutateAsync({ userPk, image, about, expertise });
-//   } else if (aboutChanged) {
-//     // console.log("image + about changed");
-//     await mutation.mutateAsync({ userPk, image, about });
-//   } else if (expertiseChanged) {
-//     // console.log("image + expertise changed");
-//     await mutation.mutateAsync({ userPk, image, expertise });
-//   } else if (!expertiseChanged && !aboutChanged) {
-//     // console.log("only image changed");
-//     await mutation.mutateAsync({ userPk, image });
-//   }
-//   // onClose();
-// } else {
-//   if (aboutChanged && expertiseChanged) {
-//     // console.log("about + expertise changed");
-//     await mutation.mutateAsync({ userPk, about, expertise });
-//   } else if (aboutChanged) {
-//     // console.log("about changed");
-
-//     await mutation.mutateAsync({ userPk, about });
-//   } else if (expertiseChanged) {
-//     // console.log("expertise changed");
-
-//     await mutation.mutateAsync({ userPk, expertise });
-//   } else {
-//     // console.log("Nothing changed");
-//   }

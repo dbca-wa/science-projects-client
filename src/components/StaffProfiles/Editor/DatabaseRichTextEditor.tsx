@@ -139,7 +139,10 @@ const DatabaseRichTextEditor = <T,>({
         </Box>
       )}
 
-      <LexicalComposer initialConfig={initialConfig} key={populationData}>
+      <LexicalComposer
+        initialConfig={initialConfig}
+        key={`${String(htmlFor)}${populationData}`}
+      >
         {/* Plugins*/}
         <HistoryPlugin />
         <ListPlugin />
