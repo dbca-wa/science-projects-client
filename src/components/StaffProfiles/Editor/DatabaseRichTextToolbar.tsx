@@ -981,3 +981,5 @@ export const BaseToolbarMenuButton = ({
     </Menu>
   );
 };
+
+export default DatabaseRichTextToolbar;
