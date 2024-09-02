@@ -37,12 +37,14 @@ COPY package.json .
 COPY vite.config.ts .
 RUN npm cache clean --force && npm install typescript
 
-# Change ownership of the /client directory to the non-root user
-ENV VITE_CACHE_DIR=/tmp/vite_cache
-RUN mkdir -p $VITE_CACHE_DIR && chown -R 1000:1000 $VITE_CACHE_DIR
-RUN chown -R 1000:1000 /client
-USER 1000
+# Create a non-root user to run the app
+ARG UID=10001
+ARG GID=10001
+RUN groupadd -g "${GID}" spmsuser \
+    && useradd --create-home --home-dir /home/spmsuser --no-log-init --uid "${UID}" --gid "${GID}" spmsuser
+
+# Switch to spmsuser (non-root)
+USER ${UID}
 
 EXPOSE 3000
-# CMD ["npm", "run", "preview"]
-CMD ["npm", "run", "preview", "--cacheDir", "/tmp/vite_cache"]
+CMD ["npm", "run", "preview"]
