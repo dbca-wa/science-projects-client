@@ -56,4 +56,5 @@ USER node
 
 
 EXPOSE 3000
-CMD [ "serve", "-s", "dist" ]
+# Use serve to serve the built files
+CMD ["serve", "-s", "dist", "-l", "3000"]
