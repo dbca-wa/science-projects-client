@@ -43,12 +43,17 @@ RUN mkdir -p /client/node_modules && \
     chown -R node:node /client && \
     chmod -R u+rwX /client
 
+
+# Install only production dependencies
+RUN npm install --omit=dev
+# RUN npm install typescript
+
+RUN npm install serve -g
+
+
 # Switch to the node user
 USER node
 
-# Install only production dependencies
-# RUN npm install --omit=dev
-RUN npm install typescript
 
 EXPOSE 3000
-CMD ["npm", "run", "preview"]
+CMD [ "serve", "-s", "dist" ]
