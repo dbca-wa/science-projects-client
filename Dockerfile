@@ -47,7 +47,8 @@ RUN mkdir -p /client/node_modules && \
 USER node
 
 # Install only production dependencies
-RUN npm install --production
+# RUN npm install --omit=dev
+RUN npm install typescript
 
 EXPOSE 3000
 CMD ["npm", "run", "preview"]
