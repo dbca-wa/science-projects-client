@@ -3,14 +3,6 @@ FROM node:latest as BUILD_IMAGE
 # This command sets the working directory inside the Docker container to "/app". This is the directory where subsequent commands will be executed.
 WORKDIR /app
 
-
-# Create a non-root user to run the app
-ARG UID=10001
-ARG GID=10001
-RUN addgroup -g ${GID} spmsuser \
-    && adduser -D -u ${UID} -G spmsuser spmsuser
-
-
 # Required for vite
 COPY package.json .
 RUN npm install
@@ -45,17 +37,7 @@ COPY package.json .
 COPY vite.config.ts .
 RUN npm cache clean --force && npm install typescript
 
-
-# Create the user and group in the production stage
-ARG UID=10001
-ARG GID=10001
-RUN addgroup -g ${GID} spmsuser \
-    && adduser -D -u ${UID} -G spmsuser spmsuser \
-    && chown -R spmsuser:spmsuser /client \
-    && chmod -R u+w /client
-
-# Switch to spmsuser (non-root)
-USER spmsuser
+USER node
 
 EXPOSE 3000
 CMD ["npm", "run", "preview"]
