@@ -7,8 +7,9 @@ WORKDIR /app
 # Create a non-root user to run the app
 ARG UID=10001
 ARG GID=10001
-RUN addgroup -g "${GID}" spmsuser \
-    && adduser -D -u "${UID}" -G spmsuser spmsuser
+RUN addgroup -g ${GID} spmsuser \
+    && adduser -D -u ${UID} -G spmsuser spmsuser
+
 
 # Required for vite
 COPY package.json .
@@ -45,7 +46,9 @@ COPY vite.config.ts .
 RUN npm cache clean --force && npm install typescript
 
 
-# Ensure spmsuser owns all the files
+# Create the user and group in the production stage
+ARG UID=10001
+ARG GID=10001
 RUN addgroup -g ${GID} spmsuser \
     && adduser -D -u ${UID} -G spmsuser spmsuser \
     && chown -R spmsuser:spmsuser /client \
