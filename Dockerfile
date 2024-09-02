@@ -36,5 +36,15 @@ COPY --from=BUILD_IMAGE /app/dist/ /client/dist/
 COPY package.json .
 COPY vite.config.ts .
 RUN npm cache clean --force && npm install typescript
+
+# Create a non-root user to run the app
+ARG UID=10001
+ARG GID=10001
+RUN groupadd -g "${GID}" spmsuser \
+    && useradd --create-home --home-dir /home/spmsuser --no-log-init --uid "${UID}" --gid "${GID}" spmsuser
+
+# Switch to spmsuser (non-root)
+USER ${UID}
+
 EXPOSE 3000
 CMD ["npm", "run", "preview"]
