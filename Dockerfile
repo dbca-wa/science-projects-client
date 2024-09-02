@@ -43,6 +43,9 @@ ARG GID=10001
 RUN groupadd -g "${GID}" spmsuser \
     && useradd --create-home --home-dir /home/spmsuser --no-log-init --uid "${UID}" --gid "${GID}" spmsuser
 
+# Ensure spmsuser owns all the files
+RUN chown -R spmsuser:spmsuser /client && chmod -R u+w /client
+
 # Switch to spmsuser (non-root)
 USER ${UID}
 
