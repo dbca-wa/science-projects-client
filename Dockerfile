@@ -30,14 +30,17 @@ RUN npm run build
 # Multistage build to prevent code exposure / reduce image size
 FROM node:latest as PRODUCTION_IMAGE
 WORKDIR /client
-
-COPY --from=BUILD_IMAGE /app/dist/ /client/dist/
-
-COPY package.json .
-COPY vite.config.ts .
-RUN npm cache clean --force && npm install typescript
-
 USER node
+
+# Copy built files from the build stage
+COPY --chown=node:node --from=BUILD_IMAGE /app/dist/ /client/dist/
+
+# Copy necessary configuration files
+COPY --chown=node:node package.json .
+COPY --chown=node:node vite.config.ts .
+
+# Install only production dependencies
+RUN npm install --production
 
 EXPOSE 3000
 CMD ["npm", "run", "preview"]
