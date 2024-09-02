@@ -30,14 +30,21 @@ RUN npm run build
 # Multistage build to prevent code exposure / reduce image size
 FROM node:latest as PRODUCTION_IMAGE
 WORKDIR /client
-USER node
-
 # Copy built files from the build stage
-COPY --chown=node:node --from=BUILD_IMAGE /app/dist/ /client/dist/
+COPY --from=BUILD_IMAGE /app/dist/ /client/dist/
 
 # Copy necessary configuration files
-COPY --chown=node:node package.json .
-COPY --chown=node:node vite.config.ts .
+COPY package.json .
+COPY vite.config.ts .
+
+# Perform operations as root to set ownership and permissions
+USER root
+RUN mkdir -p /client/node_modules && \
+    chown -R node:node /client && \
+    chmod -R u+rwX /client
+
+# Switch to the node user
+USER node
 
 # Install only production dependencies
 RUN npm install --production
