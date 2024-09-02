@@ -38,8 +38,11 @@ COPY vite.config.ts .
 RUN npm cache clean --force && npm install typescript
 
 # Change ownership of the /client directory to the non-root user
+ENV VITE_CACHE_DIR=/tmp/vite_cache
+RUN mkdir -p $VITE_CACHE_DIR && chown -R 1000:1000 $VITE_CACHE_DIR
 RUN chown -R 1000:1000 /client
 USER 1000
 
 EXPOSE 3000
-CMD ["npm", "run", "preview"]
+# CMD ["npm", "run", "preview"]
+CMD ["npm", "run", "preview", "--cacheDir", "/tmp/vite_cache"]
