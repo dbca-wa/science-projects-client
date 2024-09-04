@@ -65,7 +65,7 @@ export const SetAreasModal = ({
           duration: 3000,
           isClosable: true,
         });
-        onDeleteSuccess && onDeleteSuccess();
+        onDeleteSuccess?.();
       }
 
       setTimeout(async () => {
@@ -143,13 +143,7 @@ export const SetAreasModal = ({
                   gridColumnGap={4}
                   px={4}
                 >
-                  <Box
-                    display={"flex"}
-                    // justifyContent={"center"}
-                    // alignContent={"center"}
-                    // alignItems={"center"}
-                    w={"100%"}
-                  >
+                  <Box display={"flex"} w={"100%"}>
                     {" "}
                     {dbcaDistricts && (
                       <AreaCheckAndMaps
@@ -161,13 +155,7 @@ export const SetAreasModal = ({
                       />
                     )}
                   </Box>
-                  <Box
-                    display={"flex"}
-                    // justifyContent={"center"}
-                    // alignContent={"center"}
-                    // alignItems={"center"}
-                    w={"100%"}
-                  >
+                  <Box display={"flex"} w={"100%"}>
                     {" "}
                     {imcra && (
                       <AreaCheckAndMaps
@@ -179,14 +167,7 @@ export const SetAreasModal = ({
                       />
                     )}
                   </Box>
-                  <Box
-                    display={"flex"}
-                    // justifyContent={"center"}
-                    // alignContent={"center"}
-                    // alignItems={"center"}
-                    w={"100%"}
-                    mt={2}
-                  >
+                  <Box display={"flex"} w={"100%"} mt={2}>
                     {" "}
                     {dbcaRegions && (
                       <AreaCheckAndMaps
@@ -199,15 +180,7 @@ export const SetAreasModal = ({
                     )}
                   </Box>
 
-                  <Box
-                    display={"flex"}
-                    flexDir={"column"}
-                    mt={2}
-                    // justifyContent={"center"}
-                    // alignContent={"center"}
-                    // alignItems={"center"}
-                    w={"100%"}
-                  >
+                  <Box display={"flex"} flexDir={"column"} mt={2} w={"100%"}>
                     {nrm && (
                       <AreaCheckAndMaps
                         title="Natural Resource Management Regions"
@@ -218,13 +191,7 @@ export const SetAreasModal = ({
                       />
                     )}
                   </Box>
-                  <Box
-                    display={"flex"}
-                    // justifyContent={"center"}
-                    // alignContent={"center"}
-                    // alignItems={"center"}
-                    w={"100%"}
-                  >
+                  <Box display={"flex"} w={"100%"}>
                     {ibra && (
                       <AreaCheckAndMaps
                         title="IBRAs"

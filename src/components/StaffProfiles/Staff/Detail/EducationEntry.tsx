@@ -66,29 +66,6 @@ const EducationEntry = ({
     >
       {isHovered && buttonsVisible && (
         <div className="absolute right-0 top-0 z-40 flex py-3">
-          {/* <AddItemButton
-            as={"div"}
-            ariaLabel={"Edit Education Button"}
-            label={"Click to edit this entry"}
-            onClick={() => {}}
-            icon={MdModeEditOutline}
-            bgColor={"green.500"}
-            _hover={{ bg: "green.400" }}
-            mr={2}
-            innerItemSize="20px"
-            p={1}
-          />
-          <AddItemButton
-            as={"div"}
-            ariaLabel={"Delete Education Button"}
-            label={"Click to delete this entry"}
-            onClick={() => {}}
-            icon={FaTrashAlt}
-            bgColor={"red.500"}
-            _hover={{ bg: "red.400" }}
-            innerItemSize="20px"
-            p={1}
-          /> */}
           {isDesktop ? (
             <>
               <EducationDialog
@@ -194,8 +171,6 @@ const EducationEntry = ({
         <p>
           {institution} ({location})
         </p>
-        {/* <p>Doctor of Philosophy, 1997-2008</p> */}
-        {/* <p>Murdoch University (Perth, Australia)</p> */}
       </div>
     </div>
   );

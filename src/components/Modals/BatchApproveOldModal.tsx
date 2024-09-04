@@ -150,9 +150,7 @@ export const BatchApproveOldModal = ({ isOpen, onClose }: IModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
       <ModalOverlay />
-      <Flex
-      // as={"form"} onSubmit={handleSubmit(onSubmit)}
-      >
+      <Flex>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader>Batch Approve Older Reports?</ModalHeader>
           <ModalCloseButton />
@@ -177,15 +175,6 @@ export const BatchApproveOldModal = ({ isOpen, onClose }: IModalProps) => {
                 <ListItem>Is yet to be approved by Directorate</ListItem>
               </UnorderedList>
             </Box>
-            {/* <FormControl my={2} mb={4} userSelect="none">
-                <InputGroup>
-                  <Input
-                    type="hidden"
-                    {...register("userPk", { required: true, value: userPk })}
-                    readOnly
-                  />
-                </InputGroup>
-              </FormControl> */}
             <Text mt={4}>
               If you would still like to proceed, press "Batch Approve".
             </Text>

@@ -178,15 +178,6 @@ export const BatchApproveModal = ({ isOpen, onClose }: IModalProps) => {
               </UnorderedList>
             </Box>
 
-            {/* <FormControl my={2} mb={4} userSelect="none">
-                <InputGroup>
-                  <Input
-                    type="hidden"
-                    {...register("userPk", { required: true, value: userPk })}
-                    readOnly
-                  />
-                </InputGroup>
-              </FormControl> */}
             <Text mt={4}>
               If you would still like to proceed, press "Batch Approve".
             </Text>

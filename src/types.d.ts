@@ -844,15 +844,6 @@ interface IBusinessAreaCreate {
   data_custodian?: number;
 }
 
-// effective_from: Date;
-//effective_to: Date;   // always null, delete ?
-
-// creator_id: number; // necessary?
-// modifier_id: number; // necessary?
-
-//  date_created: Date;     // Converter needed?
-// last_modified: Date;
-
 // SERVICE ============================================================================
 
 interface IDepartmentalService {
@@ -1153,13 +1144,6 @@ interface IReaction {
   type: string;
   count: number;
 }
-
-// interface IUser {
-//     first_name: string;
-//     last_name: string;
-//     username: string;
-//     avatar: string | null;
-// }
 
 interface IChatMessage {
   sendingUser: IUser;

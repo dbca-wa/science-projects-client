@@ -52,13 +52,6 @@ export const EditPersonalInformationModal = ({
 }: IEditPIModalProps) => {
   const { isLoading, personalData: data } = usePersonalInfo(userId);
 
-  // useEffect(() => {
-  //   if (!isLoading)
-  //     console.log(
-  //       `Phone: ${data?.phone}\nFax: ${data?.fax}\nTitle: ${data?.title}\nFirst: ${data?.first_name}\nLast: ${data?.last_name}\nEmail: ${data?.email}\n`
-  //     );
-  // }, [data, isLoading]);
-
   const { colorMode } = useColorMode();
 
   const [hoveredTitle, setHoveredTitle] = useState(false);
@@ -129,10 +122,7 @@ export const EditPersonalInformationModal = ({
           isClosable: true,
         });
       }
-      // Close the modal
-      if (onClose) {
-        onClose();
-      }
+      onClose?.();
     },
     // Error handling based on API-file-declared interface
     onError: (error) => {
@@ -313,9 +303,6 @@ export const EditPersonalInformationModal = ({
                     {...register("display_first_name", {
                       value: data?.display_first_name,
                     })}
-
-                    // value={data?.first_name}
-                    // isDisabled={true}
                   />
                 </InputGroup>
               </FormControl>
@@ -334,9 +321,6 @@ export const EditPersonalInformationModal = ({
                     {...register("display_last_name", {
                       value: data?.display_last_name,
                     })}
-                    // placeholder={data?.last_name}
-                    // value={data?.last_name}
-                    // isDisabled={true}
                   />
                 </InputGroup>
               </FormControl>
@@ -356,13 +340,9 @@ export const EditPersonalInformationModal = ({
                 readOnly // Setting the input as read-only
               />
             </InputGroup>
-            {/* {errors.userPk && (
-                            <FormErrorMessage>{errors.userPk.message}</FormErrorMessage>
-                        )} */}
           </FormControl>
 
           <ModalFooter>
-            {/* <Flex mt={5} justifyContent="end"> */}
             <Button
               isLoading={mutation.isPending}
               type="submit"
@@ -376,7 +356,6 @@ export const EditPersonalInformationModal = ({
             >
               Update
             </Button>
-            {/* </Flex> */}
           </ModalFooter>
         </ModalBody>
       </ModalContent>

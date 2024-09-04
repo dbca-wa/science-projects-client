@@ -21,11 +21,7 @@ interface IAddUserModalProps {
 
 export const CreateUserModal = ({ isOpen, onClose }: IAddUserModalProps) => {
   const { colorMode } = useColorMode();
-  const {
-    isOpen: isToastOpen,
-    // onOpen: openToast,
-    onClose: closeToast,
-  } = useDisclosure();
+  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
 
   useEffect(() => {
     if (isToastOpen) {
@@ -47,8 +43,11 @@ export const CreateUserModal = ({ isOpen, onClose }: IAddUserModalProps) => {
         <ModalHeader>Add User</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {/* <CreateUser onSuccess={openToast} isModal={true} /> */}
-          <CreateUser isModal onClose={handleToastClose} onSuccess={() => navigate('/users')} />
+          <CreateUser
+            isModal
+            onClose={handleToastClose}
+            onSuccess={() => navigate("/users")}
+          />
         </ModalBody>
       </ModalContent>
     </Modal>

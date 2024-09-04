@@ -96,10 +96,7 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
       });
       queryClient.invalidateQueries({ queryKey: ["latestProgressReports"] });
       queryClient.invalidateQueries({ queryKey: ["latestStudentReports"] });
-      //  Close the modal
-      if (onClose) {
-        onClose();
-      }
+      onClose?.();
     },
     // Error handling based on API - file - declared interface
     onError: (error) => {
@@ -207,10 +204,12 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
                 Also send emails?
               </Checkbox>
               <Text fontSize={"xs"} mx={6}>
-                If this is selected, all active business area leads will receive an email alerting them the new cycle is open
-                for FY {`${latestYear - 1}-${String(latestYear).substring(2)}`}.
-                You may opt to open the cycle first and send these emails later
-                by leaving this unchecked for now, and checking/opening the cycle again later.
+                If this is selected, all active business area leads will receive
+                an email alerting them the new cycle is open for FY{" "}
+                {`${latestYear - 1}-${String(latestYear).substring(2)}`}. You
+                may opt to open the cycle first and send these emails later by
+                leaving this unchecked for now, and checking/opening the cycle
+                again later.
               </Text>
               <Checkbox
                 mt={4}
@@ -225,15 +224,6 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
                 with data from the last reported year (if one exists).
               </Text>
             </Box>
-            {/* <FormControl my={2} mb={4} userSelect="none">
-                <InputGroup>
-                  <Input
-                    type="hidden"
-                    {...register("userPk", { required: true, value: userPk })}
-                    readOnly
-                  />
-                </InputGroup>
-              </FormControl> */}
             <Text mt={4}>
               If you would still like to proceed, press "Open Cycle".
             </Text>

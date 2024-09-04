@@ -1,10 +1,19 @@
 import { remedyMultipleLeaderProjects } from "@/lib/api";
 import { IProjectData } from "@/types";
-import { Box, Button, Flex, List, ListItem, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  List,
+  ListItem,
+  Text,
+  ToastId,
+  useColorMode,
+  useToast,
+} from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef } from "react";
-
 
 interface Props {
   projects: IProjectData[];
@@ -12,7 +21,11 @@ interface Props {
   onClose: () => void;
 }
 
-export const RemedyMultipleLeaderProjectsModalContent = ({ projects, refreshDataFn, onClose }: Props) => {
+export const RemedyMultipleLeaderProjectsModalContent = ({
+  projects,
+  refreshDataFn,
+  onClose,
+}: Props) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
@@ -40,7 +53,7 @@ export const RemedyMultipleLeaderProjectsModalContent = ({ projects, refreshData
           isClosable: true,
         });
       }
-      refreshDataFn && refreshDataFn();
+      refreshDataFn?.();
       onClose();
     },
     onError: (error: AxiosError) => {
@@ -48,8 +61,9 @@ export const RemedyMultipleLeaderProjectsModalContent = ({ projects, refreshData
         toast.update(toastIdRef.current, {
           title: "Encountered an error",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -62,22 +76,24 @@ export const RemedyMultipleLeaderProjectsModalContent = ({ projects, refreshData
 
   const onRemedy = () => {
     mutation.mutate({ projects: projects?.map((p) => p.pk) });
-  }
-
+  };
 
   return (
     <>
       <Box>
         <List>
-          <ListItem>- All projects with multiple "Project Lead" roles will be affected</ListItem>
           <ListItem>
-            - The function will check which member has the is_leader property set to true
+            - All projects with multiple "Project Lead" roles will be affected
           </ListItem>
           <ListItem>
-            - This user will get the Project Lead tag
+            - The function will check which member has the is_leader property
+            set to true
           </ListItem>
+          <ListItem>- This user will get the Project Lead tag</ListItem>
           <ListItem>
-            - Other users will either get student, academic supervisor, science support or external collaborator roles, depending on the project type and whether they are staff
+            - Other users will either get student, academic supervisor, science
+            support or external collaborator roles, depending on the project
+            type and whether they are staff
           </ListItem>
         </List>
         <Text color={colorMode === "light" ? "blue.500" : "blue.300"} my={2}>
@@ -98,7 +114,6 @@ export const RemedyMultipleLeaderProjectsModalContent = ({ projects, refreshData
           </Box>
         </Flex>
       </Box>
-
     </>
   );
 };

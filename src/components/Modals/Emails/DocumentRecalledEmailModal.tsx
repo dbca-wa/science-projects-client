@@ -38,7 +38,13 @@ export const DocumentRecalledEmailModal = ({
 
   const [projectTitle, setProjectTitle] = useState("");
   const [projectPk, setProjectPk] = useState<null | number>();
-  const [projectDocumentKind, setProjectDocumentKind] = useState<"concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure">("concept")
+  const [projectDocumentKind, setProjectDocumentKind] = useState<
+    | "concept"
+    | "projectplan"
+    | "progressreport"
+    | "studentreport"
+    | "projectclosure"
+  >("concept");
   const [stage, setStage] = useState<number>();
 
   // Destructure viewing users info
@@ -51,16 +57,6 @@ export const DocumentRecalledEmailModal = ({
   const fromUserName = `${first_name} ${last_name}`;
 
   useEffect(() => {
-    console.log({
-      projectPk,
-      fromUserEmail,
-      fromUserName,
-      fromUserPk,
-      toUserPk,
-      toUserEmail,
-      toUserName,
-      projectDocumentKind
-    });
     if (
       !projectPk ||
       !toUserEmail ||
@@ -84,7 +80,8 @@ export const DocumentRecalledEmailModal = ({
     toUserPk,
     toUserEmail,
     toUserName,
-    projectDocumentKind, stage
+    projectDocumentKind,
+    stage,
   ]);
 
   const {
@@ -102,10 +99,6 @@ export const DocumentRecalledEmailModal = ({
   };
 
   const onClick = async (formData: ISendSingleEmail) => {
-    // API Call here
-    console.log("API CALL");
-    console.log(formData);
-    console.log(emailFunction);
     const dataForMutation = {
       recipients_list: [formData.toUserPk],
       project_pk: formData.project,
@@ -167,7 +160,7 @@ export const DocumentRecalledEmailModal = ({
         onClose();
       }}
       size={"md"}
-    // isCentered={true}
+      // isCentered={true}
     >
       {" "}
       <ModalOverlay />
@@ -219,7 +212,16 @@ export const DocumentRecalledEmailModal = ({
                 <FormLabel>Document Kind</FormLabel>
                 <Select
                   {...register("projectDocumentKind")}
-                  onChange={(e) => setProjectDocumentKind(e.target.value as "concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure")}
+                  onChange={(e) =>
+                    setProjectDocumentKind(
+                      e.target.value as
+                        | "concept"
+                        | "projectplan"
+                        | "progressreport"
+                        | "studentreport"
+                        | "projectclosure",
+                    )
+                  }
                 >
                   <option value={"concept"}>Concept</option>
                   <option value={"projectplan"}>Project Plan</option>
@@ -230,20 +232,16 @@ export const DocumentRecalledEmailModal = ({
               </FormControl>
             ) : null}
 
-            {projectDocumentKind ?
-              (
-                <FormControl isRequired>
-                  <FormLabel>Stage</FormLabel>
-                  <Select
-                    onChange={(e) => setStage(Number(e.target.value))}
-                  >
-                    <option value={1}>1</option>
-                    <option value={2}>2</option>
-                    <option value={3}>3</option>
-                  </Select>
-                </FormControl>
-              )
-              : null}
+            {projectDocumentKind ? (
+              <FormControl isRequired>
+                <FormLabel>Stage</FormLabel>
+                <Select onChange={(e) => setStage(Number(e.target.value))}>
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                </Select>
+              </FormControl>
+            ) : null}
 
             {canSend ? (
               <>

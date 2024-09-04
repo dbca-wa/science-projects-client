@@ -11,7 +11,6 @@ export const Head = ({ title, isStandalone }: IProps) => {
   return (
     <HelmetProvider>
       <Helmet>
-        {/* <title>{title ? `${layout === "traditional" ? "SPMS" : "Cycle"} | ${title}` : "Loading..."}</title> */}
         <title>
           {title
             ? isStandalone

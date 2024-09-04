@@ -170,20 +170,7 @@ export const CreateProjectModal = ({
         });
       }
       // Close the modal
-      if (onClose) {
-        onClose();
-      }
-      // if (
-      //   !projectType.includes("Student") &&
-      //   !projectType.includes("External")
-      // ) {await spawnNewEmptyDocument({ projectPk: data.pk, kind: data.kind });}
-      // else {
-      //   if (projectType.includes("Student")) {
-      //     console.log("Spawn document for Student here");
-      //   } else {
-      //     console.log("Spawn document for External here");
-      //   }
-      // }
+      onClose?.();
 
       queryClient.refetchQueries({ queryKey: [`projects`] });
       navigate(`/projects/${data.pk}/overview`);
@@ -340,10 +327,7 @@ export const CreateProjectModal = ({
               {projectType.includes("External") && (
                 <TabPanel>
                   <ProjectExternalSection
-                    // externalFilled={externalFilled}
-                    // externalData={externalData}
                     setExternalData={setExternalData}
-                    // setExternalFilled={setExternalFilled}
                     onClose={onClose}
                     backClick={goBack}
                     createClick={kickOffMutation}

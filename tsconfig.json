@@ -2,25 +2,17 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "target": "ESNext",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "skipLibCheck": true,
     /* Bundler mode */
-    // "moduleResolution": "bundler",
     "moduleResolution": "node",
     "outDir": "./dist", // Specify the output directory.
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
-    // "isolatedModules": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
@@ -31,9 +23,7 @@
     "noFallthroughCasesInSwitch": false,
     "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "references": [
     {
       "path": "./tsconfig.node.json"

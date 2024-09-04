@@ -105,9 +105,8 @@ export const DeleteUserModal = ({
         });
       }
       //  Close the modal
-      if (onClose) {
-        onClose();
-      }
+      onClose?.();
+
       reFetch();
     },
     // Error handling based on API - file - declared interface
@@ -213,7 +212,7 @@ export const DeleteUserModal = ({
                 background={colorMode === "light" ? "red.500" : "red.600"}
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
-                }} // isDisabled={!changesMade}
+                }}
                 isDisabled={userIsSuper}
                 isLoading={deletionMutation.isPending}
                 type="submit"

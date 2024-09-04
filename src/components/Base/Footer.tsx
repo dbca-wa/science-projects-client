@@ -9,7 +9,6 @@ export const Footer = () => {
 
   return (
     <Box
-      // position="absolute"
       display={"flex"}
       justifyContent={"center"}
       bottom="0"

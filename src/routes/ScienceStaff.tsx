@@ -24,13 +24,6 @@ export const ScienceStaff = () => {
     });
   };
 
-  // const { scienceStaffData, scienceStaffLoading } =
-  //   useScienceStaffProfileList();
-
-  // useEffect(() => {
-  //   console.log({ scienceStaffData, scienceStaffLoading });
-  // }, [scienceStaffLoading, scienceStaffData]);
-
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (

@@ -42,10 +42,7 @@ export const ExternalInternalSPConfirmationModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
       <ModalOverlay />
-      <Flex
-      // as={"form"}
-      // onSubmit={handleSubmit(seekEndorsementAndSaveFunc)}
-      >
+      <Flex>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader>Is this an externally led project?</ModalHeader>
           <ModalCloseButton />
@@ -106,7 +103,7 @@ export const ExternalInternalSPConfirmationModal = ({
                 Create
               </Button>
             </Grid>
-            { }
+            {}
           </ModalFooter>
         </ModalContent>
       </Flex>

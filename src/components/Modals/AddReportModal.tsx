@@ -36,10 +36,6 @@ export const AddReportModal = ({ isOpen, onClose }: Props) => {
   const queryClient = useQueryClient();
   const { register, watch, reset } = useForm<IReportCreation>();
   const toast = useToast();
-  // const toastIdRef = useRef<ToastId>();
-  // const addToast = (data) => {
-  //   toastIdRef.current = toast(data);
-  // };
 
   const [thisYear, setThisYear] = useState(new Date().getFullYear());
 
@@ -101,15 +97,8 @@ export const AddReportModal = ({ isOpen, onClose }: Props) => {
         <ModalHeader>Create Annual Report Info</ModalHeader>
         <ModalCloseButton />
 
-        <ModalBody
-        // as="form"
-        // id="reportcreation-form"
-        // onSubmit={onSubmit}
-        >
-          <VStack
-            spacing={10}
-            // as="form" id="add-form" onSubmit={handleSubmit(onSubmit)}
-          >
+        <ModalBody>
+          <VStack spacing={10}>
             <FormControl isRequired>
               <FormLabel>Year</FormLabel>
               <InputGroup>
@@ -144,7 +133,7 @@ export const AddReportModal = ({ isOpen, onClose }: Props) => {
                         </Text>
                       ))}
                     </Box>
-                  )
+                  ),
                 )}
               </Box>
             ) : null}

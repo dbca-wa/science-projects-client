@@ -47,11 +47,6 @@ const StaffHero = ({
 
   useEffect(() => console.log(staffHeroData), [staffHeroData]);
 
-  // branchName={"Kensington"}
-  // positionTitle={"Web and Data Development Officer"}
-  // fullName={"Jarid Prince"}
-  // tags={["React", "Django", "Docker", "Kubernetes", "ETL"]}
-
   return !staffHeroLoading ? (
     <>
       <div className="flex flex-col">

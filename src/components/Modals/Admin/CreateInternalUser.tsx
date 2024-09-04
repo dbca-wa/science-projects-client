@@ -1,7 +1,6 @@
 // Component/Route for handling user creation and the accomponying validation
 
 import { Head } from "@/components/Base/Head";
-import { BranchSearchDropdown } from "@/components/Navigation/BranchSearchDropdown";
 import {
   UserData,
   createUser,
@@ -29,7 +28,6 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { GrMail } from "react-icons/gr";
 import { RiNumber1, RiNumber2 } from "react-icons/ri";
@@ -47,7 +45,7 @@ interface IProps {
   isModal?: boolean;
 }
 
-export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
+export const CreateInternalUser = ({ onSuccess, isModal }: IProps) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const navigate = useNavigate();
@@ -72,7 +70,6 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
   const [lastNameError, setLastNameError] = useState("");
 
   const location = useLocation();
-  const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
   useEffect(() => {
     if (
@@ -238,7 +235,7 @@ export const CreateInternalUser = ({ onSuccess, isModal, onClose }: IProps) => {
             duration: 5000,
             isClosable: true,
           });
-          onSuccess && onSuccess();
+          onSuccess?.();
           if (location.pathname === "/users") {
             window.location.reload(); // Manually trigger a reload if already on the /users route - potentially change to be less jarring
           } else {

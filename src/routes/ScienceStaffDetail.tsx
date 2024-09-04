@@ -86,10 +86,6 @@ const ScienceStaffDetail = () => {
                       colorSchemeTwo="blue"
                       currentState={buttonsVisible}
                       setCurrentState={setButtonsVisible}
-                      // toolTipText={
-                      //   !buttonsVisible ? "Show Edit Buttons" : "Hide Edit Buttons"
-                      // }
-                      //  editorIsOpen={editorIsOpen}
                     />
                   </Box>
                 </Tooltip>
@@ -110,7 +106,6 @@ const ScienceStaffDetail = () => {
                         }
                       }}
                       leftIcon={<IoArrowBackCircle />}
-                      // rightIcon={<MdScience />}
                       bg={"green.500"}
                       _hover={{ bg: "green.400" }}
                       color={"white"}
@@ -154,10 +149,6 @@ const ScienceStaffDetail = () => {
                       colorSchemeTwo="blue"
                       currentState={buttonsVisible}
                       setCurrentState={setButtonsVisible}
-                      // toolTipText={
-                      //   !buttonsVisible ? "Show Edit Buttons" : "Hide Edit Buttons"
-                      // }
-                      //  editorIsOpen={editorIsOpen}
                     />
                   </Box>
                 </Tooltip>

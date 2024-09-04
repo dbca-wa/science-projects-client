@@ -93,10 +93,7 @@ export const DeletePDFEndorsementModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
       <ModalOverlay />
-      <Flex
-      // as={"form"}
-      // onSubmit={handleSubmit(seekEndorsementAndSaveFunc)}
-      >
+      <Flex>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader>Delete AEC PDF?</ModalHeader>
           <ModalCloseButton />
@@ -121,7 +118,6 @@ export const DeletePDFEndorsementModal = ({
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }}
                 isLoading={deleteAECPDFEndorsementMutation.isPending}
-                // type="submit"
                 ml={3}
                 onClick={() => onDeleteAECPDFAndApproval()}
               >

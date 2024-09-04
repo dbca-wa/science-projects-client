@@ -43,17 +43,14 @@ RUN mkdir -p /client/node_modules && \
     chown -R node:node /client && \
     chmod -R u+rwX /client
 
-
 # Install only production dependencies
 RUN npm install --omit=dev
-# RUN npm install typescript
 
+# Install serve to serve the built files
 RUN npm install serve -g
-
 
 # Switch to the node user
 USER node
-
 
 EXPOSE 3000
 # Use serve to serve the built files

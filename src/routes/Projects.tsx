@@ -91,16 +91,10 @@ export const Projects = () => {
     }
   };
 
-  // useEffect(() => {
-  //     if (filteredItems.length > 0)
-  //         console.log(filteredItems)
-  // }, [filteredItems])
-
   const handleOnlySelectedStatusChange: React.ChangeEventHandler<
     HTMLSelectElement
   > = (event) => {
     const statusValue = event.target.value;
-    // console.log(statusValue);
     setSearchFilters({
       onlyActive,
       onlyInactive,
@@ -115,7 +109,6 @@ export const Projects = () => {
     HTMLSelectElement
   > = (event) => {
     const projectKindValue = event.target.value;
-    // console.log(projectKindValue);
     setSearchFilters({
       onlyActive,
       onlyInactive,
@@ -125,8 +118,6 @@ export const Projects = () => {
       filterYear,
     });
   };
-
-  // const user = queryClient.getQueryData<IUserData>(["me"]);
 
   const navigate = useNavigate();
 
@@ -155,7 +146,6 @@ export const Projects = () => {
           duration: 3000,
           isClosable: true,
         });
-        // console.log(response);
         const downloadUrl = window.URL.createObjectURL(response as Blob);
         const link = document.createElement("a");
         link.href = downloadUrl;
@@ -171,8 +161,9 @@ export const Projects = () => {
         toast.update(toastIdRef.current, {
           title: "Could Not Generate Projects CSV",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -184,7 +175,6 @@ export const Projects = () => {
   });
 
   const runDownloadCSVMutation = () => {
-    // () => downloadProjectsCSV()
     downloadProjectCSVMutation.mutate();
   };
   const { layout } = useLayoutSwitcher();
@@ -224,7 +214,6 @@ export const Projects = () => {
           <Button
             mr={4}
             variant={"solid"}
-            // colorScheme="green"
             color={"white"}
             background={colorMode === "light" ? "green.500" : "green.600"}
             _hover={{
@@ -238,7 +227,6 @@ export const Projects = () => {
 
           <Button
             variant={"solid"}
-            // colorScheme="green"
             color={"white"}
             background={colorMode === "light" ? "green.500" : "green.600"}
             _hover={{
@@ -268,9 +256,7 @@ export const Projects = () => {
           }}
           gridRowGap={4}
           gridColumnGap={4}
-          // spacing={[1, 5]}
-          // direction={["column", "row"]}
-          justifyContent="space-between" // Set justifyContent to "space-between" to push the box to the right
+          justifyContent="space-between"
         >
           <Grid gridRowGap={4}>
             <Grid
@@ -290,7 +276,6 @@ export const Projects = () => {
                 Only Active
               </Checkbox>
               <Checkbox
-                // ml={4}
                 size="md"
                 colorScheme="gray"
                 onChange={handleOnlyInactiveProjectsChange}
@@ -307,27 +292,24 @@ export const Projects = () => {
                 base: "repeat(1, 1fr)",
                 md: "repeat(2, 1fr)",
               }}
-              // px={4}
               w={"100%"}
-            // bg={"red"}
             >
               <Select
                 onChange={handleOnlySelectedProjectKindChange}
                 size={"sm"}
-                // mx={4}
                 rounded={"5px"}
                 style={
                   colorMode === "light"
                     ? {
-                      color: "black",
-                      borderColor: "gray.100",
-                      caretColor: "black !important",
-                    }
+                        color: "black",
+                        borderColor: "gray.100",
+                        caretColor: "black !important",
+                      }
                     : {
-                      color: "white",
-                      borderColor: "white",
-                      caretColor: "black !important",
-                    }
+                        color: "white",
+                        borderColor: "white",
+                        caretColor: "black !important",
+                      }
                 }
               >
                 <option value={"All"}>All Kinds</option>
@@ -339,20 +321,19 @@ export const Projects = () => {
               <Select
                 onChange={handleOnlySelectedStatusChange}
                 size={"sm"}
-                // mx={4}
                 rounded={"5px"}
                 style={
                   colorMode === "light"
                     ? {
-                      color: "black",
-                      borderColor: "gray.100",
-                      caretColor: "black !important",
-                    }
+                        color: "black",
+                        borderColor: "gray.100",
+                        caretColor: "black !important",
+                      }
                     : {
-                      color: "white",
-                      borderColor: "white",
-                      caretColor: "black !important",
-                    }
+                        color: "white",
+                        borderColor: "white",
+                        caretColor: "black !important",
+                      }
                 }
               >
                 <option value={"All"}>All Statuses</option>
@@ -361,11 +342,9 @@ export const Projects = () => {
                 <option value={"active"}>Active (Approved)</option>
                 <option value={"updating"}>Update Requested</option>
                 <option value={"closure_requested"}>Closure Requested</option>
-                {/* <option value={"final_update"}>Final Update Requested</option> */}
                 <option value={"completed"}>Completed and Closed</option>
                 <option value={"terminated"}>Terminated</option>
                 <option value={"suspended"}>Suspended</option>
-                {/* <option value={"unknown"}>Unknown</option> */}
               </Select>
             </Grid>
           </Grid>

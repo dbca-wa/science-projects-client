@@ -1,10 +1,19 @@
 import { remedyExternallyLedProjects } from "@/lib/api";
 import { IProjectData } from "@/types";
-import { Box, Button, Flex, List, ListItem, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  List,
+  ListItem,
+  Text,
+  ToastId,
+  useColorMode,
+  useToast,
+} from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef } from "react";
-
 
 interface Props {
   projects: IProjectData[];
@@ -12,7 +21,11 @@ interface Props {
   onClose: () => void;
 }
 
-export const RemedyExternallyLedProjectsModalContent = ({ projects, refreshDataFn, onClose }: Props) => {
+export const RemedyExternallyLedProjectsModalContent = ({
+  projects,
+  refreshDataFn,
+  onClose,
+}: Props) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
@@ -40,7 +53,7 @@ export const RemedyExternallyLedProjectsModalContent = ({ projects, refreshDataF
           isClosable: true,
         });
       }
-      refreshDataFn && refreshDataFn();
+      refreshDataFn?.();
       onClose();
     },
     onError: (error: AxiosError) => {
@@ -48,8 +61,9 @@ export const RemedyExternallyLedProjectsModalContent = ({ projects, refreshDataF
         toast.update(toastIdRef.current, {
           title: "Encountered an error",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -62,8 +76,7 @@ export const RemedyExternallyLedProjectsModalContent = ({ projects, refreshDataF
 
   const onRemedy = () => {
     mutation.mutate({ projects: projects?.map((p) => p.pk) });
-  }
-
+  };
 
   return (
     <>
@@ -71,13 +84,18 @@ export const RemedyExternallyLedProjectsModalContent = ({ projects, refreshDataF
         <List>
           <ListItem>- All externally led projects will be affected</ListItem>
           <ListItem>
-            - The function will check memberships where an external leader is set
+            - The function will check memberships where an external leader is
+            set
           </ListItem>
           <ListItem>
-            - The dbca staff member who created the first document will get the leader status (if a staff member exists/if they belong to the project/if a document exists)
+            - The dbca staff member who created the first document will get the
+            leader status (if a staff member exists/if they belong to the
+            project/if a document exists)
           </ListItem>
           <ListItem>
-            - This will weed out the remaining external projects as they will have only external members of their documents created by a member outside of the project
+            - This will weed out the remaining external projects as they will
+            have only external members of their documents created by a member
+            outside of the project
           </ListItem>
         </List>
         <Text color={colorMode === "light" ? "blue.500" : "blue.300"} my={2}>
@@ -98,7 +116,6 @@ export const RemedyExternallyLedProjectsModalContent = ({ projects, refreshDataF
           </Box>
         </Flex>
       </Box>
-
     </>
   );
 };

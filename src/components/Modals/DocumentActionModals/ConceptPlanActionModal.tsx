@@ -70,14 +70,14 @@ export const ConceptPlanActionModal = ({
 
   const [shouldSendEmail, setShouldSendEmail] = useState(true);
   const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
-    baData?.leader
+    baData?.leader,
   );
 
   const sendEmail = async () => {
     if (!baLeadLoading && baLead !== undefined && baData !== undefined) {
       if (shouldSendEmail) {
         console.log(
-          `Sending Email to ${baLead?.first_name} ${baLead?.last_name}`
+          `Sending Email to ${baLead?.first_name} ${baLead?.last_name}`,
         );
       } else {
         console.log("No email sent");
@@ -90,12 +90,13 @@ export const ConceptPlanActionModal = ({
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${action === "approve"
-          ? "Approving"
-          : action === "recall"
-            ? "Recalling"
-            : "Sending Back"
-          }`,
+        title: `${
+          action === "approve"
+            ? "Approving"
+            : action === "recall"
+              ? "Recalling"
+              : "Sending Back"
+        }`,
         position: "top-right",
       });
     },
@@ -103,12 +104,13 @@ export const ConceptPlanActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${action === "approve"
-            ? "Approved"
-            : action === "recall"
-              ? "Recalled"
-              : "Sent Back"
-            }`,
+          description: `Document ${
+            action === "approve"
+              ? "Approved"
+              : action === "recall"
+                ? "Recalled"
+                : "Sent Back"
+          }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -122,25 +124,21 @@ export const ConceptPlanActionModal = ({
       onClose();
 
       setTimeout(() => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries({
           queryKey: ["projects", projectData?.pk],
         });
-
-        // queryClient.refetchQueries([`mytasks`])
       }, 350);
     },
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${action === "approve"
-            ? "Approve"
-            : action === "recall"
-              ? "Recall"
-              : "Send Back"
-            } Concept Plan`,
+          title: `Could Not ${
+            action === "approve"
+              ? "Approve"
+              : action === "recall"
+                ? "Recall"
+                : "Send Back"
+          } Concept Plan`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -152,7 +150,7 @@ export const ConceptPlanActionModal = ({
   });
 
   const onApprove = (formData: IApproveDocument) => {
-    console.log(formData)
+    console.log(formData);
     formData.shouldSendEmail = shouldSendEmail;
     approveConceptPlanMutation.mutate(formData);
   };
@@ -165,7 +163,7 @@ export const ConceptPlanActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-    // isCentered={true}
+      // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -191,7 +189,6 @@ export const ConceptPlanActionModal = ({
           id="approval-form"
           onSubmit={handleSubmit(onApprove)}
         >
-
           {!baLead ? null : ( // || isDirectorateLoading || directorateData?.length < 1
             <>
               <Input
@@ -238,19 +235,17 @@ export const ConceptPlanActionModal = ({
                     {baLead && (
                       <>
                         <strong>
-                          ({baLead.first_name} {baLead.last_name} - {baLead.email})
+                          ({baLead.first_name} {baLead.last_name} -{" "}
+                          {baLead.email})
                         </strong>{" "}
                       </>
-
                     )}
-
                     alerting them that you have{" "}
                     {action === "approve" ? "submitted" : "recalled"} this
                     document?
                   </Checkbox>
                 </Box>
               ) : stage === 2 ? (
-                // !baData || !baLead ? null : ( // || isDirectorateLoading || directorateData?.length < 1
                 <Box>
                   <Text fontWeight={"bold"}>Stage 2</Text>
                   <br />
@@ -352,13 +347,14 @@ export const ConceptPlanActionModal = ({
                 </Box>
               )}
             </>
-          )
-          }
+          )}
         </ModalBody>
-        {(!baLead) ? (
+        {!baLead ? (
           <Center p={4} flexDir={"column"}>
             <Text>No business area leader has been set for {baData.name}.</Text>
-            <Text>Contact an admin to set the leader for this business area.</Text>
+            <Text>
+              Contact an admin to set the leader for this business area.
+            </Text>
           </Center>
         ) : (
           <ModalFooter>
@@ -383,7 +379,6 @@ export const ConceptPlanActionModal = ({
                   : "Send Back"}
             </Button>
           </ModalFooter>
-
         )}
       </ModalContent>
     </Modal>

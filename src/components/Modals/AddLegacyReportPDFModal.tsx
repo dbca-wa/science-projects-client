@@ -128,14 +128,7 @@ export const AddLegacyReportPDFModal = ({
             <>
               <FormControl pb={6}>
                 <FormLabel>Report Year</FormLabel>
-                <Select
-                  // value={
-                  //   legacyPDFData.length > 0
-                  //     ? legacyPDFData[0]?.pk
-                  //     : 0
-                  // }
-                  onChange={(e) => setReportYear(Number(e.target.value))}
-                >
+                <Select onChange={(e) => setReportYear(Number(e.target.value))}>
                   {availableYears.map((year, index) => (
                     <option key={index} value={year}>
                       {year}

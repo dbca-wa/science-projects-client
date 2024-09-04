@@ -37,9 +37,14 @@ export const DocumentApprovedEmailModal = ({
   const [toUserPk, setToUserPk] = useState<null | number>();
 
   const [projectTitle, setProjectTitle] = useState("");
-  const [projectDocumentKind, setProjectDocumentKind] = useState<"concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure">("concept")
+  const [projectDocumentKind, setProjectDocumentKind] = useState<
+    | "concept"
+    | "projectplan"
+    | "progressreport"
+    | "studentreport"
+    | "projectclosure"
+  >("concept");
   const [projectPk, setProjectPk] = useState<null | number>();
-  // const [projectDocumentType, setProjectDocumentType] = useState("");
 
   // Destructure viewing users info
   const {
@@ -105,7 +110,7 @@ export const DocumentApprovedEmailModal = ({
     const dataForMutation = {
       recipients_list: [formData.toUserPk],
       project_pk: formData.project,
-      document_kind: formData.projectDocumentKind
+      document_kind: formData.projectDocumentKind,
     };
     await sendDocApprovedEmailMutation.mutate({ ...dataForMutation });
   };
@@ -162,7 +167,7 @@ export const DocumentApprovedEmailModal = ({
         onClose();
       }}
       size={"md"}
-    // isCentered={true}
+      // isCentered={true}
     >
       {" "}
       <ModalOverlay />
@@ -215,7 +220,16 @@ export const DocumentApprovedEmailModal = ({
                 <FormLabel>Document Kind</FormLabel>
                 <Select
                   {...register("projectDocumentKind")}
-                  onChange={(e) => setProjectDocumentKind(e.target.value as "concept" | "projectplan" | "progressreport" | "studentreport" | "projectclosure")}
+                  onChange={(e) =>
+                    setProjectDocumentKind(
+                      e.target.value as
+                        | "concept"
+                        | "projectplan"
+                        | "progressreport"
+                        | "studentreport"
+                        | "projectclosure",
+                    )
+                  }
                 >
                   <option value={"concept"}>Concept</option>
                   <option value={"projectplan"}>Project Plan</option>

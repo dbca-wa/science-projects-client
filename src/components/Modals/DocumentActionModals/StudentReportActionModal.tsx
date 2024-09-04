@@ -71,14 +71,14 @@ export const StudentReportActionModal = ({
 
   const [shouldSendEmail, setShouldSendEmail] = useState(true);
   const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
-    baData?.leader
+    baData?.leader,
   );
 
   const sendEmail = async () => {
     if (!baLeadLoading && baLead !== undefined && baData !== undefined) {
       if (shouldSendEmail) {
         console.log(
-          `Sending Email to ${baLead?.first_name} ${baLead?.last_name}`
+          `Sending Email to ${baLead?.first_name} ${baLead?.last_name}`,
         );
       } else {
         console.log("No email sent");
@@ -91,12 +91,13 @@ export const StudentReportActionModal = ({
     onMutate: () => {
       addToast({
         status: "loading",
-        title: `${action === "approve"
-          ? "Approving"
-          : action === "recall"
-            ? "Recalling"
-            : "Sending Back"
-          }`,
+        title: `${
+          action === "approve"
+            ? "Approving"
+            : action === "recall"
+              ? "Recalling"
+              : "Sending Back"
+        }`,
         position: "top-right",
       });
     },
@@ -104,12 +105,13 @@ export const StudentReportActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${action === "approve"
-            ? "Approved"
-            : action === "recall"
-              ? "Recalled"
-              : "Sent Back"
-            }`,
+          description: `Document ${
+            action === "approve"
+              ? "Approved"
+              : action === "recall"
+                ? "Recalled"
+                : "Sent Back"
+          }`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -132,12 +134,13 @@ export const StudentReportActionModal = ({
     onError: (error) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
-          title: `Could Not ${action === "approve"
-            ? "Approve"
-            : action === "recall"
-              ? "Recall"
-              : "Send Back"
-            } student Report`,
+          title: `Could Not ${
+            action === "approve"
+              ? "Approve"
+              : action === "recall"
+                ? "Recall"
+                : "Send Back"
+          } student Report`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -161,7 +164,7 @@ export const StudentReportActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-    // isCentered={true}
+      // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
@@ -287,12 +290,19 @@ export const StudentReportActionModal = ({
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
                     Send emails to
-                    {action === "send_back" ? stage === 2 ? ` Project lead ` : ` Business Area Lead (${baLead?.first_name} ${baLead?.last_name}) ` : " members of the Directorate alerting them that "}
-                    alerting them
-                    you have {action === "approve" ? "approved" : action === "send_back" ? "sent back" : "reopened"}{" "}
+                    {action === "send_back"
+                      ? stage === 2
+                        ? ` Project lead `
+                        : ` Business Area Lead (${baLead?.first_name} ${baLead?.last_name}) `
+                      : " members of the Directorate alerting them that "}
+                    alerting them you have{" "}
+                    {action === "approve"
+                      ? "approved"
+                      : action === "send_back"
+                        ? "sent back"
+                        : "reopened"}{" "}
                     this {action === "reopen" ? "project" : "document"}?
                   </Checkbox>
-
                 </Box>
               ) : (
                 <Box>
@@ -343,10 +353,12 @@ export const StudentReportActionModal = ({
           )}
         </ModalBody>
 
-        {(!baLead) ? (
+        {!baLead ? (
           <Center p={4} flexDir={"column"}>
             <Text>No business area leader has been set for {baData.name}.</Text>
-            <Text>Contact an admin to set the leader for this business area.</Text>
+            <Text>
+              Contact an admin to set the leader for this business area.
+            </Text>
           </Center>
         ) : (
           <ModalFooter>

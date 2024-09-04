@@ -68,7 +68,7 @@ export const CreateProgressReportModal = ({
       yearValue
     ) {
       const obj = availableProgressReportYearsData.find(
-        (item) => Number(item.year) === Number(yearValue)
+        (item) => Number(item.year) === Number(yearValue),
       );
       setSelectedReportId(obj.pk);
     }
@@ -169,7 +169,6 @@ export const CreateProgressReportModal = ({
                       create a new annual report for the year you wish to create
                       a progress report or delete the current one occupying the
                       year you wish to create for.
-                      {/* since its creation - potentially adjust hook and api to only get available reports since its creation*/}
                     </Text>
                     <Text mt={8} color={"red.500"}>
                       Note: Creating a new progress report will send out updates
@@ -219,7 +218,7 @@ export const CreateProgressReportModal = ({
                             return (
                               <option key={index} value={freeReportYear.year}>
                                 {`FY ${freeReportYear.year - 1} - ${String(
-                                  freeReportYear.year
+                                  freeReportYear.year,
                                 ).slice(2)}`}
                               </option>
                             );

@@ -46,18 +46,6 @@ const EditStaffOverviewContent = ({
   });
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  // const pkData = watch("pk");
-  // const aboutData = watch("about");
-  // const expertiseData = watch("expertise");
-
-  // useEffect(() => {
-  //   console.log({
-  //     pkData,
-  //     aboutData,
-  //     expertiseData,
-  //   });
-  // }, [pkData, aboutData, expertiseData]);
-
   const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({

@@ -54,10 +54,10 @@ export const DeleteDocumentModal = ({
   setToLastTab,
 }: Props) => {
   const { refetchProgressYears } = useGetProgressReportAvailableReportYears(
-    Number(projectPk)
+    Number(projectPk),
   );
   const { refetchStudentYears } = useGetStudentReportAvailableReportYears(
-    Number(projectPk)
+    Number(projectPk),
   );
 
   const toast = useToast();
@@ -95,7 +95,7 @@ export const DeleteDocumentModal = ({
         refetchProgressYears(() => {
           reset();
         });
-        onDeleteSuccess && onDeleteSuccess();
+        onDeleteSuccess?.();
       }
 
       setTimeout(async () => {
