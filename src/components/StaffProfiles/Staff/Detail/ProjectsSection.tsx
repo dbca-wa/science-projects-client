@@ -13,9 +13,6 @@ const ProjectsSection = ({
   buttonsVisible;
 }) => {
   const { userProjectsLoading, userProjectsData } = useInvolvedProjects(userId);
-  // useEffect(() => {
-  //   console.log(userProjectsData);
-  // }, [userProjectsData, userProjectsLoading]);
   const currentYear = useCurrentYear();
 
   const checkYearForPresent = (thisYear: number, value: number) => {
@@ -146,8 +143,6 @@ const ProjectItem = ({
 
   return (
     <div className="text-balance pb-6 pt-2">
-      {/* border border-x-0 border-b-[1px] border-t-0  */}
-
       {buttonsVisible ? (
         <a
           className="font-bold text-blue-500 hover:cursor-pointer hover:underline dark:text-slate-400"

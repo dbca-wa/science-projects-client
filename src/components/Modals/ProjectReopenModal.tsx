@@ -27,8 +27,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
 interface Props {
-  // thisUser: IUserMe;
-  // leaderPk: number;
   projectPk: string | number;
   isOpen: boolean;
   onClose: () => void;
@@ -75,16 +73,9 @@ export const ProjectReopenModal = ({
       }
 
       setTimeout(() => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
         refetchData();
         onClose();
-
-        // navigate('/projects');
-
-        // queryClient.refetchQueries([`mytasks`])
       }, 350);
     },
     onError: (error) => {
@@ -102,7 +93,6 @@ export const ProjectReopenModal = ({
   });
 
   const openProject = (formData: ISimplePkProp) => {
-    // console.log(formData);
     const newForm = {
       pk: projPk,
     };

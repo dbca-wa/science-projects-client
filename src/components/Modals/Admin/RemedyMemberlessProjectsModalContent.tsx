@@ -15,15 +15,17 @@ import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef } from "react";
 
-
 interface Props {
   projects: IProjectData[];
   refreshDataFn: () => void;
   onClose: () => void;
 }
 
-
-export const RemedyMemberlessProjectsModalContent = ({ projects, refreshDataFn, onClose }: Props) => {
+export const RemedyMemberlessProjectsModalContent = ({
+  projects,
+  refreshDataFn,
+  onClose,
+}: Props) => {
   const { colorMode } = useColorMode();
 
   const toast = useToast();
@@ -52,7 +54,7 @@ export const RemedyMemberlessProjectsModalContent = ({ projects, refreshDataFn, 
           isClosable: true,
         });
       }
-      refreshDataFn && refreshDataFn();
+      refreshDataFn?.();
       onClose();
     },
     onError: (error: AxiosError) => {
@@ -60,8 +62,9 @@ export const RemedyMemberlessProjectsModalContent = ({ projects, refreshDataFn, 
         toast.update(toastIdRef.current, {
           title: "Encountered an error",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -74,7 +77,7 @@ export const RemedyMemberlessProjectsModalContent = ({ projects, refreshDataFn, 
 
   const onRemedy = () => {
     mutation.mutate({ projects: projects?.map((p) => p.pk) });
-  }
+  };
 
   return (
     <>
@@ -82,13 +85,16 @@ export const RemedyMemberlessProjectsModalContent = ({ projects, refreshDataFn, 
         <List>
           <ListItem>- All memberless projects will be affected</ListItem>
           <ListItem>
-            - The function will check the creator of the first document (if one exists) and add them to the project as the leader
+            - The function will check the creator of the first document (if one
+            exists) and add them to the project as the leader
           </ListItem>
           <ListItem>
-            - If the leader cannot be set because a document doesnt exist, membership will remain unchanged.
+            - If the leader cannot be set because a document doesnt exist,
+            membership will remain unchanged.
           </ListItem>
           <ListItem>
-            - This will weed out the remaining memberless projects as they have no documents/data
+            - This will weed out the remaining memberless projects as they have
+            no documents/data
           </ListItem>
         </List>
         <Text color={colorMode === "light" ? "blue.500" : "blue.300"} my={2}>

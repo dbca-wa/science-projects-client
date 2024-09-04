@@ -72,13 +72,6 @@ export const FileDropzone = ({
         return;
       }
     }
-
-    // const res = await new Promise((resolve) => setTimeout(resolve, 1500));
-    // console.log(res);
-    // clearInterval(progressInterval);
-    // setUploadProgress(100);
-    // setUploadedFile(acceptedFile[0]);
-
     setTimeout(() => {
       clearInterval(newProgressInterval);
       setUploadProgress(100);
@@ -221,11 +214,8 @@ export const FileDropzone = ({
                           ? "green"
                           : "blue"
                       }
-                      // isIndeterminate
                       size={"xs"}
                       value={uploadProgress}
-                      // hasStripe
-                      // animation={"step-start"}
                     />
                   </Box>
                 </Center>

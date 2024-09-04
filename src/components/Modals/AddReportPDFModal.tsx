@@ -131,14 +131,7 @@ export const AddReportPDFModal = ({
             <>
               <FormControl pb={6}>
                 <FormLabel>Selected Report</FormLabel>
-                <Select
-                  // value={
-                  //   reportsWithoutPDFData.length > 0
-                  //     ? reportsWithoutPDFData[0]?.pk
-                  //     : 0
-                  // }
-                  onChange={(e) => setReportId(Number(e.target.value))}
-                >
+                <Select onChange={(e) => setReportId(Number(e.target.value))}>
                   {!reportsWithoutPDFLoading &&
                     reportsWithoutPDFData.map((report, index) => (
                       <option key={index} value={report?.pk}>

@@ -1,6 +1,5 @@
 // Component for adjusting the layout to Modern
 
-// import { Outlet } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 
 import { Box, Spinner } from "@chakra-ui/react";

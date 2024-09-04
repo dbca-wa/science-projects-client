@@ -1,10 +1,19 @@
 import { remedyLeaderlessProjects } from "@/lib/api";
 import { IProjectData } from "@/types";
-import { Box, Button, Flex, List, ListItem, Text, ToastId, useColorMode, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  List,
+  ListItem,
+  Text,
+  ToastId,
+  useColorMode,
+  useToast,
+} from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef } from "react";
-
 
 interface Props {
   projects: IProjectData[];
@@ -12,8 +21,11 @@ interface Props {
   onClose: () => void;
 }
 
-export const RemedyLeaderlessProjectsModalContent = ({ projects, refreshDataFn, onClose }: Props) => {
-
+export const RemedyLeaderlessProjectsModalContent = ({
+  projects,
+  refreshDataFn,
+  onClose,
+}: Props) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
@@ -41,7 +53,7 @@ export const RemedyLeaderlessProjectsModalContent = ({ projects, refreshDataFn, 
           isClosable: true,
         });
       }
-      refreshDataFn && refreshDataFn();
+      refreshDataFn?.();
       onClose();
     },
     onError: (error: AxiosError) => {
@@ -49,8 +61,9 @@ export const RemedyLeaderlessProjectsModalContent = ({ projects, refreshDataFn, 
         toast.update(toastIdRef.current, {
           title: "Encountered an error",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -63,8 +76,7 @@ export const RemedyLeaderlessProjectsModalContent = ({ projects, refreshDataFn, 
 
   const onRemedy = () => {
     mutation.mutate({ projects: projects?.map((p) => p.pk) });
-  }
-
+  };
 
   return (
     <>
@@ -72,13 +84,13 @@ export const RemedyLeaderlessProjectsModalContent = ({ projects, refreshDataFn, 
         <List>
           <ListItem>- All leaderless projects will be affected</ListItem>
           <ListItem>
-            - The function will check which member has the is_leader property set to true
+            - The function will check which member has the is_leader property
+            set to true
           </ListItem>
+          <ListItem>- This user will get the Project Lead tag</ListItem>
           <ListItem>
-            - This user will get the Project Lead tag
-          </ListItem>
-          <ListItem>
-            - This will weed out the remaining leaderless projects as they will not have the is_leader property anywhere
+            - This will weed out the remaining leaderless projects as they will
+            not have the is_leader property anywhere
           </ListItem>
         </List>
         <Text color={colorMode === "light" ? "blue.500" : "blue.300"} my={2}>
@@ -99,7 +111,6 @@ export const RemedyLeaderlessProjectsModalContent = ({ projects, refreshDataFn, 
           </Box>
         </Flex>
       </Box>
-
     </>
   );
 };

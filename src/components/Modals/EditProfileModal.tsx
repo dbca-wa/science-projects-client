@@ -87,12 +87,6 @@ export const EditProfileModal = ({
     control,
     // watch,
   } = useForm<IProfileUpdateVariables>();
-  //   {
-  //   defaultValues: {
-  //     about: initialData?.about,
-  //     expertise: initialData?.expertise,
-  //   },
-  // }
 
   // Toast
   const toast = useToast();
@@ -136,9 +130,7 @@ export const EditProfileModal = ({
         });
       }
       //  Close the modal
-      if (onClose) {
-        onClose();
-      }
+      onClose?.();
     },
     // Error handling based on API - file - declared interface
     onError: (error) => {
@@ -163,7 +155,6 @@ export const EditProfileModal = ({
     expertise,
   }: IProfileUpdateVariables) => {
     const image = selectedFile;
-    // console.log(selectedFile);
     // Check if about and expertise fields have changed
     const aboutChanged = about !== undefined && isFieldChanged("about", about);
     const expertiseChanged =
@@ -181,8 +172,6 @@ export const EditProfileModal = ({
     await mutation.mutateAsync(updateData);
   };
 
-  // const aboutValue = watch("about");
-  // const expertiseValue = watch("expertise");
   useEffect(() => {
     if (selectedFile) {
       const objectURL = URL.createObjectURL(selectedFile);
@@ -289,20 +278,13 @@ export const EditProfileModal = ({
                   color: colorMode === "light" ? `white` : `white`,
                 }}
                 ml={3}
-                isDisabled={
-                  !isValid
-                  // selectedFile === null
-                  // &&
-                  // aboutValue === initialData.about &&
-                  // expertiseValue === initialData.expertise
-                }
+                isDisabled={!isValid}
               >
                 Update
               </Button>
             </ModalFooter>
           </>
         )}
-        {/* </Flex> */}
       </ModalContent>
     </Modal>
   );

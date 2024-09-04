@@ -100,9 +100,7 @@ export const EditMembershipModal = ({
         });
       }
       //  Close the modal
-      if (onClose) {
-        onClose();
-      }
+      onClose?.();
     },
     // Error handling based on API - file - declared interface
     onError: (error) => {
@@ -278,29 +276,6 @@ export const EditMembershipModal = ({
                   )}
                 </InputGroup>
               </FormControl>
-
-              {/* <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Affiliation</FormLabel>
-                <InputGroup>
-                  {!affiliationsLoading && affiliationsData && (
-                    <Select
-                      placeholder={"Select an Affiliation"}
-                      defaultValue={currentAffiliationData?.pk || ""}
-                      {...register("affiliation")}
-                    >
-                      {affiliationsData.map(
-                        (aff: IAffiliation, index: number) => {
-                          return (
-                            <option key={index} value={aff.pk}>
-                              {aff.name}
-                            </option>
-                          );
-                        },
-                      )}
-                    </Select>
-                  )}
-                </InputGroup>
-              </FormControl> */}
             </Grid>
           </ModalBody>
           <ModalFooter>

@@ -39,7 +39,6 @@ const CVSection = ({
   buttonsVisible: boolean;
 }) => {
   const { staffCVData, staffCVLoading, refetch } = useStaffCV(userId);
-  // useEffect(() => console.log(buttonsVisible), [buttonsVisible]);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
@@ -405,30 +404,6 @@ export const EducationDialog = ({
       <DialogTrigger
       // asChild
       >
-        {/*         
-        <AddItemButton
-              as={"div"}
-              ariaLabel={"Edit Education Button"}
-              label={"Click to edit this entry"}
-              onClick={() => {}}
-              icon={MdModeEditOutline}
-              bgColor={"green.500"}
-              _hover={{ bg: "green.400" }}
-              mr={2}
-              innerItemSize="20px"
-              p={1}
-            />
-            <AddItemButton
-              as={"div"}
-              ariaLabel={"Delete Education Button"}
-              label={"Click to delete this entry"}
-              onClick={() => {}}
-              icon={FaTrashAlt}
-              bgColor={"red.500"}
-              _hover={{ bg: "red.400" }}
-              innerItemSize="20px"
-              p={1}
-            /> */}
         <span className="flex items-center">
           <AddItemButton
             as={"div"}

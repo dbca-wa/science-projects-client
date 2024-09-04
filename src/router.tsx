@@ -41,15 +41,6 @@ const inAppRouteArray = [
     path: "login",
     element: <Login />,
   },
-  // HERE FOR TESTING MAIN CONTENT COMPONENT.
-  // ON UPDATE/MIGRATION, MOVE TO SEPARATE ROUTE AND UPDATE NGINX for
-  // https://science.dbca.wa.gov.au/ to use that route, add header/footer
-  // and adjust migration script
-
-  // {
-  //   path:"science",
-  //   element: <Science />
-  // },
   {
     path: "/",
     element: (
@@ -370,6 +361,7 @@ const staffTestArray = [
   },
 ];
 
+// returns router based on url (currently excludes staffprofiles in production)
 export const router =
   VITE_PRODUCTION_BASE_URL === undefined ||
   VITE_PRODUCTION_BASE_URL?.includes("test") ||

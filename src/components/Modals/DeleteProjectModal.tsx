@@ -27,8 +27,6 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 interface Props {
-  // thisUser: IUserMe;
-  // leaderPk: number;
   projectPk: string | number;
   isOpen: boolean;
   onClose: () => void;

@@ -102,19 +102,6 @@ export const EditUserDetailsModal = ({
     watch,
   } = useForm<IFullUserUpdateVariables>();
 
-  // const {
-  //   register,
-  //   handleSubmit,
-  //   formState: { errors },
-  //   control,
-  //   watch,
-  // } = useForm<IProfileUpdateVariables>({
-  //   defaultValues: {
-  //     about: initialData?.about,
-  //     expertise: initialData?.expertise,
-  //   },
-  // });
-
   // PI ====================================================
   const [hoveredTitle, setHoveredTitle] = useState(false);
   const titleBorderColor = `${
@@ -210,10 +197,7 @@ export const EditUserDetailsModal = ({
           isClosable: true,
         });
       }
-      //  Close the modal
-      if (onClose) {
-        onClose();
-      }
+      onClose?.();
     },
     // Error handling based on API - file - declared interface
     onError: (error) => {
@@ -300,17 +284,7 @@ export const EditUserDetailsModal = ({
       console.log("Form validation errors:", errors);
     }
   }, [errors, isValid]);
-
-  // const { affiliationsLoading, affiliationsData } = useAffiliations();
-
   const me = useUser();
-
-  //   const [displayFirstName, setDisplayFirstName] = useState<string>(
-  //     userData?.display_first_name,
-  //   );
-  //   const [displayLastName, setDisplayLastName] = useState<string>(
-  //     userData?.display_last_name,
-  //   );
   useEffect(() => console.log({ user, userData }), [user, userData]);
 
   return (
@@ -479,22 +453,10 @@ export const EditUserDetailsModal = ({
                               <Input
                                 autoComplete="off"
                                 type="text"
-                                placeholder={
-                                  userData?.display_first_name
-                                  //   displayFirstName
-                                }
-                                // placeholder={userData?.display_last_name}
-
+                                placeholder={userData?.display_first_name}
                                 {...register("display_first_name", {
                                   value: userData?.display_first_name,
                                 })}
-                                // value={
-                                //   // userData?.first_name
-                                //   displayFirstName
-                                // }
-                                // onChange={(e) =>
-                                //   setDisplayFirstName(e.target.value)
-                                // }
                                 isDisabled={!me?.userData?.is_superuser}
                               />
                             </InputGroup>
@@ -509,18 +471,11 @@ export const EditUserDetailsModal = ({
                               </InputLeftElement>
                               <Input
                                 type="text"
-                                // value={displayLastName}
-                                // onChange={(e) =>
-                                //   setDisplayLastName(e.target.value)
-                                // }
                                 isDisabled={!me?.userData?.is_superuser}
                                 placeholder={userData?.display_last_name}
                                 {...register("display_last_name", {
                                   value: userData?.display_last_name,
                                 })}
-                                // isDisabled={
-                                // 	true
-                                // }
                               />
                             </InputGroup>
                           </FormControl>
@@ -570,259 +525,6 @@ export const EditUserDetailsModal = ({
                           />
                         </Box>
 
-                        {/* <Box>
-                          <FormControl userSelect="none">
-                            <FormLabel>About</FormLabel>
-                            <InputGroup>
-                              <Textarea
-                                placeholder="Tell us about your role at DBCA..."
-                                {...register("about")}
-                                value={aboutValue}
-                                onChange={(e) => setAboutValue(e.target.value)}
-                              />
-                            </InputGroup>
-                            {errors.about && (
-                              <FormErrorMessage>
-                                {errors.about.message}
-                              </FormErrorMessage>
-                            )}
-                          </FormControl>
-                        </Box>
-                        <Box>
-                          <FormControl userSelect="none" mt={4}>
-                            <FormLabel>Expertise</FormLabel>
-                            <Textarea
-                              placeholder="Briefly, what do you focus on..."
-                              {...register("expertise")}
-                              value={expertiseValue}
-                              onChange={(e) =>
-                                setExpertiseValue(e.target.value)
-                              }
-                            />
-                            {errors.expertise && (
-                              <FormErrorMessage>
-                                {errors.expertise.message}
-                              </FormErrorMessage>
-                            )}
-                          </FormControl>
-                        </Box> */}
-
-                        <Grid
-                          gridTemplateColumns={{
-                            base: "3fr 10fr",
-                            md: "4fr 8fr",
-                          }}
-                          pos="relative"
-                          w="100%"
-                          h="100%"
-                          mt={4}
-                        >
-                          {/* <Box>
-                            <FormLabel>Image</FormLabel>
-                            <Center
-                              maxH={{ base: "200px", xl: "225px" }}
-                              bg="gray.50"
-                              mt={1}
-                              rounded="lg"
-                              overflow="hidden"
-                            >
-                              {!imageLoadFailed ? (
-                                <Image
-                                  objectFit="cover"
-                                  src={
-                                    activeOption === "url" &&
-                                    selectedImageUrl &&
-                                    (selectedImageUrl ||
-                                      selectedImageUrl.trim() === "")
-                                      ? isValidImageUrl
-                                        ? selectedImageUrl
-                                        : noImageLink
-                                      : activeOption === "upload" &&
-                                        selectedFile
-                                      ? URL.createObjectURL(selectedFile)
-                                      : userData?.image?.file
-                                      ? userData.image.file
-                                      : noImageLink
-                                  }
-                                  alt="Preview"
-                                  userSelect="none"
-                                  bg="gray.800"
-                                  onLoad={handleImageLoadSuccess}
-                                  onError={handleImageLoadError}
-                                />
-                              ) : (
-                                <Image
-                                  objectFit="cover"
-                                  src={noImageLink}
-                                  alt="Preview"
-                                  userSelect="none"
-                                  bg="gray.800"
-                                />
-                              )}
-                            </Center>
-                          </Box> */}
-
-                          {/* <FormControl ml={4} mt={10}>
-                    <InputGroup>
-                      <Grid gridGap={2} ml={4}>
-                        <FormControl>
-                          <Input
-                            autoComplete="off"
-                            alignItems={"center"}
-                            type="file"
-                            // accept="image/*"
-                            accept=".png, .jpeg, .jpg, image/png, image/jpeg"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                setSelectedFile(file);
-                                setSelectedImageUrl(URL.createObjectURL(file));
-                              }
-                            }}
-                            border={"none"}
-                            sx={{
-                              "::file-selector-button": {
-                                background:
-                                  colorMode === "light"
-                                    ? "gray.100"
-                                    : "gray.600",
-                                borderRadius: "8px",
-                                padding: "2px",
-                                paddingX: "8px",
-                                mt: "1px",
-                                border: "1px solid",
-                                borderColor:
-                                  colorMode === "light"
-                                    ? "gray.400"
-                                    : "gray.700",
-                                outline: "none",
-                                mr: "15px",
-                                ml: "-16px",
-                                cursor: "pointer",
-                              },
-                              pt: "3.5px",
-                              color:
-                                colorMode === "light" ? "gray.800" : "gray.200",
-                            }}
-                          />
-                        </FormControl>
-                        <FormHelperText>
-                          Upload an image for your display picture.
-                        </FormHelperText>
-                        {errors.image && (
-                          <FormErrorMessage>
-                            {errors.image.message}
-                          </FormErrorMessage>
-                        )}
-                      </Grid>
-                    </InputGroup>
-                  </FormControl> */}
-                          {/* <FormControl ml={4} mt={10}>
-                            <InputGroup>
-                              <Grid gridGap={2} ml={4}>
-                                <Button
-                                  onClick={() => setActiveOption("url")}
-                                  display="inline-flex"
-                                  justifyContent="center"
-                                  alignItems="center"
-                                  bg={
-                                    activeOption === "url"
-                                      ? "blue.500"
-                                      : colorMode === "light"
-                                      ? "gray.200"
-                                      : "gray.700"
-                                  }
-                                  color={
-                                    colorMode === "light" ? "black" : "white"
-                                  }
-                                >
-                                  Enter URL
-                                </Button>
-                                {activeOption === "url" && (
-                                  <Input
-                                    onChange={(e) => {
-                                      setImageLoadFailed(false);
-                                      setSelectedImageUrl(e.target.value);
-                                    }}
-                                  />
-                                )}
-                                <Center>
-                                  <Text>or</Text>
-                                </Center>
-                                <Button
-                                  onClick={() => setActiveOption("upload")}
-                                  display="inline-flex"
-                                  justifyContent="center"
-                                  alignItems="center"
-                                  bg={
-                                    activeOption === "upload"
-                                      ? "blue.500"
-                                      : colorMode === "light"
-                                      ? "gray.200"
-                                      : "gray.700"
-                                  }
-                                  color={"white"}
-                                >
-                                  Upload
-                                </Button>
-                                {activeOption === "upload" && (
-                                  <FormControl>
-                                    <Input
-                                      autoComplete="off"
-                                      alignItems={"center"}
-                                      type="file"
-                                      accept=".png, .jpeg, .jpg, image/png, image/jpeg"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                          setSelectedFile(file);
-                                          setSelectedImageUrl(
-                                            URL.createObjectURL(file)
-                                          );
-                                        }
-                                      }}
-                                      border={"none"}
-                                      sx={{
-                                        "::file-selector-button": {
-                                          background:
-                                            colorMode === "light"
-                                              ? "gray.100"
-                                              : "gray.600",
-                                          borderRadius: "8px",
-                                          padding: "2px",
-                                          paddingX: "8px",
-                                          mt: "1px",
-                                          border: "1px solid",
-                                          borderColor:
-                                            colorMode === "light"
-                                              ? "gray.400"
-                                              : "gray.700",
-                                          outline: "none",
-                                          mr: "15px",
-                                          ml: "-16px",
-                                          cursor: "pointer",
-                                        },
-                                        pt: "3.5px",
-                                        color:
-                                          colorMode === "light"
-                                            ? "gray.800"
-                                            : "gray.200",
-                                      }}
-                                    />
-                                  </FormControl>
-                                )}
-                                <FormHelperText>
-                                  Upload an image for your display picture.
-                                </FormHelperText>
-                                {errors.image && (
-                                  <FormErrorMessage>
-                                    {errors.image.message}
-                                  </FormErrorMessage>
-                                )}
-                              </Grid>
-                            </InputGroup>
-                          </FormControl> */}
-                        </Grid>
                         <Box>
                           <FormLabel>Image</FormLabel>
                           <StatefulMediaChanger
@@ -919,31 +621,6 @@ export const EditUserDetailsModal = ({
                             helperText="The entity this user is affiliated with"
                           />
                         </FormControl>
-
-                        {/* <FormControl my={4} mb={4} userSelect={"none"}>
-                          <FormLabel>Affiliation</FormLabel>
-                          <InputGroup>
-                            {!affiliationsLoading && affiliationsData && (
-                              <Select
-                                placeholder={"Select an Affiliation"}
-                                defaultValue={userData?.affiliation?.pk || ""}
-                                {...register("affiliation")}
-                              >
-                                {affiliationsData
-                                  .sort((a: IAffiliation, b: IAffiliation) =>
-                                    a.name.localeCompare(b.name),
-                                  )
-                                  .map((aff: IAffiliation, index: number) => {
-                                    return (
-                                      <option key={index} value={aff.pk}>
-                                        {aff.name}
-                                      </option>
-                                    );
-                                  })}
-                              </Select>
-                            )}
-                          </InputGroup>
-                        </FormControl> */}
                       </Grid>
                     )}
 
@@ -975,31 +652,6 @@ export const EditUserDetailsModal = ({
                             helperText="The entity this user is affiliated with"
                           />
                         </FormControl>
-
-                        {/* <FormControl my={4} mb={4} userSelect={"none"}>
-                          <FormLabel>Affiliation</FormLabel>
-                          <InputGroup>
-                            {!affiliationsLoading && affiliationsData && (
-                              <Select
-                                placeholder={"Select an Affiliation"}
-                                defaultValue={userData?.affiliation?.pk || ""}
-                                {...register("affiliation")}
-                              >
-                                {affiliationsData
-                                  .sort((a: IAffiliation, b: IAffiliation) =>
-                                    a.name.localeCompare(b.name),
-                                  )
-                                  .map((aff: IAffiliation, index: number) => {
-                                    return (
-                                      <option key={index} value={aff.pk}>
-                                        {aff.name}
-                                      </option>
-                                    );
-                                  })}
-                              </Select>
-                            )}
-                          </InputGroup>
-                        </FormControl> */}
                       </>
                     )}
                   </TabPanel>

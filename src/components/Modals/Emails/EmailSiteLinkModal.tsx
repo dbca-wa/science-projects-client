@@ -205,20 +205,6 @@ export const EmailSiteLinkModal = ({ isOpen, onClose }: Props) => {
                   </FormHelperText>
                 </FormControl>
 
-                {/* <UserSearchDropdown
-                  autoFocus={true}
-                  {...register("toUserPk", { required: true })}
-                  setUserFunction={setToUserPk}
-                  setUserEmailFunction={setToUserEmail}
-                  setUserNameFunction={setToUserName}
-                  isEditable
-                  onlyInternal={true}
-                  isRequired={true}
-                  label="Send To"
-                  placeholder="Search for a user..."
-                  helperText={"Select the user you would like to send to."}
-                /> */}
-
                 {canSend ? (
                   <>
                     <Grid gridTemplateColumns={"2fr 10fr"} px={1} mt={4}>

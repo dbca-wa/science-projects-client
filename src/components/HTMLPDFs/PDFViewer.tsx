@@ -172,10 +172,6 @@ Props) => {
           thisReport?.pk ? thisReport.pk : thisReport.id,
         ],
       });
-
-      // setTimeout(() => {
-      //     refetchData();
-      // }, 1000);
     },
     onError: (error: AxiosError) => {
       if (toastIdRef.current) {
@@ -201,7 +197,6 @@ Props) => {
   };
 
   const beginProjectDocPDFGeneration = (formData: IDocGen) => {
-    // console.log(formData);
     annualReportPDFGenerationMutation.mutate(formData);
   };
 
@@ -244,7 +239,6 @@ Props) => {
 
   useEffect(() => {
     if (!pdfDocumentDataLoading && pdfDocumentData !== undefined) {
-      // console.log(pdfDocumentData);
       const binary = atob(pdfDocumentData?.pdf_data);
       const arrayBuffer = new ArrayBuffer(binary.length);
       const uint8Array = new Uint8Array(arrayBuffer);
@@ -256,7 +250,6 @@ Props) => {
       const blob = new Blob([arrayBuffer], { type: "application/pdf" });
       const dataUrl = URL.createObjectURL(blob);
 
-      // console.log(dataUrl);
       setBinaryPdfData(dataUrl);
     }
   }, [pdfDocumentDataLoading, pdfDocumentData]);
@@ -273,17 +266,6 @@ Props) => {
   return (
     <Box>
       <Flex alignContent={"center"} justifyContent={"flex-end"} mb={4}>
-        {/* <Center>
-					<Text fontSize={"sm"}>
-						{annualReportPDFGenerationMutation.isPending ||
-						unapprovedAnnualReportPDFGenerationMutation.isPending ||
-						pdfDocumentData?.report?.pdf_generation_in_progress
-							? showRestartMessage
-								? "PDF Generating... It's been 60 seconds, maybe you should cancel and try again"
-								: `PDF Generating...`
-							: "You may download this pdf or create a new one in under a minute (average 20 seconds)"}
-					</Text>
-				</Center> */}
         <Flex>
           <Box
             as="form"

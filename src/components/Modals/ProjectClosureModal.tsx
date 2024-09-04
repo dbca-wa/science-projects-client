@@ -30,8 +30,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
 interface Props {
-  // thisUser: IUserMe;
-  // leaderPk: number;
   projectKind: string;
   projectPk: string | number;
   isOpen: boolean;
@@ -224,8 +222,6 @@ export const ProjectClosureModal = ({
                       placeholder="Select a Closure Reason"
                     >
                       <option value={"completed"}>Completion</option>
-                      {/* <option value={"forcecompleted"}>Force Completion</option> */}
-                      {/* <option value={"suspended"}>Suspension</option> */}
                       <option value={"terminated"}>Termination</option>
                     </Select>
                     <FormHelperText>

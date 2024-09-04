@@ -1,4 +1,4 @@
-// WIP: Error handler for non-404 errors.
+// Error handler for non-404 errors.
 
 import {
   Box,

@@ -55,11 +55,8 @@ import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateS
 import TagInput from "../Pages/CreateProject/TagInput";
 import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
-// import { FaAnglesDown } from "react-icons/fa6";
 
 interface Props {
-  // thisUser: IUserMe;
-  // leaderPk: number;
   projectPk: string | number;
   currentTitle: string;
   currentKeywords: string[];
@@ -111,10 +108,6 @@ export const EditProjectModal = ({
   );
 
   const { openEditorsCount, closeEditor } = useEditorContext();
-
-  // useEffect(() => {
-  //   console.log(details);
-  // });
 
   useEffect(() => {
     if (locationData.length === 0) {
@@ -217,8 +210,6 @@ export const EditProjectModal = ({
     // console.log()
     if (collaborationWith !== undefined) {
       setCollaborationWith((prevString) => {
-        // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-        // return prevString.replace(regex, '');
         // Remove affiliation name along with optional preceding characters
         const regex = new RegExp(`.{0,2}${affiliation.name.trim()}\\s*`, "g");
         let modifiedString = prevString.replace(regex, "");
@@ -244,14 +235,10 @@ export const EditProjectModal = ({
         if (modifiedString?.startsWith(", ")) {
           modifiedString = modifiedString.substring(2);
         }
-        // console.log("MOD:", modifiedString)
         return modifiedString;
       });
     }
   };
-
-  // const setCollaborationWith: (value: React.SetStateAction<string>) => void
-  // const setOrganisation: (value: React.SetStateAction<"string">) => void
 
   const clearCollaboratingPartnersPkArray = () => {
     setCollaborationWith("");
@@ -318,34 +305,6 @@ export const EditProjectModal = ({
     ) {
       setCanUpdate(false);
     } else {
-      // if ((details?.external as IExternalProjectDetails)?.project) {
-      //   // HANDLE EXTERNAL FIELDS
-      //   const parser = new DOMParser();
-      //   const descriptionDoc = parser.parseFromString(
-      //     externalDescription,
-      //     "text/html",
-      //   );
-      //   const descriptionContent = descriptionDoc.body.textContent;
-      //   const aimsDoc = parser.parseFromString(aims, "text/html");
-      //   const aimsContent = aimsDoc.body.textContent;
-      //   const collaborationDoc = parser.parseFromString(
-      //     collaborationWith,
-      //     "text/html",
-      //   );
-      //   const collaborationContent = collaborationDoc.body.textContent;
-      //   // console.log({ budget, collaborationContent, aims, descriptionContent });
-
-      //   if (
-      //     descriptionContent?.length > 0 &&
-      //     aimsContent?.length > 0 &&
-      //     collaborationContent?.length > 0 &&
-      //     budget?.length > 0
-      //   ) {
-      //     setCanUpdate(true);
-      //   } else {
-      //     setCanUpdate(false);
-      //   }
-      // } else
       if ((details?.student as IStudentProjectDetails)?.level) {
         // HANDLE STUDENT FIELDS
         const parser = new DOMParser();
@@ -354,12 +313,6 @@ export const EditProjectModal = ({
           "text/html",
         );
         const organisationContent = organisationDoc.body.textContent;
-        // console.log({
-        //   level,
-        //   organisation,
-        //   length: organisationContent.length,
-        // });
-
         if (level && organisationContent.length > 0) {
           setCanUpdate(true);
         } else {
@@ -461,19 +414,6 @@ export const EditProjectModal = ({
   });
   const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
 
-  // const arrayRemoveFunction = (affiliation) => {
-  //   setCollaborationWith(prevString => {
-  //     const regex = new RegExp(`.{0,2}${affiliation}\\s*`, 'g');
-  //     return prevString.replace(regex, '');
-  //   });
-
-  // }
-
-  // const modalContentRef = useRef<HTMLDivElement>(null);
-  // const updateButtonRef = useRef<HTMLButtonElement>(null);
-  // const [isButtonInView, setIsButtonInView] = useState(false);
-  // const [scrollPosition, setScrollPosition] = useState(0); // State for scroll position
-
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
@@ -547,19 +487,6 @@ export const EditProjectModal = ({
                       setValueAsPlainText={false}
                     />
 
-                    {/* <UnboundStatefulEditor
-                        title="Collaboration With"
-                        isRequired={true}
-                        placeholder="Enter collaborating entities..."
-                        helperText={
-                          "The entity/s this project is in collaboration with, separated by commas"
-                        }
-                        showToolbar={false}
-                        showTitle={true}
-                        value={collaborationWith}
-                        setValueFunction={setCollaborationWith}
-                        setValueAsPlainText={true}
-                      /> */}
                     <AffiliationCreateSearchDropdown
                       autoFocus
                       isRequired={false}
@@ -576,15 +503,7 @@ export const EditProjectModal = ({
                       helperText="The entity/s this project is in collaboration with"
                     />
 
-                    <Flex
-                      flexWrap="wrap"
-                      gap={2}
-                      pt={
-                        0
-                        // collaborationWith?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
-                      }
-                      pb={2}
-                    >
+                    <Flex flexWrap="wrap" gap={2} pt={0} pb={2}>
                       {collaborationWith?.length > 0 &&
                         collaborationWith
                           .split(", ")
@@ -611,8 +530,6 @@ export const EditProjectModal = ({
                                 onClick={() => {
                                   setCollaboratingPartnersArray([]);
                                   setCollaborationWith((prevString) => {
-                                    // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-                                    // return prevString.replace(regex, '');
                                     // Remove affiliation name along with optional preceding characters
                                     const regex = new RegExp(
                                       `.{0,2}${aff}\\s*`,
@@ -647,17 +564,6 @@ export const EditProjectModal = ({
                     mt={2}
                     pb={2}
                   >
-                    {/* <UnboundStatefulEditor
-                        title="Organisation"
-                        placeholder="Enter the academic organisation..."
-                        helperText={"The academic organisation of the student"}
-                        showToolbar={false}
-                        showTitle={true}
-                        isRequired={true}
-                        value={organisation}
-                        setValueFunction={setOrganisation}
-                        setValueAsPlainText={true}
-                      /> */}
                     <AffiliationCreateSearchDropdown
                       autoFocus
                       isRequired
@@ -674,15 +580,7 @@ export const EditProjectModal = ({
                       helperText="The entity/s this project is in collaboration with"
                     />
 
-                    <Flex
-                      flexWrap="wrap"
-                      gap={2}
-                      pt={
-                        0
-                        // organisation?.split(', ').map(item => item.trim())?.length > 1 ? 7 : 0
-                      }
-                      pb={2}
-                    >
+                    <Flex flexWrap="wrap" gap={2} pt={0} pb={2}>
                       {organisation?.length > 0 &&
                         organisation
                           .split(", ")
@@ -710,8 +608,6 @@ export const EditProjectModal = ({
                                   setCollaboratingPartnersArray([]);
                                   if (collaborationWith !== undefined) {
                                     setCollaborationWith((prevString) => {
-                                      // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-                                      // return prevString.replace(regex, '');
                                       // Remove affiliation name along with optional preceding characters
                                       const regex = new RegExp(
                                         `.{0,2}${aff}\\s*`,
@@ -727,15 +623,12 @@ export const EditProjectModal = ({
                                         modifiedString =
                                           modifiedString.substring(2);
                                       }
-                                      // console.log("MOD:", modifiedString)
                                       return modifiedString;
                                     });
                                   }
 
                                   if (organisation !== undefined) {
                                     setOrganisation((prevString) => {
-                                      // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-                                      // return prevString.replace(regex, '');
                                       // Remove affiliation name along with optional preceding characters
                                       const regex = new RegExp(
                                         `.{0,2}${aff}\\s*`,
@@ -946,48 +839,6 @@ export const EditProjectModal = ({
                             ));
                           })}
                         </Select>
-
-                        {/* <Select
-                            variant="filled"
-                            placeholder="Select a Business Area"
-                            onChange={(event) => {
-                              const pkVal = event.target.value;
-                              const relatedBa = businessAreaList.find(
-                                (ba) => Number(ba.pk) === Number(pkVal)
-                              );
-                              if (relatedBa !== undefined) {
-                                setBusinessArea(relatedBa);
-                              }
-                            }}
-                            value={businessArea?.pk}
-                          >
-                            {businessAreaList.map((ba, index) => {
-                              const checkIsHtml = (data: string) => {
-                                // Regular expression to check for HTML tags
-                                const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-
-                                // Check if the string contains any HTML tags
-                                return htmlRegex.test(data);
-                              };
-
-                              const isHtml = checkIsHtml(ba.name);
-                              let baName = ba?.name;
-                              if (isHtml === true) {
-                                const parser = new DOMParser();
-                                const dom = parser.parseFromString(
-                                  ba.name,
-                                  "text/html"
-                                );
-                                const content = dom.body.textContent;
-                                baName = content;
-                              }
-                              return (
-                                <option key={index} value={ba.pk}>
-                                  {baName}
-                                </option>
-                              );
-                            })}
-                          </Select> */}
                       </InputGroup>
                       <FormHelperText>
                         The Business Area / Program that this project belongs
@@ -1157,30 +1008,6 @@ export const EditProjectModal = ({
               </Button>
             </Grid>
           </ModalFooter>
-          {/* {
-            isButtonInView ? (
-              <Flex
-                pos={"sticky"}
-                bottom={"90px"}
-                justifyContent={"flex-end"}
-              >
-                <Box
-                  mr={4}
-                >
-                  <Center
-                    bg={"blue.500"}
-                    rounded={"full"}
-                    animation={"pulse 1.5s infinite"}
-                    pointerEvents={"none"}
-                    color={"white"}
-                    boxSize={"100px"}
-                  >
-                    <Icon as={FaAnglesDown} boxSize={"30px"} />
-                  </Center>
-                </Box>
-              </Flex>
-            ) : null
-          } */}
         </ModalContent>
       </Modal>
     </>

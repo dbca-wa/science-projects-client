@@ -68,7 +68,7 @@ export const DeleteCommentModal = ({
           duration: 3000,
           isClosable: true,
         });
-        onDeleteSuccess && onDeleteSuccess();
+        onDeleteSuccess?.();
       }
       queryClient.invalidateQueries({
         queryKey: ["documentComments", documentPk],

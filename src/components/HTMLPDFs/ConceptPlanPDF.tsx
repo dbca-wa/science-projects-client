@@ -12,7 +12,6 @@ import {
   Hr,
   Html,
   Img,
-  // Preview,
   Section,
   Tailwind,
   Text,
@@ -31,13 +30,9 @@ export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
   const {
     conceptPlanData,
     conceptPlanDataLoading,
-    // refetchCPData
   } = useGetConceptPlanData(concept_plan_pk);
 
   useEffect(() => {
-    // if (!conceptPlanData) {
-    //     refetchCPData();
-    // }
     if (!conceptPlanDataLoading) {
       console.log(conceptPlanData);
     }
@@ -48,24 +43,6 @@ export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
   const imageUrl = useServerImageUrl(conceptPlanData?.project_image?.file);
   let baseUrl = useApiEndpoint();
   baseUrl = baseUrl.replace(":8000", ":3000");
-
-  // function replaceDarkWithLight(htmlString) {
-  //   // Replace 'dark' with 'light' in class attributes
-  //   const modifiedHTML = htmlString.replace(
-  //     /class\s*=\s*["']([^"']*dark[^"']*)["']/gi,
-  //     (match, group) => {
-  //       return `class="${group.replace(/\bdark\b/g, "light")}"`;
-  //     }
-  //   );
-
-  //   // Add margin-right: 4px to all <li> elements
-  //   const finalHTML = modifiedHTML.replace(
-  //     /<li/g,
-  //     '<li style="margin-left: 36px;"'
-  //   );
-
-  //   return finalHTML;
-  // }
 
   return (
     <>
@@ -139,13 +116,6 @@ export const ConceptPlanPDF = ({ concept_plan_pk }: IProps) => {
                         <FcCancel size={"30px"} />
                       </Box>
                     )}
-
-                    {/* <img
-                                            src={conceptPlanData?.business_area_lead_approval_granted === true ? '/public/Approved.png' : '/public/NotApproved.png'}
-                                            width="30px"
-                                            height="30px"
-                                            alt="Project Image"
-                                        /> */}
                   </td>
                 </tr>
                 <tr className="">

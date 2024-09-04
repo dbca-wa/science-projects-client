@@ -1,5 +1,4 @@
 // Route for reviewing all reports.
-// NOTE: Currently used as a Lexical text editor page, until implemented.
 
 import {
   Box,

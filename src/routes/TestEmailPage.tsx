@@ -1,10 +1,5 @@
 import DocumentApprovedEmail from "@/components/Emails/DocumentApprovedEmail";
-// import DocumentReadyForEditingEmail from "@/components/Emails/DocumentReadyForEditingEmail";
 import DocumentRecalledEmail from "@/components/Emails/DocumentRecalledEmail";
-// import DocumentSentBackEmail from "@/components/Emails/DocumentSentBackEmail";
-// import NewCycleOpenEmail from "@/components/Emails/NewCycleOpenEmail";
-// import ProjectClosureEmail from "@/components/Emails/ProjectClosureEmail";
-// import ReviewDocumentEmail from "@/components/Emails/ReviewDocumentEmail";
 import { DocumentApprovedEmailModal } from "@/components/Modals/Emails/DocumentApprovedEmailModal";
 import {
   IDocumentApproved,
@@ -14,12 +9,6 @@ import {
   IProjectClosureEmail,
   IReviewDocumentEmail,
   sendDocumentApprovedEmail,
-  // sendDocumentReadyEmail,
-  // sendDocumentRecalledEmail,
-  // sendDocumentSentBackEmail,
-  // sendNewReportingCycleOpenEmail,
-  // sendProjectClosureEmail,
-  // sendReviewProjectDocumentEmail,
 } from "@/lib/api";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
@@ -30,22 +19,12 @@ import {
   Grid,
   Spinner,
   Text,
-  // ToastId,
   useColorMode,
   useDisclosure,
-  // useToast,
 } from "@chakra-ui/react";
-import React, {
-  useRef,
-  // useState, ReactElement, createElement, useEffect
-} from "react";
+import React, { useRef } from "react";
 import { render } from "@react-email/render";
 import { DocumentRecalledEmailModal } from "@/components/Modals/Emails/DocumentRecalledEmailModal";
-// import {
-//   useMutation,
-//   //  useQueryClient
-// } from "@tanstack/react-query";
-// import { useRef } from "react";
 
 interface IWrapper {
   children: React.ReactElement;
@@ -183,64 +162,6 @@ export const TestEmailPage = () => {
         gridGap={4}
         gridRowGap={8}
       >
-        {/* <EmailWrapper
-              templateName={"Review Document"}
-              // emailFunction={onDocumentApprovedModalOpen}
-              props={{
-                recipients_list: [101073],
-                project_pk: 4,
-                document_kind: "concept",
-              }}
-            >
-              <ReviewDocumentEmail userData={userData} />
-            </EmailWrapper>
-
-            <EmailWrapper
-              templateName={"New Reporting Cycle"}
-              emailFunction={sendNewReportingCycleOpenEmail}
-              props={{
-                financial_year: 2024,
-                include_projects_with_status_updating: false,
-              }}
-            >
-              <NewCycleOpenEmail userData={userData} />
-            </EmailWrapper>
-
-            <EmailWrapper
-              templateName={"Project Closure"}
-              emailFunction={sendProjectClosureEmail}
-              props={{
-                project_pk: 20,
-              }}
-            >
-              <ProjectClosureEmail userData={userData} />
-            </EmailWrapper>
-
-            <EmailWrapper
-              templateName={"Document Ready"}
-              emailFunction={sendDocumentReadyEmail}
-              props={{
-                recipients_list: [101073],
-                project_pk: 4,
-                document_kind: "concept",
-              }}
-            >
-              <DocumentReadyForEditingEmail userData={userData} />
-            </EmailWrapper>
-
-            <EmailWrapper
-              templateName={"Document Sent Back"}
-              emailFunction={sendDocumentSentBackEmail}
-              props={{
-                stage: 3,
-                recipients_list: [101073],
-                project_pk: 4,
-                document_kind: "concept",
-              }}
-            >
-              <DocumentSentBackEmail userData={userData} />
-            </EmailWrapper> */}
-
         <EmailWrapper
           templateName={"Document Approved"}
           openModalFunction={onDocumentApprovedModalOpen}
@@ -258,11 +179,3 @@ export const TestEmailPage = () => {
     </Box>
   );
 };
-
-// emailFunction={sendDocumentRecalledEmail}
-// props={{
-//   stage: 3,
-//   recipients_list: [101073],
-//   project_pk: 4,
-//   document_kind: "concept",
-// }}

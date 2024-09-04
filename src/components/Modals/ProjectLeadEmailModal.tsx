@@ -117,24 +117,14 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
 
       if (emailList.length > 0) {
         const emailString = emailList.join(",");
-        // const mailToLink = `mailto:${emailString}&subject=${subject}`;
-        // console.log(emailList);
-        // console.log("EMAIL STRING: ", emailString);
         const mailToLink = `mailto:${emailString}&subject=SPMS:`;
-        // const mailToLink = `mailto:jarid.prince@dbca.wa.gov.au,rory.mcauley@dbca.wa.gov.au&subject=SPMS:`;
-
-        // jarid.prince@dbca.wa.gov.au
         const link = document.createElement("a");
         link.href = mailToLink;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       }
-
-      //  Close the modal
-      if (onClose) {
-        onClose();
-      }
+      onClose?.();
     },
     // Error handling based on API - file - declared interface
     onError: (error: AxiosError) => {
@@ -189,9 +179,6 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
     await projectLeadEmailMutation.mutateAsync(formData);
   };
 
-  //   const { register, handleSubmit, watch, reset } =
-  //     useForm<IProjectLeadsEmail>();
-
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
       <ModalOverlay />
@@ -221,15 +208,6 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
               </UnorderedList>
             </Box>
 
-            {/* <FormControl my={2} mb={4} userSelect="none">
-                  <InputGroup>
-                    <Input
-                      type="hidden"
-                      {...register("userPk", { required: true, value: userPk })}
-                      readOnly
-                    />
-                  </InputGroup>
-                </FormControl> */}
             <Text mt={4}>
               To fetch users and proceed to your mail app, press "Send Emails".
             </Text>

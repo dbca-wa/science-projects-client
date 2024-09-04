@@ -40,20 +40,6 @@ const EditStaffHeroContent = ({
       keyword_tags: staffHeroData?.keyword_tags,
     },
   });
-  //   const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  // const pkData = watch("pk");
-  // const keywordsData = watch("keyword_tags");
-
-  // useEffect(() => {
-  //   // console.log({
-  //   //   staffHeroData,
-  //   // });
-  //   console.log({
-  //     pkData,
-  //     keywordsData,
-  //   });
-  // }, [pkData, keywordsData]);
 
   const toast = useToast();
   const queryClient = useQueryClient();

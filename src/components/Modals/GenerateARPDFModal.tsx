@@ -100,26 +100,6 @@ export const GenerateARPDFModal = ({ isOpen, onClose, thisReport }: Props) => {
 
   const { colorMode } = useColorMode();
 
-  // useEffect(() => {
-  //     let prefillText = "";
-  //     let prefillHtml;
-  //     if (outcomeValue === "completed") {
-  //         prefillText = "The project has run its course and was completed";
-  //     } else if (outcomeValue === "forcecompleted") {
-  //         prefillText = "The project needed to be forcefully closed";
-  //     } else if (outcomeValue === "suspended") {
-  //         prefillText = "The project needs to be put on hold";
-  //     } else if (outcomeValue === "terminated") {
-  //         prefillText = "The project has not been completed, but is terminated.";
-  //     }
-  //     if (colorMode === "light") {
-  //         prefillHtml = `<p class='editor-p-light'>${prefillText}</p>`;
-  //     } else {
-  //         prefillHtml = `<p class='editor-p-dark'>${prefillText}</p>`;
-  //     }
-  //     setClosureReason(prefillHtml);
-  // }, [colorMode, outcomeValue]);
-
   const sectionDictionary = {
     cover: "Cover Page",
     dm: "Director's Message",
@@ -195,7 +175,7 @@ export const GenerateARPDFModal = ({ isOpen, onClose, thisReport }: Props) => {
                         <option key={key} value={key}>
                           {index + 1}. {value}
                         </option>
-                      )
+                      ),
                     )}
                   </Select>
                   <FormHelperText>

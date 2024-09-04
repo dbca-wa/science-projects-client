@@ -227,7 +227,6 @@ export const ProjectDetail = ({
           </Box>
         ) : (
           <Center>
-            {/* <Head title={distilledTitle} /> */}
             <Spinner />
           </Center>
         )
@@ -240,7 +239,6 @@ export const ProjectDetail = ({
               isLazy
               isFitted
               variant={"enclosed"}
-              // onChange={(index) => setTabIndex(index)}
               onChange={(index) => {
                 manuallyCheckAndToggleDialog(() => {
                   refetch();
@@ -256,7 +254,6 @@ export const ProjectDetail = ({
                   value="overview"
                   onClick={() => {
                     setActiveTabIndex(tabs.indexOf("overview"));
-                    // navigate(`/projects/${projectPk}/`);
                     window.history.pushState(
                       null,
                       "",
@@ -272,7 +269,6 @@ export const ProjectDetail = ({
                     value="concept"
                     onClick={() => {
                       setActiveTabIndex(tabs.indexOf("concept"));
-                      // navigate(`/projects/${projectPk}/concept`);
                       window.history.pushState(
                         null,
                         "",
@@ -289,7 +285,6 @@ export const ProjectDetail = ({
                     value="project"
                     onClick={() => {
                       setActiveTabIndex(tabs.indexOf("project"));
-                      // navigate(`/projects/${projectPk}/project`);
                       window.history.pushState(
                         null,
                         "",
@@ -308,7 +303,6 @@ export const ProjectDetail = ({
                       value="progress"
                       onClick={() => {
                         setActiveTabIndex(tabs.indexOf("progress"));
-                        // navigate(`/projects/${projectPk}/progress`);
                         window.history.pushState(
                           null,
                           "",

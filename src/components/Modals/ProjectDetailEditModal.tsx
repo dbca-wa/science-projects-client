@@ -229,14 +229,10 @@ export const ProjectDetailEditModal = ({
             {projectType.includes("External") && (
               <TabPanel>
                 <ProjectExternalSection
-                  // externalFilled={externalFilled}
-                  // externalData={externalData}
                   setExternalData={setExternalData}
-                  // setExternalFilled={setExternalFilled}
                   onClose={onClose}
                   backClick={goBack}
                   createClick={kickOffMutation}
-                  // projectPk={}
                 />
               </TabPanel>
             )}
@@ -251,7 +247,6 @@ export const ProjectDetailEditModal = ({
                   onClose={onClose}
                   backClick={goBack}
                   createClick={kickOffMutation}
-                  // projectPk={}
                 />
               </TabPanel>
             )}

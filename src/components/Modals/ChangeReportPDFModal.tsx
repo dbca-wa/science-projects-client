@@ -84,7 +84,6 @@ export const ChangeReportPDFModal = ({
           isClosable: true,
         });
       }
-      // reset()
       onChangePDFClose();
 
       setTimeout(() => {
@@ -92,7 +91,6 @@ export const ChangeReportPDFModal = ({
         queryClient.invalidateQueries({ queryKey: ["ararsWithPDFs"] });
         queryClient.invalidateQueries({ queryKey: ["legacyARPDFs"] });
         refetchPDFs();
-        // refetchReportsWithoutPDFs();
       }, 350);
     },
     onError: (error) => {
@@ -139,7 +137,6 @@ export const ChangeReportPDFModal = ({
         queryClient.invalidateQueries({ queryKey: ["ararsWithPDFs"] });
         queryClient.invalidateQueries({ queryKey: ["legacyARPDFs"] });
         refetchPDFs();
-        // refetchReportsWithoutPDFs();
       }, 350);
     },
     onError: (error) => {
@@ -157,37 +154,19 @@ export const ChangeReportPDFModal = ({
   });
 
   const deleteFile = () => {
-    // console.log("delete btn clicked");
     deletePDFMutation.mutate(!isLegacy ? report?.pdf?.pk : report?.pk);
   };
 
   const onSubmitPDFUpdate = () => {
-    // console.log(reportMediaId);
-    // console.log(uploadedPDF);
     const formData = {
-      // userId: userData?.pk ? userData.pk : userData.id,
       reportMediaId,
       pdfFile: uploadedPDF,
     };
     ararPDFChangeMutation.mutate(formData);
   };
 
-  // useEffect(() =>
-  //   console.log({
-  //     uploadedPDF,
-  //     reportMediaId,
-  //     isError,
-  //   }),
-  // );
-
   return (
-    <Modal
-      isOpen={isChangePDFOpen}
-      onClose={onChangePDFClose}
-      size={"lg"}
-      // scrollBehavior="inside"
-      // isCentered={true}
-    >
+    <Modal isOpen={isChangePDFOpen} onClose={onChangePDFClose} size={"lg"}>
       <ModalOverlay />
       <ModalContent
         color={colorMode === "light" ? "black" : "white"}
@@ -216,7 +195,6 @@ export const ChangeReportPDFModal = ({
             </>
           ) : null}
           <FormControl>
-            {/* <FormLabel>Delete Current PDF File</FormLabel> */}
             <Flex justifyContent={"flex-end"}>
               <Button
                 color={"white"}
@@ -252,23 +230,16 @@ export const ChangeReportPDFModal = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button
-            // variant="ghost"
-            mr={3}
-            onClick={onChangePDFClose}
-          >
+          <Button mr={3} onClick={onChangePDFClose}>
             Cancel
           </Button>
           <Button
-            // form="addpdf-form"
-            // type="submit"
             isLoading={ararPDFChangeMutation.isPending}
             bg={colorMode === "dark" ? "green.500" : "green.400"}
             color={"white"}
             _hover={{
               bg: colorMode === "dark" ? "green.400" : "green.300",
             }}
-            // report?.pdf?.pk ? report.pdf.pk : report?.pk
             isDisabled={
               !uploadedPDF || !reportMediaId || reportMediaId === 0 || isError
             }

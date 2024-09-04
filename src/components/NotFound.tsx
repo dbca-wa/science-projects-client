@@ -1,4 +1,4 @@
-// WIP Error component for 404 - displays the error in page. WIP as design in displaying data needs work.
+// Error component for 404 - displays the error in page. WIP as design in displaying data needs work.
 // Needs to be in the middle.
 
 import {

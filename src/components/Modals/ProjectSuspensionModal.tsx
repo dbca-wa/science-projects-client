@@ -79,16 +79,9 @@ export const ProjectSuspensionModal = ({
       }
 
       setTimeout(() => {
-        // if (setIsAnimating) {
-        //     setIsAnimating(false)
-        // }
         queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
         refetchData();
         onClose();
-
-        // navigate('/projects');
-
-        // queryClient.refetchQueries([`mytasks`])
       }, 350);
     },
     onError: (error) => {

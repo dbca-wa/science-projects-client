@@ -9,10 +9,6 @@ const PublicationsSection = ({
   buttonsVisible: boolean;
 }) => {
   const isLoading = true;
-  // useEffect(
-  //   () => console.log(userId, buttonsVisible),
-  //   [userId, buttonsVisible],
-  // );
   return (
     <>
       {isLoading ? (

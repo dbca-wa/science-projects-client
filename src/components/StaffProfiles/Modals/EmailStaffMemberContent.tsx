@@ -45,9 +45,6 @@ const EmailStaffMemberContent = ({
         position: "top-right",
       });
     },
-    // onMutate: () => {
-    //   console.log("mutation");
-    // },
   });
   const onSubmit = (formData: IStaffPublicEmail) => {
     mutation.mutate(formData);
@@ -73,8 +70,6 @@ const EmailStaffMemberContent = ({
         type="email"
         id="email"
         placeholder="Enter your email addresss"
-        // value={senderEmail}
-        // onChange={(e) => setSenderEmail(e.target.value)}
         className="mt-1"
         {...register("senderEmail", {
           required: true,
@@ -89,8 +84,6 @@ const EmailStaffMemberContent = ({
       <Textarea
         className="mt-1"
         placeholder="Type your message here."
-        // value={message}
-        // onChange={(e) => setMessage(e.target.value)}
         {...register("message", {
           required: true,
         })}

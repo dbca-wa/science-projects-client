@@ -63,16 +63,13 @@ export const UserFeedbackModal = ({
               Message on Teams
             </Button>
             <div className="flex w-full items-center justify-center px-40 py-5">
-              {/* <hr className="flex-grow border-t-2 border-slate-300 dark:border-white mx-2" /> */}
               <Divider
                 mx={2}
                 flexGrow={1}
                 borderTop={2}
                 borderColor={colorMode === "light" ? "gray.300" : "white"}
               />
-              {/* <span className="px-2  text-black dark:text-white"></span> */}
               <Text color={colorMode === "light" ? "black" : "whtie"}>OR</Text>
-              {/* <hr className="flex-grow border-t-2 border-slate-300 dark:border-white mx-2" /> */}
               <Divider
                 mx={2}
                 flexGrow={1}

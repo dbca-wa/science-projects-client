@@ -90,11 +90,6 @@ const StaffContent = ({
                 selected={selectedNav}
                 title={"CV"}
               />
-              {/* <NavMenuItemButton
-                setterFn={setSelectedNav}
-                selected={selectedNav}
-                title={"Publications"}
-              /> */}
             </div>
           </ScrollArea>
         </div>

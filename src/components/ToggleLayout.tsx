@@ -53,13 +53,7 @@ export const ToggleLayout = ({
   return asMenuItem ? (
     <MenuItem onClick={handleClick} zIndex={2}>
       {layouts[layout].icon}
-      <Text ml={2}>
-        {" "}
-        Toggle Layout
-        {/* {`${currentLayout.key[0].toUpperCase()}${currentLayout.key.slice(
-        1
-      )}`} */}
-      </Text>
+      <Text ml={2}>\ Toggle Layout</Text>
     </MenuItem>
   ) : (
     <AnimatePresence mode="wait" initial={false}>

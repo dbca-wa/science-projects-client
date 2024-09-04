@@ -182,14 +182,6 @@ const useToolbar = ({
             if (type in blockTypeToBlockName) {
               setBlockType(type as keyof typeof blockTypeToBlockName);
             }
-            //   if ($isCodeNode(element)) {
-            //     const language =
-            //       element.getLanguage() as keyof typeof CODE_LANGUAGE_MAP;
-            //     setCodeLanguage(
-            //       language ? CODE_LANGUAGE_MAP[language] || language : '',
-            //     );
-            //     return;
-            //   }
           }
         }
       }
@@ -441,12 +433,6 @@ export const DatabaseRichTextToolbar = ({
                       }
                       node = textNode;
                     }
-                    // Potentially unused in SPMS as we are not allowing heading/quite/decor nodes
-                    // else if ($isHeadingNode(node) || $isQuoteNode(node)) {
-                    //     node.replace($createParagraphNode(), true);
-                    // } else if ($isDecoratorBlockNode(node)) {
-                    //     node.setFormat('');
-                    // }
                   });
                 }
               });
@@ -516,8 +502,6 @@ const ElementSelector = ({
   allowInserts,
   buttonSize,
 }: ElementProps) => {
-  // blockType: "number" | "code" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "bullet" | "check" | "paragraph" | "quote"
-
   const blockTypeToBlockName = (
     blockType:
       | "number"
@@ -624,10 +608,6 @@ const ElementSelector = ({
           mx={1}
           ref={buttonRef}
           w={"100%"}
-          // // px={8}
-          // mx={1}
-          // flex={1}
-          // tabIndex={-1}
           color={"white"}
           bg={"gray.900"}
           _hover={{ bg: "gray.600" }}
@@ -639,12 +619,10 @@ const ElementSelector = ({
           {blockTypeToBlockName(blockType)}
         </MenuButton>
         <MenuList
-          // minW={"200px"}
           zIndex={9999999999999}
           w={buttonWidth}
           minW={"200px"}
           pos={"absolute"}
-          // right={-500}
           bg={"white"}
         >
           <MenuItem
@@ -780,22 +758,10 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
             w="25px"
             h="25px"
             border="1px solid"
-            borderColor={
-              isHighlighted
-                ? // ? colorMode === "light"
-                  "gray.300"
-                : // : "gray.300"
-                  // : colorMode === "light"
-                  // ?
-                  "gray.300"
-              //   : "gray.400"
-            }
+            borderColor={isHighlighted ? "gray.300" : "gray.300"}
             onMouseEnter={() => handleMouseEnter(row, col)}
             onClick={onGridClick}
-            // backgroundColor={row < tableRows && col < tableColumns ? 'blue.300' : 'white'}
             backgroundColor={
-              // colorMode === "light"
-              //   ?
               isFirstRowOrColumn
                 ? isHighlighted
                   ? "blue.300"
@@ -803,21 +769,9 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
                 : isHighlighted
                   ? "blue.200"
                   : "white"
-              // : isFirstRowOrColumn
-              //   ? isHighlighted
-              //     ? "blue.400"
-              //     : "gray.300"
-              //   : isHighlighted
-              //     ? "blue.300"
-              //     : "white"
             }
             _hover={{
-              backgroundColor:
-                // colorMode === "light" ?
-                isFirstRowOrColumn ? "blue.400" : "green.100",
-              // : isFirstRowOrColumn
-              //   ? "blue.500"
-              //   : "green.200",
+              backgroundColor: isFirstRowOrColumn ? "blue.400" : "green.100",
             }}
           />,
         );
@@ -838,13 +792,7 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
         {tableColumns} x {tableRows} table
       </Text>
       {/* Table grid */}
-      <Box
-      // display={"flex"}
-      // flexDir={"column"}
-      // w={"100%"}
-      >
-        {createGrid()}
-      </Box>
+      <Box>{createGrid()}</Box>
     </Center>
   );
 };

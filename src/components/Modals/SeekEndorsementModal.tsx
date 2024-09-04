@@ -29,11 +29,6 @@ import { useMutation } from "@tanstack/react-query";
 
 interface Props {
   projectPlanPk: number;
-  // bmEndorsementRequired: boolean;
-  // bmEndorsementProvided: boolean;
-  // herbariumEndorsementRequired: boolean;
-  // herbariumEndorsementProvided: boolean;
-
   aecEndorsementRequired: boolean;
   aecEndorsementProvided: boolean;
   aecPDFFile: File;
@@ -44,10 +39,6 @@ interface Props {
 
 export const SeekEndorsementModal = ({
   projectPlanPk,
-  // bmEndorsementRequired,
-  // bmEndorsementProvided,
-  // herbariumEndorsementRequired,
-  // herbariumEndorsementProvided,
   aecEndorsementRequired,
   aecEndorsementProvided,
   aecPDFFile,
@@ -117,10 +108,7 @@ export const SeekEndorsementModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
       <ModalOverlay />
-      <Flex
-      // as={"form"}
-      // onSubmit={handleSubmit(seekEndorsementAndSaveFunc)}
-      >
+      <Flex>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader>Save Endorsements</ModalHeader>
           <ModalCloseButton />
@@ -133,16 +121,7 @@ export const SeekEndorsementModal = ({
                   aecEndorsementRequired === false ||
                   (aecEndorsementRequired === true &&
                     aecEndorsementProvided === true)
-                    ? //     &&
-                      // // Herb not required or herb required and given
-                      // (herbariumEndorsementRequired === false ||
-                      //   (herbariumEndorsementRequired === true &&
-                      //     herbariumEndorsementProvided === true)) &&
-                      // // Bio not required or bio required and given
-                      // (bmEndorsementRequired === false ||
-                      //   (bmEndorsementRequired === true &&
-                      //     bmEndorsementProvided === true))
-                      "As all required endorsements have been provided, no emails are necessary. You may still save."
+                    ? "As all required endorsements have been provided, no emails are necessary. You may still save."
                     : "Also send notifications?"
                 }
               </Text>
@@ -154,12 +133,6 @@ export const SeekEndorsementModal = ({
                   isDisabled={
                     !aecEndorsementRequired ||
                     (aecEndorsementRequired && aecEndorsementProvided)
-                    //    &&
-                    // (!herbariumEndorsementRequired ||
-                    //   (herbariumEndorsementRequired &&
-                    //     herbariumEndorsementProvided)) &&
-                    // (!bmEndorsementRequired ||
-                    //   (bmEndorsementRequired && bmEndorsementProvided))
                   }
                 >
                   Send Notifications
@@ -169,37 +142,6 @@ export const SeekEndorsementModal = ({
             {shouldSendEmails ? (
               <Center mt={8}>
                 <UnorderedList>
-                  {/* {bmEndorsementRequired === true &&
-                    bmEndorsementProvided === false && (
-                      <ListItem color={"blue.400"}>
-                        As Biometrician endorsement is marked as required but it
-                        has yet to be provided, an email will be sent to
-                        Biometricians to approve or reject this plan
-                      </ListItem>
-                    )}
-                  {bmEndorsementRequired === false && (
-                    <ListItem color={"gray.400"}>
-                      As Biometrician endorsement is marked as not required, no
-                      email will be sent to Biometricians.
-                    </ListItem>
-                  )}
-
-                  {herbariumEndorsementRequired === true &&
-                    herbariumEndorsementProvided === false && (
-                      <ListItem color={"blue.400"}>
-                        As Herbarium Curator endorsement is required but it has
-                        yet to be provided, an email will be sent to Herbarium
-                        Curators to approve or reject this plan
-                      </ListItem>
-                    )}
-
-                  {herbariumEndorsementRequired === false && (
-                    <ListItem color={"gray.400"}>
-                      As Herbarium Curator endorsement is marked as not
-                      required, no email will be sent to Herbarium Curators
-                    </ListItem>
-                  )} */}
-
                   {/* IF involves animals */}
                   {/* AND AEC endorsement required and not provided */}
                   {aecEndorsementRequired === true &&
@@ -269,37 +211,24 @@ export const SeekEndorsementModal = ({
                   (aecEndorsementRequired === false ||
                     (aecEndorsementRequired === true &&
                       aecEndorsementProvided === true))
-                  //     &&
-                  // (herbariumEndorsementRequired === false ||
-                  //   (herbariumEndorsementRequired === true &&
-                  //     herbariumEndorsementProvided === true)) &&
-                  // (bmEndorsementRequired === false ||
-                  //   (bmEndorsementRequired === true &&
-                  //     bmEndorsementProvided === true))
                 }
                 onClick={() => {
-                  aecPDFFile !== undefined
-                    ? seekEndorsementAndSaveFunc({
-                        aecEndorsementRequired,
-                        aecEndorsementProvided,
-                        aecPDFFile,
-                        // herbariumEndorsementRequired,
-                        // herbariumEndorsementProvided,
-                        // bmEndorsementRequired,
-                        // bmEndorsementProvided,
-                        shouldSendEmails,
-                        projectPlanPk,
-                      })
-                    : seekEndorsementAndSaveFunc({
-                        aecEndorsementRequired,
-                        aecEndorsementProvided,
-                        // herbariumEndorsementRequired,
-                        // herbariumEndorsementProvided,
-                        // bmEndorsementRequired,
-                        // bmEndorsementProvided,
-                        shouldSendEmails,
-                        projectPlanPk,
-                      });
+                  if (aecPDFFile !== undefined) {
+                    seekEndorsementAndSaveFunc({
+                      aecEndorsementRequired,
+                      aecEndorsementProvided,
+                      aecPDFFile,
+                      shouldSendEmails,
+                      projectPlanPk,
+                    });
+                  } else {
+                    seekEndorsementAndSaveFunc({
+                      aecEndorsementRequired,
+                      aecEndorsementProvided,
+                      shouldSendEmails,
+                      projectPlanPk,
+                    });
+                  }
                 }}
               >
                 {shouldSendEmails ? `Save and Send Emails` : `Save`}

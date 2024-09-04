@@ -1,6 +1,6 @@
 // A template for a RTE simple button - props fill out its icon, text and functionality
 
-import { Box, Button, Text, useColorMode } from "@chakra-ui/react";
+import { Box, Button, Text } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import "./staffprofileeditor.css";
 
@@ -22,26 +22,14 @@ export const ToolbarButton = ({
   isActive,
   onClick,
 }: IBaseToolbarButtonProps) => {
-  // const { colorMode } = useColorMode();
   return (
-    <Box
-      // pos={"relative"}
-      // display={"inline-block"}
-      className="tooltip-container"
-    >
+    <Box className="tooltip-container">
       <Button
         size={"sm"}
         aria-label={ariaLabel}
         variant={variant ? variant : "ghost"}
         isDisabled={isDisabled}
-        bg={
-          isActive
-            ? // ? colorMode === "light"
-              //   ? "gray.200"
-              //   :
-              "gray.700"
-            : undefined
-        }
+        bg={isActive ? "gray.700" : undefined}
         _hover={{
           bg: "gray.600",
         }}
