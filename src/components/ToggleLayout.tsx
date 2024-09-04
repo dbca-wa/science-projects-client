@@ -53,7 +53,7 @@ export const ToggleLayout = ({
   return asMenuItem ? (
     <MenuItem onClick={handleClick} zIndex={2}>
       {layouts[layout].icon}
-      <Text ml={2}>\ Toggle Layout</Text>
+      <Text ml={2}>Toggle Layout</Text>
     </MenuItem>
   ) : (
     <AnimatePresence mode="wait" initial={false}>
