@@ -181,7 +181,8 @@ export const ProfilePage = () => {
           />
 
           {/* ACCESS PUBLIC PROFILE */}
-          {me?.is_superuser ? (
+          {
+            // me?.is_superuser ? (
             <Flex
               border={"1px solid"}
               rounded={"xl"}
@@ -209,17 +210,6 @@ export const ProfilePage = () => {
                 >
                   Public Appearance
                 </Text>
-                {/* {hoveredItem === "public appearance" && (
-                  <Flex
-                    flex={1}
-                    // bg={"pink"}
-                    justifyContent={"flex-end"}
-                    alignItems={"center"}
-                    px={4}
-                  >
-                    <AnimatedClickToEdit />
-                  </Flex>
-                )} */}
               </Flex>
 
               <Box mb={4}>
@@ -239,7 +229,6 @@ export const ProfilePage = () => {
                   base: "column",
                   lg: "row",
                 }}
-                // bg={"red"}
               >
                 {/* CARD */}
                 <Flex flex={1} w={"100%"} justifyContent={"center"}>
@@ -247,8 +236,6 @@ export const ProfilePage = () => {
                     pk={me?.pk}
                     name={`${me.display_first_name} ${me.display_last_name}`}
                     title={me.title}
-                    // position={me.about}
-                    // branch={me?.branch}
                     disableEmailButton={true}
                   />
                 </Flex>
@@ -316,7 +303,8 @@ export const ProfilePage = () => {
                 </Flex>
               </Flex>
             </Flex>
-          ) : null}
+            // ) : null
+          }
 
           {/* IN APP APPEARANCE */}
           <Flex
