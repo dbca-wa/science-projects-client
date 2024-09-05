@@ -23,7 +23,7 @@ jobs:
         env:
           VITE_PRODUCTION_BASE_URL: "https://scienceprojects-test.dbca.wa.gov.au/"
           VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects-test.dbca.wa.gov.au/api/v1/"
-          VITE_PRODUCTION_PROFILES_BASE_URL: "https://science-profiles-test.dbca.wa.gov.au/"
+          VITE_PRODUCTION_PROFILES_BASE_URL: "https://profiles-test.dbca.wa.gov.au/"
           VITE_SPMS_VERSION: ${{ steps.tag.outputs.TAG_NAME }}
         run: |
           docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:test${{ steps.tag.outputs.TAG_NAME }}
@@ -48,7 +48,7 @@ jobs:
         env:
           VITE_PRODUCTION_BASE_URL: "https://scienceprojects-migrated.dbca.wa.gov.au/"
           VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects-migrated.dbca.wa.gov.au/api/v1/"
-          VITE_PRODUCTION_PROFILES_BASE_URL: "https://science-profiles-migrated.dbca.wa.gov.au/"
+          VITE_PRODUCTION_PROFILES_BASE_URL: "https://profiles-migrated.dbca.wa.gov.au/"
           VITE_SPMS_VERSION: ${{ steps.tag.outputs.TAG_NAME }}
         run: |
           docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:migration
@@ -74,7 +74,7 @@ jobs:
         env:
           VITE_PRODUCTION_BASE_URL: "https://scienceprojects.dbca.wa.gov.au/"
           VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects.dbca.wa.gov.au/api/v1/"
-          VITE_PRODUCTION_PROFILES_BASE_URL: "https://science-profiles.dbca.wa.gov.au/"
+          VITE_PRODUCTION_PROFILES_BASE_URL: "https://profiles.dbca.wa.gov.au/"
           VITE_SPMS_VERSION: ${{ steps.tag.outputs.TAG_NAME }}
         run: |
           docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
