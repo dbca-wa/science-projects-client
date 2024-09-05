@@ -45,7 +45,8 @@ export const ReviewDocumentEmail = ({ userData }: Props) => {
             </Heading>
             <Text className="text-[14px] leading-[24px] text-black">
               {/* Hello {username}, */}
-              Hello {userData?.first_name} {userData?.last_name},
+              Hello {userData?.display_first_name ?? userData?.first_name}{" "}
+              {userData?.display_last_name ?? userData?.last_name},
             </Text>
             <Text className="text-[14px] leading-[24px] text-black">
               {/* <strong>{invitedByUsername}</strong>  */}

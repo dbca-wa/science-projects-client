@@ -69,7 +69,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
       // setAnnualReportText("Report");
     } else {
       setWelcomeUser(
-        `Hello, ${userData?.first_name}! Welcome to SPMS, DBCA's portal for science project documentation, approval and reporting.`,
+        `Hello, ${userData?.display_first_name ?? userData?.first_name} ${userData?.display_last_name ?? userData?.last_name}! Welcome to SPMS, DBCA's portal for science project documentation, approval and reporting.`,
       );
       setShouldConcat(false);
       // setAnnualReportText("Annual Report");
