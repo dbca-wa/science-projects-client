@@ -147,14 +147,14 @@ const StaffHero = ({
         isDesktop ? (
           <div className="mt-2 flex justify-center">
             <SendUserEmailDialog
-              name={`${staffHeroData?.user?.display_first_name ?? user?.first_name} ${staffHeroData?.user?.display_last_name}`}
+              name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
               pk={staffHeroData?.user?.pk}
             />
           </div>
         ) : (
           <div className="mt-2 flex justify-center">
             <SendUserEmailMobileDrawer
-              name={`${staffHeroData?.user?.display_first_name ?? user?.first_name} ${staffHeroData?.user?.display_last_name}`}
+              name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
               pk={staffHeroData?.user?.pk}
             />
           </div>
