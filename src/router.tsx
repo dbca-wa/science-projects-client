@@ -362,9 +362,13 @@ const staffTestArray = [
 ];
 
 // returns router based on url (currently excludes staffprofiles in production)
-export const router =
-  VITE_PRODUCTION_BASE_URL === undefined ||
-  VITE_PRODUCTION_BASE_URL?.includes("test") ||
-  VITE_PRODUCTION_BASE_URL?.includes("migrated")
-    ? createBrowserRouter([...inAppRouteArray, ...staffTestArray])
-    : createBrowserRouter(inAppRouteArray);
+// export const router =
+//   VITE_PRODUCTION_BASE_URL === undefined ||
+//   VITE_PRODUCTION_BASE_URL?.includes("test") ||
+//   VITE_PRODUCTION_BASE_URL?.includes("migrated")
+//     ? createBrowserRouter([...inAppRouteArray, ...staffTestArray])
+//     : createBrowserRouter(inAppRouteArray);
+export const router = createBrowserRouter([
+  ...inAppRouteArray,
+  ...staffTestArray,
+]);
