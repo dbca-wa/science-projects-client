@@ -106,11 +106,11 @@ export const ProfilePage = () => {
     return doc.body.innerHTML;
   };
 
-  useEffect(() => {
-    if (!loading) {
-      console.log(me);
-    }
-  }, [me, loading]);
+  // useEffect(() => {
+  //   if (!loading) {
+  //     console.log(me);
+  //   }
+  // }, [me, loading]);
   const NoDataText = "--";
 
   const { colorMode } = useColorMode();
@@ -413,13 +413,13 @@ export const ProfilePage = () => {
                 <Text color={subsectionTitleColor} fontSize={"sm"}>
                   First Name
                 </Text>
-                <Text>{me.display_first_name}</Text>
+                <Text>{me.display_first_name ?? me.first_name}</Text>
               </Flex>
               <Flex flexDir={"column"}>
                 <Text color={subsectionTitleColor} fontSize={"sm"}>
                   Last Name
                 </Text>
-                <Text>{me.display_last_name}</Text>
+                <Text>{me.display_last_name ?? me.last_name}</Text>
               </Flex>
               {/* <Flex flexDir={"column"}>
                 <Text color={subsectionTitleColor} fontSize={"sm"}>

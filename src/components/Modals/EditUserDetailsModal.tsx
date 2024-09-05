@@ -453,9 +453,14 @@ export const EditUserDetailsModal = ({
                               <Input
                                 autoComplete="off"
                                 type="text"
-                                placeholder={userData?.display_first_name}
+                                placeholder={
+                                  userData?.display_first_name ??
+                                  userData?.first_name
+                                }
                                 {...register("display_first_name", {
-                                  value: userData?.display_first_name,
+                                  value:
+                                    userData?.display_first_name ??
+                                    userData?.first_name,
                                 })}
                                 isDisabled={!me?.userData?.is_superuser}
                               />
@@ -472,9 +477,14 @@ export const EditUserDetailsModal = ({
                               <Input
                                 type="text"
                                 isDisabled={!me?.userData?.is_superuser}
-                                placeholder={userData?.display_last_name}
+                                placeholder={
+                                  userData?.display_last_name ??
+                                  userData?.last_name
+                                }
                                 {...register("display_last_name", {
-                                  value: userData?.display_last_name,
+                                  value:
+                                    userData?.display_last_name ??
+                                    userData?.last_name,
                                 })}
                               />
                             </InputGroup>

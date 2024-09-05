@@ -15,6 +15,10 @@ const ProjectsSection = ({
   const { userProjectsLoading, userProjectsData } = useInvolvedProjects(userId);
   const currentYear = useCurrentYear();
 
+  const sortByStartDate = (a, b) => {
+    return Number(b.start_date) - Number(a.start_date); // Sort in descending order
+  };
+
   const checkYearForPresent = (thisYear: number, value: number) => {
     if (thisYear <= value) {
       return "Present";
@@ -27,7 +31,7 @@ const ProjectsSection = ({
       {userProjectsLoading ? (
         <SimpleSkeletonSection project />
       ) : userProjectsData?.length > 0 ? (
-        userProjectsData?.map((proj, index) => {
+        userProjectsData?.sort(sortByStartDate)?.map((proj, index) => {
           return (
             <ProjectItem
               pk={proj.pk}

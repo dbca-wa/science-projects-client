@@ -299,9 +299,9 @@ export const EditPersonalInformationModal = ({
                   <Input
                     autoComplete="off"
                     type="text"
-                    placeholder={data?.display_first_name}
+                    placeholder={data?.display_first_name ?? data?.first_name}
                     {...register("display_first_name", {
-                      value: data?.display_first_name,
+                      value: data?.display_first_name ?? data?.first_name,
                     })}
                   />
                 </InputGroup>
@@ -317,9 +317,9 @@ export const EditPersonalInformationModal = ({
                   <Input
                     autoComplete="off"
                     type="text"
-                    placeholder={data?.display_last_name}
+                    placeholder={data?.display_last_name ?? data?.last_name}
                     {...register("display_last_name", {
-                      value: data?.display_last_name,
+                      value: data?.display_last_name ?? data?.last_name,
                     })}
                   />
                 </InputGroup>
