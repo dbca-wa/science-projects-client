@@ -189,7 +189,7 @@ export const ProfilePage = () => {
               borderColor={borderColor}
               padding={4}
               mb={4}
-              flexDir={"column"}
+              flexDir={"row"}
               // cursor={"pointer"}
               onMouseEnter={() => handleMouseEnter("public appearance")}
               onMouseLeave={handleMouseLeave}
@@ -201,7 +201,7 @@ export const ProfilePage = () => {
                     : "0px 2.4px 3.6px -0.6px rgba(255, 255, 255, 0.06), 0px 1.2px 2.4px -0.6px rgba(255, 255, 255, 0.036)",
               }}
             >
-              <Flex>
+              <Flex flexDir={"column"}>
                 <Text
                   fontWeight={"bold"}
                   fontSize={"lg"}
@@ -210,79 +210,61 @@ export const ProfilePage = () => {
                 >
                   Public Appearance
                 </Text>
+                <Box mb={0}>
+                  <Text
+                    color={colorMode === "light" ? "gray.500" : "gray.500"}
+                    fontSize={"xs"}
+                  >
+                    View and edit how your staff profile appears to the public
+                  </Text>
+                </Box>
               </Flex>
 
-              <Box mb={4}>
-                <Text
-                  color={colorMode === "light" ? "gray.500" : "gray.500"}
-                  fontSize={"xs"}
-                >
-                  This is how your account will appear when searched on the
-                  public database.
-                </Text>
-              </Box>
-
               <Flex
-                justifyContent={"center"}
+                justifyContent={"end"}
                 w={"100%"}
                 flexDir={{
                   base: "column",
                   lg: "row",
                 }}
               >
-                {/* CARD */}
-                <Flex flex={1} w={"100%"} justifyContent={"center"}>
-                  <ScienceStaffSearchResult
-                    pk={me?.pk}
-                    name={`${me.display_first_name} ${me.display_last_name}`}
-                    title={me.title}
-                    disableEmailButton={true}
-                  />
+                {/* View Public Profile Button */}
+
+                {/* Edit/View */}
+                <Flex
+                  justifyContent={{ base: "end" }}
+                  alignItems={"center"}
+                  w={"100%"}
+                  py={4}
+                >
+                  <Tooltip
+                    label="See and edit your staff profile"
+                    aria-label="A tooltip"
+                  >
+                    <Button
+                      bg={colorMode === "light" ? "blue.500" : "blue.500"}
+                      _hover={{
+                        bg: colorMode === "light" ? "blue.500" : "blue.500",
+                      }}
+                      color={"white"}
+                      leftIcon={<AiFillEdit />}
+                      onClick={() => {
+                        if (process.env.NODE_ENV === "development") {
+                          navigate(`/staff/${me?.pk}`);
+                        } else {
+                          setHref(
+                            `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${me?.pk}`,
+                          );
+                        }
+                      }}
+                    >
+                      Edit Profile
+                    </Button>
+                  </Tooltip>
                 </Flex>
 
-                {/* View Public Profile Button */}
-                <Flex
-                  flexDir={"column"}
-                  // justifyContent={"center"}
-                  flex={1}
-                  w={"100%"}
-                  // bg={"red"}
-                >
-                  {/* Edit/View */}
-                  <Flex
-                    justifyContent={{ base: "center" }}
-                    alignItems={"center"}
-                    w={"100%"}
-                    py={8}
-                  >
-                    <Tooltip
-                      label="See and edit your staff profile"
-                      aria-label="A tooltip"
-                    >
-                      <Button
-                        bg={colorMode === "light" ? "blue.500" : "blue.500"}
-                        _hover={{
-                          bg: colorMode === "light" ? "blue.500" : "blue.500",
-                        }}
-                        color={"white"}
-                        leftIcon={<AiFillEdit />}
-                        onClick={() => {
-                          if (process.env.NODE_ENV === "development") {
-                            navigate(`/staff/${me?.pk}`);
-                          } else {
-                            setHref(
-                              `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${me?.pk}`,
-                            );
-                          }
-                        }}
-                      >
-                        Edit Profile
-                      </Button>
-                    </Tooltip>
-                  </Flex>
-
-                  {/* Set Profile to Hidden */}
-                  {/* <Flex
+                {/* Set Profile to Hidden */}
+                {/* <Flex
                     justifyContent={"end"}
                     alignItems={"center"}
                     w={"100%"}
@@ -300,7 +282,6 @@ export const ProfilePage = () => {
                       </Button>
                     </Tooltip>
                   </Flex> */}
-                </Flex>
               </Flex>
             </Flex>
             // ) : null

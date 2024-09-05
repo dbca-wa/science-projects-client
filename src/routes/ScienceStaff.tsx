@@ -16,6 +16,7 @@ export const ScienceStaff = () => {
     searchTerm,
     page,
   });
+  // console.log(scienceStaffData);
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({
@@ -45,13 +46,13 @@ export const ScienceStaff = () => {
           <p>
             {scienceStaffData?.total_results === 0
               ? `No results for '${searchTerm}'`
-              : `Showing ${(scienceStaffData?.page - 1) * 16 + 1}-${Math.min(
-                  scienceStaffData?.page * 16,
-                  scienceStaffData?.total_results,
-                )} out of ${scienceStaffData?.total_results} results${
-                  searchTerm ? ` for '${searchTerm}'` : ""
-                }`}
-          </p>{" "}
+              : scienceStaffData?.total_results === 1
+                ? `Showing 1 result${searchTerm ? ` for '${searchTerm}'` : ""}`
+                : `Showing ${(scienceStaffData?.page - 1) * 16 + 1}-${Math.min(
+                    scienceStaffData?.page * 16,
+                    scienceStaffData?.total_results,
+                  )} results${searchTerm ? ` for '${searchTerm}'` : ""}`}
+          </p>
           <Grid
             gridTemplateColumns={
               isDesktop
@@ -70,8 +71,10 @@ export const ScienceStaff = () => {
                 key={index}
                 pk={user?.pk}
                 name={`${user?.display_first_name} ${user?.display_last_name}`}
-                position={user?.role}
-                branch={user?.branch}
+                position={user?.position}
+                location={user?.location}
+                unit={user?.unit}
+                division={user?.division} // branch={user?.branch}
               />
             ))}
           </Grid>

@@ -23,8 +23,11 @@ const ScienceStaffSearchResult = ({
   pk,
   name,
   title,
-  branch,
   position,
+  unit,
+  location,
+  division,
+  // branch,
   disableEmailButton,
 }: IStaffUserResult) => {
   const navigate = useNavigate();
@@ -54,24 +57,19 @@ const ScienceStaffSearchResult = ({
             <p className="ml-2 flex-1 text-balance text-sm">{position}</p>
           </span>
         )}
-        {branch?.name && (
+        {division && (
           <span className="flex items-center">
             <Building className="mt-[2px] self-start" size={"15px"} />
-            <p className="ml-2 flex-1 text-sm">{branch?.name}</p>
+            <p className="ml-2 flex-1 text-balance text-sm">
+              {division}, {unit}
+            </p>
           </span>
         )}
-        {branch?.address && (
+        {location && (
           <span className="flex items-center">
             <MapPin className="mt-[2px] self-start" size={"15px"} />
             <div className="ml-2 flex-1 text-sm">
-              {branch?.address?.street && (
-                <p>{`${branch?.address?.street?.trim()}`}</p>
-              )}
-              {branch?.address?.state &&
-                branch?.address?.city &&
-                branch?.address?.zipcode && (
-                  <p>{`${branch?.address?.city?.trim()}, ${branch?.address?.state?.trim()}. ${branch?.address?.zipcode}`}</p>
-                )}
+              <p>{`${location?.name?.trim()}`}</p>
             </div>
           </span>
         )}
