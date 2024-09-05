@@ -70,7 +70,7 @@ export const ScienceStaff = () => {
               <ScienceStaffSearchResult
                 key={index}
                 pk={user?.pk}
-                name={`${user?.display_first_name} ${user?.display_last_name}`}
+                name={`${user?.display_first_name ?? user?.first_name} ${user?.display_last_name ?? user?.last_name}`}
                 position={user?.position}
                 location={user?.location}
                 unit={user?.unit}

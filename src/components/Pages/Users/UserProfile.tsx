@@ -247,7 +247,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           >
             <Text userSelect={"none"} fontWeight={"bold"}>
               {!user?.display_first_name?.startsWith("None")
-                ? `${user?.display_first_name} ${user?.display_last_name}`
+                ? `${user?.display_first_name ?? user?.first_name} ${user?.display_last_name ?? user?.last_name}`
                 : `${user?.username}`}
             </Text>
             <Text userSelect={"none"}>

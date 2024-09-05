@@ -119,7 +119,7 @@ export const UserSearchDropdown = forwardRef(
         }
         if (setUserNameFunction) {
           setUserNameFunction(
-            `${userData.display_first_name} ${userData.display_last_name}`,
+            `${userData.display_first_name ?? userData?.first_name} ${userData.display_last_name ?? userData?.last_name}`,
           );
         }
         setIsMenuOpen(false);
@@ -135,7 +135,7 @@ export const UserSearchDropdown = forwardRef(
       }
       if (setUserNameFunction) {
         setUserNameFunction(
-          `${user.display_first_name} ${user.display_last_name}`,
+          `${user.display_first_name ?? user.first_name} ${user.display_last_name ?? user.last_name}`,
         );
       }
       setIsMenuOpen(false);
@@ -351,8 +351,10 @@ const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
                 : "gray.400"
           }
         >
-          {`${user.display_first_name === "None" ? user.username : user.display_first_name} ${
-            user.last_name === "None" ? "" : user.last_name
+          {`${user?.display_first_name === "None" ? user.username : (user?.display_first_name ?? user.first_name)} ${
+            user?.display_last_name === "None"
+              ? ""
+              : (user?.display_last_name ?? user.last_name)
           } ${
             user.is_staff
               ? user.is_superuser

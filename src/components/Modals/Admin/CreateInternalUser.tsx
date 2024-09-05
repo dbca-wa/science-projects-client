@@ -301,7 +301,7 @@ export const CreateInternalUser = ({ onSuccess, isModal }: IProps) => {
       {!isModal && (
         <Box>
           <Text mb={8} fontWeight={"bold"} fontSize={"2xl"}>
-            Add External User
+            Add Internal User
           </Text>
         </Box>
       )}

@@ -931,9 +931,7 @@ export const updateProfile = async ({
   about,
   expertise,
 }: IProfileUpdateVariables) => {
-  // console.log(
-  //     userPk, image, about, expertise
-  // )
+  // console.log(userPk, image, about, expertise);
 
   const formData = new FormData();
   formData.append("userPk", userPk);
