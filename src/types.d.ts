@@ -993,11 +993,17 @@ export interface IStaffProfileBranch {
 export interface IStaffUserResult {
   pk?: number;
   title?: string;
-  position?: string;
-  // address?: string;
-  branch?: IStaffProfileBranch;
-
   name: string;
+  position?: string;
+  location?: {
+    id: number;
+    name: string;
+  };
+  unit?: string;
+  division?: string;
+  // address?: string;
+  // branch?: IStaffProfileBranch;
+
   // email: string;
   disableEmailButton?: boolean;
 }
