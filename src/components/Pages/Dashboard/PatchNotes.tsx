@@ -137,26 +137,15 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             {/* &#9881;&#65039; */}
           </Text>
           <List spacing={1} ml={2}>
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Annual Report design fixes (negative margins on RHS projects / widows and orphans)
-            </ListItem> */}
-
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: (Major) Staff Profile functionality from
-              science.dbca.wa.gov.au has been redeveloped and tied into SPMS and
-              is working in test. Development to continue for integrating ORCID
-              and Library publication data. Note: This feature is currently
-              disabled pending RFC with OIM (Update: IT Assets API implemented).
+              Update: With the assistance of OIM, SPMS has migrated to new
+              infrastructure! The app has been tested but there may still be
+              bugs as a result of this change. Please report any issues below.
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -164,69 +153,11 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Allow creation of external report without immediately
-              filling in description and aims
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Allow updating external projects without requiring data
-              for description and aims
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Scientific names/italics of project titles appear on
-              annual report as typed
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Adjusted ordering of projects on Annual Report
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Added dropdown for affiliations to user edit pages
-            </ListItem>
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Professions and First name initials have a period
-              following them (Dr / J Prince -&gt; Dr. / J. Prince)
-            </ListItem> */}
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Prevent popup appearing twice when navigating away with an
-              open / unsaved rich text editor
-            </ListItem>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Reflect changes of external description and aims immediately
-              on updating
+              Feature: With the assistance of OIM, The staff profiles app is now
+              integrated in production! Visit the staff profiles page to update
+              your public details (science-profiles.dbca.wa.gov.au). Projects
+              are based on SPMS projects and use the descriptions entered on
+              each project. Publications will be added at a later date.
             </ListItem>
           </List>
 
