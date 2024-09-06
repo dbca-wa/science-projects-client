@@ -31,29 +31,6 @@ jobs:
           docker tag ghcr.io/dbca-wa/science-projects-client:test${{ steps.tag.outputs.TAG_NAME }} ghcr.io/dbca-wa/science-projects-client:test
           docker push ghcr.io/dbca-wa/science-projects-client:test
 
-  build_and_push_migration:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Docker
-        run: docker login --username idabblewith --password ${{ secrets.GH_PAT }} ghcr.io
-
-      - name: Get the tag name
-        id: tag
-        run: echo "::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}"
-
-      - name: Build and Push Migration Image
-        env:
-          VITE_PRODUCTION_BASE_URL: "https://scienceprojects-migrated.dbca.wa.gov.au/"
-          VITE_PRODUCTION_BACKEND_API_URL: "https://scienceprojects-migrated.dbca.wa.gov.au/api/v1/"
-          VITE_PRODUCTION_PROFILES_BASE_URL: "https://science-profiles-migrated.dbca.wa.gov.au/"
-          VITE_SPMS_VERSION: ${{ steps.tag.outputs.TAG_NAME }}
-        run: |
-          docker build . --build-arg VITE_SPMS_VERSION=$VITE_SPMS_VERSION --build-arg VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL --build-arg VITE_PRODUCTION_BASE_URL=$VITE_PRODUCTION_BASE_URL --build-arg VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL --tag ghcr.io/dbca-wa/science-projects-client:migration
-          docker push ghcr.io/dbca-wa/science-projects-client:migration
-
   build_and_push_production:
     runs-on: ubuntu-latest
     steps:
