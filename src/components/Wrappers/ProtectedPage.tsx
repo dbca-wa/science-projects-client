@@ -32,12 +32,8 @@ export const ProtectedPage = ({ children }: IProtectedPageProps) => {
         if (
           location.pathname !== "/login" &&
           location.pathname !== "/staff" &&
-          baseUrl !== "profiles.dbca.wa.gov.au" &&
-          baseUrl !== "profiles-test.dbca.wa.gov.au" &&
-          baseUrl !== "profiles.migrated.dbca.wa.gov.au" &&
           baseUrl !== "science-profiles.dbca.wa.gov.au" &&
-          baseUrl !== "science-profiles-test.dbca.wa.gov.au" &&
-          baseUrl !== "science-profiles.migrated.dbca.wa.gov.au"
+          baseUrl !== "science-profiles-test.dbca.wa.gov.au"
           // && location.pathname !== "/science"
         ) {
           console.log(
