@@ -45,13 +45,15 @@ export const ScienceStaff = () => {
         <div className="my-4 min-h-[450px] w-full min-w-[300px] px-4">
           <p>
             {scienceStaffData?.total_results === 0
-              ? `No results for '${searchTerm}'`
+              ? searchTerm
+                ? `No results for '${searchTerm}'`
+                : "No results found"
               : scienceStaffData?.total_results === 1
                 ? `Showing 1 result${searchTerm ? ` for '${searchTerm}'` : ""}`
                 : `Showing ${(scienceStaffData?.page - 1) * 16 + 1}-${Math.min(
                     scienceStaffData?.page * 16,
                     scienceStaffData?.total_results,
-                  )} results${searchTerm ? ` for '${searchTerm}'` : ""}`}
+                  )} results${searchTerm ? ` for '${searchTerm}'` : ""} out of ${scienceStaffData?.total_results}`}
           </p>
           <Grid
             gridTemplateColumns={

@@ -147,12 +147,12 @@ export const Navitar = ({
               >
                 {userData !== undefined &&
                   userData &&
-                  (userData.first_name
-                    ? userData.first_name.length < 12
-                      ? userData.first_name
+                  (userData.display_first_name
+                    ? userData.display_first_name.length < 12
+                      ? userData.display_first_name
                       : windowSize >= 1150
-                        ? userData.first_name
-                        : `${userData?.first_name.substring(0, 9)}...`
+                        ? userData.display_first_name
+                        : `${userData?.display_first_name.substring(0, 9)}...`
                     : userData.username)}
               </Text>
             ) : null}
