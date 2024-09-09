@@ -77,8 +77,8 @@ const EmailStaffMemberContent = ({
         })}
       />
       <p className="mb-2 p-1 text-xs text-muted-foreground">
-        You should verify that you have typed your email address correctly
-        before sending the message, otherwise we cannot reply.
+        Ensure that you have entered a valid email before sending the message;
+        otherwise, we will not be able to reply.
       </p>
       <Label>Your Message</Label>
       <Textarea

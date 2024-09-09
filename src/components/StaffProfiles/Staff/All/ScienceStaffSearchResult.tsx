@@ -35,7 +35,7 @@ const ScienceStaffSearchResult = ({
   const ignoredTitles = ["ms", "mrs", "mr", "master"];
 
   return (
-    <div className="min-h-48 rounded-md border border-blue-100 p-6">
+    <div className="min-h-48 rounded-md border border-blue-300 p-6">
       <h4
         className="cursor-pointer text-balance text-lg font-bold text-blue-600 hover:text-blue-500 hover:underline"
         onClick={() => {
