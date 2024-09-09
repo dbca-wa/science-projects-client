@@ -1,11 +1,15 @@
-# node:22-alpine3.18
-FROM node:latest as BUILD_IMAGE
+FROM node:22-alpine3.19 as BUILD_IMAGE
+# FROM node:latest as BUILD_IMAGE
 # This command sets the working directory inside the Docker container to "/app". This is the directory where subsequent commands will be executed.
 WORKDIR /app
 
 # Required for vite
-COPY package.json .
+# COPY package.json .
+COPY package*.json ./
+
+# Install dependencies, including devDependencies needed for the build process
 RUN npm install
+
 # This sets an environment variable named "PATH" to include the "./node_modules/.bin" directory. This ensures that locally installed Node.js modules can be executed directly from the command line without specifying their full path.
 ENV PATH="./node_modules/.bin:$PATH"
 
@@ -28,14 +32,14 @@ ENV VITE_SPMS_VERSION=$VITE_SPMS_VERSION
 RUN npm run build 
 
 # Multistage build to prevent code exposure / reduce image size
-FROM node:latest as PRODUCTION_IMAGE
+FROM node:22-alpine3.19 as PRODUCTION_IMAGE
 WORKDIR /client
 # Copy built files from the build stage
 COPY --from=BUILD_IMAGE /app/dist/ /client/dist/
 
 # Copy necessary configuration files
-COPY package.json .
-COPY vite.config.ts .
+# COPY package.json .
+# COPY vite.config.ts .
 
 # Perform operations as root to set ownership and permissions
 USER root
@@ -44,7 +48,7 @@ RUN mkdir -p /client/node_modules && \
     chmod -R u+rwX /client
 
 # Install only production dependencies
-RUN npm install --omit=dev
+# RUN npm install --omit=dev
 
 # Install serve to serve the built files
 RUN npm install serve -g
