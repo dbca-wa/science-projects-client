@@ -10,7 +10,7 @@ export const ScienceStaffLayout = ({ children }: { children: ReactNode }) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <Flex direction="column" minH="100vh" className="bg-slate-100">
+    <Flex direction="column" minH="100vh" className="bg-white">
       <ScienceHeader isDesktop={isDesktop} />
       <Box as="main" flex={1} className="text-slate-900">
         {children}
