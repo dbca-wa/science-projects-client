@@ -23,7 +23,7 @@ const ScienceStaffSearchBar = ({
       onSubmit={handleSearch}
     >
       <Input
-        className=""
+        className="focus:border-blue-400 focus:ring focus:ring-blue-400"
         type="text"
         placeholder="Enter a name"
         value={searchTerm}
