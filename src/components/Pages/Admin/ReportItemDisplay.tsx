@@ -222,7 +222,7 @@ export const ReportItemDisplay = ({
       >
         <Flex justifyContent="flex-start" alignItems={"center"}>
           <TextButtonFlex
-            name={`FY ${year - 1} - ${String(year).slice(2)}` ?? ""}
+            name={year ? `FY ${year - 1} - ${String(year).slice(2)}` : ""}
             onClick={onUpdateModalOpen}
           />
         </Flex>
@@ -537,7 +537,7 @@ export const ReportItemDisplay = ({
                   {updateMutation.isError ? (
                     <Box mt={4}>
                       {Object.keys(
-                        (updateMutation.error as AxiosError).response.data
+                        (updateMutation.error as AxiosError).response.data,
                       ).map((key) => (
                         <Box key={key}>
                           {(
