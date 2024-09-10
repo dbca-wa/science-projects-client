@@ -55,7 +55,8 @@ export const useGetRTESectionPlaceholder = (section: string) => {
         return "a hardcopy location";
       case "backup_location":
         return "a backup location";
-      case "scientific_outputs" || "outputs":
+      case "scientific_outputs":
+      case "outputs":
         return "scientific outputs";
       case "context":
         return "some context";
