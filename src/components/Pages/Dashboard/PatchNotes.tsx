@@ -159,6 +159,14 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               are based on SPMS projects and use the descriptions entered on
               each project. Publications will be added at a later date.
             </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Servers and dependencies updated.
+            </ListItem>
           </List>
 
           <span style={{ marginTop: 20 }}>
