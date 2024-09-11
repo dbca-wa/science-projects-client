@@ -249,7 +249,8 @@ export const ProgressReportActionModal = ({
                   <br />
                   <Text>
                     In your capacity as Business Area Lead, would you like to{" "}
-                    {action} this document?
+                    {action === "send_back" ? "send back" : action} this
+                    document?
                   </Text>
                   <br />
                   <Text>

@@ -251,7 +251,7 @@ export const ProjectClosureActionModal = ({
                   <br />
                   <Text>
                     In your capacity as Business Area Lead, would you like to{" "}
-                    {action} this{" "}
+                    {action === "send_back" ? "send back" : action} this
                     {action === "reopen" ? "Project" : "project closure"}?
                   </Text>
                   <br />
