@@ -249,7 +249,8 @@ export const ProjectPlanActionModal = ({
                   <br />
                   <Text>
                     In your capacity as Business Area Lead, would you like to{" "}
-                    {action} this project plan?
+                    {action === "send_back" ? "send back" : action} this project
+                    plan?
                   </Text>
                   <br />
                   <Text>

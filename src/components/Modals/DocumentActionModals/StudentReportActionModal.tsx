@@ -248,7 +248,8 @@ export const StudentReportActionModal = ({
                   <br />
                   <Text>
                     In your capacity as Business Area Lead, would you like to{" "}
-                    {action} this student report?
+                    {action === "send_back" ? "send back" : action} this student
+                    report?
                   </Text>
                   <br />
                   <Text>

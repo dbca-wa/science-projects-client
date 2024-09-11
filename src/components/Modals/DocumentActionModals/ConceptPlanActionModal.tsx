@@ -251,7 +251,8 @@ export const ConceptPlanActionModal = ({
                   <br />
                   <Text>
                     In your capacity as Business Area Lead, would you like to{" "}
-                    {action} this concept plan?
+                    {action === "send_back" ? "send back" : action} this concept
+                    plan?
                   </Text>
                   <br />
                   <Text>
@@ -292,8 +293,19 @@ export const ConceptPlanActionModal = ({
                     isChecked={shouldSendEmail}
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
-                    Send emails to members of the Directorate alerting them that
-                    you have approved this document?
+                    Send emails to
+                    {action === "send_back"
+                      ? stage === 2
+                        ? ` Project lead `
+                        : ` Business Area Lead (${baLead?.first_name} ${baLead?.last_name}) `
+                      : " members of the Directorate alerting them that "}
+                    alerting them you have{" "}
+                    {action === "approve"
+                      ? "approved"
+                      : action === "send_back"
+                        ? "sent back"
+                        : "reopened"}{" "}
+                    this {action === "reopen" ? "project" : "document"}?{" "}
                   </Checkbox>
                 </Box>
               ) : (
