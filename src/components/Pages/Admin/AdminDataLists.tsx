@@ -3,6 +3,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { AllProblematicProjects } from "./Data/AllProblematicProjects";
 import { EmailLists } from "./Data/EmailLists";
 import { StaffUsers } from "./Data/StaffUsers";
+import StaffProfileEmails from "./Data/StaffProfileEmails";
 
 export const AdminDataLists = () => {
   return (
@@ -12,6 +13,7 @@ export const AdminDataLists = () => {
         <TabList>
           <Tab>Problematic Projects</Tab>
           <Tab>Email List</Tab>
+          <Tab>Staff Profile List</Tab>
           <Tab>Staff Users</Tab>
         </TabList>
 
@@ -24,6 +26,11 @@ export const AdminDataLists = () => {
           {/* Emails */}
           <TabPanel>
             <EmailLists />
+          </TabPanel>
+
+          {/* Active Staff Profile Emails */}
+          <TabPanel>
+            <StaffProfileEmails />
           </TabPanel>
 
           {/* Staff */}

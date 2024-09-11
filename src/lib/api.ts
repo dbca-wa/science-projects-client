@@ -384,6 +384,13 @@ export const getEmailProjectList = async ({
   return res;
 };
 
+export const getStaffProfileEmailList = async () => {
+  const res = instance.get(`users/get_staff_profile_emails`).then((res) => {
+    return res.data;
+  });
+  return res;
+};
+
 export const batchApproveProgressAndStudentReports = async () => {
   const res = instance.post(`documents/batchapprove`).then((res) => {
     return res.data;
