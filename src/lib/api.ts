@@ -4126,3 +4126,13 @@ export const cancelAnnualReportPDF = async ({ document_pk }: IDocGen) => {
   // console.log(res.data);
   return { res };
 };
+
+export const checkStaffStatusApiCall = async (pk: number) => {
+  try {
+    const res = await instance.post(`users/is_staff/${pk}`);
+    return res.data; // Ensure that `res.data` is returned properly
+  } catch (err) {
+    console.error("Error fetching staff status:", err);
+    throw err;
+  }
+};

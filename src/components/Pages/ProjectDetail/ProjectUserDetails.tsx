@@ -584,15 +584,22 @@ export const ProjectUserDetails = ({
                     !me?.userData.is_superuser
                   }
                 >
-                  <option value="academicsuper">Academic Supervisor</option>
-                  <option value="consulted">Consulted Peer</option>
-                  <option value="externalcol">External Collaborator</option>
-                  {/* <option value="externalpeer">External Peer</option> */}
-                  <option value="group">Involved Group</option>
-                  <option value="research">Science Support</option>
-                  {/* <option value="supervising">Project Leader</option> */}
-                  <option value="student">Supervised Student</option>
-                  <option value="technical">Technical Support</option>
+                  {user?.is_staff ? (
+                    <>
+                      <option value="technical">Technical Support</option>
+                      <option value="research">Science Support</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="academicsuper">Academic Supervisor</option>
+                      <option value="consulted">Consulted Peer</option>
+                      <option value="externalcol">External Collaborator</option>
+                      {/* <option value="externalpeer">External Peer</option> */}
+                      <option value="group">Involved Group</option>
+                      {/* <option value="supervising">Project Leader</option> */}
+                      <option value="student">Supervised Student</option>
+                    </>
+                  )}
                 </Select>
               </InputGroup>
               <FormHelperText>

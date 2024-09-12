@@ -38,7 +38,11 @@ import {
   UseFormWatch,
   useForm,
 } from "react-hook-form";
-import { INewMember, createTeamMember } from "../../lib/api";
+import {
+  INewMember,
+  checkStaffStatusApiCall,
+  createTeamMember,
+} from "../../lib/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CustomAxiosError } from "../../types";
 
@@ -153,7 +157,7 @@ export const AddUserToProjectModal = ({
               : selectedProject,
           ],
         });
-        refetchTeamData && refetchTeamData();
+        refetchTeamData?.();
         if (!location.pathname.includes("project")) {
           navigate(
             `/projects/${
@@ -204,6 +208,23 @@ export const AddUserToProjectModal = ({
   const role = watch("role");
   const timeAllocation = watch("timeAllocation");
   const shortCode = watch("shortCode");
+
+  const [userIsStaff, setUserIsStaff] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkStaffStatus = async (userId: number) => {
+      try {
+        const res = await checkStaffStatusApiCall(userId);
+        setUserIsStaff(res.is_staff); // Use res.is_staff directly
+      } catch (err) {
+        console.error("Error checking staff status", err);
+      }
+    };
+
+    if (selectedUser) {
+      checkStaffStatus(selectedUser);
+    }
+  }, [selectedUser]);
 
   useEffect(() => {
     if (
@@ -307,90 +328,103 @@ export const AddUserToProjectModal = ({
                 />
               )}
             </Flex>
-            <Flex
-              border={"1px solid"}
-              rounded={"xl"}
-              borderColor={borderColor}
-              padding={4}
-              mb={4}
-              flexDir={"column"}
-              mt={2}
-            >
-              <Flex>
-                <Text
-                  fontWeight={"bold"}
-                  fontSize={"sm"}
-                  mb={1}
-                  color={sectionTitleColor}
-                >
-                  Project Role ({role ? humanReadableRoleName(role) : "None"})
-                </Text>
-              </Flex>
-              <FormControl py={2}>
-                <InputGroup>
-                  <Select
-                    {...register("role", { required: true })}
-                    variant="filled"
-                    placeholder="Select a Role for the User"
+            {selectedUser && selectedProject ? (
+              <Flex
+                border={"1px solid"}
+                rounded={"xl"}
+                borderColor={borderColor}
+                padding={4}
+                mb={4}
+                flexDir={"column"}
+                mt={2}
+              >
+                <Flex>
+                  <Text
+                    fontWeight={"bold"}
+                    fontSize={"sm"}
+                    mb={1}
+                    color={sectionTitleColor}
                   >
-                    <option value="academicsuper">Academic Supervisor</option>
-                    <option value="consulted">Consulted Peer</option>
-                    <option value="externalcol">External Collaborator</option>
-                    {/* <option value="externalpeer">External Peer</option> */}
-                    <option value="group">Involved Group</option>
-                    <option value="research">Science Support</option>
-                    {/* <option value="supervising">Project Leader</option> */}
-                    <option value="student">Supervised Student</option>
-                    <option value="technical">Technical Support</option>
-                  </Select>
-                </InputGroup>
-                <FormHelperText>
-                  The role this team member fills within this project.
-                </FormHelperText>
-              </FormControl>
+                    Project Role ({role ? humanReadableRoleName(role) : "None"})
+                  </Text>
+                </Flex>
+                <FormControl py={2}>
+                  <InputGroup>
+                    <Select
+                      {...register("role", { required: true })}
+                      variant="filled"
+                      placeholder="Select a Role for the User"
+                    >
+                      {userIsStaff ? (
+                        <>
+                          <option value="technical">Technical Support</option>
+                          <option value="research">Science Support</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="academicsuper">
+                            Academic Supervisor
+                          </option>
+                          <option value="consulted">Consulted Peer</option>
+                          <option value="externalcol">
+                            External Collaborator
+                          </option>
+                          {/* <option value="externalpeer">External Peer</option> */}
+                          <option value="group">Involved Group</option>
+                          {/* <option value="supervising">Project Leader</option> */}
+                          <option value="student">Supervised Student</option>
+                        </>
+                      )}
+                    </Select>
+                  </InputGroup>
+                  <FormHelperText>
+                    The role this team member fills within this project.
+                  </FormHelperText>
+                </FormControl>
 
-              <Flex mt={4}>
-                <Text
-                  fontWeight={"bold"}
-                  fontSize={"sm"}
-                  mb={1}
-                  color={sectionTitleColor}
-                >
-                  Time Allocation ({timeAllocation} FTE)
-                </Text>
-              </Flex>
-              <Box mx={2}>
-                <FormSlider
-                  name="timeAllocation"
-                  defaultValue={0}
-                  min={0}
-                  max={1}
-                  step={0.1}
-                  validation={{ required: true }}
-                  formContext={{
-                    register,
-                    setValue,
-                    watch,
-                  }}
+                <Flex mt={4}>
+                  <Text
+                    fontWeight={"bold"}
+                    fontSize={"sm"}
+                    mb={1}
+                    color={sectionTitleColor}
+                  >
+                    Time Allocation ({timeAllocation} FTE)
+                  </Text>
+                </Flex>
+                <Box mx={2}>
+                  <FormSlider
+                    name="timeAllocation"
+                    defaultValue={0}
+                    min={0}
+                    max={1}
+                    step={0.1}
+                    validation={{ required: true }}
+                    formContext={{
+                      register,
+                      setValue,
+                      watch,
+                    }}
+                  />
+                </Box>
+
+                <Flex mt={4}>
+                  <Text
+                    fontWeight={"bold"}
+                    fontSize={"sm"}
+                    mb={1}
+                    color={sectionTitleColor}
+                  >
+                    Short Code
+                  </Text>
+                </Flex>
+                <Input
+                  {...register("shortCode", { required: false })}
+                  type="number"
+                  autoComplete="off"
                 />
-              </Box>
-
-              <Flex mt={4}>
-                <Text
-                  fontWeight={"bold"}
-                  fontSize={"sm"}
-                  mb={1}
-                  color={sectionTitleColor}
-                >
-                  Short Code
-                </Text>
               </Flex>
-              <Input
-                {...register("shortCode", { required: false })}
-                type="number"
-                autoComplete="off"
-              />
-            </Flex>
+            ) : null}
           </Box>
         </ModalBody>
 
