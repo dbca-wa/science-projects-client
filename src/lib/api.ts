@@ -220,6 +220,13 @@ export const getEndorsementsPendingMyAction = () => {
   return res;
 };
 
+export const getPendingAdminTasks = () => {
+  const res = instance.get(`adminactions/tasks`).then((res) => {
+    return res.data;
+  });
+  return res;
+};
+
 // Separated queries (faster, hits db more)
 export const getDocumentsPendingStageOneAction = () => {
   const res = instance

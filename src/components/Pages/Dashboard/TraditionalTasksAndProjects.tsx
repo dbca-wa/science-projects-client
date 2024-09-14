@@ -32,6 +32,8 @@ export const TraditionalTasksAndProjects = () => {
   const { pendingProjectDocumentData, pendingProjectDocumentDataLoading } =
     useGetDocumentsPendingMyAction();
 
+  const pendingAdminActionsLoading = true;
+
   const { pendingEndorsementsData, pendingEndorsementsDataLoading } =
     useGetEndorsementsPendingMyAction();
 
@@ -49,6 +51,68 @@ export const TraditionalTasksAndProjects = () => {
           defaultIndex={[0]}
           allowMultiple
         >
+          {me?.userData?.is_superuser === true ? (
+            pendingAdminActionsLoading ? (
+              <Center my={4}>
+                <Spinner />
+              </Center>
+            ) : (
+              <motion.div
+                initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
+                animate={{
+                  opacity: pendingProjectDocumentDataLoading ? 0 : 1,
+                }}
+                transition={{ duration: 0.4 }} // Animation duration in seconds
+              >
+                <AccordionItem
+                  borderColor={
+                    colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
+                  }
+                  borderBottom={"none"}
+                  borderTop={"none"}
+                >
+                  <AccordionButton
+                    bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                    color={colorMode === "light" ? "black" : "white"}
+                    _hover={
+                      colorMode === "light"
+                        ? { bg: "gray.300", color: "black" }
+                        : { bg: "gray.500", color: "white" }
+                    }
+                    userSelect={"none"}
+                  >
+                    <Box as="span" flex="1" textAlign="left">
+                      My Tasks
+                    </Box>
+
+                    {/* </Box> */}
+                    {pendingProjectDocumentData?.all?.length >= 1 ? (
+                      <Box
+                        display={"inline-flex"}
+                        justifyContent={"center"}
+                        alignItems={"center"}
+                      >
+                        <Box mr={2}>
+                          {pendingProjectDocumentData?.all?.length}
+                        </Box>
+                        <FcHighPriority />
+                      </Box>
+                    ) : (
+                      <FcOk />
+                    )}
+                    <AccordionIcon />
+                  </AccordionButton>
+
+                  <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+                    <DocumentsDataTable
+                      pendingProjectDocumentData={pendingProjectDocumentData}
+                    />
+                  </AccordionPanel>
+                </AccordionItem>
+              </motion.div>
+            )
+          ) : null}
+
           {pendingProjectDocumentDataLoading ? (
             // null
             <Center my={4}>
