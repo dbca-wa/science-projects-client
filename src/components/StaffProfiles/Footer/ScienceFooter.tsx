@@ -4,7 +4,7 @@ import { useCurrentYear } from "@/lib/hooks/helper/useCurrentYear";
 
 const MobileFooter = ({ currentYear }: { currentYear: number }) => {
   return (
-    <div className="relative flex justify-center bg-[#2d2f32] px-8 py-4 text-white dark:bg-slate-950">
+    <div className="relative mt-4 flex justify-center bg-[#2d2f32] px-8 py-4 text-white dark:bg-slate-950">
       {/* bg-[#749d5f] */}
       <div className="flex flex-col text-center">
         <div className="flex justify-between">
