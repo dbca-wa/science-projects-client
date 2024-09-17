@@ -137,7 +137,7 @@ const Pagination = ({
   }
 
   return (
-    <div className="mt-4 flex items-center justify-center space-x-2">
+    <div className="mt-8 flex items-center justify-center space-x-2">
       <Button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1 || totalResults === 0}

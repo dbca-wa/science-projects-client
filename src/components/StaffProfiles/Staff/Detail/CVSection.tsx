@@ -42,7 +42,7 @@ const CVSection = ({
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <>
+    <div className="pb-6">
       {!staffCVLoading ? (
         <>
           <Subsection
@@ -110,7 +110,7 @@ const CVSection = ({
           </Subsection>
 
           <Subsection
-            title="Education"
+            title="Qualifications"
             divider
             button={
               (viewingUser?.pk === userId || viewingUser?.is_superuser) &&
@@ -175,7 +175,7 @@ const CVSection = ({
           </Subsection>
         </>
       ) : null}
-    </>
+    </div>
   );
 };
 
@@ -407,8 +407,8 @@ export const EducationDialog = ({
         <span className="flex items-center">
           <AddItemButton
             as={"div"}
-            ariaLabel={`${kind?.charAt(0).toUpperCase()}${kind?.slice(1)} Education Button`}
-            label={`Click to ${kind} an education item`}
+            ariaLabel={`${kind?.charAt(0).toUpperCase()}${kind?.slice(1)} Qualification Button`}
+            label={`Click to ${kind} a qualification item`}
             onClick={() => {}}
             icon={
               kind === "delete"
@@ -441,7 +441,7 @@ export const EducationDialog = ({
       <DialogContent className="text-slate-800 sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="mb-2 mt-3">
-            {`${kind?.charAt(0)?.toUpperCase()}${kind?.slice(1)}`} Education
+            {`${kind?.charAt(0)?.toUpperCase()}${kind?.slice(1)}`} Qualification
           </DialogTitle>
         </DialogHeader>
         {kind === "add" && (
