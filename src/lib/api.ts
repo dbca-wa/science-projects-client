@@ -1068,7 +1068,7 @@ export const createEmployment = async ({
       public_profile,
       position_title,
       start_year,
-      end_year,
+      end_year: end_year === "" ? null : end_year,
       section,
       employer,
     })
@@ -1125,7 +1125,7 @@ export const editEmployment = async ({
       // public_profile,
       position_title,
       start_year,
-      end_year,
+      end_year: end_year === "" ? null : end_year,
       section,
       employer,
     })

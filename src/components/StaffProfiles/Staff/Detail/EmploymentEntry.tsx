@@ -23,7 +23,7 @@ const EmploymentEntry = ({
   const currentYear = useCurrentYear();
 
   const checkYearForPresent = (thisYear: number, value: number) => {
-    if (thisYear <= value) {
+    if (!value || thisYear <= value) {
       return "Present";
     }
     return value;

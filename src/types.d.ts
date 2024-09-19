@@ -1077,7 +1077,7 @@ export interface IStaffEmploymentEntry {
   public_profile: number;
   position_title: string;
   start_year: string;
-  end_year: string;
+  end_year: string | null;
   section?: boolean;
   employer: string;
 }

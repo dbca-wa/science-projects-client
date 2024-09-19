@@ -117,14 +117,19 @@ const AddStaffEmploymentContent = ({
             placeholder="Enter the start year"
             className="w-full"
             {...register("start_year", {
-              required: true,
+              required: "Start year is required", // Make sure this field is required
               validate: (value) => {
                 const endYear = getValues("end_year");
-                return (
-                  !endYear ||
-                  value <= endYear ||
-                  "Start year cannot be after end year"
-                );
+                // Check if start year is a valid 4-digit number
+                const isValidYear = /^[12]\d{3}$/.test(value);
+                if (!isValidYear) {
+                  return "Start year must be a valid 4-digit year";
+                }
+                // Check if start year is less than or equal to end year (if end year exists)
+                if (endYear && value > endYear) {
+                  return "Start year cannot be after end year";
+                }
+                return true; // All validations passed
               },
             })}
           />
@@ -135,7 +140,7 @@ const AddStaffEmploymentContent = ({
 
         <div className="mt-1 flex flex-col">
           <Label htmlFor="end_year" className="my-2">
-            End Year
+            End Year (Optional)
           </Label>
 
           <Input
@@ -144,18 +149,22 @@ const AddStaffEmploymentContent = ({
             placeholder="Enter the end year"
             className="w-full"
             {...register("end_year", {
-              required: true,
+              required: false, // Optional field
               validate: (value) => {
+                if (!value) return true; // Allow empty end_year
                 const startYear = getValues("start_year");
                 return (
-                  !startYear ||
-                  value >= startYear ||
-                  "End year cannot be before start year"
+                  (/^[12]\d{3}$/.test(value) && value >= startYear) || // Ensure value is a 4-digit year and after start_year
+                  "End year must be a valid 4-digit year and not before start year"
                 );
               },
             })}
           />
-          {errors.end_year && (
+          {!errors.end_year ? (
+            <p className="ml-1 text-sm text-gray-600">
+              Leave this blank if current
+            </p>
+          ) : (
             <p className="text-sm text-red-600">{errors.end_year.message}</p>
           )}
         </div>
