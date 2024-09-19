@@ -1082,8 +1082,8 @@ export const createEmployment = async ({
 export const createEducation = async ({
   // pk,
   public_profile,
-  qualification_kind,
-  qualification_field,
+  // qualification_kind,
+  // qualification_field,
   qualification_name,
   start_year,
   end_year,
@@ -1094,8 +1094,8 @@ export const createEducation = async ({
     .post(`users/education_entries/`, {
       // pk,
       public_profile,
-      qualification_kind,
-      qualification_field,
+      // qualification_kind,
+      // qualification_field,
       qualification_name,
 
       start_year,
@@ -1139,8 +1139,8 @@ export const editEmployment = async ({
 export const editEducation = async ({
   pk,
   // public_profile,
-  qualification_kind,
-  qualification_field,
+  // qualification_kind,
+  // qualification_field,
   qualification_name,
   start_year,
   end_year,
@@ -1151,8 +1151,8 @@ export const editEducation = async ({
     .put(`users/education_entries/${pk}`, {
       // pk,
       // public_profile,
-      qualification_kind,
-      qualification_field,
+      // qualification_kind,
+      // qualification_field,
       qualification_name,
 
       start_year,

@@ -1096,8 +1096,8 @@ export type QualificationKind =
 export interface IStaffEducationEntry {
   pk: number;
   public_profile: number;
-  qualification_field: string;
-  qualification_kind: QualificationKind;
+  // qualification_field: string;
+  // qualification_kind: QualificationKind;
   qualification_name: string;
   start_year: string;
   end_year: string;
