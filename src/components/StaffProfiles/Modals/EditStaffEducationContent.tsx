@@ -39,8 +39,8 @@ const EditStaffEducationContent = ({
   } = useForm<IStaffEducationEntry>({
     mode: "onChange",
     defaultValues: {
-      qualification_field: educationItem?.qualification_field,
-      qualification_kind: educationItem?.qualification_kind,
+      // qualification_field: educationItem?.qualification_field,
+      // qualification_kind: educationItem?.qualification_kind,
       qualification_name: educationItem?.qualification_name,
       start_year: educationItem?.start_year,
       end_year: educationItem?.end_year,
@@ -82,17 +82,17 @@ const EditStaffEducationContent = ({
     mutation.mutate(formData);
   };
 
-  const qualificationKindOptions = [
-    { value: "postdoc", label: "Postdoctoral in" },
-    { value: "doc", label: "Doctor of" },
-    { value: "master", label: "Master of" },
-    { value: "graddip", label: "Graduate Diploma in" },
-    { value: "bachelor", label: "Bachelor of" },
-    { value: "assdegree", label: "Associate Degree in" },
-    { value: "diploma", label: "Diploma in" },
-    { value: "cert", label: "Certificate in" },
-    { value: "nano", label: "Nanodegree in" },
-  ];
+  // const qualificationKindOptions = [
+  //   { value: "postdoc", label: "Postdoctoral in" },
+  //   { value: "doc", label: "Doctor of" },
+  //   { value: "master", label: "Master of" },
+  //   { value: "graddip", label: "Graduate Diploma in" },
+  //   { value: "bachelor", label: "Bachelor of" },
+  //   { value: "assdegree", label: "Associate Degree in" },
+  //   { value: "diploma", label: "Diploma in" },
+  //   { value: "cert", label: "Certificate in" },
+  //   { value: "nano", label: "Nanodegree in" },
+  // ];
 
   return (
     <div className="px-3 py-4">
@@ -105,7 +105,7 @@ const EditStaffEducationContent = ({
           })}
           readOnly
         />
-        <Label htmlFor="qualification_kind" className="">
+        {/* <Label htmlFor="qualification_kind" className="">
           Qualification Type
         </Label>
         <Controller
@@ -126,7 +126,7 @@ const EditStaffEducationContent = ({
               </SelectContent>
             </Select>
           )}
-        />
+        /> */}
 
         <Label htmlFor="qualification_name" className="">
           Qualification
@@ -139,14 +139,14 @@ const EditStaffEducationContent = ({
           {...register("qualification_name", { required: false })}
         />
 
-        <Label htmlFor="qualification_field">Field</Label>
+        {/* <Label htmlFor="qualification_field">Field</Label>
         <Input
           type="text"
           id="qualification_field"
           placeholder="Enter the subject matter of the qualification"
           className="my-1"
           {...register("qualification_field", { required: true })}
-        />
+        /> */}
 
         <div className="mt-1 flex flex-col">
           <Label htmlFor="institution" className="my-2">

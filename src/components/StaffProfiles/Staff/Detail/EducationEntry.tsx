@@ -12,8 +12,8 @@ interface EducationEntryProps extends IStaffEducationEntry {
 const EducationEntry = ({
   pk,
   public_profile,
-  qualification_field,
-  qualification_kind,
+  // qualification_field,
+  // qualification_kind,
   qualification_name,
   start_year,
   end_year,
@@ -32,21 +32,21 @@ const EducationEntry = ({
   };
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const qualificationKindOptions = [
-    { value: "postdoc", label: "Postdoctoral in" },
-    { value: "doc", label: "Doctor of" },
-    { value: "master", label: "Master of" },
-    { value: "graddip", label: "Graduate Diploma in" },
-    { value: "bachelor", label: "Bachelor of" },
-    { value: "assdegree", label: "Associate Degree in" },
-    { value: "diploma", label: "Diploma in" },
-    { value: "cert", label: "Certificate in" },
-    { value: "nano", label: "Nanodegree in" },
-  ];
+  // const qualificationKindOptions = [
+  //   { value: "postdoc", label: "Postdoctoral in" },
+  //   { value: "doc", label: "Doctor of" },
+  //   { value: "master", label: "Master of" },
+  //   { value: "graddip", label: "Graduate Diploma in" },
+  //   { value: "bachelor", label: "Bachelor of" },
+  //   { value: "assdegree", label: "Associate Degree in" },
+  //   { value: "diploma", label: "Diploma in" },
+  //   { value: "cert", label: "Certificate in" },
+  //   { value: "nano", label: "Nanodegree in" },
+  // ];
 
-  const selectedOption = qualificationKindOptions.find(
-    (option) => option.value === qualification_kind,
-  );
+  // const selectedOption = qualificationKindOptions.find(
+  //   (option) => option.value === qualification_kind,
+  // );
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -77,8 +77,8 @@ const EducationEntry = ({
                 educationItem={{
                   pk,
                   public_profile,
-                  qualification_field,
-                  qualification_kind,
+                  // qualification_field,
+                  // qualification_kind,
                   qualification_name,
                   start_year,
                   end_year,
@@ -96,8 +96,8 @@ const EducationEntry = ({
                 educationItem={{
                   pk,
                   public_profile,
-                  qualification_field,
-                  qualification_kind,
+                  // qualification_field,
+                  // qualification_kind,
                   qualification_name,
                   start_year,
                   end_year,
@@ -116,8 +116,8 @@ const EducationEntry = ({
                 educationItem={{
                   pk,
                   public_profile,
-                  qualification_field,
-                  qualification_kind,
+                  // qualification_field,
+                  // qualification_kind,
                   qualification_name,
                   start_year,
                   end_year,
@@ -133,8 +133,8 @@ const EducationEntry = ({
                 educationItem={{
                   pk,
                   public_profile,
-                  qualification_field,
-                  qualification_kind,
+                  // qualification_field,
+                  // qualification_kind,
                   qualification_name,
                   start_year,
                   end_year,
@@ -148,15 +148,14 @@ const EducationEntry = ({
       )}
 
       {/* Name */}
-      <p
+      {/* <p
         style={{
           fontWeight: 600,
         }}
         className="text-balance"
       >
-        {/* History and Asian Studies */}
         {qualification_field}
-      </p>
+      </p> */}
 
       {/* Details */}
       <div className="text-balance">
@@ -166,7 +165,8 @@ const EducationEntry = ({
             : `${start_year} - ${checkYearForPresent(currentYear, Number(end_year))}`}
         </p>
         <p>
-          {selectedOption.label} {qualification_name}
+          {/* {selectedOption.label}  */}
+          {qualification_name}
         </p>
         <p>
           {institution} ({location})

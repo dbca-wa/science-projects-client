@@ -94,7 +94,7 @@ const AddStaffEducationContent = ({
           })}
           readOnly
         />
-        <Label htmlFor="qualification_kind" className="">
+        {/* <Label htmlFor="qualification_kind" className="">
           Qualification Type
         </Label>
         <Controller
@@ -115,7 +115,7 @@ const AddStaffEducationContent = ({
               </SelectContent>
             </Select>
           )}
-        />
+        /> */}
 
         <Label htmlFor="qualification_name" className="">
           Qualification
@@ -128,14 +128,14 @@ const AddStaffEducationContent = ({
           {...register("qualification_name", { required: false })}
         />
 
-        <Label htmlFor="qualification_field">Field</Label>
+        {/* <Label htmlFor="qualification_field">Field</Label>
         <Input
           type="text"
           id="qualification_field"
           placeholder="Enter the subject matter of the qualification"
           className="my-1"
           {...register("qualification_field", { required: true })}
-        />
+        /> */}
 
         <div className="mt-1 flex flex-col">
           <Label htmlFor="institution" className="my-2">
