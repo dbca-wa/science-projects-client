@@ -153,11 +153,22 @@ const ProjectItem = ({
           dangerouslySetInnerHTML={{
             __html: sanitizeHtml(replaceDarkWithLight(title || "")),
           }}
-          onClick={() => {
-            if (process.env.NODE_ENV === "development") {
-              navigate(`/projects/${pk}/overview`);
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              if (process.env.NODE_ENV === "development") {
+                window.open(`/projects/${pk}/overview`, "_blank");
+              } else {
+                window.open(
+                  `${VITE_PRODUCTION_BASE_URL}projects/${pk}/overview`,
+                  "_blank",
+                );
+              }
             } else {
-              setHref(`${VITE_PRODUCTION_BASE_URL}projects/${pk}/overview`);
+              if (process.env.NODE_ENV === "development") {
+                navigate(`/projects/${pk}/overview`);
+              } else {
+                setHref(`${VITE_PRODUCTION_BASE_URL}projects/${pk}/overview`);
+              }
             }
           }}
         />

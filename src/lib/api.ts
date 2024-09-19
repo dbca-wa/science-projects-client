@@ -18,6 +18,7 @@ import {
   IDepartmentalService,
   IDivision,
   IMergeAffiliation,
+  IMergeUser,
   IPersonalInformation,
   IProfile,
   IProgressReport,
@@ -193,6 +194,11 @@ export const createUser = async (userData: UserData) => {
     console.error("Error creating user:", error);
     throw error;
   }
+};
+
+export const mergeUsers = async (formData: IMergeUser) => {
+  // console.log(formData)
+  return instance.post("users/merge", formData).then((res) => res.data);
 };
 
 export const getUserLastOnlineTimestamp = async (userId: string) => {

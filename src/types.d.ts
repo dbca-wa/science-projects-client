@@ -150,6 +150,16 @@ export interface IAffiliation {
   name: string;
 }
 
+export interface ISetCaretaker {
+  primaryUserPk: number;
+  caretakerUserPk: number;
+}
+
+export interface IMergeUser {
+  primaryUserPk: number;
+  secondaryUsersPk: number[];
+}
+
 export interface IMergeAffiliation {
   primaryAffiliation: IAffiliation; // or IAffiliation and extract pk
   secondaryAffiliations: IAffiliation[]; // or IAffiliation and extract pk
