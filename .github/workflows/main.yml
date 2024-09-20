@@ -98,17 +98,26 @@ jobs:
 
           echo "Keeping latest 10 tags: ${keep_tags_names[*]}"
 
-          # Loop through each tag and its push date
-          for line in "${sorted_tags[@]}"; do
-              tag_name=$(echo "$line" | cut -d ' ' -f 1)
-              tag_date=$(echo "$line" | cut -d ' ' -f 2)
+          # Check total number of tags
+          total_tags_count=${#sorted_tags[@]}
+          echo "Total tags: $total_tags_count"
 
-              # Check if the tag is older than two months and not in the keep list
-              if [[ "$tag_date" < "$cutoff_date" ]] && ! [[ " ${keep_tags_names[*]} " =~ " $tag_name " ]]; then
-                  echo "Deleting tag $tag_name, pushed on $tag_date..."
-                  curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-                  https://api.github.com/repos/${{ github.repository }}/git/refs/tags/$tag_name
-              else
-                  echo "Keeping tag $tag_name, pushed on $tag_date"
-              fi
-          done
+          # Only proceed if total tags count is 25 or more
+          if (( total_tags_count > 25 )); then
+              # Loop through each tag and its push date
+              for line in "${sorted_tags[@]}"; do
+                  tag_name=$(echo "$line" | cut -d ' ' -f 1)
+                  tag_date=$(echo "$line" | cut -d ' ' -f 2)
+
+                  # Check if the tag is older than two months and not in the keep list
+                  if [[ "$tag_date" < "$cutoff_date" ]] && ! [[ " ${keep_tags_names[*]} " =~ " $tag_name " ]]; then
+                      echo "Deleting tag $tag_name, pushed on $tag_date..."
+                      curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+                      https://api.github.com/repos/${{ github.repository }}/git/refs/tags/$tag_name
+                  else
+                      echo "Keeping tag $tag_name, pushed on $tag_date"
+                  fi
+              done
+          else
+              echo "Total tags are less than or equal to 25, no cleanup needed."
+          fi
