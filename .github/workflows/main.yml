@@ -110,30 +110,33 @@ jobs:
 
           # Now clean up the package versions
           echo "Fetching list of package versions..."
-          packages=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/orgs/dbca-wa/packages/container/science-projects-client/versions | jq -r '.[] | .name')
+          package_versions=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/orgs/dbca-wa/packages/container/science-projects-client/versions | jq -r '.[] | .id + " " + .name')
 
           # Prepare a list to hold all package versions
           package_list=()
           while IFS= read -r line; do
               package_list+=("$line")
-          done <<< "$packages"
+          done <<< "$package_versions"
 
           # Keep the latest 16 package versions
           keep_packages=("${package_list[@]:0:16}")
-          keep_package_names=()
+          keep_package_ids=()
           for package in "${keep_packages[@]}"; do
-              keep_package_names+=("$package")
+              package_id=$(echo "$package" | cut -d ' ' -f 1)
+              keep_package_ids+=("$package_id")
           done
 
-          echo "Keeping latest 16 package versions: ${keep_package_names[*]}"
+          echo "Keeping latest 16 package versions: ${keep_package_ids[*]}"
 
           # Loop through each package and delete if not in keep list
-          for package_name in "${package_list[@]}"; do
-              if ! [[ " ${keep_package_names[*]} " =~ " $package_name " ]]; then
-                  echo "Deleting package version $package_name..."
+          for package in "${package_list[@]}"; do
+              package_id=$(echo "$package" | cut -d ' ' -f 1)
+
+              if ! [[ " ${keep_package_ids[*]} " =~ " $package_id " ]]; then
+                  echo "Deleting package version ID $package_id..."
                   curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-                  https://api.github.com/orgs/dbca-wa/packages/container/science-projects-client/versions/$package_name
+                  "https://api.github.com/orgs/dbca-wa/packages/container/science-projects-client/versions/$package_id"
               else
-                  echo "Keeping package version $package_name"
+                  echo "Keeping package version ID $package_id"
               fi
           done
