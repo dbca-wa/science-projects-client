@@ -110,7 +110,7 @@ jobs:
 
           # Now clean up the package versions
           echo "Fetching list of package versions..."
-          package_versions=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/orgs/dbca-wa/packages/container/science-projects-client/versions | jq -r '.[] | .id + " " + .name')
+          package_versions=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/orgs/dbca-wa/packages/container/science-projects-client/versions | jq -r '.[] | .id as $id | .name as $name | "\($id) \($name)"')
 
           # Prepare a list to hold all package versions
           package_list=()
