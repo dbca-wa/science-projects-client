@@ -275,6 +275,8 @@ export interface IUserData {
 }
 
 export interface IUserMe {
+  staff_profile_pk?: number;
+  public_email?: string;
   id?: number;
   pk?: number;
   display_first_name: string;
