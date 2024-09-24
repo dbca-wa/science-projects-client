@@ -58,7 +58,7 @@ const ScienceStaffDetail = () => {
           </Button>
         </div>
       ) : !userLoading ? (
-        <div className="max-w-[600px] justify-center">
+        <div className="sm: max-w-[600px] justify-center px-0 sm:px-12 md:w-[900px]">
           <div className="flex flex-col">
             <StaffHero
               usersPk={usersPk}

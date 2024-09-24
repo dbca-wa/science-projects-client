@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EditStaffHeroContent from "../../Modals/EditStaffHeroContent";
 import React from "react";
 
@@ -47,83 +47,268 @@ const StaffHero = ({
 
   useEffect(() => console.log(staffHeroData), [staffHeroData]);
 
-  return !staffHeroLoading ? (
-    <>
-      <div className="flex flex-col">
-        {/* Back button */}
+  const VITE_PRODUCTION_BACKEND_API_URL =
+    import.meta.env.VITE_PRODUCTION_BACKEND_API_URL || "http://127.0.0.1:8000/";
 
-        <div className="flex justify-center py-5">
-          <ChakraButton
-            onClick={() => navigate("/staff")}
-            variant={"link"}
-            leftIcon={<ChevronLeft />}
-            color={"black"}
-          >
-            Back to Search
-          </ChakraButton>
+  useEffect(() => {
+    console.log(
+      `${VITE_PRODUCTION_BACKEND_API_URL}${staffHeroData?.user?.avatar?.file}`,
+    );
+  }, [VITE_PRODUCTION_BACKEND_API_URL, staffHeroData]);
+
+  return !staffHeroLoading ? (
+    // MOBILE
+    !isDesktop ? (
+      <div className="mb-2">
+        <div className="flex flex-col">
+          {/* Back button */}
+
+          <div className="mr-4 flex justify-center py-5">
+            <ChakraButton
+              onClick={() => navigate("/staff")}
+              variant={"link"}
+              // bg={"gray.500"}
+              leftIcon={<ChevronLeft />}
+              color={"black"}
+            >
+              Back
+            </ChakraButton>
+          </div>
+
+          {/* Image (if exists) */}
+          {staffHeroData?.user?.avatar && (
+            <div className="flex justify-center">
+              <img
+                src={`${VITE_PRODUCTION_BACKEND_API_URL}${staffHeroData?.user?.avatar?.file}`}
+                alt={`Profile of ${staffHeroData?.name}`}
+                className="h-28 w-28 rounded-lg object-cover"
+              />
+            </div>
+          )}
+
+          {/* Name, Title and Tag */}
+          <div className="flex w-full flex-col justify-center p-4 pb-2 text-center">
+            <p className="text-2xl font-semibold">
+              {staffHeroData?.title && `${staffHeroData?.title}. `}
+              {staffHeroData?.name}
+            </p>
+
+            {staffHeroData?.it_asset_data && (
+              <>
+                <p className="mt-4 text-balance font-semibold text-slate-600 dark:text-slate-400">
+                  {staffHeroData?.it_asset_data?.title
+                    ? staffHeroData?.it_asset_data?.title
+                    : "Staff Member"}
+                </p>
+                <p className="mt-2 text-balance text-sm font-medium text-slate-500 dark:text-slate-400">
+                  {staffHeroData?.it_asset_data?.unit
+                    ? `${staffHeroData?.it_asset_data?.unit}`
+                    : ""}
+
+                  {staffHeroData?.it_asset_data?.division
+                    ? `, ${staffHeroData?.it_asset_data?.division}`
+                    : ""}
+                </p>
+                <p className="mt-2 text-balance text-sm font-medium text-slate-500 dark:text-slate-400">
+                  {staffHeroData?.it_asset_data?.location?.name
+                    ? `${staffHeroData?.it_asset_data?.location?.name}`
+                    : ""}
+                </p>
+              </>
+            )}
+            <div
+              className={`flex flex-col items-center justify-center ${staffHeroData?.keyword_tags.length > 0 && "mb-1 mt-1"}`}
+            >
+              <p
+                className={`text-balance text-muted-foreground ${staffHeroData?.keyword_tags?.length > 0 && "mt-3"}`}
+              >
+                {staffHeroData?.keyword_tags?.map(
+                  (tag: { pk: number; name: string }, idx: number) => {
+                    return (
+                      <React.Fragment key={tag.pk}>
+                        {tag.name}
+                        {(idx + 1) % 3 !== 0 &&
+                          idx < staffHeroData.keyword_tags.length - 1 &&
+                          " | "}
+                        {(idx + 1) % 3 === 0 && <br />}
+                      </React.Fragment>
+                    );
+                  },
+                )}
+              </p>
+              {(String(viewingUser?.pk) === usersPk ||
+                viewingUser?.is_superuser) &&
+              buttonsVisible ? (
+                <>
+                  <div className="mt-4 flex">
+                    {(staffHeroData?.keyword_tags?.length === 0 ||
+                      !staffHeroData?.keyword_tags) && (
+                      <p className="text-balance text-muted-foreground">
+                        No keywords
+                      </p>
+                    )}
+                    {isDesktop ? (
+                      <EditKeywordsDialog
+                        userPk={Number(usersPk)}
+                        refetch={refetch}
+                        staffHeroData={staffHeroData}
+                      />
+                    ) : (
+                      <EditKeywordsDrawer
+                        userPk={Number(usersPk)}
+                        refetch={refetch}
+                        staffHeroData={staffHeroData}
+                      />
+                    )}
+                  </div>
+                </>
+              ) : null}
+            </div>
+          </div>
         </div>
 
-        {/* Name, Title and Tag */}
-        <div className="flex w-full flex-col justify-center p-4 pb-2 text-center">
-          <p className="text-2xl font-bold">
-            {staffHeroData?.title && `${staffHeroData?.title}. `}
-            {staffHeroData?.name}
-          </p>
-
-          {staffHeroData?.it_asset_data && (
-            <>
-              <p className="mt-4 text-balance font-semibold text-slate-700 dark:text-slate-400">
-                {staffHeroData?.it_asset_data?.title
-                  ? staffHeroData?.it_asset_data?.title
-                  : "Staff Member"}
-              </p>
-              <p className="mt-2 text-balance text-sm font-semibold text-slate-700 dark:text-slate-400">
-                {staffHeroData?.it_asset_data?.division
-                  ? staffHeroData?.it_asset_data?.division
-                  : ""}
-                {staffHeroData?.it_asset_data?.unit
-                  ? `, ${staffHeroData?.it_asset_data?.unit}`
-                  : ""}
-              </p>
-              <p className="mt-2 text-balance text-sm font-semibold text-slate-600 dark:text-slate-400">
-                {staffHeroData?.it_asset_data?.location?.name
-                  ? `${staffHeroData?.it_asset_data?.location?.name}`
-                  : ""}
-              </p>
-            </>
-          )}
-          <div
-            className={`flex flex-col items-center justify-center ${staffHeroData?.keyword_tags.length > 0 && "mb-1 mt-1"}`}
-          >
-            <p
-              className={`text-balance text-muted-foreground ${staffHeroData?.keyword_tags?.length > 0 && "mt-3"}`}
+        {!buttonsVisible ? (
+          isDesktop ? (
+            <div className="mt-2 flex justify-center">
+              <SendUserEmailDialog
+                name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
+                pk={staffHeroData?.user?.pk}
+              />
+            </div>
+          ) : (
+            <div className="mt-2 flex justify-center">
+              <SendUserEmailMobileDrawer
+                name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
+                pk={staffHeroData?.user?.pk}
+              />
+            </div>
+          )
+        ) : null}
+      </div>
+    ) : (
+      // DESKTOP
+      <div className="mb-2">
+        <div className="mt-4 flex flex-col">
+          {/* Back button */}
+          <div className="">
+            <ChakraButton
+              onClick={() => navigate("/staff")}
+              variant={"link"}
+              // bg={"gray.500"}
+              leftIcon={<ChevronLeft />}
+              color={"black"}
             >
-              {staffHeroData?.keyword_tags?.map(
-                (tag: { pk: number; name: string }, idx: number) => {
-                  return (
-                    <React.Fragment key={tag.pk}>
-                      {tag.name}
-                      {(idx + 1) % 5 !== 0 &&
-                        idx < staffHeroData.keyword_tags.length - 1 &&
-                        " | "}
-                      {(idx + 1) % 5 === 0 && <br />}
-                    </React.Fragment>
-                  );
-                },
+              Back
+            </ChakraButton>
+          </div>
+
+          {/* Main Content Container */}
+          <div className="mt-4 flex">
+            {/* Image (if exists) */}
+            {staffHeroData?.user?.avatar && (
+              <img
+                src={`${VITE_PRODUCTION_BACKEND_API_URL}${staffHeroData?.user?.avatar?.file}`}
+                alt={`Profile of ${staffHeroData?.name}`}
+                className="mr-6 h-44 w-44 flex-shrink-0 rounded-lg object-cover"
+              />
+            )}
+            {/* Name, Title and Tag, email, keywords */}
+            <div className="flex w-full flex-col">
+              <p className="text-2xl font-semibold">
+                {staffHeroData?.title && `${staffHeroData?.title}. `}
+                {staffHeroData?.name}
+              </p>
+              {/* Division, Unit, Location */}
+              {staffHeroData?.it_asset_data && (
+                <>
+                  <p className="mt-2 text-balance font-semibold text-slate-600 dark:text-slate-400">
+                    {staffHeroData?.it_asset_data?.title
+                      ? staffHeroData?.it_asset_data?.title
+                      : "Staff Member"}
+                  </p>
+                  <p className="mt-2 text-balance text-sm font-medium text-slate-500 dark:text-slate-400">
+                    {staffHeroData?.it_asset_data?.unit
+                      ? `${staffHeroData?.it_asset_data?.unit}`
+                      : ""}
+
+                    {staffHeroData?.it_asset_data?.division
+                      ? `, ${staffHeroData?.it_asset_data?.division}`
+                      : ""}
+                  </p>
+                  <p className="mt-1 text-balance text-sm font-medium text-slate-500 dark:text-slate-400">
+                    {staffHeroData?.it_asset_data?.location?.name
+                      ? `${staffHeroData?.it_asset_data?.location?.name}`
+                      : ""}
+                  </p>
+                </>
               )}
-            </p>
+              {/* Email btn */}
+              {!buttonsVisible ? (
+                isDesktop ? (
+                  <div className="mt-3">
+                    <SendUserEmailDialog
+                      name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
+                      pk={staffHeroData?.user?.pk}
+                    />
+                  </div>
+                ) : (
+                  <div className="mt-4">
+                    <SendUserEmailMobileDrawer
+                      name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
+                      pk={staffHeroData?.user?.pk}
+                    />
+                  </div>
+                )
+              ) : null}
+            </div>
+          </div>
+          {/* Keywords */}
+          <div
+            className={`pb-4 pt-0 ${staffHeroData?.keyword_tags.length > 0 && "max-w-full border-b-2 border-gray-200"}`}
+          >
+            <div className="flex items-center">
+              <TagList staffHeroData={staffHeroData} />
+
+              {buttonsVisible === true ? (
+                String(viewingUser?.pk) === usersPk ||
+                viewingUser?.is_superuser ? (
+                  <div
+                    className={`${staffHeroData?.keyword_tags?.length < 1 ? "mt-4" : ""}`}
+                  >
+                    <EditKeywordsDialog
+                      userPk={Number(usersPk)}
+                      refetch={refetch}
+                      staffHeroData={staffHeroData}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className={`${staffHeroData?.keyword_tags?.length < 1 ? "mt-4" : ""}`}
+                  >
+                    <EditKeywordsDrawer
+                      userPk={Number(usersPk)}
+                      refetch={refetch}
+                      staffHeroData={staffHeroData}
+                    />
+                  </div>
+                )
+              ) : null}
+            </div>
             {(String(viewingUser?.pk) === usersPk ||
               viewingUser?.is_superuser) &&
             buttonsVisible ? (
               <>
-                <div className="mt-4 flex">
+                <div className="mt-2 flex items-center">
                   {(staffHeroData?.keyword_tags?.length === 0 ||
                     !staffHeroData?.keyword_tags) && (
                     <p className="text-balance text-muted-foreground">
                       No keywords
                     </p>
                   )}
-                  {isDesktop ? (
+                  {/* {isDesktop &&
+                  (String(viewingUser?.pk) === usersPk ||
+                    viewingUser?.is_superuser) &&
+                  buttonsVisible ? (
                     <EditKeywordsDialog
                       userPk={Number(usersPk)}
                       refetch={refetch}
@@ -135,33 +320,17 @@ const StaffHero = ({
                       refetch={refetch}
                       staffHeroData={staffHeroData}
                     />
-                  )}
+                  )} */}
                 </div>
               </>
             ) : null}
           </div>
+          {/*Keyword end */}
         </div>
       </div>
-
-      {!buttonsVisible ? (
-        isDesktop ? (
-          <div className="mt-2 flex justify-center">
-            <SendUserEmailDialog
-              name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
-              pk={staffHeroData?.user?.pk}
-            />
-          </div>
-        ) : (
-          <div className="mt-2 flex justify-center">
-            <SendUserEmailMobileDrawer
-              name={`${staffHeroData?.user?.display_first_name} ${staffHeroData?.user?.display_last_name}`}
-              pk={staffHeroData?.user?.pk}
-            />
-          </div>
-        )
-      ) : null}
-    </>
+    )
   ) : (
+    // LOADING
     <Center p={4}>
       <Spinner />
     </Center>
@@ -267,5 +436,52 @@ const EditKeywordsDrawer = ({
         </div>
       </DrawerContent>
     </Drawer>
+  );
+};
+
+const TagList = ({ staffHeroData }) => {
+  const [tagWidths, setTagWidths] = useState([]);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    // Reset the widths on mount
+    const widths = staffHeroData.keyword_tags.map((_, idx) => {
+      const tagElement = document.getElementById(`tag-${idx}`);
+      return tagElement ? tagElement.getBoundingClientRect().width : 0;
+    });
+    setTagWidths(widths);
+  }, [staffHeroData]);
+
+  return (
+    <p
+      ref={containerRef}
+      className={`text-balance text-muted-foreground ${staffHeroData?.keyword_tags?.length > 0 && "mt-3"}`}
+      style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}
+    >
+      {staffHeroData?.keyword_tags?.map((tag, idx) => {
+        // Calculate the total width of the tags rendered so far
+        const totalWidth = tagWidths
+          .slice(0, idx)
+          .reduce((sum, width) => sum + width, 0);
+
+        // Check if adding the current tag's width would exceed the container width
+        const exceedsContainerWidth =
+          totalWidth + tagWidths[idx] > containerRef.current?.clientWidth;
+
+        // Determine if we need to place a separator
+        const isSeparatorNeeded = idx > 0 && !exceedsContainerWidth;
+
+        // If it exceeds, we know that it is the first item in a new line
+        return (
+          <React.Fragment key={tag.pk}>
+            {/* Render separator only if it's not the first item on a new line */}
+            {isSeparatorNeeded && <span className="separator"> | </span>}
+            <span id={`tag-${idx}`} style={{ whiteSpace: "nowrap" }}>
+              {tag.name}
+            </span>
+          </React.Fragment>
+        );
+      })}
+    </p>
   );
 };
