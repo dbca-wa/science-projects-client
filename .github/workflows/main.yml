@@ -74,7 +74,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Fetching list of tags..."
-          tags=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/tags | jq -r '.[] | .name + " " + (.commit.committer.date)')
+          page=1
+          tags=""
+          while :; do
+              result=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/${{ github.repository }}/tags?page=$page&per_page=100" | jq -r '.[] | .name + " " + (.commit.committer.date)')
+              [[ -z "$result" ]] && break
+              tags+="$result"$'\n'
+              ((page++))
+          done
 
           # Prepare a list to hold all tags
           tag_list=()
@@ -100,43 +107,15 @@ jobs:
               tag_name=$(echo "$line" | cut -d ' ' -f 1)
 
               if ! [[ " ${keep_tags_names[*]} " =~ " $tag_name " ]]; then
-                  echo "Deleting tag $tag_name..."
-                  curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-                  https://api.github.com/repos/${{ github.repository }}/git/refs/tags/$tag_name
+                  if [ "$DRY_RUN" == "true" ]; then
+                      echo "Dry run: would delete tag $tag_name"
+                  else
+                      echo "Deleting tag $tag_name..."
+                      # Uncomment below to actually delete the tags
+                      # curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+                      # https://api.github.com/repos/${{ github.repository }}/git/refs/tags/$tag_name
+                  fi
               else
                   echo "Keeping tag $tag_name"
-              fi
-          done
-
-          # Now clean up the package versions
-          echo "Fetching list of package versions..."
-          package_versions=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/orgs/dbca-wa/packages/container/science-projects-client/versions | jq -r '.[] | .id as $id | .name as $name | "\($id) \($name)"')
-
-          # Prepare a list to hold all package versions
-          package_list=()
-          while IFS= read -r line; do
-              package_list+=("$line")
-          done <<< "$package_versions"
-
-          # Keep the latest 16 package versions
-          keep_packages=("${package_list[@]:0:16}")
-          keep_package_ids=()
-          for package in "${keep_packages[@]}"; do
-              package_id=$(echo "$package" | cut -d ' ' -f 1)
-              keep_package_ids+=("$package_id")
-          done
-
-          echo "Keeping latest 16 package versions: ${keep_package_ids[*]}"
-
-          # Loop through each package and delete if not in keep list
-          for package in "${package_list[@]}"; do
-              package_id=$(echo "$package" | cut -d ' ' -f 1)
-
-              if ! [[ " ${keep_package_ids[*]} " =~ " $package_id " ]]; then
-                  echo "Deleting package version ID $package_id..."
-                  curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-                  "https://api.github.com/orgs/dbca-wa/packages/container/science-projects-client/versions/$package_id"
-              else
-                  echo "Keeping package version ID $package_id"
               fi
           done

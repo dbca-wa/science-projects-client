@@ -1110,6 +1110,26 @@ export const createEducation = async ({
   return res;
 };
 
+export interface IUpdatePublicEmail {
+  staff_profile_pk: number;
+  public_email: string;
+}
+
+export const updatePublicEmail = async ({
+  staff_profile_pk,
+  public_email,
+}: IUpdatePublicEmail) => {
+  const res = instance
+    .put(`users/staffprofiles/${staff_profile_pk}`, {
+      public_email,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
 export const editEmployment = async ({
   pk,
   // public_profile,

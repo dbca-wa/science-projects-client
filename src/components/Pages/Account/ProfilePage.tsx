@@ -6,16 +6,23 @@ import {
   Button,
   Center,
   Flex,
+  FormControl,
+  FormHelperText,
+  FormLabel,
   Grid,
   Image,
+  Input,
+  InputGroup,
   Spinner,
   Text,
+  ToastId,
   Tooltip,
   useColorMode,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AiFillCloseCircle, AiFillEdit } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +32,11 @@ import { EditMembershipModal } from "../../Modals/EditMembershipModal";
 import { EditPersonalInformationModal } from "../../Modals/EditPersonalInformationModal";
 import { EditProfileModal } from "../../Modals/EditProfileModal";
 import { UserGridItem } from "../Users/UserGridItem";
+import { IoIosSave } from "react-icons/io";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { IUpdatePublicEmail, updatePublicEmail } from "@/lib/api";
+import { AxiosError } from "axios";
 
 const AnimatedClickToEdit = () => {
   return (
@@ -151,6 +163,77 @@ export const ProfilePage = () => {
   const setHref = (url: string) => {
     window.location.href = url;
   };
+
+  const queryClient = useQueryClient();
+
+  const toast = useToast();
+  const toastIdRef = useRef<ToastId>();
+  const addToast = (data) => {
+    toastIdRef.current = toast(data);
+  };
+
+  const {
+    register: updatePublicEmailRegister,
+    handleSubmit: handleUpdatePublicEmailSubmit,
+    watch: watchUpdatePublicEmail,
+    formState: { isValid },
+  } = useForm<IUpdatePublicEmail>({
+    mode: "onChange", // Validate on change
+    defaultValues: {
+      public_email: "",
+    },
+  });
+  const beginUpdatePublicEmail = (formData: IUpdatePublicEmail) => {
+    console.log(formData);
+    updatePublicEmailMutation.mutate(formData);
+  };
+
+  const updatePublicEmailMutation = useMutation({
+    mutationFn: updatePublicEmail,
+    onMutate: () => {
+      addToast({
+        status: "loading",
+        title: "Updating Email",
+        position: "top-right",
+      });
+    },
+    onSuccess: () => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: `Email Updated Successfully`,
+          status: "success",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      queryClient.invalidateQueries({
+        queryKey: ["publicStaffEmail", me?.staff_profile_pk],
+      });
+    },
+    onError: (error: AxiosError) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Could Not Update Email",
+          description: error?.response?.data
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
+            : "Error",
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
+
+  useEffect(() => {
+    console.log(me);
+  }, [me]);
+
   return (
     <Box h={"100%"}>
       {loading || me.pk === undefined ? (
@@ -189,7 +272,7 @@ export const ProfilePage = () => {
               borderColor={borderColor}
               padding={4}
               mb={4}
-              flexDir={"row"}
+              flexDir={"column"}
               // cursor={"pointer"}
               onMouseEnter={() => handleMouseEnter("public appearance")}
               onMouseLeave={handleMouseLeave}
@@ -201,70 +284,71 @@ export const ProfilePage = () => {
                     : "0px 2.4px 3.6px -0.6px rgba(255, 255, 255, 0.06), 0px 1.2px 2.4px -0.6px rgba(255, 255, 255, 0.036)",
               }}
             >
-              <Flex flexDir={"column"}>
-                <Text
-                  fontWeight={"bold"}
-                  fontSize={"lg"}
-                  mb={1}
-                  color={sectionTitleColor}
-                >
-                  Public Appearance
-                </Text>
-                <Box mb={0}>
+              <Flex flexDir={"row"}>
+                <Flex flexDir={"column"}>
                   <Text
-                    color={colorMode === "light" ? "gray.500" : "gray.500"}
-                    fontSize={"xs"}
+                    fontWeight={"bold"}
+                    fontSize={"lg"}
+                    mb={1}
+                    color={sectionTitleColor}
                   >
-                    View and edit how your staff profile appears to the public
+                    Public Appearance
                   </Text>
-                </Box>
-              </Flex>
-
-              <Flex
-                justifyContent={"end"}
-                w={"100%"}
-                flexDir={{
-                  base: "column",
-                  lg: "row",
-                }}
-              >
-                {/* View Public Profile Button */}
-
-                {/* Edit/View */}
-                <Flex
-                  justifyContent={{ base: "end" }}
-                  alignItems={"center"}
-                  w={"100%"}
-                  py={4}
-                >
-                  <Tooltip
-                    label="See and edit your staff profile"
-                    aria-label="A tooltip"
-                  >
-                    <Button
-                      bg={colorMode === "light" ? "blue.500" : "blue.500"}
-                      _hover={{
-                        bg: colorMode === "light" ? "blue.500" : "blue.500",
-                      }}
-                      color={"white"}
-                      leftIcon={<AiFillEdit />}
-                      onClick={() => {
-                        if (process.env.NODE_ENV === "development") {
-                          navigate(`/staff/${me?.pk}`);
-                        } else {
-                          setHref(
-                            `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${me?.pk}`,
-                          );
-                        }
-                      }}
+                  <Box mb={2}>
+                    <Text
+                      color={colorMode === "light" ? "gray.500" : "gray.500"}
+                      fontSize={"sm"}
                     >
-                      Edit Profile
-                    </Button>
-                  </Tooltip>
+                      View and edit how your staff profile appears to the public
+                    </Text>
+                  </Box>
                 </Flex>
 
-                {/* Set Profile to Hidden */}
-                {/* <Flex
+                <Flex
+                  justifyContent={"end"}
+                  w={"100%"}
+                  flexDir={{
+                    base: "column",
+                    lg: "row",
+                  }}
+                >
+                  {/* View Public Profile Button */}
+
+                  {/* Edit/View */}
+                  <Flex
+                    justifyContent={{ base: "end" }}
+                    alignItems={"center"}
+                    w={"100%"}
+                    py={4}
+                  >
+                    <Tooltip
+                      label="See and edit your staff profile"
+                      aria-label="A tooltip"
+                    >
+                      <Button
+                        bg={colorMode === "light" ? "blue.500" : "blue.500"}
+                        _hover={{
+                          bg: colorMode === "light" ? "blue.500" : "blue.500",
+                        }}
+                        color={"white"}
+                        leftIcon={<AiFillEdit />}
+                        onClick={() => {
+                          if (process.env.NODE_ENV === "development") {
+                            navigate(`/staff/${me?.pk}`);
+                          } else {
+                            setHref(
+                              `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${me?.pk}`,
+                            );
+                          }
+                        }}
+                      >
+                        Edit Public Profile
+                      </Button>
+                    </Tooltip>
+                  </Flex>
+
+                  {/* Set Profile to Hidden */}
+                  {/* <Flex
                     justifyContent={"end"}
                     alignItems={"center"}
                     w={"100%"}
@@ -282,6 +366,91 @@ export const ProfilePage = () => {
                       </Button>
                     </Tooltip>
                   </Flex> */}
+                </Flex>
+              </Flex>
+              <Flex flexDir={"row"} className="mt-4 w-full items-center">
+                <Flex
+                  w={"100%"}
+                  className="flex-grow"
+                  as="form"
+                  id="update-public-email-form"
+                  onSubmit={handleUpdatePublicEmailSubmit(
+                    beginUpdatePublicEmail,
+                  )}
+                >
+                  <FormControl>
+                    <FormLabel>Public Email</FormLabel>
+                    <InputGroup className="-mt-3 items-center">
+                      <Input
+                        w={"100%"}
+                        autoComplete="off"
+                        type="hidden"
+                        {...updatePublicEmailRegister("staff_profile_pk", {
+                          required: true,
+                          value: me?.staff_profile_pk,
+                        })}
+                      />
+                      <Input
+                        placeholder={me?.public_email ?? me?.email ?? ""}
+                        w={"100%"}
+                        autoComplete="off"
+                        type="email"
+                        {...updatePublicEmailRegister("public_email", {
+                          required: "Email is required",
+                          pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, // Basic email regex
+                            message: "Invalid email address",
+                          },
+                        })}
+                      />
+                      <Flex
+                        justifyContent={{ base: "end" }}
+                        alignItems={"center"}
+                        w={"100%"}
+                        py={4}
+                        flex={0}
+                        ml={4}
+                      >
+                        <Tooltip
+                          label="Update the address for receiving public emails"
+                          aria-label="A tooltip"
+                        >
+                          <Button
+                            bg={
+                              colorMode === "light" ? "green.500" : "green.500"
+                            }
+                            _hover={{
+                              bg:
+                                colorMode === "light"
+                                  ? "green.500"
+                                  : "green.500",
+                            }}
+                            color={"white"}
+                            leftIcon={<IoIosSave />}
+                            // onClick={() => {}}
+                            loadingText={"Updating..."}
+                            isDisabled={
+                              updatePublicEmailMutation.isPending || !isValid
+                            }
+                            type="submit"
+                            form="update-public-email-form"
+                            isLoading={updatePublicEmailMutation.isPending}
+                          >
+                            Update Public Email
+                          </Button>
+                        </Tooltip>
+                      </Flex>
+                    </InputGroup>
+                    <FormHelperText
+                      className="-mt-1"
+                      color={colorMode === "light" ? "gray.500" : "gray.500"}
+                      fontSize={"sm"}
+                    >
+                      The email address used for receiving emails from the
+                      public. By default your DBCA email address is used.
+                    </FormHelperText>
+                  </FormControl>
+                </Flex>
               </Flex>
             </Flex>
             // ) : null
