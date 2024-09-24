@@ -29,16 +29,30 @@ export const SimpleSkeletonSection = ({
       ) : project ? (
         <>
           <div className=""></div>
-          <Skeleton className={`h-5 w-[300px] ${skeletonLight} `} />
+          <Skeleton
+            className={`h-5 w-[300px] md:w-[500px] ${skeletonLight} `}
+          />
           {/* <div className="pb-2"></div> */}
 
-          <Skeleton className={`h-4 w-[125px] ${skeletonLight} `} />
+          <Skeleton
+            className={`h-4 w-[125px] md:w-[250px] ${skeletonLight} `}
+          />
           <div className="py-1" />
-          <Skeleton className={`h-4 w-[350px] ${skeletonLight} `} />
-          <Skeleton className={`h-4 w-[350px] ${skeletonLight} `} />
-          <Skeleton className={`h-4 w-[350px] ${skeletonLight} `} />
-          <Skeleton className={`h-4 w-[350px] ${skeletonLight} `} />
-          <Skeleton className={`h-4 w-[350px] ${skeletonLight} `} />
+          <Skeleton
+            className={`h-4 w-[350px] md:w-[600px] ${skeletonLight} `}
+          />
+          <Skeleton
+            className={`h-4 w-[350px] md:w-[600px] ${skeletonLight} `}
+          />
+          <Skeleton
+            className={`h-4 w-[350px] md:w-[600px] ${skeletonLight} `}
+          />
+          <Skeleton
+            className={`h-4 w-[350px] md:w-[600px] ${skeletonLight} `}
+          />
+          <Skeleton
+            className={`h-4 w-[350px] md:w-[600px] ${skeletonLight} `}
+          />
 
           <div className="pb-4"></div>
           <hr className="" />

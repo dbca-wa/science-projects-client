@@ -6,6 +6,7 @@ import ProjectsSection from "./ProjectsSection";
 import PublicationsSection from "./PublicationsSection";
 import ScrollArea from "./ScrollArea";
 import { IUserMe } from "@/types";
+import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 
 const NavMenuItemButton = ({
   title,
@@ -57,15 +58,13 @@ const StaffContent = ({
 }) => {
   const [selectedNav, setSelectedNav] = useState<string>("Overview");
   const { colorMode } = useColorMode();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <div className="mx-auto w-full max-w-[600px] px-2 dark:text-slate-300">
+    <div className="mx-auto w-full px-2 dark:text-slate-300">
       {/* Scrollbar / Navigation */}
-      <div className="flex justify-center">
-        <div
-          style={{ unicodeBidi: "isolate" }}
-          className="xs:w-[320px] mt-2 w-auto sm:w-[420px] md:w-auto"
-        >
+      <div className={`${!isDesktop ? "flex justify-center" : ""}`}>
+        <div style={{ unicodeBidi: "isolate" }} className="mt-2">
           <ScrollArea
             hideScrollbar={true}
             showOverflowIndicator={true}

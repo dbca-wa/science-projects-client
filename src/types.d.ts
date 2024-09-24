@@ -1027,6 +1027,13 @@ export interface IStaffUser {
   display_first_name: string;
   display_last_name: string;
   email: string;
+  avatar: {
+    file: string;
+    id: number;
+    user: {
+      id: number;
+    };
+  } | null;
 }
 
 export interface KeywordTag {

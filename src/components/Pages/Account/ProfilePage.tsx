@@ -693,8 +693,9 @@ export const ProfilePage = () => {
                 color={colorMode === "light" ? "gray.500" : "gray.500"}
                 fontSize={"xs"}
               >
-                Optionally adjust these details for in-app and public display.
-                Your image will only be used in-app.
+                Adjust these details for in-app and public display. In uploading
+                an image of your self, you are consenting to its use in your
+                public profile.
               </Text>
             </Box>
 
