@@ -99,7 +99,7 @@ export const SendUserEmailDialog = ({ name, pk }: IStaffUserResult) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <span className="flex items-center">
-          <Mail className="mt-[2px] self-start" size={"15px"} />
+          <Mail className="mt-[3px] self-start" size={"15px"} />
           <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600 hover:underline">
             Email {`${name}`}
           </a>
@@ -133,7 +133,7 @@ export const SendUserEmailMobileDrawer = ({
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger>
         <span className="flex items-center">
-          <Mail className="mt-[2px] self-start" size={"15px"} />
+          <Mail className="mt-[3px] self-start" size={"15px"} />
           <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600 hover:underline">
             Email {`${name}`}
           </a>

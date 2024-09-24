@@ -72,7 +72,7 @@ export const PublicProfilePage = () => {
             </TabList>
             <TabPanels>
               <TabPanel>
-                <Subsection title="About Me">
+                <Subsection title="About">
                   {!staffProfileLoading &&
                     staffProfileData?.overview?.about && (
                       <RichTextEditor

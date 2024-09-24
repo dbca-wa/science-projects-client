@@ -5,7 +5,7 @@ import OverviewSection from "./OverviewSection";
 import ProjectsSection from "./ProjectsSection";
 import PublicationsSection from "./PublicationsSection";
 import ScrollArea from "./ScrollArea";
-import { IUserMe } from "@/types";
+import { IStaffProfileBaseData, IUserMe } from "@/types";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 
 const NavMenuItemButton = ({
@@ -51,17 +51,21 @@ const StaffContent = ({
   buttonsVisible,
   usersPk,
   viewingUser,
+  refetchBaseData,
+  baseData,
 }: {
   buttonsVisible: boolean;
   usersPk: number;
   viewingUser: IUserMe;
+  refetchBaseData: () => void;
+  baseData: IStaffProfileBaseData;
 }) => {
   const [selectedNav, setSelectedNav] = useState<string>("Overview");
   const { colorMode } = useColorMode();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <div className="mx-auto w-full px-2 dark:text-slate-300">
+    <div className="mx-auto w-full dark:text-slate-300">
       {/* Scrollbar / Navigation */}
       <div className={`${!isDesktop ? "flex justify-center" : ""}`}>
         <div style={{ unicodeBidi: "isolate" }} className="mt-2">
@@ -101,6 +105,8 @@ const StaffContent = ({
             userId={usersPk}
             buttonsVisible={buttonsVisible}
             viewingUser={viewingUser}
+            refetchBaseData={refetchBaseData}
+            baseData={baseData}
           />
         ) : selectedNav === "Projects" ? (
           <ProjectsSection userId={usersPk} buttonsVisible={buttonsVisible} />

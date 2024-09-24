@@ -1,5 +1,5 @@
 import { useStaffProfileHero } from "@/lib/hooks/tanstack/useStaffProfileHero";
-import { IStaffProfileHeroData, IUserMe } from "@/types";
+import { IStaffProfileBaseData, IStaffProfileHeroData, IUserMe } from "@/types";
 import { Center, Button as ChakraButton, Spinner } from "@chakra-ui/react";
 import { ChevronLeft } from "lucide-react";
 import { MdEdit } from "react-icons/md";
@@ -32,12 +32,16 @@ interface IStaffHeroProp {
   viewingUser: IUserMe;
   usersPk: string;
   buttonsVisible: boolean;
+  baseData: IStaffProfileBaseData;
+  refetchBaseData: () => void;
 }
 
 const StaffHero = ({
   usersPk,
   buttonsVisible,
   viewingUser,
+  baseData,
+  refetchBaseData,
 }: IStaffHeroProp) => {
   const navigate = useNavigate();
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -188,7 +192,7 @@ const StaffHero = ({
     ) : (
       // DESKTOP
       <div className="mb-2">
-        <div className="mt-4 flex flex-col">
+        <div className="mt-6 flex flex-col">
           {/* Back button */}
           <div className="">
             <ChakraButton
@@ -198,7 +202,7 @@ const StaffHero = ({
               leftIcon={<ChevronLeft />}
               color={"black"}
             >
-              Back
+              Back to Search
             </ChakraButton>
           </div>
 
@@ -209,11 +213,11 @@ const StaffHero = ({
               <img
                 src={`${VITE_PRODUCTION_BACKEND_API_URL}${staffHeroData?.user?.avatar?.file}`}
                 alt={`Profile of ${staffHeroData?.name}`}
-                className="mr-6 h-44 w-44 flex-shrink-0 rounded-lg object-cover"
+                className="mr-4 h-44 w-44 flex-shrink-0 rounded-lg object-cover"
               />
             )}
             {/* Name, Title and Tag, email, keywords */}
-            <div className="flex w-full flex-col">
+            <div className="flex w-full flex-col px-2">
               <p className="text-2xl font-semibold">
                 {staffHeroData?.title && `${staffHeroData?.title}. `}
                 {staffHeroData?.name}

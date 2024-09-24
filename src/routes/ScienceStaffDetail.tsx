@@ -2,7 +2,10 @@ import { Head } from "@/components/Base/Head";
 import { BaseToggleOptionsButton } from "@/components/RichTextEditor/Buttons/BaseToggleOptionsButton";
 import StaffContent from "@/components/StaffProfiles/Staff/Detail/StaffContent";
 import StaffHero from "@/components/StaffProfiles/Staff/Detail/StaffHero";
+import StaffNotFound from "@/components/StaffProfiles/Staff/StaffNotFound";
 import { Button } from "@/components/ui/button";
+import { checkUserActiveAndGetStaffProfileData } from "@/lib/api";
+import { useCheckStaffProfile } from "@/lib/hooks/tanstack/useCheckStaffProfile";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import {
@@ -13,7 +16,7 @@ import {
   Spinner,
   Tooltip,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { IoArrowBackCircle } from "react-icons/io5";
 import { MdArrowBack } from "react-icons/md";
@@ -32,6 +35,24 @@ const ScienceStaffDetail = () => {
   };
   const { userData: viewingUser, userLoading } = useUser();
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  const [userIsActive, setUserIsActive] = useState<boolean>(false);
+  const { staffBaseDataLoading, staffBaseData, refetch } = useCheckStaffProfile(
+    Number(usersPk),
+  );
+
+  useEffect(() => {
+    // If the user.is_active is false, or the is_hidden is true, then we don't want to show the user's profile
+    console.log(staffBaseData);
+    if (
+      staffBaseData?.user?.is_active === false ||
+      staffBaseData?.is_hidden === true
+    ) {
+      setUserIsActive(false);
+    } else {
+      setUserIsActive(true);
+    }
+  }, [staffBaseDataLoading, staffBaseData]);
 
   return (
     <div className="relative flex h-full w-full justify-center">
@@ -60,16 +81,30 @@ const ScienceStaffDetail = () => {
       ) : !userLoading ? (
         <div className="sm: max-w-[600px] justify-center px-0 sm:px-12 md:w-[900px]">
           <div className="flex flex-col">
-            <StaffHero
-              usersPk={usersPk}
-              buttonsVisible={buttonsVisible}
-              viewingUser={viewingUser}
-            />
-            <StaffContent
-              usersPk={Number(usersPk)}
-              buttonsVisible={buttonsVisible}
-              viewingUser={viewingUser}
-            />
+            {staffBaseDataLoading ? (
+              <Center my={24}>
+                <Spinner />
+              </Center>
+            ) : !staffBaseData?.is_hidden && staffBaseData?.user?.is_active ? (
+              <>
+                <StaffHero
+                  usersPk={usersPk}
+                  buttonsVisible={buttonsVisible}
+                  viewingUser={viewingUser}
+                  refetchBaseData={refetch}
+                  baseData={staffBaseData}
+                />
+                <StaffContent
+                  usersPk={Number(usersPk)}
+                  buttonsVisible={buttonsVisible}
+                  viewingUser={viewingUser}
+                  refetchBaseData={refetch}
+                  baseData={staffBaseData}
+                />
+              </>
+            ) : (
+              <StaffNotFound />
+            )}
           </div>
           <div
             className={`absolute right-0 top-3 flex overflow-hidden px-8 md:px-10 lg:px-11 ${!isDesktop && "flex-col"}`}
