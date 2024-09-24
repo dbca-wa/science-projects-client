@@ -20,17 +20,21 @@ import EditStaffOverviewContent from "../../Modals/EditStaffOverviewContent";
 import SimpleSkeletonSection from "../../SimpleSkeletonSection";
 import AddItemButton from "./AddItemButton";
 import Subsection from "./Subsection";
-import { IStaffOverviewData, IUserMe } from "@/types";
+import { IStaffOverviewData, IStaffProfileBaseData, IUserMe } from "@/types";
 import DatabaseRichTextEditor from "../../Editor/DatabaseRichTextEditor";
 
 const OverviewSection = ({
   viewingUser,
   userId,
   buttonsVisible,
+  refetchBaseData,
+  baseData,
 }: {
   viewingUser: IUserMe;
   userId: number;
   buttonsVisible: boolean;
+  refetchBaseData: () => void;
+  baseData: IStaffProfileBaseData;
 }) => {
   const { staffOverviewLoading, staffOverviewData, refetch } =
     useStaffOverview(userId);
@@ -49,7 +53,7 @@ const OverviewSection = ({
       ) : staffOverviewData ? (
         <>
           <Subsection
-            title="About Me"
+            title="About"
             divider
             button={
               (viewingUser?.pk === userId || viewingUser?.is_superuser) &&

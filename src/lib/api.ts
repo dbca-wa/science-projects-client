@@ -1010,6 +1010,20 @@ export const updateStaffProfileOverviewSection = async ({
   return res;
 };
 
+export const checkUserActiveAndGetStaffProfileData = async ({
+  queryKey,
+}: {
+  queryKey: (string | number)[];
+}) => {
+  const [_, pk] = queryKey; // Destructure the queryKey to extract `pk`
+
+  const res = instance.get(`users/${pk}/check_staff_profile`).then((res) => {
+    // console.log(res.data)
+    return res.data;
+  });
+  return res;
+};
+
 export interface IUpdateStaffHeroSection {
   pk: number;
   keyword_tags?: KeywordTag[];

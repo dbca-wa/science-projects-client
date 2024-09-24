@@ -1058,6 +1058,30 @@ export interface IStaffProfileData {
   aucode?: string;
 }
 
+export interface IStaffProfileBaseData {
+  pk: number;
+  is_hidden: boolean;
+
+  user: {
+    display_first_name: string;
+    display_last_name: string;
+    is_active: boolean;
+    pk: number;
+  };
+  title: string | null;
+
+  about: string | null;
+  expertise: string | null;
+  public_email: string | null;
+
+  keyword_tags: KeywordTag[];
+  aucode: string | null;
+
+  it_asset_id: number | null;
+  it_asset_data: ITAssetData | null;
+  employee_id: string | null;
+}
+
 export interface IStaffProfileHeroData {
   pk: number;
   user: IStaffUser;
