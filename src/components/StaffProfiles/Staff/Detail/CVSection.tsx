@@ -42,7 +42,7 @@ const CVSection = ({
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <div className="px-4 pb-6">
+    <div className="pb-6">
       {!staffCVLoading ? (
         <>
           <Subsection
