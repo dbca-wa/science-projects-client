@@ -42,7 +42,7 @@ const CVSection = ({
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <div className="pb-6">
+    <div className="px-4 pb-6">
       {!staffCVLoading ? (
         <>
           <Subsection
@@ -73,40 +73,42 @@ const CVSection = ({
               ) : undefined
             }
           >
-            {staffCVData?.employment
-              ?.sort((a, b) => {
-                // First, sort by start_year (descending)
+            <div className="py-2">
+              {staffCVData?.employment
+                ?.sort((a, b) => {
+                  // First, sort by start_year (descending)
 
-                if (Number(a.start_year) !== Number(b.start_year)) {
-                  return Number(b.start_year) - Number(a.start_year);
-                }
-                // If start_year is the same, sort by end_year (descending)
-                if (Number(a.end_year) !== Number(b.end_year)) {
-                  return Number(b.end_year) - Number(a.end_year);
-                }
-                // If both start_year and end_year are the same, sort by position_title alphabetically (ascending)
-                return a.position_title.localeCompare(b.position_title);
-              })
-              ?.map((employmentItem, index) => (
-                <EmploymentEntry
-                  refetch={refetch}
-                  buttonsVisible={buttonsVisible}
-                  key={`Employment${index}`}
-                  pk={employmentItem?.pk}
-                  public_profile={employmentItem?.public_profile}
-                  position_title={employmentItem?.position_title}
-                  start_year={employmentItem?.start_year}
-                  end_year={employmentItem?.end_year}
-                  employer={employmentItem?.employer}
-                  section={employmentItem?.section}
-                />
-              ))}
+                  if (Number(a.start_year) !== Number(b.start_year)) {
+                    return Number(b.start_year) - Number(a.start_year);
+                  }
+                  // If start_year is the same, sort by end_year (descending)
+                  if (Number(a.end_year) !== Number(b.end_year)) {
+                    return Number(b.end_year) - Number(a.end_year);
+                  }
+                  // If both start_year and end_year are the same, sort by position_title alphabetically (ascending)
+                  return a.position_title.localeCompare(b.position_title);
+                })
+                ?.map((employmentItem, index) => (
+                  <EmploymentEntry
+                    refetch={refetch}
+                    buttonsVisible={buttonsVisible}
+                    key={`Employment${index}`}
+                    pk={employmentItem?.pk}
+                    public_profile={employmentItem?.public_profile}
+                    position_title={employmentItem?.position_title}
+                    start_year={employmentItem?.start_year}
+                    end_year={employmentItem?.end_year}
+                    employer={employmentItem?.employer}
+                    section={employmentItem?.section}
+                  />
+                ))}
 
-            {staffCVData?.employment?.length === 0 && (
-              <div>
-                <p>No information recorded</p>
-              </div>
-            )}
+              {staffCVData?.employment?.length === 0 && (
+                <div>
+                  <p>No information recorded</p>
+                </div>
+              )}
+            </div>
           </Subsection>
 
           <Subsection
@@ -137,41 +139,45 @@ const CVSection = ({
               ) : undefined
             }
           >
-            {staffCVData?.education
-              ?.sort((a, b) => {
-                // First, sort by start_year (descending)
+            <div className="py-2">
+              {staffCVData?.education
+                ?.sort((a, b) => {
+                  // First, sort by start_year (descending)
 
-                if (Number(a.start_year) !== Number(b.start_year)) {
-                  return Number(b.start_year) - Number(a.start_year);
-                }
-                // If start_year is the same, sort by end_year (descending)
-                if (Number(a.end_year) !== Number(b.end_year)) {
-                  return Number(b.end_year) - Number(a.end_year);
-                }
-                // If both start_year and end_year are the same, sort by position_title alphabetically (ascending)
-                return a.qualification_name.localeCompare(b.qualification_name);
-              })
-              ?.map((educationItem, index) => (
-                <EducationEntry
-                  buttonsVisible={buttonsVisible}
-                  refetch={refetch}
-                  key={`Education${index}`}
-                  pk={educationItem?.pk}
-                  public_profile={educationItem?.public_profile}
-                  // qualification_field={educationItem?.qualification_field}
-                  // qualification_kind={educationItem?.qualification_kind}
-                  qualification_name={educationItem?.qualification_name}
-                  start_year={educationItem?.start_year}
-                  end_year={educationItem?.end_year}
-                  institution={educationItem?.institution}
-                  location={educationItem?.location}
-                />
-              ))}
-            {staffCVData?.education?.length === 0 && (
-              <div>
-                <p>No information recorded</p>
-              </div>
-            )}
+                  if (Number(a.start_year) !== Number(b.start_year)) {
+                    return Number(b.start_year) - Number(a.start_year);
+                  }
+                  // If start_year is the same, sort by end_year (descending)
+                  if (Number(a.end_year) !== Number(b.end_year)) {
+                    return Number(b.end_year) - Number(a.end_year);
+                  }
+                  // If both start_year and end_year are the same, sort by position_title alphabetically (ascending)
+                  return a.qualification_name.localeCompare(
+                    b.qualification_name,
+                  );
+                })
+                ?.map((educationItem, index) => (
+                  <EducationEntry
+                    buttonsVisible={buttonsVisible}
+                    refetch={refetch}
+                    key={`Education${index}`}
+                    pk={educationItem?.pk}
+                    public_profile={educationItem?.public_profile}
+                    // qualification_field={educationItem?.qualification_field}
+                    // qualification_kind={educationItem?.qualification_kind}
+                    qualification_name={educationItem?.qualification_name}
+                    start_year={educationItem?.start_year}
+                    end_year={educationItem?.end_year}
+                    institution={educationItem?.institution}
+                    location={educationItem?.location}
+                  />
+                ))}
+              {staffCVData?.education?.length === 0 && (
+                <div>
+                  <p>No information recorded</p>
+                </div>
+              )}
+            </div>
           </Subsection>
         </>
       ) : null}
