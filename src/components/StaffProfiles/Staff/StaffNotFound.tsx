@@ -12,6 +12,7 @@ const StaffNotFound = () => {
         onClick={() => {
           window.location.href = "/staff";
         }}
+        color={"white"}
         bg={"blue.500"}
         _hover={{
           bg: "blue.600",
