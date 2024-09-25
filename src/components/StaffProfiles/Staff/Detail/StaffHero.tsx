@@ -191,7 +191,7 @@ const StaffHero = ({
       </div>
     ) : (
       // DESKTOP
-      <div className="mb-2">
+      <div className="mb-2 px-4">
         <div className="mt-6 flex flex-col">
           {/* Back button */}
           <div className="">
@@ -268,7 +268,7 @@ const StaffHero = ({
           </div>
           {/* Keywords */}
           <div
-            className={`pb-4 pt-0 ${staffHeroData?.keyword_tags.length > 0 && "max-w-full border-b-2 border-gray-200"}`}
+            className={`pb-4 pt-0 ${staffHeroData?.keyword_tags.length > 0 && "max-w-full border-b-2 border-gray-100"}`}
           >
             <div className="flex items-center">
               <TagList staffHeroData={staffHeroData} />
@@ -444,48 +444,52 @@ const EditKeywordsDrawer = ({
 };
 
 const TagList = ({ staffHeroData }) => {
-  const [tagWidths, setTagWidths] = useState([]);
   const containerRef = useRef(null);
-
-  useEffect(() => {
-    // Reset the widths on mount
-    const widths = staffHeroData.keyword_tags.map((_, idx) => {
-      const tagElement = document.getElementById(`tag-${idx}`);
-      return tagElement ? tagElement.getBoundingClientRect().width : 0;
-    });
-    setTagWidths(widths);
-  }, [staffHeroData]);
 
   return (
     <p
       ref={containerRef}
       className={`text-balance text-muted-foreground ${staffHeroData?.keyword_tags?.length > 0 && "mt-3"}`}
-      style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "0.25rem",
+        whiteSpace: "normal",
+        wordBreak: "break-word",
+      }}
     >
-      {staffHeroData?.keyword_tags?.map((tag, idx) => {
-        // Calculate the total width of the tags rendered so far
-        const totalWidth = tagWidths
-          .slice(0, idx)
-          .reduce((sum, width) => sum + width, 0);
+      {staffHeroData?.keyword_tags
+        ?.sort((a, b) => a.name.localeCompare(b.name))
+        ?.map((tag, idx) => {
+          return (
+            <React.Fragment key={tag.pk}>
+              {/* Render the tag */}
+              <span
+                id={`tag-${idx}`}
+                style={{
+                  whiteSpace: "normal",
+                  overflowWrap: "break-word",
+                  display: "inline",
+                }}
+              >
+                {tag.name}
+              </span>
 
-        // Check if adding the current tag's width would exceed the container width
-        const exceedsContainerWidth =
-          totalWidth + tagWidths[idx] > containerRef.current?.clientWidth;
-
-        // Determine if we need to place a separator
-        const isSeparatorNeeded = idx > 0 && !exceedsContainerWidth;
-
-        // If it exceeds, we know that it is the first item in a new line
-        return (
-          <React.Fragment key={tag.pk}>
-            {/* Render separator only if it's not the first item on a new line */}
-            {isSeparatorNeeded && <span className="separator"> | </span>}
-            <span id={`tag-${idx}`} style={{ whiteSpace: "nowrap" }}>
-              {tag.name}
-            </span>
-          </React.Fragment>
-        );
-      })}
+              {/* Render the separator, but ensure it doesn’t wrap onto a new line by using a non-breaking space */}
+              {idx < staffHeroData.keyword_tags.length - 1 && (
+                <span
+                  className="separator"
+                  style={{
+                    marginLeft: "0.05rem",
+                    marginRight: "0.05rem",
+                  }}
+                >
+                  &nbsp;|&nbsp;
+                </span>
+              )}
+            </React.Fragment>
+          );
+        })}
     </p>
   );
 };

@@ -12,7 +12,7 @@ const Subsection = ({
   button?: ReactElement;
   divider?: boolean;
 }) => (
-  <div className="py-4">
+  <div className="p-4">
     <div className="flex min-w-[270px] justify-between">
       <p className="text-lg font-semibold">{title}</p>
       {button && button}
