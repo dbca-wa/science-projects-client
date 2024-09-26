@@ -32,8 +32,6 @@ export const TraditionalTasksAndProjects = () => {
   const { pendingProjectDocumentData, pendingProjectDocumentDataLoading } =
     useGetDocumentsPendingMyAction();
 
-  const pendingAdminActionsLoading = true;
-
   const { pendingEndorsementsData, pendingEndorsementsDataLoading } =
     useGetEndorsementsPendingMyAction();
 
@@ -43,6 +41,8 @@ export const TraditionalTasksAndProjects = () => {
     }
   }, [pendingProjectDocumentData, pendingProjectDocumentDataLoading]);
 
+  // const pendingAdminActionsLoading = true;
+
   return (
     <>
       <Box mt={6}>
@@ -51,7 +51,7 @@ export const TraditionalTasksAndProjects = () => {
           defaultIndex={[0]}
           allowMultiple
         >
-          {me?.userData?.is_superuser === true ? (
+          {/* {me?.userData?.is_superuser === true ? (
             pendingAdminActionsLoading ? (
               <Center my={4}>
                 <Spinner />
@@ -85,7 +85,6 @@ export const TraditionalTasksAndProjects = () => {
                       My Tasks
                     </Box>
 
-                    {/* </Box> */}
                     {pendingProjectDocumentData?.all?.length >= 1 ? (
                       <Box
                         display={"inline-flex"}
@@ -111,7 +110,7 @@ export const TraditionalTasksAndProjects = () => {
                 </AccordionItem>
               </motion.div>
             )
-          ) : null}
+          ) : null} */}
 
           {pendingProjectDocumentDataLoading ? (
             // null

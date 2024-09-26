@@ -150,6 +150,7 @@ const ProjectsSection = ({
                         description={proj.description}
                         buttonsVisible={buttonsVisible}
                         kind={proj.kind}
+                        addSeparator={priorProjects.length - 1 !== index}
                       />
                     );
                   })}

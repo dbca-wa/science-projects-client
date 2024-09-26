@@ -33,14 +33,13 @@ import { TestPlayground } from "./routes/TestPlayground";
 import { Users } from "./routes/Users";
 import { ScienceStaffLayout } from "./components/StaffProfiles/ScienceStaffLayout";
 
-const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
-
 const inAppRouteArray = [
   // Login
   {
     path: "login",
     element: <Login />,
   },
+
   {
     path: "/",
     element: (
@@ -56,15 +55,6 @@ const inAppRouteArray = [
         element: (
           <ContentWrapper>
             <Dashboard />
-          </ContentWrapper>
-        ),
-      },
-
-      {
-        path: "guide",
-        element: (
-          <ContentWrapper>
-            <UserGuide />
           </ContentWrapper>
         ),
       },
@@ -317,6 +307,15 @@ const inAppRouteArray = [
             <LayoutCheckWrapper>
               <HowTo />
             </LayoutCheckWrapper>
+          </ContentWrapper>
+        ),
+      },
+
+      {
+        path: "guide",
+        element: (
+          <ContentWrapper>
+            <UserGuide />
           </ContentWrapper>
         ),
       },
