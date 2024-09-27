@@ -60,6 +60,8 @@ const StaffHero = ({
     );
   }, [VITE_PRODUCTION_BACKEND_API_URL, staffHeroData]);
 
+  const [isImageError, setIsImageError] = useState(false);
+
   return !staffHeroLoading ? (
     // MOBILE
     !isDesktop ? (
@@ -208,12 +210,13 @@ const StaffHero = ({
 
           {/* Main Content Container */}
           <div className="mt-4 flex">
-            {/* Image (if exists) */}
-            {staffHeroData?.user?.avatar && (
+            {/* Image (if exists and loads successfully) */}
+            {staffHeroData?.user?.avatar && !isImageError && (
               <img
                 src={`${VITE_PRODUCTION_BACKEND_API_URL}${staffHeroData?.user?.avatar?.file}`}
                 alt={`Profile of ${staffHeroData?.name}`}
                 className="mr-4 h-44 w-44 flex-shrink-0 rounded-lg object-cover"
+                onError={() => setIsImageError(true)}
               />
             )}
             {/* Name, Title and Tag, email, keywords */}
