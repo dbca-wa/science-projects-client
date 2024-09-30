@@ -34,7 +34,7 @@ export const DatePicker = ({
           mode="single"
           selected={date}
           onSelect={setDate}
-          initialFocus
+          // initialFocus
         />
       </PopoverContent>
     </Popover>
