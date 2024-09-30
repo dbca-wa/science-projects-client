@@ -27,6 +27,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import EditStaffHeroContent from "../../Modals/EditStaffHeroContent";
 import React from "react";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 
 interface IStaffHeroProp {
   viewingUser: IUserMe;
@@ -50,16 +51,7 @@ const StaffHero = ({
     useStaffProfileHero(usersPk);
 
   useEffect(() => console.log(staffHeroData), [staffHeroData]);
-
-  const VITE_PRODUCTION_BACKEND_API_URL =
-    import.meta.env.VITE_PRODUCTION_BACKEND_API_URL || "http://127.0.0.1:8000/";
-
-  useEffect(() => {
-    console.log(
-      `${VITE_PRODUCTION_BACKEND_API_URL}${staffHeroData?.user?.avatar?.file}`,
-    );
-  }, [VITE_PRODUCTION_BACKEND_API_URL, staffHeroData]);
-
+  const baseAPI = useApiEndpoint();
   const [isImageError, setIsImageError] = useState(false);
 
   return !staffHeroLoading ? (
@@ -68,7 +60,6 @@ const StaffHero = ({
       <div className="mb-2">
         <div className="flex flex-col">
           {/* Back button */}
-
           <div className="mr-4 flex justify-center py-5">
             <ChakraButton
               onClick={() => navigate("/staff")}
@@ -80,18 +71,23 @@ const StaffHero = ({
               Back
             </ChakraButton>
           </div>
-
           {/* Image (if exists) */}
-          {staffHeroData?.user?.avatar && (
+          {staffHeroData?.user?.avatar && !isImageError && (
             <div className="flex justify-center">
               <img
-                src={`${VITE_PRODUCTION_BACKEND_API_URL}${staffHeroData?.user?.avatar?.file}`}
+                src={
+                  staffHeroData?.user?.avatar
+                    ? staffHeroData?.user?.avatar?.file?.startsWith("http")
+                      ? `${staffHeroData?.user?.avatar?.file}`
+                      : `${baseAPI}${staffHeroData?.user?.avatar?.file}`
+                    : ""
+                }
                 alt={`Profile of ${staffHeroData?.name}`}
                 className="h-28 w-28 rounded-lg object-cover"
+                onError={() => setIsImageError(true)}
               />
             </div>
           )}
-
           {/* Name, Title and Tag */}
           <div className="flex w-full flex-col justify-center p-4 pb-2 text-center">
             <p className="text-2xl font-semibold">
@@ -213,7 +209,13 @@ const StaffHero = ({
             {/* Image (if exists and loads successfully) */}
             {staffHeroData?.user?.avatar && !isImageError && (
               <img
-                src={`${VITE_PRODUCTION_BACKEND_API_URL}${staffHeroData?.user?.avatar?.file}`}
+                src={
+                  staffHeroData?.user?.avatar
+                    ? staffHeroData?.user?.avatar?.file?.startsWith("http")
+                      ? `${staffHeroData?.user?.avatar?.file}`
+                      : `${baseAPI}${staffHeroData?.user?.avatar?.file}`
+                    : ""
+                }
                 alt={`Profile of ${staffHeroData?.name}`}
                 className="mr-4 h-44 w-44 flex-shrink-0 rounded-lg object-cover"
                 onError={() => setIsImageError(true)}
