@@ -143,9 +143,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: With the assistance of OIM, SPMS has migrated to new
-              infrastructure! The app has been tested but there may still be
-              bugs as a result of this change. Please report any issues below.
+              Fix: Staff profile image bug (not appearing)
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -153,12 +151,19 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: With the assistance of OIM, The staff profiles app is now
-              integrated in production! Visit the staff profiles page to update
-              your public details (science-profiles.dbca.wa.gov.au). Projects
-              are based on SPMS projects and use the descriptions entered on
-              each project. Publications will be added at a later date.
+              Fix: Annual Report generation bug (stuck in generating)
             </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Update: Adjsuted annual report styles; limited scientists to
+              leader and science support, adjusted font sizes and colours, left
+              aligned items etc.
+            </ListItem>
+
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
