@@ -65,9 +65,9 @@ const DrawerContent = React.forwardRef<
       <DrawerOverlay />
       <DrawerPrimitive.Content
         ref={ref}
-        // min-h-[80%]
+        //
         className={cn(
-          "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto max-h-[95%] flex-col rounded-t-[10px] border bg-background",
+          "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto max-h-[95%] min-h-[90%] flex-col rounded-t-[10px] border bg-background",
           className,
         )}
         style={{ bottom: `${keyboardHeight}px` }}
