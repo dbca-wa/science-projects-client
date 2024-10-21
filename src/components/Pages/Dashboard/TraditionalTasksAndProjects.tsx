@@ -22,6 +22,8 @@ import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
 import { DocumentsDataTable } from "./DocumentsDataTable";
 import { EndorsementsDataTable } from "./EndorsementsDataTable";
 import { UserProjectsDataTable } from "./UserProjectsDataTable";
+import { useGetPendingAdminTasks } from "@/lib/hooks/tanstack/useGetPendingAdminTasks";
+import { AdminTasksDataTable } from "./AdminTasksDataTable";
 
 export const TraditionalTasksAndProjects = () => {
   const { colorMode } = useColorMode();
@@ -42,6 +44,14 @@ export const TraditionalTasksAndProjects = () => {
   }, [pendingProjectDocumentData, pendingProjectDocumentDataLoading]);
 
   // const pendingAdminActionsLoading = true;
+  const { pendingAdminTasksLoading, pendingAdminTaskData } =
+    useGetPendingAdminTasks();
+
+  useEffect(() => {
+    if (!pendingAdminTasksLoading) {
+      console.log(pendingAdminTaskData);
+    }
+  }, [pendingAdminTaskData, pendingAdminTasksLoading]);
 
   return (
     <>
@@ -51,8 +61,8 @@ export const TraditionalTasksAndProjects = () => {
           defaultIndex={[0]}
           allowMultiple
         >
-          {/* {me?.userData?.is_superuser === true ? (
-            pendingAdminActionsLoading ? (
+          {me?.userData?.is_superuser === true ? (
+            pendingAdminTasksLoading ? (
               <Center my={4}>
                 <Spinner />
               </Center>
@@ -60,7 +70,7 @@ export const TraditionalTasksAndProjects = () => {
               <motion.div
                 initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
                 animate={{
-                  opacity: pendingProjectDocumentDataLoading ? 0 : 1,
+                  opacity: 1,
                 }}
                 transition={{ duration: 0.4 }} // Animation duration in seconds
               >
@@ -82,18 +92,16 @@ export const TraditionalTasksAndProjects = () => {
                     userSelect={"none"}
                   >
                     <Box as="span" flex="1" textAlign="left">
-                      My Tasks
+                      Admin Tasks
                     </Box>
 
-                    {pendingProjectDocumentData?.all?.length >= 1 ? (
+                    {pendingAdminTaskData?.length >= 1 ? (
                       <Box
                         display={"inline-flex"}
                         justifyContent={"center"}
                         alignItems={"center"}
                       >
-                        <Box mr={2}>
-                          {pendingProjectDocumentData?.all?.length}
-                        </Box>
+                        <Box mr={2}>{pendingAdminTaskData?.length}</Box>
                         <FcHighPriority />
                       </Box>
                     ) : (
@@ -103,14 +111,14 @@ export const TraditionalTasksAndProjects = () => {
                   </AccordionButton>
 
                   <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
-                    <DocumentsDataTable
-                      pendingProjectDocumentData={pendingProjectDocumentData}
+                    <AdminTasksDataTable
+                      pendingAdminTaskData={pendingAdminTaskData}
                     />
                   </AccordionPanel>
                 </AccordionItem>
               </motion.div>
             )
-          ) : null} */}
+          ) : null}
 
           {pendingProjectDocumentDataLoading ? (
             // null

@@ -9,6 +9,7 @@ interface IPageViewProps {
 export const AccountPageViewWrapper = ({ children }: IPageViewProps) => {
   return (
     <Box
+      minH={"90vh"}
       height="100%"
       display="flex"
       flexDirection="column"

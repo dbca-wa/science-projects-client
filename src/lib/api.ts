@@ -15,6 +15,7 @@ import {
   IBranch,
   IBusinessArea,
   IBusinessAreaCreate,
+  ICaretakerEntry,
   IDepartmentalService,
   IDivision,
   IMergeAffiliation,
@@ -227,7 +228,7 @@ export const getEndorsementsPendingMyAction = () => {
 };
 
 export const getPendingAdminTasks = () => {
-  const res = instance.get(`adminactions/tasks`).then((res) => {
+  const res = instance.get(`adminoptions/tasks`).then((res) => {
     return res.data;
   });
   return res;
@@ -373,6 +374,32 @@ export const deleteUserAdmin = async ({ userPk }: AdminSwitchVar) => {
   const res = instance.delete(`users/${userPk}`).then((res) => {
     return res.data;
   });
+  return res;
+};
+
+export const requestCaretaker = async ({
+  userPk,
+  caretakerPk,
+  startDate,
+  endDate,
+  reason,
+  notes,
+}: ICaretakerEntry) => {
+  const res = instance
+    .post(`adminoptions/tasks`, {
+      action: "setcaretaker",
+      status: "pending",
+      requester: userPk,
+      primary_user: userPk,
+      secondary_users: [caretakerPk],
+      start_date: startDate,
+      end_date: endDate,
+      reason,
+      notes,
+    })
+    .then((res) => {
+      return res.data;
+    });
   return res;
 };
 

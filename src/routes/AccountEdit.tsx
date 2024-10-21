@@ -6,6 +6,7 @@ import { Head } from "../components/Base/Head";
 import { SideMenuButton } from "../components/Pages/Account/SideMenuButton";
 import { ProfilePage } from "../components/Pages/Account/ProfilePage";
 import { AccountPageViewWrapper } from "../components/Wrappers/AccountPageViewWrapper";
+import CaretakerModePage from "@/components/Pages/Account/CaretakerMode";
 // import { PublicProfilePage } from "@/components/Pages/Account/PublicProfilePage";
 
 export const AccountEdit = () => {
@@ -24,6 +25,9 @@ export const AccountEdit = () => {
     switch (selected) {
       case "spmsprofile":
         content = <ProfilePage />;
+        break;
+      case "caretakermode":
+        content = <CaretakerModePage />;
         break;
       // case "publicprofile":
       //   content = <PublicProfilePage />;
@@ -60,6 +64,11 @@ export const AccountEdit = () => {
             pageName={"SPMS Profile"}
             selectedString={selected}
             onClick={() => handleSidebarMenuClick("spmsprofile")}
+          />
+          <SideMenuButton
+            pageName={"Caretaker Mode"}
+            selectedString={selected}
+            onClick={() => handleSidebarMenuClick("caretakermode")}
           />
           {/* <SideMenuButton
             pageName={"Public Profile"}
