@@ -37,16 +37,26 @@ const DrawerContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
   const [keyboardHeight, setKeyboardHeight] = React.useState(0);
+
   React.useEffect(() => {
     const handleResize = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-      setKeyboardHeight(window.innerHeight - window.visualViewport.height);
+      // Check for the current viewport height vs window height
+      if (window.visualViewport) {
+        const keyboardVisibleHeight =
+          window.innerHeight - window.visualViewport.height;
+        setKeyboardHeight(
+          keyboardVisibleHeight > 0 ? keyboardVisibleHeight : 0,
+        );
+      }
     };
 
+    // Listen to resize events to detect keyboard opening/closing
     window.addEventListener("resize", handleResize);
-    handleResize(); // Initial call
 
+    // Initial check to handle the first render when keyboard might already be visible
+    handleResize();
+
+    // Clean up the event listener
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -55,6 +65,7 @@ const DrawerContent = React.forwardRef<
       <DrawerOverlay />
       <DrawerPrimitive.Content
         ref={ref}
+        // min-h-[80%]
         className={cn(
           "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto max-h-[95%] flex-col rounded-t-[10px] border bg-background",
           className,
