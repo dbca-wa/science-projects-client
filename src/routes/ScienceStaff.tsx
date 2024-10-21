@@ -136,10 +136,17 @@ const Pagination = ({
     pageNumbers.push(i);
   }
 
+  const changePageScrollTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="mt-8 flex items-center justify-center space-x-2">
       <Button
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={() => {
+          onPageChange(currentPage - 1);
+          changePageScrollTop();
+        }}
         disabled={currentPage === 1 || totalResults === 0}
         className="bg-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
       >
@@ -149,7 +156,10 @@ const Pagination = ({
       {pageNumbers.map((pageNumber) => (
         <Button
           key={pageNumber}
-          onClick={() => onPageChange(pageNumber)}
+          onClick={() => {
+            onPageChange(pageNumber);
+            changePageScrollTop();
+          }}
           disabled={totalResults === 0}
           className={`${
             pageNumber === currentPage
@@ -162,7 +172,10 @@ const Pagination = ({
       ))}
 
       <Button
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={() => {
+          onPageChange(currentPage + 1);
+          changePageScrollTop();
+        }}
         disabled={currentPage === totalPages || totalResults === 0}
         className="bg-gray-300 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
       >
