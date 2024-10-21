@@ -33,6 +33,11 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+    --keyboard-height: env(keyboard-inset-height);
+  }
+
+  .drawer-content {
+    padding-bottom: var(--keyboard-height);
   }
 
   .dark {

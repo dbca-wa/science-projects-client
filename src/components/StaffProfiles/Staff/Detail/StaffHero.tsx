@@ -50,7 +50,7 @@ const StaffHero = ({
   const { staffHeroData, staffHeroLoading, refetch } =
     useStaffProfileHero(usersPk);
 
-  useEffect(() => console.log(staffHeroData), [staffHeroData]);
+  // useEffect(() => console.log(staffHeroData), [staffHeroData]);
   const baseAPI = useApiEndpoint();
   const [isImageError, setIsImageError] = useState(false);
 
