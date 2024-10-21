@@ -212,7 +212,7 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
             // variant="ghost"
             bg={"transparent"}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-left"
+            className="w-full text-start"
             rightIcon={sortIcon}
             // p={0}
             // m={0}
@@ -230,16 +230,17 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
       cell: ({ row }) => {
         const originalRequesterData = row.original.requester;
         return (
-          <Box className="text-center font-medium">
-            <Text color={"blue.400"} fontWeight={"semibold"} px={4}>
-              {originalRequesterData}
+          <Box className="justify-start px-4 text-start font-medium">
+            <Text color={"blue.400"} fontWeight={"semibold"}>
+              {originalRequesterData.display_first_name}{" "}
+              {originalRequesterData.display_last_name}
             </Text>
           </Box>
         );
       },
       sortingFn: (rowA, rowB) => {
-        const a = rowA.original.requester;
-        const b = rowB.original.requester;
+        const a = `${rowA.original.requester.display_first_name} ${rowA.original.requester.display_last_name}`;
+        const b = `${rowB.original.requester.display_first_name} ${rowB.original.requester.display_last_name}`;
         return a.localeCompare(b);
       },
     },
