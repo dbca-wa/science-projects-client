@@ -143,7 +143,8 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Staff profile image bug (not appearing)
+              Feature: Request Delete Button. Users can now request admins to
+              delete a project directly on the project page.
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -151,7 +152,9 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Fix: Annual Report generation bug (stuck in generating)
+              Feature: Caretaker Mode. Users can now set when they will be away
+              from the office, and assign a caretaker to manage their projects
+              in their absence.
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -159,18 +162,24 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Adjsuted annual report styles; limited scientists to
-              leader and science support, adjusted font sizes and colours, left
-              aligned items etc.
+              Feature: Merge users. Admins can now merge two users together,
+              resolving projects to the primary user.
             </ListItem>
-
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Servers and dependencies updated.
+              Style: Annual Report widow/orphan adjustments.
+            </ListItem>
+            <ListItem
+              fontSize={"small"}
+              textIndent={"-21px"}
+              marginLeft={"21px"}
+            >
+              <ListIcon as={MdCheckCircle} color="green.500" />
+              Chore: Servers and dependencies updated.
             </ListItem>
           </List>
 

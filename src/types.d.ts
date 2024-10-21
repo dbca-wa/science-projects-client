@@ -1105,6 +1105,37 @@ export interface IStaffOverviewData {
 
 // CV
 
+export interface ICaretakerEntry {
+  pk?: number;
+  userPk: number;
+  caretakerPk: number;
+  startDate: Date;
+  endDate: Date;
+  reason: "leave" | "resignation" | "other";
+  notes?: string; // if other is selected
+}
+
+export interface IAdminRequestUser {
+  pk: number;
+  display_first_name?: string;
+  display_last_name?: string;
+}
+
+export interface IAdminTask {
+  action: "deleteproject" | "mergeuser" | "setcaretaker";
+  //  | "mergeaffiliation";
+  status: "pending" | "approved" | "fulfilled" | "rejected";
+  project?: number;
+  requester?: IAdminRequestUser;
+  primary_user?: IAdminRequestUser;
+  secondary_users?: IAdminRequestUser[];
+  reason?: string;
+  notes?: string;
+  start_date?: Date;
+  end_date?: Date;
+  pk: number;
+}
+
 export interface IStaffEmploymentEntry {
   pk: number;
   public_profile: number;
