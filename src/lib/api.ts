@@ -7,6 +7,7 @@ import {
   EditorSections,
   EditorSubsections,
   EditorType,
+  IActionAdminTask,
   IAddLocationForm,
   IAddress,
   IAdminOptions,
@@ -18,6 +19,7 @@ import {
   ICaretakerEntry,
   IDepartmentalService,
   IDivision,
+  IMakeRequestToAdmins,
   IMergeAffiliation,
   IMergeUser,
   IPersonalInformation,
@@ -228,7 +230,7 @@ export const getEndorsementsPendingMyAction = () => {
 };
 
 export const getPendingAdminTasks = () => {
-  const res = instance.get(`adminoptions/tasks`).then((res) => {
+  const res = instance.get(`adminoptions/tasks/pending`).then((res) => {
     return res.data;
   });
   return res;
@@ -2782,6 +2784,39 @@ export const deleteProjectCall = async ({ pk }: ISimplePkProp) => {
 
     return instance.delete(url).then((res) => res.data);
   }
+};
+
+export const actionAdminRequestCall = async ({
+  action,
+  taskPk,
+}: IActionAdminTask) => {
+  const url = `adminoptions/tasks/${taskPk}/${action}`;
+  return instance.post(url).then((res) => res.data);
+};
+
+export const requestDeleteProjectCall = async ({
+  action,
+  project,
+  reason,
+}: IMakeRequestToAdmins) => {
+  // console.log(pk)
+  if (project !== undefined) {
+    const url = `adminoptions/tasks`;
+
+    return instance
+      .post(url, {
+        project,
+        action,
+        reason,
+      })
+      .then((res) => res.data);
+  }
+};
+
+export const cancelAdminTaskRequestCall = ({ taskPk }: { taskPk: number }) => {
+  return instance
+    .post(`adminoptions/tasks/${taskPk}/cancel`)
+    .then((res) => res.data);
 };
 
 export interface ISetProjectAreas {
