@@ -14,8 +14,10 @@ import {
   Skeleton,
   Tag,
   Text,
+  ToastId,
   useColorMode,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { AiFillCalendar, AiFillTag } from "react-icons/ai";
 import {
@@ -40,7 +42,7 @@ import {
 import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
 // import { AiFillDollarCircle } from "react-icons/ai";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BsCaretDownFill } from "react-icons/bs";
 import { CgOrganisation } from "react-icons/cg";
 import { FaSackDollar } from "react-icons/fa6";
@@ -67,6 +69,11 @@ import { ProjectReopenModal } from "../../Modals/ProjectReopenModal";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { ProjectSuspensionModal } from "@/components/Modals/ProjectSuspensionModal";
 import { SetProjectStatusModal } from "@/components/Modals/SetProjectStatusModal";
+import { RequestDeleteProjectModal } from "@/components/Modals/RequestDeleteProjectModal";
+import { ActionAdminRequestModal } from "@/components/Modals/ActionAdminRequestModal";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { cancelAdminTaskRequestCall } from "@/lib/api";
+import { AxiosError } from "axios";
 
 interface IProjectOverviewCardProps {
   location: IProjectAreas;
@@ -87,6 +94,7 @@ export const ProjectOverviewCard = ({
   documents,
   setToLastTab,
 }: IProjectOverviewCardProps) => {
+  console.log(baseInformation);
   // useEffect(() => {
   //   console.log(details);
   // }, [details]);
@@ -105,6 +113,11 @@ export const ProjectOverviewCard = ({
     isOpen: isDeleteModalOpen,
     onOpen: onOpenDeleteModal,
     onClose: onCloseDeleteModal,
+  } = useDisclosure();
+  const {
+    isOpen: isRequestDeleteModalOpen,
+    onOpen: onOpenRequestDeleteModal,
+    onClose: onCloseRequestDeleteModal,
   } = useDisclosure();
   const {
     isOpen: isClosureModalOpen,
@@ -135,6 +148,11 @@ export const ProjectOverviewCard = ({
     isOpen: isSuspendModalOpen,
     onOpen: onOpenSuspendModal,
     onClose: onCloseSuspendModal,
+  } = useDisclosure();
+  const {
+    isOpen: isActionDeleteModalOpen,
+    onOpen: onOpenActionDeleteModal,
+    onClose: onCloseActionDeleteModal,
   } = useDisclosure();
 
   const determineAuthors = (members: IProjectMember[]) => {
@@ -371,6 +389,62 @@ export const ProjectOverviewCard = ({
 
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  const toast = useToast();
+  const toastIdRef = useRef<ToastId>();
+  const addToast = (data) => {
+    toastIdRef.current = toast(data);
+  };
+  const queryClient = useQueryClient();
+
+  const cancelAdminTaskRequestMutation = useMutation({
+    mutationFn: cancelAdminTaskRequestCall,
+    onMutate: () => {
+      addToast({
+        status: "loading",
+        title: `Cancelling Request`,
+        position: "top-right",
+      });
+    },
+    onSuccess: async () => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Success",
+          description: `Request Cancelled`,
+          status: "success",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["pendingAdminTasks"] });
+        queryClient
+          .invalidateQueries({ queryKey: ["project", baseInformation?.pk] })
+          .then(() => refetchData?.());
+      }, 350);
+    },
+    onError: (error: AxiosError) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: `Could not cancel request`,
+          description: `${error.response.data}`,
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
+
+  const cancelDeletionRequest = () => {
+    console.log("Cancel deletion request");
+    cancelAdminTaskRequestMutation.mutate({
+      taskPk: baseInformation?.deletion_request_id,
+    });
+  };
+
   return (
     <>
       {(me?.userData?.is_superuser ||
@@ -468,6 +542,14 @@ export const ProjectOverviewCard = ({
               />
             </>
           )}
+          <RequestDeleteProjectModal
+            projectPk={
+              baseInformation?.pk ? baseInformation.pk : baseInformation.id
+            }
+            isOpen={isRequestDeleteModalOpen}
+            onClose={onCloseRequestDeleteModal}
+            refetch={refetchData}
+          />
         </>
       )}
 
@@ -520,6 +602,62 @@ export const ProjectOverviewCard = ({
                         </Flex> */}
           </Flex>
         )}
+        {baseInformation?.deletion_requested ? (
+          me?.userData?.is_superuser ? (
+            <>
+              <ActionAdminRequestModal
+                action="deleteproject"
+                isOpen={isActionDeleteModalOpen}
+                onClose={onCloseActionDeleteModal}
+                refetch={refetchData}
+                taskPk={baseInformation?.deletion_request_id}
+              />
+              <Flex
+                p={4}
+                bg={"red.100"}
+                rounded={"lg"}
+                mt={4}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+                color={"red.800"}
+              >
+                <Text>Deletion Requested</Text>
+                <Grid
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  gridTemplateColumns={"repeat(2, 1fr)"}
+                  gridColumnGap={2}
+                >
+                  <Button
+                    onClick={
+                      baseInformation?.deletion_requested
+                        ? onOpenActionDeleteModal
+                        : undefined
+                    }
+                    bg={"red.500"}
+                    color={"white"}
+                    _hover={{ bg: "red.400" }}
+                  >
+                    Action
+                  </Button>
+                </Grid>
+              </Flex>
+            </>
+          ) : (
+            <Flex
+              p={4}
+              bg={"red.100"}
+              rounded={"lg"}
+              mt={4}
+              justifyContent={"end"}
+              alignItems={"center"}
+              color={"red.800"}
+            >
+              <Text>Deletion Requested</Text>
+            </Flex>
+          )
+        ) : null}
         <Grid
           p={4}
           pt={6}
@@ -1134,7 +1272,31 @@ export const ProjectOverviewCard = ({
                         </Box>
                       </Flex>
                     </MenuItem>
-                  ) : null}
+                  ) : (
+                    <MenuItem
+                      onClick={
+                        baseInformation?.deletion_requested
+                          ? cancelDeletionRequest
+                          : onOpenRequestDeleteModal
+                      }
+                    >
+                      <Flex
+                        alignItems={"center"}
+                        // color={"red"}
+                      >
+                        <Box mr={2}>
+                          <FaTrash />
+                        </Box>
+                        <Box>
+                          <Text>
+                            {baseInformation?.deletion_requested
+                              ? "Cancel Deletion Request"
+                              : "Request Deletion"}
+                          </Text>
+                        </Box>
+                      </Flex>
+                    </MenuItem>
+                  )}
                 </MenuList>
               </Menu>
             </Flex>

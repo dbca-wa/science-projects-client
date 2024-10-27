@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Center,
+  Flex,
   Spinner,
   Tab,
   TabList,
@@ -36,6 +37,8 @@ import {
 // import { ProgressReportSelector } from "../components/Pages/ProjectDetail/ProgressReportSelector";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
+import { ArrowBackIcon } from "@chakra-ui/icons";
+import { Mail } from "lucide-react";
 
 export const ProjectDetail = ({
   selectedTab,
@@ -207,12 +210,13 @@ export const ProjectDetail = ({
               Sorry, a project with id "{projectPk}" does not exist.
             </Text>
             <Text mt={6}>
-              This project has either been deleted or never existed.
+              This project lkely has data issues, never existed or has been
+              deleted.
             </Text>
             <Text mt={3}>
               If you believe this is in error, please submit feedback
             </Text>
-            <Box mt={8}>
+            <Flex mt={8}>
               <Button
                 color={"white"}
                 bg={colorMode === "light" ? "blue.500" : "blue.600"}
@@ -220,10 +224,26 @@ export const ProjectDetail = ({
                   bg: colorMode === "light" ? "blue.400" : "blue.500",
                 }}
                 onClick={() => navigate("/projects")}
+                leftIcon={<ArrowBackIcon />}
               >
                 Back to Projects
               </Button>
-            </Box>
+              <Button
+                ml={4}
+                color={"white"}
+                bg={colorMode === "light" ? "orange.500" : "orange.600"}
+                _hover={{
+                  bg: colorMode === "light" ? "orange.400" : "orange.500",
+                }}
+                onClick={() => {
+                  const email = "jarid.prince@dbca.wa.gov.au";
+                  window.location.href = `mailto:${email}?subject=Feedback on Project ${projectPk}&body=I have feedback on project ${projectPk} and would like to report an issue.`;
+                }}
+                leftIcon={<Mail />}
+              >
+                Submit Feedback
+              </Button>
+            </Flex>
           </Box>
         ) : (
           <Center>

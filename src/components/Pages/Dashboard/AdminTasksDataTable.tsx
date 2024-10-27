@@ -1,3 +1,4 @@
+import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import {
   Table,
   TableBody,
@@ -7,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IAdminTask } from "@/types";
-import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
+import { Box, Button, Flex, Icon, Text, useColorMode } from "@chakra-ui/react";
 
 import {
   ColumnDef,
@@ -48,8 +49,7 @@ const taskKindsOrder = ["setcaretaker", "deleteproject", "mergeuser"];
 const taskKindsDict = {
   deleteproject: {
     title: "Delete Project",
-    description:
-      "A user has requested that a project be deleted. Approve or reject.",
+    description: "A user wishes to delete a project. Approve or reject.",
     colour: "red",
     icon: MdDelete,
   },
@@ -276,7 +276,12 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
         );
       },
       cell: ({ row }) => {
-        const originalReasonData = row.original.reason;
+        let originalReasonData = row.original.reason;
+        originalReasonData =
+          row?.original?.action === "deleteproject"
+            ? originalReasonData &&
+              `${originalReasonData[0].toLocaleUpperCase()}${originalReasonData.slice(1)}`
+            : originalReasonData;
         const originalNoteData = row.original.notes;
         return (
           <Box className="text-left font-medium">
@@ -310,6 +315,32 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
               px={4}
             >
               {taskKindsDict[row.original.action].description}
+            </Text>
+            {row?.original?.action === "deleteproject" ? (
+              <Text
+                color={"red.400"}
+                fontWeight={"semibold"}
+                fontSize={"x-small"}
+                px={4}
+              >
+                <div className="inline-flex gap-1">
+                  <Text>Project:</Text>
+                  <ExtractedHTMLTitle
+                    htmlContent={row.original.project?.title}
+                  />
+                  <Text> ({row.original.project?.pk})</Text>
+                </div>
+              </Text>
+            ) : null}
+
+            <Text
+              color={"blue.400"}
+              fontWeight={"semibold"}
+              fontSize={"x-small"}
+              px={4}
+            >
+              Requested by:{" "}
+              {`${row.original.requester.display_first_name} ${row.original.requester.display_last_name}`}
             </Text>
           </Box>
         );
@@ -414,6 +445,7 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
                 }
                 data-state={row.getIsSelected() && "selected"}
                 onClick={(e) => {
+                  console.log(row.original);
                   goToProjectDocument(e, row.original.project.pk);
                 }}
               >

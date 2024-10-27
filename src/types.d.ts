@@ -663,6 +663,8 @@ interface IProjectData {
   start_date: Date;
   end_date: Date;
   business_area: IBusinessArea;
+  deletion_requested: boolean;
+  deletion_request_id: number | null;
 
   created_at: Date;
   updated_at: Date;
@@ -1121,11 +1123,34 @@ export interface IAdminRequestUser {
   display_last_name?: string;
 }
 
+export interface IMakeRequestToAdmins {
+  action: "deleteproject" | "mergeuser" | "setcaretaker";
+
+  // Project deletion
+  project?: number;
+
+  // Merging and caretaking
+  primaryUserPk?: number;
+  secondaryUserPks?: number[];
+  reason?: string;
+  startDate?: Date;
+  endDate?: Date | null;
+  notes?: string;
+}
+
+export interface IActionAdminTask {
+  action: "approve" | "reject";
+  taskPk?: number;
+}
+
 export interface IAdminTask {
   action: "deleteproject" | "mergeuser" | "setcaretaker";
   //  | "mergeaffiliation";
   status: "pending" | "approved" | "fulfilled" | "rejected";
-  project?: number;
+  project?: {
+    pk: number;
+    title: string;
+  };
   requester?: IAdminRequestUser;
   primary_user?: IAdminRequestUser;
   secondary_users?: IAdminRequestUser[];
