@@ -10,6 +10,7 @@ export const useUser = () => {
     queryFn: getMe,
     retry: false, //immediate fail if not logged in
   });
+  // console.log(data)
   return {
     userLoading: isPending,
     userData: data as IUserMe,

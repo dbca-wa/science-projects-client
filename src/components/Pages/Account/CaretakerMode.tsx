@@ -27,7 +27,6 @@ const CaretakerModePage = () => {
 
   const [pk, setPk] = useState<number | undefined>(undefined);
   const [caretakerPk, setCaretakerPk] = useState<number | undefined>(undefined);
-  const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [reason, setReason] = useState<
     "leave" | "resignation" | "other" | null
@@ -39,12 +38,11 @@ const CaretakerModePage = () => {
       pk,
       userData,
       caretakerPk,
-      startDate,
       endDate,
       reason,
       notes,
     });
-  }, [pk, userData, caretakerPk, startDate, endDate, reason, notes]);
+  }, [pk, userData, caretakerPk, endDate, reason, notes]);
 
   const {
     isOpen: modalIsOpen,
@@ -83,7 +81,7 @@ const CaretakerModePage = () => {
         onClose={onModalClose}
         userPk={userData.pk}
         caretakerPk={caretakerPk}
-        startDate={startDate}
+        // startDate={startDate}
         endDate={endDate}
         reason={reason}
         notes={notes}
@@ -142,20 +140,6 @@ const CaretakerModePage = () => {
 
               <Flex flexDir={"row"} gap={4}>
                 <FormControl my={2} mb={4} userSelect={"none"}>
-                  <FormLabel>Start Date</FormLabel>
-                  <InputGroup flexDir={"column"}>
-                    <ShadcnDatePicker
-                      placeholder={"Enter start date"}
-                      date={startDate}
-                      setDate={setStartDate}
-                    />
-                    <FormHelperText>
-                      When will you be away from the office?
-                    </FormHelperText>
-                  </InputGroup>
-                </FormControl>
-
-                <FormControl my={2} mb={4} userSelect={"none"}>
                   <FormLabel>End Date</FormLabel>
                   <InputGroup flexDir={"column"}>
                     <ShadcnDatePicker
@@ -164,7 +148,7 @@ const CaretakerModePage = () => {
                       setDate={setEndDate}
                     />
                     <FormHelperText>
-                      When will you come back to the office?
+                      When will you return to the office?
                     </FormHelperText>
                   </InputGroup>
                 </FormControl>
@@ -186,9 +170,7 @@ const CaretakerModePage = () => {
                   disabled={
                     !userData?.pk ||
                     !caretakerPk ||
-                    !startDate ||
                     !endDate ||
-                    startDate >= endDate ||
                     !reason ||
                     (reason === "other" && !notes)
                   }

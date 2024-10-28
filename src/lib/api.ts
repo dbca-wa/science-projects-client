@@ -201,14 +201,11 @@ export const createUser = async (userData: UserData) => {
 };
 
 export const mergeUsers = async (formData: IMergeUserPk) => {
-  // console.log(formData)
   const response = await instance.post(`adminoptions/mergeusers`, {
     primaryUser: formData.primaryUserPk,
     secondaryUsers: formData.secondaryUserPks,
   });
 
-  // console.log(response.data === "");
-  // console.log(response.status);
   return response.data;
 };
 
@@ -390,7 +387,7 @@ export const deleteUserAdmin = async ({ userPk }: AdminSwitchVar) => {
 export const requestCaretaker = async ({
   userPk,
   caretakerPk,
-  startDate,
+  // startDate,
   endDate,
   reason,
   notes,
@@ -402,7 +399,7 @@ export const requestCaretaker = async ({
       requester: userPk,
       primary_user: userPk,
       secondary_users: [caretakerPk],
-      start_date: startDate,
+      // start_date: startDate,
       end_date: endDate,
       reason,
       notes,

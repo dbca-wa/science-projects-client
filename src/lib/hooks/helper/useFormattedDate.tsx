@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export const useFormattedDate = (
-  date: string | Date | undefined | null
+  date: string | Date | undefined | null,
 ): string => {
   const [formattedDate, setFormattedDate] = useState<string>("");
 
@@ -24,7 +24,7 @@ export const useFormattedDate = (
   };
 
   useEffect(() => {
-    if (date === null) {
+    if (date === null || date === undefined) {
       setFormattedDate("");
       return;
     }
@@ -61,7 +61,7 @@ export const useFormattedDate = (
     let formattedDate = inputDate.toLocaleString("en-AU", dateOptions);
     formattedDate = formattedDate.replace(
       new RegExp(`\\b${day}\\b`),
-      `${day}${ordinalIndicator}`
+      `${day}${ordinalIndicator}`,
     );
     formattedDate = formattedDate.replace(
       /\b(\d{1,2}:\d{1,2})\s*([ap]m)\b/gi,
@@ -72,12 +72,12 @@ export const useFormattedDate = (
         const formattedHour =
           hourInt === 0 || hourInt === 12 ? 12 : hourInt % 12;
         return `${formattedHour}:${minute}${suffix}`;
-      }
+      },
     );
     formattedDate = formattedDate.replace("at", "@");
 
     const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(
-      inputDate
+      inputDate,
     );
     const monthIndex = formattedDate.indexOf(month);
     formattedDate =
