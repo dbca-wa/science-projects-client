@@ -141,6 +141,7 @@ export const CaretakerSetContent = ({
             autoFocus
             isEditable
             setterFunction={setPrimaryUser}
+            ignoreUserPks={[...secondaryUsers.map((user) => user.pk)]}
             label="Primary User"
             placeholder="Search for primary user who is going away"
             helperText="This user will be able to act normally"
@@ -154,6 +155,7 @@ export const CaretakerSetContent = ({
             arrayAddFunction={addSecondaryUserPkToArray}
             arrayRemoveFunction={removeSecondaryUserPkFromArray}
             arrayClearFunction={clearSecondaryUserArray}
+            ignoreUserPks={[primaryUser?.pk]}
             label="Secondary User/s"
             placeholder="Search for users"
             helperText="The user/s you would like to become caretaker for the primary user"
@@ -178,16 +180,16 @@ export const CaretakerSetContent = ({
             // secondaryUsers?.length < 1 ||
             // !primaryUser
           }
-          isLoading={
-            true
-            // caretakerAdminMutation.isPending
-          }
-          onClick={() => {
-            onSubmitCaretaker({
-              primaryUser,
-              secondaryUsers,
-            });
-          }}
+          //   isLoading={
+          //     true
+          //     caretakerAdminMutation.isPending
+          //   }
+          //   onClick={() => {
+          //     onSubmitCaretaker({
+          //       primaryUser,
+          //       secondaryUsers,
+          //     });
+          //   }}
         >
           Set Caretaker
         </Button>
