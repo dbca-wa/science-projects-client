@@ -62,6 +62,8 @@ export const MyProjectsSection = ({ data, loading }: IProjectSection) => {
                   end_date={project.end_date}
                   created_at={project.created_at}
                   updated_at={project.updated_at}
+                  deletion_requested={project.deletion_requested}
+                  deletion_request_id={project.deletion_request_id}
                 />
               </motion.div>
             );

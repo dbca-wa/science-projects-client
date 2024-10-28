@@ -36,7 +36,7 @@ interface IModalProps {
   onClose: () => void;
   userPk: number;
   caretakerPk: number;
-  startDate: Date | null;
+  // startDate: Date | null;
   endDate: Date | null;
   reason: "leave" | "resignation" | "other" | null;
   notes: string | undefined;
@@ -47,7 +47,7 @@ export const CaretakerModeConfirmModal = ({
   onClose,
   userPk,
   caretakerPk,
-  startDate,
+  // startDate,
   endDate,
   reason,
   notes,
@@ -168,14 +168,14 @@ export const CaretakerModeConfirmModal = ({
     await setCaretakerMutation.mutateAsync({
       userPk: formData.userPk,
       caretakerPk: formData.caretakerPk,
-      startDate: formData.startDate,
+      // startDate: formData.startDate,
       endDate: formData.endDate,
       reason: formData.reason,
       notes: formData.notes,
     });
   };
 
-  const formattedStart = useFormattedDate(startDate);
+  // const formattedStart = useFormattedDate(startDate);
   const formattedEnd = useFormattedDate(endDate);
 
   return (
@@ -198,8 +198,10 @@ export const CaretakerModeConfirmModal = ({
             </Text>
             <Box mt={4}>
               <UnorderedList>
-                <ListItem>From {formattedStart.split("@")[0]}</ListItem>
-                <ListItem>To {formattedEnd.split("@")[0]}</ListItem>
+                {/* <ListItem>From {formattedStart.split("@")[0]}</ListItem> */}
+                {formattedEnd !== "" && (
+                  <ListItem>Until {formattedEnd.split("@")[0]}</ListItem>
+                )}
                 <ListItem>
                   They will be able to perform actions on your behalf
                 </ListItem>
@@ -228,7 +230,7 @@ export const CaretakerModeConfirmModal = ({
                   onSubmit({
                     userPk: userPk,
                     caretakerPk: caretakerPk,
-                    startDate: startDate,
+                    // startDate: startDate,
                     endDate: endDate,
                     reason: reason,
                     notes: notes,

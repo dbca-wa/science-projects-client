@@ -612,6 +612,7 @@ interface IProjectMember {
   project: number;
   is_leader: boolean;
   user: IMemberUserDetails;
+  caretakers: IMemberUserDetails[] | null;
   role: string;
   time_allocation: number;
   position: number;
@@ -1116,7 +1117,7 @@ export interface ICaretakerEntry {
   pk?: number;
   userPk: number;
   caretakerPk: number;
-  startDate: Date;
+  // startDate: Date;
   endDate: Date;
   reason: "leave" | "resignation" | "other";
   notes?: string; // if other is selected

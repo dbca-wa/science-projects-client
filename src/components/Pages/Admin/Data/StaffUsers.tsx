@@ -25,6 +25,12 @@ export const StaffUsers = () => {
     onClose: onCloseMergeUserModal,
   } = useDisclosure();
 
+  // const {
+  //   isOpen: isSetCaretakerModalOpen,
+  //   onOpen: onOpenSetCaretakerModal,
+  //   onClose: onCloseSetCaretakerModal,
+  // } = useDisclosure();
+
   return (
     <>
       <AddDBCAUserModal
@@ -35,6 +41,10 @@ export const StaffUsers = () => {
         isOpen={isMergeUserModalOpen}
         onClose={onCloseMergeUserModal}
       />
+      {/* <SetCaretakerModal
+        isOpen={isSetCaretakerModalOpen}
+        onClose={onCloseSetCaretakerModal}
+      /> */}
       <Box>
         <Flex alignItems={"center"} mt={4}>
           <Text fontSize={"x-large"} py={4} flex={1}>
@@ -55,27 +65,6 @@ export const StaffUsers = () => {
           Add a DBCA User
         </Button>
         <Button
-          bg={colorMode === "light" ? "orange.600" : "orange.700"}
-          color={"white"}
-          _hover={{
-            bg: colorMode === "light" ? "orange.500" : "orange.600",
-          }}
-          isDisabled={true}
-        >
-          Set Caretaker
-        </Button>
-
-        <Button
-          bg={colorMode === "light" ? "orange.600" : "orange.700"}
-          color={"white"}
-          _hover={{
-            bg: colorMode === "light" ? "orange.500" : "orange.600",
-          }}
-          isDisabled={true}
-        >
-          Set Maintainer
-        </Button>
-        <Button
           bg={colorMode === "light" ? "red.600" : "red.700"}
           color={"white"}
           _hover={{
@@ -85,6 +74,27 @@ export const StaffUsers = () => {
           onClick={onOpenMergeUserModal}
         >
           Merge Users
+        </Button>
+        <Button
+          bg={colorMode === "light" ? "gray.800" : "gray.900"}
+          color={"white"}
+          _hover={{
+            bg: colorMode === "light" ? "gray.700" : "gray.800",
+          }}
+          isDisabled={true}
+        >
+          Set Maintainer
+        </Button>
+        <Button
+          bg={colorMode === "light" ? "orange.600" : "orange.700"}
+          color={"white"}
+          _hover={{
+            bg: colorMode === "light" ? "orange.500" : "orange.600",
+          }}
+          isDisabled={true}
+          // onClick={onOpenSetCaretakerModal}
+        >
+          Set User Caretaker
         </Button>
       </Grid>
     </>

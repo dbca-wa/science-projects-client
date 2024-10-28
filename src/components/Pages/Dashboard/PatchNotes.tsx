@@ -153,11 +153,11 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Beta Feature: Merge users. Admins can now merge duplicate users
+              Feature: Merge users. Admins can now merge duplicate users
               together, resolving projects to the primary user. User requests
               coming soon.
             </ListItem>
-            <ListItem
+            {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
@@ -166,15 +166,14 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               Beta Feature: Caretaker Mode. Admins can now assign a caretaker to
               manage projects of users in their absence. User requests coming
               soon.
-            </ListItem>
-
+            </ListItem> */}
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Chore: Servers and dependencies updated.
+              Update: Servers and dependencies updated.
             </ListItem>
           </List>
 
