@@ -210,7 +210,7 @@ export const ProjectDetail = ({
               Sorry, a project with id "{projectPk}" does not exist.
             </Text>
             <Text mt={6}>
-              This project lkely has data issues, never existed or has been
+              This project likely has data issues, never existed or has been
               deleted.
             </Text>
             <Text mt={3}>
