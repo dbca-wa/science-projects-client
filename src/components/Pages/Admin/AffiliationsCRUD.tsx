@@ -54,7 +54,7 @@ export const AffiliationsCRUD = () => {
 
   const removeSecondaryAffiliationPkFromArray = (affiliation: IAffiliation) => {
     setSecondaryAffiliations((prev) =>
-      prev.filter((item) => item !== affiliation)
+      prev.filter((item) => item !== affiliation),
     );
   };
 
@@ -213,7 +213,7 @@ export const AffiliationsCRUD = () => {
       setCountOfItems(slices.length);
       if (slices && alreadyPresentNames.length === 0) {
         setAlreadyPresentNames(
-          Array.from(slices).map((slice) => slice.name.toLowerCase())
+          Array.from(slices).map((slice) => slice.name.toLowerCase()),
         );
       }
     }
@@ -227,7 +227,10 @@ export const AffiliationsCRUD = () => {
     } else {
       // console.log(nameValue);
       // console.log(alreadyPresentNames);
-      if (nameValue.includes(',') || alreadyPresentNames.includes(nameValue.toLowerCase())) {
+      if (
+        nameValue.includes(",") ||
+        alreadyPresentNames.includes(nameValue.toLowerCase())
+      ) {
         setCreateIsDisabled(true);
       } else {
         setCreateIsDisabled(false);
@@ -372,8 +375,8 @@ export const AffiliationsCRUD = () => {
               >
                 <VStack
                   spacing={4}
-                // as="form"
-                // id="merge-form"
+                  // as="form"
+                  // id="merge-form"
                 >
                   <Box justifyContent={"start"} w={"100%"}>
                     <Text>Combine similar affiliations into one!</Text>
@@ -453,7 +456,9 @@ export const AffiliationsCRUD = () => {
                     }}
                     size="lg"
                     isDisabled={
-                      secondaryAffiliations?.length < 1 || !primaryAffiliation
+                      mergeMutation.isPending ||
+                      secondaryAffiliations?.length < 1 ||
+                      !primaryAffiliation
                     }
                   >
                     Merge

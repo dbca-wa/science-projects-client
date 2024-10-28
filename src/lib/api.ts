@@ -22,6 +22,7 @@ import {
   IMakeRequestToAdmins,
   IMergeAffiliation,
   IMergeUser,
+  IMergeUserPk,
   IPersonalInformation,
   IProfile,
   IProgressReport,
@@ -199,9 +200,16 @@ export const createUser = async (userData: UserData) => {
   }
 };
 
-export const mergeUsers = async (formData: IMergeUser) => {
+export const mergeUsers = async (formData: IMergeUserPk) => {
   // console.log(formData)
-  return instance.post("users/merge", formData).then((res) => res.data);
+  const response = await instance.post(`adminoptions/mergeusers`, {
+    primaryUser: formData.primaryUserPk,
+    secondaryUsers: formData.secondaryUserPks,
+  });
+
+  // console.log(response.data === "");
+  // console.log(response.status);
+  return response.data;
 };
 
 export const getUserLastOnlineTimestamp = async (userId: string) => {
