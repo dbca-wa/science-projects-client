@@ -18,6 +18,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { useRef, useState } from "react";
 
 interface IProps {
@@ -76,11 +77,11 @@ export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
       onClose?.();
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
-    onError: () => {
+    onError: (error: AxiosError) => {
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Failed",
-          description: `Something went wrong!`,
+          description: `${Object.values(error.response.data)[0] || "An error occurred"}`,
           status: "error",
           position: "top-right",
           duration: 3000,
@@ -149,6 +150,7 @@ export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
             autoFocus
             isEditable
             setterFunction={setPrimaryUser}
+            ignoreUserPks={[...secondaryUsers.map((user) => user.pk)]}
             label="Primary User"
             placeholder="Search for primary user to merge into"
             helperText="This user will be the primary user after the merge, others will be deleted"
@@ -162,6 +164,7 @@ export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
             arrayAddFunction={addSecondaryUserPkToArray}
             arrayRemoveFunction={removeSecondaryUserPkFromArray}
             arrayClearFunction={clearSecondaryUserArray}
+            ignoreUserPks={[primaryUser?.pk]}
             label="Secondary User/s"
             placeholder="Search for an user"
             helperText="The user/s you would like to merge into the primary user"

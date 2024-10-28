@@ -28,7 +28,6 @@ import { FaTrash } from "react-icons/fa";
 import { getUsersBasedOnSearchTerm } from "../../lib/api";
 import { IUserData } from "../../types";
 import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
-import { only } from "node:test";
 
 interface IUserArraySearchDropdown {
   isRequired: boolean;
@@ -37,6 +36,7 @@ interface IUserArraySearchDropdown {
   arrayAddFunction?: (setUserPk: IUserData) => void;
   arrayRemoveFunction?: (setUserPk: IUserData) => void;
   arrayClearFunction?: () => void;
+  ignoreUserPks?: number[];
   label: string;
   placeholder: string;
   helperText: string;
@@ -54,6 +54,7 @@ export const UserArraySearchDropdown = forwardRef(
       arrayAddFunction,
       arrayRemoveFunction,
       arrayClearFunction,
+      ignoreUserPks = [],
       label,
       placeholder,
       helperText,
@@ -80,7 +81,12 @@ export const UserArraySearchDropdown = forwardRef(
           .then((data) => {
             // console.log(data.users);
             const filtr = data.users.filter((item) => {
-              return !array?.some((arrayItem) => arrayItem.pk === item.pk);
+              // Filter out the users that are already in the array then filter out the users that are in the ignoreUserPks array
+              const list = array?.map((item) => item.pk);
+              return (
+                !list?.includes(item.pk) && !ignoreUserPks.includes(item.pk)
+              );
+              // return !array?.some((arrayItem) => arrayItem.pk === item.pk);
             });
             console.log(filtr);
             setFilteredItems(filtr);
