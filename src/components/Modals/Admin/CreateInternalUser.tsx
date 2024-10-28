@@ -451,7 +451,8 @@ export const CreateInternalUser = ({ onSuccess, isModal }: IProps) => {
             NOTE: If the information provided above does not match OIM's data,
             the user will be unable to log in. Instead, when they visit the
             site, a fresh account will be created with OIM's data. That account
-            will NOT be connected to the account created here.
+            will NOT be connected to the account created here. You will have to
+            merge the users.
           </Text>
         </Box>
 

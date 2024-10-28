@@ -156,8 +156,13 @@ export interface ISetCaretaker {
 }
 
 export interface IMergeUser {
+  primaryUser: IUserData;
+  secondaryUsers: IUserData[];
+}
+
+export interface IMergeUserPk {
   primaryUserPk: number;
-  secondaryUsersPk: number[];
+  secondaryUserPks: number[];
 }
 
 export interface IMergeAffiliation {

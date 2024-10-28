@@ -1,4 +1,5 @@
 import { AddDBCAUserModal } from "@/components/Modals/Admin/AddDBCAUserModal";
+import { MergeUsersModal } from "@/components/Modals/Admin/MergeUsersModal";
 import {
   Box,
   Text,
@@ -18,16 +19,26 @@ export const StaffUsers = () => {
     onClose: onCloseAddDBCAUserModal,
   } = useDisclosure();
 
+  const {
+    isOpen: isMergeUserModalOpen,
+    onOpen: onOpenMergeUserModal,
+    onClose: onCloseMergeUserModal,
+  } = useDisclosure();
+
   return (
     <>
       <AddDBCAUserModal
         isOpen={isAddDBCAUserModalOpen}
         onClose={onCloseAddDBCAUserModal}
       />
+      <MergeUsersModal
+        isOpen={isMergeUserModalOpen}
+        onClose={onCloseMergeUserModal}
+      />
       <Box>
         <Flex alignItems={"center"} mt={4}>
           <Text fontSize={"x-large"} py={4} flex={1}>
-            Staff User Actions
+            Admin User Actions
           </Text>
         </Flex>
       </Box>
@@ -63,6 +74,17 @@ export const StaffUsers = () => {
           isDisabled={true}
         >
           Set Maintainer
+        </Button>
+        <Button
+          bg={colorMode === "light" ? "red.600" : "red.700"}
+          color={"white"}
+          _hover={{
+            bg: colorMode === "light" ? "red.500" : "red.600",
+          }}
+          // isDisabled={true}
+          onClick={onOpenMergeUserModal}
+        >
+          Merge Users
         </Button>
       </Grid>
     </>
