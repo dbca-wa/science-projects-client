@@ -410,6 +410,19 @@ export const requestCaretaker = async ({
   return res;
 };
 
+export const cancelCaretakerRequest = async ({
+  taskPk,
+}: {
+  taskPk: number;
+}) => {
+  const res = instance
+    .put(`adminoptions/tasks/${taskPk}`, { status: "cancelled" })
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
+
 export const batchApproveOLDProgressAndStudentReports = async () => {
   const res = instance.post(`documents/batchapproveold`).then((res) => {
     return res.data;
@@ -482,6 +495,16 @@ export const getMe = async () => {
     // console.log(res.data)
     return res.data;
   });
+  return res;
+};
+
+export const checkCaretakerStatus = async () => {
+  const res = instance
+    .get(`adminoptions/caretakers/checkcaretaker`)
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
   return res;
 };
 

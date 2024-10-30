@@ -279,6 +279,36 @@ export interface IUserData {
   businessAreas?: IBusinessArea[];
 }
 
+export interface ICheckCaretakerStatus {
+  caretaker_request_object: {
+    id: number;
+    action: string;
+    created_at: Date;
+    end_date: Date | null;
+    notes: string | null;
+    primary_user: number;
+    reason: string | null;
+    secondary_users: {
+      pk: number;
+      display_first_name: string;
+      display_last_name: string;
+    }[];
+    status: string;
+  };
+  caretaker_object: {
+    pk: number;
+    user: number;
+    caretaker: {
+      pk: number;
+      display_first_name: string;
+      display_last_name: string;
+    };
+    end_date: Date | null;
+    reason: string | null;
+    notes: string | null;
+  } | null;
+}
+
 export interface IUserMe {
   staff_profile_pk?: number;
   public_email?: string;

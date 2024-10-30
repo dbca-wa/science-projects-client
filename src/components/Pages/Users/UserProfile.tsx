@@ -33,6 +33,7 @@ import { DeleteUserModal } from "../../Modals/DeleteUserModal";
 import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
 import { PromoteUserModal } from "../../Modals/PromoteUserModal";
 import { UserProjectsDataTable } from "../Dashboard/UserProjectsDataTable";
+import { CaretakerModeConfirmModal } from "@/components/Modals/CaretakerModeConfirmModal";
 
 interface Props {
   pk: number;
@@ -142,6 +143,11 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     onClose: onMergeUserModalClose,
   } = useDisclosure();
   const {
+    isOpen: isRequestCaretakerModalOpen,
+    onOpen: onRequestCaretakerModalOpen,
+    onClose: onRequestCaretakerModalClose,
+  } = useDisclosure();
+  const {
     isOpen: isEditUserDetailsModalOpen,
     onOpen: onEditUserDetailsModalOpen,
     onClose: onEditUserDetailsModalClose,
@@ -230,12 +236,23 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
       />
 
       {user?.pk !== me?.userData?.pk && (
-        <RequestMergeUserModal
-          isOpen={isMergeUserModalOpen}
-          onClose={onMergeUserModalClose}
-          primaryUserPk={me?.userData?.pk}
-          secondaryUserPks={[user?.pk]}
-        />
+        <>
+          <RequestMergeUserModal
+            isOpen={isMergeUserModalOpen}
+            onClose={onMergeUserModalClose}
+            primaryUserPk={me?.userData?.pk}
+            secondaryUserPks={[user?.pk]}
+          />
+          <CaretakerModeConfirmModal
+            isOpen={isRequestCaretakerModalOpen}
+            onClose={onRequestCaretakerModalClose}
+            userPk={me?.userData?.pk}
+            caretakerPk={user?.pk}
+            endDate={undefined}
+            reason={"leave"}
+            notes={""}
+          />
+        </>
       )}
 
       <EditUserDetailsModal
@@ -300,7 +317,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
         <Grid
           gridTemplateColumns={
-            user?.pk !== me?.userData?.pk ? "repeat(3, 1fr)" : "repeat(2, 1fr)"
+            user?.pk !== me?.userData?.pk ? "repeat(2, 1fr)" : "repeat(2, 1fr)"
           }
           gridGap={4}
           mt={4}
@@ -344,23 +361,6 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             </Button>
           )}
 
-          {user?.pk !== me?.userData?.pk && (
-            <Button
-              bg={colorMode === "light" ? "red.500" : "red.400"}
-              color={
-                colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-              }
-              onClick={onMergeUserModalOpen}
-              _hover={{
-                bg: colorMode === "light" ? "red.400" : "red.300",
-                color: "white",
-              }}
-              isDisabled={user.email === me.userData.email}
-            >
-              Merge
-            </Button>
-          )}
-
           <Button
             bg={colorMode === "light" ? "green.500" : "green.400"}
             color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
@@ -373,6 +373,39 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           >
             Add to Project
           </Button>
+
+          {user?.pk !== me?.userData?.pk && (
+            <>
+              <Button
+                bg={colorMode === "light" ? "red.500" : "red.400"}
+                color={
+                  colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
+                }
+                onClick={onMergeUserModalOpen}
+                _hover={{
+                  bg: colorMode === "light" ? "red.400" : "red.300",
+                  color: "white",
+                }}
+                isDisabled={user.email === me.userData.email}
+              >
+                Merge
+              </Button>
+              <Button
+                bg={colorMode === "light" ? "red.500" : "red.400"}
+                color={
+                  colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
+                }
+                onClick={onRequestCaretakerModalOpen}
+                _hover={{
+                  bg: colorMode === "light" ? "red.400" : "red.300",
+                  color: "white",
+                }}
+                isDisabled={user.email === me.userData.email}
+              >
+                Set Caretaker
+              </Button>
+            </>
+          )}
         </Grid>
 
         <Flex
