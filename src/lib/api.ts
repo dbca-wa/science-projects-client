@@ -2818,6 +2818,27 @@ export const requestDeleteProjectCall = async ({
   }
 };
 
+export const requestMergeUserCall = async ({
+  action,
+  primaryUserPk,
+  secondaryUserPks,
+  reason,
+}: IMakeRequestToAdmins) => {
+  // console.log(pk)
+  if (primaryUserPk !== undefined && secondaryUserPks.length > 0) {
+    const url = `adminoptions/tasks`;
+
+    return instance
+      .post(url, {
+        primary_user: primaryUserPk,
+        secondary_users: secondaryUserPks,
+        action,
+        reason,
+      })
+      .then((res) => res.data);
+  }
+};
+
 export const cancelAdminTaskRequestCall = ({ taskPk }: { taskPk: number }) => {
   return instance
     .post(`adminoptions/tasks/${taskPk}/cancel`)
