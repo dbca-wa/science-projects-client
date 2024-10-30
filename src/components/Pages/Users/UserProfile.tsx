@@ -1,6 +1,7 @@
 // The drawer content that pops out when clicking on a user grid item
 
 import { DeactivateUserModal } from "@/components/Modals/DeactivateUserModal";
+import { RequestMergeUserModal } from "@/components/Modals/RequestMergeUserModal";
 import { useInvolvedProjects } from "@/lib/hooks/tanstack/useInvolvedProjects";
 import {
   Avatar,
@@ -16,7 +17,7 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { FiCopy } from "react-icons/fi";
@@ -136,6 +137,11 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     onClose: onAddToProjectModalClose,
   } = useDisclosure();
   const {
+    isOpen: isMergeUserModalOpen,
+    onOpen: onMergeUserModalOpen,
+    onClose: onMergeUserModalClose,
+  } = useDisclosure();
+  const {
     isOpen: isEditUserDetailsModalOpen,
     onOpen: onEditUserDetailsModalOpen,
     onClose: onEditUserDetailsModalClose,
@@ -223,6 +229,15 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
         preselectedUser={pk}
       />
 
+      {user?.pk !== me?.userData?.pk && (
+        <RequestMergeUserModal
+          isOpen={isMergeUserModalOpen}
+          onClose={onMergeUserModalClose}
+          primaryUserPk={me?.userData?.pk}
+          secondaryUserPks={[user?.pk]}
+        />
+      )}
+
       <EditUserDetailsModal
         isOpen={isEditUserDetailsModalOpen}
         onClose={onEditUserDetailsModalClose}
@@ -284,7 +299,9 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
         </Flex>
 
         <Grid
-          gridTemplateColumns={"repeat(2, 1fr)"}
+          gridTemplateColumns={
+            user?.pk !== me?.userData?.pk ? "repeat(3, 1fr)" : "repeat(2, 1fr)"
+          }
           gridGap={4}
           mt={4}
           pt={2}
@@ -324,6 +341,23 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             >
               {/* Chat */}
               Email
+            </Button>
+          )}
+
+          {user?.pk !== me?.userData?.pk && (
+            <Button
+              bg={colorMode === "light" ? "red.500" : "red.400"}
+              color={
+                colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
+              }
+              onClick={onMergeUserModalOpen}
+              _hover={{
+                bg: colorMode === "light" ? "red.400" : "red.300",
+                color: "white",
+              }}
+              isDisabled={user.email === me.userData.email}
+            >
+              Merge
             </Button>
           )}
 
