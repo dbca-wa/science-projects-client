@@ -28,6 +28,7 @@ import { createBranch, getAllBranches } from "../../../lib/api";
 import { IBranch } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { BranchItemDisplay } from "./BranchItemDisplay";
+import { Head } from "@/components/Base/Head";
 
 export const BranchesCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IBranch>();
@@ -109,6 +110,7 @@ export const BranchesCRUD = () => {
   const { colorMode } = useColorMode();
   return (
     <>
+      <Head title="Branches" />
       {isLoading ? (
         <Center h={"200px"}>
           <Spinner />

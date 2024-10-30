@@ -34,6 +34,7 @@ import { IDepartmentalService } from "../../../types";
 import { ServiceItemDisplay } from "./ServiceItemDisplay";
 import { AxiosError } from "axios";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { Head } from "@/components/Base/Head";
 
 export const ServicesCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IDepartmentalService>();
@@ -80,7 +81,7 @@ export const ServicesCRUD = () => {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredSlices, setFilteredSlices] = useState<IDepartmentalService[]>(
-    []
+    [],
   );
   const [countOfItems, setCountOfItems] = useState(0);
 
@@ -113,6 +114,8 @@ export const ServicesCRUD = () => {
   const { colorMode } = useColorMode();
   return (
     <>
+      <Head title="Services" />
+
       {isLoading ? (
         <Center h={"200px"}>
           <Spinner />
@@ -222,7 +225,7 @@ export const ServicesCRUD = () => {
                   {mutation.isError ? (
                     <Box mt={4}>
                       {Object.keys(
-                        (mutation.error as AxiosError).response.data
+                        (mutation.error as AxiosError).response.data,
                       ).map((key) => (
                         <Box key={key}>
                           {(

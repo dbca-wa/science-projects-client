@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { getAllReports } from "../../../lib/api";
 import { IReport } from "../../../types";
 import { ReportItemDisplay } from "./ReportItemDisplay";
+import { Head } from "@/components/Base/Head";
 
 export const ReportsCRUD = () => {
   const {
@@ -40,6 +41,7 @@ export const ReportsCRUD = () => {
 
   return (
     <>
+      <Head title="Reports" />
       {isLoading ? (
         <Center h={"200px"}>
           <Spinner />

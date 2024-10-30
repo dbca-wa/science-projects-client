@@ -23,7 +23,7 @@ import {
   Text,
   useColorMode,
   useDisclosure,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -34,6 +34,7 @@ import { IBusinessArea, IBusinessAreaCreate } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { BusinessAreaItemDisplay } from "./BusinessAreaItemDisplay";
 import { StatefulMediaChanger } from "./StatefulMediaChanger";
+import { Head } from "@/components/Base/Head";
 
 export const BusinessAreasCRUD = () => {
   const {
@@ -150,7 +151,6 @@ export const BusinessAreasCRUD = () => {
     }
   }, [nameData, focus, introduction, division]);
 
-
   const onSubmitBusinessAreaCreation = (formData: IBusinessAreaCreate) => {
     const {
       // old_id,
@@ -194,6 +194,7 @@ export const BusinessAreasCRUD = () => {
 
   return (
     <>
+      <Head title="Business Areas" />
       {isLoading ? (
         <Center h={"200px"}>
           <Spinner />
@@ -319,14 +320,16 @@ export const BusinessAreasCRUD = () => {
                       onChange={(e) => setDivision(Number(e.target.value))}
                       value={division}
                       defaultValue={division}
-                    // {...register("division", { required: true })}
-
+                      // {...register("division", { required: true })}
                     >
                       <option value={1}>Select a Division</option>
-                      {divsData?.map((divi) => <option key={divi.pk} value={divi.pk}>[{divi.slug}] {divi.name}</option>)}
+                      {divsData?.map((divi) => (
+                        <option key={divi.pk} value={divi.pk}>
+                          [{divi.slug}] {divi.name}
+                        </option>
+                      ))}
                     </Select>
                   )}
-
 
                   <FormControl isRequired>
                     <FormLabel>Name</FormLabel>
@@ -431,12 +434,12 @@ export const BusinessAreasCRUD = () => {
                   {mutation.isError ? (
                     <Box mt={4}>
                       {Object.keys(
-                        (mutation.error as AxiosError)?.response?.data
+                        (mutation.error as AxiosError)?.response?.data,
                       ).map((key) => (
                         <Box key={key}>
                           {(
                             (mutation.error as AxiosError)?.response?.data[
-                            key
+                              key
                             ] as string[]
                           ).map((errorMessage, index) => (
                             <Text key={`${key}-${index}`} color="red.500">

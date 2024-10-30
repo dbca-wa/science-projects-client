@@ -25,6 +25,7 @@ import {
 import React, { useRef } from "react";
 import { render } from "@react-email/render";
 import { DocumentRecalledEmailModal } from "@/components/Modals/Emails/DocumentRecalledEmailModal";
+import { Head } from "@/components/Base/Head";
 
 interface IWrapper {
   children: React.ReactElement;
@@ -136,46 +137,49 @@ export const TestEmailPage = () => {
       <Spinner />
     </Center>
   ) : (
-    <Box>
-      <DocumentApprovedEmailModal
-        isOpen={isDocumentApprovedModalOpen}
-        onClose={onDocumentApprovedModalClose}
-        emailFunction={sendDocumentApprovedEmail}
-        thisUser={userData}
-      />
-      <DocumentRecalledEmailModal
-        isOpen={isDocumentRecalledModalOpen}
-        onClose={onDocumentRecalledModalClose}
-        emailFunction={sendDocumentApprovedEmail}
-        thisUser={userData}
-      />
-      <Text fontWeight={"bold"} fontSize={"xl"}>
-        See below for emails templates
-      </Text>
-      <Grid
-        pt={8}
-        gridTemplateColumns={{
-          base: "repeat(1, 1fr)",
-          lg: "repeat(2, 1fr)",
-          "2xl": "repeat(3, 1fr)",
-        }}
-        gridGap={4}
-        gridRowGap={8}
-      >
-        <EmailWrapper
-          templateName={"Document Approved"}
-          openModalFunction={onDocumentApprovedModalOpen}
+    <>
+      <Head title="Emails" />
+      <Box>
+        <DocumentApprovedEmailModal
+          isOpen={isDocumentApprovedModalOpen}
+          onClose={onDocumentApprovedModalClose}
+          emailFunction={sendDocumentApprovedEmail}
+          thisUser={userData}
+        />
+        <DocumentRecalledEmailModal
+          isOpen={isDocumentRecalledModalOpen}
+          onClose={onDocumentRecalledModalClose}
+          emailFunction={sendDocumentApprovedEmail}
+          thisUser={userData}
+        />
+        <Text fontWeight={"bold"} fontSize={"xl"}>
+          See below for emails templates
+        </Text>
+        <Grid
+          pt={8}
+          gridTemplateColumns={{
+            base: "repeat(1, 1fr)",
+            lg: "repeat(2, 1fr)",
+            "2xl": "repeat(3, 1fr)",
+          }}
+          gridGap={4}
+          gridRowGap={8}
         >
-          <DocumentApprovedEmail userData={userData} />
-        </EmailWrapper>
+          <EmailWrapper
+            templateName={"Document Approved"}
+            openModalFunction={onDocumentApprovedModalOpen}
+          >
+            <DocumentApprovedEmail userData={userData} />
+          </EmailWrapper>
 
-        <EmailWrapper
-          templateName={"Document Recalled"}
-          openModalFunction={onDocumentRecalledModalOpen}
-        >
-          <DocumentRecalledEmail userData={userData} />
-        </EmailWrapper>
-      </Grid>
-    </Box>
+          <EmailWrapper
+            templateName={"Document Recalled"}
+            openModalFunction={onDocumentRecalledModalOpen}
+          >
+            <DocumentRecalledEmail userData={userData} />
+          </EmailWrapper>
+        </Grid>
+      </Box>
+    </>
   );
 };
