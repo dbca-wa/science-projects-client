@@ -36,6 +36,7 @@ import {
   OrganisedLocationData,
 } from "../../../types";
 import { LocationItemDisplay } from "./LocationItemDisplay";
+import { Head } from "@/components/Base/Head";
 
 export const LocationsCRUD = () => {
   const { register, handleSubmit } = useForm<IAddLocationForm>();
@@ -77,7 +78,7 @@ export const LocationsCRUD = () => {
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredSlices, setFilteredSlices] = useState<ISimpleLocationData[]>(
-    []
+    [],
   );
   const [selectedAreaTypes, setSelectedAreaTypes] = useState<string[]>([]);
   const [countOfItems, setCountOfItems] = useState(0);
@@ -124,8 +125,8 @@ export const LocationsCRUD = () => {
         for (const area_type in slices) {
           filteredSlices = filteredSlices.concat(
             slices[area_type].filter((sl) =>
-              sl.name.toLowerCase().includes(searchTerm.toLowerCase())
-            )
+              sl.name.toLowerCase().includes(searchTerm.toLowerCase()),
+            ),
           );
         }
       } else {
@@ -136,7 +137,7 @@ export const LocationsCRUD = () => {
 
       setFilteredSlices(filteredSlices);
       setSearchLoading(false);
-    }, 100)
+    }, 100),
   ).current;
 
   const handleSearchChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -159,7 +160,7 @@ export const LocationsCRUD = () => {
         if (searchTerm) {
           slicesHere = Object.keys(slicesHere).reduce((acc, areaType) => {
             const filteredAreaType = slicesHere[areaType].filter((sl) =>
-              sl.name.toLowerCase().includes(searchTerm.toLowerCase())
+              sl.name.toLowerCase().includes(searchTerm.toLowerCase()),
             );
             if (filteredAreaType.length > 0) {
               acc[areaType] = filteredAreaType;
@@ -232,6 +233,8 @@ export const LocationsCRUD = () => {
 
   return (
     <>
+      <Head title="Locations" />
+
       {isLoading ? (
         <Center h={"200px"}>
           <Spinner />
@@ -348,7 +351,7 @@ export const LocationsCRUD = () => {
                             name={s.name}
                             area_type={s.area_type}
                           />
-                        ))
+                        )),
                       )}
               </Grid>
             )}
@@ -397,7 +400,7 @@ export const LocationsCRUD = () => {
                   {mutation.isError ? (
                     <Box mt={4}>
                       {Object.keys(
-                        (mutation.error as AxiosError).response.data
+                        (mutation.error as AxiosError).response.data,
                       ).map((key) => (
                         <Box key={key}>
                           {(

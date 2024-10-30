@@ -30,6 +30,7 @@ import { createAddress, getAllAddresses } from "../../../lib/api";
 import { IAddress, IBranch } from "../../../types";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
 import { AddressItemDisplay } from "./AddressItemDisplay";
+import { Head } from "@/components/Base/Head";
 
 export const AddressesCRUD = () => {
   const { register, handleSubmit, watch, reset } = useForm<IAddress>();
@@ -116,6 +117,7 @@ export const AddressesCRUD = () => {
   const { colorMode } = useColorMode();
   return (
     <>
+      <Head title="Addresses" />
       {isLoading ? (
         <Center h={"200px"}>
           <Spinner />
@@ -287,7 +289,7 @@ export const AddressesCRUD = () => {
                   {mutation.isError && (
                     <Box mt={4}>
                       {Object.keys(
-                        (mutation.error as AxiosError).response.data
+                        (mutation.error as AxiosError).response.data,
                       ).map((key) => (
                         <Box key={key}>
                           {(

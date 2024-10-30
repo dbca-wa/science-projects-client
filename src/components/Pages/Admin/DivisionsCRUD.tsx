@@ -31,6 +31,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { IDivision } from "../../../types";
 import { DivisionItemDisplay } from "./DivisionItemDisplay";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { Head } from "@/components/Base/Head";
 
 export const DivisionsCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IDivision>();
@@ -118,8 +119,8 @@ export const DivisionsCRUD = () => {
         for (const slice in slices) {
           filteredSlices = filteredSlices.concat(
             slices.filter((sl) =>
-              sl.name.toLowerCase().includes(searchTerm.toLowerCase())
-            )
+              sl.name.toLowerCase().includes(searchTerm.toLowerCase()),
+            ),
           );
         }
       } else {
@@ -130,7 +131,7 @@ export const DivisionsCRUD = () => {
 
       setFilteredSlices(filteredSlices);
       setSearchLoading(false);
-    }, 100)
+    }, 100),
   ).current;
 
   // const handleSearchChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -151,6 +152,7 @@ export const DivisionsCRUD = () => {
 
   return (
     <>
+      <Head title="Divisions" />
       {isLoading ? (
         <Center h={"200px"}>
           <Spinner />

@@ -39,6 +39,7 @@ import {
 } from "../../../lib/api";
 import { IAffiliation, IMergeAffiliation } from "../../../types";
 import { AffiliationItemDisplay } from "./AffiliationItemDisplay";
+import { Head } from "@/components/Base/Head";
 
 export const AffiliationsCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IAffiliation>();
@@ -240,6 +241,8 @@ export const AffiliationsCRUD = () => {
 
   return (
     <>
+      <Head title="Affiliations" />
+
       {isLoading ? (
         <Center h={"200px"}>
           <Spinner />
