@@ -1,4 +1,5 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
+import { AdminTableRowWithModal } from "@/components/Modals/AdminTableRowWithModal";
 import {
   Table,
   TableBody,
@@ -8,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IAdminTask } from "@/types";
-import { Box, Button, Flex, Icon, Text, useColorMode } from "@chakra-ui/react";
+import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
 
 import {
   ColumnDef,
@@ -18,6 +19,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { formatDate } from "date-fns";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BsFillSignMergeLeftFill } from "react-icons/bs";
@@ -277,11 +279,23 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
       },
       cell: ({ row }) => {
         let originalReasonData = row.original.reason;
+        const formattedDate = formatDate(
+          row.original.created_at,
+          "dd/MM/yyyy @ h:mm",
+        );
         originalReasonData =
           row?.original?.action === "deleteproject"
-            ? originalReasonData &&
+            ? originalReasonData?.length > 0 &&
               `${originalReasonData[0].toLocaleUpperCase()}${originalReasonData.slice(1)}`
-            : originalReasonData;
+            : row?.original?.action === "setcaretaker"
+              ? originalReasonData?.length > 0
+                ? `${originalReasonData[0].toLocaleUpperCase()}${originalReasonData.slice(1)}: Set ${row.original.secondary_users[0].display_first_name} ${row.original.secondary_users[0].display_last_name} as caretaker for requester's account`
+                : `Set ${row.original.secondary_users[0].display_first_name} ${row.original.secondary_users[0].display_last_name} as caretaker for requester's account`
+              : row?.original?.action === "mergeuser"
+                ? originalReasonData?.length > 0
+                  ? `${originalReasonData[0].toLocaleUpperCase()}${originalReasonData.slice(1)}: Merge ${row.original.secondary_users[0].display_first_name} ${row.original.secondary_users[0].display_last_name} (id:${row.original.secondary_users[0].pk}) into requester's account.`
+                  : `Merge ${row.original.secondary_users[0].display_first_name} ${row.original.secondary_users[0].display_last_name} (id:${row.original.secondary_users[0].pk}) into requester's account`
+                : originalReasonData;
         const originalNoteData = row.original.notes;
         return (
           <Box className="text-left font-medium">
@@ -333,15 +347,25 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
               </Text>
             ) : null}
 
-            <Text
-              color={"blue.400"}
-              fontWeight={"semibold"}
-              fontSize={"x-small"}
-              px={4}
-            >
-              Requested by:{" "}
-              {`${row.original.requester.display_first_name} ${row.original.requester.display_last_name}`}
-            </Text>
+            {/* Group text so it appears next to each other - on same line in same sentence */}
+            <div className="flex flex-nowrap items-center px-4">
+              <Text
+                color={"blue.400"}
+                fontWeight={"semibold"}
+                fontSize={"x-small"}
+              >
+                Requested by:{" "}
+                {`${row.original.requester.display_first_name} ${row.original.requester.display_last_name}`}{" "}
+              </Text>
+              <Text
+                color={"gray.400"}
+                fontWeight={"semibold"}
+                fontSize={"x-small"}
+                ml={1}
+              >
+                {` on ${formattedDate}`}
+              </Text>
+            </div>
           </Box>
         );
       },
@@ -411,9 +435,6 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
     },
   });
 
-  const twRowClassLight = "hover:cursor-pointer hover:bg-blue-50";
-  const twRowClassDark = "hover:cursor-pointer hover:bg-inherit";
-
   return (
     <div className="rounded-b-md border">
       <Table>
@@ -437,25 +458,16 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                className={
-                  colorMode === "light" ? twRowClassLight : twRowClassDark
-                }
-                data-state={row.getIsSelected() && "selected"}
-                onClick={(e) => {
-                  console.log(row.original);
-                  goToProjectDocument(e, row.original.project.pk);
-                }}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            table
+              .getRowModel()
+              .rows.map((row) => (
+                <AdminTableRowWithModal
+                  key={row.id}
+                  row={row}
+                  colorMode={colorMode}
+                  goToProjectDocument={goToProjectDocument}
+                />
+              ))
           ) : (
             <TableRow>
               <TableCell colSpan={columns?.length} className="h-24 text-center">

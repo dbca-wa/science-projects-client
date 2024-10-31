@@ -40,6 +40,7 @@ interface IModalProps {
   endDate: Date | null;
   reason: "leave" | "resignation" | "other" | null;
   notes: string | undefined;
+  refetch: () => void;
 }
 
 export const CaretakerModeConfirmModal = ({
@@ -51,6 +52,7 @@ export const CaretakerModeConfirmModal = ({
   endDate,
   reason,
   notes,
+  refetch,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
   const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
@@ -103,16 +105,12 @@ export const CaretakerModeConfirmModal = ({
           isClosable: true,
         });
       }
-      queryClient.invalidateQueries({
-        queryKey: ["latestUnapprovedProgressReports"],
-      });
-      queryClient.invalidateQueries({ queryKey: ["latestProgressReports"] });
-      queryClient.invalidateQueries({ queryKey: ["latestStudentReports"] });
-
-      //  Close the modal
-      if (onClose) {
-        onClose();
-      }
+      queryClient
+        .invalidateQueries({
+          queryKey: ["pendingAdminTasks"],
+        })
+        .then(() => refetch())
+        .then(() => onClose());
     },
     // Error handling based on API - file - declared interface
     onError: (error) => {

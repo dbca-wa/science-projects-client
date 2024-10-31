@@ -206,6 +206,7 @@ const CaretakerModePage = () => {
 
           {/* Modal */}
           <CaretakerModeConfirmModal
+            refetch={refetchCaretakerData}
             isOpen={modalIsOpen}
             onClose={onModalClose}
             userPk={userData.pk}

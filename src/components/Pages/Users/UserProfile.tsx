@@ -246,6 +246,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           <CaretakerModeConfirmModal
             isOpen={isRequestCaretakerModalOpen}
             onClose={onRequestCaretakerModalClose}
+            refetch={() => {}}
             userPk={me?.userData?.pk}
             caretakerPk={user?.pk}
             endDate={undefined}
