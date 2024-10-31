@@ -1195,6 +1195,7 @@ export interface IAdminTask {
   start_date?: Date;
   end_date?: Date;
   pk: number;
+  created_at?: Date;
 }
 
 export interface IStaffEmploymentEntry {

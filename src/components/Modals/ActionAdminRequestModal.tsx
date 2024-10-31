@@ -19,18 +19,21 @@ import {
   ModalFooter,
   Grid,
   Button,
+  Box,
 } from "@chakra-ui/react";
 import { actionAdminRequestCall } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { IActionAdminTask } from "../../types";
+import { IActionAdminTask, IAdminTask } from "../../types";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "date-fns";
 
 interface Props {
   action: "deleteproject" | "mergeuser" | "setcaretaker";
   projectPk?: number;
+  task?: IAdminTask;
   taskPk: number;
   isOpen: boolean;
   onClose: () => void;
@@ -40,11 +43,15 @@ interface Props {
 export const ActionAdminRequestModal = ({
   action,
   projectPk,
+  task,
   taskPk,
   isOpen,
   onClose,
   refetch,
 }: Props) => {
+  useEffect(() => {
+    console.log({ task });
+  }, [task]);
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
   const addToast = (data) => {
@@ -155,7 +162,7 @@ export const ActionAdminRequestModal = ({
               </InputGroup>
             </FormControl>
 
-            {action === "deleteproject" && (
+            {action === "deleteproject" ? (
               <>
                 <Center>
                   <Text fontWeight={"semibold"} fontSize={"xl"}>
@@ -183,7 +190,79 @@ export const ActionAdminRequestModal = ({
                   </Text>
                 </Center>
               </>
-            )}
+            ) : action === "mergeuser" ? (
+              <>
+                <Box mb={3}>
+                  <UnorderedList ml={6} mt={2}>
+                    <ListItem>
+                      The primary user ({task.primary_user.display_first_name}{" "}
+                      {task.primary_user.display_last_name}) will receive any
+                      projects belonging to the secondary user (
+                      {task.secondary_users[0].display_first_name}{" "}
+                      {task.secondary_users[0].display_last_name})
+                    </ListItem>
+                    <ListItem>
+                      The primary user ({task.primary_user.display_first_name}{" "}
+                      {task.primary_user.display_last_name}) will receive any
+                      comments belonging to the secondary user/s
+                    </ListItem>
+                    <ListItem>
+                      The primary user ({task.primary_user.display_first_name}{" "}
+                      {task.primary_user.display_last_name}) will receive any
+                      documents and roles belonging to the secondary user (
+                      {task.secondary_users[0].display_first_name}{" "}
+                      {task.secondary_users[0].display_last_name}) on projects,
+                      where applicable (if primary user is already on the
+                      project and has a higher role, they will maintain the
+                      higher role)
+                    </ListItem>
+                    <ListItem
+                      textDecoration={"underline"}
+                      color={colorMode === "light" ? "red.500" : "red.400"}
+                    >
+                      The secondary user (
+                      {task.secondary_users[0].display_first_name}{" "}
+                      {task.secondary_users[0].display_last_name}) will be
+                      deleted from the system. This is permanent.
+                    </ListItem>
+                  </UnorderedList>
+                </Box>
+              </>
+            ) : action === "setcaretaker" ? (
+              <>
+                <Box>
+                  <Text mt={4}>
+                    {task.primary_user.display_first_name}{" "}
+                    {task.primary_user.display_last_name} requested that{" "}
+                    {task.secondary_users[0].display_first_name}{" "}
+                    {task.secondary_users[0].display_last_name} be their
+                    caretaker while they are away.
+                  </Text>
+                  <Box mt={4}>
+                    <UnorderedList>
+                      {/* <ListItem>From {formattedStart.split("@")[0]}</ListItem> */}
+                      {task.end_date && (
+                        <ListItem>
+                          Until {formatDate(task.end_date, "dd/MM/YYYY")}
+                        </ListItem>
+                      )}
+                      <ListItem>
+                        {task.secondary_users[0].display_first_name} will be
+                        able to perform actions on{" "}
+                        {task.primary_user.display_first_name}{" "}
+                        {task.primary_user.display_last_name}'s' behalf
+                      </ListItem>
+                      <ListItem>
+                        If {task.primary_user.display_first_name}{" "}
+                        {task.primary_user.display_last_name} is a business area
+                        lead, {task.secondary_users[0].display_first_name} will
+                        act in their stead
+                      </ListItem>
+                    </UnorderedList>
+                  </Box>
+                </Box>
+              </>
+            ) : null}
           </ModalBody>
           <ModalFooter>
             <Flex flexDir={"column"}>
