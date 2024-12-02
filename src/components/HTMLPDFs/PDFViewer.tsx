@@ -166,15 +166,27 @@ Props) => {
           isClosable: true,
         });
       }
-      queryClient.invalidateQueries({
+      queryClient.cancelQueries({
         queryKey: [
           "annualReportPDF",
           thisReport?.pk ? thisReport.pk : thisReport.id,
         ],
       });
+      pdfDocumentData.report.pdf_generation_in_progress = false;
+
+      // queryClient.invalidateQueries({
+      //   queryKey: [
+      //     "annualReportPDF",
+      //     thisReport?.pk ? thisReport.pk : thisReport.id,
+      //   ],
+      // });
+      // Turn off the loading toast, set the pdfDocumentData?.report?.pdf_generation_in_progress to false
+      // and set the pdfDocumentData to undefined
+      // setPdfDocumentData(undefined);
     },
     onError: (error: AxiosError) => {
       if (toastIdRef.current) {
+        console.log(error);
         toast.update(toastIdRef.current, {
           title: "Could Not Cancel",
           description: error?.response?.data
@@ -219,8 +231,8 @@ Props) => {
     ) {
       timer = setInterval(() => {
         setGenerationTime((prevTime) => prevTime + 1000); // Increase by 1 second (1000 milliseconds)
-        if (generationTime >= 60000) {
-          setShowRestartMessage(true); // Show restart message after 30 seconds
+        if (generationTime >= 10000) {
+          setShowRestartMessage(true); // Show restart message after 10 seconds
         }
       }, 1000); // Run every second
     } else {
@@ -267,6 +279,19 @@ Props) => {
     <Box>
       <Flex alignContent={"center"} justifyContent={"flex-end"} mb={4}>
         <Flex>
+          <Text fontSize={"sm"} color={"gray.500"} mr={2}>
+            {showRestartMessage
+              ? "Generation taking longer than expected. Please try again."
+              : null}
+          </Text>
+          <Text fontSize={"sm"} color={"gray.500"} mr={2}>
+            {generationTime > 0
+              ? `Generation time: ${generationTime / 1000} seconds`
+              : null}
+          </Text>
+        </Flex>
+
+        <Flex>
           <Box
             as="form"
             id="cancel-pdf-generation-form"
@@ -309,7 +334,13 @@ Props) => {
             />
           </Box>
 
-          {annualReportPDFGenerationMutation.isPending ||
+          {/* If the generation mutation is still pending but has been cancelled 
+            show the generate buttons, otherwise show the cancel button
+          */}
+          {(annualReportPDFGenerationMutation.isPending &&
+            !cancelDocGenerationMutation.isSuccess) ||
+          (unapprovedAnnualReportPDFGenerationMutation.isPending &&
+            !cancelDocGenerationMutation.isSuccess) ||
           pdfDocumentData?.report?.pdf_generation_in_progress ? (
             <Button
               size={"sm"}
@@ -368,16 +399,13 @@ Props) => {
               background: colorMode === "light" ? "green.400" : "green.500",
             }}
             loadingText={"Generation In Progress"}
-            isDisabled={
-              pdfDocumentData?.report?.pdf_generation_in_progress ||
-              annualReportPDFGenerationMutation.isPending
-            }
             type="submit"
             form="pdf-generation-form"
             isLoading={
-              pdfDocumentData?.report?.pdf_generation_in_progress ||
-              annualReportPDFGenerationMutation.isPending ||
-              unapprovedAnnualReportPDFGenerationMutation.isPending
+              (annualReportPDFGenerationMutation.isPending &&
+                !cancelDocGenerationMutation.isPending) ||
+              (unapprovedAnnualReportPDFGenerationMutation.isPending &&
+                !cancelDocGenerationMutation.isPending)
             }
           >
             <Box mr={2}>
@@ -399,15 +427,19 @@ Props) => {
             loadingText={"Generation In Progress"}
             isDisabled={
               pdfDocumentData?.report?.pdf_generation_in_progress ||
-              annualReportPDFGenerationMutation.isPending ||
-              unapprovedAnnualReportPDFGenerationMutation.isPending
+              (annualReportPDFGenerationMutation.isPending &&
+                !cancelDocGenerationMutation.isSuccess) ||
+              (unapprovedAnnualReportPDFGenerationMutation.isPending &&
+                !cancelDocGenerationMutation.isSuccess)
             }
             type="submit"
             form="pdf-generation-form-unapproved"
             isLoading={
               pdfDocumentData?.report?.pdf_generation_in_progress ||
-              annualReportPDFGenerationMutation.isPending ||
-              unapprovedAnnualReportPDFGenerationMutation.isPending
+              (annualReportPDFGenerationMutation.isPending &&
+                !cancelDocGenerationMutation.isSuccess) ||
+              (unapprovedAnnualReportPDFGenerationMutation.isPending &&
+                !cancelDocGenerationMutation.isSuccess)
             }
           >
             <Box mr={2}>
