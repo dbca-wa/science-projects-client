@@ -117,7 +117,7 @@ export const FloatingToolbar = ({
       setFloatingElemPosition(
         rangeRect,
         popupCharStylesEditorElem,
-        anchorElem
+        anchorElem,
         //   isLink,
       );
     }
@@ -162,8 +162,8 @@ export const FloatingToolbar = ({
           updateTextFormatFloatingToolbar();
           return false;
         },
-        COMMAND_PRIORITY_LOW
-      )
+        COMMAND_PRIORITY_LOW,
+      ),
     );
   }, [editor, updateTextFormatFloatingToolbar]);
   return (
@@ -189,7 +189,7 @@ export const FloatingToolbar = ({
       {editor.isEditable() && (
         <>
           <RevisedBaseToolbarButton
-            ariaLabel="Format text as bold"
+            ariaLabel="Format text as Bold"
             isActive={isBold}
             variant={"ghost"}
             isDisabled={false}
@@ -200,7 +200,7 @@ export const FloatingToolbar = ({
             <FaBold />
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
-            ariaLabel="Format text as italic"
+            ariaLabel="Format text as Italic"
             isActive={isItalic}
             variant={"ghost"}
             isDisabled={false}
@@ -211,7 +211,7 @@ export const FloatingToolbar = ({
             <FaItalic />
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
-            ariaLabel="Format text as underlined"
+            ariaLabel="Format text as Underlined"
             isActive={isUnderline}
             variant={"ghost"}
             isDisabled={false}
@@ -244,7 +244,7 @@ export const FloatingToolbar = ({
             <MdSubscript />
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
-            ariaLabel="Format superscript"
+            ariaLabel="Format Superscript"
             isActive={isSuperscript}
             variant={"ghost"}
             isDisabled={false}
@@ -255,7 +255,7 @@ export const FloatingToolbar = ({
             <MdSuperscript />
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
-            ariaLabel="Clear formatting"
+            ariaLabel="Clear Formatting"
             variant={"ghost"}
             isDisabled={false}
             onClick={() => {
@@ -293,7 +293,7 @@ export const FloatingToolbar = ({
                       if (textNode.__format !== 0) {
                         textNode.setFormat(0);
                         $getNearestBlockElementAncestorOrThrow(
-                          textNode
+                          textNode,
                         ).setFormat("");
                       }
                       node = textNode;
@@ -328,7 +328,7 @@ export const FloatingToolbar = ({
 
 function useFloatingToolbar(
   editor: LexicalEditor,
-  anchorElem: HTMLElement
+  anchorElem: HTMLElement,
 ): JSX.Element | null {
   const [isText, setIsText] = useState(false);
   // const [isLink, setIsLink] = useState(false);
@@ -406,7 +406,7 @@ function useFloatingToolbar(
         if (editor.getRootElement() === null) {
           setIsText(false);
         }
-      })
+      }),
     );
   }, [editor, updatePopup]);
 
@@ -426,7 +426,7 @@ function useFloatingToolbar(
       isSuperscript={isSuperscript}
       isUnderline={isUnderline}
     />,
-    anchorElem
+    anchorElem,
   );
 }
 
