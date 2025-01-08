@@ -138,7 +138,9 @@ export const TraditionalTasksAndProjects = () => {
                   colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
                 }
                 borderBottom={"none"}
-                borderTop={"none"}
+                borderTop={
+                  me?.userData?.is_superuser === true ? "1px gray.300" : "none"
+                }
               >
                 <AccordionButton
                   bg={colorMode === "light" ? "gray.200" : "gray.700"}
