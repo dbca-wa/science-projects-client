@@ -26,37 +26,63 @@ export const TraditionalLayout = () => {
     );
   }
   return (
-    <Box minH={"100vh"} minW={"720px"} display="flex" flexDirection="column">
-      <OldHeader />
+    <Box
+      h={"100vh"}
+      w={"100vw"}
+      overscrollBehaviorY={"none"}
+      // overflowY={"scroll"}
+      minW={"720px"}
+      display="flex"
+      flexDirection="column"
+      pos={"fixed"}
+    >
+      <Box
+        top={0}
+        left={0}
+        right={0}
+        scrollBehavior={"smooth"}
+        overflowY={"scroll"}
+        css={{
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+          listStyle: "none",
+          "::-webkit-scrollbar": {
+            display: "none",
+          },
+        }}
+      >
+        <OldHeader />
 
-      <TraditionalPageWrapper>
-        <Box
-          my={6}
-          minH={"1000px"}
-          bgColor={"white"}
-          rounded={6}
-          py={4}
-          bg={colorMode === "light" ? "white" : "blackAlpha.800"}
-        >
-          <Box mx={10}>
-            <Outlet />
+        <TraditionalPageWrapper>
+          <Box
+            overscrollBehaviorY={"none"}
+            my={6}
+            minH={"1000px"}
+            bgColor={"white"}
+            rounded={6}
+            py={4}
+            bg={colorMode === "light" ? "white" : "blackAlpha.800"}
+          >
+            <Box mx={10}>
+              <Outlet />
+            </Box>
           </Box>
-        </Box>
 
-        <Image
-          src={colorMode === "light" ? dayImage : nightImage}
-          width={"100%"}
-          height={"100%"}
-          objectFit={"cover"}
-          position="fixed"
-          zIndex={-1}
-          top={0}
-          left={0}
-          userSelect={"none"}
-        />
-      </TraditionalPageWrapper>
+          <Image
+            src={colorMode === "light" ? dayImage : nightImage}
+            width={"100%"}
+            height={"100%"}
+            objectFit={"cover"}
+            position="fixed"
+            zIndex={-1}
+            top={0}
+            left={0}
+            userSelect={"none"}
+          />
+        </TraditionalPageWrapper>
 
-      <Footer />
+        <Footer />
+      </Box>
     </Box>
   );
 };
