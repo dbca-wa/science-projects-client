@@ -36,7 +36,7 @@ import {
   createAffiliation,
   getAllAffiliations,
   mergeAffiliations,
-} from "../../../lib/api";
+} from "../../../lib/api/api";
 import { IAffiliation, IMergeAffiliation } from "../../../types";
 import { AffiliationItemDisplay } from "./AffiliationItemDisplay";
 import { Head } from "@/components/Base/Head";

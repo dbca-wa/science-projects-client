@@ -3,7 +3,7 @@
 
 import { IPersonalInformation } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { getPersonalInformation } from "../../api";
+import { getPersonalInformation } from "../../api/api";
 
 export const usePersonalInfo = (userId: undefined | string | number) => {
   const { isPending, data, refetch } = useQuery({

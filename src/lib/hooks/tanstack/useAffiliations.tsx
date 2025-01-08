@@ -2,7 +2,7 @@
 // Exposes data and loading states of query
 
 import { useQuery } from "@tanstack/react-query";
-import { getAllAffiliations } from "../../api";
+import { getAllAffiliations } from "../../api/api";
 
 export const useAffiliations = () => {
   const { isPending, data, refetch } = useQuery({

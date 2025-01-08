@@ -8,7 +8,7 @@ import {
   getAllBusinessAreas,
   getDoesUserWithEmailExist,
   getDoesUserWithFullNameExist,
-} from "@/lib/api";
+} from "@/lib/api/api";
 import { IBranch, IBusinessArea } from "@/types";
 import {
   Box,

@@ -14,7 +14,7 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BsPlus } from "react-icons/bs";
-import { getStudentReportForYear } from "../../../lib/api";
+import { getStudentReportForYear } from "../../../lib/api/api";
 import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import { useGetStudentReportAvailableReportYears } from "../../../lib/hooks/tanstack/useGetStudentReportAvailableReportYears";
 import { IProjectMember, IStudentReport, IUserMe } from "../../../types";

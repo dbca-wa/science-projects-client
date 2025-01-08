@@ -1,7 +1,7 @@
 // Simple hook for getting the tasks of the user, for the dashboard
 
 import { useQuery } from "@tanstack/react-query";
-import { getReportPDFs } from "../../api";
+import { getReportPDFs } from "../../api/api";
 
 export const useGetReportPDFs = () => {
   const { isPending, data } = useQuery({

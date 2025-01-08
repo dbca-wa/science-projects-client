@@ -1,7 +1,7 @@
 // Simple hook for getting the Annual Reports which do not yet have pdfs
 
 import { useQuery } from "@tanstack/react-query";
-import { getLegacyArarPDFs } from "../../api";
+import { getLegacyArarPDFs } from "../../api/api";
 import { ILegacyPDF } from "@/types";
 
 export const useGetLegacyARPDFs = () => {

@@ -27,7 +27,7 @@ import {
   ICreateProjectDetails,
   ICreateProjectExternalDetails,
   ICreateProjectStudentDetails,
-} from "../../lib/api";
+} from "../../lib/api/api";
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection";
 import { IExtendedProjectDetails, IProjectData } from "../../types";

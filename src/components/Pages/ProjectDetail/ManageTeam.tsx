@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { BsGripVertical, BsPlus } from "react-icons/bs";
-import { updateTeamMemberPosition } from "../../../lib/api";
+import { updateTeamMemberPosition } from "../../../lib/api/api";
 import { useProjectTeam } from "../../../lib/hooks/tanstack/useProjectTeam";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
 import { IProjectMember } from "../../../types";

@@ -28,7 +28,7 @@ import { useForm } from "react-hook-form";
 import {
   createDepartmentalService,
   getAllDepartmentalServices,
-} from "../../../lib/api";
+} from "../../../lib/api/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { IDepartmentalService } from "../../../types";
 import { ServiceItemDisplay } from "./ServiceItemDisplay";

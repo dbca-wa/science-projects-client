@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getStaffProfiles } from "../../api";
+import { getStaffProfiles } from "../../api/api";
 
 export const useScienceStaffProfileList = ({
   searchTerm,

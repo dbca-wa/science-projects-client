@@ -10,7 +10,7 @@ import "../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
-import { GuideSections } from "@/lib/api";
+import { GuideSections } from "@/lib/api/api";
 import { useGetRTESectionTitle } from "@/lib/hooks/helper/useGetRTESectionTitle";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
@@ -242,8 +242,8 @@ export const GuideRichTextEditor = ({
               ? "whiteAlpha.600"
               : "whiteAlpha.400"
             : isEditorOpen
-            ? "blackAlpha.500"
-            : "blackAlpha.400"
+              ? "blackAlpha.500"
+              : "blackAlpha.400"
         }
       >
         {isEditorOpen ? (

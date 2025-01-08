@@ -1,6 +1,6 @@
 import { IStaffCVData } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { getPublicProfileCVData } from "../../api";
+import { getPublicProfileCVData } from "../../api/api";
 
 export const useStaffCV = (userPk: undefined | string | number) => {
   const { isPending, data, refetch } = useQuery({

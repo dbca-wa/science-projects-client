@@ -2,7 +2,7 @@
 // Exposes data and loading states of query
 
 import { useQuery } from "@tanstack/react-query";
-import { getMyBusinessAreas } from "../../api";
+import { getMyBusinessAreas } from "../../api/api";
 import { IBusinessArea } from "@/types";
 
 export const useMyBusinessAreas = () => {

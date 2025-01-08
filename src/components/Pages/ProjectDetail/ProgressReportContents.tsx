@@ -14,7 +14,7 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BsPlus } from "react-icons/bs";
-import { getProgressReportForYear } from "../../../lib/api";
+import { getProgressReportForYear } from "../../../lib/api/api";
 import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import { useGetProgressReportAvailableReportYears } from "../../../lib/hooks/tanstack/useGetProgressReportAvailableReportYears";
 import {
@@ -53,10 +53,10 @@ export const ProgressReportContents = ({
   // Handling years
   const { availableProgressReportYearsData } =
     useGetProgressReportAvailableReportYears(
-      Number(documents[0].document?.project?.pk)
+      Number(documents[0].document?.project?.pk),
     );
   const years = Array.from(
-    new Set(documents.map((progressReport) => progressReport.year))
+    new Set(documents.map((progressReport) => progressReport.year)),
   ).sort((a, b) => b - a);
   const [selectedYear, setSelectedYear] = useState(() => {
     const years = documents.map((progressReport) => progressReport.year);
@@ -73,7 +73,7 @@ export const ProgressReportContents = ({
         }
         return maxDocument;
       },
-      null
+      null,
     );
     return highestYearDocument;
   });
@@ -110,7 +110,7 @@ export const ProgressReportContents = ({
       try {
         const newPRData = await getProgressReportForYear(
           selectedYear,
-          projectPk
+          projectPk,
         );
         setSelectedProgressReport(newPRData);
       } catch (error) {
@@ -183,7 +183,7 @@ export const ProgressReportContents = ({
                 isDisabled={
                   availableProgressReportYearsData?.length < 1 ||
                   all_documents?.project_plan?.document?.project?.status ===
-                  "suspended"
+                    "suspended"
                 }
                 leftIcon={<BsPlus size={"20px"} />}
               >

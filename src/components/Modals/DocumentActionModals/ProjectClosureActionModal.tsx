@@ -28,7 +28,7 @@ import {
   IProjectData,
   IUserMe,
 } from "../../../types";
-import { handleDocumentAction } from "../../../lib/api";
+import { handleDocumentAction } from "../../../lib/api/api";
 import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
 import { useDirectorateMembers } from "../../../lib/hooks/tanstack/useDirectorateMembers";
 

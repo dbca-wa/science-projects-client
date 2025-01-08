@@ -8,7 +8,7 @@ import {
   AccordionContent,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { getAllProblematicProjects } from "@/lib/api";
+import { getAllProblematicProjects } from "@/lib/api/api";
 import { IProblematicData } from "@/lib/hooks/tanstack/useAllProblematicProjects";
 import {
   Box,
@@ -165,7 +165,7 @@ export const AllProblematicProjects = () => {
                 w={"100%"}
                 h={"500px"}
                 flexDir={"column"}
-              //   bg={"Red"}
+                //   bg={"Red"}
               >
                 <Button
                   bg={colorMode === "light" ? "blue.500" : "blue.500"}

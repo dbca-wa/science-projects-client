@@ -2,7 +2,7 @@
 // Exposes data and loading states of query
 
 import { useQuery } from "@tanstack/react-query";
-import { getAllProblematicProjects } from "../../api";
+import { getAllProblematicProjects } from "../../api/api";
 import { IProjectData } from "@/types";
 
 export interface IProblematicData {

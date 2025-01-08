@@ -1,4 +1,4 @@
-import { getStaffProfileEmailList } from "@/lib/api";
+import { getStaffProfileEmailList } from "@/lib/api/api";
 import {
   Box,
   Button,

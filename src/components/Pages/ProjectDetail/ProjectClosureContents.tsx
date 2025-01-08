@@ -1,6 +1,6 @@
 // Maps out the document provided to the rich text editor components for project closure documents.
 
-import { setClosureOutcome } from "@/lib/api";
+import { setClosureOutcome } from "@/lib/api/api";
 import {
   Flex,
   Select,
@@ -53,7 +53,7 @@ export const ProjectClosureContents = ({
   const userInTeam = useCheckUserInTeam(mePk, members);
 
   const [selectedOutcome, setSelectedOutcome] = useState<string>(
-    document?.intended_outcome
+    document?.intended_outcome,
   );
   const potentialOutcomes = [
     "completed",
@@ -99,8 +99,9 @@ export const ProjectClosureContents = ({
         toast.update(toastIdRef.current, {
           title: "Could Not Set Closure Outcome",
           description: error?.response?.data
-            ? `${error.response.status}: ${Object.values(error.response.data)[0]
-            }`
+            ? `${error.response.status}: ${
+                Object.values(error.response.data)[0]
+              }`
             : "Error",
           status: "error",
           position: "top-right",
@@ -152,10 +153,12 @@ export const ProjectClosureContents = ({
         refetchData={refetch}
         setToLastTab={setToLastTab}
         isBaLead={isBaLead}
-      // projectPk={projectPk}
+        // projectPk={projectPk}
       />
 
-      {(document.document.project.kind === "science" || userData?.is_superuser) && (!document?.document?.directorate_approval_granted) ? (
+      {(document.document.project.kind === "science" ||
+        userData?.is_superuser) &&
+      !document?.document?.directorate_approval_granted ? (
         <Flex
           width={"100%"}
           mb={8}
@@ -185,7 +188,6 @@ export const ProjectClosureContents = ({
           </Flex>
         </Flex>
       ) : null}
-
 
       {document.document.project.kind === "science" && (
         <>
@@ -281,7 +283,6 @@ export const ProjectClosureContents = ({
             data={document?.scientific_outputs}
             section={"scientific_outputs"}
           />
-
         </>
       )}
 

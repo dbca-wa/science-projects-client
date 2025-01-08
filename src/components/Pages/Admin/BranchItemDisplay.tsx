@@ -31,7 +31,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteBranch, updateBranch } from "../../../lib/api";
+import { deleteBranch, updateBranch } from "../../../lib/api/api";
 import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
 import { IBranch } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";

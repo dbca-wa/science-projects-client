@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { ISpecialEndorsement } from "../../../lib/api";
+import { ISpecialEndorsement } from "../../../lib/api/api";
 import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
 import { IProjectPlan, IUserMe } from "../../../types";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
@@ -116,7 +116,7 @@ export const ProjectPlanEndorsements = ({
     (uploadedPDF && uploadedPDF.type === "application/pdf") ||
       document?.endorsements?.ae_endorsement_provided === true
       ? true
-      : false
+      : false,
   );
 
   useEffect(() => {
@@ -170,7 +170,7 @@ export const ProjectPlanEndorsements = ({
             rounded={"lg"}
             p={6}
             w={"100%"}
-          // gridRowGap={2}
+            // gridRowGap={2}
           >
             {/* Title */}
             <Box mb={4}>
@@ -342,9 +342,9 @@ export const ProjectPlanEndorsements = ({
               borderColor={"gray.300"}
               p={4}
               rounded={"xl"}
-            // roundedTop={0}
-            // borderTop={0}
-            // roundedBottom={0}
+              // roundedTop={0}
+              // borderTop={0}
+              // roundedBottom={0}
             >
               <Flex
                 // ml={8}
@@ -355,7 +355,7 @@ export const ProjectPlanEndorsements = ({
                   <Text
                     fontWeight={"semibold"}
 
-                  // color={involvesAnimalsValue ? "black" : "gray.500"}
+                    // color={involvesAnimalsValue ? "black" : "gray.500"}
                   >
                     Animal Ethics Committee Endorsement Required?
                   </Text>
@@ -452,7 +452,7 @@ export const ProjectPlanEndorsements = ({
                         onClick={() => {
                           window.open(
                             `${baseApi}${document?.endorsements?.aec_pdf?.file}`,
-                            "_blank"
+                            "_blank",
                           );
                         }}
                         _hover={{
@@ -475,11 +475,12 @@ export const ProjectPlanEndorsements = ({
                             }
                           >
                             {document?.endorsements?.aec_pdf?.file
-                              ? `${document.endorsements.aec_pdf.file
-                                .split("/")
-                                .pop()
-                                .split(".")[0]
-                              }.pdf`
+                              ? `${
+                                  document.endorsements.aec_pdf.file
+                                    .split("/")
+                                    .pop()
+                                    .split(".")[0]
+                                }.pdf`
                               : "No File"}
                             {/* {baseApi}{document?.endorsements?.aec_pdf?.file} */}
                           </Text>

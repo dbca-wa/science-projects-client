@@ -2,7 +2,7 @@ import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import {
   ISaveProgressReportSection,
   updateProgressReportSection,
-} from "@/lib/api";
+} from "@/lib/api/api";
 import { IProjectData, IProjectMember } from "@/types";
 import {
   Box,

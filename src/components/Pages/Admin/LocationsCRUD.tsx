@@ -29,7 +29,7 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createLocation, getAllLocations } from "../../../lib/api";
+import { createLocation, getAllLocations } from "../../../lib/api/api";
 import {
   IAddLocationForm,
   ISimpleLocationData,

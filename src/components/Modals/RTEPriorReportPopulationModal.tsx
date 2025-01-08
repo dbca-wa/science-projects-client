@@ -27,7 +27,7 @@ import {
   MutationError,
   PRPopulationVar,
   getPreviousDataForProgressReportPopulation,
-} from "../../lib/api";
+} from "../../lib/api/api";
 
 interface IModalProps {
   isOpen: boolean;

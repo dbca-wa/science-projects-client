@@ -35,7 +35,7 @@ import {
   MutationError,
   ProjectCreationMutationSuccess,
   createProject,
-} from "../../lib/api";
+} from "../../lib/api/api";
 import { useNavigate } from "react-router-dom";
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection";

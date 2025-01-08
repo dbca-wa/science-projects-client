@@ -37,7 +37,7 @@ import {
   promoteUserToLeader,
   removeTeamMemberFromProject,
   updateProjectMember,
-} from "../../../lib/api";
+} from "../../../lib/api/api";
 import { useCopyText } from "../../../lib/hooks/helper/useCopyText";
 import { useFormattedDate } from "../../../lib/hooks/helper/useFormattedDate";
 import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";

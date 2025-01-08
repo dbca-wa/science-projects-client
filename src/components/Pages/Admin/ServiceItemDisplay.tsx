@@ -36,7 +36,7 @@ import { UserProfile } from "../Users/UserProfile";
 import {
   deleteDepartmentalService,
   updateDepartmentalService,
-} from "../../../lib/api";
+} from "../../../lib/api/api";
 import { useState } from "react";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";

@@ -1,7 +1,7 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
 import { IProgressReportDisplayData } from "@/components/RichTextEditor/Editors/ARProgressReportHandler";
 import { IStudentReportDisplayData } from "@/components/RichTextEditor/Editors/ARStudentReportHandler";
-import { IApproveProgressReport, approveProgressReport } from "@/lib/api";
+import { IApproveProgressReport, approveProgressReport } from "@/lib/api/api";
 import {
   Box,
   Button,

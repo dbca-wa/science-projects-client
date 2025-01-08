@@ -1,4 +1,4 @@
-import { GuideSections } from "@/lib/api";
+import { GuideSections } from "@/lib/api/api";
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/helper/useGetRTESectionPlaceholder";
 import { Box, Spacer, Text } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";

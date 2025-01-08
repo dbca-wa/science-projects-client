@@ -20,7 +20,7 @@ import {
   IUsernameLoginSuccess,
   IUsernameLoginVariables,
   logInOrdinary,
-} from "../lib/api";
+} from "../lib/api/api";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";

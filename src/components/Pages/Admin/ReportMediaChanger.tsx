@@ -1,4 +1,4 @@
-import { deleteReportMediaImage, uploadReportMediaImage } from "@/lib/api";
+import { deleteReportMediaImage, uploadReportMediaImage } from "@/lib/api/api";
 import { handleImageFileCompression } from "@/lib/hooks/helper/handleImageFileCompression";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import {

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getProjectTeam } from "../../api";
+import { getProjectTeam } from "../../api/api";
 
 export const useProjectTeam = (projectPk: undefined | string) => {
   const { isPending, data, refetch } = useQuery({

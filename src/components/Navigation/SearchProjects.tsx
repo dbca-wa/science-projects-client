@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
-import { getAllBusinessAreas, getAllProjectsYears } from "../../lib/api";
+import { getAllBusinessAreas, getAllProjectsYears } from "../../lib/api/api";
 import { useProjectSearchContext } from "../../lib/hooks/helper/ProjectSearchContext";
 
 interface IProps {
@@ -174,16 +174,16 @@ export const SearchProjects = ({ orientation }: IProps) => {
             style={
               colorMode === "light"
                 ? {
-                  color: "black",
-                  backgroundColor: "white",
-                  borderColor: "gray.200",
-                  caretColor: "black !important",
-                }
+                    color: "black",
+                    backgroundColor: "white",
+                    borderColor: "gray.200",
+                    caretColor: "black !important",
+                  }
                 : {
-                  color: "white",
-                  borderColor: "white",
-                  caretColor: "black !important",
-                }
+                    color: "white",
+                    borderColor: "white",
+                    caretColor: "black !important",
+                  }
             }
           >
             <option value={0} color={"black"}>
@@ -206,16 +206,16 @@ export const SearchProjects = ({ orientation }: IProps) => {
             style={
               colorMode === "light"
                 ? {
-                  color: "black",
-                  backgroundColor: "white",
-                  borderColor: "gray.200",
-                  caretColor: "black !important",
-                }
+                    color: "black",
+                    backgroundColor: "white",
+                    borderColor: "gray.200",
+                    caretColor: "black !important",
+                  }
                 : {
-                  color: "white",
-                  borderColor: "white",
-                  caretColor: "black !important",
-                }
+                    color: "white",
+                    borderColor: "white",
+                    caretColor: "black !important",
+                  }
             }
           >
             <option key={"All"} value={"All"} color={"black"}>
@@ -252,23 +252,23 @@ export const SearchProjects = ({ orientation }: IProps) => {
           style={
             colorMode === "light"
               ? {
-                color: "black",
-                backgroundColor: "white",
-                borderColor: "gray.200",
-                caretColor: "black !important",
-              }
+                  color: "black",
+                  backgroundColor: "white",
+                  borderColor: "gray.200",
+                  caretColor: "black !important",
+                }
               : {
-                color: "white",
-                borderColor: "white",
-                caretColor: "black !important",
-              }
+                  color: "white",
+                  borderColor: "white",
+                  caretColor: "black !important",
+                }
           }
         >
           <option value={"All"} color={"black"}>
             All Business Areas
           </option>
           {businessAreas.map((ba, index) => {
-            console.log(ba)
+            console.log(ba);
             const checkIsHtml = (data: string) => {
               // Regular expression to check for HTML tags
               const htmlRegex = /<\/?[a-z][\s\S]*>/i;

@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
-import { deleteAECPDFEndorsement } from "../../lib/api";
+import { deleteAECPDFEndorsement } from "../../lib/api/api";
 
 interface Props {
   projectPlanPk: number;

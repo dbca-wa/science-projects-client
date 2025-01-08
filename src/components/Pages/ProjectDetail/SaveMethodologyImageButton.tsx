@@ -1,6 +1,6 @@
 // A template for a RTE toggalable button - props fill out its icons, colorSchemes, states and functionality
 
-import { IHandleMethodologyImage, handleMethodologyImage } from "@/lib/api";
+import { IHandleMethodologyImage, handleMethodologyImage } from "@/lib/api/api";
 import { IProjectPlan } from "@/types";
 import {
   Button,

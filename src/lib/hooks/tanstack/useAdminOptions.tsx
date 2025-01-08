@@ -2,7 +2,7 @@
 // Exposes that data as well as the state of the query (loading or not)
 
 import { useQuery } from "@tanstack/react-query";
-import { getAdminOptionsByPk } from "../../api";
+import { getAdminOptionsByPk } from "../../api/api";
 import { IAdminOptions } from "@/types";
 
 export const useAdminOptions = (pk: number) => {

@@ -1,4 +1,4 @@
-import { remedyExternallyLedProjects } from "@/lib/api";
+import { remedyExternallyLedProjects } from "@/lib/api/api";
 import { IProjectData } from "@/types";
 import {
   Box,

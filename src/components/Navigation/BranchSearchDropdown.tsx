@@ -20,7 +20,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { getBranchesBasedOnSearchTerm } from "../../lib/api";
+import { getBranchesBasedOnSearchTerm } from "../../lib/api/api";
 import { useBranch } from "../../lib/hooks/tanstack/useBranch";
 import { IBranch } from "../../types";
 
@@ -46,7 +46,7 @@ export const BranchSearchDropdown = forwardRef(
       preselectedBranchPk,
       isEditable,
     }: IBranchSearchDropdown,
-    ref
+    ref,
   ) => {
     const inputRef = useRef(null);
     const [searchTerm, setSearchTerm] = useState(""); // Local state for search term
@@ -71,7 +71,7 @@ export const BranchSearchDropdown = forwardRef(
     }, [searchTerm]);
 
     const { branchLoading, branchData } = useBranch(
-      preselectedBranchPk !== undefined ? preselectedBranchPk : 0
+      preselectedBranchPk !== undefined ? preselectedBranchPk : 0,
     );
 
     useEffect(() => {
@@ -153,7 +153,7 @@ export const BranchSearchDropdown = forwardRef(
         <FormHelperText>{helperText}</FormHelperText>
       </FormControl>
     );
-  }
+  },
 );
 
 // =========================================== ADDITIONAL COMPONENTS ====================================================

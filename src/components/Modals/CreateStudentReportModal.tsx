@@ -26,7 +26,7 @@ import {
   Spinner,
   Box,
 } from "@chakra-ui/react";
-import { ISpawnDocument, spawnNewEmptyDocument } from "../../lib/api";
+import { ISpawnDocument, spawnNewEmptyDocument } from "../../lib/api/api";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -69,7 +69,7 @@ export const CreateStudentReportModal = ({
       yearValue
     ) {
       const obj = availableStudentYearsData.find(
-        (item) => Number(item.year) === Number(yearValue)
+        (item) => Number(item.year) === Number(yearValue),
       );
       setSelectedReportId(obj.pk);
     }
@@ -210,7 +210,7 @@ export const CreateStudentReportModal = ({
                             return (
                               <option key={index} value={freeReportYear.year}>
                                 {`FY ${freeReportYear.year - 1} - ${String(
-                                  freeReportYear.year
+                                  freeReportYear.year,
                                 ).slice(2)}`}
                               </option>
                             );

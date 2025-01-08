@@ -18,7 +18,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { ISetProjectStatusProps, setProjectStatus } from "../../lib/api";
+import { ISetProjectStatusProps, setProjectStatus } from "../../lib/api/api";
 
 interface Props {
   projectPk: string | number;
