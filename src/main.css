@@ -130,3 +130,7 @@
   -ms-overflow-style: none; /* Internet Explorer and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+body {
+  overscroll-behavior-y: none;
+}

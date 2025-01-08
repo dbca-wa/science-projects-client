@@ -22,6 +22,7 @@ export const TraditionalPageWrapper: React.FC<IPageWrapperProps> = ({
       flex="1"
       display="flex"
       flexDirection="column"
+      overscrollBehaviorY={"none"}
     >
       {children}
     </Box>

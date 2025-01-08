@@ -13,7 +13,14 @@ export const ModernLayout = () => {
   const { loading } = useLayoutSwitcher();
 
   return (
-    <Box display={"flex"} minH={"100vh"} maxH={"100vh"}>
+    <Box
+      display={"flex"}
+      minH={"100vh"}
+      maxH={"100vh"}
+      w={"100vw"}
+      overscrollBehaviorY={"none"}
+      pos={"fixed"}
+    >
       <Sidebar />
       <Box flex={1} h={"100vh"} overflow={"auto"} pos="relative">
         <ModernHeader />
