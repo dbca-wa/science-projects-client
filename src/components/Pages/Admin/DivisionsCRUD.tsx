@@ -25,7 +25,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createDivision, getAllDivisions } from "../../../lib/api";
+import { createDivision, getAllDivisions } from "../../../lib/api/api";
 import _ from "lodash";
 import { useQueryClient } from "@tanstack/react-query";
 import { IDivision } from "../../../types";

@@ -30,7 +30,7 @@ import {
   MutationError,
   MutationSuccess,
   deactivateUserAdmin,
-} from "../../lib/api";
+} from "../../lib/api/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
 import { IUserData } from "@/types";
@@ -170,18 +170,23 @@ export const DeactivateUserModal = ({
       <ModalOverlay />
       <Flex as={"form"} onSubmit={handleSubmit(onSubmit)}>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-          <ModalHeader>{user?.is_active ? "Deactivate" : "Reactivate"} User?</ModalHeader>
+          <ModalHeader>
+            {user?.is_active ? "Deactivate" : "Reactivate"} User?
+          </ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
             <Center>
               <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to {user?.is_active ? "deactivate" : "reactivate"} this user?
+                Are you sure you want to{" "}
+                {user?.is_active ? "deactivate" : "reactivate"} this user?
               </Text>
             </Center>
             <Center mt={4}>
               <UnorderedList mb={0} pb={0}>
-                <ListItem mb={0} pb={0}>They will now receive emails</ListItem>
+                <ListItem mb={0} pb={0}>
+                  They will now receive emails
+                </ListItem>
               </UnorderedList>
             </Center>
             <FormControl mt={0} mb={4} userSelect="none">
@@ -208,7 +213,15 @@ export const DeactivateUserModal = ({
                 isLoading={deactivationMutation.isPending}
                 type="submit"
                 color={"white"}
-                background={colorMode === "light" ? user?.is_active ? "red.500" : "green.500" : user?.is_active ? "red.600" : "green.500"}
+                background={
+                  colorMode === "light"
+                    ? user?.is_active
+                      ? "red.500"
+                      : "green.500"
+                    : user?.is_active
+                      ? "red.600"
+                      : "green.500"
+                }
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }}

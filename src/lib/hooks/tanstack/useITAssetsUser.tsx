@@ -2,7 +2,7 @@
 // Exposes that data as well as the state of the query (loading or not)
 
 import { useQuery } from "@tanstack/react-query";
-import { getITAssetUser } from "../../api";
+import { getITAssetUser } from "../../api/api";
 
 export const useITAssetsUser = (pk: number) => {
   const { isPending, data } = useQuery({

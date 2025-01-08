@@ -29,7 +29,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createBusinessArea, getAllBusinessAreas } from "../../../lib/api";
+import { createBusinessArea, getAllBusinessAreas } from "../../../lib/api/api";
 import { IBusinessArea, IBusinessAreaCreate } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { BusinessAreaItemDisplay } from "./BusinessAreaItemDisplay";

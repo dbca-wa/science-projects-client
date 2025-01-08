@@ -2,7 +2,7 @@
 // Exposes data and loading states of query
 
 import { useQuery } from "@tanstack/react-query";
-import { getAllBranches } from "../../api";
+import { getAllBranches } from "../../api/api";
 
 export const useBranches = () => {
   const { isPending, data } = useQuery({

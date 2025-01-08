@@ -28,7 +28,7 @@ import {
   createUser,
   getDoesUserWithEmailExist,
   getDoesUserWithFullNameExist,
-} from "../lib/api";
+} from "../lib/api/api";
 import { AffiliationSearchDropdown } from "@/components/Navigation/AffiliationSearchDropdown";
 import { IAffiliation } from "@/types";
 import { motion } from "framer-motion";

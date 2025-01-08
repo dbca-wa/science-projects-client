@@ -1,6 +1,6 @@
 // User Search component - works/appears on the Users page with UserSearchContext
 
-import { getAllBusinessAreas } from "@/lib/api";
+import { getAllBusinessAreas } from "@/lib/api/api";
 import { IBusinessArea } from "@/types";
 import {
   Flex,
@@ -86,7 +86,6 @@ export const SearchUsers = () => {
 
   // useEffect(() => console.log(businessAreaValue), [])
 
-
   useEffect(() => {
     const fetchBusinessAreas = async () => {
       try {
@@ -114,7 +113,6 @@ export const SearchUsers = () => {
     return doc.body.textContent || "";
   };
 
-
   return (
     <Flex>
       <Select
@@ -125,16 +123,16 @@ export const SearchUsers = () => {
         style={
           colorMode === "light"
             ? {
-              color: "black",
-              backgroundColor: "white",
-              borderColor: "gray.200",
-              caretColor: "black !important",
-            }
+                color: "black",
+                backgroundColor: "white",
+                borderColor: "gray.200",
+                caretColor: "black !important",
+              }
             : {
-              color: "white",
-              borderColor: "white",
-              caretColor: "black !important",
-            }
+                color: "white",
+                borderColor: "white",
+                caretColor: "black !important",
+              }
         }
       >
         <option key={"All"} value={"All"} color={"black"}>

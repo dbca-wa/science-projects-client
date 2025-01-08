@@ -1,7 +1,7 @@
 // Simple hook for getting the arars where a progress report can be created for a given project
 
 import { useQuery } from "@tanstack/react-query";
-import { getAvailableReportYearsForProgressReport } from "../../api";
+import { getAvailableReportYearsForProgressReport } from "../../api/api";
 
 export const useGetProgressReportAvailableReportYears = (pk: number) => {
   const { isPending, data, refetch } = useQuery({

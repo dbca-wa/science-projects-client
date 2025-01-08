@@ -1,4 +1,4 @@
-import { GuideSections } from "@/lib/api";
+import { GuideSections } from "@/lib/api/api";
 import { EditorSubsections } from "@/types";
 import { useState, useEffect } from "react";
 

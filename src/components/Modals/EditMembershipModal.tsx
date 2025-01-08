@@ -27,7 +27,7 @@ import {
   IProfileUpdateSuccess,
   MutationError,
   updateMembership,
-} from "../../lib/api";
+} from "../../lib/api/api";
 import { useForm } from "react-hook-form";
 import { IAffiliation, IBranch, IBusinessArea } from "../../types";
 import { useBusinessAreas } from "../../lib/hooks/tanstack/useBusinessAreas";

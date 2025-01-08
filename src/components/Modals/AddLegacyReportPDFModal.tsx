@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { addLegacyPDF } from "../../lib/api";
+import { addLegacyPDF } from "../../lib/api/api";
 import { useUser } from "../../lib/hooks/tanstack/useUser";
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
 

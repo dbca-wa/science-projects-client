@@ -1,7 +1,7 @@
 // Has mention and hashtag functionality
 
 import { ChatUser } from "@/components/Pages/Chat/ChatUser";
-import { IBranch, IBusinessArea, IUserData } from "@/types";
+import { IBranch, IBusinessArea, ICommentReaction, IUserData } from "@/types";
 import {
   Box,
   Center,
@@ -30,7 +30,7 @@ import "../../../../styles/texteditor.css";
 import { ListItemNode, ListNode } from "@lexical/list";
 
 import { DeleteCommentModal } from "@/components/Modals/DeleteCommentModal";
-import { createCommentReaction } from "@/lib/api";
+import { createCommentReaction } from "@/lib/api/api";
 import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -40,23 +40,6 @@ import { ImCross } from "react-icons/im";
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import { MentionNode } from "../../Plugins/MentionsPlugin";
 import { PrepopulateCommentDisplayPlugin } from "../../Plugins/PrepopulateCommentDisplayPlugin";
-
-export interface ICommentReaction {
-  pk?: number;
-  user: number;
-  // user: IUserData;
-  comment?: number | null;
-  direct_message?: number | null;
-  reaction:
-    | "thumbup"
-    | "thumbdown"
-    | "heart"
-    | "brokenheart"
-    | "hundred"
-    | "confused"
-    | "funny"
-    | "surprised";
-}
 
 interface Props {
   baseAPI: string;

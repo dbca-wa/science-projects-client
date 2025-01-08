@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { DrawerClose } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { deleteEmployment, ISimplePkProp } from "@/lib/api";
+import { deleteEmployment, ISimplePkProp } from "@/lib/api/api";
 import { IStaffEmploymentEntry } from "@/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

@@ -1,4 +1,4 @@
-import { createReport } from "@/lib/api";
+import { createReport } from "@/lib/api/api";
 import { IReportCreation } from "@/types";
 import {
   Box,

@@ -16,7 +16,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { ISetProjectStatusProps, setProjectStatus } from "../../../../lib/api";
+import {
+  ISetProjectStatusProps,
+  setProjectStatus,
+} from "../../../../lib/api/api";
 import { useFormattedDate } from "../../../../lib/hooks/helper/useFormattedDate";
 import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
@@ -45,8 +48,8 @@ export const ProgressReportDocActions = ({
   setToLastTab,
   isBaLead,
 }: // setSelectedProgressReport, setSelectedYear,
-  // , projectPk
-  IProgressDocumentActions) => {
+// , projectPk
+IProgressDocumentActions) => {
   const { colorMode } = useColorMode();
 
   const {
@@ -280,7 +283,7 @@ export const ProgressReportDocActions = ({
               </Box>
               <Grid
                 pt={2}
-              // gridGap={2}
+                // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -309,7 +312,7 @@ export const ProgressReportDocActions = ({
                             : progressReportData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                              colorMode === "light"
+                                colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -513,9 +516,9 @@ export const ProgressReportDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-              // gridGap={2}
-              // pt={4}
-              // pos={"relative"}
+                // gridGap={2}
+                // pt={4}
+                // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -698,7 +701,7 @@ export const ProgressReportDocActions = ({
                   borderBottom={"0px"}
                   // rounded={"2xl"}
                   p={4}
-                // pos={"relative"}
+                  // pos={"relative"}
                 >
                   <Flex
                     mt={1}
@@ -740,7 +743,7 @@ export const ProgressReportDocActions = ({
                         ? 3
                         : 0
                     }
-                  // gridTemplateColumns={"repeat(2, 1fr)"}
+                    // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     {progressReportData?.document
                       ?.project_lead_approval_granted &&

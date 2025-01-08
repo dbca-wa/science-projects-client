@@ -8,7 +8,7 @@ import {
   INewCycleEmail,
   IProjectClosureEmail,
   IReviewDocumentEmail,
-} from "@/lib/api";
+} from "@/lib/api/api";
 
 export interface ITAssetData {
   id: number;
@@ -1306,3 +1306,23 @@ interface IDashProps {
 }
 
 // SCIENCE PORTFOLIO ================================================================================
+export interface ISimplePkProp {
+  pk: number;
+}
+
+export interface ICommentReaction {
+  pk?: number;
+  user: number;
+  // user: IUserData;
+  comment?: number | null;
+  direct_message?: number | null;
+  reaction:
+    | "thumbup"
+    | "thumbdown"
+    | "heart"
+    | "brokenheart"
+    | "hundred"
+    | "confused"
+    | "funny"
+    | "surprised";
+}

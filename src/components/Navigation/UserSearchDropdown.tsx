@@ -25,7 +25,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { getInternalUsersBasedOnSearchTerm } from "../../lib/api";
+import { getInternalUsersBasedOnSearchTerm } from "../../lib/api/api";
 import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
 import { IUserData } from "../../types";
 import { EmailSiteLinkModal } from "../Modals/Emails/EmailSiteLinkModal";

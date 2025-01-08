@@ -4,7 +4,7 @@ import { Button, ToastId, useColorMode, useToast } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { FaDownload } from "react-icons/fa";
-import { downloadProjectsCSV } from "../../../lib/api";
+import { downloadProjectsCSV } from "../../../lib/api/api";
 
 export const DownloadProjectsCSVButton = () => {
   const { colorMode } = useColorMode();

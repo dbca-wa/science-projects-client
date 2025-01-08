@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { DrawerClose } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { IUpdateStaffHeroSection, updateStaffHeroSection } from "@/lib/api";
+import { IUpdateStaffHeroSection, updateStaffHeroSection } from "@/lib/api/api";
 // import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import { IStaffProfileHeroData } from "@/types";
 import { useToast } from "@chakra-ui/react";

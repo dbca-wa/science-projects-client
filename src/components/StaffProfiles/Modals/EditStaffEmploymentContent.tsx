@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { DrawerClose } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { editEmployment } from "@/lib/api";
+import { editEmployment } from "@/lib/api/api";
 import { IStaffEmploymentEntry } from "@/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

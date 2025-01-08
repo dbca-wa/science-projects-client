@@ -2,7 +2,7 @@
 // Exposes that data as well as the state of the query (loading or not)
 
 import { useQuery } from "@tanstack/react-query";
-import { getLatestActiveStudentReports } from "../../api";
+import { getLatestActiveStudentReports } from "../../api/api";
 
 export const useLatestYearsActiveStudentProjects = () => {
   const { isPending, data, refetch } = useQuery({

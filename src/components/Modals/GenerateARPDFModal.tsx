@@ -28,7 +28,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaFilePdf } from "react-icons/fa";
-import { IGeneratePDFProps, generateReportPDF } from "../../lib/api";
+import { IGeneratePDFProps, generateReportPDF } from "../../lib/api/api";
 
 interface Props {
   isOpen: boolean;

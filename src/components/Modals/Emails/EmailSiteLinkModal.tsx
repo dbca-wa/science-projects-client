@@ -2,7 +2,7 @@ import {
   getDoesUserWithEmailExist,
   IEmailRecipientsString,
   sendSPMSLinkEmail,
-} from "@/lib/api";
+} from "@/lib/api/api";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
   Button,

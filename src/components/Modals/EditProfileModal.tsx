@@ -29,7 +29,7 @@ import {
   IProfileUpdateVariables,
   removeUserAvatar,
   updateProfile,
-} from "../../lib/api";
+} from "../../lib/api/api";
 import { useNoImage } from "../../lib/hooks/helper/useNoImage";
 import useServerImageUrl from "../../lib/hooks/helper/useServerImageUrl";
 import { IProfile } from "../../types";

@@ -18,7 +18,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../lib/hooks/tanstack/useUser";
-import { addPDFToReport } from "../../lib/api";
+import { addPDFToReport } from "../../lib/api/api";
 import { useGetARARsWithoputPDF } from "../../lib/hooks/tanstack/useGetARARsWithoputPDF";
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
 

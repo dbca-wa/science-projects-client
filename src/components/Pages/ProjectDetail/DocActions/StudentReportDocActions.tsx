@@ -16,7 +16,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { ISetProjectStatusProps, setProjectStatus } from "../../../../lib/api";
+import {
+  ISetProjectStatusProps,
+  setProjectStatus,
+} from "../../../../lib/api/api";
 import { useFormattedDate } from "../../../../lib/hooks/helper/useFormattedDate";
 import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
@@ -48,8 +51,8 @@ export const StudentReportDocActions = ({
   setToLastTab,
   isBaLead,
 }: // setselectedStudentReport, setSelectedYear,
-  // , projectPk
-  IStudentDocumentActions) => {
+// , projectPk
+IStudentDocumentActions) => {
   const { colorMode } = useColorMode();
   const kindDict = {
     core_function: {
@@ -295,7 +298,7 @@ export const StudentReportDocActions = ({
               </Box>
               <Grid
                 pt={2}
-              // gridGap={2}
+                // gridGap={2}
               >
                 <Flex
                   border={"1px solid"}
@@ -324,7 +327,7 @@ export const StudentReportDocActions = ({
                             : studentReportData.document.status === "revising"
                               ? "orange.500"
                               : // New
-                              colorMode === "light"
+                                colorMode === "light"
                                 ? "red.500"
                                 : "red.600"
                     }
@@ -527,9 +530,9 @@ export const StudentReportDocActions = ({
               <Grid
                 pt={2}
                 gridTemplateColumns={"repeat(1, 1fr)"}
-              // gridGap={2}
-              // pt={4}
-              // pos={"relative"}
+                // gridGap={2}
+                // pt={4}
+                // pos={"relative"}
               >
                 {/* Project Lead GRID */}
                 <Grid
@@ -742,8 +745,8 @@ export const StudentReportDocActions = ({
                     mt={
                       studentReportData?.document
                         ?.project_lead_approval_granted &&
-                        studentReportData?.document
-                          ?.directorate_approval_granted === false
+                      studentReportData?.document
+                        ?.directorate_approval_granted === false
                         ? 3
                         : 0
                     }

@@ -2,7 +2,7 @@
 // Exposes that data as well as the state of the query (loading or not)
 
 import { useQuery } from "@tanstack/react-query";
-import { getAffiliationByPk } from "../../api";
+import { getAffiliationByPk } from "../../api/api";
 
 export const useAffiliation = (pk: number) => {
   const { isPending, data } = useQuery({

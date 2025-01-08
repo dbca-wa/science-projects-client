@@ -29,7 +29,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteLocation, updateLocation } from "../../../lib/api";
+import { deleteLocation, updateLocation } from "../../../lib/api/api";
 import { IAddLocationForm, ISimpleLocationData } from "../../../types";
 
 export const LocationItemDisplay = ({
@@ -243,7 +243,7 @@ export const LocationItemDisplay = ({
               {updateMutation.isError ? (
                 <Box mt={4}>
                   {Object.keys(
-                    (updateMutation.error as AxiosError).response.data
+                    (updateMutation.error as AxiosError).response.data,
                   ).map((key) => (
                     <Box key={key}>
                       {(

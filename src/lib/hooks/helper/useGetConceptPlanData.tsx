@@ -1,4 +1,4 @@
-import { getDataForConceptPlanGeneration } from "../../api";
+import { getDataForConceptPlanGeneration } from "../../api/api";
 import { IConceptPlanGenerationData } from "@/types";
 import { useEffect, useState } from "react";
 

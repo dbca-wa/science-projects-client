@@ -1,7 +1,7 @@
 // Hook used to determine the user. Used on login and getting full profile from pk in data.
 
 import { useQuery } from "@tanstack/react-query";
-import { checkCaretakerStatus } from "../../api";
+import { checkCaretakerStatus } from "../../api/api";
 import { ICheckCaretakerStatus } from "../../../types";
 
 export const useCheckExistingCaretaker = () => {

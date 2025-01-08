@@ -1,5 +1,5 @@
 import { ProjectLeadEmailModal } from "@/components/Modals/ProjectLeadEmailModal";
-import { getEmailProjectList } from "@/lib/api";
+import { getEmailProjectList } from "@/lib/api/api";
 import {
   Box,
   Button,

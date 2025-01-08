@@ -3,7 +3,7 @@ import {
   cancelAnnualReportPDF,
   generateAnnualReportPDF,
   generateAnnualReportUnapprovedPDF,
-} from "@/lib/api";
+} from "@/lib/api/api";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import { useGetAnnualReportPDF } from "@/lib/hooks/tanstack/useGetAnnualReportPDF";
 import { IReport } from "@/types";
