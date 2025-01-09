@@ -29,7 +29,7 @@ export const StartAndEndDateSelector = ({
             label={"Start Date"}
             placeholder={startDate ? `${startDate}` : "Select Start Date"}
             required={true}
-            dateFormat={"DD/MM/YYYY"}
+            dateFormat={"dd/MM/yyyy"}
             selectedDate={startDate}
             setSelectedDate={setStartDate}
           />
@@ -37,7 +37,7 @@ export const StartAndEndDateSelector = ({
             label={"End Date"}
             placeholder={endDate ? `${endDate}` : "Select End Date"}
             required={true}
-            dateFormat={"DD/MM/YYYY"}
+            dateFormat={"dd/MM/yyyy"}
             selectedDate={endDate}
             setSelectedDate={setEndDate}
           />

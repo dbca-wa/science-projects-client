@@ -292,21 +292,26 @@ export interface ICheckCaretakerStatus {
       pk: number;
       display_first_name: string;
       display_last_name: string;
+      image: IImageData;
     }[];
     status: string;
   };
-  caretaker_object: {
+  caretaker_object: ICaretakerObject | null;
+}
+
+export interface ICaretakerObject {
+  pk?: number;
+  id?: number;
+  user: number;
+  caretaker: {
     pk: number;
-    user: number;
-    caretaker: {
-      pk: number;
-      display_first_name: string;
-      display_last_name: string;
-    };
-    end_date: Date | null;
-    reason: string | null;
-    notes: string | null;
-  } | null;
+    display_first_name: string;
+    display_last_name: string;
+    image: IImageData;
+  };
+  end_date: Date | null;
+  reason: string | null;
+  notes: string | null;
 }
 
 export interface IUserMe {
@@ -1308,6 +1313,9 @@ interface IDashProps {
 // SCIENCE PORTFOLIO ================================================================================
 export interface ISimplePkProp {
   pk: number;
+}
+export interface ISimpleIdProp {
+  id: number;
 }
 
 export interface ICommentReaction {
