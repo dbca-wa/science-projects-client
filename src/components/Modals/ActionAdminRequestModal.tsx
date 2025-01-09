@@ -243,7 +243,7 @@ export const ActionAdminRequestModal = ({
                       {/* <ListItem>From {formattedStart.split("@")[0]}</ListItem> */}
                       {task.end_date && (
                         <ListItem>
-                          Until {formatDate(task.end_date, "dd/MM/YYYY")}
+                          Until {formatDate(task.end_date, "dd/MM/yyyy")}
                         </ListItem>
                       )}
                       <ListItem>
@@ -265,16 +265,22 @@ export const ActionAdminRequestModal = ({
             ) : null}
           </ModalBody>
           <ModalFooter>
-            <Flex flexDir={"column"}>
-              <Center pb={5} px={5} display={"flex"} flexDir={"column"}>
+            <Flex flexDir={"column"} w={"full"}>
+              <Box pb={5} display={"flex"} flexDir={"column"} w={"full"}>
                 <Text fontWeight={"semibold"} color={"blue.500"}>
                   If you wish to proceed, click approve. Otherwise, click reject
                   and the request will be removed.
                 </Text>
-                <Text fontWeight={"semibold"} color={"blue.500"}>
-                  To exit, press the close button.
+                <Text
+                  my={4}
+                  fontWeight={"semibold"}
+                  color={"blue.500"}
+                  justifyContent={"start"}
+                  w={"100%"}
+                >
+                  To exit, press the close button or click away.
                 </Text>
-              </Center>
+              </Box>
               <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
                 <Button
                   colorScheme="gray"

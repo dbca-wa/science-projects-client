@@ -169,6 +169,37 @@ export const requestCaretaker = async ({
   return res;
 };
 
+export const removeCaretaker = async ({ id }: { id: number }) => {
+  const res = instance.delete(`adminoptions/caretakers/${id}`).then((res) => {
+    return res.data;
+  });
+  return res;
+};
+
+export interface IExtendCaretakerProps {
+  id: number;
+  currentEndDate: Date;
+  newEndDate: Date;
+}
+
+export const extendCaretaker = async ({
+  id,
+  currentEndDate,
+  newEndDate,
+}: IExtendCaretakerProps) => {
+  if (newEndDate <= currentEndDate) {
+    throw new Error("The new end date must be after the current end date");
+  }
+  const res = instance
+    .put(`adminoptions/caretakers/${id}`, {
+      end_date: newEndDate,
+    })
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
+
 export const cancelCaretakerRequest = async ({
   taskPk,
 }: {
