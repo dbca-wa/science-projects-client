@@ -143,6 +143,34 @@ export const deleteUserAdmin = async ({ userPk }: AdminSwitchVar) => {
   return res;
 };
 
+export const adminSetCaretaker = async ({
+  userPk,
+  caretakerPk,
+  endDate,
+  reason,
+  notes,
+}: ICaretakerEntry) => {
+  // console.log("DATA:", {
+  //   userPk,
+  //   caretakerPk,
+  //   endDate,
+  //   reason,
+  //   notes,
+  // });
+  const res = instance
+    .post(`adminoptions/caretakers/adminsetcaretaker`, {
+      userPk,
+      caretakerPk,
+      endDate,
+      reason,
+      notes,
+    })
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
+
 export const requestCaretaker = async ({
   userPk,
   caretakerPk,

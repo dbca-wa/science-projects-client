@@ -178,7 +178,8 @@ export const RemoveCaretakerModal = ({
               </Text>
             </Center>
             <Text mt={4}>
-              They will immedediately lose permissions to act on your behalf.
+              They will immedediately lose permissions to act on the user's
+              behalf.
             </Text>
 
             <Text mt={4}>

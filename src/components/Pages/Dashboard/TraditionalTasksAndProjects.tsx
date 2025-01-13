@@ -24,12 +24,14 @@ import { EndorsementsDataTable } from "./EndorsementsDataTable";
 import { UserProjectsDataTable } from "./UserProjectsDataTable";
 import { useGetPendingAdminTasks } from "@/lib/hooks/tanstack/useGetPendingAdminTasks";
 import { AdminTasksDataTable } from "./AdminTasksDataTable";
+import { useGetPendingCaretakerTasks } from "@/lib/hooks/tanstack/useGetPendingCaretakerTasks";
 
 export const TraditionalTasksAndProjects = () => {
   const { colorMode } = useColorMode();
   const me = useUser();
+  // useEffect(() => console.log(me));
   const { projectData, projectsLoading } = useGetMyProjects();
-  useEffect(() => console.log(projectData));
+  // useEffect(() => console.log(projectData));
 
   const { pendingProjectDocumentData, pendingProjectDocumentDataLoading } =
     useGetDocumentsPendingMyAction();
@@ -37,21 +39,31 @@ export const TraditionalTasksAndProjects = () => {
   const { pendingEndorsementsData, pendingEndorsementsDataLoading } =
     useGetEndorsementsPendingMyAction();
 
-  useEffect(() => {
-    if (!pendingProjectDocumentDataLoading) {
-      console.log(pendingProjectDocumentData);
-    }
-  }, [pendingProjectDocumentData, pendingProjectDocumentDataLoading]);
+  // useEffect(() => {
+  //   if (!pendingProjectDocumentDataLoading) {
+  //     console.log(pendingProjectDocumentData);
+  //   }
+  // }, [pendingProjectDocumentData, pendingProjectDocumentDataLoading]);
 
   // const pendingAdminActionsLoading = true;
   const { pendingAdminTasksLoading, pendingAdminTaskData } =
     useGetPendingAdminTasks();
 
+  const { pendingCaretakerTasksLoading, pendingCaretakerTaskData } =
+    useGetPendingCaretakerTasks(me?.userData?.pk);
+
   useEffect(() => {
-    if (!pendingAdminTasksLoading) {
-      console.log(pendingAdminTaskData);
+    if (!pendingCaretakerTasksLoading) {
+      console.log("Caretaker Data:");
+      console.log(pendingCaretakerTaskData);
     }
-  }, [pendingAdminTaskData, pendingAdminTasksLoading]);
+  }, [pendingCaretakerTasksLoading, pendingCaretakerTaskData]);
+
+  // useEffect(() => {
+  //   if (!pendingAdminTasksLoading) {
+  //     console.log(pendingAdminTaskData);
+  //   }
+  // }, [pendingAdminTaskData, pendingAdminTasksLoading]);
 
   return (
     <>
@@ -315,6 +327,72 @@ export const TraditionalTasksAndProjects = () => {
               </AccordionItem>
             </motion.div>
           )}
+
+          {me?.userData?.is_superuser === true ? (
+            pendingCaretakerTasksLoading ? (
+              <Center my={4}>
+                <Spinner />
+              </Center>
+            ) : (
+              <motion.div
+                initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
+                animate={{
+                  opacity: pendingCaretakerTasksLoading ? 0 : 1,
+                }}
+                transition={{ duration: 0.4 }} // Animation duration in seconds
+              >
+                <AccordionItem
+                  borderColor={
+                    colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
+                  }
+                  borderBottom={"none"}
+                  borderTop={
+                    me?.userData?.is_superuser === true
+                      ? "1px gray.300"
+                      : "none"
+                  }
+                >
+                  <AccordionButton
+                    bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                    color={colorMode === "light" ? "black" : "white"}
+                    _hover={
+                      colorMode === "light"
+                        ? { bg: "gray.300", color: "black" }
+                        : { bg: "gray.500", color: "white" }
+                    }
+                    userSelect={"none"}
+                  >
+                    <Box as="span" flex="1" textAlign="left">
+                      Caretaker Tasks
+                    </Box>
+
+                    {/* </Box> */}
+                    {pendingCaretakerTaskData?.all?.length >= 1 ? (
+                      <Box
+                        display={"inline-flex"}
+                        justifyContent={"center"}
+                        alignItems={"center"}
+                      >
+                        <Box mr={2}>
+                          {pendingCaretakerTaskData?.all?.length}
+                        </Box>
+                        <FcHighPriority />
+                      </Box>
+                    ) : (
+                      <FcOk />
+                    )}
+                    <AccordionIcon />
+                  </AccordionButton>
+
+                  <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+                    <DocumentsDataTable
+                      pendingProjectDocumentData={pendingCaretakerTaskData}
+                    />
+                  </AccordionPanel>
+                </AccordionItem>
+              </motion.div>
+            )
+          ) : null}
         </Accordion>
       </Box>
     </>

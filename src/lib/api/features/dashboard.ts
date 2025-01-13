@@ -20,6 +20,15 @@ export const getPendingAdminTasks = () => {
   return res;
 };
 
+export const getPendingCaretakerTasks = ({ usersPk }: { usersPk: number }) => {
+  const res = instance
+    .get(`adminoptions/caretakers/pending/${usersPk}`)
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
+
 // Separated queries (faster, hits db more)
 export const getDocumentsPendingStageOneAction = () => {
   const res = instance

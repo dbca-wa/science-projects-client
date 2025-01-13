@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getFullUser } from "../../api/api";
 
 export const useFullUserByPk = (pk: number) => {
-  const { isPending, data } = useQuery({
+  const { isPending, data, refetch } = useQuery({
     queryKey: ["user", pk],
     queryFn: getFullUser,
     retry: false,
@@ -14,5 +14,6 @@ export const useFullUserByPk = (pk: number) => {
   return {
     userLoading: isPending,
     userData: data,
+    refetchUser: refetch,
   };
 };
