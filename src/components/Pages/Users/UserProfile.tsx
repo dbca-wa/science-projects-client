@@ -34,6 +34,11 @@ import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
 import { PromoteUserModal } from "../../Modals/PromoteUserModal";
 import { UserProjectsDataTable } from "../Dashboard/UserProjectsDataTable";
 import { CaretakerModeConfirmModal } from "@/components/Modals/CaretakerModeConfirmModal";
+import { SetCaretakerAdminModal } from "@/components/Modals/SetCaretakerAdminModal";
+import { formatDate } from "date-fns";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { RemoveCaretakerModal } from "@/components/Modals/RemoveCaretakerModal";
 
 interface Props {
   pk: number;
@@ -42,7 +47,14 @@ interface Props {
 }
 
 export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
-  const { userLoading: loading, userData: user } = useFullUserByPk(pk);
+  const baseAPI = useApiEndpoint();
+  const noImage = useNoImage();
+
+  const {
+    userLoading: loading,
+    userData: user,
+    refetchUser: refetch,
+  } = useFullUserByPk(pk);
   const formatted_date = useFormattedDate(user?.date_joined);
 
   const { currentPage } = useUpdatePage();
@@ -127,6 +139,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     onOpen: onDeactivateModalOpen,
     onClose: onDeactivateModalClose,
   } = useDisclosure();
+
   const {
     isOpen: isPromoteModalOpen,
     onOpen: onPromoteModalOpen,
@@ -147,6 +160,19 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     onOpen: onRequestCaretakerModalOpen,
     onClose: onRequestCaretakerModalClose,
   } = useDisclosure();
+
+  const {
+    isOpen: isSetCaretakerAdminModalOpen,
+    onOpen: onOpenSetCaretakerAdminModal,
+    onClose: onCloseSetCaretakerAdminModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isRemoveCaretakerAdminModalOpen,
+    onOpen: onOpenRemoveCaretakerAdminModal,
+    onClose: onCloseRemoveCaretakerAdminModal,
+  } = useDisclosure();
+
   const {
     isOpen: isEditUserDetailsModalOpen,
     onOpen: onEditUserDetailsModalOpen,
@@ -210,25 +236,58 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     </Center>
   ) : (
     <>
-      <DeleteUserModal
-        isOpen={isDeleteModalOpen}
-        onClose={onDeleteModalClose}
-        userIsSuper={userInQuestionIsSuperuser}
-        userPk={user.pk}
-      />
-      <DeactivateUserModal
-        isOpen={isDeactivateModalOpen}
-        onClose={onDeactivateModalClose}
-        userIsSuper={userInQuestionIsSuperuser}
-        user={user}
-      />
-      <PromoteUserModal
-        isOpen={isPromoteModalOpen}
-        onClose={onPromoteModalClose}
-        userPk={user.pk}
-        userIsSuper={userInQuestionIsSuperuser}
-        userIsExternal={!user.is_staff}
-      />
+      {me?.userData?.is_superuser && (
+        <>
+          <SetCaretakerAdminModal
+            isOpen={isSetCaretakerAdminModalOpen}
+            onClose={onCloseSetCaretakerAdminModal}
+            userIsSuper={userInQuestionIsSuperuser}
+            userPk={user.pk}
+            refetch={refetch}
+          />
+          <RemoveCaretakerModal
+            isOpen={isRemoveCaretakerAdminModalOpen}
+            onClose={onCloseRemoveCaretakerAdminModal}
+            caretakerObject={{
+              id: user?.caretakers?.[0]?.caretaker_obj_id,
+              user: user?.pk,
+              caretaker: {
+                pk: user?.caretakers?.[0]?.pk || null,
+                display_first_name:
+                  user?.caretakers?.[0]?.display_first_name || "",
+                display_last_name:
+                  user?.caretakers?.[0]?.display_last_name || "",
+
+                image: user?.caretakers?.[0]?.image || null,
+              },
+              reason: "leave",
+              notes: "",
+              end_date: user?.caretakers?.[0]?.end_date || null,
+            }}
+            refetch={refetch}
+          />
+          <DeleteUserModal
+            isOpen={isDeleteModalOpen}
+            onClose={onDeleteModalClose}
+            userIsSuper={userInQuestionIsSuperuser}
+            userPk={user.pk}
+          />
+          <DeactivateUserModal
+            isOpen={isDeactivateModalOpen}
+            onClose={onDeactivateModalClose}
+            userIsSuper={userInQuestionIsSuperuser}
+            user={user}
+          />
+          <PromoteUserModal
+            isOpen={isPromoteModalOpen}
+            onClose={onPromoteModalClose}
+            userPk={user.pk}
+            userIsSuper={userInQuestionIsSuperuser}
+            userIsExternal={!user.is_staff}
+          />
+        </>
+      )}
+
       <AddUserToProjectModal
         isOpen={isAddToProjectModalOpen}
         onClose={onAddToProjectModalClose}
@@ -246,7 +305,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           <CaretakerModeConfirmModal
             isOpen={isRequestCaretakerModalOpen}
             onClose={onRequestCaretakerModalClose}
-            refetch={() => {}}
+            refetch={refetch}
             userPk={me?.userData?.pk}
             caretakerPk={user?.pk}
             endDate={undefined}
@@ -401,9 +460,11 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   bg: colorMode === "light" ? "red.400" : "red.300",
                   color: "white",
                 }}
-                isDisabled={user.email === me.userData.email}
+                isDisabled={
+                  user.email === me.userData.email || user.caretakers.length > 0
+                }
               >
-                Set Caretaker
+                Set as Caretaker
               </Button>
             </>
           )}
@@ -648,6 +709,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 Details
               </Text>
             </Flex>
+
             <Grid gridTemplateColumns="1fr 3fr">
               {/* <Text color={subsectionTitleColor}
                                     userSelect={"none"}
@@ -740,6 +802,91 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 </Grid>
               </Grid>
             </Flex>
+          </Flex>
+          <Flex
+            border={"1px solid"}
+            rounded={"xl"}
+            borderColor={borderColor}
+            padding={4}
+            mb={4}
+            flexDir={"column"}
+            mt={2}
+          >
+            <Flex mb={3}>
+              <Text
+                color={sectionTitleColor}
+                userSelect={"none"}
+                fontSize={"sm"}
+                mr={2}
+              >
+                <b>Caretaker</b>
+              </Text>
+            </Flex>
+            {user?.caretakers && user.caretakers.length > 0 && (
+              <Flex
+                justifyContent={"space-between"}
+                mb={4}
+                alignItems={"center"}
+              >
+                <Box display={"flex"} alignItems={"center"} gap={2}>
+                  <Avatar
+                    size="md"
+                    name={`${user?.caretakers[0]?.display_first_name} ${user?.caretakers[0]?.display_last_name}`}
+                    src={
+                      user?.caretakers[0]?.image
+                        ? user?.caretakers[0]?.image?.startsWith("http")
+                          ? `${user?.caretakers[0]?.image}`
+                          : `${baseAPI}${user?.caretakers[0]?.image}`
+                        : noImage
+                    }
+                  />
+                  <Box display={"flex"} flexDir={"column"}>
+                    <Text
+                      fontSize={"md"}
+                      fontWeight={"semibold"}
+                      color={colorMode === "light" ? "gray.800" : "gray.200"}
+                    >
+                      {`${user?.caretakers[0]?.display_first_name} ${
+                        user?.caretakers[0]?.display_last_name
+                      }`}
+                    </Text>
+                  </Box>
+                </Box>
+              </Flex>
+            )}
+
+            {me?.userData?.is_superuser && (
+              <Flex mb={3} gap={4} w={"100%"} justifyContent={"space-between"}>
+                <Button
+                  w={"100%"}
+                  onClick={onOpenSetCaretakerAdminModal}
+                  bg={colorMode === "light" ? "green.600" : "green.700"}
+                  color={
+                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
+                  }
+                  _hover={{
+                    bg: colorMode === "light" ? "green.500" : "green.600",
+                  }}
+                  isDisabled={user?.caretakers && user.caretakers.length > 0}
+                >
+                  Set a Caretaker
+                </Button>
+                <Button
+                  w={"100%"}
+                  onClick={onOpenRemoveCaretakerAdminModal}
+                  bg={colorMode === "light" ? "red.600" : "red.700"}
+                  color={
+                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
+                  }
+                  _hover={{
+                    bg: colorMode === "light" ? "red.500" : "red.600",
+                  }}
+                  isDisabled={user?.caretakers && user.caretakers.length === 0}
+                >
+                  Remove Caretaker
+                </Button>
+              </Flex>
+            )}
           </Flex>
           {me.userData.is_superuser && (
             <Flex
