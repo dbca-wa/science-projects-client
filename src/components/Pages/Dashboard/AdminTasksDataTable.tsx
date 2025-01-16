@@ -278,6 +278,7 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
         );
       },
       cell: ({ row }) => {
+        console.log(row.original);
         let originalReasonData = row.original.reason;
         const formattedDate = formatDate(
           row.original.created_at,
@@ -289,8 +290,8 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
               `${originalReasonData[0].toLocaleUpperCase()}${originalReasonData.slice(1)}`
             : row?.original?.action === "setcaretaker"
               ? originalReasonData?.length > 0
-                ? `${originalReasonData[0].toLocaleUpperCase()}${originalReasonData.slice(1)}: Set ${row.original.secondary_users[0].display_first_name} ${row.original.secondary_users[0].display_last_name} as caretaker for requester's account`
-                : `Set ${row.original.secondary_users[0].display_first_name} ${row.original.secondary_users[0].display_last_name} as caretaker for requester's account`
+                ? `${originalReasonData[0].toLocaleUpperCase()}${originalReasonData.slice(1)}: Set ${row.original.secondary_users[0].display_first_name} ${row.original.secondary_users[0].display_last_name} as caretaker for ${row.original.primary_user.display_first_name} ${row.original.primary_user.display_last_name}'s account`
+                : `Set ${row.original.secondary_users[0].display_first_name} ${row.original.secondary_users[0].display_last_name} as caretaker for ${row.original.primary_user.display_first_name} ${row.original.primary_user.display_last_name}'s account`
               : row?.original?.action === "mergeuser"
                 ? originalReasonData?.length > 0
                   ? `${originalReasonData[0].toLocaleUpperCase()}${originalReasonData.slice(1)}: Merge ${row.original.secondary_users[0].display_first_name} ${row.original.secondary_users[0].display_last_name} (id:${row.original.secondary_users[0].pk}) into requester's account.`
@@ -348,11 +349,12 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
             ) : null}
 
             {/* Group text so it appears next to each other - on same line in same sentence */}
-            <div className="flex flex-nowrap items-center px-4">
+            <div className="flex w-full flex-col flex-nowrap items-center px-4">
               <Text
                 color={"blue.400"}
                 fontWeight={"semibold"}
                 fontSize={"x-small"}
+                className="w-full"
               >
                 Requested by:{" "}
                 {`${row.original.requester.display_first_name} ${row.original.requester.display_last_name}`}{" "}
@@ -362,6 +364,7 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
                 fontWeight={"semibold"}
                 fontSize={"x-small"}
                 ml={1}
+                className="w-full"
               >
                 {` on ${formattedDate}`}
               </Text>

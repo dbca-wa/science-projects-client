@@ -29,6 +29,8 @@ export const TraditionalLayout = () => {
     <Box
       h={"100vh"}
       w={"100vw"}
+      top={0}
+      left={0}
       overscrollBehaviorY={"none"}
       // overflowY={"scroll"}
       minW={"720px"}
@@ -63,7 +65,7 @@ export const TraditionalLayout = () => {
             py={4}
             bg={colorMode === "light" ? "white" : "blackAlpha.800"}
           >
-            <Box mx={10}>
+            <Box mx={10} h={"100%"} minH={"100vh"}>
               <Outlet />
             </Box>
           </Box>

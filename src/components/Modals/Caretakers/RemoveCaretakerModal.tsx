@@ -1,10 +1,12 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
 import {
+  Box,
   Button,
   Center,
   Flex,
   Grid,
+  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -14,6 +16,7 @@ import {
   ModalOverlay,
   Text,
   ToastId,
+  UnorderedList,
   useColorMode,
   useDisclosure,
   useToast,
@@ -23,21 +26,23 @@ import { useEffect, useRef } from "react";
 import {
   MutationError,
   MutationSuccess,
-  cancelCaretakerRequest,
-} from "../../lib/api/api";
+  removeCaretaker,
+} from "../../../lib/api/api";
+import { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/types";
+import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
 
 interface IModalProps {
   isOpen: boolean;
   onClose: () => void;
-  refresh: () => void;
-  taskPk: number;
+  caretakerObject: ICaretakerObject | null;
+  refetch: () => void;
 }
 
-export const CancelCaretakerRequestModal = ({
+export const RemoveCaretakerModal = ({
   isOpen,
   onClose,
-  refresh,
-  taskPk,
+  caretakerObject,
+  refetch,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
   const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
@@ -62,16 +67,17 @@ export const CancelCaretakerRequestModal = ({
 
   const queryClient = useQueryClient();
 
-  const cancelCaretakerRequestMutation = useMutation<
+  const removeCaretakerMutation = useMutation<
     MutationSuccess,
     MutationError,
-    { taskPk: number }
+    ISimpleIdProp
   >({
     // Start of mutation handling
-    mutationFn: cancelCaretakerRequest,
+    mutationFn: removeCaretaker,
     onMutate: () => {
+      console.log("onMutate");
       addToast({
-        title: "Cancelling request...",
+        title: "Removing Caretaker...",
         description: "One moment!",
         status: "loading",
         position: "top-right",
@@ -83,7 +89,7 @@ export const CancelCaretakerRequestModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Your request has been cancelled.`,
+          description: `Caretaker removed.`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -92,15 +98,15 @@ export const CancelCaretakerRequestModal = ({
       }
       queryClient
         .invalidateQueries({
-          queryKey: ["pendingAdminTasks"],
+          queryKey: ["caretakers"],
         })
-        .then(() => refresh())
+        .then(() => refetch())
         .then(() => onClose());
     },
     // Error handling based on API - file - declared interface
     onError: (error) => {
       console.log(error);
-      let errorMessage = "An error occurred while cancelling your request"; // Default error message
+      let errorMessage = "An error occurred while removing a caretaker"; // Default error message
 
       const collectErrors = (data, prefix = "") => {
         if (typeof data === "string") {
@@ -146,33 +152,39 @@ export const CancelCaretakerRequestModal = ({
     },
   });
 
-  const onSubmit = async (formData: { taskPk: number }) => {
-    console.log(formData);
-    await cancelCaretakerRequestMutation.mutateAsync({
-      taskPk: formData.taskPk,
+  const onSubmit = async (formData: ISimpleIdProp) => {
+    // console.log(formData);
+    await removeCaretakerMutation.mutateAsync({
+      id: caretakerObject?.id,
     });
   };
-  useEffect(() => {
-    console.log({ taskPk: taskPk });
-  }, [taskPk]);
+
+  // const formattedStart = useFormattedDate(startDate);
+  const formattedEnd = useFormattedDate(caretakerObject?.end_date);
 
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
       <ModalOverlay />
       <Flex>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-          <ModalHeader>Cancel Request?</ModalHeader>
+          <ModalHeader>Remove Caretaker?</ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
             <Center>
               <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to cancel your caretaker request?
+                Are you sure you want to remove{" "}
+                {caretakerObject?.caretaker?.display_first_name}{" "}
+                {caretakerObject?.caretaker?.display_last_name} as caretaker?
               </Text>
             </Center>
-            <Text mt={4}>Your request will be removed from the system.</Text>
             <Text mt={4}>
-              If you would still like to proceed, press "Cancel Request".
+              They will immedediately lose permissions to act on the user's
+              behalf.
+            </Text>
+
+            <Text mt={4}>
+              If you would still like to proceed, press "Remove Caretaker".
             </Text>
           </ModalBody>
           <ModalFooter>
@@ -186,15 +198,15 @@ export const CancelCaretakerRequestModal = ({
                 _hover={{
                   background: colorMode === "light" ? "red.400" : "red.500",
                 }} // isDisabled={!changesMade}
-                isLoading={cancelCaretakerRequestMutation.isPending}
+                isLoading={removeCaretakerMutation.isPending}
                 onClick={() =>
                   onSubmit({
-                    taskPk,
+                    id: caretakerObject?.id,
                   })
                 }
                 ml={3}
               >
-                Cancel Request
+                Remove Caretaker
               </Button>
             </Grid>
           </ModalFooter>

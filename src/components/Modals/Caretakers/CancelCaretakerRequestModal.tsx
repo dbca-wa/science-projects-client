@@ -1,17 +1,10 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
 import {
-  Box,
   Button,
   Center,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  FormLabel,
   Grid,
-  InputGroup,
-  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -21,7 +14,6 @@ import {
   ModalOverlay,
   Text,
   ToastId,
-  UnorderedList,
   useColorMode,
   useDisclosure,
   useToast,
@@ -29,28 +21,23 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import {
-  extendCaretaker,
   MutationError,
   MutationSuccess,
-  IExtendCaretakerProps,
-} from "../../lib/api/api";
-import { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/types";
-import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
-import React from "react";
-import { ShadcnDatePicker } from "../Pages/Account/ShadcnDatePicker";
+  cancelCaretakerRequest,
+} from "../../../lib/api/api";
 
 interface IModalProps {
   isOpen: boolean;
   onClose: () => void;
-  caretakerObject: ICaretakerObject | null;
-  refetch: () => void;
+  refresh: () => void;
+  taskPk: number;
 }
 
-export const ExtendCaretakerModal = ({
+export const CancelCaretakerRequestModal = ({
   isOpen,
   onClose,
-  caretakerObject,
-  refetch,
+  refresh,
+  taskPk,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
   const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
@@ -75,16 +62,16 @@ export const ExtendCaretakerModal = ({
 
   const queryClient = useQueryClient();
 
-  const extendCaretakerMutation = useMutation<
+  const cancelCaretakerRequestMutation = useMutation<
     MutationSuccess,
     MutationError,
-    IExtendCaretakerProps
+    { taskPk: number }
   >({
     // Start of mutation handling
-    mutationFn: extendCaretaker,
+    mutationFn: cancelCaretakerRequest,
     onMutate: () => {
       addToast({
-        title: "Extending Caretaker...",
+        title: "Cancelling request...",
         description: "One moment!",
         status: "loading",
         position: "top-right",
@@ -96,7 +83,7 @@ export const ExtendCaretakerModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Caretaker extended.`,
+          description: `Your request has been cancelled.`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -105,15 +92,15 @@ export const ExtendCaretakerModal = ({
       }
       queryClient
         .invalidateQueries({
-          queryKey: ["caretakers"],
+          queryKey: ["pendingAdminTasks"],
         })
-        .then(() => refetch())
+        .then(() => refresh())
         .then(() => onClose());
     },
     // Error handling based on API - file - declared interface
     onError: (error) => {
       console.log(error);
-      let errorMessage = "An error occurred while extending a caretaker"; // Default error message
+      let errorMessage = "An error occurred while cancelling your request"; // Default error message
 
       const collectErrors = (data, prefix = "") => {
         if (typeof data === "string") {
@@ -159,88 +146,34 @@ export const ExtendCaretakerModal = ({
     },
   });
 
-  // const formattedStart = useFormattedDate(startDate);
-  const formattedEnd = useFormattedDate(caretakerObject?.end_date);
-
-  const [newEndDate, setNewEndDate] = React.useState<Date | null>(
-    caretakerObject?.end_date,
-  );
-
-  const [error, setError] = React.useState<string | null>(null);
-  useEffect(() => {
-    if (
-      newEndDate &&
-      caretakerObject?.end_date &&
-      newEndDate <= new Date(caretakerObject.end_date)
-    ) {
-      console.log("Bad date");
-      setError("The new end date must be after the current end date.");
-    } else {
-      setError(null);
-    }
-  }, [newEndDate, caretakerObject]);
-
-  const onSubmit = async (formData: IExtendCaretakerProps) => {
+  const onSubmit = async (formData: { taskPk: number }) => {
     console.log(formData);
-    await extendCaretakerMutation.mutateAsync({
-      id: formData?.id,
-      newEndDate: formData?.newEndDate,
-      currentEndDate: formData?.currentEndDate,
+    await cancelCaretakerRequestMutation.mutateAsync({
+      taskPk: formData.taskPk,
     });
   };
+  useEffect(() => {
+    console.log({ taskPk: taskPk });
+  }, [taskPk]);
 
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
       <ModalOverlay />
       <Flex>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-          <ModalHeader>Extend Caretaker?</ModalHeader>
+          <ModalHeader>Cancel Request?</ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
             <Center>
               <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to extend{" "}
-                {caretakerObject?.caretaker?.display_first_name}{" "}
-                {caretakerObject?.caretaker?.display_last_name} as caretaker?
+                Are you sure you want to cancel your caretaker request?
               </Text>
             </Center>
+            <Text mt={4}>Your request will be removed from the system.</Text>
             <Text mt={4}>
-              The period they are currently assigned to ends on {formattedEnd}
+              If you would still like to proceed, press "Cancel Request".
             </Text>
-
-            <Flex flexDir={"row"} gap={4} mt={4} pos={"relative"}>
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>New End Date</FormLabel>
-                <InputGroup flexDir={"column"}>
-                  <ShadcnDatePicker
-                    placeholder={"Enter end date"}
-                    date={newEndDate}
-                    setDate={(date) => {
-                      setNewEndDate(date);
-                    }}
-                  />
-                  <Box mt={2}>
-                    {error ? (
-                      <Text
-                        fontSize={"sm"}
-                        color={colorMode === "light" ? "red.600" : "red.400"}
-                      >
-                        {error}
-                      </Text>
-                    ) : (
-                      <Text
-                        fontSize={"sm"}
-                        color={colorMode === "light" ? "gray.600" : "gray.400"}
-                      >
-                        Set a date beyond the current end date.
-                      </Text>
-                    )}
-                  </Box>
-                  {/* <FormErrorMessage>{error}</FormErrorMessage> */}
-                </InputGroup>
-              </FormControl>
-            </Flex>
           </ModalBody>
           <ModalFooter>
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
@@ -249,22 +182,19 @@ export const ExtendCaretakerModal = ({
               </Button>
               <Button
                 color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
+                background={colorMode === "light" ? "red.500" : "red.600"}
                 _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
+                  background: colorMode === "light" ? "red.400" : "red.500",
                 }} // isDisabled={!changesMade}
-                isLoading={extendCaretakerMutation.isPending}
+                isLoading={cancelCaretakerRequestMutation.isPending}
                 onClick={() =>
                   onSubmit({
-                    id: caretakerObject?.id,
-                    newEndDate: newEndDate,
-                    currentEndDate: caretakerObject?.end_date,
+                    taskPk,
                   })
                 }
-                isDisabled={error !== null}
                 ml={3}
               >
-                Extend Date
+                Cancel Request
               </Button>
             </Grid>
           </ModalFooter>

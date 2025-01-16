@@ -279,23 +279,31 @@ export interface IUserData {
   businessAreas?: IBusinessArea[];
 }
 
-export interface ICheckCaretakerStatus {
-  caretaker_request_object: {
-    id: number;
-    action: string;
-    created_at: Date;
-    end_date: Date | null;
-    notes: string | null;
-    primary_user: number;
-    reason: string | null;
-    secondary_users: {
-      pk: number;
-      display_first_name: string;
-      display_last_name: string;
-      image: IImageData;
-    }[];
-    status: string;
+export interface ICaretakerRequestObject {
+  id: number;
+  action: string;
+  created_at: Date;
+  end_date: Date | null;
+  notes: string | null;
+  primary_user: {
+    pk: number;
+    display_first_name: string;
+    display_last_name: string;
+    image: IImageData;
   };
+  reason: string | null;
+  secondary_users: {
+    pk: number;
+    display_first_name: string;
+    display_last_name: string;
+    image: IImageData;
+  }[];
+  status: string;
+}
+
+export interface ICheckCaretakerStatus {
+  caretaker_request_object: ICaretakerRequestObject | null;
+  become_caretaker_request_object: ICaretakerRequestObject | null;
   caretaker_object: ICaretakerObject | null;
 }
 
@@ -319,6 +327,8 @@ export interface IUserMe {
   public_email?: string;
   id?: number;
   pk?: number;
+  caretakers: ICaretakerSimpleUserData[];
+  caretaking_for: ICaretakerSimpleUserData[];
   display_first_name: string;
   display_last_name: string;
   about: string;
@@ -346,6 +356,13 @@ export interface IUserMe {
   branches?: IBranch[];
   businessAreas?: IBusinessArea[];
   business_areas_led: number[];
+}
+
+export interface ICaretakerSimpleUserData {
+  display_first_name: string | null;
+  display_last_name: string | null;
+  email: string;
+  image: string;
 }
 
 export interface IMemberUserDetails {

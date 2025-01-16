@@ -230,9 +230,9 @@ export const ProfilePage = () => {
     },
   });
 
-  useEffect(() => {
-    console.log(me);
-  }, [me]);
+  // useEffect(() => {
+  //   console.log(me);
+  // }, [me]);
 
   return (
     <Box h={"100%"}>
@@ -495,7 +495,7 @@ export const ProfilePage = () => {
             <Flex>
               <Flex w={"100%"} p={2}>
                 <Tooltip
-                  label="Click to view your SPMS profile"
+                  // label="Click to view your SPMS profile"
                   aria-label="A tooltip"
                 >
                   <Box w={"100%"}>

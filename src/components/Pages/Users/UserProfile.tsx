@@ -15,9 +15,10 @@ import {
   Spinner,
   Text,
   useColorMode,
+  Tooltip,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { FiCopy } from "react-icons/fi";
@@ -33,12 +34,18 @@ import { DeleteUserModal } from "../../Modals/DeleteUserModal";
 import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
 import { PromoteUserModal } from "../../Modals/PromoteUserModal";
 import { UserProjectsDataTable } from "../Dashboard/UserProjectsDataTable";
-import { CaretakerModeConfirmModal } from "@/components/Modals/CaretakerModeConfirmModal";
-import { SetCaretakerAdminModal } from "@/components/Modals/SetCaretakerAdminModal";
+import { CaretakerModeConfirmModal } from "@/components/Modals/Caretakers/CaretakerModeConfirmModal";
+import { SetCaretakerAdminModal } from "@/components/Modals/Caretakers/SetCaretakerAdminModal";
 import { formatDate } from "date-fns";
 import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
-import { RemoveCaretakerModal } from "@/components/Modals/RemoveCaretakerModal";
+import { RemoveCaretakerModal } from "@/components/Modals/Caretakers/RemoveCaretakerModal";
+import { BecomeCaretakerModal } from "@/components/Modals/Caretakers/BecomeCaretakerModal";
+import { SetCaretakerForMyAccountModal } from "@/components/Modals/Caretakers/SetCaretakerForMyAccountModal";
+import { useCheckExistingCaretaker } from "@/lib/hooks/tanstack/useCheckExistingCaretaker";
+import { CancelCaretakerRequestModal } from "@/components/Modals/Caretakers/CancelCaretakerRequestModal";
+import { view } from "framer-motion";
+import { on } from "events";
 
 interface Props {
   pk: number;
@@ -168,6 +175,30 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   } = useDisclosure();
 
   const {
+    isOpen: cancelModalIsOpen,
+    onOpen: onCancelModalOpen,
+    onClose: onCancelModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: cancelBecomeModalIsOpen,
+    onOpen: onOpenCancelBecomeModal,
+    onClose: onCancelBecomeModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isSetCaretakerMyModalOpen,
+    onOpen: onOpenSetCaretakerMyModal,
+    onClose: onCloseSetCaretakerMyModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isBecomeCaretakerModalOpen,
+    onOpen: onOpenBecomeCaretakerModal,
+    onClose: onCloseBecomeCaretakerModal,
+  } = useDisclosure();
+
+  const {
     isOpen: isRemoveCaretakerAdminModalOpen,
     onOpen: onOpenRemoveCaretakerAdminModal,
     onClose: onCloseRemoveCaretakerAdminModal,
@@ -230,21 +261,31 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   //   },
   // };
 
-  return loading || !user || pk === undefined ? (
+  const { caretakerData, caretakerDataLoading, refetchCaretakerData } =
+    useCheckExistingCaretaker();
+
+  useEffect(() => {
+    if (!caretakerDataLoading) console.log(caretakerData);
+    console.log(user);
+  }, [caretakerData, caretakerDataLoading, user]);
+
+  const viewingUserIsAccount = me?.userData?.pk === user?.pk;
+  const viewingUserIsSuper = me?.userData?.is_superuser;
+  const accountIsStaff = user?.is_staff;
+  const accountIsSuper = user?.is_superuser;
+  const accountHasCaretakers = user?.caretakers?.length > 0;
+  const caretakerIsMe = user?.caretakers?.[0]?.pk === me?.userData?.pk;
+  const caretakeeIsMe = user?.caretaking_for?.[0]?.pk === me?.userData?.pk;
+  const accountIsCaretaking = user?.caretaking_for?.length > 0;
+
+  return loading || !user || pk === undefined || caretakerDataLoading ? (
     <Center w={"100%"} h={"100%"}>
       <Spinner size={"xl"} />
     </Center>
   ) : (
     <>
-      {me?.userData?.is_superuser && (
+      {(viewingUserIsSuper || viewingUserIsAccount || caretakerIsMe) && (
         <>
-          <SetCaretakerAdminModal
-            isOpen={isSetCaretakerAdminModalOpen}
-            onClose={onCloseSetCaretakerAdminModal}
-            userIsSuper={userInQuestionIsSuperuser}
-            userPk={user.pk}
-            refetch={refetch}
-          />
           <RemoveCaretakerModal
             isOpen={isRemoveCaretakerAdminModalOpen}
             onClose={onCloseRemoveCaretakerAdminModal}
@@ -264,7 +305,59 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               notes: "",
               end_date: user?.caretakers?.[0]?.end_date || null,
             }}
-            refetch={refetch}
+            refetch={() => {
+              refetch();
+              refetchCaretakerData();
+            }}
+          />
+          {viewingUserIsAccount && (
+            <SetCaretakerForMyAccountModal
+              isOpen={isSetCaretakerMyModalOpen}
+              onClose={onCloseSetCaretakerMyModal}
+              userIsSuper={userInQuestionIsSuperuser}
+              userPk={user.pk}
+              refetch={() => {
+                refetch();
+                refetchCaretakerData();
+              }}
+            />
+          )}
+        </>
+      )}
+      {caretakeeIsMe && (
+        <RemoveCaretakerModal
+          isOpen={isRemoveCaretakerAdminModalOpen}
+          onClose={onCloseRemoveCaretakerAdminModal}
+          caretakerObject={{
+            id: caretakerData?.caretaker_object?.id,
+            user: user?.pk,
+            caretaker: {
+              pk: user?.caretaker_for?.[0]?.pk || null,
+              display_first_name: user?.display_first_name || "",
+              display_last_name: user?.display_last_name || "",
+              image: user?.caretaker_for?.[0]?.image || null,
+            },
+            reason: "leave",
+            notes: "",
+            end_date: user?.caretaker_for?.[0]?.end_date || null,
+          }}
+          refetch={() => {
+            refetch();
+            refetchCaretakerData();
+          }}
+        />
+      )}
+      {viewingUserIsSuper && (
+        <>
+          <SetCaretakerAdminModal
+            isOpen={isSetCaretakerAdminModalOpen}
+            onClose={onCloseSetCaretakerAdminModal}
+            userIsSuper={userInQuestionIsSuperuser}
+            userPk={user.pk}
+            refetch={() => {
+              refetch();
+              refetchCaretakerData();
+            }}
           />
           <DeleteUserModal
             isOpen={isDeleteModalOpen}
@@ -288,13 +381,24 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
         </>
       )}
 
+      <BecomeCaretakerModal
+        isOpen={isBecomeCaretakerModalOpen}
+        onClose={onCloseBecomeCaretakerModal}
+        myPk={me?.userData?.pk}
+        user={user}
+        refetch={() => {
+          refetch();
+          refetchCaretakerData();
+        }}
+      />
+
       <AddUserToProjectModal
         isOpen={isAddToProjectModalOpen}
         onClose={onAddToProjectModalClose}
         preselectedUser={pk}
       />
 
-      {user?.pk !== me?.userData?.pk && (
+      {!viewingUserIsAccount && (
         <>
           <RequestMergeUserModal
             isOpen={isMergeUserModalOpen}
@@ -305,7 +409,10 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           <CaretakerModeConfirmModal
             isOpen={isRequestCaretakerModalOpen}
             onClose={onRequestCaretakerModalClose}
-            refetch={refetch}
+            refetch={() => {
+              refetch();
+              refetchCaretakerData();
+            }}
             userPk={me?.userData?.pk}
             caretakerPk={user?.pk}
             endDate={undefined}
@@ -377,14 +484,14 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
         <Grid
           gridTemplateColumns={
-            user?.pk !== me?.userData?.pk ? "repeat(2, 1fr)" : "repeat(2, 1fr)"
+            !viewingUserIsAccount ? "repeat(2, 1fr)" : "repeat(2, 1fr)"
           }
           gridGap={4}
           mt={4}
           pt={2}
           pb={4}
         >
-          {!user?.is_staff && (
+          {!accountIsStaff && (
             <Button
               onClick={openEmailAddressedToUser}
               bg={colorMode === "light" ? "blue.500" : "blue.400"}
@@ -403,7 +510,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               Email
             </Button>
           )}
-          {user?.is_staff && (
+          {accountIsStaff && (
             <Button
               bg={colorMode === "light" ? "blue.500" : "blue.400"}
               color={
@@ -433,41 +540,6 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           >
             Add to Project
           </Button>
-
-          {user?.pk !== me?.userData?.pk && (
-            <>
-              <Button
-                bg={colorMode === "light" ? "red.500" : "red.400"}
-                color={
-                  colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                }
-                onClick={onMergeUserModalOpen}
-                _hover={{
-                  bg: colorMode === "light" ? "red.400" : "red.300",
-                  color: "white",
-                }}
-                isDisabled={user.email === me.userData.email}
-              >
-                Merge
-              </Button>
-              <Button
-                bg={colorMode === "light" ? "red.500" : "red.400"}
-                color={
-                  colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                }
-                onClick={onRequestCaretakerModalOpen}
-                _hover={{
-                  bg: colorMode === "light" ? "red.400" : "red.300",
-                  color: "white",
-                }}
-                isDisabled={
-                  user.email === me.userData.email || user.caretakers.length > 0
-                }
-              >
-                Set as Caretaker
-              </Button>
-            </>
-          )}
         </Grid>
 
         <Flex
@@ -480,7 +552,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           mt={2}
         >
           <Flex flexDir={"column"} userSelect={"none"}>
-            {user?.is_staff && (
+            {accountIsStaff && (
               <Flex h={"60px"}>
                 <Image
                   rounded={"lg"}
@@ -533,7 +605,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 </Center>
               </Flex>
             )}
-            {!user?.is_staff && (
+            {!accountIsStaff && (
               <Text color={colorMode === "light" ? "gray.600" : "gray.300"}>
                 <b>External User</b> - This user does not belong to DBCA
               </Text>
@@ -643,6 +715,54 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
           <Spacer />
 
+          {!userProjectsLoading && userProjectsData?.length > 0 && (
+            <Flex
+              border={"1px solid"}
+              rounded={"xl"}
+              borderColor={borderColor}
+              padding={4}
+              mb={4}
+              flexDir={"column"}
+              mt={2}
+            >
+              {" "}
+              <Flex>
+                <Text
+                  fontWeight={"bold"}
+                  fontSize={"sm"}
+                  mb={1}
+                  color={sectionTitleColor}
+                  userSelect={"none"}
+                >
+                  Involved Projects
+                </Text>
+              </Flex>
+              {!userProjectsLoading &&
+                (userProjectsData?.length === 0 ? (
+                  <p>No Projects</p>
+                ) : (
+                  <>
+                    <UserProjectsDataTable
+                      projectData={userProjectsData}
+                      disabledColumns={{
+                        kind: true,
+                        status: true,
+                        business_area: true,
+                        created_at: true,
+                        role: false,
+                        title: false,
+                      }}
+                      defaultSorting={"title"}
+                      noDataString="Not associated with any projects"
+                    />
+                  </>
+                ))}
+              {/* <ExtractedHTMLTitle></ExtractedHTMLTitle> */}
+            </Flex>
+          )}
+
+          <Spacer />
+
           <Flex
             border={"1px solid"}
             rounded={"xl"}
@@ -652,42 +772,631 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             flexDir={"column"}
             mt={2}
           >
-            {" "}
-            <Flex>
+            <Flex mb={3}>
               <Text
-                fontWeight={"bold"}
-                fontSize={"sm"}
-                mb={1}
                 color={sectionTitleColor}
                 userSelect={"none"}
+                fontSize={"sm"}
+                mr={2}
               >
-                Involved Projects
+                <b>Caretaker and Merging</b>
               </Text>
             </Flex>
-            {!userProjectsLoading &&
-              (userProjectsData?.length === 0 ? (
-                <p>No Projects</p>
+
+            <Flex flexDir={"column"} gap={2}>
+              <Text
+                color={subsectionTitleColor}
+                userSelect={"none"}
+                fontSize={"sm"}
+                mb={accountHasCaretakers ? 3 : 0}
+              >
+                <b>Caretaker</b>
+              </Text>
+              {accountHasCaretakers ? (
+                <Box>
+                  <Flex
+                    justifyContent={"space-between"}
+                    mb={4}
+                    alignItems={"center"}
+                  >
+                    <Box display={"flex"} alignItems={"center"} gap={2}>
+                      <Avatar
+                        size="md"
+                        name={`${user?.caretakers[0]?.display_first_name} ${user?.caretakers[0]?.display_last_name}`}
+                        src={
+                          user?.caretakers[0]?.image
+                            ? user?.caretakers[0]?.image?.startsWith("http")
+                              ? `${user?.caretakers[0]?.image}`
+                              : `${baseAPI}${user?.caretakers[0]?.image}`
+                            : noImage
+                        }
+                      />
+                      <Box display={"flex"} flexDir={"column"}>
+                        <Text
+                          fontSize={"md"}
+                          fontWeight={"semibold"}
+                          color={
+                            colorMode === "light" ? "gray.800" : "gray.200"
+                          }
+                        >
+                          {`${user?.caretakers[0]?.display_first_name} ${
+                            user?.caretakers[0]?.display_last_name
+                          }`}
+                        </Text>
+                      </Box>
+                    </Box>
+                    {(viewingUserIsAccount || caretakerIsMe) && (
+                      <Box>
+                        <Button
+                          bg={colorMode === "light" ? "red.600" : "red.700"}
+                          color={
+                            colorMode === "light"
+                              ? "whiteAlpha.900"
+                              : "whiteAlpha.900"
+                          }
+                          _hover={{
+                            bg: colorMode === "light" ? "red.500" : "red.600",
+                          }}
+                          onClick={onOpenRemoveCaretakerAdminModal}
+                        >
+                          Remove Caretaker
+                        </Button>
+                      </Box>
+                    )}
+                  </Flex>
+                </Box>
               ) : (
                 <>
-                  <UserProjectsDataTable
-                    projectData={userProjectsData}
-                    disabledColumns={{
-                      kind: true,
-                      status: true,
-                      business_area: true,
-                      created_at: true,
-                      role: false,
-                      title: false,
-                    }}
-                    defaultSorting={"title"}
-                    noDataString="Not associated with any projects"
-                  />
-                </>
-              ))}
-            {/* <ExtractedHTMLTitle></ExtractedHTMLTitle> */}
-          </Flex>
+                  {caretakerData?.caretaker_request_object?.status &&
+                    caretakerData?.caretaker_request_object?.status ===
+                      "pending" && (
+                      <CancelCaretakerRequestModal
+                        isOpen={cancelModalIsOpen}
+                        onClose={onCancelModalClose}
+                        refresh={() => {
+                          refetch();
+                          refetchCaretakerData();
+                        }}
+                        taskPk={caretakerData?.caretaker_request_object?.id}
+                      />
+                    )}
 
-          <Spacer />
+                  {caretakerData?.become_caretaker_request_object?.status &&
+                    caretakerData?.become_caretaker_request_object?.status ===
+                      "pending" && (
+                      <CancelCaretakerRequestModal
+                        isOpen={cancelBecomeModalIsOpen}
+                        onClose={onCancelBecomeModalClose}
+                        refresh={() => {
+                          refetch();
+                          refetchCaretakerData();
+                        }}
+                        taskPk={
+                          caretakerData?.become_caretaker_request_object?.id
+                        }
+                      />
+                    )}
+                  <Flex
+                    justifyContent={"space-between"}
+                    mb={0}
+                    alignItems={"center"}
+                  >
+                    <Text>
+                      {caretakerData?.caretaker_request_object?.status &&
+                      caretakerData?.caretaker_request_object?.status ===
+                        "pending"
+                        ? caretakerData?.caretaker_request_object?.primary_user
+                            ?.pk === me?.userData?.pk
+                          ? `You have requested that this user be your caretaker`
+                          : `A Caretaker request has been made (${caretakerData?.caretaker_request_object?.secondary_users[0]?.display_first_name} ${caretakerData?.caretaker_request_object?.secondary_users[0]?.display_last_name})`
+                        : viewingUserIsAccount
+                          ? "You have not set a caretaker."
+                          : "No caretaker has been set for this user."}
+                    </Text>
+                    {!accountHasCaretakers && viewingUserIsAccount && (
+                      <Button
+                        // w={"100%"}
+                        onClick={
+                          caretakerData?.caretaker_request_object?.status &&
+                          caretakerData?.caretaker_request_object?.status ===
+                            "pending"
+                            ? onCancelModalOpen
+                            : viewingUserIsSuper
+                              ? onOpenSetCaretakerAdminModal
+                              : onOpenSetCaretakerMyModal
+                        }
+                        bg={
+                          caretakerData?.caretaker_request_object?.status &&
+                          caretakerData?.caretaker_request_object?.status ===
+                            "pending"
+                            ? colorMode === "light"
+                              ? `gray.500`
+                              : `gray.500`
+                            : colorMode === "light"
+                              ? `green.600`
+                              : `green.700`
+                        }
+                        color={
+                          colorMode === "light"
+                            ? "whiteAlpha.900"
+                            : "whiteAlpha.900"
+                        }
+                        _hover={{
+                          bg:
+                            caretakerData?.caretaker_request_object?.status &&
+                            caretakerData?.caretaker_request_object?.status ===
+                              "pending"
+                              ? colorMode === "light"
+                                ? `gray.400`
+                                : `gray.400`
+                              : colorMode === "light"
+                                ? `green.500`
+                                : `green.600`,
+                        }}
+                        isDisabled={
+                          user?.caretakers && user.caretakers.length > 0
+                        }
+                      >
+                        {caretakerData?.caretaker_request_object?.status &&
+                        caretakerData?.caretaker_request_object?.status ===
+                          "pending"
+                          ? "Cancel Request"
+                          : viewingUserIsSuper
+                            ? "Set Caretaker"
+                            : "Request Caretaker"}
+                      </Button>
+                    )}
+                  </Flex>
+
+                  {accountHasCaretakers && accountIsStaff ? (
+                    <>
+                      <Text
+                        color={colorMode === "light" ? "gray.500" : "gray.400"}
+                        fontSize={"sm"}
+                        className="text-balance"
+                      >
+                        To set or become caretaker, visit your profile and
+                        remove your current caretaker.
+                      </Text>
+
+                      {/* <Flex w={"100%"} justifyContent={"space-between"} pr={2}>
+                        {" "}
+                        <Text>Click here to remove your caretaker</Text>
+                        <Text
+                          color={
+                            colorMode === "light" ? "blue.500" : "blue.400"
+                          }
+                          fontWeight={"semibold"}
+                          onClick={}
+                        >
+                          Remove
+                        </Text>
+                      </Flex> */}
+                    </>
+                  ) : (
+                    !viewingUserIsAccount &&
+                    accountIsStaff && (
+                      <>
+                        <BecomeCaretakerModal
+                          isOpen={isSetCaretakerAdminModalOpen}
+                          onClose={onCloseSetCaretakerAdminModal}
+                          myPk={me?.userData?.pk}
+                          user={user}
+                          refetch={() => {
+                            refetch();
+                            refetchCaretakerData();
+                          }}
+                        />
+                        <Flex
+                          justifyContent={"space-between"}
+                          alignItems={"center"}
+                          mb={0}
+                        >
+                          {caretakerData?.become_caretaker_request_object
+                            ?.secondary_users[0]?.pk === me?.userData?.pk && (
+                            <Text
+                              color={
+                                colorMode === "light" ? "gray.500" : "gray.400"
+                              }
+                              fontSize={"sm"}
+                              className="text-balance"
+                            >
+                              Your request has been made to become this user's
+                              caretaker
+                            </Text>
+                          )}
+
+                          <Button
+                            mt={2}
+                            w={
+                              caretakerData?.become_caretaker_request_object
+                                ?.secondary_users[0]?.pk === me?.userData?.pk
+                                ? undefined
+                                : "100%"
+                            }
+                            onClick={
+                              caretakerData?.become_caretaker_request_object
+                                ?.status === "pending" &&
+                              caretakerData?.become_caretaker_request_object
+                                ?.secondary_users[0]?.pk === me?.userData?.pk
+                                ? onOpenCancelBecomeModal
+                                : onOpenBecomeCaretakerModal
+                            }
+                            bg={
+                              caretakerData?.become_caretaker_request_object
+                                ?.status === "pending" &&
+                              caretakerData?.become_caretaker_request_object
+                                ?.secondary_users[0]?.pk === me?.userData?.pk
+                                ? colorMode === "light"
+                                  ? "red.500"
+                                  : "red.600"
+                                : colorMode === "light"
+                                  ? "green.600"
+                                  : "green.700"
+                            }
+                            color={
+                              colorMode === "light"
+                                ? "whiteAlpha.900"
+                                : "whiteAlpha.900"
+                            }
+                            _hover={{
+                              bg:
+                                caretakerData?.become_caretaker_request_object
+                                  ?.status === "pending" &&
+                                caretakerData?.become_caretaker_request_object
+                                  ?.secondary_users[0]?.pk === me?.userData?.pk
+                                  ? colorMode === "light"
+                                    ? "red.400"
+                                    : "red.500"
+                                  : colorMode === "light"
+                                    ? "green.500"
+                                    : "green.600",
+                            }}
+                            isDisabled={
+                              accountHasCaretakers ||
+                              caretakerData?.caretaker_request_object
+                                ?.primary_user?.pk === me?.userData?.pk ||
+                              caretakerData?.caretaker_object?.caretaker?.pk ===
+                                user?.pk
+                              //     ||
+                              //     caretakerData?.become_caretaker_request_object
+                              //   ?.status === "pending" &&
+                              // caretakerData?.become_caretaker_request_object
+                              //   ?.secondary_users[0]?.pk === me?.userData?.pk
+                            }
+                          >
+                            {/* {
+                            caretakerData?.caretaker_request_object
+                              ?.secondary_users[0]?.display_first_name
+                          } */}
+                            {caretakerData?.become_caretaker_request_object
+                              ?.status === "pending" &&
+                            caretakerData?.become_caretaker_request_object
+                              ?.secondary_users[0]?.pk === me?.userData?.pk
+                              ? "Cancel Request"
+                              : "Become Caretaker"}
+                          </Button>
+                        </Flex>
+                      </>
+                    )
+                  )}
+                </>
+              )}
+
+              {viewingUserIsSuper && accountIsStaff && (
+                <Flex
+                  mb={0}
+                  gap={4}
+                  w={"100%"}
+                  justifyContent={"space-between"}
+                >
+                  {user?.caretakers && user.caretakers.length > 0 && (
+                    <Button
+                      w={"100%"}
+                      onClick={onOpenRemoveCaretakerAdminModal}
+                      bg={colorMode === "light" ? "red.600" : "red.700"}
+                      color={
+                        colorMode === "light"
+                          ? "whiteAlpha.900"
+                          : "whiteAlpha.900"
+                      }
+                      _hover={{
+                        bg: colorMode === "light" ? "red.500" : "red.600",
+                      }}
+                      isDisabled={accountHasCaretakers ? false : true}
+                    >
+                      Remove Caretaker
+                    </Button>
+                  )}
+                </Flex>
+              )}
+
+              {/* {accountIsCaretaking && ( */}
+              <Box mt={2}>
+                <Text
+                  color={subsectionTitleColor}
+                  userSelect={"none"}
+                  fontSize={"sm"}
+                  mb={accountIsCaretaking ? 3 : 1}
+                >
+                  <b>Caretaking For</b>
+                </Text>
+                {accountIsCaretaking ? (
+                  <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
+                    {user?.caretaking_for?.map((obj) => (
+                      <Tooltip
+                        key={obj.pk}
+                        label={`This user has authority to act on ${obj.display_first_name} ${obj.display_last_name}'s behalf`}
+                      >
+                        <Flex
+                          key={obj.pk}
+                          bg={colorMode === "light" ? "gray.50" : "gray.600"}
+                          p={2}
+                          rounded={"xl"}
+                          alignItems={"center"}
+                          justifyContent={"space-between"}
+                        >
+                          <Flex alignItems={"center"}>
+                            <Avatar
+                              size="sm"
+                              name={`${obj.display_first_name} ${obj.display_last_name}`}
+                              src={
+                                obj.image
+                                  ? obj.image.startsWith("http")
+                                    ? `${obj.image}`
+                                    : `${baseAPI}${obj.image}`
+                                  : noImage
+                              }
+                            />
+                            <Text ml={2}>
+                              {obj.display_first_name} {obj.display_last_name}
+                            </Text>
+                          </Flex>
+                          {(viewingUserIsAccount ||
+                            viewingUserIsSuper ||
+                            caretakerIsMe ||
+                            caretakeeIsMe) && (
+                            <Button
+                              variant={"ghost"}
+                              color={"white"}
+                              background={
+                                colorMode === "light" ? "red.500" : "red.600"
+                              }
+                              _hover={{
+                                background:
+                                  colorMode === "light" ? "red.400" : "red.500",
+                              }}
+                              onClick={onOpenRemoveCaretakerAdminModal}
+                            >
+                              Remove
+                            </Button>
+                          )}
+                        </Flex>
+                      </Tooltip>
+                    ))}
+                  </Grid>
+                ) : (
+                  <Text>
+                    {viewingUserIsAccount
+                      ? "You are not caretaking for anyone."
+                      : "This user is not caretaking for anyone."}
+                  </Text>
+                )}
+              </Box>
+              {/* )} */}
+
+              {!viewingUserIsAccount && (
+                <>
+                  {accountIsStaff &&
+                    (caretakerData?.caretaker_request_object?.status ===
+                      "pending" &&
+                    caretakerData?.caretaker_request_object?.secondary_users[0]
+                      ?.pk === user?.pk ? (
+                      <Flex
+                        justifyContent={"space-between"}
+                        alignItems={"center"}
+                        my={2}
+                      >
+                        <Text
+                          color={
+                            colorMode === "light" ? "gray.500" : "gray.400"
+                          }
+                          fontSize={"sm"}
+                          className="text-balance"
+                        >
+                          Your request has been made to set this user as your
+                          caretaker
+                        </Text>
+                        <Button
+                          bg={colorMode === "light" ? "red.600" : "red.700"}
+                          color={
+                            colorMode === "light"
+                              ? "whiteAlpha.900"
+                              : "whiteAlpha.900"
+                          }
+                          _hover={{
+                            bg: colorMode === "light" ? "red.500" : "red.600",
+                          }}
+                          onClick={onCancelModalOpen}
+                        >
+                          Cancel Request
+                        </Button>
+                      </Flex>
+                    ) : (
+                      <Button
+                        bg={colorMode === "light" ? "red.500" : "red.400"}
+                        color={
+                          colorMode === "light"
+                            ? "whiteAlpha.900"
+                            : "whiteAlpha.900"
+                        }
+                        onClick={onRequestCaretakerModalOpen}
+                        _hover={{
+                          bg: colorMode === "light" ? "red.400" : "red.300",
+                          color: "white",
+                        }}
+                        isDisabled={
+                          // accountHasCaretakers &&
+                          caretakerIsMe ||
+                          // accountIsCaretaking ||
+                          viewingUserIsAccount ||
+                          (caretakerData?.caretaker_request_object?.status ===
+                            "pending" &&
+                            caretakerData?.caretaker_request_object
+                              ?.secondary_users[0]?.pk === me?.userData?.pk) ||
+                          // If user already has an open request elsewhere
+                          (caretakerData?.become_caretaker_request_object
+                            ?.status === "pending" &&
+                            caretakerData?.become_caretaker_request_object
+                              ?.secondary_users[0]?.pk === me?.userData?.pk) ||
+                          // If user is already being cared for by this user (check if user pk is in caretaking_for)
+                          user?.caretaking_for?.some(
+                            (obj) => obj.pk === me?.userData?.pk,
+                          )
+                        }
+                      >
+                        Set as Caretaker
+                      </Button>
+                    ))}
+
+                  <Button
+                    bg={colorMode === "light" ? "red.500" : "red.400"}
+                    color={
+                      colorMode === "light"
+                        ? "whiteAlpha.900"
+                        : "whiteAlpha.900"
+                    }
+                    onClick={onMergeUserModalOpen}
+                    _hover={{
+                      bg: colorMode === "light" ? "red.400" : "red.300",
+                      color: "white",
+                    }}
+                    isDisabled={user.email === me.userData.email}
+                  >
+                    Merge with My Account
+                  </Button>
+                </>
+              )}
+            </Flex>
+          </Flex>
+          {viewingUserIsSuper && (
+            <Flex
+              border={"1px solid"}
+              rounded={"xl"}
+              borderColor={borderColor}
+              padding={4}
+              mb={4}
+              flexDir={"column"}
+              mt={2}
+            >
+              <Flex pb={1}>
+                <Text
+                  fontWeight={"bold"}
+                  fontSize={"sm"}
+                  mb={1}
+                  color={sectionTitleColor}
+                  userSelect={"none"}
+                >
+                  Admin
+                </Text>
+              </Flex>
+              <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
+                <Button
+                  onClick={
+                    user.email === me.userData.email
+                      ? () => {
+                          navigate("/users/me");
+                        }
+                      : onEditUserDetailsModalOpen
+                  }
+                  bg={accountIsSuper ? "blue.600" : "blue.500"}
+                  color={
+                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
+                  }
+                  _hover={{
+                    bg:
+                      colorMode === "light"
+                        ? accountIsSuper
+                          ? "blue.500"
+                          : "blue.400"
+                        : accountIsSuper
+                          ? "blue.500"
+                          : "blue.400",
+                    color: "white",
+                  }}
+                  isDisabled={
+                    user.email === me.userData.email &&
+                    currentPage === "/users/me"
+                  }
+                >
+                  Edit Details
+                </Button>
+                <Button
+                  onClick={() => {
+                    setVariablesForPromoteModalAndOpen(accountIsSuper);
+                  }}
+                  bg={
+                    colorMode === "light"
+                      ? accountIsSuper
+                        ? "red.600"
+                        : "green.600"
+                      : accountIsSuper
+                        ? "red.800"
+                        : "green.500"
+                  }
+                  color={
+                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
+                  }
+                  _hover={{
+                    bg:
+                      colorMode === "light"
+                        ? accountIsSuper
+                          ? "red.500"
+                          : "green.500"
+                        : accountIsSuper
+                          ? "red.700"
+                          : "green.400",
+                    color: "white",
+                  }}
+                  isDisabled={
+                    !accountIsStaff || user.email === me.userData.email
+                  }
+                >
+                  {accountIsSuper ? "Demote" : "Promote"}
+                </Button>
+                <Button
+                  onClick={onDeactivateModalOpen}
+                  bg={colorMode === "light" ? "orange.600" : "orange.700"}
+                  color={
+                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
+                  }
+                  _hover={{
+                    bg: colorMode === "light" ? "orange.500" : "orange.600",
+                  }}
+                  isDisabled={
+                    accountIsSuper || user.email === me.userData.email
+                  }
+                >
+                  {user?.is_active ? "Deactivate" : "Reactivate"}
+                </Button>
+                <Button
+                  onClick={onDeleteModalOpen}
+                  bg={colorMode === "light" ? "red.600" : "red.700"}
+                  color={
+                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
+                  }
+                  _hover={{
+                    bg: colorMode === "light" ? "red.500" : "red.600",
+                  }}
+                  isDisabled={
+                    accountIsSuper || user.email === me.userData.email
+                  }
+                >
+                  Delete
+                </Button>
+              </Grid>
+            </Flex>
+          )}
 
           <Flex
             border={"1px solid"}
@@ -710,7 +1419,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               </Text>
             </Flex>
 
-            <Grid gridTemplateColumns="1fr 3fr">
+            <Flex>
               {/* <Text color={subsectionTitleColor}
                                     userSelect={"none"}
                                     fontSize={"sm"}
@@ -720,10 +1429,10 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 userSelect={"none"}
                 fontSize={"sm"}
               >
-                <b>Joined: </b>
-              </Text>
-              <Text>{formatted_date}</Text>
-            </Grid>
+                <b>Joined&nbsp;</b>
+              </Text>{" "}
+              <Text fontSize={"sm"}>{`${formatted_date}`}</Text>
+            </Flex>
             <Flex
               mt={4}
               rounded="xl"
@@ -769,7 +1478,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   >
                     Staff?
                   </Text>
-                  {user?.is_staff ? (
+                  {accountIsStaff ? (
                     <FcApproval />
                   ) : (
                     <Box color={colorMode === "light" ? "red.500" : "red.600"}>
@@ -792,7 +1501,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   >
                     Admin?
                   </Text>
-                  {user?.is_superuser ? (
+                  {accountIsSuper ? (
                     <FcApproval />
                   ) : (
                     <Box color={colorMode === "light" ? "red.500" : "red.600"}>
@@ -803,209 +1512,6 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               </Grid>
             </Flex>
           </Flex>
-          <Flex
-            border={"1px solid"}
-            rounded={"xl"}
-            borderColor={borderColor}
-            padding={4}
-            mb={4}
-            flexDir={"column"}
-            mt={2}
-          >
-            <Flex mb={3}>
-              <Text
-                color={sectionTitleColor}
-                userSelect={"none"}
-                fontSize={"sm"}
-                mr={2}
-              >
-                <b>Caretaker</b>
-              </Text>
-            </Flex>
-            {user?.caretakers && user.caretakers.length > 0 && (
-              <Flex
-                justifyContent={"space-between"}
-                mb={4}
-                alignItems={"center"}
-              >
-                <Box display={"flex"} alignItems={"center"} gap={2}>
-                  <Avatar
-                    size="md"
-                    name={`${user?.caretakers[0]?.display_first_name} ${user?.caretakers[0]?.display_last_name}`}
-                    src={
-                      user?.caretakers[0]?.image
-                        ? user?.caretakers[0]?.image?.startsWith("http")
-                          ? `${user?.caretakers[0]?.image}`
-                          : `${baseAPI}${user?.caretakers[0]?.image}`
-                        : noImage
-                    }
-                  />
-                  <Box display={"flex"} flexDir={"column"}>
-                    <Text
-                      fontSize={"md"}
-                      fontWeight={"semibold"}
-                      color={colorMode === "light" ? "gray.800" : "gray.200"}
-                    >
-                      {`${user?.caretakers[0]?.display_first_name} ${
-                        user?.caretakers[0]?.display_last_name
-                      }`}
-                    </Text>
-                  </Box>
-                </Box>
-              </Flex>
-            )}
-
-            {me?.userData?.is_superuser && (
-              <Flex mb={3} gap={4} w={"100%"} justifyContent={"space-between"}>
-                <Button
-                  w={"100%"}
-                  onClick={onOpenSetCaretakerAdminModal}
-                  bg={colorMode === "light" ? "green.600" : "green.700"}
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{
-                    bg: colorMode === "light" ? "green.500" : "green.600",
-                  }}
-                  isDisabled={user?.caretakers && user.caretakers.length > 0}
-                >
-                  Set a Caretaker
-                </Button>
-                <Button
-                  w={"100%"}
-                  onClick={onOpenRemoveCaretakerAdminModal}
-                  bg={colorMode === "light" ? "red.600" : "red.700"}
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{
-                    bg: colorMode === "light" ? "red.500" : "red.600",
-                  }}
-                  isDisabled={user?.caretakers && user.caretakers.length === 0}
-                >
-                  Remove Caretaker
-                </Button>
-              </Flex>
-            )}
-          </Flex>
-          {me.userData.is_superuser && (
-            <Flex
-              border={"1px solid"}
-              rounded={"xl"}
-              borderColor={borderColor}
-              padding={4}
-              mb={4}
-              flexDir={"column"}
-              mt={2}
-            >
-              <Flex pb={1}>
-                <Text
-                  fontWeight={"bold"}
-                  fontSize={"sm"}
-                  mb={1}
-                  color={sectionTitleColor}
-                  userSelect={"none"}
-                >
-                  Admin
-                </Text>
-              </Flex>
-              <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
-                <Button
-                  onClick={
-                    user.email === me.userData.email
-                      ? () => {
-                          navigate("/users/me");
-                        }
-                      : onEditUserDetailsModalOpen
-                  }
-                  bg={user?.is_superuser ? "blue.600" : "blue.500"}
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{
-                    bg:
-                      colorMode === "light"
-                        ? user?.is_superuser
-                          ? "blue.500"
-                          : "blue.400"
-                        : user?.is_superuser
-                          ? "blue.500"
-                          : "blue.400",
-                    color: "white",
-                  }}
-                  isDisabled={
-                    user.email === me.userData.email &&
-                    currentPage === "/users/me"
-                  }
-                >
-                  Edit Details
-                </Button>
-                <Button
-                  onClick={() => {
-                    setVariablesForPromoteModalAndOpen(user?.is_superuser);
-                  }}
-                  bg={
-                    colorMode === "light"
-                      ? user?.is_superuser
-                        ? "red.600"
-                        : "green.600"
-                      : user?.is_superuser
-                        ? "red.800"
-                        : "green.500"
-                  }
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{
-                    bg:
-                      colorMode === "light"
-                        ? user?.is_superuser
-                          ? "red.500"
-                          : "green.500"
-                        : user?.is_superuser
-                          ? "red.700"
-                          : "green.400",
-                    color: "white",
-                  }}
-                  isDisabled={
-                    !user?.is_staff || user.email === me.userData.email
-                  }
-                >
-                  {user.is_superuser ? "Demote" : "Promote"}
-                </Button>
-                <Button
-                  onClick={onDeactivateModalOpen}
-                  bg={colorMode === "light" ? "orange.600" : "orange.700"}
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{
-                    bg: colorMode === "light" ? "orange.500" : "orange.600",
-                  }}
-                  isDisabled={
-                    user.is_superuser || user.email === me.userData.email
-                  }
-                >
-                  {user?.is_active ? "Deactivate" : "Reactivate"}
-                </Button>
-                <Button
-                  onClick={onDeleteModalOpen}
-                  bg={colorMode === "light" ? "red.600" : "red.700"}
-                  color={
-                    colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
-                  }
-                  _hover={{
-                    bg: colorMode === "light" ? "red.500" : "red.600",
-                  }}
-                  isDisabled={
-                    user.is_superuser || user.email === me.userData.email
-                  }
-                >
-                  Delete
-                </Button>
-              </Grid>
-            </Flex>
-          )}
         </Box>
       </Flex>
     </>

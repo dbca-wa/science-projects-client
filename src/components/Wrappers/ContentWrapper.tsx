@@ -20,7 +20,9 @@ export const ContentWrapper: React.FC<IPageWrapperProps> = ({ children }) => {
         height: "100%",
       }}
     >
-      <Box pb={4}>{children}</Box>
+      <Box pb={4} h={"100%"}>
+        {children}
+      </Box>
     </Box>
   );
 };

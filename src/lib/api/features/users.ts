@@ -171,6 +171,31 @@ export const adminSetCaretaker = async ({
   return res;
 };
 
+export const becomeCaretaker = async ({
+  userPk,
+  caretakerPk,
+  endDate,
+  reason,
+  notes,
+}: ICaretakerEntry) => {
+  const res = instance
+    .post(`adminoptions/tasks`, {
+      action: "setcaretaker",
+      status: "pending",
+      requester: caretakerPk,
+      primary_user: userPk,
+      secondary_users: [caretakerPk],
+      // start_date: startDate,
+      end_date: endDate,
+      reason,
+      notes,
+    })
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
+
 export const requestCaretaker = async ({
   userPk,
   caretakerPk,
@@ -196,6 +221,17 @@ export const requestCaretaker = async ({
     });
   return res;
 };
+
+export async function checkPendingCaretakerRequestsByPk(
+  context: QueryFunctionContext<[string, { pk: number }]>,
+) {
+  const { queryKey } = context;
+  const [_, { pk }] = queryKey;
+
+  return instance
+    .post(`adminoptions/caretakers/requests`, { pk })
+    .then((res) => res.data);
+}
 
 export const removeCaretaker = async ({ id }: { id: number }) => {
   const res = instance.delete(`adminoptions/caretakers/${id}`).then((res) => {
