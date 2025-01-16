@@ -1,11 +1,15 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
 import {
-  Box,
   Button,
   Center,
   Flex,
+  FormControl,
+  FormHelperText,
+  FormLabel,
   Grid,
+  Input,
+  InputGroup,
   ListItem,
   Modal,
   ModalBody,
@@ -14,46 +18,64 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Select,
   Text,
+  Textarea,
   ToastId,
   UnorderedList,
   useColorMode,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import {
+  AdminSwitchVar,
   MutationError,
   MutationSuccess,
+  adminSetCaretaker,
+  deleteUserAdmin,
   requestCaretaker,
-} from "../../lib/api/api";
+} from "../../../lib/api/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUserSearchContext } from "../../../lib/hooks/helper/UserSearchContext";
 import { ICaretakerEntry } from "@/types";
 import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
+import { ShadcnDatePicker } from "../../Pages/Account/ShadcnDatePicker";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 
 interface IModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userPk: number;
-  caretakerPk: number;
-  // startDate: Date | null;
-  endDate: Date | null;
-  reason: "leave" | "resignation" | "other" | null;
-  notes: string | undefined;
   refetch: () => void;
+  userIsSuper: boolean;
+  userPk: string | number;
 }
 
-export const CaretakerModeConfirmModal = ({
+export const SetCaretakerForMyAccountModal = ({
   isOpen,
   onClose,
+  userIsSuper,
   userPk,
-  caretakerPk,
-  // startDate,
-  endDate,
-  reason,
-  notes,
   refetch,
 }: IModalProps) => {
+  const [caretakerPk, setCaretakerPk] = useState<number | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [reason, setReason] = useState<
+    "leave" | "resignation" | "other" | null
+  >(null);
+  const [notes, setNotes] = useState<string | undefined>(undefined);
+
+  // useEffect(() => {
+  //   console.log({
+  //     userPk,
+  //     caretakerPk,
+  //     endDate,
+  //     reason,
+  //     notes,
+  //   });
+  // }, [userPk, caretakerPk, endDate, reason, notes]);
+
   const { colorMode } = useColorMode();
   const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
 
@@ -67,6 +89,9 @@ export const CaretakerModeConfirmModal = ({
     closeToast();
     onClose();
   };
+  const queryClient = useQueryClient();
+
+  const { reFetch } = useUserSearchContext();
 
   // Toast
   const toast = useToast();
@@ -75,9 +100,7 @@ export const CaretakerModeConfirmModal = ({
     toastIdRef.current = toast(data);
   };
 
-  const queryClient = useQueryClient();
-
-  const setCaretakerMutation = useMutation<
+  const requestCaretakerMutation = useMutation<
     MutationSuccess,
     MutationError,
     ICaretakerEntry
@@ -163,7 +186,7 @@ export const CaretakerModeConfirmModal = ({
 
   const onSubmit = async (formData: ICaretakerEntry) => {
     console.log(formData);
-    await setCaretakerMutation.mutateAsync({
+    await requestCaretakerMutation.mutateAsync({
       userPk: formData.userPk,
       caretakerPk: formData.caretakerPk,
       // startDate: formData.startDate,
@@ -181,36 +204,88 @@ export const CaretakerModeConfirmModal = ({
       <ModalOverlay />
       <Flex>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-          <ModalHeader>Request Caretaker?</ModalHeader>
+          <ModalHeader>Set a Caretaker?</ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
-            <Center>
-              <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to request a caretaker?
+            <Center mb={8} mt={2}>
+              <Text fontSize={"lg"}>
+                Are you sure you want to set a caretaker?
               </Text>
             </Center>
-            <Text mt={4}>
-              A request will be made to admins to set the selected user as
-              caretaker for your projects:
-            </Text>
-            <Box mt={4}>
-              <UnorderedList>
-                {/* <ListItem>From {formattedStart.split("@")[0]}</ListItem> */}
-                {formattedEnd !== "" && (
-                  <ListItem>Until {formattedEnd.split("@")[0]}</ListItem>
-                )}
-                <ListItem>
-                  They will be able to perform actions on your behalf
-                </ListItem>
-                <ListItem>
-                  If you return early, you can manually remove caretaker
-                </ListItem>
-              </UnorderedList>
-            </Box>
-            <Text mt={4}>
-              If you would still like to proceed, press "Request Caretaker".
-            </Text>
+            <div>
+              <FormControl my={2} mb={4} userSelect={"none"}>
+                <FormLabel>Reason</FormLabel>
+                <Select
+                  variant="filled"
+                  placeholder="Select the reason for absence"
+                  isDisabled={false}
+                  onChange={(e) =>
+                    setReason(
+                      e.target.value as
+                        | "leave"
+                        | "resignation"
+                        | "other"
+                        | null,
+                    )
+                  }
+                  value={reason}
+                >
+                  <option value="leave">On Leave</option>
+                  <option value="resignation">Leaving the Department</option>
+                  <option value="other">Other</option>
+                </Select>
+              </FormControl>
+
+              {(reason === "other" ||
+                reason === "resignation" ||
+                reason === "leave") && (
+                <>
+                  {reason === "other" && (
+                    <FormControl my={2} mb={4} userSelect={"none"}>
+                      <FormLabel>Notes</FormLabel>
+                      <Textarea
+                        placeholder="Enter the reason"
+                        onChange={(e) => setNotes(e.target.value)}
+                        value={notes}
+                      />
+                      <FormHelperText>
+                        Please provide a reason for this user's absence.
+                      </FormHelperText>
+                    </FormControl>
+                  )}
+
+                  {reason !== "resignation" && (
+                    <Flex flexDir={"row"} gap={4}>
+                      <FormControl my={2} mb={4} userSelect={"none"}>
+                        <FormLabel>End Date</FormLabel>
+                        <InputGroup flexDir={"column"}>
+                          <ShadcnDatePicker
+                            placeholder={"Enter end date"}
+                            date={endDate}
+                            setDate={setEndDate}
+                          />
+                          <FormHelperText>
+                            When will the user return to the office?
+                          </FormHelperText>
+                        </InputGroup>
+                      </FormControl>
+                    </Flex>
+                  )}
+
+                  <UserSearchDropdown
+                    isRequired={false}
+                    onlyInternal
+                    setUserFunction={setCaretakerPk}
+                    label={"Caretaker"}
+                    placeholder={"Enter a caretaker"}
+                    helperText={
+                      "Who will look after their projects while they are gone?"
+                    }
+                  />
+                </>
+              )}
+            </div>
           </ModalBody>
           <ModalFooter>
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
@@ -218,15 +293,23 @@ export const CaretakerModeConfirmModal = ({
                 Cancel
               </Button>
               <Button
+                disabled={
+                  !userPk ||
+                  !caretakerPk ||
+                  (reason !== "resignation" && !endDate) ||
+                  !reason ||
+                  (reason === "other" && !notes)
+                }
+                variant={"solid"}
                 color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
+                background={colorMode === "light" ? "green.500" : "green.600"}
                 _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }} // isDisabled={!changesMade}
-                isLoading={setCaretakerMutation.isPending}
+                  background: colorMode === "light" ? "green.400" : "green.500",
+                }}
+                isLoading={requestCaretakerMutation.isPending}
                 onClick={() =>
                   onSubmit({
-                    userPk: userPk,
+                    userPk: userPk as number,
                     caretakerPk: caretakerPk,
                     // startDate: startDate,
                     endDate: endDate,

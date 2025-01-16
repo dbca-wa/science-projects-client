@@ -23,6 +23,7 @@ export const TraditionalPageWrapper: React.FC<IPageWrapperProps> = ({
       display="flex"
       flexDirection="column"
       overscrollBehaviorY={"none"}
+      minH={"100vh"}
     >
       {children}
     </Box>

@@ -36,13 +36,13 @@ import {
   adminSetCaretaker,
   deleteUserAdmin,
   requestCaretaker,
-} from "../../lib/api/api";
+} from "../../../lib/api/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "../../../lib/hooks/helper/UserSearchContext";
 import { ICaretakerEntry } from "@/types";
 import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
-import { ShadcnDatePicker } from "../Pages/Account/ShadcnDatePicker";
-import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
+import { ShadcnDatePicker } from "../../Pages/Account/ShadcnDatePicker";
+import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 
 interface IModalProps {
   isOpen: boolean;
@@ -66,15 +66,15 @@ export const SetCaretakerAdminModal = ({
   >(null);
   const [notes, setNotes] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    console.log({
-      userPk,
-      caretakerPk,
-      endDate,
-      reason,
-      notes,
-    });
-  }, [userPk, caretakerPk, endDate, reason, notes]);
+  // useEffect(() => {
+  //   console.log({
+  //     userPk,
+  //     caretakerPk,
+  //     endDate,
+  //     reason,
+  //     notes,
+  //   });
+  // }, [userPk, caretakerPk, endDate, reason, notes]);
 
   const { colorMode } = useColorMode();
   const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
@@ -200,7 +200,7 @@ export const SetCaretakerAdminModal = ({
   const formattedEnd = useFormattedDate(endDate);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"sm"}>
+    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
       <ModalOverlay />
       <Flex>
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
@@ -208,9 +208,9 @@ export const SetCaretakerAdminModal = ({
           <ModalCloseButton />
 
           <ModalBody>
-            <Center>
+            <Center mb={8} mt={2}>
               <Text fontSize={"lg"}>
-                Are you sure you want to set a caretaker for this user?
+                Are you sure you want to set a caretaker?
               </Text>
             </Center>
             <div>

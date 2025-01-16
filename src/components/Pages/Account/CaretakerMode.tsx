@@ -1,4 +1,4 @@
-import { CaretakerModeConfirmModal } from "@/components/Modals/CaretakerModeConfirmModal";
+import { CaretakerModeConfirmModal } from "@/components/Modals/Caretakers/CaretakerModeConfirmModal";
 import { UserSearchDropdown } from "@/components/Navigation/UserSearchDropdown";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
@@ -23,12 +23,12 @@ import { FaRunning } from "react-icons/fa";
 import { ShadcnDatePicker } from "./ShadcnDatePicker";
 import { useCheckExistingCaretaker } from "@/lib/hooks/tanstack/useCheckExistingCaretaker";
 import { formatDate } from "date-fns";
-import { CancelCaretakerRequestModal } from "@/components/Modals/CancelCaretakerRequestModal";
+import { CancelCaretakerRequestModal } from "@/components/Modals/Caretakers/CancelCaretakerRequestModal";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import { useNoImage } from "@/lib/hooks/helper/useNoImage";
-import { RemoveCaretakerModal } from "@/components/Modals/RemoveCaretakerModal";
+import { RemoveCaretakerModal } from "@/components/Modals/Caretakers/RemoveCaretakerModal";
 import { checkIfDateExpired } from "@/lib/utils/checkIfDateExpired";
-import { ExtendCaretakerModal } from "@/components/Modals/ExtendCaretakerModal";
+import { ExtendCaretakerModal } from "@/components/Modals/Caretakers/ExtendCaretakerModal";
 
 const CaretakerModePage = () => {
   const baseAPI = useApiEndpoint();
@@ -37,6 +37,7 @@ const CaretakerModePage = () => {
   const { userData, userLoading } = useUser();
   const { caretakerData, caretakerDataLoading, refetchCaretakerData } =
     useCheckExistingCaretaker();
+  console.log(caretakerData);
 
   const [pk, setPk] = useState<number | undefined>(undefined);
   const [caretakerPk, setCaretakerPk] = useState<number | undefined>(undefined);
@@ -46,24 +47,26 @@ const CaretakerModePage = () => {
   >(null);
   const [notes, setNotes] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    console.log({
-      pk,
-      userData,
-      caretakerPk,
-      endDate,
-      reason,
-      notes,
-    });
-  }, [pk, userData, caretakerPk, endDate, reason, notes]);
+  console.log(userData);
+  // useEffect(() => {
+  //   console.log({
+  //     pk,
+  //     userData,
+  //     caretakerPk,
+  //     endDate,
+  //     reason,
+  //     notes,
+  //   });
+  // }, [pk, userData, caretakerPk, endDate, reason, notes]);
 
-  useEffect(() => {
-    console.log({
-      caretakerData,
-      caretakerDataLoading,
-    });
-  }, [caretakerData, caretakerDataLoading]);
+  // useEffect(() => {
+  //   console.log({
+  //     caretakerData,
+  //     caretakerDataLoading,
+  //   });
+  // }, [caretakerData, caretakerDataLoading]);
 
+  //#region Modals
   const {
     isOpen: modalIsOpen,
     onOpen: onOpenModal,
@@ -87,6 +90,7 @@ const CaretakerModePage = () => {
     onOpen: onOpenExtendModal,
     onClose: onExtendModalClose,
   } = useDisclosure();
+  //#endregion
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,6 +128,109 @@ const CaretakerModePage = () => {
           in your absence. Caretaker requests are subject to admin approval.{" "}
         </Text>
       </Box>
+
+      {
+        // Show any users that the current user is a caretaker for
+        userData?.caretaking_for?.length > 0 && (
+          <Box mb={4}>
+            <Text className="font-semibold">
+              You are caretaking for the following user:
+            </Text>
+            <Box className="mt-4">
+              {userData?.caretaking_for.map((user) => (
+                <Flex className="items-center justify-between gap-4 py-2">
+                  <Flex className="items-center gap-4">
+                    <Avatar
+                      key={user.email}
+                      size="md"
+                      name={`${user.display_first_name} ${user.display_last_name}`}
+                      src={
+                        user.image
+                          ? user.image?.startsWith("http")
+                            ? `${user.image}`
+                            : `${baseAPI}${user.image}`
+                          : noImage
+                      }
+                    />
+                    <Text
+                      fontSize={"md"}
+                      fontWeight={"semibold"}
+                      color={colorMode === "light" ? "gray.800" : "gray.200"}
+                    >
+                      {user.display_first_name} {user.display_last_name}
+                    </Text>
+                  </Flex>
+                  <Button>Remove</Button>
+                </Flex>
+              ))}
+            </Box>
+          </Box>
+        )
+      }
+
+      {caretakerData?.become_caretaker_request_object !== null &&
+      caretakerData?.become_caretaker_request_object?.status === "pending" ? (
+        <div>
+          <Text color={"red.500"} mt={4} fontSize={"md"}>
+            You have an active request to become a user's caretaker. Please wait
+            for admin approval or cancel your request:
+          </Text>
+          <Flex justifyContent={"space-between"} my={4} alignItems={"center"}>
+            <Box display={"flex"} alignItems={"center"} gap={2}>
+              <Avatar
+                size="md"
+                name={`${caretakerData?.become_caretaker_request_object?.primary_user?.display_first_name} ${caretakerData?.become_caretaker_request_object?.primary_user?.display_last_name}`}
+                src={
+                  caretakerData?.become_caretaker_request_object?.primary_user
+                    ?.image
+                    ? caretakerData?.become_caretaker_request_object?.primary_user?.image?.file?.startsWith(
+                        "http",
+                      )
+                      ? `${caretakerData?.become_caretaker_request_object?.primary_user?.image?.file}`
+                      : `${baseAPI}${caretakerData?.become_caretaker_request_object?.primary_user?.image?.file}`
+                    : caretakerData?.become_caretaker_request_object
+                          ?.primary_user?.image?.old_file
+                      ? caretakerData?.become_caretaker_request_object
+                          ?.primary_user?.image?.old_file
+                      : noImage
+                }
+              />
+              <Box display={"flex"} flexDir={"column"}>
+                <Text
+                  fontSize={"md"}
+                  fontWeight={"semibold"}
+                  color={colorMode === "light" ? "gray.800" : "gray.200"}
+                >
+                  {`${
+                    caretakerData?.become_caretaker_request_object?.primary_user
+                      ?.display_first_name
+                  } ${
+                    caretakerData?.become_caretaker_request_object?.primary_user
+                      .display_last_name
+                  }`}
+                </Text>
+                <Text fontSize={"sm"} color={"gray.500"}>
+                  Requested on{" "}
+                  {formatDate(
+                    caretakerData?.become_caretaker_request_object?.created_at,
+                    "dd/MM/yyyy",
+                  )}
+                </Text>
+              </Box>
+            </Box>
+
+            <Flex>
+              <Button onClick={onCancelModalOpen}>Cancel</Button>
+            </Flex>
+          </Flex>
+          <CancelCaretakerRequestModal
+            isOpen={cancelModalIsOpen}
+            onClose={onCancelModalClose}
+            refresh={refetchCaretakerData}
+            taskPk={caretakerData?.become_caretaker_request_object?.id}
+          />
+        </div>
+      ) : null}
 
       {caretakerData?.caretaker_object === null &&
       caretakerData?.caretaker_request_object === null ? (
@@ -280,7 +387,7 @@ const CaretakerModePage = () => {
                   }`}
                 </Text>
                 <Text fontSize={"sm"} color={"gray.500"}>
-                  Requested on $
+                  Requested on{" "}
                   {formatDate(
                     caretakerData?.caretaker_request_object?.created_at,
                     "dd/MM/yyyy",

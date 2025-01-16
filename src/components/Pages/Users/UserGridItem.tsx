@@ -109,7 +109,7 @@ export const UserGridItem = ({
         onClose={onUserClose}
         size={"lg"} //by default is xs
       >
-        <DrawerOverlay />
+        <DrawerOverlay zIndex={999} />
         <DrawerContent>
           <DrawerBody>
             <UserProfile
