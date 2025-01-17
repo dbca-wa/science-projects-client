@@ -286,30 +286,6 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
     <>
       {(viewingUserIsSuper || viewingUserIsAccount || caretakerIsMe) && (
         <>
-          <RemoveCaretakerModal
-            isOpen={isRemoveCaretakerAdminModalOpen}
-            onClose={onCloseRemoveCaretakerAdminModal}
-            caretakerObject={{
-              id: user?.caretakers?.[0]?.caretaker_obj_id,
-              user: user?.pk,
-              caretaker: {
-                pk: user?.caretakers?.[0]?.pk || null,
-                display_first_name:
-                  user?.caretakers?.[0]?.display_first_name || "",
-                display_last_name:
-                  user?.caretakers?.[0]?.display_last_name || "",
-
-                image: user?.caretakers?.[0]?.image || null,
-              },
-              reason: "leave",
-              notes: "",
-              end_date: user?.caretakers?.[0]?.end_date || null,
-            }}
-            refetch={() => {
-              refetch();
-              refetchCaretakerData();
-            }}
-          />
           {viewingUserIsAccount && (
             <SetCaretakerForMyAccountModal
               isOpen={isSetCaretakerMyModalOpen}
@@ -347,6 +323,31 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           }}
         />
       )}
+      {/* <RemoveCaretakerModal
+            isOpen={isRemoveCaretakerAdminModalOpen}
+            onClose={onCloseRemoveCaretakerAdminModal}
+            caretakerObject={{
+              id: user?.caretakers?.[0]?.caretaker_obj_id,
+              user: user?.pk,
+              caretaker: {
+                pk: user?.caretakers?.[0]?.pk || null,
+                display_first_name:
+                  user?.caretakers?.[0]?.display_first_name || "",
+                display_last_name:
+                  user?.caretakers?.[0]?.display_last_name || "",
+
+                image: user?.caretakers?.[0]?.image || null,
+              },
+              reason: "leave",
+              notes: "",
+              end_date: user?.caretakers?.[0]?.end_date || null,
+            }}
+            refetch={() => {
+              refetch();
+              refetchCaretakerData();
+            }}
+          /> */}
+
       {viewingUserIsSuper && (
         <>
           <SetCaretakerAdminModal
@@ -825,7 +826,9 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         </Text>
                       </Box>
                     </Box>
-                    {(viewingUserIsAccount || caretakerIsMe) && (
+                    {(viewingUserIsAccount ||
+                      caretakerIsMe ||
+                      viewingUserIsSuper) && (
                       <Box>
                         <Button
                           bg={colorMode === "light" ? "red.600" : "red.700"}
@@ -1128,6 +1131,33 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         key={obj.pk}
                         label={`This user has authority to act on ${obj.display_first_name} ${obj.display_last_name}'s behalf`}
                       >
+                        {viewingUserIsAccount ||
+                          (viewingUserIsSuper && (
+                            <RemoveCaretakerModal
+                              isOpen={isRemoveCaretakerAdminModalOpen}
+                              onClose={onCloseRemoveCaretakerAdminModal}
+                              caretakerObject={{
+                                id: obj?.caretaker_obj_id,
+                                user: obj?.pk,
+                                caretaker: {
+                                  pk: user?.pk || null,
+                                  display_first_name:
+                                    user?.display_first_name || "",
+                                  display_last_name:
+                                    user?.display_last_name || "",
+                                  image: user?.image || null,
+                                },
+                                reason: "leave",
+                                notes: "",
+                                end_date: null,
+                              }}
+                              refetch={() => {
+                                refetch();
+                                refetchCaretakerData();
+                              }}
+                            />
+                          ))}
+
                         <Flex
                           key={obj.pk}
                           bg={colorMode === "light" ? "gray.50" : "gray.600"}
