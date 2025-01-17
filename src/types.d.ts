@@ -359,6 +359,8 @@ export interface IUserMe {
 }
 
 export interface ICaretakerSimpleUserData {
+  pk: number;
+  caretaker_obj_id?: number;
   display_first_name: string | null;
   display_last_name: string | null;
   email: string;
