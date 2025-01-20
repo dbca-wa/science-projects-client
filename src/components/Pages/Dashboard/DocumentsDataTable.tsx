@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -16,14 +17,17 @@ import {
   Flex,
   Icon,
   Text,
+  Tooltip,
   useColorMode,
 } from "@chakra-ui/react";
 
 import {
   ColumnDef,
+  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -281,6 +285,12 @@ export const DocumentsDataTable = ({
       // Otherwise, directorate should always come last
       return isDirectorateA ? 1 : -1;
     },
+    filterFn: (row) => {
+      if (hideDirectorate) {
+        return row.original.taskType !== "directorate";
+      }
+      return true;
+    },
   };
 
   const baseColumns: ColumnDef<IDocTypeTask>[] = [
@@ -527,24 +537,65 @@ export const DocumentsDataTable = ({
     },
   ]);
 
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+
     // onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       //   //   columnVisibility,
+      columnFilters,
     },
   });
 
   const twRowClassLight = "hover:cursor-pointer hover:bg-blue-50";
   const twRowClassDark = "hover:cursor-pointer hover:bg-inherit";
 
+  const [hideDirectorate, setHideDirectorate] = useState(true);
+
+  useEffect(() => {
+    if (!isCaretakerTable) return;
+    table.getColumn("for_user")?.setFilterValue(!hideDirectorate);
+  }, [hideDirectorate, isCaretakerTable]);
+
   return (
     <div className="rounded-b-md border">
+      {columns?.includes(caretakerColumn) &&
+        data?.some((t) => t?.taskType === "directorate") && (
+          <div className="flex items-center justify-end space-x-2 p-4">
+            <Checkbox
+              // className="size-4 max-w-sm text-black"
+              id="hideDirectorate"
+              checked={hideDirectorate}
+              onCheckedChange={() => {
+                setHideDirectorate((prev) => !prev);
+                table.getColumn("for_user")?.setFilterValue(!hideDirectorate); // Toggle the filter value
+              }}
+              aria-label="Hide Directorate Tasks"
+            />
+            <Tooltip
+              label="Hides all tasks which belong to the directorate"
+              aria-label="A tooltip"
+            >
+              <label
+                htmlFor="hideDirectorate"
+                className={
+                  "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                }
+              >
+                Hide Directorate Tasks
+              </label>
+            </Tooltip>
+          </div>
+        )}
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
