@@ -539,6 +539,14 @@ export interface IMidDoc {
   referenced_doc: IReferencedDoc;
 }
 
+export interface ISmallUserWithAvatar {
+  pk: number;
+  email: string;
+  display_first_name: string;
+  display_last_name: string;
+  image: string;
+}
+
 export interface IMainDoc {
   pk?: number;
   id?: number;
@@ -556,6 +564,7 @@ export interface IMainDoc {
   directorate_approval_granted: boolean;
   pdf_generation_in_progress: boolean;
   pdf: IProjectDocPDF;
+  for_user?: ISmallUserWithAvatar;
 }
 
 interface IProjectDocPDF {
