@@ -138,10 +138,12 @@ const CaretakerModePage = () => {
             </Text>
             <Box className="mt-4">
               {userData?.caretaking_for.map((user) => (
-                <Flex className="items-center justify-between gap-4 py-2">
+                <Flex
+                  className="items-center justify-between gap-4 py-2"
+                  key={user.email}
+                >
                   <Flex className="items-center gap-4">
                     <Avatar
-                      key={user.email}
                       size="md"
                       name={`${user.display_first_name} ${user.display_last_name}`}
                       src={

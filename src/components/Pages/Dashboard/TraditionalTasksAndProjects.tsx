@@ -200,6 +200,7 @@ export const TraditionalTasksAndProjects = () => {
                   <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
                     <DocumentsDataTable
                       pendingProjectDocumentData={pendingCaretakerTaskData}
+                      isCaretakerTable
                     />
                   </AccordionPanel>
                 </AccordionItem>

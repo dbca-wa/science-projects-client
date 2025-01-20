@@ -6,8 +6,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 import { IMainDoc } from "@/types";
-import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
 
 import {
   ColumnDef,
@@ -40,6 +50,7 @@ interface IPendingProjectDocumentData {
 
 interface Props {
   pendingProjectDocumentData: IPendingProjectDocumentData;
+  isCaretakerTable?: boolean;
 }
 
 const returnHTMLTitle = (titleData) => {
@@ -154,7 +165,12 @@ function isDocTypeTask(taskRow: any): taskRow is IDocTypeTask {
   return "project" in taskRow;
 }
 
-export const DocumentsDataTable = ({ pendingProjectDocumentData }: Props) => {
+export const DocumentsDataTable = ({
+  pendingProjectDocumentData,
+  isCaretakerTable,
+}: Props) => {
+  const baseAPI = useApiEndpoint();
+  const noImage = useNoImage();
   const { colorMode } = useColorMode();
   const navigate = useNavigate();
   const goToProjectDocument = (
@@ -185,7 +201,89 @@ export const DocumentsDataTable = ({ pendingProjectDocumentData }: Props) => {
     }
   };
 
-  const columns: ColumnDef<IDocTypeTask>[] = [
+  const caretakerColumn: ColumnDef<IDocTypeTask> = {
+    accessorKey: "for_user",
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+      let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
+
+      if (isSorted === "asc") {
+        sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
+      } else if (isSorted === "desc") {
+        sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
+      }
+
+      return (
+        <Button
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="w-full text-center"
+          rightIcon={sortIcon}
+          bg={"transparent"}
+          _hover={
+            colorMode === "dark"
+              ? { bg: "blue.400", color: "white" }
+              : { bg: "blue.50", color: "black" }
+          }
+        >
+          User
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const isDirectorate = row.original.taskType === "directorate";
+      const user = row.original?.for_user;
+      const hasImage = user?.image;
+      return (
+        <Flex className="flex w-full flex-col items-center justify-center text-center align-middle font-medium">
+          <Avatar
+            name={
+              isDirectorate
+                ? "Directorate"
+                : `${user?.display_first_name} ${user?.display_last_name}`
+            }
+            src={
+              !isDirectorate
+                ? hasImage
+                  ? user.image?.startsWith("http")
+                    ? `${user.image}`
+                    : `${baseAPI}${user.image}`
+                  : noImage
+                : undefined
+            }
+            bg={isDirectorate ? "red.500" : undefined}
+            color={isDirectorate ? "white" : undefined}
+            size="sm"
+          />
+          <Text
+            color={isDirectorate ? "red.500" : undefined}
+            fontWeight={"semibold"}
+            px={2}
+            className="flex items-center"
+          >
+            {isDirectorate
+              ? "Directorate"
+              : `${user?.display_first_name} ${user?.display_last_name}`}
+          </Text>
+        </Flex>
+      );
+    },
+    sortingFn: (rowA, rowB) => {
+      const isDirectorateA = rowA.original.taskType === "directorate";
+      const isDirectorateB = rowB.original.taskType === "directorate";
+
+      // If both are directorate or neither are, compare normally
+      if (isDirectorateA === isDirectorateB) {
+        const nameA = rowA.original?.for_user?.display_first_name ?? "";
+        const nameB = rowB.original?.for_user?.display_first_name ?? "";
+        return nameA.localeCompare(nameB);
+      }
+
+      // Otherwise, directorate should always come last
+      return isDirectorateA ? 1 : -1;
+    },
+  };
+
+  const baseColumns: ColumnDef<IDocTypeTask>[] = [
     {
       accessorKey: "capacity",
       header: ({ column }) => {
@@ -393,6 +491,11 @@ export const DocumentsDataTable = ({ pendingProjectDocumentData }: Props) => {
       },
     },
   ];
+
+  const columns = isCaretakerTable
+    ? [caretakerColumn, ...baseColumns]
+    : baseColumns;
+
   //   console.log(combinedData);
   const [data, setData] = useState([]);
 
