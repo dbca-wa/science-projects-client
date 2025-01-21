@@ -310,7 +310,15 @@ export interface ICheckCaretakerStatus {
 export interface ICaretakerObject {
   pk?: number;
   id?: number;
-  user: number;
+  caretaker_obj_id?: number;
+  user:
+    | number
+    | {
+        pk: number;
+        display_first_name: string;
+        display_last_name: string;
+        image: string;
+      };
   caretaker: {
     pk: number;
     display_first_name: string;
