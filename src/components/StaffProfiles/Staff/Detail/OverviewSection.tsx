@@ -489,7 +489,7 @@ const TagList = ({ staffOverviewData }) => {
   return (
     <p
       ref={containerRef}
-      className={`text-balance text-muted-foreground ${staffOverviewData?.keyword_tags?.length > 0 && "mt-3"}`}
+      className={`text-balance ${staffOverviewData?.keyword_tags?.length > 0 && "mt-3"}`}
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -511,13 +511,15 @@ const TagList = ({ staffOverviewData }) => {
                   overflowWrap: "break-word",
                   display: "inline",
                 }}
+                className="text-[14px] font-medium text-gray-700"
               >
                 {/* Trimmed and every first letter capitalized */}
                 {tag.name?.trim()?.replace(/\b\w/g, (l) => l.toUpperCase())}
+                {idx < staffOverviewData.keyword_tags.length - 1 && ", "}
               </span>
 
               {/* Render the separator, but ensure it doesn’t wrap onto a new line by using a non-breaking space */}
-              {idx < staffOverviewData.keyword_tags.length - 1 && (
+              {/* {idx < staffOverviewData.keyword_tags.length - 1 && (
                 <span
                   className="separator"
                   style={{
@@ -527,7 +529,7 @@ const TagList = ({ staffOverviewData }) => {
                 >
                   &nbsp;|&nbsp;
                 </span>
-              )}
+              )} */}
             </React.Fragment>
           );
         })}

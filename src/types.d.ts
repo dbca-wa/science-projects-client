@@ -1267,7 +1267,7 @@ export interface IStaffEducationEntry {
   // qualification_field: string;
   // qualification_kind: QualificationKind;
   qualification_name: string;
-  start_year: string;
+  // start_year: string;
   end_year: string;
   institution: string;
   location: string;

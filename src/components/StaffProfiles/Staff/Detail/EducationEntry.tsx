@@ -15,7 +15,7 @@ const EducationEntry = ({
   // qualification_field,
   // qualification_kind,
   qualification_name,
-  start_year,
+  // start_year,
   end_year,
   institution,
   location,
@@ -80,7 +80,7 @@ const EducationEntry = ({
                   // qualification_field,
                   // qualification_kind,
                   qualification_name,
-                  start_year,
+                  // start_year,
                   end_year,
                   institution,
                   location,
@@ -99,7 +99,7 @@ const EducationEntry = ({
                   // qualification_field,
                   // qualification_kind,
                   qualification_name,
-                  start_year,
+                  // start_year,
                   end_year,
                   institution,
                   location,
@@ -119,7 +119,7 @@ const EducationEntry = ({
                   // qualification_field,
                   // qualification_kind,
                   qualification_name,
-                  start_year,
+                  // start_year,
                   end_year,
                   institution,
                   location,
@@ -136,7 +136,7 @@ const EducationEntry = ({
                   // qualification_field,
                   // qualification_kind,
                   qualification_name,
-                  start_year,
+                  // start_year,
                   end_year,
                   institution,
                   location,
@@ -159,17 +159,19 @@ const EducationEntry = ({
 
       {/* Details */}
       <div className="text-balance">
-        <p>
-          {start_year === end_year
-            ? `${start_year}`
-            : `${start_year} - ${checkYearForPresent(currentYear, Number(end_year))}`}
-        </p>
-        <p>
+        <p className="text-[15px] font-semibold text-slate-700 dark:text-slate-400">
           {/* {selectedOption.label}  */}
           {qualification_name}
         </p>
-        <p>
+        <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-600">
           {institution} ({location})
+        </p>
+
+        <p className="text-sm text-slate-600 dark:text-slate-500">
+          {checkYearForPresent(currentYear, Number(end_year))}
+          {/* {start_year === end_year
+            ? `${start_year}`
+            : `${start_year} - ${checkYearForPresent(currentYear, Number(end_year))}`} */}
         </p>
       </div>
     </div>

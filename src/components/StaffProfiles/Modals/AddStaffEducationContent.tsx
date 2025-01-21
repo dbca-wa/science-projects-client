@@ -164,7 +164,7 @@ const AddStaffEducationContent = ({
           />
         </div>
 
-        <div className="mt-1 flex flex-col">
+        {/* <div className="mt-1 flex flex-col">
           <Label htmlFor="start_year" className="my-2">
             Start Year
           </Label>
@@ -189,11 +189,11 @@ const AddStaffEducationContent = ({
           {errors.start_year && (
             <p className="text-sm text-red-600">{errors.start_year.message}</p>
           )}
-        </div>
+        </div> */}
 
         <div className="mt-1 flex flex-col">
           <Label htmlFor="end_year" className="my-2">
-            End Year
+            Year Complete
           </Label>
 
           <Input
@@ -203,14 +203,14 @@ const AddStaffEducationContent = ({
             className="w-full"
             {...register("end_year", {
               required: true,
-              validate: (value) => {
-                const startYear = getValues("start_year");
-                return (
-                  !startYear ||
-                  value >= startYear ||
-                  "End year cannot be before start year"
-                );
-              },
+              // validate: (value) => {
+              //   const startYear = getValues("start_year");
+              //   return (
+              //     !startYear ||
+              //     value >= startYear ||
+              //     "End year cannot be before start year"
+              //   );
+              // },
             })}
           />
           {errors.end_year && (

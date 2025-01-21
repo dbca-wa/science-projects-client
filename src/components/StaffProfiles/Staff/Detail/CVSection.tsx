@@ -146,9 +146,9 @@ const CVSection = ({
                 ?.sort((a, b) => {
                   // First, sort by start_year (descending)
 
-                  if (Number(a.start_year) !== Number(b.start_year)) {
-                    return Number(b.start_year) - Number(a.start_year);
-                  }
+                  // if (Number(a.start_year) !== Number(b.start_year)) {
+                  //   return Number(b.start_year) - Number(a.start_year);
+                  // }
                   // If start_year is the same, sort by end_year (descending)
                   if (Number(a.end_year) !== Number(b.end_year)) {
                     return Number(b.end_year) - Number(a.end_year);
@@ -168,7 +168,7 @@ const CVSection = ({
                     // qualification_field={educationItem?.qualification_field}
                     // qualification_kind={educationItem?.qualification_kind}
                     qualification_name={educationItem?.qualification_name}
-                    start_year={educationItem?.start_year}
+                    // start_year={educationItem?.start_year}
                     end_year={educationItem?.end_year}
                     institution={educationItem?.institution}
                     location={educationItem?.location}
