@@ -3,9 +3,11 @@ import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import { IStaffEmploymentEntry } from "@/types";
 import { useState } from "react";
 import { EmploymentDialog, EmploymentDrawer } from "./CVSection";
+import clsx from "clsx";
 
 interface EmploymentEntryProps extends IStaffEmploymentEntry {
   buttonsVisible: boolean;
+  isLast: boolean;
   refetch: () => void;
 }
 
@@ -18,6 +20,7 @@ const EmploymentEntry = ({
   section,
   employer,
   buttonsVisible,
+  isLast,
   refetch,
 }: EmploymentEntryProps) => {
   const currentYear = useCurrentYear();
@@ -34,7 +37,7 @@ const EmploymentEntry = ({
   return (
     <>
       <div
-        className="relative select-none py-4"
+        className={clsx("relative select-none", isLast ? "py-4" : "pb-0 pt-4")}
         onMouseOver={() => setIsHovered(true)}
         onMouseOut={() => setIsHovered(false)}
       >

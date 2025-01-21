@@ -50,7 +50,12 @@ root.render(
       <LayoutSwitcherProvider>
         <UserSearchProvider>
           <ProjectSearchProvider>
-            <RouterProvider router={router} />
+            <RouterProvider
+              router={router}
+              future={{
+                v7_startTransition: true,
+              }}
+            />
           </ProjectSearchProvider>
         </UserSearchProvider>
       </LayoutSwitcherProvider>

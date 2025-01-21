@@ -1,6 +1,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -8,6 +9,7 @@ import {
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -218,9 +220,19 @@ const EditAboutDialog = ({
           />
         </span>
       </DialogTrigger>
-      <DialogContent className="max-h-[80vh] w-[700px] max-w-[700px] overflow-y-auto text-slate-800">
+      <DialogContent
+        className="max-h-[80vh] w-[700px] max-w-[700px] overflow-y-auto text-slate-800"
+        // aria-describedby="edit-about-dialog-description"
+        aria-description="Edit your About to provide more information about yourself."
+      >
         <DialogHeader>
           <DialogTitle className="mb-2 mt-3">Edit About</DialogTitle>
+          <DialogDescription
+            id="edit-about-dialog-description"
+            className="sr-only"
+          >
+            Edit your About to provide more information about yourself.
+          </DialogDescription>
         </DialogHeader>
 
         <EditStaffOverviewContent
@@ -265,11 +277,20 @@ const EditAboutDrawer = ({
           />
         </span>
       </DrawerTrigger>
-      <DrawerContent className="w-full px-3 py-4">
+      <DrawerContent
+        className="w-full px-3 py-4"
+        aria-describedby="edit-about-drawer-description"
+      >
         <div className="mx-auto w-full max-w-sm text-slate-800">
           <div className="no-scrollbar max-h-screen overflow-x-hidden overflow-y-scroll">
             <DrawerHeader>
               <DrawerTitle className="mb-2 mt-3">Edit About</DrawerTitle>
+              <DrawerDescription
+                id="edit-about-drawer-description"
+                className="sr-only"
+              >
+                Edit your About to provide more information about yourself.
+              </DrawerDescription>
             </DrawerHeader>
             <EditStaffOverviewContent
               sectionKind="about"

@@ -29,7 +29,7 @@ const StaffProfileNavMenuItemButton = ({
           setterFn(title);
         }}
         className={clsx(
-          `-mb-[1px] mr-2 cursor-pointer appearance-none rounded-sm border-none py-2 text-lg outline-none hover:text-black/50 dark:hover:text-gray-100`,
+          `-mb-[1px] mr-2 cursor-pointer appearance-none rounded-sm border-none py-2 text-lg outline-none hover:text-black/90 dark:hover:text-gray-100`,
           title === "Overview" && isDesktop && "pr-4",
           // title === "Publications" && "pl-4",
           (title === "Projects" ||
@@ -37,16 +37,23 @@ const StaffProfileNavMenuItemButton = ({
             title === "Publications" ||
             (!isDesktop && title === "Overview")) &&
             "px-4",
+          selected?.toLocaleLowerCase() === title?.toLocaleLowerCase() &&
+            "font-semibold",
         )}
         // bg-[rgb(37,37,37)] text-white
         style={{ transition: "background 200ms ease-in-out 0s" }}
       >
         {title}
       </button>
-      {selected?.toLocaleLowerCase() === title?.toLocaleLowerCase() && (
+      {selected?.toLocaleLowerCase() === title?.toLocaleLowerCase() ? (
         <div
-          // className={`border-b-2`}
-          style={{ borderBottom: `4px solid ${borderColor}` }}
+          className="pt-1"
+          style={{ borderBottom: `6px solid ${borderColor}` }}
+        />
+      ) : (
+        <div
+          className="pt-[8px]"
+          style={{ borderBottom: `2px solid ${borderColor}` }}
         />
       )}
     </div>
