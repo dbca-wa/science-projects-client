@@ -65,7 +65,7 @@ const StaffContent = ({
       <div
         className={clsx(
           "w-full",
-          isDesktop && "min-w-[685px]",
+          isDesktop && "min-w-[720px]",
           !isDesktop && "min-w-[500px]",
         )}
       >
