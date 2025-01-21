@@ -1282,7 +1282,9 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           // If user is already being cared for by this user (check if user pk is in caretaking_for)
                           user?.caretaking_for?.some(
                             (obj) => obj.pk === me?.userData?.pk,
-                          )
+                          ) ||
+                          // If user already has a caretaker set
+                          me?.userData?.caretakers?.length > 0
                         }
                       >
                         Set as Caretaker

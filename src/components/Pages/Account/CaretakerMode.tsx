@@ -29,6 +29,7 @@ import { useNoImage } from "@/lib/hooks/helper/useNoImage";
 import { RemoveCaretakerModal } from "@/components/Modals/Caretakers/RemoveCaretakerModal";
 import { checkIfDateExpired } from "@/lib/utils/checkIfDateExpired";
 import { ExtendCaretakerModal } from "@/components/Modals/Caretakers/ExtendCaretakerModal";
+import CaretakerUserDisplay from "./CaretakerUserDisplay";
 
 const CaretakerModePage = () => {
   const baseAPI = useApiEndpoint();
@@ -37,7 +38,6 @@ const CaretakerModePage = () => {
   const { userData, userLoading } = useUser();
   const { caretakerData, caretakerDataLoading, refetchCaretakerData } =
     useCheckExistingCaretaker();
-  console.log(caretakerData);
 
   const [pk, setPk] = useState<number | undefined>(undefined);
   const [caretakerPk, setCaretakerPk] = useState<number | undefined>(undefined);
@@ -46,7 +46,7 @@ const CaretakerModePage = () => {
     "leave" | "resignation" | "other" | null
   >(null);
   const [notes, setNotes] = useState<string | undefined>(undefined);
-
+  // console.log(caretakerData);
   console.log(userData);
   // useEffect(() => {
   //   console.log({
@@ -137,33 +137,29 @@ const CaretakerModePage = () => {
               You are caretaking for the following user:
             </Text>
             <Box className="mt-4">
-              {userData?.caretaking_for.map((user) => (
-                <Flex
-                  className="items-center justify-between gap-4 py-2"
-                  key={user.email}
-                >
-                  <Flex className="items-center gap-4">
-                    <Avatar
-                      size="md"
-                      name={`${user.display_first_name} ${user.display_last_name}`}
-                      src={
-                        user.image
-                          ? user.image?.startsWith("http")
-                            ? `${user.image}`
-                            : `${baseAPI}${user.image}`
-                          : noImage
-                      }
-                    />
-                    <Text
-                      fontSize={"md"}
-                      fontWeight={"semibold"}
-                      color={colorMode === "light" ? "gray.800" : "gray.200"}
-                    >
-                      {user.display_first_name} {user.display_last_name}
-                    </Text>
-                  </Flex>
-                  <Button>Remove</Button>
-                </Flex>
+              {userData?.caretaking_for.map((caretaken_user) => (
+                <CaretakerUserDisplay
+                  key={
+                    typeof caretaken_user === "object"
+                      ? caretaken_user.pk
+                      : caretaken_user
+                  }
+                  refetchCaretakerData={refetchCaretakerData}
+                  caretakerObject={{
+                    // id:
+                    caretaker_obj_id: caretaken_user?.caretaker_obj_id,
+                    user: caretaken_user,
+                    caretaker: {
+                      pk: userData.pk,
+                      display_first_name: userData?.display_first_name,
+                      display_last_name: userData?.display_last_name,
+                      image: userData?.image,
+                    },
+                    end_date: null,
+                    reason: null,
+                    notes: null,
+                  }}
+                />
               ))}
             </Box>
           </Box>
@@ -252,7 +248,7 @@ const CaretakerModePage = () => {
                     e.target.value as "leave" | "resignation" | "other" | null,
                   )
                 }
-                value={reason}
+                value={reason ?? undefined}
               >
                 <option value="leave">On Leave</option>
                 <option value="resignation">Leaving the Department</option>
@@ -411,12 +407,12 @@ const CaretakerModePage = () => {
         </div>
       ) : caretakerData?.caretaker_object !== null ? (
         <>
-          <RemoveCaretakerModal
-            isOpen={removeModalIsOpen}
-            onClose={onRemoveModalClose}
-            refetch={refetchCaretakerData}
-            caretakerObject={caretakerData?.caretaker_object}
-          />
+          {/* <RemoveCaretakerModal
+                     isOpen={removeModalIsOpen}
+                     onClose={onRemoveModalClose}
+                     refetch={refetchCaretakerData}
+                     caretakerObject={caretakerData?.caretaker_object}
+                   /> */}
           <div className="my-4">
             <Text color={"red.500"} fontSize={"md"}>
               You have an active caretaker.

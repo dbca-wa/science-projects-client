@@ -140,74 +140,6 @@ export const TraditionalTasksAndProjects = () => {
             </motion.div>
           )}
 
-          {/* Caretaker Tasks */}
-          {me?.userData?.caretaking_for?.length > 0 ? (
-            pendingCaretakerTasksLoading ? (
-              <Center my={4}>
-                <Spinner />
-              </Center>
-            ) : (
-              <motion.div
-                initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
-                animate={{
-                  opacity: pendingCaretakerTasksLoading ? 0 : 1,
-                }}
-                transition={{ duration: 0.4 }} // Animation duration in seconds
-              >
-                <AccordionItem
-                  borderColor={
-                    colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
-                  }
-                  borderBottom={"none"}
-                  borderTop={
-                    me?.userData?.is_superuser === true
-                      ? "1px gray.300"
-                      : "none"
-                  }
-                >
-                  <AccordionButton
-                    bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                    color={colorMode === "light" ? "black" : "white"}
-                    _hover={
-                      colorMode === "light"
-                        ? { bg: "gray.300", color: "black" }
-                        : { bg: "gray.500", color: "white" }
-                    }
-                    userSelect={"none"}
-                  >
-                    <Box as="span" flex="1" textAlign="left">
-                      Caretaker Tasks
-                    </Box>
-
-                    {/* </Box> */}
-                    {pendingCaretakerTaskData?.all?.length >= 1 ? (
-                      <Box
-                        display={"inline-flex"}
-                        justifyContent={"center"}
-                        alignItems={"center"}
-                      >
-                        <Box mr={2}>
-                          {pendingCaretakerTaskData?.all?.length}
-                        </Box>
-                        <FcHighPriority />
-                      </Box>
-                    ) : (
-                      <FcOk />
-                    )}
-                    <AccordionIcon />
-                  </AccordionButton>
-
-                  <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
-                    <DocumentsDataTable
-                      pendingProjectDocumentData={pendingCaretakerTaskData}
-                      isCaretakerTable
-                    />
-                  </AccordionPanel>
-                </AccordionItem>
-              </motion.div>
-            )
-          ) : null}
-
           {/* Admin Tasks */}
           {me?.userData?.is_superuser === true ? (
             pendingAdminTasksLoading ? (
@@ -261,6 +193,74 @@ export const TraditionalTasksAndProjects = () => {
                   <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
                     <AdminTasksDataTable
                       pendingAdminTaskData={pendingAdminTaskData}
+                    />
+                  </AccordionPanel>
+                </AccordionItem>
+              </motion.div>
+            )
+          ) : null}
+
+          {/* Caretaker Tasks */}
+          {me?.userData?.caretaking_for?.length > 0 ? (
+            pendingCaretakerTasksLoading ? (
+              <Center my={4}>
+                <Spinner />
+              </Center>
+            ) : (
+              <motion.div
+                initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
+                animate={{
+                  opacity: pendingCaretakerTasksLoading ? 0 : 1,
+                }}
+                transition={{ duration: 0.4 }} // Animation duration in seconds
+              >
+                <AccordionItem
+                  borderColor={
+                    colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
+                  }
+                  borderBottom={"none"}
+                  // borderTop={
+                  //   me?.userData?.is_superuser === true
+                  //     ? "1px gray.300"
+                  //     : "none"
+                  // }
+                >
+                  <AccordionButton
+                    bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                    color={colorMode === "light" ? "black" : "white"}
+                    _hover={
+                      colorMode === "light"
+                        ? { bg: "gray.300", color: "black" }
+                        : { bg: "gray.500", color: "white" }
+                    }
+                    userSelect={"none"}
+                  >
+                    <Box as="span" flex="1" textAlign="left">
+                      Caretaker Tasks
+                    </Box>
+
+                    {/* </Box> */}
+                    {pendingCaretakerTaskData?.all?.length >= 1 ? (
+                      <Box
+                        display={"inline-flex"}
+                        justifyContent={"center"}
+                        alignItems={"center"}
+                      >
+                        <Box mr={2}>
+                          {pendingCaretakerTaskData?.all?.length}
+                        </Box>
+                        <FcHighPriority />
+                      </Box>
+                    ) : (
+                      <FcOk />
+                    )}
+                    <AccordionIcon />
+                  </AccordionButton>
+
+                  <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+                    <DocumentsDataTable
+                      pendingProjectDocumentData={pendingCaretakerTaskData}
+                      isCaretakerTable
                     />
                   </AccordionPanel>
                 </AccordionItem>

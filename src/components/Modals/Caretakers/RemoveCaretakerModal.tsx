@@ -46,7 +46,7 @@ export const RemoveCaretakerModal = ({
 }: IModalProps) => {
   const { colorMode } = useColorMode();
   const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
-
+  console.log(caretakerObject);
   useEffect(() => {
     if (isToastOpen) {
       onClose();
@@ -155,7 +155,9 @@ export const RemoveCaretakerModal = ({
   const onSubmit = async (formData: ISimpleIdProp) => {
     // console.log(formData);
     await removeCaretakerMutation.mutateAsync({
-      id: caretakerObject?.id,
+      id: caretakerObject?.caretaker_obj_id
+        ? caretakerObject.caretaker_obj_id
+        : caretakerObject?.id,
     });
   };
 
@@ -201,7 +203,10 @@ export const RemoveCaretakerModal = ({
                 isLoading={removeCaretakerMutation.isPending}
                 onClick={() =>
                   onSubmit({
-                    id: caretakerObject?.id,
+                    id:
+                      caretakerObject?.id !== undefined
+                        ? caretakerObject.id
+                        : caretakerObject?.caretaker_obj_id,
                   })
                 }
                 ml={3}

@@ -229,7 +229,7 @@ export const SetCaretakerForMyAccountModal = ({
                         | null,
                     )
                   }
-                  value={reason}
+                  value={reason ?? undefined}
                 >
                   <option value="leave">On Leave</option>
                   <option value="resignation">Leaving the Department</option>

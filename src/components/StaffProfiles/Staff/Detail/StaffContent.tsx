@@ -7,6 +7,7 @@ import PublicationsSection from "./PublicationsSection";
 import ScrollArea from "./ScrollArea";
 import { IStaffProfileBaseData, IUserMe } from "@/types";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
+import clsx from "clsx";
 
 const NavMenuItemButton = ({
   title,
@@ -31,7 +32,15 @@ const NavMenuItemButton = ({
           // console.log(`Setting to ${title}`);
           setterFn(title);
         }}
-        className={`-mb-[1px] mr-2 cursor-pointer appearance-none rounded-sm border-none px-4 py-2 text-lg outline-none hover:text-black/50 dark:hover:text-gray-100`}
+        className={clsx(
+          `-mb-[1px] mr-2 cursor-pointer appearance-none rounded-sm border-none py-2 text-lg outline-none hover:text-black/50 dark:hover:text-gray-100`,
+          title === "Overview" && "pr-4",
+          // title === "Publications" && "pl-4",
+          (title === "Projects" ||
+            title === "CV" ||
+            title === "Publications") &&
+            "px-4",
+        )}
         // bg-[rgb(37,37,37)] text-white
         style={{ transition: "background 200ms ease-in-out 0s" }}
       >
@@ -39,8 +48,8 @@ const NavMenuItemButton = ({
       </button>
       {selected?.toLocaleLowerCase() === title?.toLocaleLowerCase() && (
         <div
-          className={`border-b-2`}
-          style={{ borderBottom: `2px solid ${borderColor}` }}
+          // className={`border-b-2`}
+          style={{ borderBottom: `4px solid ${borderColor}` }}
         />
       )}
     </div>
@@ -68,7 +77,7 @@ const StaffContent = ({
     <div className="mx-auto w-full dark:text-slate-300">
       {/* Scrollbar / Navigation */}
       <div className={`${!isDesktop ? "flex justify-center" : ""}`}>
-        <div style={{ unicodeBidi: "isolate" }} className="mt-2">
+        <div style={{ unicodeBidi: "isolate" }} className="mt-2 px-4">
           <ScrollArea
             hideScrollbar={true}
             showOverflowIndicator={true}
