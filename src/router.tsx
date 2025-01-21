@@ -32,6 +32,7 @@ import { TestEmailPage } from "./routes/TestEmailPage";
 import { TestPlayground } from "./routes/TestPlayground";
 import { Users } from "./routes/Users";
 import { ScienceStaffLayout } from "./components/StaffProfiles/ScienceStaffLayout";
+import { error } from "console";
 
 const inAppRouteArray = [
   // Login
@@ -349,6 +350,7 @@ const staffProfilesAppArray = [
         <ScienceStaff />
       </ScienceStaffLayout>
     ),
+    // errorElement: <ErrorHandler />,
   },
   {
     path: "/staff/:staffProfilePk",
@@ -357,6 +359,7 @@ const staffProfilesAppArray = [
         <ScienceStaffDetail />
       </ScienceStaffLayout>
     ),
+    // errorElement: <ErrorHandler />,
   },
 ];
 

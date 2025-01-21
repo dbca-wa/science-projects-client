@@ -1178,6 +1178,7 @@ export interface IStaffOverviewData {
   user: IStaffUser;
   about: string;
   expertise: string;
+  keyword_tags: KeywordTag[];
 }
 
 // Projects (Handled elsewhere - user projects)

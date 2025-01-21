@@ -15,18 +15,11 @@ const ProjectsSection = ({
   userId: number;
   buttonsVisible;
 }) => {
-  const { userProjectsLoading, userProjectsData } = useInvolvedProjects(userId);
-  const currentYear = useCurrentYear();
+  const { userProjectsLoading, userProjectsData, refetchUserProjects } =
+    useInvolvedProjects(userId);
 
   const sortByStartDate = (a, b) => {
     return Number(b.start_date) - Number(a.start_date); // Sort in descending order
-  };
-
-  const checkYearForPresent = (thisYear: number, value: number) => {
-    if (thisYear <= value) {
-      return "Present";
-    }
-    return value;
   };
 
   // Split into "Current" and "Prior" projects based on status
@@ -59,7 +52,7 @@ const ProjectsSection = ({
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <div className="mt-4 w-full px-4">
+    <div className="w-full">
       {userProjectsLoading ? (
         <SimpleSkeletonSection project />
       ) : userProjectsData?.length > 0 ? (
@@ -75,6 +68,8 @@ const ProjectsSection = ({
                   section="current"
                   projects={currentProjects}
                   buttonsVisible={buttonsVisible}
+                  userId={userId}
+                  refetch={refetchUserProjects}
                 />
               ) : null}
 
@@ -85,6 +80,8 @@ const ProjectsSection = ({
                     section="closed"
                     projects={priorProjects}
                     buttonsVisible={buttonsVisible}
+                    userId={userId}
+                    refetch={refetchUserProjects}
                   />
                 </>
               ) : null}

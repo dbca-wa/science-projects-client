@@ -902,17 +902,20 @@ export interface IUpdateStaffOverviewSection {
   pk: number;
   about?: string;
   expertise?: string;
+  keyword_tags?: KeywordTag[];
 }
 
 export const updateStaffProfileOverviewSection = async ({
   pk,
   about,
   expertise,
+  keyword_tags,
 }: IUpdateStaffOverviewSection) => {
   const res = instance
     .put(`users/staffprofiles/${pk}`, {
       about,
       expertise,
+      keyword_tags,
     })
     .then((res) => {
       // console.log(res.data)

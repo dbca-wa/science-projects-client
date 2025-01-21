@@ -3,7 +3,7 @@ import { IProjectData } from "../../../types";
 import { getUsersProjects } from "../../api/api";
 
 export const useInvolvedProjects = (pk: number) => {
-  const { isPending, data } = useQuery({
+  const { isPending, data, refetch } = useQuery({
     queryKey: ["userProjects", pk],
     queryFn: getUsersProjects,
     retry: false,
@@ -11,5 +11,6 @@ export const useInvolvedProjects = (pk: number) => {
   return {
     userProjectsLoading: isPending,
     userProjectsData: data as IProjectData[],
+    refetchUserProjects: refetch,
   };
 };

@@ -1,6 +1,8 @@
 import replaceDarkWithLight from "@/lib/hooks/helper/replaceDarkWithLight";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
+import EditStaffProjectDescrtiption from "./EditStaffProjectDescrtiption";
+import hasMeaningfulContent from "@/lib/utils/hasMeaningfulContent";
 
 interface IProjectItemProps {
   pk: number;
@@ -12,6 +14,8 @@ interface IProjectItemProps {
   kind: string;
   isOnly: boolean;
   isLast: boolean;
+  // canEdit: boolean;
+  refetch: () => void;
 }
 
 const StaffProjectItem = ({
@@ -24,6 +28,8 @@ const StaffProjectItem = ({
   kind,
   isOnly,
   isLast,
+  // canEdit,
+  refetch,
   // addSeparator,
 }: IProjectItemProps) => {
   const roleDict = {
@@ -93,33 +99,18 @@ const StaffProjectItem = ({
       }
     });
 
-    return doc.body.innerHTML;
-  };
-
-  const hasMeaningfulContent = (
-    description: string | null | undefined,
-  ): boolean => {
-    if (!description) return false; // Return false if description is null or undefined.
-
-    // Create a temporary DOM element to parse the HTML string.
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = description;
-
-    // Extract the text content and trim it to remove whitespace.
-    const textContent = tempDiv.textContent?.trim() || "";
-
-    // Return true if there is any non-empty text content.
-    return textContent.length > 0;
+    return doc.body.innerHTML.trim();
   };
 
   return (
-    <div className="relative h-full pl-6">
+    <div className="relative h-full pl-4">
       {/* Vertical line that spans full height */}
       <div
         className={clsx(
-          "absolute left-0 top-6 w-[1px] bg-gray-200",
+          "absolute left-0 top-6 -ml-0.5 w-[1px] bg-gray-200",
           {
             // Style depending on the position of the item in the list
+
             // If it's the only item, have no height
             // "h-[0px]": isOnly,
 
@@ -142,60 +133,74 @@ const StaffProjectItem = ({
 
       {/* Dot marker */}
       {/* <div className="absolute left-0 top-2 h-5 w-5 rounded-full border-2 border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800" /> */}
-      <div className="absolute -left-[1.3px] mr-2 mt-[9px] size-1 rounded-full bg-gray-500"></div>
+      <div className="absolute -left-[1.3px] -ml-0.5 mr-2 mt-[9px] size-1 rounded-full bg-gray-500"></div>
 
       {/* Content container */}
       <div className="mb-2">
         {/* Title Role, Date date section */}
-        <div className="mb-2">
-          {buttonsVisible ? (
-            <a
-              className="text-[14px] font-semibold text-blue-500 hover:cursor-pointer hover:underline dark:text-slate-400"
-              dangerouslySetInnerHTML={{
-                __html: sanitizeHtml(replaceDarkWithLight(title || "")),
-              }}
-              onClick={(e) => {
-                if (e.ctrlKey || e.metaKey) {
-                  if (process.env.NODE_ENV === "development") {
-                    window.open(`/projects/${pk}/overview`, "_blank");
-                  } else {
-                    window.open(
-                      `${VITE_PRODUCTION_BASE_URL}projects/${pk}/overview`,
-                      "_blank",
-                    );
-                  }
-                } else {
-                  if (process.env.NODE_ENV === "development") {
-                    navigate(`/projects/${pk}/overview`);
-                  } else {
-                    setHref(
-                      `${VITE_PRODUCTION_BASE_URL}projects/${pk}/overview`,
-                    );
-                  }
-                }
-              }}
-            />
-          ) : (
-            <p
-              className="text-[14px] font-semibold text-slate-700 dark:text-slate-400"
-              dangerouslySetInnerHTML={{
-                __html: sanitizeHtml(replaceDarkWithLight(title || "")),
-              }}
-            />
-          )}
+        <div className="mb-2 flex w-full items-start justify-between">
+          <div className="flex w-fit flex-col">
+            {/* Title */}
+            <div className="w-fit">
+              {buttonsVisible ? (
+                <a
+                  className="text-[14px] font-semibold text-blue-500 hover:cursor-pointer hover:underline dark:text-slate-400"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(replaceDarkWithLight(title || "")),
+                  }}
+                  onClick={(e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                      if (process.env.NODE_ENV === "development") {
+                        window.open(`/projects/${pk}/overview`, "_blank");
+                      } else {
+                        window.open(
+                          `${VITE_PRODUCTION_BASE_URL}projects/${pk}/overview`,
+                          "_blank",
+                        );
+                      }
+                    } else {
+                      if (process.env.NODE_ENV === "development") {
+                        navigate(`/projects/${pk}/overview`);
+                      } else {
+                        setHref(
+                          `${VITE_PRODUCTION_BASE_URL}projects/${pk}/overview`,
+                        );
+                      }
+                    }
+                  }}
+                />
+              ) : (
+                <p
+                  className="text-[14px] font-semibold text-slate-700 dark:text-slate-400"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(replaceDarkWithLight(title || "")),
+                  }}
+                />
+              )}
+            </div>
 
-          {/* Role and Dates */}
-          <div className="flex">
-            <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-600">
-              {roleDict[role].string} | {datesString}
-            </p>
-          </div>
-          {(kind === "student" || kind === "external") && (
+            {/* Role and Dates */}
             <div className="flex">
-              <p className="text-sm font-normal text-slate-400 dark:text-slate-600">
-                {kind === "student" ? "Student Project" : "External Project"}
+              <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-600">
+                {roleDict[role].string} | {datesString}
               </p>
             </div>
+            {(kind === "student" || kind === "external") && (
+              <div className="flex">
+                <p className="text-sm font-normal text-slate-400 dark:text-slate-600">
+                  {kind === "student" ? "Student Project" : "External Project"}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Edit Button (For Description) */}
+          {roleDict[role].string === "Project Leader" && buttonsVisible && (
+            <EditStaffProjectDescrtiption
+              projectId={pk}
+              projectDescription={description}
+              refetch={refetch}
+            />
           )}
         </div>
 
