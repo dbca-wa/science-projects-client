@@ -312,6 +312,19 @@ export const batchApproveProgressAndStudentReports = async () => {
   return res;
 };
 
+export const toggleStaffProfileVisibility = async ({
+  staffProfilePk,
+}: {
+  staffProfilePk: number;
+}) => {
+  const res = instance
+    .post(`users/staffprofiles/${staffProfilePk}/toggle_visibility`)
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
+
 export interface INewCycle {
   alsoUpdate: boolean;
   shouldSendEmails: boolean;

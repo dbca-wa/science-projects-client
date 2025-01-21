@@ -333,6 +333,7 @@ export interface ICaretakerObject {
 export interface IUserMe {
   staff_profile_pk?: number;
   public_email?: string;
+  staff_profile_hidden?: boolean;
   id?: number;
   pk?: number;
   caretakers: ICaretakerSimpleUserData[];

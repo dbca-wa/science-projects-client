@@ -28,6 +28,7 @@ import { useEffect, useRef, useState } from "react";
 import EditStaffHeroContent from "../../Modals/EditStaffKeywordsContent";
 import React from "react";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { Button } from "@/components/ui/button";
 
 interface IStaffHeroProp {
   viewingUser: IUserMe;

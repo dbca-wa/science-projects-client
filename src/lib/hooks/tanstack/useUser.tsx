@@ -5,7 +5,7 @@ import { getMe } from "../../api/api";
 import { IUserMe } from "../../../types";
 
 export const useUser = () => {
-  const { isPending, data, isError } = useQuery({
+  const { isPending, data, isError, refetch } = useQuery({
     queryKey: ["me"],
     queryFn: getMe,
     retry: false, //immediate fail if not logged in
@@ -15,5 +15,6 @@ export const useUser = () => {
     userLoading: isPending,
     userData: data as IUserMe,
     isLoggedIn: !isError,
+    refetchUser: refetch,
   };
 };

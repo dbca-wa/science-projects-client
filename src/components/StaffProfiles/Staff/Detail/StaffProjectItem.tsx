@@ -124,7 +124,7 @@ const StaffProjectItem = ({
               !isLast && !isOnly && hasMeaningfulContent(description),
 
             // If it's not the last/only item and doesn't have description
-            "h-[calc(100%-2rem)] pb-6":
+            "h-[calc(100%-1rem)] pb-6":
               !isLast && !isOnly && !hasMeaningfulContent(description),
           },
           "dark:bg-gray-700",
@@ -180,9 +180,12 @@ const StaffProjectItem = ({
             </div>
 
             {/* Role and Dates */}
-            <div className="flex">
+            <div className="flex flex-col">
               <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-600">
-                {roleDict[role].string} | {datesString}
+                {roleDict[role].string}
+              </p>
+              <p className="text-[13px] font-normal text-slate-500 dark:text-slate-600">
+                {datesString}
               </p>
             </div>
             {(kind === "student" || kind === "external") && (

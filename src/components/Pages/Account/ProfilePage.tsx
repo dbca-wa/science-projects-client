@@ -23,7 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { AiFillCloseCircle, AiFillEdit } from "react-icons/ai";
+import { AiFillCloseCircle, AiFillEdit, AiFillEye } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
@@ -37,6 +37,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { IUpdatePublicEmail, updatePublicEmail } from "@/lib/api/api";
 import { AxiosError } from "axios";
+import HideStaffProfileModal from "@/components/Modals/ToggleStaffProfileVisibilityModal";
 
 const AnimatedClickToEdit = () => {
   return (
@@ -56,7 +57,7 @@ const AnimatedClickToEdit = () => {
 };
 
 export const ProfilePage = () => {
-  const { userLoading: loading, userData: me } = useUser();
+  const { userLoading: loading, userData: me, refetchUser } = useUser();
   const VITE_PRODUCTION_PROFILES_BASE_URL = import.meta.env
     .VITE_PRODUCTION_PROFILES_BASE_URL;
   const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
@@ -148,6 +149,12 @@ export const ProfilePage = () => {
     onClose: onCloseEditMembershipModal,
   } = useDisclosure();
 
+  const {
+    isOpen: isToggleStaffProfileVisibilityModalOpen,
+    onOpen: onOpenToggleStaffProfileVisibilityModal,
+    onClose: onCloseToggleStaffProfileVisibilityModal,
+  } = useDisclosure();
+
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const handleMouseEnter = (itemName: string) => {
@@ -183,6 +190,7 @@ export const ProfilePage = () => {
       public_email: "",
     },
   });
+
   const beginUpdatePublicEmail = (formData: IUpdatePublicEmail) => {
     console.log(formData);
     updatePublicEmailMutation.mutate(formData);
@@ -230,9 +238,9 @@ export const ProfilePage = () => {
     },
   });
 
-  // useEffect(() => {
-  //   console.log(me);
-  // }, [me]);
+  useEffect(() => {
+    console.log(me);
+  }, [me]);
 
   return (
     <Box h={"100%"}>
@@ -261,6 +269,14 @@ export const ProfilePage = () => {
             userId={me.pk}
             isOpen={isEditMembershipModalOpen}
             onClose={onCloseEditMembershipModal}
+          />
+
+          <HideStaffProfileModal
+            isOpen={isToggleStaffProfileVisibilityModalOpen}
+            onClose={onCloseToggleStaffProfileVisibilityModal}
+            staffProfilePk={me?.staff_profile_pk}
+            isHidden={me?.staff_profile_hidden}
+            refetch={refetchUser}
           />
 
           {/* ACCESS PUBLIC PROFILE */}
@@ -309,7 +325,7 @@ export const ProfilePage = () => {
                   w={"100%"}
                   flexDir={{
                     base: "column",
-                    lg: "row",
+                    // lg: "row",
                   }}
                 >
                   {/* View Public Profile Button */}
@@ -348,7 +364,7 @@ export const ProfilePage = () => {
                   </Flex>
 
                   {/* Set Profile to Hidden */}
-                  {/* <Flex
+                  <Flex
                     justifyContent={"end"}
                     alignItems={"center"}
                     w={"100%"}
@@ -359,13 +375,15 @@ export const ProfilePage = () => {
                       aria-label="A tooltip"
                     >
                       <Button
-                        onClick={() => console.log("Setting hidden")}
+                        onClick={onOpenToggleStaffProfileVisibilityModal}
                         leftIcon={<AiFillEye />}
                       >
-                        Hide Profile
+                        {me?.staff_profile_hidden
+                          ? "Show Staff Profile"
+                          : "Hide Staff Profile"}
                       </Button>
                     </Tooltip>
-                  </Flex> */}
+                  </Flex>
                 </Flex>
               </Flex>
               <Flex flexDir={"row"} className="mt-4 w-full items-center">

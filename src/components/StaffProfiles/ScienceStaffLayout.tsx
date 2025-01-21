@@ -15,7 +15,7 @@ export const ScienceStaffLayout = ({ children }: { children: ReactNode }) => {
       w={"100vw"}
       overscrollBehaviorY={"none"}
       // overflowY={"scroll"}
-      minW={"720px"}
+      minW={"420px"}
       display="flex"
       flexDirection="column"
       pos={"fixed"}

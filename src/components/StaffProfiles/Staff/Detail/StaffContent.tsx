@@ -66,7 +66,7 @@ const StaffContent = ({
         className={clsx(
           "w-full",
           isDesktop && "min-w-[720px]",
-          !isDesktop && "min-w-[500px]",
+          !isDesktop && "w-[420px]",
         )}
       >
         {selectedNav === "Overview" ? (
