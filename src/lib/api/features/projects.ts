@@ -512,6 +512,24 @@ export const updateProjectDetails = async ({
     .then((d) => d.data);
 };
 
+export interface IUpdateProjectDescription {
+  pk: number;
+  description: string;
+}
+
+export const updateProjectDescription = async ({
+  pk,
+  description,
+}: IUpdateProjectDescription) => {
+  const data = {
+    description: description,
+  };
+  const res = instance.put(`projects/${pk}`, data).then((res) => {
+    return res.data;
+  });
+  return res;
+};
+
 export const getMyProjectsBasedOnSearchTerm = async (
   searchTerm: string,
   userPk: number,

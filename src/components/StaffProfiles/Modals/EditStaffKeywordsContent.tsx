@@ -3,30 +3,28 @@ import { DrawerClose } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { IUpdateStaffHeroSection, updateStaffHeroSection } from "@/lib/api/api";
 // import { useMediaQuery } from "@/lib/utils/useMediaQuery";
-import { IStaffProfileHeroData } from "@/types";
+import { IStaffOverviewData, IStaffProfileHeroData } from "@/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import StaffKeywordManager from "../Staff/Detail/StaffKeywordManager";
 
-export interface EditStaffHeroProps {
-  sectionKind: "keyword_tags";
-  staffHeroData: IStaffProfileHeroData;
+export interface EditStaffKeywordsProps {
+  staffOverviewData: IStaffOverviewData;
   usersPk: number;
   refetch: () => void;
   onClose: () => void;
   kind: "drawer" | "dialog";
 }
 
-const EditStaffHeroContent = ({
+const EditStaffKeywordsContent = ({
   usersPk,
   refetch,
   kind,
-  staffHeroData,
+  staffOverviewData,
   onClose,
-  sectionKind,
-}: EditStaffHeroProps) => {
+}: EditStaffKeywordsProps) => {
   const {
     register,
     handleSubmit,
@@ -36,8 +34,8 @@ const EditStaffHeroContent = ({
   } = useForm<IUpdateStaffHeroSection>({
     mode: "onChange",
     defaultValues: {
-      pk: staffHeroData?.pk,
-      keyword_tags: staffHeroData?.keyword_tags,
+      pk: staffOverviewData?.pk,
+      keyword_tags: staffOverviewData?.keyword_tags,
     },
   });
 
@@ -81,21 +79,19 @@ const EditStaffHeroContent = ({
             type="hidden"
             {...register("pk", {
               required: true,
-              value: staffHeroData?.pk,
+              value: staffOverviewData?.pk,
             })}
             readOnly
           />
 
-          {sectionKind === "keyword_tags" && (
-            <Controller
-              name="keyword_tags"
-              control={control}
-              defaultValue={staffHeroData?.keyword_tags}
-              render={({ field }) => (
-                <StaffKeywordManager registerFn={register} field={field} />
-              )}
-            />
-          )}
+          <Controller
+            name="keyword_tags"
+            control={control}
+            defaultValue={staffOverviewData?.keyword_tags}
+            render={({ field }) => (
+              <StaffKeywordManager registerFn={register} field={field} />
+            )}
+          />
         </div>
 
         <div className="flex w-full justify-end">
@@ -117,4 +113,4 @@ const EditStaffHeroContent = ({
     </div>
   );
 };
-export default EditStaffHeroContent;
+export default EditStaffKeywordsContent;

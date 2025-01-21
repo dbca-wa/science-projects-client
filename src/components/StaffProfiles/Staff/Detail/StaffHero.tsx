@@ -25,7 +25,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useEffect, useRef, useState } from "react";
-import EditStaffHeroContent from "../../Modals/EditStaffHeroContent";
+import EditStaffHeroContent from "../../Modals/EditStaffKeywordsContent";
 import React from "react";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 
@@ -83,7 +83,7 @@ const StaffHero = ({
                     : ""
                 }
                 alt={`Profile of ${staffHeroData?.name}`}
-                className="h-28 w-28 rounded-lg object-cover"
+                className="size-28 rounded-lg object-cover"
                 onError={() => setIsImageError(true)}
               />
             </div>
@@ -118,54 +118,6 @@ const StaffHero = ({
                 </p>
               </>
             )}
-            <div
-              className={`flex flex-col items-center justify-center ${staffHeroData?.keyword_tags.length > 0 && "mb-1 mt-1"}`}
-            >
-              <p
-                className={`text-balance text-muted-foreground ${staffHeroData?.keyword_tags?.length > 0 && "mt-3"}`}
-              >
-                {staffHeroData?.keyword_tags?.map(
-                  (tag: { pk: number; name: string }, idx: number) => {
-                    return (
-                      <React.Fragment key={tag.pk}>
-                        {tag.name}
-                        {(idx + 1) % 3 !== 0 &&
-                          idx < staffHeroData.keyword_tags.length - 1 &&
-                          " | "}
-                        {(idx + 1) % 3 === 0 && <br />}
-                      </React.Fragment>
-                    );
-                  },
-                )}
-              </p>
-              {(String(viewingUser?.pk) === usersPk ||
-                viewingUser?.is_superuser) &&
-              buttonsVisible ? (
-                <>
-                  <div className="mt-4 flex">
-                    {(staffHeroData?.keyword_tags?.length === 0 ||
-                      !staffHeroData?.keyword_tags) && (
-                      <p className="text-balance text-muted-foreground">
-                        No keywords
-                      </p>
-                    )}
-                    {isDesktop ? (
-                      <EditKeywordsDialog
-                        userPk={Number(usersPk)}
-                        refetch={refetch}
-                        staffHeroData={staffHeroData}
-                      />
-                    ) : (
-                      <EditKeywordsDrawer
-                        userPk={Number(usersPk)}
-                        refetch={refetch}
-                        staffHeroData={staffHeroData}
-                      />
-                    )}
-                  </div>
-                </>
-              ) : null}
-            </div>
           </div>
         </div>
 
@@ -217,11 +169,11 @@ const StaffHero = ({
                     : ""
                 }
                 alt={`Profile of ${staffHeroData?.name}`}
-                className="mr-4 h-44 w-44 flex-shrink-0 rounded-lg object-cover"
+                className="mr-4 size-[150px] flex-shrink-0 rounded-lg object-cover"
                 onError={() => setIsImageError(true)}
               />
             )}
-            {/* Name, Title and Tag, email, keywords */}
+            {/* Name, Title and Tag, email */}
             <div className="flex w-full flex-col px-2">
               <p className="text-2xl font-semibold">
                 {staffHeroData?.title && `${staffHeroData?.title}. `}
@@ -271,70 +223,6 @@ const StaffHero = ({
               ) : null}
             </div>
           </div>
-          {/* Keywords */}
-          <div
-            className={`pb-4 pt-0 ${staffHeroData?.keyword_tags.length > 0 && "max-w-full border-b-2 border-gray-100"}`}
-          >
-            <div className="flex items-center">
-              <TagList staffHeroData={staffHeroData} />
-
-              {buttonsVisible === true ? (
-                String(viewingUser?.pk) === usersPk ||
-                viewingUser?.is_superuser ? (
-                  <div
-                    className={`${staffHeroData?.keyword_tags?.length < 1 ? "mt-4" : ""}`}
-                  >
-                    <EditKeywordsDialog
-                      userPk={Number(usersPk)}
-                      refetch={refetch}
-                      staffHeroData={staffHeroData}
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className={`${staffHeroData?.keyword_tags?.length < 1 ? "mt-4" : ""}`}
-                  >
-                    <EditKeywordsDrawer
-                      userPk={Number(usersPk)}
-                      refetch={refetch}
-                      staffHeroData={staffHeroData}
-                    />
-                  </div>
-                )
-              ) : null}
-            </div>
-            {(String(viewingUser?.pk) === usersPk ||
-              viewingUser?.is_superuser) &&
-            buttonsVisible ? (
-              <>
-                <div className="mt-2 flex items-center">
-                  {(staffHeroData?.keyword_tags?.length === 0 ||
-                    !staffHeroData?.keyword_tags) && (
-                    <p className="text-balance text-muted-foreground">
-                      No keywords
-                    </p>
-                  )}
-                  {/* {isDesktop &&
-                  (String(viewingUser?.pk) === usersPk ||
-                    viewingUser?.is_superuser) &&
-                  buttonsVisible ? (
-                    <EditKeywordsDialog
-                      userPk={Number(usersPk)}
-                      refetch={refetch}
-                      staffHeroData={staffHeroData}
-                    />
-                  ) : (
-                    <EditKeywordsDrawer
-                      userPk={Number(usersPk)}
-                      refetch={refetch}
-                      staffHeroData={staffHeroData}
-                    />
-                  )} */}
-                </div>
-              </>
-            ) : null}
-          </div>
-          {/*Keyword end */}
         </div>
       </div>
     )
@@ -346,155 +234,3 @@ const StaffHero = ({
   );
 };
 export default StaffHero;
-
-const EditKeywordsDialog = ({
-  userPk,
-  refetch,
-  staffHeroData,
-}: {
-  userPk: number;
-  refetch: () => void;
-  staffHeroData: IStaffProfileHeroData;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  // const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger
-      // asChild
-      >
-        <span className="flex items-center">
-          <AddItemButton
-            ml={4}
-            // mt={-3}
-            icon={MdEdit}
-            ariaLabel={"Edit Tags Button"}
-            label={"Edit Tags"}
-            onClick={() => {}}
-            innerItemSize={"20px"}
-            p={1}
-          />
-        </span>
-      </DialogTrigger>
-      <DialogContent className="max-h-[80vh] w-[700px] max-w-[700px] overflow-y-auto text-slate-800">
-        <DialogHeader>
-          <DialogTitle className="mb-2 mt-3">Edit Keywords</DialogTitle>
-        </DialogHeader>
-        <EditStaffHeroContent
-          sectionKind="keyword_tags"
-          staffHeroData={staffHeroData}
-          usersPk={userPk}
-          refetch={refetch}
-          onClose={handleClose}
-          kind={"dialog"}
-        />{" "}
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const EditKeywordsDrawer = ({
-  userPk,
-  refetch,
-  staffHeroData,
-}: {
-  userPk: number;
-  refetch: () => void;
-  staffHeroData: IStaffProfileHeroData;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  // const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
-
-  return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger>
-        <span className="flex items-center">
-          <AddItemButton
-            ml={4}
-            // mt={-3}
-            icon={MdEdit}
-            ariaLabel={"Edit Tags Button"}
-            label={"Edit Tags"}
-            onClick={() => {}}
-            innerItemSize={"20px"}
-            p={1}
-            outline={"none"}
-          />
-        </span>
-      </DrawerTrigger>
-      <DrawerContent className="p-3">
-        <div className="mx-auto w-full max-w-sm text-slate-800">
-          <div className="no-scrollbar max-h-screen overflow-x-hidden overflow-y-scroll">
-            <DrawerHeader>
-              <DrawerTitle className="mb-2 mt-3">Edit Keywords</DrawerTitle>
-            </DrawerHeader>
-            <EditStaffHeroContent
-              sectionKind="keyword_tags"
-              staffHeroData={staffHeroData}
-              usersPk={userPk}
-              refetch={refetch}
-              onClose={handleClose}
-              kind={"drawer"}
-            />{" "}
-          </div>
-        </div>
-      </DrawerContent>
-    </Drawer>
-  );
-};
-
-const TagList = ({ staffHeroData }) => {
-  const containerRef = useRef(null);
-
-  return (
-    <p
-      ref={containerRef}
-      className={`text-balance text-muted-foreground ${staffHeroData?.keyword_tags?.length > 0 && "mt-3"}`}
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "0.25rem",
-        whiteSpace: "normal",
-        wordBreak: "break-word",
-      }}
-    >
-      {staffHeroData?.keyword_tags
-        ?.sort((a, b) => a.name.localeCompare(b.name))
-        ?.map((tag, idx) => {
-          return (
-            <React.Fragment key={tag.pk}>
-              {/* Render the tag */}
-              <span
-                id={`tag-${idx}`}
-                style={{
-                  whiteSpace: "normal",
-                  overflowWrap: "break-word",
-                  display: "inline",
-                }}
-              >
-                {tag.name}
-              </span>
-
-              {/* Render the separator, but ensure it doesn’t wrap onto a new line by using a non-breaking space */}
-              {idx < staffHeroData.keyword_tags.length - 1 && (
-                <span
-                  className="separator"
-                  style={{
-                    marginLeft: "0.05rem",
-                    marginRight: "0.05rem",
-                  }}
-                >
-                  &nbsp;|&nbsp;
-                </span>
-              )}
-            </React.Fragment>
-          );
-        })}
-    </p>
-  );
-};

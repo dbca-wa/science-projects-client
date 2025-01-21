@@ -12,13 +12,13 @@ const Subsection = ({
   button?: ReactElement;
   divider?: boolean;
 }) => (
-  <div className="p-4">
-    <div className="flex min-w-[270px] justify-between">
+  <div className="w-full p-4">
+    <div className="flex w-full min-w-[270px] justify-between">
       <p className="text-lg font-semibold">{title}</p>
       {button && button}
     </div>
     {divider && <Divider mt={2} mb={1} bg={"gray.300"} />}
-    {children}
+    <div className="w-full">{children}</div>
   </div>
 );
 export default Subsection;

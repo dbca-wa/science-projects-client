@@ -8,53 +8,7 @@ import ScrollArea from "./ScrollArea";
 import { IStaffProfileBaseData, IUserMe } from "@/types";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import clsx from "clsx";
-
-const NavMenuItemButton = ({
-  title,
-  setterFn,
-  selected,
-}: {
-  title: string;
-  setterFn: React.Dispatch<React.SetStateAction<string>>;
-  selected?: string;
-}) => {
-  const colorDict = {
-    Overview: "#2A6096",
-    Projects: "#01A7B2",
-    CV: "#1E5456",
-    Publications: "#FFC530",
-  };
-  const borderColor = colorDict[title as keyof typeof colorDict];
-  return (
-    <div>
-      <button
-        onClick={() => {
-          // console.log(`Setting to ${title}`);
-          setterFn(title);
-        }}
-        className={clsx(
-          `-mb-[1px] mr-2 cursor-pointer appearance-none rounded-sm border-none py-2 text-lg outline-none hover:text-black/50 dark:hover:text-gray-100`,
-          title === "Overview" && "pr-4",
-          // title === "Publications" && "pl-4",
-          (title === "Projects" ||
-            title === "CV" ||
-            title === "Publications") &&
-            "px-4",
-        )}
-        // bg-[rgb(37,37,37)] text-white
-        style={{ transition: "background 200ms ease-in-out 0s" }}
-      >
-        {title}
-      </button>
-      {selected?.toLocaleLowerCase() === title?.toLocaleLowerCase() && (
-        <div
-          // className={`border-b-2`}
-          style={{ borderBottom: `4px solid ${borderColor}` }}
-        />
-      )}
-    </div>
-  );
-};
+import StaffProfileNavMenuItemButton from "./StaffProfileNavMenuItemButton";
 
 const StaffContent = ({
   buttonsVisible,
@@ -87,17 +41,17 @@ const StaffContent = ({
             }
           >
             <div className="relative flex pb-2">
-              <NavMenuItemButton
+              <StaffProfileNavMenuItemButton
                 setterFn={setSelectedNav}
                 selected={selectedNav}
                 title={"Overview"}
               />
-              <NavMenuItemButton
+              <StaffProfileNavMenuItemButton
                 setterFn={setSelectedNav}
                 selected={selectedNav}
                 title={"Projects"}
               />
-              <NavMenuItemButton
+              <StaffProfileNavMenuItemButton
                 setterFn={setSelectedNav}
                 selected={selectedNav}
                 title={"CV"}
@@ -108,14 +62,20 @@ const StaffContent = ({
       </div>
 
       {/* Content */}
-      <div className="w-full min-w-[360px]">
+      <div
+        className={clsx(
+          "w-full",
+          isDesktop && "min-w-[685px]",
+          !isDesktop && "min-w-[500px]",
+        )}
+      >
         {selectedNav === "Overview" ? (
           <OverviewSection
             userId={usersPk}
             buttonsVisible={buttonsVisible}
             viewingUser={viewingUser}
-            refetchBaseData={refetchBaseData}
-            baseData={baseData}
+            // refetchBaseData={refetchBaseData}
+            // baseData={baseData}
           />
         ) : selectedNav === "Projects" ? (
           <ProjectsSection userId={usersPk} buttonsVisible={buttonsVisible} />

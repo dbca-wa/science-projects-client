@@ -11,12 +11,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import DatabaseRichTextEditor from "../Editor/DatabaseRichTextEditor";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
+import StaffKeywordManager from "../Staff/Detail/StaffKeywordManager";
 
 export interface EditOverviewProps {
   usersPk: number;
   refetch: () => void;
   // staffProfilePk: number;
-  sectionKind: "about" | "expertise";
+  sectionKind: "about" | "expertise" | "keyword_tags";
   staffOverviewData: IStaffOverviewData;
   kind: "drawer" | "dialog";
   onClose: () => void;
@@ -127,6 +128,17 @@ const EditStaffOverviewContent = ({
                   registerFn={register}
                   isMobile={!isDesktop}
                 />
+              )}
+            />
+          )}
+
+          {sectionKind === "keyword_tags" && (
+            <Controller
+              name="keyword_tags"
+              control={control}
+              defaultValue={staffOverviewData?.keyword_tags}
+              render={({ field }) => (
+                <StaffKeywordManager registerFn={register} field={field} />
               )}
             />
           )}

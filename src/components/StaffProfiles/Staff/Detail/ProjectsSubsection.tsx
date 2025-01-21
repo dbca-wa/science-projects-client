@@ -3,14 +3,23 @@ import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import { IProjectData } from "@/types";
 import React from "react";
 import StaffProjectItem from "./StaffProjectItem";
+import Subsection from "./Subsection";
 
 interface IProps {
   section: "current" | "closed";
   projects: IProjectData[];
   buttonsVisible: boolean;
+  userId: number;
+  refetch: () => void;
 }
 
-const ProjectsSubsection = ({ section, projects, buttonsVisible }) => {
+const ProjectsSubsection = ({
+  section,
+  projects,
+  buttonsVisible,
+  userId,
+  refetch,
+}) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const currentYear = useCurrentYear();
   const checkYearForPresent = (thisYear: number, value: number) => {
@@ -21,14 +30,10 @@ const ProjectsSubsection = ({ section, projects, buttonsVisible }) => {
   };
 
   return (
-    <>
-      <div className="mb-0 mt-2 flex items-center">
-        <h3 className="text-xl font-bold text-slate-700 dark:text-slate-400">
-          {section === "current" ? "Current Projects" : "Closed Projects"}
-        </h3>
-        {/* <hr className="ml-4 mt-[6px] flex-grow border-gray-300 dark:border-slate-600" /> */}
-      </div>
-
+    <Subsection
+      title={section === "current" ? "Current Projects" : "Closed Projects"}
+      divider={true}
+    >
       <div className="px-2 py-3">
         {projects?.map((proj, index) => {
           return (
@@ -50,11 +55,13 @@ const ProjectsSubsection = ({ section, projects, buttonsVisible }) => {
               kind={proj.kind}
               isOnly={projects.length === 1}
               isLast={projects[projects.length - 1] === proj}
+              // canEdit={proj.role === "leader" || proj.role === "member"}
+              refetch={refetch}
             />
           );
         })}
       </div>
-    </>
+    </Subsection>
   );
 };
 

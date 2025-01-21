@@ -42,7 +42,7 @@ const CVSection = ({
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
-    <div className="pb-6">
+    <div className="w-full pb-6">
       {!staffCVLoading ? (
         <>
           <Subsection
@@ -104,8 +104,10 @@ const CVSection = ({
                 ))}
 
               {staffCVData?.employment?.length === 0 && (
-                <div>
-                  <p>No information recorded</p>
+                <div className="mt-2 flex w-full items-center">
+                  <p className="text-balance text-muted-foreground">
+                    No information available.
+                  </p>
                 </div>
               )}
             </div>
@@ -173,8 +175,10 @@ const CVSection = ({
                   />
                 ))}
               {staffCVData?.education?.length === 0 && (
-                <div>
-                  <p>No information recorded</p>
+                <div className="mt-2 flex w-full items-center">
+                  <p className="text-balance text-muted-foreground">
+                    No information available.
+                  </p>
                 </div>
               )}
             </div>
