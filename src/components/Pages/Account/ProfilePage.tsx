@@ -37,7 +37,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { IUpdatePublicEmail, updatePublicEmail } from "@/lib/api/api";
 import { AxiosError } from "axios";
-import HideStaffProfileModal from "@/components/Modals/ToggleStaffProfileVisibilityModal";
+import ToggleStaffProfileVisibilityModal from "@/components/Modals/ToggleStaffProfileVisibilityModal";
 
 const AnimatedClickToEdit = () => {
   return (
@@ -271,7 +271,7 @@ export const ProfilePage = () => {
             onClose={onCloseEditMembershipModal}
           />
 
-          <HideStaffProfileModal
+          <ToggleStaffProfileVisibilityModal
             isOpen={isToggleStaffProfileVisibilityModalOpen}
             onClose={onCloseToggleStaffProfileVisibilityModal}
             staffProfilePk={me?.staff_profile_pk}
@@ -717,7 +717,7 @@ export const ProfilePage = () => {
               </Text>
             </Box>
 
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
+            <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={8}>
               <Flex flexDir={"column"}>
                 <Text color={subsectionTitleColor} fontSize={"sm"}>
                   Image

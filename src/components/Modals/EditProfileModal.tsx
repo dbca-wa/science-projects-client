@@ -198,7 +198,7 @@ export const EditProfileModal = ({
         {!isLoading && (
           <>
             <ModalBody pos="relative" flex={1}>
-              <Box my={2} mb={4} userSelect="none">
+              <Box userSelect="none">
                 <InputGroup>
                   <Input
                     type="hidden"
@@ -208,6 +208,23 @@ export const EditProfileModal = ({
                 </InputGroup>
               </Box>
               <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
+                <Box>
+                  <FormLabel>Image</FormLabel>
+                  <StatefulMediaChanger
+                    helperText={"Upload an image that represents you."}
+                    selectedImageUrl={selectedImageUrl}
+                    setSelectedImageUrl={setSelectedImageUrl}
+                    selectedFile={selectedFile}
+                    setSelectedFile={setSelectedFile}
+                    clearImageAddedFunctionality={async () => {
+                      const data = await removeUserAvatar({
+                        pk: Number(userId),
+                      });
+                      queryClient.refetchQueries();
+                    }}
+                  />
+                </Box>
+
                 <Box my={2}>
                   <Controller
                     name="about"
@@ -246,25 +263,6 @@ export const EditProfileModal = ({
                     )}
                   />
                 </Box>
-
-                <Grid>
-                  <Box>
-                    <FormLabel>Image</FormLabel>
-                    <StatefulMediaChanger
-                      helperText={"Upload an image that represents you."}
-                      selectedImageUrl={selectedImageUrl}
-                      setSelectedImageUrl={setSelectedImageUrl}
-                      selectedFile={selectedFile}
-                      setSelectedFile={setSelectedFile}
-                      clearImageAddedFunctionality={async () => {
-                        const data = await removeUserAvatar({
-                          pk: Number(userId),
-                        });
-                        queryClient.refetchQueries();
-                      }}
-                    />
-                  </Box>
-                </Grid>
               </Grid>
             </ModalBody>
             <ModalFooter>
