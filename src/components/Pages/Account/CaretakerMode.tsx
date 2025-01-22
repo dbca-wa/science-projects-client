@@ -133,7 +133,7 @@ const CaretakerModePage = () => {
         // Show any users that the current user is a caretaker for
         userData?.caretaking_for?.length > 0 && (
           <Box mb={4}>
-            <Text className="font-semibold">
+            <Text className="font-semibold" color={"red.500"}>
               You are caretaking for the following user:
             </Text>
             <Box className="mt-4">
@@ -414,7 +414,7 @@ const CaretakerModePage = () => {
                      caretakerObject={caretakerData?.caretaker_object}
                    /> */}
           <div className="my-4">
-            <Text color={"red.500"} fontSize={"md"}>
+            <Text color={"red.500"} fontSize={"md"} fontWeight={"semibold"}>
               You have an active caretaker.
             </Text>
           </div>

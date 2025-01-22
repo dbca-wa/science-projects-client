@@ -65,7 +65,16 @@ const CaretakerUserDisplay = ({
             {caretakee.display_first_name} {caretakee.display_last_name}
           </Text>
         </Flex>
-        <Button onClick={onOpenRemoveModal}>Remove</Button>
+        <Button
+          onClick={onOpenRemoveModal}
+          color={"white"}
+          background={colorMode === "light" ? "red.500" : "red.600"}
+          _hover={{
+            background: colorMode === "light" ? "red.400" : "red.500",
+          }}
+        >
+          Remove
+        </Button>
       </Flex>
     </>
   );
