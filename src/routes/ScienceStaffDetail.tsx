@@ -52,16 +52,17 @@ const ScienceStaffDetail = () => {
   return (
     <div className="relative flex h-full w-full justify-center">
       <Head title={`DBCA | Staff Details`} isStandalone />
-      {viewingUser?.is_superuser ||
-        (viewingUser?.pk === Number(staffBaseData?.user?.pk) && (
-          <ToggleStaffProfileVisibilityModal
-            isOpen={isToggleStaffProfileVisibilityModalOpen}
-            onClose={onCloseToggleStaffProfileVisibilityModal}
-            staffProfilePk={viewingUser?.staff_profile_pk}
-            isHidden={viewingUser?.staff_profile_hidden}
-            refetch={refetchUser}
-          />
-        ))}
+      {((buttonsVisible && viewingUser?.is_superuser) ||
+        (buttonsVisible &&
+          viewingUser?.pk === Number(staffBaseData?.user?.pk))) && (
+        <ToggleStaffProfileVisibilityModal
+          isOpen={isToggleStaffProfileVisibilityModalOpen}
+          onClose={onCloseToggleStaffProfileVisibilityModal}
+          staffProfilePk={viewingUser?.staff_profile_pk}
+          profileIsHidden={viewingUser?.staff_profile_hidden}
+          refetch={refetchUser}
+        />
+      )}
 
       {!isNumeric ||
       (staffBaseData?.is_hidden &&
@@ -135,8 +136,9 @@ const ScienceStaffDetail = () => {
                   </Box>
                 </Tooltip>
               )}
-              {viewingUser?.pk === Number(staffBaseData?.user?.pk) ||
-              viewingUser?.is_superuser ? (
+              {(buttonsVisible &&
+                viewingUser?.pk === Number(staffBaseData?.user?.pk)) ||
+              (viewingUser?.is_superuser && buttonsVisible) ? (
                 <div className={`flex items-center justify-center`}>
                   <Tooltip aria-label="toggle-tooltip" label="Back to SPMS">
                     {isDesktop ? (
@@ -180,29 +182,18 @@ const ScienceStaffDetail = () => {
                   </Tooltip>
                 </div>
               ) : null}
-              {/* {(viewingUser?.is_superuser ||
-                viewingUser?.pk === Number(staffBaseData?.user?.pk)) && (
-                <Tooltip aria-label="toggle-tooltip" label="Toggle Edit/View">
-                  <Box>
-                    <BaseToggleOptionsButton
-                      iconOne={AiFillEye}
-                      colorSchemeOne="green"
-                      iconTwo={AiFillEyeInvisible}
-                      colorSchemeTwo="blue"
-                      currentState={buttonsVisible}
-                      setCurrentState={setButtonsVisible}
-                    />
-                  </Box>
-                </Tooltip>
-              )} */}
             </div>
-            {viewingUser?.is_superuser ||
-            viewingUser?.pk === Number(staffBaseData?.user?.pk) ? (
+            {(buttonsVisible && viewingUser?.is_superuser) ||
+            (buttonsVisible &&
+              viewingUser?.pk === Number(staffBaseData?.user?.pk)) ? (
               <div className={`flex w-full justify-center`}>
                 <div className="mt-4 w-full">
                   <Button
                     className="w-full"
-                    onClick={onOpenToggleStaffProfileVisibilityModal}
+                    onClick={() => {
+                      console.log("clicked");
+                      onOpenToggleStaffProfileVisibilityModal();
+                    }}
                   >
                     {viewingUser?.staff_profile_hidden ? "Show" : "Hide"}{" "}
                     Profile

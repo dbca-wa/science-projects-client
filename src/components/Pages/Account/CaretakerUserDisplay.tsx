@@ -15,9 +15,11 @@ import React from "react";
 const CaretakerUserDisplay = ({
   caretakerObject,
   refetchCaretakerData,
+  direct,
 }: {
   caretakerObject: ICaretakerObject;
   refetchCaretakerData?: () => void;
+  direct: boolean;
 }) => {
   const { colorMode } = useColorMode();
   const baseAPI = useApiEndpoint();

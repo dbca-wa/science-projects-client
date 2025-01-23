@@ -152,6 +152,7 @@ const StaffHero = ({
               // bg={"gray.500"}
               leftIcon={<ChevronLeft />}
               color={"black"}
+              ml={-2}
             >
               Back to Search
             </ChakraButton>

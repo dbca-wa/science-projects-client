@@ -369,11 +369,13 @@ export interface IUserMe {
 
 export interface ICaretakerSimpleUserData {
   pk: number;
+  is_superuser: boolean;
   caretaker_obj_id?: number;
   display_first_name: string | null;
   display_last_name: string | null;
   email: string;
   image: string;
+  caretakers: ICaretakerSimpleUserData[];
 }
 
 export interface IMemberUserDetails {
@@ -390,6 +392,8 @@ export interface IMemberUserDetails {
   branch: string | null;
   role: string | null;
   image: IImageData;
+  caretaking_for: ICaretakerSimpleUserData[];
+  caretakers: ICaretakerSimpleUserData[];
 }
 
 export interface IPersonalInformation {
@@ -684,7 +688,7 @@ interface IProjectMember {
   project: number;
   is_leader: boolean;
   user: IMemberUserDetails;
-  caretakers: IMemberUserDetails[] | null;
+  // caretakers: IMemberUserDetails[] | null;
   role: string;
   time_allocation: number;
   position: number;
