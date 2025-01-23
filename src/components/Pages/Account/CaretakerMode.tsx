@@ -134,7 +134,7 @@ const CaretakerModePage = () => {
         userData?.caretaking_for?.length > 0 && (
           <Box mb={4}>
             <Text className="font-semibold" color={"red.500"}>
-              You are caretaking for the following user:
+              You are caretaking for the following users:
             </Text>
             <Box className="mt-4">
               {userData?.caretaking_for.map((caretaken_user) => (
@@ -144,6 +144,7 @@ const CaretakerModePage = () => {
                       ? caretaken_user.pk
                       : caretaken_user
                   }
+                  direct={true}
                   refetchCaretakerData={refetchCaretakerData}
                   caretakerObject={{
                     // id:

@@ -175,7 +175,7 @@ const OverviewSection = ({
                 {(staffOverviewData?.keyword_tags?.length === 0 ||
                   !staffOverviewData?.keyword_tags) && (
                   <p className="text-balance text-muted-foreground">
-                    No keywords.
+                    No information available.
                   </p>
                 )}
               </div>

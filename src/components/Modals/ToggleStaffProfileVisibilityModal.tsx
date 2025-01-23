@@ -28,7 +28,7 @@ interface IToggleStaffProfileVisibilityModalProps {
   isOpen: boolean;
   onClose: () => void;
   staffProfilePk: number;
-  isHidden: boolean;
+  profileIsHidden: boolean;
   refetch: () => void;
 }
 
@@ -36,7 +36,7 @@ const ToggleStaffProfileVisibilityModal = ({
   isOpen,
   onClose,
   staffProfilePk,
-  isHidden,
+  profileIsHidden,
   refetch,
 }: IToggleStaffProfileVisibilityModalProps) => {
   const { colorMode } = useColorMode();
@@ -79,7 +79,7 @@ const ToggleStaffProfileVisibilityModal = ({
         toast.update(toastIdRef.current, {
           title: "Success",
           description: `Your profile is now ${
-            !isHidden ? "hidden" : "visible"
+            !profileIsHidden ? "hidden" : "visible"
           }.`,
           status: "success",
           position: "top-right",
@@ -162,25 +162,27 @@ const ToggleStaffProfileVisibilityModal = ({
       // as={"form"} onSubmit={handleSubmit(onSubmit)}
       >
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
-          <ModalHeader>{!isHidden ? "Hide" : "Show"} Staff Profile</ModalHeader>
+          <ModalHeader>
+            {!profileIsHidden ? "Hide" : "Show"} Staff Profile
+          </ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
             {/* <Center> */}
             <Text fontWeight={"bold"} fontSize={"xl"}>
-              Are you sure you want to {!isHidden ? "hide" : "show"} your staff
-              profile?
+              Are you sure you want to {!profileIsHidden ? "hide" : "show"} your
+              staff profile?
             </Text>
             {/* </Center> */}
             <Text mt={4}>
-              Your account {!isHidden ? " will no longer " : " will "}
+              Your account {!profileIsHidden ? " will no longer " : " will "}
               appear in the science profiles public directory. You can change
               this setting at any time.
             </Text>
 
             <Text mt={4}>
               If you would still like to proceed, press "
-              {!isHidden ? "Hide" : "Show"}".
+              {!profileIsHidden ? "Hide" : "Show"}".
             </Text>
           </ModalBody>
           <ModalFooter>
@@ -202,7 +204,7 @@ const ToggleStaffProfileVisibilityModal = ({
                 }
                 ml={3}
               >
-                {!isHidden ? "Hide" : "Show"}
+                {!profileIsHidden ? "Hide" : "Show"}
               </Button>
             </Grid>
           </ModalFooter>

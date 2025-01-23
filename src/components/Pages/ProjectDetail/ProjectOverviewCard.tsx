@@ -74,6 +74,7 @@ import { ActionAdminRequestModal } from "@/components/Modals/ActionAdminRequestM
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cancelAdminTaskRequestCall } from "@/lib/api/api";
 import { AxiosError } from "axios";
+import useCaretakerPermissions from "@/lib/hooks/helper/useCaretakerPermissions";
 
 interface IProjectOverviewCardProps {
   location: IProjectAreas;
@@ -94,7 +95,7 @@ export const ProjectOverviewCard = ({
   documents,
   setToLastTab,
 }: IProjectOverviewCardProps) => {
-  console.log(baseInformation);
+  // console.log(baseInformation);
   // useEffect(() => {
   //   console.log(details);
   // }, [details]);
@@ -332,6 +333,14 @@ export const ProjectOverviewCard = ({
   const userInTeam = useCheckUserInTeam(mePk, members);
   const userIsLeader = useCheckUserIsTeamLeader(mePk, members);
   const userIsBaLead = mePk === baseInformation?.business_area?.leader;
+
+  const {
+    userIsCaretakerOfMember,
+    userIsCaretakerOfProjectLeader,
+    userIsCaretakerOfBaLeader,
+    userIsCaretakerOfAdmin,
+  } = useCaretakerPermissions(me?.userData, members, baseInformation);
+
   // useCheckUserIsBaLeader(mePk, baseInformation?.business_area?.pk ? baseInformation?.business_area?.pk : baseInformation?.business_area?.id );
   // useEffect(() => { console.log(mePk, userInTeam) })
 
