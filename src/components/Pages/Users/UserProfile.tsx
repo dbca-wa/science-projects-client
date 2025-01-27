@@ -300,7 +300,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           )}
         </>
       )}
-      {caretakeeIsMe && (
+
+      {/* {caretakeeIsMe && (
         <RemoveCaretakerModal
           isOpen={isRemoveCaretakerAdminModalOpen}
           onClose={onCloseRemoveCaretakerAdminModal}
@@ -322,7 +323,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             refetchCaretakerData();
           }}
         />
-      )}
+      )} */}
+
       {/* <RemoveCaretakerModal
             isOpen={isRemoveCaretakerAdminModalOpen}
             onClose={onCloseRemoveCaretakerAdminModal}
@@ -1132,7 +1134,9 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         label={`This user has authority to act on ${obj.display_first_name} ${obj.display_last_name}'s behalf`}
                       >
                         {viewingUserIsAccount ||
-                          (viewingUserIsSuper && (
+                          viewingUserIsSuper ||
+                          caretakeeIsMe ||
+                          (caretakerIsMe && (
                             <RemoveCaretakerModal
                               isOpen={isRemoveCaretakerAdminModalOpen}
                               onClose={onCloseRemoveCaretakerAdminModal}

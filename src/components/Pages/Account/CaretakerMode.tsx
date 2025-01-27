@@ -18,7 +18,7 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaRunning } from "react-icons/fa";
 import { ShadcnDatePicker } from "./ShadcnDatePicker";
 import { useCheckExistingCaretaker } from "@/lib/hooks/tanstack/useCheckExistingCaretaker";
@@ -30,6 +30,9 @@ import { RemoveCaretakerModal } from "@/components/Modals/Caretakers/RemoveCaret
 import { checkIfDateExpired } from "@/lib/utils/checkIfDateExpired";
 import { ExtendCaretakerModal } from "@/components/Modals/Caretakers/ExtendCaretakerModal";
 import CaretakerUserDisplay from "./CaretakerUserDisplay";
+import getAllIndirectCaretakees from "@/lib/hooks/helper/getAllIndirectCaretakees";
+import { CaretakeeDataTable } from "./CaretakeeDataTable";
+import { MemoizedCaretakeeSection } from "./MemoizedCaretakeeSection";
 
 const CaretakerModePage = () => {
   const baseAPI = useApiEndpoint();
@@ -65,6 +68,11 @@ const CaretakerModePage = () => {
   //     caretakerDataLoading,
   //   });
   // }, [caretakerData, caretakerDataLoading]);
+
+  const indirectUsers = useMemo(
+    () => getAllIndirectCaretakees(userData?.caretaking_for),
+    [userData?.caretaking_for],
+  );
 
   //#region Modals
   const {
@@ -129,12 +137,17 @@ const CaretakerModePage = () => {
         </Text>
       </Box>
 
-      {
+      <MemoizedCaretakeeSection
+        userData={userData}
+        refetchCaretakerData={refetchCaretakerData}
+      />
+
+      {/* {
         // Show any users that the current user is a caretaker for
         userData?.caretaking_for?.length > 0 && (
           <Box mb={4}>
             <Text className="font-semibold" color={"red.500"}>
-              You are caretaking for the following users:
+              You are directly caretaking for the following users:
             </Text>
             <Box className="mt-4">
               {userData?.caretaking_for.map((caretaken_user) => (
@@ -144,7 +157,7 @@ const CaretakerModePage = () => {
                       ? caretaken_user.pk
                       : caretaken_user
                   }
-                  direct={true}
+                  direct={false}
                   refetchCaretakerData={refetchCaretakerData}
                   caretakerObject={{
                     // id:
@@ -163,9 +176,40 @@ const CaretakerModePage = () => {
                 />
               ))}
             </Box>
+
+            <Text className="font-semibold" color={"red.500"}>
+              You are indirectly caretaking for the following users:
+            </Text>
+            <Box className="mt-4">
+              {indirectUsers.map((indirect_user) => (
+                <CaretakerUserDisplay
+                  key={
+                    typeof indirect_user === "object"
+                      ? indirect_user.pk
+                      : indirect_user
+                  }
+                  direct={false}
+                  refetchCaretakerData={refetchCaretakerData}
+                  caretakerObject={{
+                    // id:
+                    caretaker_obj_id: indirect_user?.caretaker_obj_id,
+                    user: indirect_user,
+                    caretaker: {
+                      pk: userData.pk,
+                      display_first_name: userData?.display_first_name,
+                      display_last_name: userData?.display_last_name,
+                      image: userData?.image,
+                    },
+                    end_date: null,
+                    reason: null,
+                    notes: null,
+                  }}
+                />
+              ))}
+            </Box>
           </Box>
         )
-      }
+      } */}
 
       {caretakerData?.become_caretaker_request_object !== null &&
       caretakerData?.become_caretaker_request_object?.status === "pending" ? (
