@@ -292,6 +292,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               onClose={onCloseSetCaretakerMyModal}
               userIsSuper={userInQuestionIsSuperuser}
               userPk={user.pk}
+              userData={user}
               refetch={() => {
                 refetch();
                 refetchCaretakerData();
@@ -357,6 +358,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             onClose={onCloseSetCaretakerAdminModal}
             userIsSuper={userInQuestionIsSuperuser}
             userPk={user.pk}
+            userData={user}
             refetch={() => {
               refetch();
               refetchCaretakerData();

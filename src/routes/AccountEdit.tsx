@@ -6,7 +6,7 @@ import { Head } from "../components/Base/Head";
 import { SideMenuButton } from "../components/Pages/Account/SideMenuButton";
 import { ProfilePage } from "../components/Pages/Account/ProfilePage";
 import { AccountPageViewWrapper } from "../components/Wrappers/AccountPageViewWrapper";
-import CaretakerModePage from "@/components/Pages/Account/CaretakerMode";
+import CaretakerModePage from "@/components/Pages/Account/Caretaking/CaretakerMode";
 // import { PublicProfilePage } from "@/components/Pages/Account/PublicProfilePage";
 
 export const AccountEdit = () => {

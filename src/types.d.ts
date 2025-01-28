@@ -1376,3 +1376,9 @@ export interface ICommentReaction {
     | "funny"
     | "surprised";
 }
+
+export interface ICaretakerSubsections {
+  userData: IUserMe;
+  refetchCaretakerData: () => void;
+  caretakerData: ICheckCaretakerStatus;
+}

@@ -39,10 +39,11 @@ import {
 } from "../../../lib/api/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserSearchContext } from "../../../lib/hooks/helper/UserSearchContext";
-import { ICaretakerEntry } from "@/types";
+import { ICaretakerEntry, IUserMe } from "@/types";
 import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
 import { ShadcnDatePicker } from "../../Pages/Account/ShadcnDatePicker";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import useCaretakingChain from "@/lib/hooks/helper/useCaretakingChain";
 
 interface IModalProps {
   isOpen: boolean;
@@ -50,6 +51,7 @@ interface IModalProps {
   refetch: () => void;
   userIsSuper: boolean;
   userPk: string | number;
+  userData: IUserMe;
 }
 
 export const SetCaretakerAdminModal = ({
@@ -58,6 +60,7 @@ export const SetCaretakerAdminModal = ({
   userIsSuper,
   userPk,
   refetch,
+  userData,
 }: IModalProps) => {
   const [caretakerPk, setCaretakerPk] = useState<number | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -199,6 +202,8 @@ export const SetCaretakerAdminModal = ({
   // const formattedStart = useFormattedDate(startDate);
   const formattedEnd = useFormattedDate(endDate);
 
+  const ignoreArray = useCaretakingChain(userData);
+
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
       <ModalOverlay />
@@ -282,6 +287,7 @@ export const SetCaretakerAdminModal = ({
                     helperText={
                       "Who will look after their projects while they are gone?"
                     }
+                    ignoreArray={ignoreArray}
                   />
                 </>
               )}
