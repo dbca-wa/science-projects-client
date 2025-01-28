@@ -531,12 +531,18 @@ export const getInternalUsersBasedOnSearchTerm = async (
   searchTerm: string,
   onlyInternal: boolean,
   projectPk?: number,
+  ignoreArray?: number[],
 ) => {
   try {
     let url = `users/smallsearch`;
 
     if (searchTerm !== "") {
       url += `?searchTerm=${searchTerm}`;
+    }
+
+    if (ignoreArray && ignoreArray.length > 0) {
+      // Spread the ignoreArray into a string separated by commas
+      url += `${searchTerm ? "&" : "?"}ignoreArray=${ignoreArray.join(",")}`;
     }
 
     url += `${searchTerm ? "&" : "?"}onlyInternal=${onlyInternal === undefined || onlyInternal == false ? "False" : "True"}`;

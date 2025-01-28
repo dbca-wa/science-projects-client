@@ -45,6 +45,7 @@ interface IUserSearchDropdown {
   isEditable?: boolean;
   projectPk?: number;
   isClosed?: boolean;
+  ignoreArray?: number[];
 }
 
 export const UserSearchDropdown = forwardRef(
@@ -63,6 +64,7 @@ export const UserSearchDropdown = forwardRef(
       isEditable,
       projectPk,
       isClosed,
+      ignoreArray,
     }: IUserSearchDropdown,
     ref,
   ) => {
@@ -89,7 +91,12 @@ export const UserSearchDropdown = forwardRef(
 
     useEffect(() => {
       if (projectPk || searchTerm.trim() !== "") {
-        getInternalUsersBasedOnSearchTerm(searchTerm, onlyInternal, projectPk)
+        getInternalUsersBasedOnSearchTerm(
+          searchTerm,
+          onlyInternal,
+          projectPk,
+          ignoreArray,
+        )
           .then((data) => {
             console.log(data.users);
             if (data.users.length === 0) {
@@ -221,37 +228,42 @@ export const UserSearchDropdown = forwardRef(
         </FormHelperText>
         {showAddUser && (
           <>
-            <CreateUserModal
-              onClose={onCloseCreateUserModal}
-              isOpen={isCreateUserModalOpen}
-            />
-            <EmailSiteLinkModal
-              onClose={onCloseEmailSiteLinkModal}
-              isOpen={isEmailSiteLinkModalOpen}
-            />
-            <Flex mt={4} mb={2} justifyContent={"flex-end"}>
-              <Button
-                color={"white"}
-                bg={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  bg: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
-                onClick={onOpenCreateUserModal}
-              >
-                Add New External User
-              </Button>
-              <Button
-                ml={3}
-                color={"white"}
-                bg={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  bg: colorMode === "light" ? "green.400" : "green.500",
-                }}
-                onClick={onOpenEmailSiteLinkModal}
-              >
-                Send Link to DBCA Staff
-              </Button>
-            </Flex>{" "}
+            {!ignoreArray ||
+              (ignoreArray?.length < 1 && (
+                <>
+                  <CreateUserModal
+                    onClose={onCloseCreateUserModal}
+                    isOpen={isCreateUserModalOpen}
+                  />
+                  <EmailSiteLinkModal
+                    onClose={onCloseEmailSiteLinkModal}
+                    isOpen={isEmailSiteLinkModalOpen}
+                  />
+                  <Flex mt={4} mb={2} justifyContent={"flex-end"}>
+                    <Button
+                      color={"white"}
+                      bg={colorMode === "light" ? "blue.500" : "blue.600"}
+                      _hover={{
+                        bg: colorMode === "light" ? "blue.400" : "blue.500",
+                      }}
+                      onClick={onOpenCreateUserModal}
+                    >
+                      Add New External User
+                    </Button>
+                    <Button
+                      ml={3}
+                      color={"white"}
+                      bg={colorMode === "light" ? "green.500" : "green.600"}
+                      _hover={{
+                        bg: colorMode === "light" ? "green.400" : "green.500",
+                      }}
+                      onClick={onOpenEmailSiteLinkModal}
+                    >
+                      Send Link to DBCA Staff
+                    </Button>
+                  </Flex>{" "}
+                </>
+              ))}
           </>
         )}
       </FormControl>

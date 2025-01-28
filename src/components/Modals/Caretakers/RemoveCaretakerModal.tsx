@@ -96,13 +96,21 @@ export const RemoveCaretakerModal = ({
           isClosable: true,
         });
       }
+
+      // Explicitly call refetch after invalidating queries
       queryClient
         .invalidateQueries({
           queryKey: ["caretakers"],
         })
-        .then(() => refetch())
-        .then(() => onClose());
+        .then((r) =>
+          queryClient.invalidateQueries({
+            queryKey: ["myCaretakerStatus"],
+          }),
+        )
+        .then((r) => refetch()) // Explicit call to refetch
+        .then((r) => onClose());
     },
+
     // Error handling based on API - file - declared interface
     onError: (error) => {
       console.log(error);

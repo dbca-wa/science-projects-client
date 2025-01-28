@@ -1,6 +1,7 @@
 import { IUserMe } from "@/types";
 import { CaretakeeDataTable } from "./CaretakeeDataTable";
 import React from "react";
+import isEqual from "lodash.isequal";
 
 export const MemoizedCaretakeeSection = React.memo(
   ({
@@ -21,10 +22,10 @@ export const MemoizedCaretakeeSection = React.memo(
     );
   },
   (prevProps, nextProps) => {
-    // Only re-render if caretaking_for data has changed
-    return (
-      JSON.stringify(prevProps.userData?.caretaking_for) ===
-      JSON.stringify(nextProps.userData?.caretaking_for)
+    // Use lodash's isEqual for deep comparison of caretaking_for
+    return isEqual(
+      prevProps.userData?.caretaking_for,
+      nextProps.userData?.caretaking_for,
     );
   },
 );
