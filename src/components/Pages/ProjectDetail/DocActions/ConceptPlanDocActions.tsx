@@ -26,31 +26,30 @@ import {
   // generateConceptPlan,
   setProjectStatus,
   spawnNewEmptyDocument,
-} from "../../../../lib/api/api";
-import { useFormattedDate } from "../../../../lib/hooks/helper/useFormattedDate";
-import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea";
-import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
-import { useProjectTeam } from "../../../../lib/hooks/tanstack/useProjectTeam";
-import { useUser } from "../../../../lib/hooks/tanstack/useUser";
-import {
-  IConceptPlan,
-  IProjectDocuments,
-  IProjectMember,
-} from "../../../../types";
+} from "@/lib/api/api";
+import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
+import { useBusinessArea } from "@/lib/hooks/tanstack/useBusinessArea";
+import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
+import { useProjectTeam } from "@/lib/hooks/tanstack/useProjectTeam";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
+import { IConceptPlan, IProjectDocuments, IProjectMember } from "@/types";
 import { ConceptPlanActionModal } from "../../../Modals/DocumentActionModals/ConceptPlanActionModal";
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
+import useCaretakerPermissions from "@/lib/hooks/helper/useCaretakerPermissions";
 
 interface IConceptDocumentActions {
   conceptPlanData: IConceptPlan;
   refetchData: () => void;
   all_documents: IProjectDocuments;
+  members: IProjectMember[];
 }
 
 export const ConceptPlanDocActions = ({
   all_documents,
   conceptPlanData,
   refetchData,
+  members,
 }: // , projectPk
 IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
@@ -103,6 +102,32 @@ IConceptDocumentActions) => {
   const { baData, baLoading } = useBusinessArea(
     conceptPlanData?.document?.project?.business_area?.pk,
   );
+
+  const {
+    userIsCaretakerOfMember,
+    userIsCaretakerOfProjectLeader,
+    userIsCaretakerOfBaLeader,
+    userIsCaretakerOfAdmin,
+  } = useCaretakerPermissions(
+    userData,
+    members,
+    conceptPlanData?.document?.project,
+  );
+
+  useEffect(() => {
+    console.log({
+      userIsCaretakerOfMember,
+      userIsCaretakerOfProjectLeader,
+      userIsCaretakerOfBaLeader,
+      userIsCaretakerOfAdmin,
+    });
+  }, [
+    userIsCaretakerOfMember,
+    userIsCaretakerOfProjectLeader,
+    userIsCaretakerOfBaLeader,
+    userIsCaretakerOfAdmin,
+  ]);
+
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
     conceptPlanData?.document?.modifier,
@@ -595,7 +620,9 @@ IConceptDocumentActions) => {
                       ?.business_area_lead_approval_granted === false &&
                       conceptPlanData?.document
                         ?.project_lead_approval_granted === true &&
-                      (userData?.is_superuser ||
+                      (userIsCaretakerOfBaLeader ||
+                        userIsCaretakerOfProjectLeader ||
+                        userData?.is_superuser ||
                         userData?.pk === leaderMember?.user?.pk ||
                         userData?.pk === baLead?.pk) && (
                         <Center justifyContent={"flex-end"}>
@@ -638,7 +665,9 @@ IConceptDocumentActions) => {
                         conceptPlanData?.document?.pk) &&
                       conceptPlanData?.document
                         ?.project_lead_approval_granted === false &&
-                      (userData?.is_superuser ||
+                      (userIsCaretakerOfBaLeader ||
+                        userIsCaretakerOfProjectLeader ||
+                        userData?.is_superuser ||
                         userData?.pk === leaderMember?.user?.pk ||
                         userData?.pk === baLead?.pk) && (
                         <Center justifyContent={"flex-end"}>
@@ -737,7 +766,8 @@ IConceptDocumentActions) => {
                       conceptPlanData?.document
                         ?.business_area_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === baLead?.pk) && (
+                        userData?.pk === baLead?.pk ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                         // justifyContent={"flex-start"}
                         // ml={4}
@@ -784,7 +814,8 @@ IConceptDocumentActions) => {
                       conceptPlanData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.leader === baData?.leader) && (
+                        userData?.business_area?.leader === baData?.leader ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                           // justifyContent={"flex-start"}
                           ml={3}
@@ -828,7 +859,8 @@ IConceptDocumentActions) => {
                       conceptPlanData?.document
                         ?.business_area_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === baData?.leader) && (
+                        userData?.pk === baData?.leader ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                           // justifyContent={"flex-end"}
                           ml={3}
@@ -922,7 +954,8 @@ IConceptDocumentActions) => {
                       conceptPlanData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userData?.business_area?.name === "Directorate" ||
+                        userIsCaretakerOfAdmin) && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ConceptPlanActionModal
                             userData={userData}
@@ -964,7 +997,8 @@ IConceptDocumentActions) => {
 
                     {conceptPlanData?.document?.directorate_approval_granted &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userData?.business_area?.name === "Directorate" ||
+                        userIsCaretakerOfAdmin) && (
                         // !all_documents?.project_plan &&
                         <Center justifyContent={"flex-start"} ml={3}>
                           <ConceptPlanActionModal
@@ -1021,7 +1055,8 @@ IConceptDocumentActions) => {
                     {conceptPlanData?.document
                       ?.business_area_lead_approval_granted &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.name === "Directorate") &&
+                        userData?.business_area?.name === "Directorate" ||
+                        userIsCaretakerOfAdmin) &&
                       !conceptPlanData?.document
                         ?.directorate_approval_granted && (
                         <Center ml={3} justifyContent={"flex-end"}>

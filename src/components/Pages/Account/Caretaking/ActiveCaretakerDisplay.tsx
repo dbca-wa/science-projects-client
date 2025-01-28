@@ -36,6 +36,10 @@ const ActiveCaretakerDisplay = ({
     onClose: onExtendModalClose,
   } = useDisclosure();
 
+  const isExpiredCaretakerDate = checkIfDateExpired(
+    caretakerData?.caretaker_object?.end_date,
+  );
+
   return (
     <>
       {/* Actual Caretaker */}
@@ -88,10 +92,12 @@ const ActiveCaretakerDisplay = ({
                 </Text>
                 {caretakerData?.caretaker_object?.end_date && (
                   <Text fontSize={"sm"} color={"gray.500"}>
-                    {`Ends ${formatDate(
-                      caretakerData?.caretaker_object?.end_date,
-                      "dd/MM/yyyy",
-                    )}
+                    {isExpiredCaretakerDate
+                      ? `(Expired)`
+                      : `Ends ${formatDate(
+                          caretakerData?.caretaker_object?.end_date,
+                          "dd/MM/yyyy",
+                        )}
                    `}
                   </Text>
                 )}

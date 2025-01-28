@@ -33,7 +33,7 @@ export const ConceptPlanContents = ({
   baseAPI,
   baLead,
 }: // setToLastTab,
-  Props) => {
+Props) => {
   const { colorMode } = useColorMode();
 
   const documentType = "conceptplan";
@@ -63,6 +63,7 @@ export const ConceptPlanContents = ({
       <ConceptPlanDocActions
         all_documents={all_documents}
         conceptPlanData={document}
+        members={members}
         refetchData={refetch}
       />
 
