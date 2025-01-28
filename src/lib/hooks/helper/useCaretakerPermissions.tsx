@@ -73,10 +73,11 @@ const checkCaretakerOfMember = (
   myData: IUserMe,
   members: IProjectMember[],
 ): boolean => {
+  console.log("Members:", members);
   return members.some((member) =>
     myData.caretaking_for?.some(
       (caretakee) =>
-        member.pk === caretakee?.pk ||
+        member?.user?.pk === caretakee?.pk ||
         (caretakee?.pk &&
           member.user?.pk &&
           isCaretakerRecursive(
@@ -191,7 +192,7 @@ const checkCaretakerOfAdmin = (
 const useCaretakerPermissions = (
   myData: IUserMe | undefined,
   members: IProjectMember[],
-  baseInformation?: IProjectData,
+  baseInformation: IProjectData,
 ): ICaretakerPermissions => {
   return useMemo(() => {
     // Early return for invalid data
