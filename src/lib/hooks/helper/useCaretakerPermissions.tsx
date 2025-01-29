@@ -1,3 +1,4 @@
+import { checkIfDateExpired } from "@/lib/utils/checkIfDateExpired";
 import {
   ICaretakerPermissions,
   ICaretakerSimpleUserData,
@@ -5,6 +6,7 @@ import {
   IProjectMember,
   IUserMe,
 } from "@/types";
+import { isValid } from "date-fns";
 import { useMemo } from "react";
 
 // Constants for better maintainability
@@ -15,15 +17,35 @@ const PERMISSION_DEFAULTS = {
   userIsCaretakerOfAdmin: false,
 };
 
+const isValidCaretakingRelationship = (
+  caretakee: ICaretakerSimpleUserData,
+): boolean => {
+  console.log("Checking if caretaking relationship is valid:", caretakee);
+  if (!caretakee?.end_date) return true;
+  const dateIsExpired = checkIfDateExpired(new Date(caretakee.end_date));
+  console.log("Date expired status:", dateIsExpired);
+  return !dateIsExpired;
+};
+
+// Helper function to check if a user is being caretaken for validly
+const isValidCaretakeeForUser = (myData: IUserMe, userId: number): boolean => {
+  return (
+    myData.caretaking_for?.some(
+      (caretakee) =>
+        caretakee?.pk === userId && isValidCaretakingRelationship(caretakee),
+    ) ?? false
+  );
+};
+
 const isCaretakerRecursive = (
+  myData: IUserMe,
   caretakerId: number,
   userId: number,
   visited: Set<number> = new Set(),
   users: IProjectMember[],
   depth: number = 0,
-  maxDepth: number = 10, // Prevent deep recursion
+  maxDepth: number = 10,
 ): boolean => {
-  // Early exit conditions
   if (!caretakerId || !userId) return false;
   if (depth >= maxDepth) {
     if (process.env.NODE_ENV === "development") {
@@ -38,19 +60,17 @@ const isCaretakerRecursive = (
   const user = users.find((member) => member.user?.pk === userId)?.user;
   if (!user) return false;
 
-  // Direct check
-  const isDirectCaretaker =
-    user.caretakers?.some((caretaker) => caretaker?.pk === caretakerId) ??
-    false;
+  // Check if this user is being validly caretaken for
+  if (isValidCaretakeeForUser(myData, userId)) return true;
 
-  if (isDirectCaretaker) return true;
-
-  // Recursive check with depth tracking
+  // Recursive check
   return (
     user.caretakers?.some(
       (caretaker) =>
         caretaker?.pk &&
+        isValidCaretakeeForUser(myData, caretaker.pk) &&
         isCaretakerRecursive(
+          myData,
           caretakerId,
           caretaker.pk,
           visited,
@@ -62,19 +82,20 @@ const isCaretakerRecursive = (
   );
 };
 
-// Separate complex checks into their own functions for better testing and maintenance
 const checkCaretakerOfMember = (
   myData: IUserMe,
   members: IProjectMember[],
 ): boolean => {
-  console.log("Members:", members);
   return members.some((member) =>
     myData.caretaking_for?.some(
       (caretakee) =>
-        member?.user?.pk === caretakee?.pk ||
+        (member?.user?.pk === caretakee?.pk &&
+          isValidCaretakingRelationship(caretakee)) ||
         (caretakee?.pk &&
           member.user?.pk &&
+          isValidCaretakingRelationship(caretakee) &&
           isCaretakerRecursive(
+            myData,
             caretakee.pk,
             member.user.pk,
             new Set(),
@@ -91,22 +112,27 @@ const checkCaretakerOfProjectLeader = (
   return members.some(
     (member) =>
       member.is_leader === true &&
-      member.user?.caretakers?.some(
-        (leaderCaretaker) =>
-          leaderCaretaker?.pk === myData.pk ||
-          myData.caretaking_for?.some(
-            (caretakee) =>
-              caretakee?.pk === leaderCaretaker?.pk ||
-              (caretakee?.pk &&
-                leaderCaretaker?.pk &&
-                isCaretakerRecursive(
-                  caretakee.pk,
-                  leaderCaretaker.pk,
-                  new Set(),
-                  members,
-                )),
-          ),
-      ),
+      myData.caretaking_for?.some((caretakee) => {
+        // Check if we're directly caretaking for the leader
+        const isDirectCaretaker =
+          member.user?.pk === caretakee?.pk &&
+          isValidCaretakingRelationship(caretakee);
+
+        // Check recursive caretaking relationship
+        const isIndirectCaretaker =
+          caretakee?.pk &&
+          member.user?.pk &&
+          isValidCaretakingRelationship(caretakee) &&
+          isCaretakerRecursive(
+            myData,
+            caretakee.pk,
+            member.user.pk,
+            new Set(),
+            members,
+          );
+
+        return isDirectCaretaker || isIndirectCaretaker;
+      }),
   );
 };
 
@@ -119,26 +145,40 @@ const checkCaretakerOfBaLeader = (
   if (!baLeaderPk) return false;
 
   return (
-    myData.caretaking_for?.some(
-      (caretakee) =>
-        caretakee?.pk === baLeaderPk ||
-        (caretakee?.pk &&
-          isCaretakerRecursive(caretakee.pk, baLeaderPk, new Set(), members)),
-    ) ?? false
+    myData.caretaking_for?.some((caretakee) => {
+      // Direct check
+      const isDirectCaretaker =
+        caretakee?.pk === baLeaderPk &&
+        isValidCaretakingRelationship(caretakee);
+
+      // Recursive check
+      const isIndirectCaretaker =
+        caretakee?.pk &&
+        isValidCaretakingRelationship(caretakee) &&
+        isCaretakerRecursive(
+          myData,
+          caretakee.pk,
+          baLeaderPk,
+          new Set(),
+          members,
+        );
+
+      return isDirectCaretaker || isIndirectCaretaker;
+    }) ?? false
   );
 };
 
-// Recursive function to check if any user in the caretaker chain is a superuser
-// Recursive function to check if any user in the caretaker chain is a superuser
 const isCaretakerOfSuperuser = (
   userToCheck: ICaretakerSimpleUserData,
   members: IProjectMember[],
   visited: Set<number> = new Set(),
+  myData: IUserMe,
 ): boolean => {
   if (!userToCheck?.pk || visited.has(userToCheck.pk)) return false;
+  if (!isValidCaretakingRelationship(userToCheck)) return false;
+
   visited.add(userToCheck.pk);
 
-  // First check if the user is in members list and is a superuser
   const memberUser = members.find((m) => m.user?.pk === userToCheck.pk)?.user;
   if (memberUser?.is_superuser === true) {
     if (process.env.NODE_ENV === "development") {
@@ -149,21 +189,20 @@ const isCaretakerOfSuperuser = (
     return true;
   }
 
-  // If not in members or not a superuser, check who they're caretaking for
   if (process.env.NODE_ENV === "development") {
     console.log(`Checking caretakers of: ${userToCheck.display_first_name}`);
   }
 
-  // Use the caretakers from the passed user object if they're not in members
   const caretakers = memberUser?.caretakers || userToCheck.caretakers;
 
   return (
     caretakers?.some((caretaker) => {
-      if (!caretaker) return false;
+      if (!caretaker || !isValidCaretakeeForUser(myData, caretaker.pk))
+        return false;
       if (process.env.NODE_ENV === "development") {
         console.log(`Checking caretaker: ${caretaker.display_first_name}`);
       }
-      return isCaretakerOfSuperuser(caretaker, members, visited);
+      return isCaretakerOfSuperuser(caretaker, members, visited, myData);
     }) ?? false
   );
 };
@@ -172,13 +211,11 @@ const checkCaretakerOfAdmin = (
   myData: IUserMe,
   members: IProjectMember[],
 ): boolean => {
-  // Check if any user we're caretaking for either:
-  // 1. Is a superuser themselves
-  // 2. Is caretaking for someone who is or leads to a superuser
   return (
     myData.caretaking_for?.some((caretakee) => {
-      if (!caretakee?.pk) return false; // user is not caretaking for anyone, return false
-      return isCaretakerOfSuperuser(caretakee, members); // Check if the caretaken user is caretaking for a superuser
+      if (!caretakee?.pk || !isValidCaretakingRelationship(caretakee))
+        return false;
+      return isCaretakerOfSuperuser(caretakee, members, new Set(), myData);
     }) ?? false
   );
 };

@@ -280,7 +280,10 @@ export const ProjectPlanContents = ({
         isBaLead={isBaLead}
         userData={userData}
         refetchDocument={refetch}
-        // isProjectLeader={}
+        userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+        userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+        userIsCaretakerOfMember={userIsCaretakerOfMember}
+        userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
       />
 
       <Box pb={6} mt={4}>
