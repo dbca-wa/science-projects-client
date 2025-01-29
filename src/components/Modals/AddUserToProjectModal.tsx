@@ -354,6 +354,7 @@ export const AddUserToProjectModal = ({
                       {...register("role", { required: true })}
                       variant="filled"
                       placeholder="Select a Role for the User"
+                      defaultValue={userIsStaff ? "technical" : "consulted"}
                     >
                       {userIsStaff ? (
                         <>
