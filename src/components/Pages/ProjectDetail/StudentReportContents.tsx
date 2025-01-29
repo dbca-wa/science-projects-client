@@ -17,13 +17,18 @@ import { BsPlus } from "react-icons/bs";
 import { getStudentReportForYear } from "../../../lib/api/api";
 import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import { useGetStudentReportAvailableReportYears } from "../../../lib/hooks/tanstack/useGetStudentReportAvailableReportYears";
-import { IProjectMember, IStudentReport, IUserMe } from "../../../types";
+import {
+  ICaretakerPermissions,
+  IProjectMember,
+  IStudentReport,
+  IUserMe,
+} from "../../../types";
 import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { StudentReportDocActions } from "./DocActions/StudentReportDocActions";
 
-interface Props {
+interface Props extends ICaretakerPermissions {
   documents: IStudentReport[];
   userData: IUserMe;
   members: IProjectMember[];
@@ -43,6 +48,10 @@ export const StudentReportContents = ({
   setToLastTab,
   baseAPI,
   baLead,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: Props) => {
   // useEffect(() => console.log(documents))
   // Handling years
@@ -136,6 +145,15 @@ export const StudentReportContents = ({
       .business_area_lead_approval_granted &&
     documents?.filter((r) => r.year === selectedYear)[0]?.document
       .directorate_approval_granted;
+
+  const canEditPermission =
+    ((userInTeam ||
+      isBaLead ||
+      userIsCaretakerOfBaLeader ||
+      userIsCaretakerOfMember) &&
+      !isFullyApproved) ||
+    userData?.is_superuser ||
+    userIsCaretakerOfAdmin;
 
   return (
     <>
@@ -250,16 +268,17 @@ export const StudentReportContents = ({
             documents={documents}
             setToLastTab={setToLastTab}
             isBaLead={isBaLead}
+            userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+            userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+            userIsCaretakerOfMember={userIsCaretakerOfMember}
+            userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
           />
           {/* Editors */}
 
           <RichTextEditor
             wordLimit={300}
             limitCanBePassed={false}
-            canEdit={
-              ((userInTeam || isBaLead) && !isFullyApproved) ||
-              userData?.is_superuser
-            }
+            canEdit={canEditPermission}
             writeable_document_kind={"Student Report"}
             writeable_document_pk={selectedStudentReport?.pk}
             project_pk={selectedStudentReport?.document?.project?.pk}

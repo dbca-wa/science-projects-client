@@ -32,13 +32,18 @@ import { useBusinessArea } from "@/lib/hooks/tanstack/useBusinessArea";
 import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
 import { useProjectTeam } from "@/lib/hooks/tanstack/useProjectTeam";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
-import { IConceptPlan, IProjectDocuments, IProjectMember } from "@/types";
+import {
+  ICaretakerPermissions,
+  IConceptPlan,
+  IProjectDocuments,
+  IProjectMember,
+} from "@/types";
 import { ConceptPlanActionModal } from "../../../Modals/DocumentActionModals/ConceptPlanActionModal";
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
 import useCaretakerPermissions from "@/lib/hooks/helper/useCaretakerPermissions";
 
-interface IConceptDocumentActions {
+interface IConceptDocumentActions extends ICaretakerPermissions {
   conceptPlanData: IConceptPlan;
   refetchData: () => void;
   all_documents: IProjectDocuments;
@@ -50,6 +55,10 @@ export const ConceptPlanDocActions = ({
   conceptPlanData,
   refetchData,
   members,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: // , projectPk
 IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
@@ -103,30 +112,19 @@ IConceptDocumentActions) => {
     conceptPlanData?.document?.project?.business_area?.pk,
   );
 
-  const {
-    userIsCaretakerOfMember,
-    userIsCaretakerOfProjectLeader,
-    userIsCaretakerOfBaLeader,
-    userIsCaretakerOfAdmin,
-  } = useCaretakerPermissions(
-    userData,
-    members,
-    conceptPlanData?.document?.project,
-  );
-
-  useEffect(() => {
-    console.log({
-      userIsCaretakerOfMember,
-      userIsCaretakerOfProjectLeader,
-      userIsCaretakerOfBaLeader,
-      userIsCaretakerOfAdmin,
-    });
-  }, [
-    userIsCaretakerOfMember,
-    userIsCaretakerOfProjectLeader,
-    userIsCaretakerOfBaLeader,
-    userIsCaretakerOfAdmin,
-  ]);
+  // useEffect(() => {
+  //   console.log({
+  //     userIsCaretakerOfMember,
+  //     userIsCaretakerOfProjectLeader,
+  //     userIsCaretakerOfBaLeader,
+  //     userIsCaretakerOfAdmin,
+  //   });
+  // }, [
+  //   userIsCaretakerOfMember,
+  //   userIsCaretakerOfProjectLeader,
+  //   userIsCaretakerOfBaLeader,
+  //   userIsCaretakerOfAdmin,
+  // ]);
 
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(

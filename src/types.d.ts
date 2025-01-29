@@ -1382,3 +1382,10 @@ export interface ICaretakerSubsections {
   refetchCaretakerData: () => void;
   caretakerData: ICheckCaretakerStatus;
 }
+
+export interface ICaretakerPermissions {
+  userIsCaretakerOfMember: boolean;
+  userIsCaretakerOfProjectLeader: boolean;
+  userIsCaretakerOfBaLeader: boolean;
+  userIsCaretakerOfAdmin: boolean;
+}

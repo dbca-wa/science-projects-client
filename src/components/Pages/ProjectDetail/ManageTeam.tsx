@@ -16,12 +16,12 @@ import { BsGripVertical, BsPlus } from "react-icons/bs";
 import { updateTeamMemberPosition } from "../../../lib/api/api";
 import { useProjectTeam } from "../../../lib/hooks/tanstack/useProjectTeam";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
-import { IProjectMember } from "../../../types";
+import { ICaretakerPermissions, IProjectMember } from "../../../types";
 import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
 import { TeamMember } from "./TeamMember";
 import { TeamMemberDisplay } from "./TeamMemberDisplay";
 
-interface Props {
+interface Props extends ICaretakerPermissions {
   // team: IProjectMember[];
   project_id: number;
   ba_leader: number;
@@ -31,6 +31,10 @@ export const ManageTeam = ({
   // team,
   project_id,
   ba_leader,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: Props) => {
   const [rearrangedTeam, setRearrangedTeam] = useState<IProjectMember[]>([]);
   const [currentlyDraggingIndex, setCurrentlyDraggingIndex] = useState<
@@ -178,8 +182,11 @@ export const ManageTeam = ({
 
           <Flex w={"100%"} justifyContent={"flex-end"}>
             {(userData.is_superuser ||
+              userIsCaretakerOfAdmin ||
               userData.pk === ba_leader ||
-              checkInTeam(userData?.pk)) && (
+              userIsCaretakerOfBaLeader ||
+              checkInTeam(userData?.pk) ||
+              userIsCaretakerOfMember) && (
               // userData.is_superuser || userData.pk === ba_leader ||
               // userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk)
               <>
@@ -224,6 +231,9 @@ export const ManageTeam = ({
         {teamData.length > 0 ? (
           // Allow project leader or admin to change order
           userData.is_superuser ||
+          userIsCaretakerOfAdmin ||
+          userIsCaretakerOfProjectLeader ||
+          userIsCaretakerOfBaLeader ||
           userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk ? (
             <DragDropContext
               onDragStart={(start) => {

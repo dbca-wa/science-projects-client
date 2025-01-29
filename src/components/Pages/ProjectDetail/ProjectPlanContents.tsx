@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import { useCheckUserIsTeamLeader } from "../../../lib/hooks/helper/useCheckUserIsTeamLeader";
 import {
+  ICaretakerPermissions,
   IProjectAreas,
   IProjectDocuments,
   IProjectMember,
@@ -18,7 +19,7 @@ import { ProjectPlanDocActions } from "./DocActions/ProjectPlanDocActions";
 import { MethodologyImage } from "./MethodologyImage";
 import { ProjectPlanEndorsements } from "./ProjectPlanEndorsements";
 
-interface Props {
+interface Props extends ICaretakerPermissions {
   document: IProjectPlan | null;
   all_documents: IProjectDocuments;
   userData: IUserMe;
@@ -40,6 +41,10 @@ export const ProjectPlanContents = ({
   projectAreas,
   baseAPI,
   baLead,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: Props) => {
   const { colorMode } = useColorMode();
   // useEffect(() => console.log(console.log(document)));
@@ -60,6 +65,15 @@ export const ProjectPlanContents = ({
     all_documents?.project_plan?.document.project_lead_approval_granted &&
     all_documents?.project_plan?.document.business_area_lead_approval_granted &&
     all_documents?.project_plan?.document.directorate_approval_granted;
+
+  const canEditPermission =
+    ((userInTeam ||
+      isBaLead ||
+      userIsCaretakerOfBaLeader ||
+      userIsCaretakerOfMember) &&
+      !isFullyApproved) ||
+    userData?.is_superuser ||
+    userIsCaretakerOfAdmin;
 
   return (
     <motion.div
@@ -82,13 +96,14 @@ export const ProjectPlanContents = ({
         setToLastTab={setToLastTab}
         projectAreas={projectAreas}
         isBaLead={isBaLead}
+        userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+        userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+        userIsCaretakerOfMember={userIsCaretakerOfMember}
+        userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
       />
 
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -101,10 +116,7 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -117,10 +129,7 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -132,10 +141,7 @@ export const ProjectPlanContents = ({
         section={"outcome"}
       />
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -147,10 +153,7 @@ export const ProjectPlanContents = ({
         section={"knowledge_transfer"}
       />
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -163,10 +166,7 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -179,10 +179,7 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -207,10 +204,7 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -223,10 +217,7 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -239,10 +230,7 @@ export const ProjectPlanContents = ({
       />
 
       <RichTextEditor
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         document_pk={document?.document?.pk}
         project_pk={document?.document?.project?.pk}
         writeable_document_kind={"Project Plan"}
@@ -260,10 +248,7 @@ export const ProjectPlanContents = ({
         </Text>
         <Grid mt={4} gridTemplateColumns={"repeat(1, 1fr)"} pos={"relative"}>
           <RichTextEditor
-            canEdit={
-              ((userInTeam || isBaLead) && !isFullyApproved) ||
-              userData?.is_superuser
-            }
+            canEdit={canEditPermission}
             document_pk={document?.document?.pk}
             project_pk={document?.document?.project?.pk}
             writeable_document_kind={"Project Plan"}
@@ -276,10 +261,7 @@ export const ProjectPlanContents = ({
           />
 
           <RichTextEditor
-            canEdit={
-              ((userInTeam || isBaLead) && !isFullyApproved) ||
-              userData?.is_superuser
-            }
+            canEdit={canEditPermission}
             document_pk={document?.document?.pk}
             project_pk={document?.document?.project?.pk}
             writeable_document_kind={"Project Plan"}

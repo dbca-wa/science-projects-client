@@ -25,13 +25,17 @@ import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea"
 import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
 import { useProjectTeam } from "../../../../lib/hooks/tanstack/useProjectTeam";
 import { useUser } from "../../../../lib/hooks/tanstack/useUser";
-import { IProjectMember, IStudentReport } from "../../../../types";
+import {
+  ICaretakerPermissions,
+  IProjectMember,
+  IStudentReport,
+} from "../../../../types";
 import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { StudentReportActionModal } from "../../../Modals/DocumentActionModals/StudentReportActionModal";
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
 
-interface IStudentDocumentActions {
+interface IStudentDocumentActions extends ICaretakerPermissions {
   studentReportData: IStudentReport;
   refetchData: () => void;
   documents: IStudentReport[];
@@ -50,6 +54,10 @@ export const StudentReportDocActions = ({
   callSameData,
   setToLastTab,
   isBaLead,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: // setselectedStudentReport, setSelectedYear,
 // , projectPk
 IStudentDocumentActions) => {
@@ -586,8 +594,11 @@ IStudentDocumentActions) => {
                       studentReportData?.document
                         ?.project_lead_approval_granted === true &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.pk === leaderMember?.user?.pk ||
-                        isBaLead) && (
+                        userIsCaretakerOfProjectLeader ||
+                        isBaLead ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <StudentReportActionModal
                             userData={userData}
@@ -624,8 +635,11 @@ IStudentDocumentActions) => {
                       studentReportData?.document
                         ?.project_lead_approval_granted === false &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.pk === leaderMember?.user?.pk ||
-                        isBaLead) && (
+                        userIsCaretakerOfProjectLeader ||
+                        isBaLead ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <StudentReportActionModal
                             userData={userData}
@@ -756,7 +770,9 @@ IStudentDocumentActions) => {
                       studentReportData?.document
                         ?.business_area_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === baLead?.pk) && (
+                        userIsCaretakerOfAdmin ||
+                        userData?.pk === baLead?.pk ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center>
                           <StudentReportActionModal
                             userData={userData}
@@ -797,7 +813,9 @@ IStudentDocumentActions) => {
                       studentReportData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.leader === baData?.leader) && (
+                        userIsCaretakerOfAdmin ||
+                        userData?.business_area?.leader === baData?.leader ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                           // justifyContent={"flex-start"}
                           ml={3}
@@ -839,7 +857,9 @@ IStudentDocumentActions) => {
                       studentReportData?.document
                         ?.business_area_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === baData?.leader) && (
+                        userIsCaretakerOfAdmin ||
+                        userData?.pk === baData?.leader ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                           // justifyContent={"flex-end"}
                           ml={3}
@@ -930,6 +950,7 @@ IStudentDocumentActions) => {
                       studentReportData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <StudentReportActionModal
@@ -970,6 +991,7 @@ IStudentDocumentActions) => {
                     {studentReportData?.document
                       ?.directorate_approval_granted &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           <StudentReportActionModal
@@ -1005,6 +1027,7 @@ IStudentDocumentActions) => {
                     {studentReportData?.document
                       ?.business_area_lead_approval_granted &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.business_area?.name === "Directorate") &&
                       !studentReportData?.document
                         ?.directorate_approval_granted && (
