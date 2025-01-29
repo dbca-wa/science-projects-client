@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ISpecialEndorsement } from "../../../lib/api/api";
 import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
-import { IProjectPlan, IUserMe } from "../../../types";
+import { ICaretakerPermissions, IProjectPlan, IUserMe } from "../../../types";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
 import { SingleFileStateUpload } from "../../SingleFileStateUpload";
 
@@ -25,7 +25,7 @@ import { BsFilePdfFill } from "react-icons/bs";
 import { DeletePDFEndorsementModal } from "@/components/Modals/DeletePDFEndorsementModal";
 import { TiDelete } from "react-icons/ti";
 
-interface IEndorsementProps {
+interface IEndorsementProps extends ICaretakerPermissions {
   document: IProjectPlan;
   userData: IUserMe;
   userIsLeader: boolean;
@@ -38,6 +38,10 @@ export const ProjectPlanEndorsements = ({
   userData,
   isBaLead,
   refetchDocument,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: IEndorsementProps) => {
   const { register, watch, setValue } = useForm<ISpecialEndorsement>();
 
@@ -102,7 +106,13 @@ export const ProjectPlanEndorsements = ({
   // }, [userData]);
 
   useEffect(() => {
-    if (userData?.is_superuser || userData?.is_aec || isBaLead) {
+    if (
+      userData?.is_superuser ||
+      userIsCaretakerOfAdmin ||
+      userData?.is_aec ||
+      isBaLead ||
+      userIsCaretakerOfBaLeader
+    ) {
       setUserCanEditAECEndorsement(true);
     } else {
       setUserCanEditAECEndorsement(false);
@@ -178,159 +188,6 @@ export const ProjectPlanEndorsements = ({
                 Endorsements
               </Text>
             </Box>
-
-            {/* <Grid
-              gridTemplateColumns={"repeat(1, 1fr)"}
-              gridRowGap={4}
-              alignItems={"center"}
-              userSelect={"none"}
-              border={"1px solid"}
-              borderColor={"gray.300"}
-              p={4}
-              rounded={"xl"}
-              roundedTop={"xl"}
-              // borderTop={0}
-              roundedBottom={0}
-            >
-              <Flex alignItems={"center"} userSelect={"none"}>
-                <Box flex={1}>
-                  <Text fontWeight={"semibold"}>
-                    Biometrician Endorsement Required?
-                  </Text>
-                </Box>
-                <Checkbox
-                  borderColor={"blue.500"}
-
-                  defaultChecked={bmEndRequired}
-                  mr={3}
-                  {...register("bmEndorsementRequired", {
-                    value: bmEndRequired,
-                  })}
-                />
-              </Flex>
-
-              <Flex alignItems={"center"} w={"100%"}>
-                <Box flex={1}>
-                  <Text
-                    color={
-                      bmEndRequiredValue
-                        ? colorMode === "light"
-                          ? "black"
-                          : "white"
-                        : "gray.500"
-                    }
-                  >
-                    Biometrician's Endorsement
-                  </Text>
-                </Box>
-
-                <Flex>
-                  {!userCanEditBMEndorsement ? (
-                    <Tag
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      display={"flex"}
-                      bg={
-                        document?.endorsements?.bm_endorsement_provided === true
-                          ? "green.500"
-                          : "red.500"
-                      }
-                      color={"white"}
-                    >
-                      {document?.endorsements?.bm_endorsement_provided === true
-                        ? "Granted"
-                        : "Required"}
-                    </Tag>
-                  ) : (
-                    <Switch
-                      defaultChecked={
-                        document?.endorsements?.bm_endorsement_provided === true
-                      }
-                      {...register("bmEndorsementProvided", {
-                        value: bmEndProvided,
-                      })}
-                      isDisabled={!bmEndRequiredValue}
-                    />
-                  )}
-                </Flex>
-              </Flex>
-            </Grid>
-
-            <Grid
-              gridTemplateColumns={"repeat(1, 1fr)"}
-              gridRowGap={4}
-              alignItems={"center"}
-              userSelect={"none"}
-              border={"1px solid"}
-              borderColor={"gray.300"}
-              p={4}
-              rounded={"xl"}
-              roundedTop={0}
-              borderTop={0}
-              roundedBottom={0}
-            >
-              <Flex>
-                <Box flex={1}>
-                  <Text fontWeight={"semibold"}>
-                    Herbarium Curator's Endorsement Required?
-                  </Text>
-                </Box>
-                <Checkbox
-                  borderColor={"blue.500"}
-                  defaultChecked={hcEndRequired}
-                  mr={3}
-                  // onChange={handleTogglePlantsInvolved}
-                  {...register("herbariumEndorsementRequired", {
-                    value: hcEndRequired,
-                  })}
-                />
-              </Flex>
-          
-              <Flex alignItems={"center"}>
-                <Box>
-                  <Text
-                    color={
-                      hcEndReqValue
-                        ? colorMode === "light"
-                          ? "black"
-                          : "white"
-                        : "gray.500"
-                    }
-                  >
-                    Herbarium Curator's Endorsement
-                  </Text>
-                </Box>
-                <Flex flex={1} justifyContent={"flex-end"}>
-                  {!userCanEditHCEndorsement ? (
-                    <Tag
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      display={"flex"}
-                      bg={
-                        document?.endorsements?.hc_endorsement_provided === true
-                          ? "green.500"
-                          : "red.500"
-                      }
-                      color={"white"}
-                    >
-                      {document?.endorsements?.hc_endorsement_provided === true
-                        ? "Granted"
-                        : "Required"}
-                    </Tag>
-                  ) : (
-                    <Switch
-                      defaultChecked={
-                        document?.endorsements?.hc_endorsement_provided === true
-                      }
-                      {...register("herbariumEndorsementProvided", {
-                        value: hcEndProvided,
-                      })}
-                      isDisabled={!hcEndReqValue}
-                    />
-                  )}
-                </Flex>
-              </Flex>
-            </Grid> */}
 
             {/* Interaction with Animals */}
             <Grid

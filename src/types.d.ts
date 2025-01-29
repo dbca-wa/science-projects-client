@@ -375,6 +375,7 @@ export interface ICaretakerSimpleUserData {
   display_last_name: string | null;
   email: string;
   image: string;
+  end_date: Date | null;
   caretakers: ICaretakerSimpleUserData[];
 }
 

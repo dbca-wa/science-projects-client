@@ -2,5 +2,7 @@
 
 export const checkIfDateExpired = (dateToCheck: Date) => {
   const currentDate = new Date();
-  return currentDate > dateToCheck;
+  const result = currentDate > dateToCheck;
+  console.log("Checking if date is expired:", dateToCheck, currentDate, result);
+  return result;
 };
