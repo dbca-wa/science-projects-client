@@ -39,6 +39,7 @@ import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Mail } from "lucide-react";
+import useCaretakerPermissions from "@/lib/hooks/helper/useCaretakerPermissions";
 
 export const ProjectDetail = ({
   selectedTab,
@@ -81,6 +82,13 @@ export const ProjectDetail = ({
 
   // useEffect(() => console.log(documents), [documents]);
   const me = useUser();
+
+  const {
+    userIsCaretakerOfMember,
+    userIsCaretakerOfProjectLeader,
+    userIsCaretakerOfBaLeader,
+    userIsCaretakerOfAdmin,
+  } = useCaretakerPermissions(me?.userData, members, baseInformation);
 
   // Refetch data on tab change and ensure falsy items are removed from the array
   const [tabs, setTabs] = useState([]);
@@ -396,6 +404,12 @@ export const ProjectDetail = ({
                         documents={documents}
                         refetchData={refetch}
                         setToLastTab={setToLastTab}
+                        userIsCaretakerOfMember={userIsCaretakerOfMember}
+                        userIsCaretakerOfProjectLeader={
+                          userIsCaretakerOfProjectLeader
+                        }
+                        userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+                        userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                       />
 
                       {/* <ManageTeam /> */}
@@ -405,6 +419,12 @@ export const ProjectDetail = ({
                           projectPk !== undefined ? Number(projectPk) : 0
                         }
                         ba_leader={baLead}
+                        userIsCaretakerOfMember={userIsCaretakerOfMember}
+                        userIsCaretakerOfProjectLeader={
+                          userIsCaretakerOfProjectLeader
+                        }
+                        userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+                        userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                       />
                     </motion.div>
                   ) : (
@@ -423,6 +443,12 @@ export const ProjectDetail = ({
                       all_documents={documents}
                       refetch={refetch}
                       baLead={baLead}
+                      userIsCaretakerOfMember={userIsCaretakerOfMember}
+                      userIsCaretakerOfProjectLeader={
+                        userIsCaretakerOfProjectLeader
+                      }
+                      userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+                      userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                     />
                   </TabPanel>
                 )}
@@ -440,6 +466,12 @@ export const ProjectDetail = ({
                       setToLastTab={setToLastTab}
                       projectAreas={location}
                       baLead={baLead}
+                      userIsCaretakerOfMember={userIsCaretakerOfMember}
+                      userIsCaretakerOfProjectLeader={
+                        userIsCaretakerOfProjectLeader
+                      }
+                      userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+                      userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                     />
                   </TabPanel>
                 )}
@@ -457,6 +489,12 @@ export const ProjectDetail = ({
                         members={members}
                         setToLastTab={setToLastTab}
                         baLead={baLead}
+                        userIsCaretakerOfMember={userIsCaretakerOfMember}
+                        userIsCaretakerOfProjectLeader={
+                          userIsCaretakerOfProjectLeader
+                        }
+                        userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+                        userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                       />
                     </TabPanel>
                   )}
@@ -475,6 +513,12 @@ export const ProjectDetail = ({
                         members={members}
                         setToLastTab={setToLastTab}
                         baLead={baLead}
+                        userIsCaretakerOfMember={userIsCaretakerOfMember}
+                        userIsCaretakerOfProjectLeader={
+                          userIsCaretakerOfProjectLeader
+                        }
+                        userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+                        userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                       />
                     </TabPanel>
                   )}
@@ -491,6 +535,12 @@ export const ProjectDetail = ({
                       refetch={refetch}
                       setToLastTab={setToLastTab}
                       baLead={baLead}
+                      userIsCaretakerOfMember={userIsCaretakerOfMember}
+                      userIsCaretakerOfProjectLeader={
+                        userIsCaretakerOfProjectLeader
+                      }
+                      userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+                      userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
                     />
                   </TabPanel>
                 )}

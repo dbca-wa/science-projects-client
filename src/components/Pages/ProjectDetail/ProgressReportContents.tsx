@@ -18,6 +18,7 @@ import { getProgressReportForYear } from "../../../lib/api/api";
 import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import { useGetProgressReportAvailableReportYears } from "../../../lib/hooks/tanstack/useGetProgressReportAvailableReportYears";
 import {
+  ICaretakerPermissions,
   IProgressReport,
   IProjectDocuments,
   IProjectMember,
@@ -28,7 +29,7 @@ import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions";
 
-interface Props {
+interface Props extends ICaretakerPermissions {
   baseAPI: string;
   documents: IProgressReport[];
   all_documents: IProjectDocuments;
@@ -48,6 +49,10 @@ export const ProgressReportContents = ({
   refetch,
   setToLastTab,
   baLead,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: Props) => {
   // useEffect(() => console.log(userData));
   // Handling years
@@ -140,6 +145,15 @@ export const ProgressReportContents = ({
   } = useDisclosure();
 
   const isBaLead = mePk === baLead;
+
+  const canEditPermission =
+    ((userInTeam ||
+      isBaLead ||
+      userIsCaretakerOfBaLeader ||
+      userIsCaretakerOfMember) &&
+      !isFullyApproved) ||
+    userData?.is_superuser ||
+    userIsCaretakerOfAdmin;
 
   return (
     <>
@@ -254,6 +268,10 @@ export const ProgressReportContents = ({
             documents={documents}
             setToLastTab={setToLastTab}
             isBaLead={isBaLead}
+            userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+            userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+            userIsCaretakerOfMember={userIsCaretakerOfMember}
+            userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
           />
           {/* Editors */}
 
@@ -261,10 +279,7 @@ export const ProgressReportContents = ({
             key={`context${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
-            canEdit={
-              ((userInTeam || isBaLead) && !isFullyApproved) ||
-              userData?.is_superuser
-            }
+            canEdit={canEditPermission}
             writeable_document_kind={"Progress Report"}
             writeable_document_pk={selectedProgressReport?.pk}
             project_pk={selectedProgressReport?.document?.project?.pk}
@@ -280,10 +295,7 @@ export const ProgressReportContents = ({
             key={`aims${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
-            canEdit={
-              ((userInTeam || isBaLead) && !isFullyApproved) ||
-              userData?.is_superuser
-            }
+            canEdit={canEditPermission}
             writeable_document_kind={"Progress Report"}
             writeable_document_pk={selectedProgressReport?.pk}
             project_pk={selectedProgressReport.document.project.pk}
@@ -299,10 +311,7 @@ export const ProgressReportContents = ({
             key={`progress${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
-            canEdit={
-              ((userInTeam || isBaLead) && !isFullyApproved) ||
-              userData?.is_superuser
-            }
+            canEdit={canEditPermission}
             writeable_document_kind={"Progress Report"}
             writeable_document_pk={selectedProgressReport?.pk}
             project_pk={selectedProgressReport.document.project.pk}
@@ -318,10 +327,7 @@ export const ProgressReportContents = ({
             key={`implications${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
-            canEdit={
-              ((userInTeam || isBaLead) && !isFullyApproved) ||
-              userData?.is_superuser
-            }
+            canEdit={canEditPermission}
             writeable_document_kind={"Progress Report"}
             writeable_document_pk={selectedProgressReport?.pk}
             project_pk={selectedProgressReport.document.project.pk}
@@ -337,10 +343,7 @@ export const ProgressReportContents = ({
             key={`future${editorKey}`} // Change the key to force a re-render
             wordLimit={150}
             limitCanBePassed={true}
-            canEdit={
-              ((userInTeam || isBaLead) && !isFullyApproved) ||
-              userData?.is_superuser
-            }
+            canEdit={canEditPermission}
             writeable_document_kind={"Progress Report"}
             writeable_document_pk={selectedProgressReport?.pk}
             project_pk={selectedProgressReport.document.project.pk}

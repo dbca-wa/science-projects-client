@@ -31,6 +31,7 @@ import {
 import { HiOutlineExternalLink } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import {
+  ICaretakerPermissions,
   IExtendedProjectDetails,
   IExternalProjectDetails,
   IProjectAreas,
@@ -76,7 +77,7 @@ import { cancelAdminTaskRequestCall } from "@/lib/api/api";
 import { AxiosError } from "axios";
 import useCaretakerPermissions from "@/lib/hooks/helper/useCaretakerPermissions";
 
-interface IProjectOverviewCardProps {
+interface IProjectOverviewCardProps extends ICaretakerPermissions {
   location: IProjectAreas;
   baseInformation: IProjectData;
   details: IExtendedProjectDetails | null | undefined;
@@ -94,6 +95,10 @@ export const ProjectOverviewCard = ({
   refetchData,
   documents,
   setToLastTab,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: IProjectOverviewCardProps) => {
   // console.log(baseInformation);
   // useEffect(() => {
@@ -334,13 +339,6 @@ export const ProjectOverviewCard = ({
   const userIsLeader = useCheckUserIsTeamLeader(mePk, members);
   const userIsBaLead = mePk === baseInformation?.business_area?.leader;
 
-  const {
-    userIsCaretakerOfMember,
-    userIsCaretakerOfProjectLeader,
-    userIsCaretakerOfBaLeader,
-    userIsCaretakerOfAdmin,
-  } = useCaretakerPermissions(me?.userData, members, baseInformation);
-
   // useCheckUserIsBaLeader(mePk, baseInformation?.business_area?.pk ? baseInformation?.business_area?.pk : baseInformation?.business_area?.id );
   // useEffect(() => { console.log(mePk, userInTeam) })
 
@@ -454,11 +452,22 @@ export const ProjectOverviewCard = ({
     });
   };
 
+  const canEditPermission =
+    userInTeam ||
+    userIsBaLead ||
+    userIsCaretakerOfBaLeader ||
+    userIsCaretakerOfMember ||
+    me?.userData?.is_superuser ||
+    userIsCaretakerOfAdmin;
+
   return (
     <>
       {(me?.userData?.is_superuser ||
+        userIsCaretakerOfAdmin ||
         userIsLeader ||
+        userIsCaretakerOfProjectLeader ||
         userIsBaLead ||
+        userIsCaretakerOfBaLeader ||
         me?.userData?.business_area?.name === "Directorate") && (
         <>
           <EditProjectModal
@@ -570,8 +579,11 @@ export const ProjectOverviewCard = ({
         // overflow={"hidden"}
       >
         {(me?.userData?.is_superuser ||
+          userIsCaretakerOfAdmin ||
           userIsLeader ||
+          userIsCaretakerOfProjectLeader ||
           userIsBaLead ||
+          userIsCaretakerOfBaLeader ||
           me?.userData?.business_area?.name === "Directorate") && (
           <Flex
             // justifyContent={"flex-end"}
@@ -612,7 +624,7 @@ export const ProjectOverviewCard = ({
           </Flex>
         )}
         {baseInformation?.deletion_requested ? (
-          me?.userData?.is_superuser ? (
+          me?.userData?.is_superuser || userIsCaretakerOfAdmin ? (
             <>
               <ActionAdminRequestModal
                 action="deleteproject"
@@ -1020,8 +1032,11 @@ export const ProjectOverviewCard = ({
           //   gridTemplateColumns={"repeat(2, 1fr)"}
         >
           {me?.userData?.is_superuser ||
+          userIsCaretakerOfAdmin ||
           userIsLeader ||
+          userIsCaretakerOfProjectLeader ||
           userIsBaLead ||
+          userIsCaretakerOfBaLeader ||
           me?.userData?.business_area?.name === "Directorate" ? (
             <Flex
             //   justifyContent={"space-between"}
@@ -1389,12 +1404,7 @@ export const ProjectOverviewCard = ({
                 <RichTextEditor
                   // wordLimit={500}
                   limitCanBePassed={false}
-                  canEdit={
-                    userInTeam ||
-                    userIsLeader ||
-                    userIsBaLead ||
-                    me?.userData?.is_superuser
-                  }
+                  canEdit={canEditPermission}
                   editorType="ProjectDetail"
                   data={(details?.external as IExternalProjectDetails)?.aims}
                   details_pk={
@@ -1411,12 +1421,7 @@ export const ProjectOverviewCard = ({
               <RichTextEditor
                 // wordLimit={500}
                 limitCanBePassed={false}
-                canEdit={
-                  userInTeam ||
-                  userIsLeader ||
-                  userIsBaLead ||
-                  me?.userData?.is_superuser
-                }
+                canEdit={canEditPermission}
                 editorType="ProjectDetail"
                 data={baseInformation.description}
                 project_pk={baseInformation.id}
@@ -1453,26 +1458,6 @@ export const ProjectOverviewCard = ({
               baseInformation={baseInformation}
               details={details}
             />
-
-            {/* <ProjectDetailEditModal
-                            onClose={onEditProjectDetailModalClose}
-                            isOpen={isEditProjectDetailModalOpen}
-                        /> */}
-            {/* <Button
-                            bg={
-                                colorMode === "light" ? "green.500" : "green.600"
-                            }
-                            color={"white"}
-                            _hover={
-
-                                {
-                                    bg: colorMode === "light" ? "green.400" : "green.500"
-                                }
-                            }
-                            leftIcon={<AiFillEdit />}
-                            onClick={onEditProjectDetailModalOpen}>
-                            Edit Project Details
-                        </Button> */}
           </Flex>
         </Box>
       </Box>

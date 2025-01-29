@@ -4,6 +4,7 @@ import { useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import {
+  ICaretakerPermissions,
   IConceptPlan,
   IProjectDocuments,
   IProjectMember,
@@ -13,7 +14,7 @@ import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { ConceptPlanDocActions } from "./DocActions/ConceptPlanDocActions";
 
-interface Props {
+interface Props extends ICaretakerPermissions {
   all_documents: IProjectDocuments;
   userData: IUserMe;
   members: IProjectMember[];
@@ -21,7 +22,6 @@ interface Props {
   baseAPI: string;
   refetch: () => void;
   baLead: number;
-  // setToLastTab: (tabToGoTo?: number) => void;
 }
 
 export const ConceptPlanContents = ({
@@ -32,6 +32,10 @@ export const ConceptPlanContents = ({
   refetch,
   baseAPI,
   baLead,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: // setToLastTab,
 Props) => {
   const { colorMode } = useColorMode();
@@ -46,6 +50,16 @@ Props) => {
     all_documents?.concept_plan?.document.project_lead_approval_granted &&
     all_documents?.concept_plan?.document.business_area_lead_approval_granted &&
     all_documents?.concept_plan?.document.directorate_approval_granted;
+
+  const canEditPermission =
+    ((userInTeam ||
+      isBaLead ||
+      userIsCaretakerOfBaLeader ||
+      userIsCaretakerOfMember) &&
+      !isFullyApproved) ||
+    userData?.is_superuser ||
+    userIsCaretakerOfAdmin;
+
   return (
     <motion.div
       initial={{ y: -10, opacity: 0 }}
@@ -65,14 +79,15 @@ Props) => {
         conceptPlanData={document}
         members={members}
         refetchData={refetch}
+        userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
+        userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
+        userIsCaretakerOfMember={userIsCaretakerOfMember}
+        userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
       />
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -85,10 +100,7 @@ Props) => {
       />
       <RichTextEditor
         wordLimit={500}
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -102,10 +114,7 @@ Props) => {
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -118,10 +127,7 @@ Props) => {
       />
       <RichTextEditor
         wordLimit={500}
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -134,10 +140,7 @@ Props) => {
       />
       <RichTextEditor
         wordLimit={500}
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -151,10 +154,7 @@ Props) => {
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}
@@ -168,10 +168,7 @@ Props) => {
 
       <RichTextEditor
         wordLimit={500}
-        canEdit={
-          ((userInTeam || isBaLead) && !isFullyApproved) ||
-          userData?.is_superuser
-        }
+        canEdit={canEditPermission}
         project_pk={document?.document?.project?.pk}
         document_pk={document?.document?.pk}
         isUpdate={true}

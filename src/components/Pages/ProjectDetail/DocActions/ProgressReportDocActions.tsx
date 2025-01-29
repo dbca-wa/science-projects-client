@@ -25,13 +25,17 @@ import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea"
 import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";
 import { useProjectTeam } from "../../../../lib/hooks/tanstack/useProjectTeam";
 import { useUser } from "../../../../lib/hooks/tanstack/useUser";
-import { IProgressReport, IProjectMember } from "../../../../types";
+import {
+  ICaretakerPermissions,
+  IProgressReport,
+  IProjectMember,
+} from "../../../../types";
 import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { ProgressReportActionModal } from "../../../Modals/DocumentActionModals/ProgressReportActionModal";
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
 
-interface IProgressDocumentActions {
+interface IProgressDocumentActions extends ICaretakerPermissions {
   progressReportData: IProgressReport;
   refetchData: () => void;
   callSameData: () => void;
@@ -47,6 +51,10 @@ export const ProgressReportDocActions = ({
   callSameData,
   setToLastTab,
   isBaLead,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: // setSelectedProgressReport, setSelectedYear,
 // , projectPk
 IProgressDocumentActions) => {
@@ -572,8 +580,11 @@ IProgressDocumentActions) => {
                       progressReportData?.document
                         ?.project_lead_approval_granted === true &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.pk === leaderMember?.user?.pk ||
-                        isBaLead) && (
+                        userIsCaretakerOfProjectLeader ||
+                        isBaLead ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <ProgressReportActionModal
                             userData={userData}
@@ -610,8 +621,11 @@ IProgressDocumentActions) => {
                       progressReportData?.document
                         ?.project_lead_approval_granted === false &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.pk === leaderMember?.user?.pk ||
-                        isBaLead) && (
+                        userIsCaretakerOfProjectLeader ||
+                        isBaLead ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <ProgressReportActionModal
                             userData={userData}
@@ -750,7 +764,9 @@ IProgressDocumentActions) => {
                       progressReportData?.document
                         ?.business_area_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === baLead?.pk) && (
+                        userIsCaretakerOfAdmin ||
+                        userData?.pk === baLead?.pk ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                         // justifyContent={"flex-start"}
                         // ml={4}
@@ -794,7 +810,9 @@ IProgressDocumentActions) => {
                       progressReportData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.leader === baData?.leader) && (
+                        userIsCaretakerOfAdmin ||
+                        userData?.business_area?.leader === baData?.leader ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                           // justifyContent={"flex-start"}
                           ml={3}
@@ -835,7 +853,9 @@ IProgressDocumentActions) => {
                       progressReportData?.document
                         ?.business_area_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === baData?.leader) && (
+                        userIsCaretakerOfAdmin ||
+                        userData?.pk === baData?.leader ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                           // justifyContent={"flex-end"}
                           ml={3}
@@ -926,6 +946,7 @@ IProgressDocumentActions) => {
                       progressReportData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ProgressReportActionModal
@@ -966,6 +987,7 @@ IProgressDocumentActions) => {
                     {progressReportData?.document
                       ?.directorate_approval_granted &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.business_area?.name === "Directorate") && (
                         <Center mt={3} justifyContent={"flex-start"} ml={3}>
                           <ProgressReportActionModal
@@ -1002,6 +1024,7 @@ IProgressDocumentActions) => {
                     {progressReportData?.document
                       ?.business_area_lead_approval_granted &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.business_area?.name === "Directorate") &&
                       !progressReportData?.document
                         ?.directorate_approval_granted && (

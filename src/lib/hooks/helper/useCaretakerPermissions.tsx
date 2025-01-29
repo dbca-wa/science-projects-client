@@ -1,4 +1,5 @@
 import {
+  ICaretakerPermissions,
   ICaretakerSimpleUserData,
   IProjectData,
   IProjectMember,
@@ -13,13 +14,6 @@ const PERMISSION_DEFAULTS = {
   userIsCaretakerOfBaLeader: false,
   userIsCaretakerOfAdmin: false,
 };
-
-interface ICaretakerPermissions {
-  userIsCaretakerOfMember: boolean;
-  userIsCaretakerOfProjectLeader: boolean;
-  userIsCaretakerOfBaLeader: boolean;
-  userIsCaretakerOfAdmin: boolean;
-}
 
 const isCaretakerRecursive = (
   caretakerId: number,

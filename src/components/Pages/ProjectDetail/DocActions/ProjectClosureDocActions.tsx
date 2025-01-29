@@ -26,6 +26,7 @@ import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk"
 import { useProjectTeam } from "../../../../lib/hooks/tanstack/useProjectTeam";
 import { useUser } from "../../../../lib/hooks/tanstack/useUser";
 import {
+  ICaretakerPermissions,
   IProjectClosure,
   IProjectDocuments,
   IProjectMember,
@@ -36,7 +37,7 @@ import { ProjectClosureActionModal } from "../../../Modals/DocumentActionModals/
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
 
-interface IConceptDocumentActions {
+interface IConceptDocumentActions extends ICaretakerPermissions {
   projectClosureData: IProjectClosure;
   refetchData: () => void;
   all_documents: IProjectDocuments;
@@ -50,6 +51,10 @@ export const ProjectClosureDocActions = ({
   refetchData,
   setToLastTab,
   isBaLead,
+  userIsCaretakerOfAdmin,
+  userIsCaretakerOfBaLeader,
+  userIsCaretakerOfMember,
+  userIsCaretakerOfProjectLeader,
 }: // , projectPk
 IConceptDocumentActions) => {
   const { colorMode } = useColorMode();
@@ -611,15 +616,20 @@ IConceptDocumentActions) => {
                           : projectClosureData?.document
                                 ?.business_area_lead_approval_granted
                             ? userData?.is_superuser ||
-                              userData?.pk === leaderMember?.pk
+                              userIsCaretakerOfAdmin ||
+                              userData?.pk === leaderMember?.pk ||
+                              userIsCaretakerOfProjectLeader
                               ? 2
                               : 0
                             : 3
                       }
                     >
                       {userData?.is_superuser ||
+                      userIsCaretakerOfAdmin ||
                       userData?.pk === leaderMember?.pk ||
-                      userData?.pk === baData?.leader ? (
+                      userIsCaretakerOfProjectLeader ||
+                      userData?.pk === baData?.leader ||
+                      userIsCaretakerOfBaLeader ? (
                         <Button
                           color={"white"}
                           background={
@@ -646,7 +656,9 @@ IConceptDocumentActions) => {
                             "suspended") &&
                         (isBaLead ||
                           leaderMember?.pk === userData?.pk ||
-                          userData?.is_superuser) && (
+                          userIsCaretakerOfProjectLeader ||
+                          userData?.is_superuser ||
+                          userIsCaretakerOfAdmin) && (
                           <>
                             {/* <ProjectClosureActionModal
                             userData={userData}
@@ -692,8 +704,11 @@ IConceptDocumentActions) => {
                         projectClosureData?.document
                           ?.project_lead_approval_granted === true &&
                         (userData?.is_superuser ||
+                          userIsCaretakerOfAdmin ||
                           userData?.pk === leaderMember?.user?.pk ||
-                          isBaLead) && (
+                          userIsCaretakerOfProjectLeader ||
+                          isBaLead ||
+                          userIsCaretakerOfBaLeader) && (
                           <>
                             <ProjectClosureActionModal
                               userData={userData}
@@ -741,8 +756,11 @@ IConceptDocumentActions) => {
                         projectClosureData?.document
                           ?.project_lead_approval_granted === false &&
                         (userData?.is_superuser ||
+                          userIsCaretakerOfAdmin ||
                           userData?.pk === leaderMember?.user?.pk ||
-                          isBaLead) && (
+                          userIsCaretakerOfProjectLeader ||
+                          isBaLead ||
+                          userIsCaretakerOfBaLeader) && (
                           <Center justifyContent={"flex-end"}>
                             <>
                               <DeleteDocumentModal
@@ -913,7 +931,10 @@ IConceptDocumentActions) => {
                       ?.project_lead_approval_granted &&
                     projectClosureData?.document
                       ?.business_area_lead_approval_granted === false &&
-                    (userData?.is_superuser || userData?.pk === baLead?.pk) ? (
+                    (userData?.is_superuser ||
+                      userIsCaretakerOfAdmin ||
+                      userData?.pk === baLead?.pk ||
+                      userIsCaretakerOfBaLeader) ? (
                       <Center
                       // justifyContent={"flex-start"}
                       // ml={4}
@@ -978,7 +999,10 @@ IConceptDocumentActions) => {
                           "terminated" ||
                         projectClosureData?.document?.project?.status ===
                           "suspended") &&
-                      (isBaLead || userData?.is_superuser) ? (
+                      (isBaLead ||
+                        userIsCaretakerOfBaLeader ||
+                        userData?.is_superuser ||
+                        userIsCaretakerOfAdmin) ? (
                       <Button
                         color={"white"}
                         background={
@@ -1001,7 +1025,9 @@ IConceptDocumentActions) => {
                       projectClosureData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.leader === baData?.leader) && (
+                        userIsCaretakerOfAdmin ||
+                        userData?.business_area?.leader === baData?.leader ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                           // justifyContent={"flex-start"}
                           ml={3}
@@ -1046,7 +1072,9 @@ IConceptDocumentActions) => {
                       projectClosureData?.document
                         ?.business_area_lead_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.pk === baData?.leader) && (
+                        userIsCaretakerOfAdmin ||
+                        userData?.pk === baData?.leader ||
+                        userIsCaretakerOfBaLeader) && (
                         <Center
                           // justifyContent={"flex-end"}
                           ml={3}
@@ -1149,6 +1177,7 @@ IConceptDocumentActions) => {
                       projectClosureData?.document?.project?.status ===
                         "suspended") &&
                     (userData?.is_superuser ||
+                      userIsCaretakerOfAdmin ||
                       userData?.business_area?.name === "Directorate") ? (
                       <Button
                         color={"white"}
@@ -1172,6 +1201,7 @@ IConceptDocumentActions) => {
                       projectClosureData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ProjectClosureActionModal
@@ -1215,6 +1245,7 @@ IConceptDocumentActions) => {
                     {projectClosureData?.document
                       ?.directorate_approval_granted &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           <ProjectClosureActionModal
@@ -1290,6 +1321,7 @@ IConceptDocumentActions) => {
                     {projectClosureData?.document
                       ?.business_area_lead_approval_granted &&
                       (userData?.is_superuser ||
+                        userIsCaretakerOfAdmin ||
                         userData?.business_area?.name === "Directorate") &&
                       !projectClosureData?.document
                         ?.directorate_approval_granted && (
