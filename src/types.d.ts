@@ -377,6 +377,7 @@ export interface ICaretakerSimpleUserData {
   image: string;
   end_date: Date | null;
   caretakers: ICaretakerSimpleUserData[];
+  caretaking_for: ICaretakerSimpleUserData[];
 }
 
 export interface IMemberUserDetails {

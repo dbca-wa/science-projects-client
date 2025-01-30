@@ -21,10 +21,11 @@ import {
   Button,
   Box,
 } from "@chakra-ui/react";
-import { ISimplePkProp, openProjectCall } from "../../lib/api/api";
+import { openProjectCall } from "../../lib/api/api";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { ISimplePkProp } from "@/types";
 
 interface Props {
   projectPk: string | number;
