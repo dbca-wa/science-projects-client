@@ -24,7 +24,8 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { ISimplePkProp, suspendProjectCall } from "../../lib/api/api";
+import { suspendProjectCall } from "../../lib/api/api";
+import { ISimplePkProp } from "@/types";
 
 interface Props {
   projectPk: string | number;

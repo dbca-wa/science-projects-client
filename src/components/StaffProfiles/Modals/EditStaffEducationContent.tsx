@@ -42,7 +42,7 @@ const EditStaffEducationContent = ({
       // qualification_field: educationItem?.qualification_field,
       // qualification_kind: educationItem?.qualification_kind,
       qualification_name: educationItem?.qualification_name,
-      start_year: educationItem?.start_year,
+      // start_year: educationItem?.start_year,
       end_year: educationItem?.end_year,
       institution: educationItem?.institution,
       location: educationItem?.location,
@@ -175,7 +175,7 @@ const EditStaffEducationContent = ({
           />
         </div>
 
-        <div className="mt-1 flex flex-col">
+        {/* <div className="mt-1 flex flex-col">
           <Label htmlFor="start_year" className="my-2">
             Start Year
           </Label>
@@ -200,7 +200,7 @@ const EditStaffEducationContent = ({
           {errors.start_year && (
             <p className="text-sm text-red-600">{errors.start_year.message}</p>
           )}
-        </div>
+        </div> */}
 
         <div className="mt-1 flex flex-col">
           <Label htmlFor="end_year" className="my-2">
@@ -214,14 +214,14 @@ const EditStaffEducationContent = ({
             className="w-full"
             {...register("end_year", {
               required: true,
-              validate: (value) => {
-                const startYear = getValues("start_year");
-                return (
-                  !startYear ||
-                  value >= startYear ||
-                  "End year cannot be before start year"
-                );
-              },
+              // validate: (value) => {
+              //   const startYear = getValues("start_year");
+              //   return (
+              //     !startYear ||
+              //     value >= startYear ||
+              //     "End year cannot be before start year"
+              //   );
+              // },
             })}
           />
           {errors.end_year && (

@@ -32,7 +32,7 @@ const CaretakerUserDisplay = ({
   } = useDisclosure();
 
   console.log(caretakerObject);
-  const caretakee: ICaretakerSimpleUserData = caretakerObject.user;
+  const caretakee = caretakerObject.user as ICaretakerSimpleUserData;
 
   return (
     <>

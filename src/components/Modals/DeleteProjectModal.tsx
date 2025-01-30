@@ -20,11 +20,12 @@ import {
   Grid,
   Button,
 } from "@chakra-ui/react";
-import { ISimplePkProp, deleteProjectCall } from "../../lib/api/api";
+import { deleteProjectCall } from "../../lib/api/api";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { ISimplePkProp } from "@/types";
 
 interface Props {
   projectPk: string | number;

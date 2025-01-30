@@ -275,7 +275,7 @@ export const ProfilePage = () => {
             isOpen={isToggleStaffProfileVisibilityModalOpen}
             onClose={onCloseToggleStaffProfileVisibilityModal}
             staffProfilePk={me?.staff_profile_pk}
-            isHidden={me?.staff_profile_hidden}
+            profileIsHidden={me?.staff_profile_hidden}
             refetch={refetchUser}
           />
 
