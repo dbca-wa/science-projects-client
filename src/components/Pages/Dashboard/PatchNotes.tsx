@@ -143,9 +143,12 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Request Delete Button. Users can now request admins to
-              delete a project directly on the project page. Click Edit
-              Project/Request Deletion.
+              Feature: Caretaker mode. Users can now request and assign a
+              caretaker to manage their workload while away from work. Projects
+              shown on your public profile are those that you are directly
+              involved with. If there are any user's projects which you are
+              already managing in a caretaker capacity, request to become that
+              user's caretaker, then assign those projects to that user.
             </ListItem>
             <ListItem
               fontSize={"small"}
@@ -153,20 +156,10 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               marginLeft={"21px"}
             >
               <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Merge users. Admins can now merge duplicate users
-              together, resolving projects to the primary user. User requests
-              coming soon.
+              Feature: Staff Profile Publications. Publications belonging to
+              users are now fetched from the library and displayed on their
+              public profile. Users may also add additional publications.
             </ListItem>
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Beta Feature: Caretaker Mode. Admins can now assign a caretaker to
-              manage projects of users in their absence. User requests coming
-              soon.
-            </ListItem> */}
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
