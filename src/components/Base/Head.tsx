@@ -19,7 +19,7 @@ export const Head = ({
 }: IProps) => {
   // Keywords
   const defaultKeywords =
-    "Science, Project, Management, System, SPMS, DBCA, Department of Biodiversity, Conservation and Attractions";
+    "Science Profiles, Science, Project, Management, System, SPMS, Profiles, DBCA, Department of Biodiversity, Conservation and Attractions";
 
   // Url
   const defaultPublicUrl = "https://science-profiles.dbca.wa.gov.au/";
