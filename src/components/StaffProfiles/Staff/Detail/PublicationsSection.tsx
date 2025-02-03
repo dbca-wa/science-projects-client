@@ -19,10 +19,7 @@ const PublicationsSection = ({
     useUserPublications(employee_id);
 
   useEffect(() => {
-    console.log(
-      "PublicationsSection",
-      publicationData?.docs?.map((pub) => pub.title),
-    );
+    console.log("PublicationsSection", publicationData);
   }, [publicationData]);
 
   return (

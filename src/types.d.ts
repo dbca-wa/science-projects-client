@@ -1421,4 +1421,6 @@ export interface PublicationResponse {
   start: number;
   numFoundExact: boolean;
   docs: Publication[];
+  isError: boolean;
+  errorMessage: string;
 }

@@ -47,7 +47,7 @@ export const ScienceStaff = () => {
             {scienceStaffData?.total_results === 0
               ? searchTerm
                 ? `No results for '${searchTerm}'`
-                : "No results found"
+                : "Service is down for maintenance. Please try again later."
               : scienceStaffData?.total_results === 1
                 ? `Showing 1 result${searchTerm ? ` for '${searchTerm}'` : ""}`
                 : `Showing ${(scienceStaffData?.page - 1) * 16 + 1}-${Math.min(
@@ -139,6 +139,10 @@ const Pagination = ({
   const changePageScrollTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  if (totalPages === 1 || totalResults === 0) {
+    return null;
+  }
 
   return (
     <div className="mt-8 flex items-center justify-center space-x-2">
