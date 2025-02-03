@@ -3,7 +3,7 @@ import { Button } from "@chakra-ui/react";
 import React, { useEffect } from "react";
 
 interface IPublicationsProps {
-  employee_id: number;
+  employee_id: string;
   publicationData: any;
   refetch: () => void;
 }
