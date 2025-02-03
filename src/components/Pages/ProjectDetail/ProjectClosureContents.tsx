@@ -1,6 +1,6 @@
 // Maps out the document provided to the rich text editor components for project closure documents.
 
-import { setClosureOutcome } from "@/lib/api/api";
+import { setClosureOutcome } from "@/lib/api";
 import {
   Flex,
   Select,

@@ -8,7 +8,7 @@ import {
   AccordionContent,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { getAllProblematicProjects } from "@/lib/api/api";
+import { getAllProblematicProjects } from "@/lib/api";
 import { IProblematicData } from "@/lib/hooks/tanstack/useAllProblematicProjects";
 import {
   Box,

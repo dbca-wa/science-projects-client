@@ -2,7 +2,7 @@
 // exposing them for easy access on the frontend. Also exposes loading state.
 
 import { useQuery } from "@tanstack/react-query";
-import { getAllLocations } from "../../api/api";
+import { getAllLocations } from "../../api";
 
 export const useGetLocations = () => {
   const { isPending, data: locationData } = useQuery({

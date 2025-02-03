@@ -3,7 +3,7 @@
 // exposes variables in ProjectSearchContext to components via the useProjectSearchContext hook.
 
 import { createContext, useState, useContext, useEffect } from "react";
-import { getProjectsBasedOnSearchTerm } from "../../api/api";
+import { getProjectsBasedOnSearchTerm } from "../../api";
 import { IProjectData } from "../../../types";
 
 interface IProjectSearchContext {

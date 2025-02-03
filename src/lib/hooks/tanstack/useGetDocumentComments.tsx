@@ -1,7 +1,7 @@
 // Simple hook for getting projects the user is involved in, for the dashboard.
 
 import { useQuery } from "@tanstack/react-query";
-import { getDocumentComments } from "../../api/api";
+import { getDocumentComments } from "../../api";
 
 export const useGetDocumentComments = (documentId: number) => {
   const { isPending, data, refetch } = useQuery({

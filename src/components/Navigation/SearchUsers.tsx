@@ -1,6 +1,6 @@
 // User Search component - works/appears on the Users page with UserSearchContext
 
-import { getAllBusinessAreas } from "@/lib/api/api";
+import { getAllBusinessAreas } from "@/lib/api";
 import { IBusinessArea } from "@/types";
 import {
   Flex,

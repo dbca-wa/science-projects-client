@@ -30,7 +30,7 @@ import "../../../../styles/texteditor.css";
 import { ListItemNode, ListNode } from "@lexical/list";
 
 import { DeleteCommentModal } from "@/components/Modals/DeleteCommentModal";
-import { createCommentReaction } from "@/lib/api/api";
+import { createCommentReaction } from "@/lib/api";
 import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

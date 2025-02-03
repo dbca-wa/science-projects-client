@@ -5,6 +5,21 @@ import {
   IApproveDocument,
 } from "@/types";
 import instance from "../axiosInstance";
+import { QueryFunctionContext } from "@tanstack/react-query";
+
+// export interface IUserPublicationGet {
+//   employee_id: number;
+// }
+
+export const getPublicationsForUser = async ({
+  queryKey,
+}: QueryFunctionContext) => {
+  const [_, employee_id] = queryKey;
+
+  return instance.get(`documents/publications/${employee_id}`).then((res) => {
+    return res.data;
+  });
+};
 
 export interface ISaveStudentReport {
   mainDocumentId: number;

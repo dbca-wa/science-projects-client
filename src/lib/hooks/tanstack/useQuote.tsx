@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { IQuote } from "../../../types";
-import { getQuote } from "../../api/api";
+import { getQuote } from "../../api";
 
 export const useQuote = () => {
   const { data, isPending } = useQuery<IQuote>({

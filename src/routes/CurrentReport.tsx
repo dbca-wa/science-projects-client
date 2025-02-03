@@ -20,7 +20,7 @@ import { Head } from "../components/Base/Head";
 import { AnnualReportDetails } from "../components/Pages/CurrentReport/AnnualReportDetails";
 import { AnnualReportMedia } from "../components/Pages/CurrentReport/AnnualReportMedia";
 import { ParticipatingProjectReports } from "../components/Pages/CurrentReport/ParticipatingProjectReports";
-import { getLatestReportingYear } from "../lib/api/api";
+import { getLatestReportingYear } from "../lib/api";
 import { IReport } from "../types";
 import { PDFViewer } from "@/components/HTMLPDFs/PDFViewer";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";

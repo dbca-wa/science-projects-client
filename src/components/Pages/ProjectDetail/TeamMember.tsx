@@ -13,14 +13,24 @@ import {
   Flex,
   Grid,
   HStack,
+  Text,
   Tag,
   useColorMode,
   useDisclosure,
+  Tooltip,
 } from "@chakra-ui/react";
 import { DraggableProvided } from "react-beautiful-dnd"; // Import DraggableProvided
 import { FaCrown } from "react-icons/fa";
-import { IImageData, IUserData, IUserMe } from "../../../types";
+import {
+  IBranch,
+  IBusinessArea,
+  ICaretakerSimpleUserData,
+  IImageData,
+  IUserData,
+  IUserMe,
+} from "../../../types";
 import { ProjectUserDetails } from "./ProjectUserDetails";
+import { UserProfile } from "../Users/UserProfile";
 
 interface ITeamMember {
   user_id: number;
@@ -42,6 +52,9 @@ interface ITeamMember {
   backgroundColor: string | undefined; // Add backgroundColor prop
   refetchTeamData: () => void;
   ba_leader: number;
+  caretaker: ICaretakerSimpleUserData;
+  baData: IBusinessArea[];
+  branchesData: IBranch[];
 }
 
 export const TeamMember = ({
@@ -63,6 +76,9 @@ export const TeamMember = ({
   dragHandleProps,
   backgroundColor, // Accept backgroundColor prop
   ba_leader,
+  caretaker,
+  baData,
+  branchesData,
 }: ITeamMember) => {
   // Define your styles for the dragged state
   const { colorMode } = useColorMode();
@@ -118,6 +134,12 @@ export const TeamMember = ({
     onClose: onUserClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isCaretakerOpen,
+    onOpen: onCaretakerOpen,
+    onClose: onCaretakerClose,
+  } = useDisclosure();
+
   const draggedStyles = {
     background: "blue.500",
     scale: 1.1,
@@ -159,6 +181,26 @@ export const TeamMember = ({
         </DrawerContent>
       </Drawer>
 
+      <Drawer
+        isOpen={isCaretakerOpen}
+        placement="right"
+        onClose={onCaretakerClose}
+        size={"lg"} //by default is xs
+      >
+        <DrawerOverlay zIndex={999} />
+        <DrawerContent>
+          <DrawerBody>
+            <UserProfile
+              pk={caretaker?.pk}
+              branches={branchesData}
+              businessAreas={baData}
+            />
+          </DrawerBody>
+
+          <DrawerFooter></DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
       <HStack
         {...draggableProps}
         {...dragHandleProps}
@@ -187,8 +229,8 @@ export const TeamMember = ({
                 image?.file
                   ? `${baseURL}${image.file}`
                   : image?.old_file
-                  ? `${baseURL}${image.old_file}`
-                  : ""
+                    ? `${baseURL}${image.old_file}`
+                    : ""
               }
               userSelect={"none"}
               onClick={onUserOpen}
@@ -206,28 +248,68 @@ export const TeamMember = ({
             gridTemplateColumns={"repeat(1, 1fr)"}
             userSelect={"none"}
           >
-            <Button
-              ml={"2px"}
-              variant={"link"}
-              justifyContent={"start"}
-              color={
-                isCurrentlyDragging
-                  ? "white"
-                  : colorMode === "light"
-                  ? "blue.500"
-                  : "blue.600"
-              }
-              _hover={{
-                color: colorMode === "light" ? "blue.400" : "blue.500",
-              }}
-              onClick={onUserOpen}
-              cursor="pointer"
-              fontSize={"lg"}
+            <Box
+              display={"flex"}
+              flexDirection={"row"}
+              gap={2}
+              alignItems={"center"}
             >
-              {name !== "undefined undefined" && name !== "None None"
-                ? name
-                : username}
-            </Button>
+              <Button
+                ml={"2px"}
+                variant={"link"}
+                justifyContent={"start"}
+                color={
+                  isCurrentlyDragging
+                    ? "white"
+                    : colorMode === "light"
+                      ? "blue.500"
+                      : "blue.600"
+                }
+                _hover={{
+                  color: colorMode === "light" ? "blue.400" : "blue.500",
+                }}
+                onClick={onUserOpen}
+                cursor="pointer"
+                fontSize={"lg"}
+              >
+                {name !== "undefined undefined" && name !== "None None"
+                  ? name
+                  : username}
+              </Button>
+              {/* Display caretaker info if there is one */}
+              {caretaker && (
+                <Tooltip
+                  label={`This user is away and ${caretaker.display_first_name} ${caretaker.display_last_name} is caretaking`}
+                  aria-label="Caretaker"
+                >
+                  <Box
+                    display={"flex"}
+                    alignItems={"center"}
+                    gap={2}
+                    userSelect={"none"}
+                    onClick={onCaretakerOpen}
+                    cursor="pointer"
+                  >
+                    <Avatar
+                      mt={1}
+                      size={"xs"}
+                      src={
+                        caretaker?.image ? `${baseURL}${caretaker?.image}` : ""
+                      }
+                    />
+                    <Text
+                      color={"blue.500"}
+                      fontSize={"xs"}
+                      justifyContent={"center"}
+                    >
+                      ({caretaker.display_first_name}{" "}
+                      {caretaker.display_last_name} is caretaking)
+                    </Text>
+                  </Box>
+                </Tooltip>
+              )}
+            </Box>
+
             <Box>
               <Tag
                 mt={1}

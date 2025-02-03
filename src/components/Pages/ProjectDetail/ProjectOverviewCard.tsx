@@ -73,7 +73,7 @@ import { SetProjectStatusModal } from "@/components/Modals/SetProjectStatusModal
 import { RequestDeleteProjectModal } from "@/components/Modals/RequestDeleteProjectModal";
 import { ActionAdminRequestModal } from "@/components/Modals/ActionAdminRequestModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { cancelAdminTaskRequestCall } from "@/lib/api/api";
+import { cancelAdminTaskRequestCall } from "@/lib/api";
 import { AxiosError } from "axios";
 import useCaretakerPermissions from "@/lib/hooks/helper/useCaretakerPermissions";
 

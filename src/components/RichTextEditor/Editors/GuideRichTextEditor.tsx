@@ -10,7 +10,7 @@ import "../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
-import { GuideSections } from "@/lib/api/api";
+import { GuideSections } from "@/lib/api";
 import { useGetRTESectionTitle } from "@/lib/hooks/helper/useGetRTESectionTitle";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { HideEditorButton } from "../Buttons/HideEditorButton";

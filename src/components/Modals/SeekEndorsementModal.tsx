@@ -23,7 +23,7 @@ import {
   Checkbox,
   Box,
 } from "@chakra-ui/react";
-import { ISpecialEndorsement, seekEndorsementAndSave } from "../../lib/api/api";
+import { ISpecialEndorsement, seekEndorsementAndSave } from "../../lib/api";
 import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 

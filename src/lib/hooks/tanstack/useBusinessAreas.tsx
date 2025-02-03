@@ -2,7 +2,7 @@
 // Exposes data and loading states of query
 
 import { useQuery } from "@tanstack/react-query";
-import { getAllBusinessAreas } from "../../api/api";
+import { getAllBusinessAreas } from "../../api";
 
 export const useBusinessAreas = () => {
   const { isPending, data } = useQuery({

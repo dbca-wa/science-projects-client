@@ -24,7 +24,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createBranch, getAllBranches } from "../../../lib/api/api";
+import { createBranch, getAllBranches } from "../../../lib/api";
 import { IBranch } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { BranchItemDisplay } from "./BranchItemDisplay";

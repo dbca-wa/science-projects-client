@@ -1,4 +1,4 @@
-import { toggleStaffProfileVisibility } from "@/lib/api/api";
+import { toggleStaffProfileVisibility } from "@/lib/api";
 import {
   Text,
   Box,

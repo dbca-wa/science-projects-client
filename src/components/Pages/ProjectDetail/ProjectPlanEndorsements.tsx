@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { ISpecialEndorsement } from "../../../lib/api/api";
+import { ISpecialEndorsement } from "../../../lib/api";
 import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
 import { ICaretakerPermissions, IProjectPlan, IUserMe } from "../../../types";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";

@@ -35,7 +35,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteReport, updateReport } from "../../../lib/api/api";
+import { deleteReport, updateReport } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
 import { IReport } from "../../../types";
 import { UserProfile } from "../Users/UserProfile";

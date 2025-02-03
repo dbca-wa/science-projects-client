@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import {
   IUpdateStaffOverviewSection,
   updateStaffProfileOverviewSection,
-} from "@/lib/api/api";
+} from "@/lib/api";
 import { IStaffOverviewData } from "@/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

@@ -1,6 +1,6 @@
 // WIP
 
-import { getInternalUsersBasedOnSearchTerm } from "@/lib/api/api";
+import { getInternalUsersBasedOnSearchTerm } from "@/lib/api";
 import { IUserData } from "@/types";
 import {
   Avatar,

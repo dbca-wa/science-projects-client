@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
-import { getAllBusinessAreas, getAllProjectsYears } from "../../lib/api/api";
+import { getAllBusinessAreas, getAllProjectsYears } from "../../lib/api";
 import { useProjectSearchContext } from "../../lib/hooks/helper/ProjectSearchContext";
 
 interface IProps {

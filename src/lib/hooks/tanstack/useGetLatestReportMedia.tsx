@@ -2,7 +2,7 @@
 // Exposes that data as well as the state of the query (loading or not)
 
 import { useQuery } from "@tanstack/react-query";
-import { getLatestReportMedia } from "../../api/api";
+import { getLatestReportMedia } from "../../api";
 
 export const useGetLatestReportMedia = () => {
   const { isPending, data, refetch } = useQuery({

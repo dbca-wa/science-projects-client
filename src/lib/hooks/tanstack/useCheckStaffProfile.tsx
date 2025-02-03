@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { checkUserActiveAndGetStaffProfileData } from "../../api/api";
+import { checkUserActiveAndGetStaffProfileData } from "../../api";
 import { IStaffProfileBaseData } from "@/types";
 
 export const useCheckStaffProfile = (userPk: number) => {

@@ -1,7 +1,7 @@
 // Route for displaying paginated projects
 
 import { SearchProjects } from "@/components/Navigation/SearchProjects";
-import { downloadProjectsCSV } from "@/lib/api/api";
+import { downloadProjectsCSV } from "@/lib/api";
 import {
   Box,
   Button,

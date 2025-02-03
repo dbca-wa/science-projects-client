@@ -35,7 +35,7 @@ import { UserGridItem } from "../Users/UserGridItem";
 import { IoIosSave } from "react-icons/io";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { IUpdatePublicEmail, updatePublicEmail } from "@/lib/api/api";
+import { IUpdatePublicEmail, updatePublicEmail } from "@/lib/api";
 import { AxiosError } from "axios";
 import ToggleStaffProfileVisibilityModal from "@/components/Modals/ToggleStaffProfileVisibilityModal";
 

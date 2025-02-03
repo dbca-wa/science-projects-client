@@ -1,6 +1,6 @@
 // The options bar which sits below the text area in the simple rich text editor
 
-import { GuideSections } from "@/lib/api/api";
+import { GuideSections } from "@/lib/api";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { Flex, Grid } from "@chakra-ui/react";
 import { EditorType } from "../../../types";

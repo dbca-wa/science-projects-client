@@ -49,7 +49,7 @@ import {
   MutationSuccess,
   adminUpdateUser,
   removeUserAvatar,
-} from "../../lib/api/api";
+} from "../../lib/api";
 import { Controller, useForm } from "react-hook-form";
 import { MdFax } from "react-icons/md";
 import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";

@@ -20,7 +20,7 @@ import {
   Grid,
   Button,
 } from "@chakra-ui/react";
-import { IDeleteDocument, deleteDocumentCall } from "../../lib/api/api";
+import { IDeleteDocument, deleteDocumentCall } from "../../lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useGetStudentReportAvailableReportYears } from "../../lib/hooks/tanstack/useGetStudentReportAvailableReportYears";

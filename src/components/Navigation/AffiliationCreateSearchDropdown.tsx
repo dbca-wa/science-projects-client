@@ -33,7 +33,7 @@ import { GrOrganization } from "react-icons/gr";
 import {
   createAffiliation,
   getAffiliationsBasedOnSearchTerm,
-} from "../../lib/api/api";
+} from "../../lib/api";
 import { IAffiliation } from "../../types";
 
 interface IAffiliationSearchDropdown {

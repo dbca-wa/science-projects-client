@@ -27,7 +27,7 @@ import {
   MutationError,
   MutationSuccess,
   removeCaretaker,
-} from "../../../lib/api/api";
+} from "../../../lib/api";
 import { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/types";
 import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
 

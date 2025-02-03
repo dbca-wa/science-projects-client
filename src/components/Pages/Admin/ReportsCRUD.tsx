@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { getAllReports } from "../../../lib/api/api";
+import { getAllReports } from "../../../lib/api";
 import { IReport } from "../../../types";
 import { ReportItemDisplay } from "./ReportItemDisplay";
 import { Head } from "@/components/Base/Head";

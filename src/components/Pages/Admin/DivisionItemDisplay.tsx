@@ -32,7 +32,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteDivision, updateDivision } from "../../../lib/api/api";
+import { deleteDivision, updateDivision } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
 import { IDivision } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";

@@ -1,4 +1,4 @@
-import { createDocumentComment } from "@/lib/api/api";
+import { createDocumentComment } from "@/lib/api";
 import { Button, ToastId, useColorMode, useToast } from "@chakra-ui/react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

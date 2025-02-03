@@ -20,7 +20,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { getBranchesBasedOnSearchTerm } from "../../lib/api/api";
+import { getBranchesBasedOnSearchTerm } from "../../lib/api";
 import { useBranch } from "../../lib/hooks/tanstack/useBranch";
 import { IBranch } from "../../types";
 

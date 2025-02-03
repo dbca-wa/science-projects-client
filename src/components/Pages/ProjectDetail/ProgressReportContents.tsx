@@ -14,7 +14,7 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BsPlus } from "react-icons/bs";
-import { getProgressReportForYear } from "../../../lib/api/api";
+import { getProgressReportForYear } from "../../../lib/api";
 import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
 import { useGetProgressReportAvailableReportYears } from "../../../lib/hooks/tanstack/useGetProgressReportAvailableReportYears";
 import {
