@@ -12,7 +12,7 @@ import { $getRoot } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 // import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import DraggableBlockPlugin from "@/components/RichTextEditor/Plugins/DraggableBlockPlugin";
-import { GuideSections } from "@/lib/api/api";
+import { GuideSections } from "@/lib/api";
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/helper/useGetRTESectionPlaceholder";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";

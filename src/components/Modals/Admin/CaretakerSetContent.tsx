@@ -2,7 +2,7 @@
 
 import { Head } from "@/components/Base/Head";
 import { UserArraySearchDropdown } from "@/components/Navigation/UserArraySearchDropdown";
-import { mergeUsers } from "@/lib/api/api";
+import { mergeUsers } from "@/lib/api";
 import { IMergeUser, IUserData } from "@/types";
 import {
   Box,

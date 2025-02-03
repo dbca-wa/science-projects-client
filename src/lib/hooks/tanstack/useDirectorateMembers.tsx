@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getDirectorateMembers } from "../../api/api";
+import { getDirectorateMembers } from "../../api";
 
 export const useDirectorateMembers = () => {
   const { isPending, data, refetch } = useQuery({

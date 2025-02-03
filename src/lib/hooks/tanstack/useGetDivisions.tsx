@@ -2,7 +2,7 @@
 // Exposes data and loading states of query
 
 import { useQuery } from "@tanstack/react-query";
-import { getAllDivisions } from "../../api/api";
+import { getAllDivisions } from "../../api";
 import { IDivision } from "@/types";
 
 export const useGetDivisions = () => {

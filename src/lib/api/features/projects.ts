@@ -204,7 +204,7 @@ export const updateTeamMemberPosition = async (
 export const getProjectTeam = async ({ queryKey }: QueryFunctionContext) => {
   const [_, pk] = queryKey;
   const res = instance.get(`projects/${pk}/team`).then((res) => {
-    // console.log(res.data)
+    console.log("Team Data", res.data);
     return res.data;
   });
   return res;

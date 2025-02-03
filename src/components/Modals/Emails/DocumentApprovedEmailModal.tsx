@@ -1,6 +1,6 @@
 import { ProjectSearchDropdown } from "@/components/Navigation/ProjectSearchDropdown";
 import { UserSearchDropdown } from "@/components/Navigation/UserSearchDropdown";
-import { sendDocumentApprovedEmail } from "@/lib/api/api";
+import { sendDocumentApprovedEmail } from "@/lib/api";
 import { IEmailModalProps, ISendSingleEmail } from "@/types";
 import {
   Button,

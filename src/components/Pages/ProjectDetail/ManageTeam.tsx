@@ -13,13 +13,15 @@ import {
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { BsGripVertical, BsPlus } from "react-icons/bs";
-import { updateTeamMemberPosition } from "../../../lib/api/api";
+import { updateTeamMemberPosition } from "../../../lib/api";
 import { useProjectTeam } from "../../../lib/hooks/tanstack/useProjectTeam";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
 import { ICaretakerPermissions, IProjectMember } from "../../../types";
 import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
 import { TeamMember } from "./TeamMember";
 import { TeamMemberDisplay } from "./TeamMemberDisplay";
+import { useBranches } from "@/lib/hooks/tanstack/useBranches";
+import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
 
 interface Props extends ICaretakerPermissions {
   // team: IProjectMember[];
@@ -157,6 +159,8 @@ export const ManageTeam = ({
   };
 
   const { userLoading, userData } = useUser();
+  const { branchesLoading, branchesData } = useBranches();
+  const { baLoading, baData } = useBusinessAreas();
 
   return (
     !userLoading &&
@@ -284,6 +288,14 @@ export const ManageTeam = ({
                                 (colorMode === "light" ? "white" : "gray.800")
                               } // Pass the background color as a prop
                               refetchTeamData={refetchTeamData}
+                              // Caretaker Data
+                              caretaker={
+                                tm.user.caretakers.length > 0
+                                  ? tm.user.caretakers[0]
+                                  : undefined
+                              }
+                              branchesData={branchesData}
+                              baData={baData}
                             />
                             {/* Right Section */}
                             <Box
@@ -315,25 +327,37 @@ export const ManageTeam = ({
             </DragDropContext>
           ) : (
             <Grid rounded={"xl"} mt={4} overflow="hidden">
-              {rearrangedTeam.map((tm, index) => (
-                <TeamMemberDisplay
-                  ba_leader={ba_leader}
-                  key={index}
-                  leader_pk={leaderPk}
-                  user_id={tm.user.pk}
-                  name={`${tm.user.first_name} ${tm.user.last_name}`}
-                  short_code={tm.short_code}
-                  username={tm.user.username}
-                  image={tm.user.image}
-                  is_leader={tm.is_leader}
-                  role={tm.role}
-                  position={tm.position}
-                  time_allocation={tm.time_allocation}
-                  usersCount={rearrangedTeam.length}
-                  project_id={project_id}
-                  refetchTeamData={refetchTeamData}
-                />
-              ))}
+              {rearrangedTeam.map((tm, index) => {
+                console.log("rearrangedTeam", rearrangedTeam);
+                return (
+                  <TeamMemberDisplay
+                    ba_leader={ba_leader}
+                    key={index}
+                    leader_pk={leaderPk}
+                    user_id={tm.user.pk}
+                    name={`${tm.user.first_name} ${tm.user.last_name}`}
+                    short_code={tm.short_code}
+                    username={tm.user.username}
+                    image={tm.user.image}
+                    is_leader={tm.is_leader}
+                    role={tm.role}
+                    position={tm.position}
+                    time_allocation={tm.time_allocation}
+                    usersCount={rearrangedTeam.length}
+                    project_id={project_id}
+                    refetchTeamData={refetchTeamData}
+                    // Get first caretaker, if there is one, otherwise undefined
+                    // Caretaker Data
+                    caretaker={
+                      tm.user.caretakers.length > 0
+                        ? tm.user.caretakers[0]
+                        : undefined
+                    }
+                    branchesData={branchesData}
+                    baData={baData}
+                  />
+                );
+              })}
             </Grid>
           )
         ) : null}

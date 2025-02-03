@@ -27,7 +27,7 @@ import {
   MutationError,
   MutationSuccess,
   openNewCycle,
-} from "../../lib/api/api";
+} from "../../lib/api";
 import { useLatestReportYear } from "@/lib/hooks/tanstack/useLatestReportYear";
 
 interface IModalProps {

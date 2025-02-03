@@ -24,7 +24,7 @@ import { GoTriangleDown } from "react-icons/go";
 import { SiReadthedocs } from "react-icons/si";
 import { TbWorldWww } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-import { logOut } from "../../lib/api/api";
+import { logOut } from "../../lib/api";
 import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
 import useApiEndpoint from "../../lib/hooks/helper/useApiEndpoint";
 import { useUser } from "../../lib/hooks/tanstack/useUser";

@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import {
   getFullProjectSimple,
   getMyProjectsBasedOnSearchTerm,
-} from "../../lib/api/api";
+} from "../../lib/api";
 import { useUser } from "../../lib/hooks/tanstack/useUser";
 import { IMidDoc } from "../../types";
 // import { useNoImage } from "../../lib/hooks/useNoImage";

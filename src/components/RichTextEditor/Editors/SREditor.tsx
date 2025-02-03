@@ -1,5 +1,5 @@
 import { ExtractedHTMLTitle } from "@/components/ExtractedHTMLTitle";
-import { ISaveStudentReport, updateStudentReportProgress } from "@/lib/api/api";
+import { ISaveStudentReport, updateStudentReportProgress } from "@/lib/api";
 import { IProjectData, IProjectMember } from "@/types";
 import {
   Box,

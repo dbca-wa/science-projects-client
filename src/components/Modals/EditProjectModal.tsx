@@ -32,7 +32,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaArrowLeft } from "react-icons/fa";
 import { HiAcademicCap } from "react-icons/hi";
-import { IEditProject, updateProjectDetails } from "../../lib/api/api";
+import { IEditProject, updateProjectDetails } from "../../lib/api";
 import { useBusinessAreas } from "../../lib/hooks/tanstack/useBusinessAreas";
 import { useDepartmentalServices } from "../../lib/hooks/tanstack/useDepartmentalServices";
 import { useGetLocations } from "../../lib/hooks/tanstack/useGetLocations";

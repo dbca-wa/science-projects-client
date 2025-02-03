@@ -2,7 +2,7 @@
 // Exposes that data and the state of the query loading
 
 import { useQuery } from "@tanstack/react-query";
-import { getFullProject } from "../../api/api";
+import { getFullProject } from "../../api";
 
 export const useProject = (projectPk: undefined | string | number) => {
   const { isPending, data, refetch } = useQuery({

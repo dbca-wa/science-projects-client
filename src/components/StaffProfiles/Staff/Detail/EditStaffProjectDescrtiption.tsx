@@ -22,10 +22,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { ToastId, useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  IUpdateProjectDescription,
-  updateProjectDescription,
-} from "@/lib/api/api";
+import { IUpdateProjectDescription, updateProjectDescription } from "@/lib/api";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 
 interface IEditDescriptionProps {

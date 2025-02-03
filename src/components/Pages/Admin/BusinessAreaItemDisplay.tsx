@@ -43,7 +43,7 @@ import {
   activateBusinessArea,
   deleteBusinessArea,
   updateBusinessArea,
-} from "../../../lib/api/api";
+} from "../../../lib/api";
 import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
 import useDistilledHtml from "../../../lib/hooks/helper/useDistilledHtml";
 import { useNoImage } from "../../../lib/hooks/helper/useNoImage";

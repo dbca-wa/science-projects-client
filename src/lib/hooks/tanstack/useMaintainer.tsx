@@ -1,6 +1,6 @@
 import { IMiniUser } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { getMaintainer } from "../../api/api";
+import { getMaintainer } from "../../api";
 
 export const useMaintainer = () => {
   const { isPending, data, refetch } = useQuery({

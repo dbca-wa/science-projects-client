@@ -3,7 +3,7 @@
 // exposes variables in UserSearchContext to components via the useUserSearchContext hook.
 
 import { createContext, useState, useContext, useEffect } from "react";
-import { getUsersBasedOnSearchTerm } from "../../api/api";
+import { getUsersBasedOnSearchTerm } from "../../api";
 import { IUserData } from "../../../types";
 
 interface IUserSearchContext {

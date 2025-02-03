@@ -2,7 +2,7 @@ import {
   IDocGen,
   cancelProjectDocumentGeneration,
   generateProjectDocument,
-} from "@/lib/api/api";
+} from "@/lib/api";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import {
   IConceptPlan,

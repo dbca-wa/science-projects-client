@@ -1,7 +1,7 @@
 import {
   getProblematicProjectsForBusinessAreas,
   getUnapprovedDocsForBusinessAreas,
-} from "@/lib/api/api";
+} from "@/lib/api";
 import { useMyBusinessAreas } from "@/lib/hooks/tanstack/useMyBusinessAreas";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { IMainDoc, IProjectData } from "@/types";

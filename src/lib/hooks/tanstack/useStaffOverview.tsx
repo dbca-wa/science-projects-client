@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getPublicProfileOverviewData } from "../../api/api";
+import { getPublicProfileOverviewData } from "../../api";
 import { IStaffOverviewData } from "@/types";
 
 export const useStaffOverview = (userPk: undefined | string | number) => {

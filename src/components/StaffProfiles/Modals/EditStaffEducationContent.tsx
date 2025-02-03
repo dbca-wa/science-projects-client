@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { editEducation } from "@/lib/api/api";
+import { editEducation } from "@/lib/api";
 import { IStaffEducationEntry } from "@/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

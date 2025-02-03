@@ -25,7 +25,7 @@ import {
   useState,
 } from "react";
 import { FaTrash } from "react-icons/fa";
-import { getUsersBasedOnSearchTerm } from "../../lib/api/api";
+import { getUsersBasedOnSearchTerm } from "../../lib/api";
 import { IUserData } from "../../types";
 import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
 

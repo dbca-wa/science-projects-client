@@ -2,7 +2,7 @@
 // Exposes that data and the state of the query loading
 
 import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "../../api/api";
+import { getProfile } from "../../api";
 import { IProfile } from "@/types";
 
 export const useProfile = (userId: undefined | string | number) => {

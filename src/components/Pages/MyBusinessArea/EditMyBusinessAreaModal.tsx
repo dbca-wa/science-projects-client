@@ -1,5 +1,5 @@
 import { UnboundStatefulEditor } from "@/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import { IMyBAUpdateSubmissionData, updateMyBa } from "@/lib/api/api";
+import { IMyBAUpdateSubmissionData, updateMyBa } from "@/lib/api";
 import useDistilledHtml from "@/lib/hooks/helper/useDistilledHtml";
 import {
   Button,

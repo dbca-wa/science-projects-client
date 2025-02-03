@@ -18,7 +18,7 @@ import {
   Grid,
   Button,
 } from "@chakra-ui/react";
-import { IDeleteComment, deleteCommentCall } from "../../lib/api/api";
+import { IDeleteComment, deleteCommentCall } from "../../lib/api";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

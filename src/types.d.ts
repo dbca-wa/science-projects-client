@@ -8,7 +8,7 @@ import {
   INewCycleEmail,
   IProjectClosureEmail,
   IReviewDocumentEmail,
-} from "@/lib/api/api";
+} from "@/lib/api";
 
 export interface ITAssetData {
   id: number;

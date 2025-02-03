@@ -16,10 +16,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import {
-  ISetProjectStatusProps,
-  setProjectStatus,
-} from "../../../../lib/api/api";
+import { ISetProjectStatusProps, setProjectStatus } from "../../../../lib/api";
 import { useFormattedDate } from "../../../../lib/hooks/helper/useFormattedDate";
 import { useBusinessArea } from "../../../../lib/hooks/tanstack/useBusinessArea";
 import { useFullUserByPk } from "../../../../lib/hooks/tanstack/useFullUserByPk";

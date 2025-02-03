@@ -1,4 +1,4 @@
-import { remedyMultipleLeaderProjects } from "@/lib/api/api";
+import { remedyMultipleLeaderProjects } from "@/lib/api";
 import { IProjectData } from "@/types";
 import {
   Box,

@@ -2,7 +2,7 @@
 // Exposes data and loading states of query
 
 import { useQuery } from "@tanstack/react-query";
-import { checkPendingCaretakerRequestsByPk } from "../../api/api";
+import { checkPendingCaretakerRequestsByPk } from "../../api";
 
 export const useCheckCaretakerRequestMade = (pk: { pk: number }) => {
   const { isPending, data } = useQuery({

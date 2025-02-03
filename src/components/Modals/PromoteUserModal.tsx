@@ -28,7 +28,7 @@ import {
   MutationError,
   MutationSuccess,
   switchAdmin,
-} from "../../lib/api/api";
+} from "../../lib/api";
 import { useForm } from "react-hook-form";
 
 interface IModalProps {

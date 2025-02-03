@@ -6,7 +6,7 @@ import { ToastId, useToast } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
 import { FaSave } from "react-icons/fa";
-import { IHTMLSave, saveHtmlToDB } from "../../../lib/api/api";
+import { IHTMLSave, saveHtmlToDB } from "../../../lib/api";
 import { BaseOptionsButton } from "./BaseOptionsButton";
 
 export const SaveButton = ({
