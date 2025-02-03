@@ -1391,3 +1391,34 @@ export interface ICaretakerPermissions {
   userIsCaretakerOfBaLeader: boolean;
   userIsCaretakerOfAdmin: boolean;
 }
+
+// Publications ================================================================================
+export interface Publication {
+  DocId: string;
+  BiblioText: string;
+  staff_only: boolean;
+  UserName: string;
+  recno: number;
+  content: string[];
+  title: string;
+  Material: string;
+  publisher: string;
+  AuthorBiblio: string;
+  year: string;
+  documentKey: string;
+  UserId: string;
+  author: string;
+  citation: string;
+  place: string;
+  BiblioEditors: string;
+  link_address?: string[];
+  link_category?: string[];
+  link_notes?: string[];
+}
+
+export interface PublicationResponse {
+  numFound: number;
+  start: number;
+  numFoundExact: boolean;
+  docs: Publication[];
+}
