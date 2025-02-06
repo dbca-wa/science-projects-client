@@ -14,8 +14,10 @@ const StaffProfileNavMenuItemButton = ({
   const colorDict = {
     Overview: "#2A6096",
     Projects: "#01A7B2",
-    CV: "#1E5456",
-    Publications: "#FFC530",
+    CV: "#FFC530",
+    Background: "#FFC530",
+    Experience: "#FFC530",
+    Publications: "#1E5456",
   };
   const borderColor = colorDict[title as keyof typeof colorDict];
 
@@ -34,6 +36,8 @@ const StaffProfileNavMenuItemButton = ({
           // title === "Publications" && "pl-4",
           (title === "Projects" ||
             title === "CV" ||
+            title === "Background" ||
+            title === "Experience" ||
             title === "Publications" ||
             (!isDesktop && title === "Overview")) &&
             "px-4",
