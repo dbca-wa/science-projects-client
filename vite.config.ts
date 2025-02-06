@@ -5,6 +5,7 @@ import path from "path";
 export default defineConfig({
   build: {
     minify: true,
+    sourcemap: false,
   },
   plugins: [react()],
   preview: {

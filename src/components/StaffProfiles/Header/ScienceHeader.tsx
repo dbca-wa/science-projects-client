@@ -7,7 +7,11 @@ const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   return (
     <div className="flex h-[65px] w-full flex-row items-center justify-between gap-2 bg-[#2d2f32] p-2 text-white dark:bg-slate-950">
       <div className="flex justify-start px-8">
-        <img src={"/logo.svg"} className="w-[240px] p-6" />
+        <img
+          src={"/logo.svg"}
+          className="w-[240px] p-6"
+          alt="Department of Biodiversity, Conservation and Attractions"
+        />
       </div>
       {isLoggedIn ? (
         <div className="flex justify-end">
@@ -30,7 +34,11 @@ const MobileHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
   return (
     <div className="flex h-[65px] w-full items-center justify-between gap-2 bg-[#2d2f32] p-2 px-5 text-white dark:bg-slate-950">
-      <img src={"/logo.svg"} className="w-[190px]" />
+      <img
+        src={"/logo.svg"}
+        className="w-[190px]"
+        alt="Department of Biodiversity, Conservation and Attractions"
+      />
       {isLoggedIn ? (
         <Button variant="link" className="bg-transparent text-lg text-white">
           <a href={`${VITE_PRODUCTION_BASE_URL ?? "/"}`} className="">

@@ -1,4 +1,4 @@
-import { Head } from "@/components/Base/Head";
+import { Head, StaffUserData } from "@/components/Base/Head";
 import ToggleStaffProfileVisibilityModal from "@/components/Modals/ToggleStaffProfileVisibilityModal";
 import { BaseToggleOptionsButton } from "@/components/RichTextEditor/Buttons/BaseToggleOptionsButton";
 import StaffContent from "@/components/StaffProfiles/Staff/Detail/StaffContent";
@@ -41,7 +41,7 @@ const ScienceStaffDetail = () => {
     Number(usersPk),
   );
 
-  console.log(staffBaseData);
+  // console.log(staffBaseData);
 
   const {
     isOpen: isToggleStaffProfileVisibilityModalOpen,
@@ -49,9 +49,45 @@ const ScienceStaffDetail = () => {
     onOpen: onOpenToggleStaffProfileVisibilityModal,
   } = useDisclosure();
 
+  // console.log(
+  //   staffBaseData?.keyword_tags
+  //     ?.map((word) =>
+  //       word.name
+  //         .split(" ")
+  //         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+  //         .join(" "),
+  //     )
+  //     .join(", "),
+  // );
+  const keyWordsString = staffBaseData?.keyword_tags
+    ?.map((word) =>
+      word.name
+        .split(" ")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" "),
+    )
+    .join(", ");
+
+  const userDataObject: StaffUserData = {
+    name: `${staffBaseData?.user?.display_first_name || ""} ${staffBaseData?.user?.display_last_name || ""}`.trim(),
+    position: staffBaseData?.title || "",
+    ...(keyWordsString && { keywords: keyWordsString }), // Only include if defined
+    ...(staffBaseData?.about && { about: staffBaseData.about }), // Only include if defined
+  };
+
   return (
     <div className="relative flex h-full w-full justify-center">
-      <Head title={`DBCA | Staff Details`} isStandalone />
+      <Head
+        title={`DBCA | ${staffBaseDataLoading ? "Staff Details" : `${staffBaseData?.user?.display_first_name} ${staffBaseData?.user?.display_last_name}`}`}
+        description={
+          staffBaseDataLoading
+            ? "Staff Details"
+            : `${staffBaseData?.user?.display_first_name} ${staffBaseData?.user?.display_last_name}'s staff profile. ${keyWordsString}}`
+        }
+        isStandalone
+        isStaffProfile
+        userData={userDataObject}
+      />
       {((buttonsVisible && viewingUser?.is_superuser) ||
         (buttonsVisible &&
           viewingUser?.pk === Number(staffBaseData?.user?.pk))) && (

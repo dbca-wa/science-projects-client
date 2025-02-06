@@ -2,12 +2,21 @@
 
 import { Helmet, HelmetProvider } from "react-helmet-async";
 
+export interface StaffUserData {
+  name: string;
+  position: string;
+  keywords?: string;
+  about?: string;
+}
+
 interface IProps {
   title?: string;
   isStandalone?: boolean;
   description?: string;
   keywords?: string;
   url?: string;
+  userData?: StaffUserData;
+  isStaffProfile?: boolean;
 }
 
 export const Head = ({
@@ -16,6 +25,8 @@ export const Head = ({
   description,
   keywords,
   url,
+  userData,
+  isStaffProfile,
 }: IProps) => {
   // Keywords
   const defaultKeywords =
@@ -30,8 +41,9 @@ export const Head = ({
 
   // Description
   const defaultDescription =
-    "Science Project Management System | DBCA | Western Australia";
-  const defaultPublicProfileDescription = "Science Staff, DBCA";
+    "Science Project Management System | DBCA | Department of Biodiversity, Conservation and Attractions | Western Australia";
+  const defaultPublicProfileDescription =
+    "Science Staff | DBCA | Department of Biodiversity, Conservation and Attractions | Western Australia";
 
   // Functions
   const getDescription = () => {
@@ -40,15 +52,79 @@ export const Head = ({
         ? defaultPublicProfileDescription
         : defaultDescription;
 
-    return description
-      ? `${baseDescription} - ${description}`
-      : baseDescription;
+    return description ? `${description}` : baseDescription;
   };
 
   const formatTitle = (rawTitle: string | undefined) => {
     if (!rawTitle) return "Loading...";
     const formattedTitle = isStandalone ? rawTitle : `SPMS | ${rawTitle}`;
     return formattedTitle.substring(0, 60);
+  };
+
+  const getRobotsContent = (path: string) => {
+    if (path.startsWith("/staff")) {
+      return "index, follow";
+    }
+    return "noindex, nofollow";
+  };
+
+  const getSitemapStructuredData = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "@id": "https://science-profiles.dbca.wa.gov.au/staff",
+      name: "Staff Directory",
+      description: "Browse all science staff profiles",
+      isPartOf: {
+        "@type": "WebSite",
+        "@id": "https://science-profiles.dbca.wa.gov.au/#website",
+      },
+    };
+  };
+
+  const getStructuredData = () => {
+    if (isStaffProfile && userData) {
+      // Profile page structured data
+      return {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: userData.name,
+        jobTitle: userData.position,
+        description: userData.about,
+        keywords: userData.keywords,
+        worksFor: {
+          "@type": "Organization",
+          name: "Department of Biodiversity, Conservation and Attractions",
+          url: "https://www.dbca.wa.gov.au/",
+          "@id": "https://www.dbca.wa.gov.au/",
+        },
+        url: currentUrl,
+        isPartOf: {
+          "@type": "WebSite",
+          name: "Science Staff Profiles",
+          url: "https://science-profiles.dbca.wa.gov.au/",
+          "@id": "https://science-profiles.dbca.wa.gov.au/#website",
+        },
+      };
+    }
+
+    // Main website structured data
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://science-profiles.dbca.wa.gov.au/#website",
+      name: "Science Staff Profiles",
+      url: "https://science-profiles.dbca.wa.gov.au/",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate:
+            "https://science-profiles.dbca.wa.gov.au/staff/{user_id}",
+        },
+      },
+      mainEntityOfPage: getSitemapStructuredData(),
+    };
   };
 
   // Final values
@@ -64,22 +140,26 @@ export const Head = ({
       <Helmet>
         {/* JSON-LD */}
         <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "name": "Science Staff Profiles",
-            "url": "https://science-profiles.dbca.wa.gov.au/",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": "https://science-profiles.dbca.wa.gov.au/staff/{user_id}",
-              "query-input": "required name=user_id"
-            }
-          }`}
+          {JSON.stringify(getStructuredData())}
         </script>
+
         <title>{finalTitle}</title>
         <link rel="icon" type="image/jpg" href={imageString} />
+        <link
+          rel="alternate"
+          type="application/json"
+          href="https://science-profiles.dbca.wa.gov.au/staff"
+          title="Staff Directory"
+        />
         <meta name="description" content={finalDescription} />
         <meta name="keywords" content={finalKeywords} />
+        <meta httpEquiv="Cache-Control" content="max-age=3600" />
+        <meta httpEquiv="Content-Language" content="en" />
+        <meta
+          name="sitemap"
+          content="https://science-profiles.dbca.wa.gov.au/staff"
+        />
+
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content={currentUrl} />
@@ -94,10 +174,31 @@ export const Head = ({
         <meta property="twitter:image" content={imageStringAbsolute} />
         {/* Additional SEO tags */}
         <link rel="canonical" href={currentUrl} />
-        <meta name="robots" content="index, follow" />
+        <meta
+          name="robots"
+          content={getRobotsContent(window.location.pathname)}
+        />
+        <meta
+          name="googlebot"
+          content={getRobotsContent(window.location.pathname)}
+        />
+        <meta
+          name="googlebot-news"
+          content={getRobotsContent(window.location.pathname)}
+        />
+        <meta
+          name="slurp"
+          content={getRobotsContent(window.location.pathname)}
+        />
+        <meta
+          name="bingbot"
+          content={getRobotsContent(window.location.pathname)}
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-        <html lang="en" /> {/* Important for accessibility and SEO */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+        <html lang="en" />
       </Helmet>
     </HelmetProvider>
   );

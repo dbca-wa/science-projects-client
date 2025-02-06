@@ -144,7 +144,7 @@ const OverviewSection = ({
 
           {/* Keywords */}
           <Subsection
-            title="Fields"
+            title="Key Interests"
             divider
             button={
               (viewingUser?.pk === userId || viewingUser?.is_superuser) &&

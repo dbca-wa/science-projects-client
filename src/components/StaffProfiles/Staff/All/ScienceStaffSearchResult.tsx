@@ -1,6 +1,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -8,10 +9,12 @@ import {
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import { IStaffUserResult } from "@/types";
 import { Building, Mail, MapPin, User } from "lucide-react";
@@ -98,14 +101,21 @@ export const SendUserEmailDialog = ({ name, pk }: IStaffUserResult) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <span className="flex items-center">
-          <Mail className="mt-[3px] self-start" size={"15px"} />
-          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600 hover:underline">
-            Email {`${name}`}
-          </a>
-        </span>
+        <Button
+          variant="link"
+          className="m-0 -mb-1 h-auto px-0 pt-1 text-blue-600 hover:underline"
+          aria-label={`Open email dialog for ${name}`}
+        >
+          <span className="flex items-center">
+            <Mail className="mt-[3px] self-start" size={"15px"} />
+            <span className="ml-2 flex-1 text-sm font-semibold">
+              Email {name}
+            </span>
+          </span>
+        </Button>
       </DialogTrigger>
       <DialogContent className="p-4 text-slate-800 sm:max-w-[425px]">
+        <DialogDescription className="sr-only">Email {name}</DialogDescription>
         <DialogHeader>
           <DialogTitle className="mb-2 mt-3">Email {`${name}`}</DialogTitle>
         </DialogHeader>
@@ -131,15 +141,22 @@ export const SendUserEmailMobileDrawer = ({
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger>
-        <span className="flex items-center">
-          <Mail className="mt-[3px] self-start" size={"15px"} />
-          <a className="ml-2 flex-1 cursor-pointer text-sm font-semibold text-blue-600 hover:underline">
-            Email {`${name}`}
-          </a>
-        </span>
+      <DrawerTrigger asChild>
+        <Button
+          variant="link"
+          className="m-0 -mb-1 h-auto px-0 pt-0.5 text-blue-600 hover:underline"
+          aria-label={`Open email dialog for ${name}`}
+        >
+          <span className="flex items-center">
+            <Mail className="mt-[3px] self-start" size={"15px"} />
+            <span className="ml-2 flex-1 text-sm font-semibold">
+              Email {name}
+            </span>
+          </span>
+        </Button>
       </DrawerTrigger>
       <DrawerContent className="p-4">
+        <DrawerDescription className="sr-only">Email {name}</DrawerDescription>
         <div className="mx-auto w-full max-w-sm text-slate-800">
           <DrawerHeader>
             <DrawerTitle className="mb-2 mt-3">Email {`${name}`}</DrawerTitle>

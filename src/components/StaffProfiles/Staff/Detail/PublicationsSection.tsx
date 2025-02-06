@@ -18,9 +18,9 @@ const PublicationsSection = ({
   const { publicationData, isLoading, refetch } =
     useUserPublications(employee_id);
 
-  useEffect(() => {
-    console.log("PublicationsSection", publicationData);
-  }, [publicationData]);
+  // useEffect(() => {
+  //   console.log("PublicationsSection", publicationData);
+  // }, [publicationData]);
 
   return (
     <>

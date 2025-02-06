@@ -27,6 +27,8 @@ const StaffContent = ({
   const { colorMode } = useColorMode();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
+  const CV_TAB_NAMES = ["CV", "Background", "Experience"];
+
   return (
     <div className="mx-auto w-full dark:text-slate-300">
       {/* Scrollbar / Navigation */}
@@ -54,6 +56,8 @@ const StaffContent = ({
               <StaffProfileNavMenuItemButton
                 setterFn={setSelectedNav}
                 selected={selectedNav}
+                // title={"Background"}
+                // title={"Experience"}
                 title={"CV"}
               />
               <StaffProfileNavMenuItemButton
@@ -84,7 +88,7 @@ const StaffContent = ({
           />
         ) : selectedNav === "Projects" ? (
           <ProjectsSection userId={usersPk} buttonsVisible={buttonsVisible} />
-        ) : selectedNav === "CV" ? (
+        ) : CV_TAB_NAMES.includes(selectedNav) ? (
           <CVSection
             userId={usersPk}
             buttonsVisible={buttonsVisible}
