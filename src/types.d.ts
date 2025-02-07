@@ -755,7 +755,7 @@ interface IProjectData {
   tag?: string;
   role?: ProjectRoles;
 
-  hidden_from_staff_profiles: number[];
+  hidden_from_staff_profiles?: number[];
 }
 
 interface IFullProjectDetails {
