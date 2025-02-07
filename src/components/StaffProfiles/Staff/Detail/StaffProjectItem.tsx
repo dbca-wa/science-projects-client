@@ -136,7 +136,7 @@ const StaffProjectItem = ({
       <div className="absolute -left-[1.3px] -ml-0.5 mr-2 mt-[9px] size-1 rounded-full bg-gray-500"></div>
 
       {/* Content container */}
-      <div className="mb-2">
+      <div className={isLast ? "pb-0" : "mb-2 pb-2"}>
         {/* Title Role, Date date section */}
         <div className="mb-2 flex w-full items-start justify-between">
           <div className="flex w-fit flex-col">
