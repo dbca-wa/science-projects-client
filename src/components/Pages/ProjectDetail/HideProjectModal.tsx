@@ -1,4 +1,7 @@
-import { toggleStaffProfileVisibility } from "@/lib/api";
+import {
+  toggleProjectVisibilityOnStaffProfile,
+  toggleStaffProfileVisibility,
+} from "@/lib/api";
 import {
   Text,
   Box,
@@ -24,21 +27,23 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import React, { useEffect, useRef } from "react";
 
-interface IToggleStaffProfileVisibilityModalProps {
+interface HideProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  staffProfilePk: number;
-  profileIsHidden: boolean;
+  userPk: number;
+  projectPk: number;
+  projectIsHiddenFromStaffProfile: boolean;
   refetch: () => void;
 }
 
-const ToggleStaffProfileVisibilityModal = ({
+const HideProjectModal = ({
   isOpen,
   onClose,
-  staffProfilePk,
-  profileIsHidden,
+  userPk,
+  projectPk,
+  projectIsHiddenFromStaffProfile,
   refetch,
-}: IToggleStaffProfileVisibilityModalProps) => {
+}: HideProjectModalProps) => {
   const { colorMode } = useColorMode();
   const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
 
@@ -63,10 +68,10 @@ const ToggleStaffProfileVisibilityModal = ({
   const queryClient = useQueryClient();
   const toggleVisibilityMutation = useMutation({
     // Start of mutation handling
-    mutationFn: toggleStaffProfileVisibility,
+    mutationFn: toggleProjectVisibilityOnStaffProfile,
     onMutate: () => {
       addToast({
-        title: "Changing Profile Visibility...",
+        title: "Changing Project Visibility...",
         description: "One moment!",
         status: "loading",
         position: "top-right",
@@ -78,9 +83,9 @@ const ToggleStaffProfileVisibilityModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Your profile is now ${
-            !profileIsHidden ? "hidden" : "visible"
-          }.`,
+          description: `This project is now ${
+            !projectIsHiddenFromStaffProfile ? "hidden" : "visible"
+          } from your staff profile.`,
           status: "success",
           position: "top-right",
           duration: 3000,
@@ -88,9 +93,9 @@ const ToggleStaffProfileVisibilityModal = ({
         });
       }
       //  Close the modal
-      // queryClient.invalidateQueries({
-      //   queryKey: ["latestUnapprovedProgressReports"],
-      // });
+      queryClient.invalidateQueries({
+        queryKey: ["hiddenProjects", userPk],
+      });
       queryClient.invalidateQueries({ queryKey: ["me"] }).then(() => {
         refetch();
       });
@@ -102,7 +107,7 @@ const ToggleStaffProfileVisibilityModal = ({
     // Error handling based on API - file - declared interface
     onError: (error: AxiosError) => {
       console.log(error);
-      let errorMessage = "An error occurred while setting profile visibility"; // Default error message
+      let errorMessage = "An error occurred while setting project visibility"; // Default error message
 
       const collectErrors = (data, prefix = "") => {
         if (typeof data === "string") {
@@ -148,9 +153,16 @@ const ToggleStaffProfileVisibilityModal = ({
     },
   });
 
-  const onSubmit = async ({ staffProfilePk }: { staffProfilePk: number }) => {
+  const onSubmit = async ({
+    userPk,
+    projectPk,
+  }: {
+    userPk: number;
+    projectPk: number;
+  }) => {
     await toggleVisibilityMutation.mutateAsync({
-      staffProfilePk,
+      userPk,
+      projectPk,
     });
     onClose();
   };
@@ -163,26 +175,31 @@ const ToggleStaffProfileVisibilityModal = ({
       >
         <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
           <ModalHeader>
-            {!profileIsHidden ? "Hide" : "Show"} Staff Profile
+            {!projectIsHiddenFromStaffProfile ? "Hide" : "Show"} Project From
+            Staff Profile
           </ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
             {/* <Center> */}
             <Text fontWeight={"bold"} fontSize={"xl"}>
-              Are you sure you want to {!profileIsHidden ? "hide" : "show"} your
-              staff profile?
+              Are you sure you want to{" "}
+              {!projectIsHiddenFromStaffProfile
+                ? "hide this project from your staff profile"
+                : "show this project on your staff profile"}
+              ?
             </Text>
             {/* </Center> */}
             <Text mt={4}>
-              Your account {!profileIsHidden ? " will no longer " : " will "}
-              appear in the science profiles public directory. You can change
-              this setting at any time.
+              This project{" "}
+              {!projectIsHiddenFromStaffProfile ? " will no longer " : " will "}
+              appear on your projects tab in the science profiles public
+              directory. You can change this setting at any time.
             </Text>
 
             <Text mt={4}>
               If you would still like to proceed, press "
-              {!profileIsHidden ? "Hide" : "Show"}".
+              {!projectIsHiddenFromStaffProfile ? "Hide" : "Show"}".
             </Text>
           </ModalBody>
           <ModalFooter>
@@ -199,12 +216,13 @@ const ToggleStaffProfileVisibilityModal = ({
                 isLoading={toggleVisibilityMutation.isPending}
                 onClick={() =>
                   onSubmit({
-                    staffProfilePk,
+                    userPk,
+                    projectPk,
                   })
                 }
                 ml={3}
               >
-                {!profileIsHidden ? "Hide" : "Show"}
+                {!projectIsHiddenFromStaffProfile ? "Hide" : "Show"}
               </Button>
             </Grid>
           </ModalFooter>
@@ -214,4 +232,4 @@ const ToggleStaffProfileVisibilityModal = ({
   );
 };
 
-export default ToggleStaffProfileVisibilityModal;
+export default HideProjectModal;

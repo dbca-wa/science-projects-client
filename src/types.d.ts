@@ -754,6 +754,8 @@ interface IProjectData {
   updated_at: Date;
   tag?: string;
   role?: ProjectRoles;
+
+  hidden_from_staff_profiles: number[];
 }
 
 interface IFullProjectDetails {

@@ -76,6 +76,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cancelAdminTaskRequestCall } from "@/lib/api";
 import { AxiosError } from "axios";
 import useCaretakerPermissions from "@/lib/hooks/helper/useCaretakerPermissions";
+import HideProjectModal from "./HideProjectModal";
 
 interface IProjectOverviewCardProps extends ICaretakerPermissions {
   location: IProjectAreas;
@@ -100,7 +101,7 @@ export const ProjectOverviewCard = ({
   userIsCaretakerOfMember,
   userIsCaretakerOfProjectLeader,
 }: IProjectOverviewCardProps) => {
-  // console.log(baseInformation);
+  console.log(baseInformation);
   // useEffect(() => {
   //   console.log(details);
   // }, [details]);
@@ -159,6 +160,11 @@ export const ProjectOverviewCard = ({
     isOpen: isActionDeleteModalOpen,
     onOpen: onOpenActionDeleteModal,
     onClose: onCloseActionDeleteModal,
+  } = useDisclosure();
+  const {
+    isOpen: isHideProjectModalOpen,
+    onOpen: onOpenHideProjectModal,
+    onClose: onCloseHideProjectModal,
   } = useDisclosure();
 
   const determineAuthors = (members: IProjectMember[]) => {
@@ -1376,6 +1382,41 @@ export const ProjectOverviewCard = ({
             {/* <TestRichTextEditor
 
                         /> */}
+
+            {/* Check if user is in members array by checking each member.user.id */}
+            {members?.some(
+              (member) =>
+                member.user.pk === me?.userData?.id ||
+                member.user.pk === me?.userData?.pk,
+            ) && (
+              <>
+                {/* isHideProjectModalOpen */}
+                <HideProjectModal
+                  projectIsHiddenFromStaffProfile={baseInformation?.hidden_from_staff_profiles?.includes(
+                    me?.userData?.pk,
+                  )}
+                  projectPk={baseInformation.id}
+                  isOpen={isHideProjectModalOpen}
+                  onClose={onCloseHideProjectModal}
+                  userPk={me?.userData?.pk}
+                  refetch={refetchData}
+                />
+                <Box my={4}>
+                  <Button
+                    onClick={onOpenHideProjectModal}
+                    background={"orange.500"}
+                    color={"white"}
+                    _hover={{ bg: "orange.400" }}
+                  >
+                    {baseInformation?.hidden_from_staff_profiles?.includes(
+                      me?.userData?.pk,
+                    )
+                      ? "Show On Staff Profile"
+                      : "Hide From Staff Profile"}
+                  </Button>
+                </Box>
+              </>
+            )}
 
             {(details?.external as IExternalProjectDetails)?.project ? (
               <>
