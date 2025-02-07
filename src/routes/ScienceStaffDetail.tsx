@@ -41,7 +41,7 @@ const ScienceStaffDetail = () => {
     Number(usersPk),
   );
 
-  // console.log(staffBaseData);
+  console.log(staffBaseData);
 
   const {
     isOpen: isToggleStaffProfileVisibilityModalOpen,

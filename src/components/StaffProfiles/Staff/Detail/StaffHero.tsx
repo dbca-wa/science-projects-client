@@ -55,6 +55,8 @@ const StaffHero = ({
   const baseAPI = useApiEndpoint();
   const [isImageError, setIsImageError] = useState(false);
 
+  console.log(staffHeroData);
+
   return !staffHeroLoading ? (
     // MOBILE
     !isDesktop ? (
@@ -99,9 +101,11 @@ const StaffHero = ({
             {staffHeroData?.it_asset_data && (
               <>
                 <p className="mt-4 text-balance font-semibold text-slate-600 dark:text-slate-400">
-                  {staffHeroData?.it_asset_data?.title
-                    ? staffHeroData?.it_asset_data?.title
-                    : "Staff Member"}
+                  {staffHeroData?.user?.ba_lead_status
+                    ? staffHeroData?.user?.ba_lead_status
+                    : staffHeroData?.it_asset_data?.title
+                      ? staffHeroData?.it_asset_data?.title
+                      : "Staff Member"}
                 </p>
                 <p className="mt-2 text-balance text-sm font-medium text-slate-500 dark:text-slate-400">
                   {staffHeroData?.it_asset_data?.unit
@@ -185,9 +189,13 @@ const StaffHero = ({
               {staffHeroData?.it_asset_data && (
                 <>
                   <p className="mt-2 text-balance font-semibold text-slate-600 dark:text-slate-400">
-                    {staffHeroData?.it_asset_data?.title
-                      ? staffHeroData?.it_asset_data?.title
-                      : "Staff Member"}
+                    {staffHeroData?.user?.ba_lead_status
+                      ? staffHeroData?.user?.ba_lead_status
+                      : staffHeroData?.it_asset_data?.title
+                        ? staffHeroData?.it_asset_data?.title
+                        : "Staff Member"}
+                    {/* staffHeroData?.user?.ba_lead_status ?
+                    staffHeroData?.user?.ba_lead_status : */}
                   </p>
                   <p className="mt-2 text-balance text-sm font-medium text-slate-500 dark:text-slate-400">
                     {staffHeroData?.it_asset_data?.unit
