@@ -1110,6 +1110,7 @@ export interface IStaffUserResult {
 
 export interface IStaffUser {
   pk: number;
+  ba_lead_status?: string | null;
   display_first_name: string;
   display_last_name: string;
   email: string;
@@ -1149,6 +1150,7 @@ export interface IStaffProfileBaseData {
   is_hidden: boolean;
 
   user: {
+    ba_lead_status: string | null;
     display_first_name: string;
     display_last_name: string;
     is_active: boolean;
