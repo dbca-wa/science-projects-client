@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import StaffProjectItem from "./StaffProjectItem";
 import ProjectsSubsection from "./ProjectsSubsection";
+import { useInvolvedStaffProfileProjects } from "@/lib/hooks/tanstack/useInvolvedStaffProfileProjects";
 
 const ProjectsSection = ({
   userId,
@@ -16,7 +17,9 @@ const ProjectsSection = ({
   buttonsVisible;
 }) => {
   const { userProjectsLoading, userProjectsData, refetchUserProjects } =
-    useInvolvedProjects(userId);
+    useInvolvedStaffProfileProjects(userId);
+
+  // getUsersProjectsForStaffProfile
 
   const sortByStartDate = (a, b) => {
     return Number(b.start_date) - Number(a.start_date); // Sort in descending order
@@ -89,7 +92,7 @@ const ProjectsSection = ({
           );
         })()
       ) : (
-        <div className="w-full">
+        <div className="w-full p-4">
           <p>No projects registered.</p>
         </div>
       )}

@@ -325,6 +325,24 @@ export const toggleStaffProfileVisibility = async ({
   return res;
 };
 
+export const toggleProjectVisibilityOnStaffProfile = async ({
+  userPk,
+  projectPk,
+}: {
+  userPk: number;
+  projectPk: number;
+}) => {
+  console.log({ userPk, projectPk });
+  const res = instance
+    .post(`projects/${projectPk}/toggle_user_profile_visibility`, {
+      user_pk: userPk,
+    })
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
+
 export interface INewCycle {
   alsoUpdate: boolean;
   shouldSendEmails: boolean;
@@ -378,6 +396,17 @@ export const checkCaretakerStatus = async () => {
 export const getUsersProjects = async ({ queryKey }: QueryFunctionContext) => {
   const [_, pk] = queryKey;
   const res = instance.get(`users/${pk}/projects`).then((res) => {
+    // console.log(res.data)
+    return res.data;
+  });
+  return res;
+};
+
+export const getUsersProjectsForStaffProfile = async ({
+  queryKey,
+}: QueryFunctionContext) => {
+  const [_, pk] = queryKey;
+  const res = instance.get(`users/${pk}/projects_staff_profile`).then((res) => {
     // console.log(res.data)
     return res.data;
   });
