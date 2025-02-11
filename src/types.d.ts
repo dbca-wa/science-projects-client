@@ -1261,6 +1261,13 @@ export interface IStaffEmploymentEntry {
   employer: string;
 }
 
+export interface IStaffPublicationEntry {
+  pk: number;
+  public_profile: number;
+  title: string;
+  year: number;
+}
+
 export type QualificationKind =
   | "postdoc"
   | "doc"
@@ -1420,11 +1427,24 @@ export interface Publication {
   link_notes?: string[];
 }
 
-export interface PublicationResponse {
+export interface LibraryPublicationResponse {
   numFound: number;
   start: number;
   numFoundExact: boolean;
   docs: Publication[];
   isError: boolean;
   errorMessage: string;
+}
+
+export interface CustomPublication {
+  pk: number;
+  public_profile: number;
+  title: string;
+  year: string;
+}
+
+export interface PublicationResponse {
+  staffProfilePk: number;
+  libraryData: LibraryPublicationResponse;
+  customPublications: CustomPublication[];
 }

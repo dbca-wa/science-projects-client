@@ -97,6 +97,7 @@ const StaffContent = ({
         ) : (
           <PublicationsSection
             userId={usersPk}
+            viewingUser={viewingUser}
             buttonsVisible={buttonsVisible}
             // There will always be employee_id for these users if IT Assets working correctly
             employee_id={baseData.employee_id}

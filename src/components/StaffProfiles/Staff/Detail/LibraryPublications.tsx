@@ -1,15 +1,17 @@
 import React from "react";
 import Subsection from "./Subsection";
-import { PublicationResponse, Publication } from "@/types";
+import {
+  PublicationResponse,
+  Publication,
+  LibraryPublicationResponse,
+} from "@/types";
 
 interface ILibraryPublicationsProps {
-  publicationData: PublicationResponse;
+  libraryData: LibraryPublicationResponse;
 }
 
-const LibraryPublications = ({
-  publicationData,
-}: ILibraryPublicationsProps) => {
-  const publicationsByYear = publicationData.docs.reduce(
+const LibraryPublications = ({ libraryData }: ILibraryPublicationsProps) => {
+  const publicationsByYear = libraryData.docs.reduce(
     (acc, pub) => {
       let year = pub.year;
       const bracketMatch = pub.year?.match(/\[(\d{4})\]/);
@@ -25,7 +27,7 @@ const LibraryPublications = ({
       }
       return acc;
     },
-    {} as Record<string, typeof publicationData.docs>,
+    {} as Record<string, typeof libraryData.docs>,
   );
 
   const uniqueYears = Object.keys(publicationsByYear)
@@ -36,14 +38,14 @@ const LibraryPublications = ({
   return (
     <Subsection
       title={`Publications${
-        !!(publicationData?.docs?.length > 9)
-          ? ` (${publicationData?.docs?.length})`
+        !!(libraryData?.docs?.length > 9)
+          ? ` (${libraryData?.docs?.length})`
           : ""
       }`}
       divider
     >
       <div className="mt-3">
-        {publicationData.docs.length === 0 && (
+        {libraryData.docs.length === 0 && (
           <p className="text-balance">No publications found.</p>
         )}
         {uniqueYears.map((year) => (

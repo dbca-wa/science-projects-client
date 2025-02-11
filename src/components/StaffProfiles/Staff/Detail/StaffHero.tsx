@@ -55,7 +55,7 @@ const StaffHero = ({
   const baseAPI = useApiEndpoint();
   const [isImageError, setIsImageError] = useState(false);
 
-  console.log(staffHeroData);
+  // console.log(staffHeroData);
 
   return !staffHeroLoading ? (
     // MOBILE

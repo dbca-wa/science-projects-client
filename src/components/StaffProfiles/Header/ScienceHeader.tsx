@@ -36,7 +36,7 @@ const MobileHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
     <div className="flex h-[65px] w-full items-center justify-between gap-2 bg-[#2d2f32] p-2 px-5 text-white dark:bg-slate-950">
       <img
         src={"/logo.svg"}
-        className="w-[190px]"
+        className="w-[190px] select-none"
         alt="Department of Biodiversity, Conservation and Attractions"
       />
       {isLoggedIn ? (
