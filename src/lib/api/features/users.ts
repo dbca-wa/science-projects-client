@@ -8,6 +8,7 @@ import {
   ISimplePkProp,
   IStaffEducationEntry,
   IStaffEmploymentEntry,
+  IStaffPublicationEntry,
   KeywordTag,
 } from "@/types";
 import instance from "../axiosInstance";

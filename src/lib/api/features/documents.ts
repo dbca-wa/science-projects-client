@@ -3,6 +3,8 @@ import {
   EditorSubsections,
   EditorType,
   IApproveDocument,
+  ISimplePkProp,
+  IStaffPublicationEntry,
 } from "@/types";
 import instance from "../axiosInstance";
 import { QueryFunctionContext } from "@tanstack/react-query";
@@ -10,6 +12,55 @@ import { QueryFunctionContext } from "@tanstack/react-query";
 // export interface IUserPublicationGet {
 //   employee_id: number;
 // }
+
+export const createPublication = async ({
+  // pk,
+  public_profile,
+  title,
+  year,
+}: IStaffPublicationEntry) => {
+  const res = instance
+    .post(`documents/custompublications`, {
+      // pk,
+      public_profile,
+      title,
+      year,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export const editPublication = async ({
+  pk,
+  // public_profile,
+  title,
+  year,
+}: IStaffPublicationEntry) => {
+  const res = instance
+    .put(`documents/custompublications/${pk}`, {
+      // pk,
+      // public_profile,
+      title,
+      year,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
+export const deletePublication = async ({ pk }: ISimplePkProp) => {
+  const res = instance
+    .delete(`documents/custompublications/${pk}`)
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+};
 
 export const getPublicationsForUser = async ({
   queryKey,

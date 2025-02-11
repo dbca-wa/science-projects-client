@@ -41,7 +41,7 @@ const ScienceStaffDetail = () => {
     Number(usersPk),
   );
 
-  console.log(staffBaseData);
+  // console.log(staffBaseData);
 
   const {
     isOpen: isToggleStaffProfileVisibilityModalOpen,
@@ -227,7 +227,7 @@ const ScienceStaffDetail = () => {
                   <Button
                     className="w-full"
                     onClick={() => {
-                      console.log("clicked");
+                      // console.log("clicked");
                       onOpenToggleStaffProfileVisibilityModal();
                     }}
                   >
