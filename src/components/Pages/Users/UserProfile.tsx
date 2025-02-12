@@ -291,7 +291,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               isOpen={isSetCaretakerMyModalOpen}
               onClose={onCloseSetCaretakerMyModal}
               userIsSuper={userInQuestionIsSuperuser}
-              userPk={user.pk}
+              userPk={user?.pk}
               userData={user}
               refetch={() => {
                 refetch();
@@ -357,7 +357,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             isOpen={isSetCaretakerAdminModalOpen}
             onClose={onCloseSetCaretakerAdminModal}
             userIsSuper={userInQuestionIsSuperuser}
-            userPk={user.pk}
+            userPk={user?.pk}
             userData={user}
             refetch={() => {
               refetch();
@@ -368,7 +368,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             isOpen={isDeleteModalOpen}
             onClose={onDeleteModalClose}
             userIsSuper={userInQuestionIsSuperuser}
-            userPk={user.pk}
+            userPk={user?.pk}
           />
           <DeactivateUserModal
             isOpen={isDeactivateModalOpen}
@@ -379,7 +379,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
           <PromoteUserModal
             isOpen={isPromoteModalOpen}
             onClose={onPromoteModalClose}
-            userPk={user.pk}
+            userPk={user?.pk}
             userIsSuper={userInQuestionIsSuperuser}
             userIsExternal={!user.is_staff}
           />
@@ -1132,7 +1132,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
                     {user?.caretaking_for?.map((obj) => (
                       <Tooltip
-                        key={obj.pk}
+                        key={obj?.pk}
                         label={`This user has authority to act on ${obj.display_first_name} ${obj.display_last_name}'s behalf`}
                       >
                         {viewingUserIsAccount ||
@@ -1165,7 +1165,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           ))}
 
                         <Flex
-                          key={obj.pk}
+                          key={obj?.pk}
                           bg={colorMode === "light" ? "gray.50" : "gray.600"}
                           p={2}
                           rounded={"xl"}
@@ -1287,7 +1287,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                               ?.secondary_users[0]?.pk === me?.userData?.pk) ||
                           // If user is already being cared for by this user (check if user pk is in caretaking_for)
                           user?.caretaking_for?.some(
-                            (obj) => obj.pk === me?.userData?.pk,
+                            (obj) => obj?.pk === me?.userData?.pk,
                           ) ||
                           // If user already has a caretaker set
                           me?.userData?.caretakers?.length > 0
@@ -1423,9 +1423,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   color={
                     colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"
                   }
-                  _hover={{
-                    bg: colorMode === "light" ? "red.500" : "red.600",
-                  }}
+                  _hover={{ bg: colorMode === "light" ? "red.500" : "red.600" }}
                   isDisabled={
                     accountIsSuper || user.email === me.userData.email
                   }
