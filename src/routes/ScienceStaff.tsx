@@ -27,6 +27,12 @@ export const ScienceStaff = () => {
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
+  const getDisplayName = (user) => {
+    const firstName = user?.display_first_name ?? user?.first_name;
+    const lastName = user?.display_last_name ?? user?.last_name;
+    return `${firstName} ${lastName}`.toLowerCase(); // lowercase for case-insensitive sorting
+  };
+
   return (
     <div className="p-4">
       <Head title="DBCA | Staff Profiles" isStandalone />
@@ -68,24 +74,28 @@ export const ScienceStaff = () => {
             gridGap={4}
             py={4}
           >
-            {scienceStaffData?.users?.map((user, index) => {
-              // console.log(user);
-              return (
-                <ScienceStaffSearchResult
-                  key={index}
-                  pk={user?.pk}
-                  name={`${user?.display_first_name ?? user?.first_name} ${user?.display_last_name ?? user?.last_name}`}
-                  position={
-                    user?.business_area_led
-                      ? `Business Area Leader, ${user.business_area_led}`
-                      : user?.position
-                  }
-                  location={user?.location}
-                  unit={user?.unit}
-                  division={user?.division} // branch={user?.branch}
-                />
-              );
-            })}
+            {scienceStaffData?.users
+              ?.sort((a, b) =>
+                getDisplayName(a).localeCompare(getDisplayName(b)),
+              )
+              ?.map((user, index) => {
+                // console.log(user);
+                return (
+                  <ScienceStaffSearchResult
+                    key={index}
+                    pk={user?.pk}
+                    name={`${user?.display_first_name ?? user?.first_name} ${user?.display_last_name ?? user?.last_name}`}
+                    position={
+                      user?.business_area_led
+                        ? `Business Area Leader, ${user.business_area_led}`
+                        : user?.position
+                    }
+                    location={user?.location}
+                    unit={user?.unit}
+                    division={user?.division} // branch={user?.branch}
+                  />
+                );
+              })}
           </Grid>
           <Pagination
             totalResults={scienceStaffData?.total_results}
