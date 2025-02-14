@@ -1,15 +1,8 @@
-import { useEffect } from "react";
-import SimpleSkeletonSection from "../../SimpleSkeletonSection";
-import Subsection from "./Subsection";
-import ResponsivePopup from "./ResponsivePopup";
 import { useUserPublications } from "@/lib/hooks/tanstack/useUserPublications";
-import LogPublicationsButton from "./LogPublicationsButton";
-import LibraryPublications from "./LibraryPublications";
-import { IUserMe } from "@/types";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
-import { PublicationDialog } from "../PublicationDialog";
-import PublicationDrawer from "../PublicationDrawer";
-import CustomPublications from "./CustomPublications";
+import { IUserMe } from "@/types";
+import SimpleSkeletonSection from "../../SimpleSkeletonSection";
+import LibraryPublications from "./LibraryPublications";
 
 const PublicationsSection = ({
   userId,
@@ -39,13 +32,13 @@ const PublicationsSection = ({
         </>
       ) : (
         <>
-          <CustomPublications
+          {/* <CustomPublications
             publicationData={publicationData}
             userId={userId}
             viewingUser={viewingUser}
             buttonsVisible={buttonsVisible}
             refetch={refetch}
-          />
+          /> */}
           <LibraryPublications libraryData={publicationData?.libraryData} />
         </>
       )}
