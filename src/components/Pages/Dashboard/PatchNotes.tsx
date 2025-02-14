@@ -150,7 +150,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               already managing in a caretaker capacity, request to become that
               user's caretaker, then assign those projects to that user.
             </ListItem>
-            <ListItem
+            {/* <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
               marginLeft={"21px"}
@@ -159,7 +159,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               Feature: Staff Profile Publications. Publications belonging to
               users are now fetched from the library and displayed on their
               public profile. Users may also add additional publications.
-            </ListItem>
+            </ListItem> */}
             <ListItem
               fontSize={"small"}
               textIndent={"-21px"}
