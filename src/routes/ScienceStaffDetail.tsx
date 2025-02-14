@@ -75,6 +75,23 @@ const ScienceStaffDetail = () => {
     ...(staffBaseData?.about && { about: staffBaseData.about }), // Only include if defined
   };
 
+  if (staffBaseDataLoading) {
+    return (
+      <div className="relative flex h-full w-full justify-center">
+        <Head
+          title="DBCA | Staff Details"
+          description="Staff Details"
+          isStandalone
+          isStaffProfile
+          userData={userDataObject}
+        />
+        <Center my={24}>
+          <Spinner />
+        </Center>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex h-full w-full justify-center">
       <Head
@@ -88,6 +105,7 @@ const ScienceStaffDetail = () => {
         isStaffProfile
         userData={userDataObject}
       />
+
       {((buttonsVisible && viewingUser?.is_superuser) ||
         (buttonsVisible &&
           viewingUser?.pk === Number(staffBaseData?.user?.pk))) && (
@@ -101,13 +119,18 @@ const ScienceStaffDetail = () => {
       )}
 
       {!isNumeric ||
+      !staffBaseData ||
       (staffBaseData?.is_hidden &&
         viewingUser?.pk !== staffBaseData?.user?.pk &&
         !viewingUser?.is_superuser) ? (
         <div
           className={`flex h-full w-full flex-col items-center justify-center p-8`}
         >
-          <p>No matching user for ID {usersPk}</p>
+          <p>
+            {staffBaseData?.is_hidden
+              ? "This profile is currently hidden."
+              : `No matching user for ID ${usersPk}`}
+          </p>
           <Button
             className="mt-8"
             onClick={() => {

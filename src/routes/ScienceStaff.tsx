@@ -48,7 +48,14 @@ export const ScienceStaff = () => {
       {scienceStaffLoading || !scienceStaffData ? (
         <StaffResultSkeleton />
       ) : (
-        <div className="my-4 min-h-[450px] w-full min-w-[300px] px-4">
+        <div
+          className={clsx(
+            "my-4 min-h-[450px] w-full min-w-[300px] px-4",
+            scienceStaffData?.total_results === 0
+              ? "flex items-center justify-center"
+              : "",
+          )}
+        >
           <p>
             {scienceStaffData?.total_results === 0
               ? searchTerm
@@ -125,6 +132,7 @@ export const ScienceStaff = () => {
 
 import { Head } from "@/components/Base/Head";
 import { Button } from "@/components/ui/button";
+import clsx from "clsx";
 
 interface PaginationProps {
   currentPage: number;
