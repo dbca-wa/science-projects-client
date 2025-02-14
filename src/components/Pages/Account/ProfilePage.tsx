@@ -272,6 +272,7 @@ export const ProfilePage = () => {
           />
 
           <ToggleStaffProfileVisibilityModal
+            userPk={me?.pk}
             isOpen={isToggleStaffProfileVisibilityModalOpen}
             onClose={onCloseToggleStaffProfileVisibilityModal}
             staffProfilePk={me?.staff_profile_pk}
