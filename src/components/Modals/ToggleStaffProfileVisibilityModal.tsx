@@ -29,6 +29,7 @@ interface IToggleStaffProfileVisibilityModalProps {
   onClose: () => void;
   staffProfilePk: number;
   profileIsHidden: boolean;
+  userPk: number;
   refetch: () => void;
 }
 
@@ -37,6 +38,7 @@ const ToggleStaffProfileVisibilityModal = ({
   onClose,
   staffProfilePk,
   profileIsHidden,
+  userPk,
   refetch,
 }: IToggleStaffProfileVisibilityModalProps) => {
   const { colorMode } = useColorMode();
@@ -91,6 +93,14 @@ const ToggleStaffProfileVisibilityModal = ({
       // queryClient.invalidateQueries({
       //   queryKey: ["latestUnapprovedProgressReports"],
       // });
+      // invalidate that user profile
+      queryClient.invalidateQueries({
+        queryKey: ["staffProfile", staffProfilePk],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["baseStaffProfile", userPk],
+      });
+
       queryClient.invalidateQueries({ queryKey: ["me"] }).then(() => {
         refetch();
       });

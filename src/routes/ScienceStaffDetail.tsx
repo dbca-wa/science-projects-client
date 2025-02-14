@@ -111,10 +111,14 @@ const ScienceStaffDetail = () => {
           viewingUser?.pk === Number(staffBaseData?.user?.pk))) && (
         <ToggleStaffProfileVisibilityModal
           isOpen={isToggleStaffProfileVisibilityModalOpen}
+          userPk={staffBaseData?.user?.pk}
           onClose={onCloseToggleStaffProfileVisibilityModal}
-          staffProfilePk={viewingUser?.staff_profile_pk}
-          profileIsHidden={viewingUser?.staff_profile_hidden}
-          refetch={refetchUser}
+          staffProfilePk={staffBaseData?.pk}
+          profileIsHidden={staffBaseData?.is_hidden}
+          refetch={() => {
+            refetch();
+            refetchUser();
+          }}
         />
       )}
 
@@ -254,8 +258,7 @@ const ScienceStaffDetail = () => {
                       onOpenToggleStaffProfileVisibilityModal();
                     }}
                   >
-                    {viewingUser?.staff_profile_hidden ? "Show" : "Hide"}{" "}
-                    Profile
+                    {staffBaseData?.is_hidden ? "Show" : "Hide"} Profile
                   </Button>
                 </div>
               </div>
