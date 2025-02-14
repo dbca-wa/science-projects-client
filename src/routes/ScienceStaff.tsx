@@ -69,7 +69,7 @@ export const ScienceStaff = () => {
             py={4}
           >
             {scienceStaffData?.users?.map((user, index) => {
-              console.log(user);
+              // console.log(user);
               return (
                 <ScienceStaffSearchResult
                   key={index}

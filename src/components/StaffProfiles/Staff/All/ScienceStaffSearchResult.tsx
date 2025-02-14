@@ -37,7 +37,7 @@ const ScienceStaffSearchResult = ({
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const ignoredTitles = ["ms", "mrs", "mr", "master"];
 
-  console.log({ pk, name, title, position, unit, location, division });
+  // console.log({ pk, name, title, position, unit, location, division });
 
   return (
     <div className="min-h-48 rounded-md border border-blue-300 p-6">
