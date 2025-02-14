@@ -68,14 +68,6 @@ const PublicationYear = ({ year }: { year: number }) => {
 interface IPublicationTextProps {
   publication: Publication;
 }
-// {
-//   "linkContent": "Case study: the FORESTCHECK project: the response of vascular flora to silviculture in jarrah (Eucalyptus marginata) forest",
-//   "baseTitle":   "Case study: the FORESTCHECK project: the response of vascular flora to silviculture in jarrah (Eucalyptus marginata"
-// }
-// {
-//   "linkContent": "Case study: the FORESTCHECK project: the response of vascular flora to silviculture in jarrah (Eucalyptus marginata) forest",
-//   "baseTitle": "Case study: the FORESTCHECK project: the response of vascular flora to silviculture in jarrah (Eucalyptus marginata<"
-// }
 
 const PublicationText = ({ publication }: IPublicationTextProps) => {
   const normalizeText = (text: string) => {
@@ -93,44 +85,42 @@ const PublicationText = ({ publication }: IPublicationTextProps) => {
 
   const processText = (publication: Publication) => {
     let text = publication.BiblioText;
-    // console.log("Initial text:", text);
 
-    // First handle staff-only case
+    // Handle staff-only case first
     if (publication.staff_only) {
-      const processed = text.replace(/<a\b[^>]*>.*?<\/a>\s*\.?\s*/g, "");
-      // console.log("Staff-only processed:", processed);
-      return processed;
+      // For staff-only publications, we want to keep all the citation information
+      // but remove only the staff-only link and any trailing period
+      return text.replace(/<a\b[^>]*>.*?<\/a>\s*\.?\s*$/, "");
     }
 
-    // Get the base title and clean it properly
-    const baseTitle = normalizeText(publication.title);
+    // Check if the link appears after a year pattern (YYYY)
+    const yearPattern = /\(\d{4}\)\./;
+    if (yearPattern.test(text)) {
+      // If we find a year pattern, we don't want to move or remove any links
+      // as they are likely part of the citation rather than duplicated titles
+      return text;
+    }
 
     // Find any links in the text
     const linkMatch = text.match(/<a\b[^>]*>(.*?)<\/a>/);
     if (!linkMatch) {
-      // console.log("No link found in text");
       return text;
     }
+
+    // Get the base title and clean it
+    const baseTitle = normalizeText(publication.title);
 
     // Get the full link and its content
     const fullLink = linkMatch[0];
     const modifiedLink = fullLink.replace(/\.<\/a>$/, "</a>");
     const linkContent = normalizeText(linkMatch[1]);
 
-    // console.log("String comparison:", {
-    //   baseTitle,
-    //   linkContent,
-    //   lengthDiff: baseTitle.length - linkContent.length,
-    // });
-
-    // Check if the link content matches the base title
+    // Only proceed with title replacement if the link content matches the base title
     if (linkContent === baseTitle) {
-      // console.log("Link content matches base title");
-
-      // Find the original title in the text (before the link)
+      // Find the text before the link
       const beforeLink = text.split(/<a\b[^>]*>.*?<\/a>/)[0];
 
-      // Look for the complete title (including any HTML tags)
+      // Create a regex to find the complete title (including any HTML tags)
       const titleRegex = new RegExp(
         linkMatch[1]
           .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
@@ -139,34 +129,22 @@ const PublicationText = ({ publication }: IPublicationTextProps) => {
       );
 
       const titleMatch = beforeLink.match(titleRegex);
+
       if (titleMatch) {
         // Remove the original link from the end
         text = text.replace(fullLink, "");
 
         // Replace the first occurrence of the title with the link
         text = text.replace(titleMatch[0], `${modifiedLink}.`);
-
-        // console.log("Text reconstruction:", {
-        //   originalTitle: titleMatch[0],
-        //   modifiedLink,
-        //   result: text,
-        // });
-      } else {
-        // console.log("Title not found in text");
       }
-    } else {
-      // console.log("No match:", { linkContent, baseTitle });
     }
 
     // Clean up any double periods and spaces
-    text = text
+    return text
       .replace(/\.\s*\./g, ".")
       .replace(/\s+/g, " ")
       .replace(/\s+\./g, ".")
       .trim();
-
-    // console.log("Final text:", text);
-    return text;
   };
 
   const processedText = processText(publication);
