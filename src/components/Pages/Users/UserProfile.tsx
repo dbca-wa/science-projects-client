@@ -591,7 +591,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                       {user?.business_area?.name ? (
                         <>
                           <span>
-                            {user?.business_area?.leader.pk === user?.pk
+                            {user?.business_area?.leader?.pk === user?.pk
                               ? "Business Area Leader, "
                               : ``}
                           </span>
