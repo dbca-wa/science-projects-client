@@ -18,6 +18,7 @@ import {
   useColorMode,
   useDisclosure,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { AiFillCalendar, AiFillTag } from "react-icons/ai";
 import {
@@ -403,8 +404,8 @@ export const ProjectOverviewCard = ({
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
   const queryClient = useQueryClient();

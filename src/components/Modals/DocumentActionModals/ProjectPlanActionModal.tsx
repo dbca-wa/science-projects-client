@@ -18,6 +18,7 @@ import {
   Checkbox,
   Grid,
   Center,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -60,10 +61,10 @@ export const ProjectPlanActionModal = ({
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
   const { register, handleSubmit, reset } = useForm<IApproveDocument>();
 
-  const addToast = (data) => {
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

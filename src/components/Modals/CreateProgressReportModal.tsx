@@ -25,6 +25,7 @@ import {
   FormHelperText,
   Spinner,
   Box,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { ISpawnDocument, spawnNewEmptyDocument } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
@@ -84,8 +85,8 @@ export const CreateProgressReportModal = ({
   }, [selectedReportId]);
 
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

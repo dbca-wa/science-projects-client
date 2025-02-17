@@ -21,6 +21,7 @@ import {
   Button,
   Select,
   Box,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { requestDeleteProjectCall } from "../../lib/api";
 import { useRef } from "react";
@@ -43,8 +44,8 @@ export const RequestDeleteProjectModal = ({
   refetch,
 }: Props) => {
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

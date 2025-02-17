@@ -22,6 +22,7 @@ import {
   useColorMode,
   useDisclosure,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -66,8 +67,8 @@ export const DeactivateUserModal = ({
 
   // Toast
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
   const queryClient = useQueryClient();

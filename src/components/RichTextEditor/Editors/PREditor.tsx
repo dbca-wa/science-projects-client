@@ -15,6 +15,7 @@ import {
   useColorMode,
   useDisclosure,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
@@ -304,8 +305,8 @@ IPREditorProps) => {
   const { register, handleSubmit, reset } =
     useForm<ISaveProgressReportSection>();
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

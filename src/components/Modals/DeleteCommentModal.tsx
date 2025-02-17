@@ -17,6 +17,7 @@ import {
   ModalFooter,
   Grid,
   Button,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { IDeleteComment, deleteCommentCall } from "../../lib/api";
 import { useRef } from "react";
@@ -41,8 +42,8 @@ export const DeleteCommentModal = ({
   onDeleteSuccess,
 }: Props) => {
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

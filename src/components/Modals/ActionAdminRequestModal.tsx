@@ -20,6 +20,7 @@ import {
   Grid,
   Button,
   Box,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { actionAdminRequestCall } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
@@ -53,8 +54,8 @@ export const ActionAdminRequestModal = ({
     console.log({ task });
   }, [task]);
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
   const [decision, setDecision] = useState("");

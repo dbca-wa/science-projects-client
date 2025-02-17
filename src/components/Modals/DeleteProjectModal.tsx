@@ -19,6 +19,7 @@ import {
   ModalFooter,
   Grid,
   Button,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { deleteProjectCall } from "../../lib/api";
 import { useRef } from "react";
@@ -37,8 +38,8 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
   const navigate = useNavigate();
 
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

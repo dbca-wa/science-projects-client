@@ -19,6 +19,7 @@ import {
   useColorMode,
   useDisclosure,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
@@ -56,8 +57,8 @@ export const PromoteUserModal = ({
 
   // Toast
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 
