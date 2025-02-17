@@ -143,6 +143,7 @@ export const DocumentApprovedEmailModal = ({
           isClosable: true,
         });
       }
+      onClose();
     },
     onError: (error) => {
       if (toastIdRef.current) {

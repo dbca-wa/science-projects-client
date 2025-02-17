@@ -136,6 +136,7 @@ export const DocumentRecalledEmailModal = ({
           isClosable: true,
         });
       }
+      onClose();
     },
     onError: (error) => {
       if (toastIdRef.current) {
