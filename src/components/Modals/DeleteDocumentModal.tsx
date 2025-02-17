@@ -19,6 +19,7 @@ import {
   ModalFooter,
   Grid,
   Button,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { IDeleteDocument, deleteDocumentCall } from "../../lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -61,8 +62,8 @@ export const DeleteDocumentModal = ({
   );
 
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

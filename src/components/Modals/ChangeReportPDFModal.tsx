@@ -20,6 +20,7 @@ import {
   ToastId,
   useColorMode,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -50,8 +51,8 @@ export const ChangeReportPDFModal = ({
   const queryClient = useQueryClient();
 
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

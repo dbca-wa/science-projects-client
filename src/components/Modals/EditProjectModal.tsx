@@ -23,6 +23,7 @@ import {
   TagLabel,
   Text,
   ToastId,
+  UseToastOptions,
   VisuallyHiddenInput,
   useColorMode,
   useToast,
@@ -345,8 +346,8 @@ export const EditProjectModal = ({
   const { register } = useForm<IEditProject>();
   const queryClient = useQueryClient();
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

@@ -11,6 +11,7 @@ import {
   useToast,
   ToastId,
   useColorMode,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
@@ -47,9 +48,9 @@ export const Login = ({ onClose }: IIsModal) => {
   } = useForm<ILoginData>();
 
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
 
-  const addToast = (data) => {
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

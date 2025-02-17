@@ -2,7 +2,7 @@
 // This will by default be implemented once a document has been approved.
 // Only the system, directorate or program leader can click the button again to enable editing.
 
-import { ToastId, useToast } from "@chakra-ui/react";
+import { ToastId, useToast, UseToastOptions } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
 import { FaSave } from "react-icons/fa";
@@ -19,8 +19,8 @@ export const GuideSaveButton = ({
   canSave,
 }: IHTMLGuideSave) => {
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

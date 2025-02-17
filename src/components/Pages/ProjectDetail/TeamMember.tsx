@@ -1,5 +1,3 @@
-// Component for showing details regarding a team member. Dragging adjusts the position of the team member.
-
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import {
   Avatar,
@@ -19,7 +17,6 @@ import {
   useDisclosure,
   Tooltip,
 } from "@chakra-ui/react";
-import { DraggableProvided } from "react-beautiful-dnd"; // Import DraggableProvided
 import { FaCrown } from "react-icons/fa";
 import {
   IBranch,
@@ -45,12 +42,10 @@ interface ITeamMember {
   position: number;
   usersCount: number;
   project_id: number;
-  draggableProps: DraggableProvided["draggableProps"];
-  dragHandleProps: DraggableProvided["dragHandleProps"];
   isCurrentlyDragging: boolean;
   draggingUser: IUserData | IUserMe;
-  backgroundColor: string | undefined; // Add backgroundColor prop
-  refetchTeamData: () => void;
+  backgroundColor: string | undefined;
+  refetchTeamData: (options?: any) => Promise<any>;
   ba_leader: number;
   caretaker: ICaretakerSimpleUserData;
   baData: IBusinessArea[];
@@ -67,20 +62,16 @@ export const TeamMember = ({
   role,
   image,
   time_allocation,
-  // position,
   username,
   usersCount,
   project_id,
   isCurrentlyDragging,
-  draggableProps,
-  dragHandleProps,
-  backgroundColor, // Accept backgroundColor prop
+  backgroundColor,
   ba_leader,
   caretaker,
   baData,
   branchesData,
 }: ITeamMember) => {
-  // Define your styles for the dragged state
   const { colorMode } = useColorMode();
 
   const roleColors: { [key: string]: { bg: string; color: string } } = {
@@ -142,7 +133,7 @@ export const TeamMember = ({
 
   const draggedStyles = {
     background: "blue.500",
-    scale: 1.1,
+    transform: "scale(1.1)",
     borderRadius: "10px",
     cursor: "grabbing",
     zIndex: 999,
@@ -156,7 +147,7 @@ export const TeamMember = ({
         isOpen={isUserOpen}
         placement="right"
         onClose={onUserClose}
-        size={"sm"} //by default is xs
+        size="sm"
       >
         <DrawerOverlay />
         <DrawerContent>
@@ -168,7 +159,6 @@ export const TeamMember = ({
               is_leader={is_leader}
               leader_pk={leader_pk}
               role={role}
-              // position={position}
               shortCode={short_code}
               time_allocation={time_allocation}
               usersCount={usersCount}
@@ -176,7 +166,6 @@ export const TeamMember = ({
               onClose={onUserClose}
             />
           </DrawerBody>
-
           <DrawerFooter></DrawerFooter>
         </DrawerContent>
       </Drawer>
@@ -185,7 +174,7 @@ export const TeamMember = ({
         isOpen={isCaretakerOpen}
         placement="right"
         onClose={onCaretakerClose}
-        size={"lg"} //by default is xs
+        size="lg"
       >
         <DrawerOverlay zIndex={999} />
         <DrawerContent>
@@ -196,19 +185,14 @@ export const TeamMember = ({
               businessAreas={baData}
             />
           </DrawerBody>
-
           <DrawerFooter></DrawerFooter>
         </DrawerContent>
       </Drawer>
 
       <HStack
-        {...draggableProps}
-        {...dragHandleProps}
         style={isCurrentlyDragging ? draggedStyles : {}}
-        scale={isCurrentlyDragging ? 1.1 : 1}
-        borderRadius={isCurrentlyDragging ? "10px" : "0px"}
         bg={isCurrentlyDragging ? "blue.500" : backgroundColor}
-        justifyContent={"space-between"}
+        justifyContent="space-between"
         _hover={{
           boxShadow:
             colorMode === "light"
@@ -216,15 +200,14 @@ export const TeamMember = ({
               : "0px 2px 3px -0.5px rgba(255, 255, 255, 0.05), 0px 1px 2px -0.5px rgba(255, 255, 255, 0.03)",
           zIndex: 999,
         }}
-        border={"1px solid"}
+        border="1px solid"
         borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
       >
-        {/* Left Section */}
         <Flex p={4}>
-          <Box pos={"relative"}>
+          <Box pos="relative">
             <Avatar
               mt={1}
-              size={"lg"}
+              size="lg"
               src={
                 image?.file
                   ? `${baseURL}${image.file}`
@@ -232,32 +215,23 @@ export const TeamMember = ({
                     ? `${baseURL}${image.old_file}`
                     : ""
               }
-              userSelect={"none"}
+              userSelect="none"
               onClick={onUserOpen}
               cursor="pointer"
             />
             {is_leader && (
-              <Box pos={"absolute"} color={"yellow.300"} top={-1} right={"38%"}>
+              <Box pos="absolute" color="yellow.300" top={-1} right="38%">
                 <FaCrown />
               </Box>
             )}
           </Box>
 
-          <Grid
-            ml={4}
-            gridTemplateColumns={"repeat(1, 1fr)"}
-            userSelect={"none"}
-          >
-            <Box
-              display={"flex"}
-              flexDirection={"row"}
-              gap={2}
-              alignItems={"center"}
-            >
+          <Grid ml={4} gridTemplateColumns="repeat(1, 1fr)" userSelect="none">
+            <Box display="flex" flexDirection="row" gap={2} alignItems="center">
               <Button
-                ml={"2px"}
-                variant={"link"}
-                justifyContent={"start"}
+                ml="2px"
+                variant="link"
+                justifyContent="start"
                 color={
                   isCurrentlyDragging
                     ? "white"
@@ -270,37 +244,36 @@ export const TeamMember = ({
                 }}
                 onClick={onUserOpen}
                 cursor="pointer"
-                fontSize={"lg"}
+                fontSize="lg"
               >
                 {name !== "undefined undefined" && name !== "None None"
                   ? name
                   : username}
               </Button>
-              {/* Display caretaker info if there is one */}
               {caretaker && (
                 <Tooltip
                   label={`This user is away and ${caretaker.display_first_name} ${caretaker.display_last_name} is caretaking`}
                   aria-label="Caretaker"
                 >
                   <Box
-                    display={"flex"}
-                    alignItems={"center"}
+                    display="flex"
+                    alignItems="center"
                     gap={2}
-                    userSelect={"none"}
+                    userSelect="none"
                     onClick={onCaretakerOpen}
                     cursor="pointer"
                   >
                     <Avatar
                       mt={1}
-                      size={"xs"}
+                      size="xs"
                       src={
                         caretaker?.image ? `${baseURL}${caretaker?.image}` : ""
                       }
                     />
                     <Text
-                      color={"blue.500"}
-                      fontSize={"xs"}
-                      justifyContent={"center"}
+                      color="blue.500"
+                      fontSize="xs"
+                      justifyContent="center"
                     >
                       ({caretaker.display_first_name}{" "}
                       {caretaker.display_last_name} is caretaking)
@@ -318,8 +291,8 @@ export const TeamMember = ({
                 color={
                   roleArray.find((item) => item.role === role)?.color ?? ""
                 }
-                size={"md"}
-                justifyContent={"center"}
+                size="md"
+                justifyContent="center"
               >
                 {roleArray.find((item) => item.role === role)?.displayName ??
                   ""}

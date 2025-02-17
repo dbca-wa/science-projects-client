@@ -19,6 +19,7 @@ import {
   ToastId,
   useColorMode,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -312,8 +313,8 @@ const DropdownCreateAffiliationMenuItem = ({
   const toast = useToast();
 
   const queryClient = useQueryClient();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
   const createAffiliationMutation = useMutation({

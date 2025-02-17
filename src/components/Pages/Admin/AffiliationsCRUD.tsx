@@ -24,6 +24,7 @@ import {
   Spinner,
   Text,
   ToastId,
+  UseToastOptions,
   VStack,
   useColorMode,
   useDisclosure,
@@ -84,11 +85,11 @@ export const AffiliationsCRUD = () => {
   } = useDisclosure();
 
   const queryClient = useQueryClient();
-  const toastIdRef = useRef<ToastId>();
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
   const mergeToast = (data) => {
     toastIdRef.current = toast(data);
   };
-  const addToast = (data) => {
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
   const creationMutation = useMutation({
