@@ -15,6 +15,7 @@ import {
   ToastId,
   useColorMode,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -48,8 +49,8 @@ export const Navitar = ({
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
   const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;

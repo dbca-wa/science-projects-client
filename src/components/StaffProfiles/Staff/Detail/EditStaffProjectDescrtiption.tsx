@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import DatabaseRichTextEditor from "../../Editor/DatabaseRichTextEditor";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { ToastId, useToast } from "@chakra-ui/react";
+import { ToastId, useToast, UseToastOptions } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IUpdateProjectDescription, updateProjectDescription } from "@/lib/api";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
@@ -49,7 +49,7 @@ const EditStaffProjectDescrtiption = ({
       </DialogTrigger>
       <DialogContent className="max-h-[80vh] w-[700px] max-w-[700px] overflow-y-auto text-slate-800">
         <DialogHeader>
-          <DialogTitle className="mb-2 mt-3">Edit Description</DialogTitle>
+          <DialogTitle className="mt-3 mb-2">Edit Description</DialogTitle>
         </DialogHeader>
         <EditDecriptionContent
           projectId={projectId}
@@ -106,8 +106,8 @@ const EditDecriptionContent = ({
 }: IEditDescriptionProps) => {
   const queryClient = useQueryClient();
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
   const [isUpdating, setIsUpdating] = useState(false);
@@ -219,7 +219,7 @@ const EditDecriptionContent = ({
 
         <div className="flex w-full justify-end">
           {contentKind === "drawer" && (
-            <DrawerClose asChild className="mb-8 mr-3 mt-3">
+            <DrawerClose asChild className="mt-3 mr-3 mb-8">
               <Button variant="outline">Cancel</Button>
             </DrawerClose>
           )}

@@ -35,6 +35,7 @@ import {
   TabPanels,
   TabPanel,
   Flex,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { IAffiliation, IBranch, IBusinessArea, IUserData } from "../../types";
@@ -154,8 +155,8 @@ export const EditUserDetailsModal = ({
 
   // Toast
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

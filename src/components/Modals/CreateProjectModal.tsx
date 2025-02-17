@@ -17,6 +17,7 @@ import {
   useToast,
   ToastId,
   useDisclosure,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 import { useCurrentYear } from "../../lib/hooks/helper/useCurrentYear";
@@ -110,8 +111,8 @@ export const CreateProjectModal = ({
   };
 
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

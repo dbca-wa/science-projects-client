@@ -17,6 +17,7 @@ import {
   ToastId,
   useColorMode,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
@@ -38,8 +39,8 @@ export const DeletePDFEndorsementModal = ({
   setToggle,
 }: Props) => {
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

@@ -1,5 +1,11 @@
 import { createDocumentComment } from "@/lib/api";
-import { Button, ToastId, useColorMode, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  ToastId,
+  useColorMode,
+  useToast,
+  UseToastOptions,
+} from "@chakra-ui/react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CLEAR_EDITOR_COMMAND } from "lexical";
@@ -29,8 +35,8 @@ export const PostCommentButton = ({
   };
 
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 

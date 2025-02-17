@@ -30,7 +30,7 @@ interface IProps {
 export const MergeUserContent = ({ onSuccess, isModal, onClose }: IProps) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
   const queryClient = useQueryClient();
 
   const mergeToast = (data) => {

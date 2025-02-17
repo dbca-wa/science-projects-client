@@ -1,5 +1,3 @@
-// WIP project detail section for project creation
-
 import {
   Box,
   Button,
@@ -11,8 +9,7 @@ import {
   InputGroup,
   Select,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "react-calendar/dist/Calendar.css";
 import { useBusinessAreas } from "../../../lib/hooks/tanstack/useBusinessAreas";
 import { useDepartmentalServices } from "../../../lib/hooks/tanstack/useDepartmentalServices";
@@ -25,7 +22,7 @@ interface IProjectDetailSectionProps {
   thisUser: number;
   projectDetailsFilled: boolean;
   setProjectDetailsFilled: (val: boolean) => void;
-  nextClick: (data) => void;
+  nextClick: (data: any) => void;
   onClose: () => void;
   backClick: () => void;
   projectType: string;
@@ -35,123 +32,139 @@ interface IProjectDetailSectionProps {
 export const ProjectDetailsSection = ({
   backClick,
   nextClick,
-  projectDetailsFilled,
   setProjectDetailsFilled,
   projectType,
   thisUser,
-  // onClose,
   colorMode,
 }: IProjectDetailSectionProps) => {
-  const [selectedBusinessArea, setSelectedBusinessArea] = useState<number>(0);
-  const [selectedDepartmentalService, setSelectedDepartmentalService] =
-    useState<number>(0);
+  // Consolidated form state
+  const [formState, setFormState] = useState({
+    businessArea: 0,
+    departmentalService: 0,
+    leader: thisUser,
+    dataCustodian: thisUser,
+    startDate: undefined as Date | undefined,
+    endDate: undefined as Date | undefined,
+  });
 
-  const [selectedLeader, setSelectedLeader] =
-    useState<number>();
-  const [selectedDataCustodian, setSelectedDataCustodian] = useState<number>();
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
-  // const [selectedDates, setSelectedDates] = useState();
+  // Memoized handler functions
+  const handleBusinessAreaChange = useCallback((value: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      businessArea: parseInt(value),
+    }));
+  }, []);
 
-  useEffect(() => {
-    // Adjust to auto set, but allow for closing and re-setting data custodian.
-    if (
-      selectedBusinessArea &&
-      // && selectedDepartmentalService
-      selectedLeader &&
-      selectedDataCustodian &&
-      startDate &&
-      endDate &&
-      startDate <= endDate
-    ) {
-      setProjectDetailsFilled(true);
-    } else {
-      setProjectDetailsFilled(false);
-    }
-  }, [
-    startDate,
-    endDate,
-    selectedDataCustodian,
-    selectedLeader,
-    selectedDepartmentalService,
-    selectedBusinessArea,
-    setProjectDetailsFilled,
-  ]);
+  const handleDepartmentalServiceChange = useCallback((value: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      departmentalService: parseInt(value),
+    }));
+  }, []);
 
-  const [businessAreaList, setBusinessAreaList] = useState<IBusinessArea[]>([]);
-  const [servicesList, setServicesList] = useState<IDepartmentalService[]>([]);
+  const handleLeaderChange = useCallback((value: number) => {
+    setFormState((prev) => ({
+      ...prev,
+      leader: value,
+    }));
+  }, []);
 
+  const handleDataCustodianChange = useCallback((value: number) => {
+    setFormState((prev) => ({
+      ...prev,
+      dataCustodian: value,
+    }));
+  }, []);
+
+  const handleDateChange = useCallback(
+    (startDate: Date | undefined, endDate: Date | undefined) => {
+      setFormState((prev) => ({
+        ...prev,
+        startDate,
+        endDate,
+      }));
+    },
+    [],
+  );
+
+  // Data fetching and processing
   const { baData: businessAreaDataFromAPI, baLoading } = useBusinessAreas();
   const { dsData: servicesDataFromAPI, dsLoading } = useDepartmentalServices();
 
-  useEffect(() => {
-    if (!baLoading) {
-      const alphabetisedBA = [...businessAreaDataFromAPI];
-      alphabetisedBA.sort((a, b) => a.name.localeCompare(b.name));
-      setBusinessAreaList(alphabetisedBA);
+  const businessAreaList = useMemo(() => {
+    if (!baLoading && businessAreaDataFromAPI) {
+      return [...businessAreaDataFromAPI].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
     }
+    return [];
   }, [baLoading, businessAreaDataFromAPI]);
 
-  useEffect(() => {
-    if (!dsLoading) {
-      const alphabetisedDS = [...servicesDataFromAPI];
-      alphabetisedDS.sort((a, b) => a.name.localeCompare(b.name));
-      setServicesList(alphabetisedDS);
+  const servicesList = useMemo(() => {
+    if (!dsLoading && servicesDataFromAPI) {
+      return [...servicesDataFromAPI].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
     }
+    return [];
   }, [dsLoading, servicesDataFromAPI]);
 
-  const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
-  // Function to check if a string contains HTML tags
-  const checkIsHtml = (data) => {
-    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-    return htmlRegex.test(data);
-  };
+  // Form validation
+  useEffect(() => {
+    const isValid =
+      formState.businessArea !== 0 &&
+      formState.leader !== undefined &&
+      formState.dataCustodian !== undefined &&
+      formState.startDate !== undefined &&
+      formState.endDate !== undefined &&
+      formState.startDate <= formState.endDate;
 
-  // Function to sanitize HTML content and extract text
-  const sanitizeHtml = (htmlString) => {
+    setProjectDetailsFilled(isValid);
+  }, [formState, setProjectDetailsFilled]);
+
+  // Utility functions
+  const sanitizeHtml = useCallback((htmlString: string) => {
     const doc = new DOMParser().parseFromString(htmlString, "text/html");
     return doc.body.textContent || "";
-  };
+  }, []);
+
+  const checkIsHtml = useCallback((data: string) => {
+    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+    return htmlRegex.test(data);
+  }, []);
+
+  const handleNext = useCallback(() => {
+    nextClick({
+      businessArea: formState.businessArea,
+      departmentalService: formState.departmentalService,
+      dataCustodian: formState.dataCustodian,
+      projectLead: formState.leader,
+      startDate: formState.startDate,
+      endDate: formState.endDate,
+    });
+  }, [formState, nextClick]);
+
+  const orderedDivisionSlugs = useMemo(() => ["BCS", "CEM", "RFMS"], []);
 
   return (
     <>
-      <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={8} px={24}>
+      <Grid gridTemplateColumns="repeat(1, 1fr)" gridGap={8} px={24}>
         <Box>
-          <FormControl
-            // isRequired
-            mb={4}
-          >
+          <FormControl mb={4}>
             <FormLabel>Departmental Service</FormLabel>
             <InputGroup>
               <Select
                 variant="filled"
                 placeholder="Select a Departmental Service"
-                onChange={(event) =>
-                  setSelectedDepartmentalService(parseInt(event.target.value))
+                onChange={(e) =>
+                  handleDepartmentalServiceChange(e.target.value)
                 }
-                value={selectedDepartmentalService}
+                value={formState.departmentalService}
               >
                 {servicesList.map((service, index) => {
-                  const checkIsHtml = (data: string) => {
-                    // Regular expression to check for HTML tags
-                    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-
-                    // Check if the string contains any HTML tags
-                    return htmlRegex.test(data);
-                  };
-
-                  const isHtml = checkIsHtml(service.name);
-                  let serviceName = service.name;
-                  if (isHtml === true) {
-                    const parser = new DOMParser();
-                    const dom = parser.parseFromString(
-                      service.name,
-                      "text/html"
-                    );
-                    const content = dom.body.textContent;
-                    serviceName = content;
-                  }
-
+                  const serviceName = checkIsHtml(service.name)
+                    ? sanitizeHtml(service.name)
+                    : service.name;
                   return (
                     <option key={index} value={service.pk}>
                       {serviceName}
@@ -160,130 +173,105 @@ export const ProjectDetailsSection = ({
                 })}
               </Select>
             </InputGroup>
-            <FormHelperText
-            // color={colorMode === "light" ? "gray.500" : "gray.400"}
-            >
+            <FormHelperText>
               The DBCA service that this project delivers outputs to.
             </FormHelperText>
           </FormControl>
 
           <FormControl isRequired mb={4}>
             <FormLabel>Business Area</FormLabel>
-
             <InputGroup>
               <Select
                 variant="filled"
                 placeholder="Select a Business Area"
-                onChange={(event) =>
-                  setSelectedBusinessArea(parseInt(event.target.value))
-                }
-                value={selectedBusinessArea}
+                onChange={(e) => handleBusinessAreaChange(e.target.value)}
+                value={formState.businessArea}
               >
                 {orderedDivisionSlugs.flatMap((divSlug) => {
-                  // Filter business areas for the current division
                   const divisionBusinessAreas = businessAreaList
                     .filter(
-                      (ba) => ba.division.slug === divSlug && ba.is_active
+                      (ba) => ba.division.slug === divSlug && ba.is_active,
                     )
                     .sort((a, b) => a.name.localeCompare(b.name));
 
                   return divisionBusinessAreas.map((ba, index) => (
                     <option key={`${ba.name}${index}`} value={ba.pk}>
                       {ba?.division ? `[${ba?.division?.slug}] ` : ""}
-                      {checkIsHtml(ba.name)
-                        ? sanitizeHtml(ba.name)
-                        : ba.name}{" "}
+                      {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}
                       {ba.is_active ? "" : "(INACTIVE)"}
                     </option>
                   ));
                 })}
               </Select>
             </InputGroup>
-            <FormHelperText
-            // color={colorMode === "light" ? "gray.500" : "gray.400"}
-            >
+            <FormHelperText>
               The Business Area / Program that this project belongs to. Only
               active Business Areas are selectable.
             </FormHelperText>
           </FormControl>
         </Box>
-        <Grid gridTemplateColumns={"repeat(1, 1fr)"}>
+
+        <Grid gridTemplateColumns="repeat(1, 1fr)">
           <FormControl>
             <StartAndEndDateSelector
-              startDate={startDate}
-              endDate={endDate}
-              setStartDate={setStartDate}
-              setEndDate={setEndDate}
+              startDate={formState.startDate}
+              endDate={formState.endDate}
+              setStartDate={(date: Date | undefined) =>
+                handleDateChange(date, formState.endDate)
+              }
+              setEndDate={(date: Date | undefined) =>
+                handleDateChange(formState.startDate, date)
+              }
               helperText="These dates can be tentative and adjusted from project settings later"
             />
           </FormControl>
 
-          <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={8}>
+          <Grid gridTemplateColumns="repeat(2, 1fr)" gridGap={8}>
             <Box mb={4}>
               <UserSearchDropdown
                 isRequired={true}
-                setUserFunction={setSelectedLeader}
-                preselectedUserPk={thisUser}
+                setUserFunction={handleLeaderChange}
+                preselectedUserPk={formState.leader}
                 label={
                   projectType !== "Student Project"
                     ? "Project Leader"
                     : "Project Leader"
                 }
-                placeholder={
-                  projectType === "Student Project"
-                    ? "Search for a Project Leader"
-                    : "Search for a Project Leader"
-                }
-                helperText={
-                  projectType === "Student Project"
-                    ? "The Project Leader."
-                    : "The Project Leader."
-                }
+                placeholder="Search for a Project Leader"
+                helperText="The Project Leader."
               />
             </Box>
 
             <Box mb={4}>
               <UserSearchDropdown
                 isRequired={true}
-                setUserFunction={setSelectedDataCustodian}
-                // preselectedUserPk={selectedDataCustodian}
-                preselectedUserPk={thisUser}
+                setUserFunction={handleDataCustodianChange}
+                preselectedUserPk={formState.dataCustodian}
                 isEditable={true}
                 label="Data Custodian"
                 placeholder="Search for a data custodian"
-                helperText={
-                  "The data custodian is responsible for data management, publishing, and metadata documentation on the data catalogue"
-                }
+                helperText="The data custodian is responsible for data management, publishing, and metadata documentation on the data catalogue"
               />
             </Box>
           </Grid>
         </Grid>
       </Grid>
 
-      <Flex w={"100%"} justifyContent={"flex-end"} pb={4}>
+      <Flex w="100%" justifyContent="flex-end" pb={4}>
         <Button onClick={backClick}>Back</Button>
         <Button
           ml={3}
-          // type="submit"
-          //   colorScheme="blue"
           backgroundColor={colorMode === "light" ? "blue.500" : "blue.600"}
-          color={"white"}
+          color="white"
           _hover={{
             backgroundColor: colorMode === "light" ? "blue.600" : "blue.700",
           }}
-          isDisabled={!projectDetailsFilled}
-          onClick={() => {
-            if (projectDetailsFilled) {
-              nextClick({
-                businessArea: selectedBusinessArea,
-                departmentalService: selectedDepartmentalService,
-                dataCustodian: selectedDataCustodian,
-                projectLead: selectedLeader,
-                startDate: startDate,
-                endDate: endDate,
-              });
-            } else return;
-          }}
+          isDisabled={
+            !formState.businessArea ||
+            !formState.startDate ||
+            !formState.endDate
+          }
+          onClick={handleNext}
         >
           Next &rarr;
         </Button>

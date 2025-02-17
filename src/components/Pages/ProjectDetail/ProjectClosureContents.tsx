@@ -8,6 +8,7 @@ import {
   ToastId,
   useColorMode,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -69,8 +70,8 @@ export const ProjectClosureContents = ({
 
   const queryClient = useQueryClient();
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-  const addToast = (data) => {
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 
