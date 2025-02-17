@@ -193,12 +193,13 @@ export const TeamMember = ({
         style={isCurrentlyDragging ? draggedStyles : {}}
         bg={isCurrentlyDragging ? "blue.500" : backgroundColor}
         justifyContent="space-between"
+        zIndex={isCurrentlyDragging ? 999 : 1}
         _hover={{
           boxShadow:
             colorMode === "light"
               ? "0px 10px 15px -5px rgba(0, 0, 0, 0.15), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.03), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.05), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.05)"
               : "0px 2px 3px -0.5px rgba(255, 255, 255, 0.05), 0px 1px 2px -0.5px rgba(255, 255, 255, 0.03)",
-          zIndex: 999,
+          // zIndex: 999,
         }}
         border="1px solid"
         borderColor={colorMode === "light" ? "gray.200" : "gray.600"}

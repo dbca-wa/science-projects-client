@@ -150,6 +150,7 @@ export const EmailSiteLinkModal = ({ isOpen, onClose }: Props) => {
           isClosable: true,
         });
       }
+      onClose();
     },
     onError: (error) => {
       if (toastIdRef.current) {

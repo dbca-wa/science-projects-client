@@ -50,10 +50,13 @@ export const SortableTeamMember = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    // Apply a very high z-index when dragging
+    zIndex: isDragging ? 9999 : 1,
+    position: "relative" as const,
   };
 
   return (
-    <Box ref={setNodeRef} style={style} pos="relative" {...attributes}>
+    <Box ref={setNodeRef} style={style} mb={0}>
       <TeamMember
         ba_leader={ba_leader}
         leader_pk={leader_pk}
@@ -68,7 +71,7 @@ export const SortableTeamMember = ({
         time_allocation={tm.time_allocation}
         usersCount={usersCount}
         project_id={project_id}
-        isCurrentlyDragging={currentlyDraggingIndex === index}
+        isCurrentlyDragging={isDragging}
         backgroundColor={
           backgroundColors[tm.user.pk] ||
           (colorMode === "light" ? "white" : "gray.800")
@@ -87,7 +90,7 @@ export const SortableTeamMember = ({
         userSelect="none"
         right={0}
         top={1}
-        h={"100%"}
+        h="100%"
         p={12}
         flex={1}
         color={
@@ -95,10 +98,9 @@ export const SortableTeamMember = ({
         }
         cursor="grab"
         _active={{ cursor: "grabbing" }}
-        // bg={"blue.100"}
-        justifyItems={"center"}
-        alignItems={"center"}
-        display={"flex"}
+        justifyItems="center"
+        alignItems="center"
+        display="flex"
       >
         <BsGripVertical />
       </Box>
