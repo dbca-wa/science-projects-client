@@ -281,7 +281,7 @@ function useDraggableBlockMenu(
   anchorElem: HTMLElement,
   isEditable: boolean,
   toolbarHeight: number,
-): JSX.Element {
+): React.JSX.Element {
   const scrollerElem = anchorElem.parentElement;
   const menuRef = useRef<HTMLDivElement>(null);
   const targetLineRef = useRef<HTMLDivElement>(null);
@@ -468,7 +468,7 @@ export default function RTEDragPlugin({
 }: {
   anchorElem?: HTMLElement;
   toolbarHeight?: number;
-}): JSX.Element {
+}): React.JSX.Element {
   const [editor] = useLexicalComposerContext();
   return useDraggableBlockMenu(
     editor,

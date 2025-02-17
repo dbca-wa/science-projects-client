@@ -307,10 +307,10 @@ class CustomMentionTypeheadOption extends MenuOption {
     this.user = user;
   }
   // name: string;
-  // picture: JSX.Element;
+  // picture: React.JSX.Element;
   // pk: number;
 
-  // constructor(name: string, picture: JSX.Element, pk: number) {
+  // constructor(name: string, picture: React.JSX.Element, pk: number) {
   //   super(name);
   //   this.name = name;
   //   this.picture = picture;
@@ -502,7 +502,7 @@ const CustomMentionsTypeheadMenuItem = ({
 //   );
 // };
 
-export default function NewMentionsPlugin(): JSX.Element | null {
+export default function NewMentionsPlugin(): React.JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
   const [queryString, setQueryString] = useState<string | null>(null);

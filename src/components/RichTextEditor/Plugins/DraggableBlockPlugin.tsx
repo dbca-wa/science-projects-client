@@ -281,7 +281,7 @@ function useDraggableBlockMenu(
   anchorElem: HTMLElement,
   isEditable: boolean,
   toolbarHeight: number,
-): JSX.Element {
+): React.JSX.Element {
   const scrollerElem = anchorElem.parentElement;
   const { colorMode } = useColorMode();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -479,7 +479,7 @@ export default function DraggableBlockPlugin({
 }: {
   anchorElem?: HTMLElement;
   toolbarHeight?: number;
-}): JSX.Element {
+}): React.JSX.Element {
   const [editor] = useLexicalComposerContext();
   return useDraggableBlockMenu(
     editor,
