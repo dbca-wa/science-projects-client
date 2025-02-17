@@ -329,7 +329,7 @@ export const FloatingToolbar = ({
 function useFloatingToolbar(
   editor: LexicalEditor,
   anchorElem: HTMLElement,
-): JSX.Element | null {
+): React.JSX.Element | null {
   const [isText, setIsText] = useState(false);
   // const [isLink, setIsLink] = useState(false);
   const [isBold, setIsBold] = useState(false);
@@ -434,7 +434,7 @@ export default function FloatingToolbarPlugin({
   anchorElem = document.body,
 }: {
   anchorElem?: HTMLElement;
-}): JSX.Element | null {
+}): React.JSX.Element | null {
   const [editor] = useLexicalComposerContext();
   return useFloatingToolbar(editor, anchorElem);
 }
