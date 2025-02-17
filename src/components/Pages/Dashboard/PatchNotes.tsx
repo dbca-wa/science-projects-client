@@ -16,12 +16,43 @@ import {
   useDisclosure,
   useColorMode,
 } from "@chakra-ui/react";
+import { title } from "process";
 import { useCallback, useEffect, useState } from "react";
 import { MdCheckCircle } from "react-icons/md";
 
 interface IUserInterface {
   userData: IUserMe;
 }
+
+const PatchNoteEntry = ({
+  title,
+  kind,
+  description,
+}: {
+  title: string;
+  kind: "feature" | "update";
+  description: string;
+}) => {
+  return (
+    <ListItem fontSize={"small"} textIndent={"-21px"} marginLeft={"21px"}>
+      <ListIcon as={MdCheckCircle} color="green.500" />
+      <Text as="span" fontWeight="semibold">
+        {`${kind[0].toUpperCase()}${kind.slice(1)}: ${title}`}
+      </Text>
+      <Text
+        display="block"
+        mt={0}
+        ml="21px"
+        sx={{
+          textIndent: "0",
+          marginLeft: "0",
+        }}
+      >
+        {description}
+      </Text>
+    </ListItem>
+  );
+};
 
 export const PatchNotes = ({ userData }: IUserInterface) => {
   const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
@@ -137,37 +168,34 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             {/* &#9881;&#65039; */}
           </Text>
           <List spacing={1} ml={2}>
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Caretaker mode. Users can now request and assign a
-              caretaker to manage their workload while away from work. Projects
-              shown on your public profile are those that you are directly
-              involved with. If there are any user's projects which you are
-              already managing in a caretaker capacity, request to become that
-              user's caretaker, then assign those projects to that user.
-            </ListItem>
-            {/* <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Feature: Staff Profile Publications. Publications belonging to
-              users are now fetched from the library and displayed on their
-              public profile. Users may also add additional publications.
-            </ListItem> */}
-            <ListItem
-              fontSize={"small"}
-              textIndent={"-21px"}
-              marginLeft={"21px"}
-            >
-              <ListIcon as={MdCheckCircle} color="green.500" />
-              Update: Servers and dependencies updated.
-            </ListItem>
+            <PatchNoteEntry
+              title={"Caretaker mode"}
+              kind="feature"
+              description={
+                "Users can now request and assign a caretaker to manage their workload while away from work. Projects shown on your public profile are those that you are directly involved with. If there are any projects which you are already unofficially managing in a caretaker capacity, request to become that user's caretaker, then assign those projects to that user."
+              }
+            />
+            <PatchNoteEntry
+              title={"Hide From Public profile"}
+              kind="feature"
+              description={
+                "In addition to caretaker mode, you can directly hide any project you are a member of from your public profile. You can do this by visiting the project's overview tab and clicking the orange 'Hide From Staff Profile' button. This will not impact the project's visibility to other users."
+              }
+            />
+
+            <PatchNoteEntry
+              title={"Staff Profile Publications"}
+              kind="feature"
+              description={
+                "Publications belonging to staff are now fetched from the library and displayed on their public profile. Users may also add additional publications."
+              }
+            />
+
+            <PatchNoteEntry
+              title={"Dependencies"}
+              kind="update"
+              description={"Servers and dependencies updated."}
+            />
           </List>
 
           <span style={{ marginTop: 20 }}>

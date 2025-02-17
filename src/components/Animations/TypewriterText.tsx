@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import React, { ReactNode } from "react";
+import React, { ReactNode, ReactElement } from "react";
 
 interface ITypewriterProps {
   children: ReactNode;
@@ -20,20 +20,22 @@ export const TypewriterText = ({
     <motion.span
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      style={{ display: "inline", whiteSpace: "normal" }} // Ensure inline display
+      style={{ display: "inline", whiteSpace: "normal" }}
     >
       {childArray.map((child, lineIndex) => {
         if (React.isValidElement(child)) {
-          const childText = child.props.children;
+          // Type assertion to access props safely
+          const element = child as ReactElement<{ children: ReactNode }>;
+          const childContent = element.props.children;
 
-          if (typeof childText === "string") {
+          if (typeof childContent === "string") {
             const startDelay = totalCharacters * characterDelay;
-            totalCharacters += childText.length;
+            totalCharacters += childContent.length;
 
             return (
               <AnimatedText
                 key={lineIndex}
-                text={childText}
+                text={childContent}
                 delayStart={startDelay}
                 characterDelay={characterDelay}
                 characterDuration={characterDuration}

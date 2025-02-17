@@ -33,7 +33,7 @@ export const CaretakerSetContent = ({
 }: IProps) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
   const queryClient = useQueryClient();
 
   const caretakerToast = (data) => {
