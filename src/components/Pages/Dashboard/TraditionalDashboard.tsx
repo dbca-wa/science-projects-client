@@ -29,7 +29,6 @@ export const TraditionalDashboard = () => {
 
   const { userData } = useUser();
   const { colorMode } = useColorMode();
-  const dataCatalogueDisabled = true;
 
   const handleResize = useCallback(() => {
     // 1150 = the breakpoint at which issues occur with text overlaying
@@ -59,36 +58,20 @@ export const TraditionalDashboard = () => {
         }}
         gap={10}
       >
-        <Popover trigger="hover">
-          <PopoverTrigger>
-            <Button
-              leftIcon={<FaDatabase />}
-              bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
-              color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-              _hover={{
-                bg: colorMode === "light" ? `blue.600` : `blue.400`,
-                color: colorMode === "light" ? `white` : `white`,
-              }}
-              // as="a"
-              onClick={() => {
-                if (!dataCatalogueDisabled) {
-                  window.open("https://data.dbca.wa.gov.au/", "_blank");
-                }
-              }}
-              // isDisabled={dataCatalogueDisabled}
-            >
-              {shouldConcat ? "Data" : "Data Catalogue"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent>
-            <PopoverArrow />
-            {/* <PopoverCloseButton /> */}
-            {/* <PopoverHeader>Confirmation!</PopoverHeader> */}
-            <PopoverBody justifyContent={"center"} display={"flex"}>
-              Coming Soon
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
+        <Button
+          leftIcon={<FaDatabase />}
+          bgColor={colorMode === "light" ? `blue.500` : `blue.600`}
+          color={colorMode === "light" ? `white` : `whiteAlpha.900`}
+          _hover={{
+            bg: colorMode === "light" ? `blue.600` : `blue.400`,
+            color: colorMode === "light" ? `white` : `white`,
+          }}
+          onClick={() => {
+            window.open("https://data.bio.wa.gov.au/", "_blank");
+          }}
+        >
+          {shouldConcat ? "Data" : "Data Catalogue"}
+        </Button>
 
         <Button
           leftIcon={<TbWorldWww />}
