@@ -1349,7 +1349,7 @@ export const ProjectOverviewCard = ({
               }}
               onClick={() => {
                 window.open(
-                  `https://data.bio.wa.gov.au/dataset/?q=${projectLabel}`,
+                  `https://data.bio.wa.gov.au/dataset/?tags=${projectLabel}`,
                   "_blank",
                 );
               }}
