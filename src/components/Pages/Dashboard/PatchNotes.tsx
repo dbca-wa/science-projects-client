@@ -211,7 +211,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               change, please send an email to{" "}
             </Text>
             <Link
-              href={`mailto:jarid.prince@dbca.wa.gov.au&subject=SPMS Feedback`}
+              href={`mailto:jarid.prince@dbca.wa.gov.au?subject=SPMS Feedback`}
               color={colorMode === "light" ? "blue.400" : "blue.300"}
             >
               jarid.prince@dbca.wa.gov.au

@@ -81,7 +81,7 @@ export const UserFeedbackModal = ({
             <Button
               onClick={() =>
                 window.open(
-                  "mailto:jarid.prince@dbca.wa.gov.au&subject=SPMS%20Assistance",
+                  "mailto:jarid.prince@dbca.wa.gov.au?subject=SPMS%20Assistance",
                   "_blank",
                 )
               }
