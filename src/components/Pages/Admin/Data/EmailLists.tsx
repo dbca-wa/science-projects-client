@@ -81,7 +81,7 @@ export const EmailLists = () => {
     // const mailToLink = `mailto:${emailString}&subject=${subject}`;
     // console.log(emailList);
     // console.log("EMAIL STRING: ", emailString);
-    const mailToLink = `mailto:${emailString}&subject=SPMS:`;
+    const mailToLink = `mailto:${emailString}?subject=SPMS:`;
     // const mailToLink = `mailto:jarid.prince@dbca.wa.gov.au,rory.mcauley@dbca.wa.gov.au&subject=SPMS:`;
 
     // jarid.prince@dbca.wa.gov.au

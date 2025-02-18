@@ -118,7 +118,7 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
 
       if (emailList.length > 0) {
         const emailString = emailList.join(",");
-        const mailToLink = `mailto:${emailString}&subject=SPMS:`;
+        const mailToLink = `mailto:${emailString}?subject=SPMS:`;
         const link = document.createElement("a");
         link.href = mailToLink;
         document.body.appendChild(link);
