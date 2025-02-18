@@ -16,7 +16,7 @@ export const ScienceStaff = () => {
     searchTerm,
     page,
   });
-  // console.log(scienceStaffData);
+  console.log(scienceStaffData);
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({
@@ -97,6 +97,7 @@ export const ScienceStaff = () => {
                         ? `Business Area Leader, ${user.business_area_led}`
                         : user?.position
                     }
+                    is_hidden={user?.is_hidden}
                     location={user?.location}
                     unit={user?.unit}
                     division={user?.division} // branch={user?.branch}

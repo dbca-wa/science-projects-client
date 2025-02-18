@@ -57,7 +57,7 @@ const PatchNoteEntry = ({
 export const PatchNotes = ({ userData }: IUserInterface) => {
   const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
-  const VERSION = import.meta.env.VITE_SPMS_VERSION || "3.1.5";
+  const VERSION = import.meta.env.VITE_SPMS_VERSION || "Development v3";
 
   const [welcomeUser, setWelcomeUser] = useState("");
   const [spmsText, setSpmsText] = useState("Science Project Management System");
@@ -176,7 +176,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               }
             />
             <PatchNoteEntry
-              title={"Hide From Public profile"}
+              title={"Hide Projects From Public Profile"}
               kind="feature"
               description={
                 "In addition to caretaker mode, you can directly hide any project you are a member of from your public profile. You can do this by visiting the project's overview tab and clicking the orange 'Hide From Staff Profile' button. This will not impact the project's visibility to other users."
