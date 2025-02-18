@@ -179,7 +179,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               title={"Hide Projects From Public Profile"}
               kind="feature"
               description={
-                "In addition to caretaker mode, you can directly hide any project you are a member of from your public profile. You can do this by visiting the project's overview tab and clicking the orange 'Hide From Staff Profile' button. This will not impact the project's visibility to other users."
+                "In addition to caretaker mode, you can directly hide any project you are a member of from your public profile. You can do this by visiting the project's overview tab and clicking the orange 'Hide From Staff Profile' button. This will not impact the project's visibility for other users."
               }
             />
 
@@ -190,7 +190,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "Publications belonging to staff are now fetched from the library and displayed on their public profile. Users may also add additional publications."
               }
             />
-
+            <PatchNoteEntry
+              title={"Easy Access to links"}
+              kind="update"
+              description={
+                "Access to data catalogue, scientific sites register, and your public profile is available on any page by clicking your name at the top-right of the page and selecting the appropriate link. Data catalogue is now also accessible on the home page."
+              }
+            />
             <PatchNoteEntry
               title={"Dependencies"}
               kind="update"
