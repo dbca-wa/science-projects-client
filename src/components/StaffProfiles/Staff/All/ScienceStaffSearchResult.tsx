@@ -21,6 +21,12 @@ import { Building, Mail, MapPin, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EmailStaffMemberContent from "../../Modals/EmailStaffMemberContent";
 import { useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const ScienceStaffSearchResult = ({
   pk,
@@ -32,6 +38,7 @@ const ScienceStaffSearchResult = ({
   division,
   // branch,
   disableEmailButton,
+  is_hidden,
 }: IStaffUserResult) => {
   const navigate = useNavigate();
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -40,8 +47,22 @@ const ScienceStaffSearchResult = ({
   // console.log({ pk, name, title, position, unit, location, division });
 
   return (
-    <div className="min-h-48 rounded-md border border-blue-300 p-6">
-      <h4
+    <div className="relative min-h-48 rounded-md border border-blue-300 p-6">
+      {is_hidden && (
+        <div className="absolute right-0 top-0 rounded-bl-md rounded-tr-md bg-red-500 px-2 py-1 text-xs text-white">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="select-none">HIDDEN</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>This staff profile is hidden from the public</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      )}
+      <h2
         className="cursor-pointer text-balance text-lg font-bold text-blue-600 hover:text-blue-500 hover:underline"
         onClick={() => {
           const staffId = pk;
@@ -54,7 +75,7 @@ const ScienceStaffSearchResult = ({
           !ignoredTitles.includes(title) &&
           `${title[0].toLocaleUpperCase()}${title.slice(1)}. `}{" "}
         {name}
-      </h4>
+      </h2>
       <div className="my-3">
         {position && (
           <span className="flex items-center">

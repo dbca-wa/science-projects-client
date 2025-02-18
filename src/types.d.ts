@@ -1101,6 +1101,7 @@ export interface IStaffUserResult {
   };
   unit?: string;
   division?: string;
+  is_hidden?: boolean;
   // address?: string;
   // branch?: IStaffProfileBranch;
 
