@@ -1348,7 +1348,10 @@ export const ProjectOverviewCard = ({
                 textDecoration: "underline",
               }}
               onClick={() => {
-                window.open("https://data.dbca.wa.gov.au/", "_blank");
+                window.open(
+                  `https://data.bio.wa.gov.au/dataset/?q=${projectLabel}`,
+                  "_blank",
+                );
               }}
             >
               Review datasets tagged with {projectLabel}

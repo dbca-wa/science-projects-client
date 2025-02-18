@@ -227,6 +227,38 @@ export const Navitar = ({
             <ToggleDarkMode asMenuItem />
           </MenuGroup>
 
+          {/* {isModern && ( */}
+          <MenuGroup
+            title="Links"
+            fontSize={"12px"}
+            color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
+            textAlign={"center"}
+            zIndex={isOpen ? 2 : 1}
+          >
+            <MenuItem
+              onClick={() => {
+                window.open("https://data.bio.wa.gov.au/", "_blank");
+              }}
+              zIndex={isOpen ? 2 : 1}
+            >
+              {<FaBook />}
+              <Text ml={2}>Data Catalogue</Text>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                window.open(
+                  "https://scientificsites.dpaw.wa.gov.au/",
+                  "_blank",
+                );
+              }}
+              zIndex={isOpen ? 2 : 1}
+            >
+              {<TbWorldWww />}
+              <Text ml={2}>Scientific Sites Register</Text>
+            </MenuItem>
+          </MenuGroup>
+          {/* )} */}
+
           <MenuGroup
             title="DBCA Account"
             fontSize={"12px"}
@@ -245,26 +277,24 @@ export const Navitar = ({
                 {layout === "modern" ? "My Profile" : "My SPMS Profile"}
               </Text>
             </MenuItem>
-            {userData?.is_superuser && (
-              <MenuItem
-                // onClick={() => {
-                //   window.open("https://sww.dpaw.wa.gov.au/", "_blank");
-                // }}
-                onClick={() => {
-                  if (process.env.NODE_ENV === "development") {
-                    navigate(`/staff/${userData?.pk}`);
-                  } else {
-                    setHref(
-                      `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${userData?.pk}`,
-                    );
-                  }
-                }}
-                zIndex={isOpen ? 2 : 1}
-              >
-                {<FaUserCircle />}
-                <Text ml={2}>My Public Profile</Text>
-              </MenuItem>
-            )}
+            <MenuItem
+              // onClick={() => {
+              //   window.open("https://sww.dpaw.wa.gov.au/", "_blank");
+              // }}
+              onClick={() => {
+                if (process.env.NODE_ENV === "development") {
+                  navigate(`/staff/${userData?.pk}`);
+                } else {
+                  setHref(
+                    `${VITE_PRODUCTION_PROFILES_BASE_URL}staff/${userData?.pk}`,
+                  );
+                }
+              }}
+              zIndex={isOpen ? 2 : 1}
+            >
+              {<FaUserCircle />}
+              <Text ml={2}>My Public Profile</Text>
+            </MenuItem>
 
             {userData?.is_superuser && (
               <MenuItem onClick={onLogOut} zIndex={isOpen ? 2 : 1}>
@@ -273,37 +303,6 @@ export const Navitar = ({
               </MenuItem>
             )}
           </MenuGroup>
-          {isModern && (
-            <MenuGroup
-              title="Links"
-              fontSize={"12px"}
-              color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
-              textAlign={"center"}
-              zIndex={isOpen ? 2 : 1}
-            >
-              <MenuItem
-                onClick={() => {
-                  window.open("https://data.bio.wa.gov.au/", "_blank");
-                }}
-                zIndex={isOpen ? 2 : 1}
-              >
-                {<FaBook />}
-                <Text ml={2}>Data Catalogue</Text>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  window.open(
-                    "https://scientificsites.dpaw.wa.gov.au/",
-                    "_blank",
-                  );
-                }}
-                zIndex={isOpen ? 2 : 1}
-              >
-                {<TbWorldWww />}
-                <Text ml={2}>Scientific Sites Register</Text>
-              </MenuItem>
-            </MenuGroup>
-          )}
         </MenuList>
       </Menu>
     </Box>
