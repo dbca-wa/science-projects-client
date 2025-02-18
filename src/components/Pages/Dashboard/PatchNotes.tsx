@@ -65,6 +65,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
   const [shouldConcat, setShouldConcat] = useState(false);
   // const [startDate, setStartDate] = useState<string>();
   const teamsChatUrl = "msteams:/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
+  const teamsWebUrl =
+    "https://teams.microsoft.com/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
+
+  const handleTeamsClick = (e) => {
+    e.preventDefault();
+    window.open(teamsWebUrl, "_blank");
+  };
 
   const {
     isOpen: isFeedbackModalOpen,
@@ -221,7 +228,8 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               or{" "}
             </Text>
             <Link
-              href={teamsChatUrl}
+              onClick={handleTeamsClick}
+              // href={teamsChatUrl}
               color={colorMode === "light" ? "blue.400" : "blue.300"}
             >
               message on Teams.

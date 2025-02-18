@@ -26,6 +26,12 @@ export const UserFeedbackModal = ({
   onCloseFeedbackModal,
 }: Props) => {
   const { colorMode } = useColorMode();
+  const teamsWebUrl =
+    "https://teams.microsoft.com/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
+  const handleTeamsClick = (e) => {
+    e.preventDefault();
+    window.open(teamsWebUrl, "_blank");
+  };
 
   return (
     <Modal
@@ -44,12 +50,7 @@ export const UserFeedbackModal = ({
         <ModalBody>
           <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4} py={8}>
             <Button
-              onClick={() =>
-                window.open(
-                  "msteams:/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au",
-                  "_blank",
-                )
-              }
+              onClick={handleTeamsClick}
               leftIcon={<BsMicrosoftTeams />}
               backgroundColor={
                 colorMode === "light" ? "purple.500" : "purple.600"
@@ -79,12 +80,7 @@ export const UserFeedbackModal = ({
             </div>
 
             <Button
-              onClick={() =>
-                window.open(
-                  "mailto:jarid.prince@dbca.wa.gov.au?subject=SPMS%20Assistance",
-                  "_blank",
-                )
-              }
+              onClick={handleTeamsClick}
               leftIcon={<MdEmail />}
               backgroundColor={colorMode === "light" ? "blue.500" : "blue.600"}
               color={"white"}
