@@ -33,6 +33,7 @@ import { TestPlayground } from "./routes/TestPlayground";
 import { Users } from "./routes/Users";
 import { ScienceStaffLayout } from "./components/StaffProfiles/ScienceStaffLayout";
 import { error } from "console";
+import ProjectsMap from "./routes/ProjectsMap";
 
 const inAppRouteArray = [
   // Login
@@ -41,6 +42,10 @@ const inAppRouteArray = [
     element: <Login />,
   },
 
+  {
+    path: "projects/map",
+    element: <ProjectsMap />,
+  },
   {
     path: "/",
     element: (
