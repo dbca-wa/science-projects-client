@@ -1,33 +1,4 @@
 {
-  /* <Button
-  className="mb-4 w-full text-lg font-semibold"
-  onClick={(e) => {
-    if (e.ctrlKey || e.metaKey) {
-      window.open(`/`, "_blank");
-    } else {
-      navigate("/");
-    }
-  }}
-  >
-  <ArrowLeft />
-  Back to SPMS
-  </Button> */
-}
-
-// <div className="mt-2">
-// <h3 className="mb-4 text-sm font-semibold text-muted-foreground">
-//   SEARCH
-// </h3>
-// <Input placeholder="Search for a project..." className="w-full" />
-// </div>
-
-// const { baLoading, baData } = useBusinessAreas();
-// // Business Areas state
-// const [businessAreas, setBusinessAreas] = useState<{
-//   [key: string]: boolean;
-// }>({});
-
-{
   /* <div className="mt-6">
               <h3 className="mb-4 text-sm font-semibold text-muted-foreground">
                 BUSINESS AREAS
