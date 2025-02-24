@@ -34,6 +34,8 @@ import { Users } from "./routes/Users";
 import { ScienceStaffLayout } from "./components/StaffProfiles/ScienceStaffLayout";
 import { error } from "console";
 import ProjectsMap from "./routes/ProjectsMap";
+import ErrorBoundary from "./components/Base/ErrorBoundary";
+import ErrorPage from "./components/Base/ErrorPage";
 
 const inAppRouteArray = [
   // Login
@@ -356,6 +358,7 @@ const staffProfilesAppArray = [
       </ScienceStaffLayout>
     ),
     // errorElement: <ErrorHandler />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/staff/:staffProfilePk",
@@ -364,7 +367,7 @@ const staffProfilesAppArray = [
         <ScienceStaffDetail />
       </ScienceStaffLayout>
     ),
-    // errorElement: <ErrorHandler />,
+    errorElement: <ErrorPage />,
   },
 ];
 
