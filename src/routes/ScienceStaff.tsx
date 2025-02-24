@@ -86,16 +86,19 @@ export const ScienceStaff = () => {
                 getDisplayName(a).localeCompare(getDisplayName(b)),
               )
               ?.map((user, index) => {
-                // console.log(user);
+                console.log(user);
                 return (
                   <ScienceStaffSearchResult
                     key={index}
                     pk={user?.pk}
                     name={`${user?.display_first_name ?? user?.first_name} ${user?.display_last_name ?? user?.last_name}`}
                     position={
-                      user?.business_area_led
-                        ? `Business Area Leader, ${user.business_area_led}`
+                      user.custom_title_on && user.custom_title
+                        ? `${user.custom_title[0].toUpperCase()}${user.custom_title.slice(1)}`
                         : user?.position
+                      // user?.business_area_led
+                      //   ? `Business Area Leader, ${user.business_area_led}`
+                      //   : user?.position
                     }
                     is_hidden={user?.is_hidden}
                     location={user?.location}

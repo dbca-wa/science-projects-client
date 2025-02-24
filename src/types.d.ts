@@ -333,6 +333,8 @@ export interface ICaretakerObject {
 export interface IUserMe {
   staff_profile_pk?: number;
   public_email?: string;
+  custom_title?: string;
+  custom_title_on?: boolean;
   staff_profile_hidden?: boolean;
   id?: number;
   pk?: number;
@@ -1181,6 +1183,8 @@ export interface IStaffProfileHeroData {
   keyword_tags: KeywordTag[]; // make this max of 5
   it_asset_data: ITAssetData;
   it_asset_id: number;
+  custom_title: string;
+  custom_title_on: boolean;
 }
 
 // Overview
