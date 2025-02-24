@@ -216,7 +216,8 @@ const CustomTitleSection = ({ me }: { me: IUserMe }) => {
           >
             contact HR
           </a>{" "}
-          to update your HR details. This process may take some time.
+          to update your HR details (recommended). This process may take some
+          time.
         </FormHelperText>
       </FormControl>
     </Flex>
