@@ -189,11 +189,10 @@ const StaffHero = ({
               {staffHeroData?.it_asset_data && (
                 <>
                   <p className="mt-2 text-balance font-semibold text-slate-600 dark:text-slate-400">
-                    {staffHeroData?.user?.ba_lead_status
-                      ? staffHeroData?.user?.ba_lead_status
-                      : staffHeroData?.it_asset_data?.title
-                        ? staffHeroData?.it_asset_data?.title
-                        : "Staff Member"}
+                    {staffHeroData?.custom_title_on &&
+                    staffHeroData?.custom_title
+                      ? `${staffHeroData?.custom_title[0].toUpperCase()}${staffHeroData?.custom_title.slice(1)}`
+                      : staffHeroData?.it_asset_data?.title}
                     {/* staffHeroData?.user?.ba_lead_status ?
                     staffHeroData?.user?.ba_lead_status : */}
                   </p>

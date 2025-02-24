@@ -1107,6 +1107,29 @@ export const updatePublicEmail = async ({
   return res;
 };
 
+export interface IUpdateCustomTitle {
+  staff_profile_pk: number;
+  custom_title: string;
+  custom_title_on: boolean;
+}
+
+export const updateCustomTitle = async ({
+  staff_profile_pk,
+  custom_title,
+  custom_title_on,
+}: IUpdateCustomTitle) => {
+  const res = instance
+    .put(`users/staffprofiles/${staff_profile_pk}`, {
+      custom_title,
+      custom_title_on,
+    })
+    .then((res) => {
+      // console.log(res.data)
+      return res.data;
+    });
+  return res;
+};
+
 export const editEmployment = async ({
   pk,
   // public_profile,
