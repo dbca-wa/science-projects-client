@@ -133,7 +133,9 @@ const CustomTitleSection = ({ me }: { me: IUserMe }) => {
     >
       <FormControl>
         <Flex className="mb-2 w-full items-center justify-between gap-4">
-          <FormLabel htmlFor="custom-title-input">Custom Title</FormLabel>
+          <FormLabel htmlFor="custom-title-input">
+            Custom Position Title
+          </FormLabel>
           <div className="flex items-center gap-2">
             <Switch
               //   checked={isEnabled}
