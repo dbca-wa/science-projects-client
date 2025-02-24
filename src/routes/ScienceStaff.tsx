@@ -16,7 +16,7 @@ export const ScienceStaff = () => {
     searchTerm,
     page,
   });
-  console.log(scienceStaffData);
+  // console.log(scienceStaffData);
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({
@@ -86,7 +86,7 @@ export const ScienceStaff = () => {
                 getDisplayName(a).localeCompare(getDisplayName(b)),
               )
               ?.map((user, index) => {
-                console.log(user);
+                // console.log(user);
                 return (
                   <ScienceStaffSearchResult
                     key={index}
