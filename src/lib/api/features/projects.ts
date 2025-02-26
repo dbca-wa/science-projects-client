@@ -638,6 +638,83 @@ export const getProjectsBasedOnSearchTerm = async (
   }
 };
 
+export const getMapProjectsBasedOnSearchTerm = async (
+  searchTerm: string,
+  page: number,
+  filters: {
+    onlyActive: boolean;
+    onlyInactive: boolean;
+    filterBA: string;
+    filterProjectKind: string;
+    filterProjectStatus: string;
+    filterYear: number;
+    selectedLocations: number[];
+  },
+) => {
+  try {
+    let url = `projects?page=${page}`;
+
+    if (searchTerm !== "") {
+      url += `&searchTerm=${searchTerm}`;
+    }
+
+    if (filters.onlyActive) {
+      url += "&only_active=true";
+    }
+
+    if (filters.onlyInactive) {
+      url += "&only_inactive=true";
+    }
+
+    if (filters.filterBA) {
+      if (filters.filterBA === "All") {
+        // skip to get all areas
+      } else {
+        url += `&businessarea=${filters.filterBA}`;
+      }
+    }
+
+    if (filters.filterProjectStatus) {
+      if (filters.filterProjectStatus === "All") {
+        // skip to get all
+      } else {
+        url += `&projectstatus=${filters.filterProjectStatus}`;
+      }
+    }
+
+    if (filters.filterProjectKind) {
+      if (filters.filterProjectKind === "All") {
+        // skip to get all
+      } else {
+        url += `&projectkind=${filters.filterProjectKind}`;
+      }
+    }
+    if (filters.filterYear) {
+      if (filters.filterYear === 0) {
+        // skip to get all
+      } else {
+        url += `&year=${filters.filterYear}`;
+      }
+    }
+
+    // console.log({
+    //     "url": url,
+    //     "filterBA": filters.filterBA,
+    //     "projectStatus": filters.filterProjectStatus,
+    //     "projectKind": filters.filterProjectKind,
+    // })
+
+    const response = await instance.get(url);
+
+    const { projects, total_results, total_pages } = response.data;
+    // console.log(projects)
+    return { projects, total_results, total_pages };
+  } catch (error) {
+    console.error("Error fetching projects based on search term:", error);
+    throw error;
+  }
+};
+
 export const getProjects = async ({ searchTerm }: ISearchTerm) => {
   return instance
     .post("projects/", {

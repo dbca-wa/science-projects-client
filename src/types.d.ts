@@ -737,6 +737,7 @@ type ProjectRoles =
 interface IProjectData {
   pk: number | undefined;
   id?: number;
+  areas: ISimpleLocationData[];
   kind: string;
   title: string;
   status: string;

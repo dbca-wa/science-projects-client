@@ -12,6 +12,7 @@ import MapSidebarSection from "./MapSidebarSection";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useGetLocationsGeojson } from "@/lib/hooks/tanstack/useGetLocationsGeojson";
+import { IProjectData, ISimpleLocationData } from "@/types";
 
 interface LayerVisibility {
   dbcaRegions: boolean;
@@ -44,11 +45,41 @@ interface LayerData {
 interface MapLocationsSidebarProps {
   mapRef: React.RefObject<L.Map | null>;
   mapContainerRef: React.RefObject<HTMLDivElement>;
+  dbcaRegions: any;
+  dbcaDistricts: any;
+  nrm: any;
+  ibra: any;
+  imcra: any;
+  locationsLoading: boolean;
+  selectedLocations: number[];
+  setFilterLocations?: (locations: number[]) => void;
+  areaDbcaRegions: ISimpleLocationData[];
+  areaDbcaDistricts: ISimpleLocationData[];
+  areaIbra: ISimpleLocationData[];
+  areaImcra: ISimpleLocationData[];
+  areaNrm: ISimpleLocationData[];
+  areaLocationsLoading: boolean;
+  filteredItems: IProjectData[];
 }
 
 const MapLocationsSidebar = ({
   mapRef,
   mapContainerRef,
+  dbcaRegions,
+  dbcaDistricts,
+  nrm,
+  ibra,
+  imcra,
+  locationsLoading,
+  selectedLocations,
+  setFilterLocations,
+  areaDbcaRegions,
+  areaDbcaDistricts,
+  areaIbra,
+  areaImcra,
+  areaNrm,
+  areaLocationsLoading,
+  filteredItems,
 }: MapLocationsSidebarProps) => {
   const [showLabels, setShowLabels] = useState(true);
   const [showColors, setShowColors] = useState(true);
@@ -107,9 +138,6 @@ const MapLocationsSidebar = ({
       }
     });
   };
-
-  const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } =
-    useGetLocationsGeojson();
 
   const [selectedRegion, setSelectedRegion] = useState<RegionProperties | null>(
     null,

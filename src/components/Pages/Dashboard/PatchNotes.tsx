@@ -182,35 +182,14 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "Users can now add a custom position title to their profile by clicking their avatar in the navbar, navigating to My SPMS Profile, and filling in information in the Public Appearance section. This title will be displayed on your public profile and in search results, replacing information from HR systems. Note: It is recommended that users first request to update their official title and any other information by contacting Establishment@dbca.wa.gov.au."
               }
             />
-            {/* <PatchNoteEntry
-              title={"Caretaker mode"}
+            <PatchNoteEntry
+              title={"Projects Map"}
               kind="feature"
               description={
-                "Users can now request and assign a caretaker to manage their workload while away from work. Projects shown on your public profile are those that you are directly involved with. If there are any projects which you are already unofficially managing in a caretaker capacity, request to become that user's caretaker, then assign those projects to that user."
-              }
-            /> */}
-            {/* <PatchNoteEntry
-              title={"Hide Projects From Public Profile"}
-              kind="feature"
-              description={
-                "In addition to caretaker mode, you can directly hide any project you are a member of from your public profile. You can do this by visiting the project's overview tab and clicking the orange 'Hide From Staff Profile' button. This will not impact the project's visibility for other users."
+                "Users can now visualise projects on a map in SPMS by clicking the Projects Map link on the projects page. The map displays project locations and allows users to filter by project status, project type, business area and year."
               }
             />
 
-            <PatchNoteEntry
-              title={"Staff Profile Publications"}
-              kind="feature"
-              description={
-                "Publications belonging to staff are now fetched from the library and displayed on their public profile. Users may also add additional publications."
-              }
-            /> */}
-            {/* <PatchNoteEntry
-              title={"Easy Access to links"}
-              kind="update"
-              description={
-                "Access to data catalogue, scientific sites register, and your public profile is available on any page by clicking your name at the top-right of the page and selecting the appropriate link. Data catalogue is now also accessible on the home page."
-              }
-            /> */}
             <PatchNoteEntry
               title={"Dependencies"}
               kind="update"
