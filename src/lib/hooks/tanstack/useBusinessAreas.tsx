@@ -3,6 +3,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getAllBusinessAreas } from "../../api";
+import { IBusinessArea } from "@/types";
 
 export const useBusinessAreas = () => {
   const { isPending, data } = useQuery({
@@ -17,6 +18,6 @@ export const useBusinessAreas = () => {
 
   return {
     baLoading: isPending,
-    baData: sortedBA,
+    baData: sortedBA as IBusinessArea[],
   };
 };

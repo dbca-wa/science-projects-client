@@ -1,53 +1,128 @@
-import { useNavigate } from "react-router-dom";
-import { Button } from "../ui/button";
-import MapSidebarSection from "./MapSidebarSection";
-import { ArrowLeft } from "lucide-react";
+import { MapSearchFilters } from "@/lib/hooks/helper/ProjectMapSearchContext";
+import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
+import { IProjectData, ISimpleLocationData } from "@/types";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
-import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
-import { useState } from "react";
+import MapSidebarSection from "./MapSidebarSection";
+import ProjectMapMarker from "./ProjectMapMarker";
 
 interface MapLocationsSidebarProps {
+  filteredItems: IProjectData[];
   mapRef: React.RefObject<L.Map | null>;
   mapContainerRef: React.RefObject<HTMLDivElement>;
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  setIsOnProjectsPage: (value: boolean) => void;
+  setCurrentProjectResultsPage: (value: number) => void;
+  setSearchFilters: (filters: MapSearchFilters) => void;
+  onlyActive: boolean;
+  onlyInactive: boolean;
+  filterProjectKind: string;
+  filterProjectStatus: string;
+  filterBA: string;
+  filterYear: number;
+  dbcaRegions: any;
+  dbcaDistricts: any;
+  nrm: any;
+  ibra: any;
+  imcra: any;
+  areaDbcaRegions: ISimpleLocationData[];
+  areaDbcaDistricts: ISimpleLocationData[];
+  areaIbra: ISimpleLocationData[];
+  areaImcra: ISimpleLocationData[];
+  areaNrm: ISimpleLocationData[];
+  areaLocationsLoading: boolean;
 }
 
 const MapBackAndSearch = ({
+  filteredItems,
   mapRef,
   mapContainerRef,
+  searchTerm,
+  setSearchTerm,
+  setIsOnProjectsPage,
+  setCurrentProjectResultsPage,
+  setSearchFilters,
+  onlyActive,
+  onlyInactive,
+  filterProjectKind,
+  filterProjectStatus,
+  filterBA,
+  filterYear,
+  dbcaRegions,
+  dbcaDistricts,
+  nrm,
+  ibra,
+  imcra,
+  areaDbcaRegions,
+  areaDbcaDistricts,
+  areaIbra,
+  areaImcra,
+  areaNrm,
 }: MapLocationsSidebarProps) => {
-  const navigate = useNavigate();
-
   const { baLoading, baData } = useBusinessAreas();
-  // Business Areas state
-  const [businessAreas, setBusinessAreas] = useState<{
-    [key: string]: boolean;
-  }>({});
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    setIsOnProjectsPage(true);
+    return () => {
+      setIsOnProjectsPage(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    setCurrentProjectResultsPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      setSearchTerm(inputValue);
+    }, 500);
+
+    return () => clearTimeout(debounceTimer);
+  }, [inputValue]);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  };
+
+  // Get first project with areas
+  const firstProjectWithArea = filteredItems?.find(
+    (project) => project.areas?.length > 0,
+  );
+  console.log("Filtered Items:", filteredItems);
+  console.log("First Project with Area:", firstProjectWithArea);
 
   return (
     <MapSidebarSection className="pb-0" title="Search">
       <div className="mt-2">
-        <Input placeholder="Search for a project..." className="w-full" />
+        <Input
+          placeholder="Search for a project..."
+          className="w-full"
+          onChange={handleChange}
+        />
       </div>
+
+      {firstProjectWithArea && (
+        <ProjectMapMarker
+          project={firstProjectWithArea}
+          mapRef={mapRef}
+          dbcaRegions={dbcaRegions}
+          dbcaDistricts={dbcaDistricts}
+          nrm={nrm}
+          ibra={ibra}
+          imcra={imcra}
+          areaDbcaRegions={areaDbcaRegions}
+          areaDbcaDistricts={areaDbcaDistricts}
+          areaIbra={areaIbra}
+          areaImcra={areaImcra}
+          areaNrm={areaNrm}
+        />
+      )}
     </MapSidebarSection>
   );
 };
 
 export default MapBackAndSearch;
-
-{
-  /* <Button
-        className="w-full text-lg font-semibold"
-        onClick={(e) => {
-          if (e.ctrlKey || e.metaKey) {
-            window.open(`/`, "_blank");
-          } else {
-            navigate("/");
-          }
-        }}
-      >
-        <ArrowLeft />
-        Back to SPMS
-      </Button> */
-}

@@ -23,6 +23,7 @@ import { ProjectSearchProvider } from "./lib/hooks/helper/ProjectSearchContext";
 import { UserSearchProvider } from "./lib/hooks/helper/UserSearchContext";
 import { router } from "./router";
 import theme from "./theme";
+import { ProjectMapSearchProvider } from "./lib/hooks/helper/ProjectMapSearchContext";
 // import { RouterProvider, createRouter } from "react-router-dom";
 // import { routeTree } from "./routeTree.gen";
 
@@ -50,12 +51,14 @@ root.render(
       <LayoutSwitcherProvider>
         <UserSearchProvider>
           <ProjectSearchProvider>
-            <RouterProvider
-              router={router}
-              future={{
-                v7_startTransition: true,
-              }}
-            />
+            <ProjectMapSearchProvider>
+              <RouterProvider
+                router={router}
+                future={{
+                  v7_startTransition: true,
+                }}
+              />
+            </ProjectMapSearchProvider>
           </ProjectSearchProvider>
         </UserSearchProvider>
       </LayoutSwitcherProvider>
