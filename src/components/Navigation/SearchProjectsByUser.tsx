@@ -1,6 +1,7 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { UserSearchDropdown } from "./UserSearchDropdown";
+import clsx from "clsx";
 
 const SearchProjectsByUser = ({
   handleFilterUserChange,
@@ -14,6 +15,8 @@ const SearchProjectsByUser = ({
     handleFilterUserChange(selectedUser);
   }, [selectedUser]);
 
+  const { colorMode } = useColorMode();
+
   return (
     <Flex className="w-full justify-end">
       <UserSearchDropdown
@@ -21,8 +24,8 @@ const SearchProjectsByUser = ({
         label=""
         helperText=""
         setUserFunction={setSelectedUser}
-        placeholder="Search by user"
-        className="my-0 h-8 py-0"
+        placeholder="Filter by user"
+        className={clsx("my-0 h-8 text-sm")}
         hideCannotFind
       />
     </Flex>

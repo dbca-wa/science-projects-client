@@ -1,7 +1,8 @@
 // Project search component - works/appears on the Users page with ProjectSearchContext
 
-import { IBusinessArea } from "@/types";
 import {
+  Box,
+  Checkbox,
   Flex,
   Grid,
   Input,
@@ -12,11 +13,13 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
-import { getAllBusinessAreas, getAllProjectsYears } from "../../lib/api";
+import { getAllProjectsYears } from "../../lib/api";
 import { useProjectSearchContext } from "../../lib/hooks/helper/ProjectSearchContext";
+import SearchProjectsByUser from "./SearchProjectsByUser";
 
 interface IProps {
   orientation?: "vertical" | "horizontal";
+  handleFilterUserChange?: (user: number | null) => void;
 }
 
 export const SearchProjects = ({ orientation }: IProps) => {
@@ -35,27 +38,70 @@ export const SearchProjects = ({ orientation }: IProps) => {
     filterProjectStatus,
     filterBA,
     filterYear,
+    filterUser,
   } = useProjectSearchContext();
-
-  const [businessAreas, setBusinessAreas] = useState<IBusinessArea[]>([]);
-  const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
 
   // useEffect(() => console.log(businessAreas));
   const [availableYears, setAvailableYears] = useState<number[]>([]);
 
-  const handleOnlySelectedBusinessAreaChange: React.ChangeEventHandler<
-    HTMLSelectElement
-  > = (event) => {
-    const businessAreaValue = event.target.value;
-    // console.log(businessAreaValue);
+  const handleFilterUserChange = (userId: number | null) => {
     setSearchFilters({
-      onlyActive: onlyActive,
-      onlyInactive: onlyInactive,
-      filterBA: businessAreaValue,
-      filterProjectKind: filterProjectKind,
-      filterProjectStatus: filterProjectStatus,
-      filterYear: filterYear,
+      onlyActive,
+      onlyInactive,
+      filterBA,
+      filterProjectKind,
+      filterProjectStatus,
+      filterYear,
+      filterUser: userId,
     });
+  };
+
+  const handleOnlyActiveProjectsChange = () => {
+    if (!onlyActive) {
+      setSearchFilters({
+        onlyActive: true,
+        onlyInactive: false,
+        filterBA,
+        filterProjectKind,
+        filterProjectStatus,
+        filterYear,
+        filterUser,
+      });
+    } else {
+      setSearchFilters({
+        onlyActive: false,
+        onlyInactive: false,
+        filterBA,
+        filterProjectKind,
+        filterProjectStatus,
+        filterYear,
+        filterUser,
+      });
+    }
+  };
+
+  const handleOnlyInactiveProjectsChange = () => {
+    if (!onlyInactive) {
+      setSearchFilters({
+        onlyActive: false,
+        onlyInactive: true,
+        filterBA,
+        filterProjectKind,
+        filterProjectStatus,
+        filterYear,
+        filterUser,
+      });
+    } else {
+      setSearchFilters({
+        onlyInactive: false,
+        onlyActive: false,
+        filterBA,
+        filterProjectKind,
+        filterProjectStatus,
+        filterYear,
+        filterUser,
+      });
+    }
   };
 
   const handleOnlySelectedYearChange: React.ChangeEventHandler<
@@ -70,6 +116,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
       filterProjectKind: filterProjectKind,
       filterProjectStatus: filterProjectStatus,
       filterYear: yearValue,
+      filterUser,
     });
   };
 
@@ -84,19 +131,6 @@ export const SearchProjects = ({ orientation }: IProps) => {
     const doc = new DOMParser().parseFromString(htmlString, "text/html");
     return doc.body.textContent || "";
   };
-
-  useEffect(() => {
-    const fetchBusinessAreas = async () => {
-      try {
-        const data = await getAllBusinessAreas();
-        setBusinessAreas(data);
-      } catch (error) {
-        console.error("Error fetching business areas:", error);
-      }
-    };
-
-    fetchBusinessAreas();
-  }, []);
 
   useEffect(() => {
     const fetchAvailableProjectYears = async () => {
@@ -141,11 +175,11 @@ export const SearchProjects = ({ orientation }: IProps) => {
         // bg={"red"}
         w={"100%"}
         h={"100%"}
-        gridRowGap={1}
+        gridRowGap={4}
       >
         {/* Project Business Area Filters */}
 
-        <InputGroup borderColor="gray.200" size="sm" mb={1}>
+        <InputGroup borderColor="gray.200" size="sm">
           <InputRightElement
             pointerEvents="none"
             children={<FiSearch color={"#9CA3AF"} />}
@@ -161,11 +195,26 @@ export const SearchProjects = ({ orientation }: IProps) => {
             color={colorMode === "dark" ? "whiteAlpha.900" : ""}
             _placeholder={{
               color: colorMode === "dark" ? "gray.300" : "gray.500",
+              paddingLeft: "2px",
             }}
           />
         </InputGroup>
 
-        <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridColumnGap={4}>
+        <Box mt={1}>
+          <SearchProjectsByUser
+            handleFilterUserChange={handleFilterUserChange}
+          />
+        </Box>
+
+        <Grid
+          mt={1}
+          gridGap={4}
+          gridTemplateColumns={{
+            base: "repeat(1, 1fr)",
+            md: "repeat(2, 1fr)",
+          }}
+          className="flex items-center justify-end"
+        >
           <Select
             onChange={handleOnlySelectedYearChange}
             size={"sm"}
@@ -198,101 +247,34 @@ export const SearchProjects = ({ orientation }: IProps) => {
                   </option>
                 ))}
           </Select>
-          <Select
-            onChange={handleOnlySelectedBusinessAreaChange}
-            size={"sm"}
-            // mx={4}
-            rounded={"5px"}
-            style={
-              colorMode === "light"
-                ? {
-                    color: "black",
-                    backgroundColor: "white",
-                    borderColor: "gray.200",
-                    caretColor: "black !important",
-                  }
-                : {
-                    color: "white",
-                    borderColor: "white",
-                    caretColor: "black !important",
-                  }
-            }
+          <Checkbox
+            size="md"
+            colorScheme="green"
+            onChange={handleOnlyActiveProjectsChange}
+            isChecked={onlyActive}
+            isDisabled={onlyInactive}
           >
-            <option key={"All"} value={"All"} color={"black"}>
-              All Business Areas
-            </option>
-            {orderedDivisionSlugs.flatMap((divSlug) => {
-              // Filter business areas for the current division
-              const divisionBusinessAreas = businessAreas
-                .filter((ba) => ba.division.slug === divSlug)
-                .sort((a, b) => a.name.localeCompare(b.name));
-
-              return divisionBusinessAreas.map((ba, index) => (
-                <option key={`${ba.name}${index}`} value={ba.pk}>
-                  {ba?.division ? `[${ba?.division?.slug}] ` : ""}
-                  {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
-                  {ba.is_active ? "" : "(INACTIVE)"}
-                </option>
-              ));
-            })}
-          </Select>
+            Active
+          </Checkbox>
+          <Checkbox
+            size="md"
+            colorScheme="gray"
+            onChange={handleOnlyInactiveProjectsChange}
+            isChecked={onlyInactive}
+            isDisabled={onlyActive}
+          >
+            Inactive
+          </Checkbox>
         </Grid>
+
+        {/* <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridColumnGap={4}>
+          
+        </Grid> */}
       </Grid>
     );
   } else {
     return (
       <Flex>
-        {/* Project Business Area Filters */}
-
-        <Select
-          onChange={handleOnlySelectedBusinessAreaChange}
-          size={"sm"}
-          mx={4}
-          rounded={"5px"}
-          style={
-            colorMode === "light"
-              ? {
-                  color: "black",
-                  backgroundColor: "white",
-                  borderColor: "gray.200",
-                  caretColor: "black !important",
-                }
-              : {
-                  color: "white",
-                  borderColor: "white",
-                  caretColor: "black !important",
-                }
-          }
-        >
-          <option value={"All"} color={"black"}>
-            All Business Areas
-          </option>
-          {businessAreas.map((ba, index) => {
-            console.log(ba);
-            const checkIsHtml = (data: string) => {
-              // Regular expression to check for HTML tags
-              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
-
-              // Check if the string contains any HTML tags
-              return htmlRegex.test(data);
-            };
-
-            const isHtml = checkIsHtml(ba.name);
-            let baName = ba?.name;
-            if (isHtml === true) {
-              const parser = new DOMParser();
-              const dom = parser.parseFromString(ba.name, "text/html");
-              const content = dom.body.textContent;
-              baName = content;
-            }
-            return (
-              <option key={index} value={ba.pk}>
-                {baName}
-              </option>
-            );
-          })}{" "}
-        </Select>
-
         <InputGroup borderColor="gray.200" size="sm">
           <InputRightElement
             pointerEvents="none"
