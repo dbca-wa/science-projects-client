@@ -48,6 +48,7 @@ interface IUserSearchDropdown {
   ignoreArray?: number[];
   className?: string;
   hideCannotFind?: boolean;
+  placeholderColor?: string;
 }
 
 export const UserSearchDropdown = forwardRef(
@@ -69,6 +70,7 @@ export const UserSearchDropdown = forwardRef(
       ignoreArray,
       className,
       hideCannotFind,
+      placeholderColor,
     }: IUserSearchDropdown,
     ref,
   ) => {
@@ -202,6 +204,13 @@ export const UserSearchDropdown = forwardRef(
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder={placeholder}
+              _placeholder={
+                placeholderColor
+                  ? { color: placeholderColor, marginLeft: "-4px" }
+                  : colorMode === "dark"
+                    ? { color: "gray.300", marginLeft: "-4px" }
+                    : { color: "gray.500", marginLeft: "-4px" }
+              }
               onFocus={() => setIsMenuOpen(true)}
               autoFocus={autoFocus ? true : false}
               autoComplete="off"
@@ -420,8 +429,8 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
       bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
       borderRadius="md"
       px={2}
-      py={1}
-      mr={2}
+      // py={1}
+      // mr={2}
     >
       <Avatar
         size="sm"
