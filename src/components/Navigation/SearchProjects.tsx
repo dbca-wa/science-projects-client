@@ -266,10 +266,6 @@ export const SearchProjects = ({ orientation }: IProps) => {
             Inactive
           </Checkbox>
         </Grid>
-
-        {/* <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridColumnGap={4}>
-          
-        </Grid> */}
       </Grid>
     );
   } else {

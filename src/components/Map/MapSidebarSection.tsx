@@ -6,6 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import { Separator } from "../ui/separator";
 
 interface MapSidebarSectionProps {
   title: string;
@@ -46,6 +47,7 @@ const MapSidebarSection = ({
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+      <Separator className="mt-4 bg-blue-200" />
     </div>
   );
 };

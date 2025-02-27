@@ -30,7 +30,7 @@ const PatchNoteEntry = ({
   description,
 }: {
   title: string;
-  kind: "feature" | "update";
+  kind: "feature" | "update" | "fix";
   description: string;
 }) => {
   return (
@@ -176,20 +176,68 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2}>
             <PatchNoteEntry
-              title={"Custom Title"}
+              title={"Search Project By User"}
               kind="feature"
               description={
-                "Users can now add a custom position title to their profile by clicking their avatar in the navbar, navigating to My SPMS Profile, and filling in information in the Public Appearance section. This title will be displayed on your public profile and in search results, replacing information from HR systems. Note: It is recommended that users first request to update their official title and any other information by contacting Establishment@dbca.wa.gov.au."
+                "By popular demand! Users can now use the projects page to directly search for a user's projects. This feature works with other filters and expands on viewing staff projects by clicking on their account on the users page."
               }
             />
             <PatchNoteEntry
-              title={"Projects Map"}
+              title={"Project Map"}
               kind="feature"
               description={
-                "Users can now visualise projects on a map in SPMS by clicking the Projects Map link on the projects page. The map displays project locations and allows users to filter by project status, project type, business area and year."
+                "Users can now access a map page to visualise where projects are located as they search. Users can also adjust a project's location from this page."
               }
             />
-
+            <PatchNoteEntry
+              title={"Feedback on Documents"}
+              kind="feature"
+              description={
+                "Business Area leads and the directorate can now provide feedback via the notification email when sending a document back for revisions."
+              }
+            />
+            <PatchNoteEntry
+              title={"Remedy Buttons"}
+              kind="fix"
+              description={
+                "A bug has been patched in the Remedy Problematic Project function which prevented all projects from being updated."
+              }
+            />
+            <PatchNoteEntry
+              title={"Search by ID"}
+              kind="update"
+              description={
+                "Search functionality has been expanded to include the last part of a project's ID (e.g. '123' in EXT-2022-123). Users may filter year and project type as usual. This functionality will only work if there are no leading zeros in the ID search term (type '23' if '023')."
+              }
+            />
+            <PatchNoteEntry
+              title={"Elegant Errors"}
+              kind="update"
+              description={
+                "For public facing pages, error messages have been updated to be more user-friendly and informative to admins."
+              }
+            />
+            <PatchNoteEntry
+              title={"Modern Layout Updated"}
+              kind="update"
+              description={
+                "The second 'modern' layout has been adjusted to implement missing features already present on the default layout."
+              }
+            />
+            <PatchNoteEntry
+              title={"Documentation"}
+              kind="update"
+              description={
+                "Documentation / Quick GUide has been updated to reflect recent changes."
+              }
+            />
+            <PatchNoteEntry
+              title={"Modern Layout Updated"}
+              kind="update"
+              description={
+                "Feedback email submission adjusted to go to shared inbox for ecoinformatics."
+              }
+            />
             <PatchNoteEntry
               title={"Dependencies"}
               kind="update"

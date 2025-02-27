@@ -31,6 +31,7 @@ const ProjectsMap = () => {
     filterYear,
     selectedLocations,
     filteredItems,
+    filterUser,
     setSelectedLocations,
   } = useProjectMapSearchContext();
 
@@ -48,8 +49,8 @@ const ProjectsMap = () => {
   } = useGetLocations();
 
   // Business Area State and Selections ================================
-  // const { baData, baLoading } = useBusinessAreas();
-  // const [selectedBas, setSelectedBas] = useState<IBusinessArea[]>([]);
+  const { baData, baLoading } = useBusinessAreas();
+  const [selectedBas, setSelectedBas] = useState<IBusinessArea[]>([]);
 
   return (
     <div className="relative h-screen w-full">
@@ -79,6 +80,8 @@ const ProjectsMap = () => {
           filterProjectStatus={filterProjectStatus}
           filterBA={filterBA}
           filterYear={filterYear}
+          filterUser={filterUser}
+          selectedLocations={selectedLocations}
           mapRef={mapRef}
           mapContainerRef={mapContainerRef}
           dbcaRegions={dbcaRegions}
@@ -117,14 +120,14 @@ const ProjectsMap = () => {
         />
 
         {/* BUSINESS AREAS */}
-        {/* <MapBusinessAreasSidebar
+        <MapBusinessAreasSidebar
           mapRef={mapRef}
           mapContainerRef={mapContainerRef}
           baData={baData}
           baLoading={baLoading}
           selectedBas={selectedBas}
           setSelectedBas={setSelectedBas}
-        /> */}
+        />
       </div>
     </div>
   );

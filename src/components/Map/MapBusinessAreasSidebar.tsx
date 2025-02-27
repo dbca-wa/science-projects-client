@@ -77,7 +77,7 @@ const MapBusinessAreasSidebar = ({
   };
 
   return (
-    <MapSidebarSection title="Business Areas">
+    <MapSidebarSection title="Business Areas" className="-mt-4">
       <div className="mb-4 grid grid-cols-2 gap-2">
         <Button
           className="w-full rounded text-white hover:bg-green-600"
