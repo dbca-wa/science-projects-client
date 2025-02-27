@@ -572,6 +572,7 @@ export const getProjectsBasedOnSearchTerm = async (
     filterProjectKind: string;
     filterProjectStatus: string;
     filterYear: number;
+    filterUser: number | null;
   },
 ) => {
   try {
@@ -587,6 +588,14 @@ export const getProjectsBasedOnSearchTerm = async (
 
     if (filters.onlyInactive) {
       url += "&only_inactive=true";
+    }
+
+    if (filters.filterUser) {
+      if (filters.filterUser === 0 || filters.filterUser === null) {
+        // skip to get all areas
+      } else {
+        url += `&selected_user=${filters.filterUser}`;
+      }
     }
 
     if (filters.filterBA) {
