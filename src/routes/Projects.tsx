@@ -28,6 +28,7 @@ import { PaginatorProject } from "../components/Pages/Projects/PaginatorProject"
 import { useProjectSearchContext } from "../lib/hooks/helper/ProjectSearchContext";
 import { BreadCrumb } from "@/components/Base/BreadCrumb";
 import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
+import SearchProjectsByUser from "@/components/Navigation/SearchProjectsByUser";
 
 export const Projects = () => {
   const { colorMode } = useColorMode();
@@ -57,6 +58,7 @@ export const Projects = () => {
         filterProjectKind,
         filterProjectStatus,
         filterYear,
+        filterUser: null,
       });
     } else {
       setSearchFilters({
@@ -66,6 +68,7 @@ export const Projects = () => {
         filterProjectKind,
         filterProjectStatus,
         filterYear,
+        filterUser: null,
       });
     }
   };
@@ -79,6 +82,7 @@ export const Projects = () => {
         filterProjectKind,
         filterProjectStatus,
         filterYear,
+        filterUser: null,
       });
     } else {
       setSearchFilters({
@@ -88,6 +92,7 @@ export const Projects = () => {
         filterProjectKind,
         filterProjectStatus,
         filterYear,
+        filterUser: null,
       });
     }
   };
@@ -103,6 +108,19 @@ export const Projects = () => {
       filterProjectKind,
       filterProjectStatus: statusValue,
       filterYear,
+      filterUser: null,
+    });
+  };
+
+  const handleFilterUserChange = (userId: number | null) => {
+    setSearchFilters({
+      onlyActive,
+      onlyInactive,
+      filterBA,
+      filterProjectKind,
+      filterProjectStatus,
+      filterYear,
+      filterUser: userId,
     });
   };
 
@@ -117,6 +135,7 @@ export const Projects = () => {
       filterProjectStatus,
       filterProjectKind: projectKindValue,
       filterYear,
+      filterUser: null,
     });
   };
 
@@ -255,11 +274,14 @@ export const Projects = () => {
             base: "repeat(1, 1fr)",
             lg: "repeat(2, 1fr)",
           }}
-          gridRowGap={4}
-          gridColumnGap={4}
+          gridGap={4}
           justifyContent="space-between"
         >
-          <Grid gridRowGap={4}>
+          <Grid
+            gridRowGap={4}
+            // bg={"red.500"}
+            className="flex flex-col justify-end"
+          >
             <Grid
               gridGap={4}
               gridTemplateColumns={{
@@ -350,7 +372,16 @@ export const Projects = () => {
             </Grid>
           </Grid>
 
-          <Flex>
+          <Flex
+            flexDir={"column"}
+            w={"100%"}
+            justifyContent={"space-between"}
+            gridGap={4}
+          >
+            <SearchProjectsByUser
+              handleFilterUserChange={handleFilterUserChange}
+            />
+
             <SearchProjects orientation={"vertical"} />
           </Flex>
         </Grid>

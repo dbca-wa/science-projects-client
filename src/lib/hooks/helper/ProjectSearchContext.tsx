@@ -11,6 +11,7 @@ import { IProjectData } from "../../../types";
 interface SearchFilters {
   onlyActive: boolean;
   onlyInactive: boolean;
+  filterUser: number | null;
   filterBA: string;
   filterProjectKind: string;
   filterProjectStatus: string;
@@ -30,6 +31,7 @@ interface IProjectSearchContext {
   setIsOnProjectsPage: (value: boolean) => void;
   onlyActive: boolean;
   onlyInactive: boolean;
+  filterUser: number | null;
   filterBA: string;
   filterProjectKind: string;
   filterProjectStatus: string;
@@ -62,6 +64,7 @@ export const ProjectSearchProvider = ({
       filterProjectKind: "All",
       filterProjectStatus: "All",
       filterYear: 0,
+      filterUser: null,
     },
   });
 

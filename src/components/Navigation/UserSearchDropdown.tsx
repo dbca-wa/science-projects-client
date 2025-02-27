@@ -46,6 +46,8 @@ interface IUserSearchDropdown {
   projectPk?: number;
   isClosed?: boolean;
   ignoreArray?: number[];
+  className?: string;
+  hideCannotFind?: boolean;
 }
 
 export const UserSearchDropdown = forwardRef(
@@ -65,6 +67,8 @@ export const UserSearchDropdown = forwardRef(
       projectPk,
       isClosed,
       ignoreArray,
+      className,
+      hideCannotFind,
     }: IUserSearchDropdown,
     ref,
   ) => {
@@ -115,7 +119,7 @@ export const UserSearchDropdown = forwardRef(
     }, [searchTerm]);
 
     const { userLoading, userData } = useFullUserByPk(
-      preselectedUserPk !== undefined ? preselectedUserPk : 0,
+      preselectedUserPk !== undefined ? preselectedUserPk : null,
     );
 
     useEffect(() => {
@@ -158,7 +162,7 @@ export const UserSearchDropdown = forwardRef(
       ) {
         return;
       }
-      setUserFunction(0); // Clear the selected user by setting the userPk to 0 (or any value that represents no user)
+      setUserFunction(null); // Clear the selected user by setting the userPk to 0 (or any value that represents no user)
       if (setUserEmailFunction) {
         setUserEmailFunction("");
       }
@@ -179,6 +183,8 @@ export const UserSearchDropdown = forwardRef(
       <FormControl
         isRequired={isRequired}
         mb={0}
+        my={-4}
+        // p={-2}
         // bg={"red"}
         w={"100%"}
         h={"100%"}
@@ -199,6 +205,7 @@ export const UserSearchDropdown = forwardRef(
               onFocus={() => setIsMenuOpen(true)}
               autoFocus={autoFocus ? true : false}
               autoComplete="off"
+              className={className}
             />
           </InputGroup>
         )}
@@ -222,50 +229,54 @@ export const UserSearchDropdown = forwardRef(
                 {helperText}
             </Box> */}
         <FormHelperText>
-          {showAddUser
+          {hideCannotFind !== true &&
+          hideCannotFind !== undefined &&
+          showAddUser
             ? "Can't find who you're looking for? Use the buttons below to add an external user or email a DBCA staff member with a link to create an account - they must click the link and login."
             : helperText}
         </FormHelperText>
-        {showAddUser && (
-          <>
-            {!ignoreArray ||
-              (ignoreArray?.length < 1 && (
-                <>
-                  <CreateUserModal
-                    onClose={onCloseCreateUserModal}
-                    isOpen={isCreateUserModalOpen}
-                  />
-                  <EmailSiteLinkModal
-                    onClose={onCloseEmailSiteLinkModal}
-                    isOpen={isEmailSiteLinkModalOpen}
-                  />
-                  <Flex mt={4} mb={2} justifyContent={"flex-end"}>
-                    <Button
-                      color={"white"}
-                      bg={colorMode === "light" ? "blue.500" : "blue.600"}
-                      _hover={{
-                        bg: colorMode === "light" ? "blue.400" : "blue.500",
-                      }}
-                      onClick={onOpenCreateUserModal}
-                    >
-                      Add New External User
-                    </Button>
-                    <Button
-                      ml={3}
-                      color={"white"}
-                      bg={colorMode === "light" ? "green.500" : "green.600"}
-                      _hover={{
-                        bg: colorMode === "light" ? "green.400" : "green.500",
-                      }}
-                      onClick={onOpenEmailSiteLinkModal}
-                    >
-                      Send Link to DBCA Staff
-                    </Button>
-                  </Flex>{" "}
-                </>
-              ))}
-          </>
-        )}
+        {hideCannotFind !== true &&
+          hideCannotFind !== undefined &&
+          showAddUser && (
+            <>
+              {!ignoreArray ||
+                (ignoreArray?.length < 1 && (
+                  <>
+                    <CreateUserModal
+                      onClose={onCloseCreateUserModal}
+                      isOpen={isCreateUserModalOpen}
+                    />
+                    <EmailSiteLinkModal
+                      onClose={onCloseEmailSiteLinkModal}
+                      isOpen={isEmailSiteLinkModalOpen}
+                    />
+                    <Flex mt={4} mb={2} justifyContent={"flex-end"}>
+                      <Button
+                        color={"white"}
+                        bg={colorMode === "light" ? "blue.500" : "blue.600"}
+                        _hover={{
+                          bg: colorMode === "light" ? "blue.400" : "blue.500",
+                        }}
+                        onClick={onOpenCreateUserModal}
+                      >
+                        Add New External User
+                      </Button>
+                      <Button
+                        ml={3}
+                        color={"white"}
+                        bg={colorMode === "light" ? "green.500" : "green.600"}
+                        _hover={{
+                          bg: colorMode === "light" ? "green.400" : "green.500",
+                        }}
+                        onClick={onOpenEmailSiteLinkModal}
+                      >
+                        Send Link to DBCA Staff
+                      </Button>
+                    </Flex>{" "}
+                  </>
+                ))}
+            </>
+          )}
       </FormControl>
     );
   },
