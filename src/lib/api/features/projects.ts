@@ -658,6 +658,7 @@ export const getMapProjectsBasedOnSearchTerm = async (
     filterProjectStatus: string;
     filterYear: number;
     selectedLocations: number[];
+    filterUser: number | null;
   },
 ) => {
   try {
@@ -665,6 +666,19 @@ export const getMapProjectsBasedOnSearchTerm = async (
 
     if (searchTerm !== "") {
       url += `&searchTerm=${searchTerm}`;
+    }
+
+    if (filters.selectedLocations.length > 0) {
+      const locationsString = JSON.stringify(filters.selectedLocations);
+      url += `&locations=${locationsString}`;
+    }
+
+    if (filters.filterUser) {
+      if (filters.filterUser === 0 || filters.filterUser === null) {
+        // skip to get all users
+      } else {
+        url += `&selected_user=${filters.filterUser}`;
+      }
     }
 
     if (filters.onlyActive) {

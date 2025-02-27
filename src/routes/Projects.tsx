@@ -1,12 +1,14 @@
 // Route for displaying paginated projects
 
+import { BreadCrumb } from "@/components/Base/BreadCrumb";
 import { SearchProjects } from "@/components/Navigation/SearchProjects";
 import { downloadProjectsCSV, getAllBusinessAreas } from "@/lib/api";
+import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
+import { IBusinessArea } from "@/types";
 import {
   Box,
   Button,
   Center,
-  Checkbox,
   Flex,
   Grid,
   Select,
@@ -20,16 +22,12 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { useEffect, useRef, useState } from "react";
-import { FaDownload } from "react-icons/fa";
+import { FaDownload, FaMapMarkerAlt } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { Head } from "../components/Base/Head";
 import { PaginatorProject } from "../components/Pages/Projects/PaginatorProject";
 import { useProjectSearchContext } from "../lib/hooks/helper/ProjectSearchContext";
-import { BreadCrumb } from "@/components/Base/BreadCrumb";
-import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
-import SearchProjectsByUser from "@/components/Navigation/SearchProjectsByUser";
-import { IBusinessArea } from "@/types";
 
 export const Projects = () => {
   const { colorMode } = useColorMode();
@@ -62,7 +60,7 @@ export const Projects = () => {
       filterProjectKind,
       filterProjectStatus: statusValue,
       filterYear,
-      filterUser: null,
+      filterUser,
     });
   };
 
@@ -205,8 +203,7 @@ export const Projects = () => {
             fontSize={"sm"}
             color={colorMode === "dark" ? "gray.200" : "gray.600"}
           >
-            Use the filters below to fine-tune. You can ctrl click to open the
-            projects in another tab.
+            Ctrl + Click to open projects in another tab and keep filters.
           </Text>
         </Flex>
 
@@ -215,9 +212,9 @@ export const Projects = () => {
           w={"100%"}
           justifyContent={"flex-end"}
           alignItems={"center"}
+          gap={2}
         >
           <Button
-            mr={4}
             variant={"solid"}
             color={"white"}
             background={colorMode === "light" ? "green.500" : "green.600"}
@@ -241,6 +238,19 @@ export const Projects = () => {
             leftIcon={<IoMdAdd />}
           >
             New Project
+          </Button>
+
+          <Button
+            variant={"solid"}
+            color={"white"}
+            background={colorMode === "light" ? "blue.500" : "blue.600"}
+            _hover={{
+              background: colorMode === "light" ? "blue.400" : "blue.500",
+            }}
+            onClick={() => navigate("/projects/map")}
+            leftIcon={<FaMapMarkerAlt />}
+          >
+            Map
           </Button>
         </Flex>
       </Flex>
@@ -270,6 +280,48 @@ export const Projects = () => {
             }}
             w={"100%"}
           >
+            {/* Filter BA */}
+            <Select
+              onChange={handleOnlySelectedBusinessAreaChange}
+              size={"sm"}
+              // mx={4}
+              rounded={"5px"}
+              style={
+                colorMode === "light"
+                  ? {
+                      color: "black",
+                      backgroundColor: "white",
+                      borderColor: "gray.200",
+                      caretColor: "black !important",
+                    }
+                  : {
+                      color: "white",
+                      borderColor: "white",
+                      caretColor: "black !important",
+                    }
+              }
+            >
+              <option key={"All"} value={"All"} color={"black"}>
+                All Business Areas
+              </option>
+              {orderedDivisionSlugs.flatMap((divSlug) => {
+                // Filter business areas for the current division
+                const divisionBusinessAreas = businessAreas
+                  .filter((ba) => ba.division.slug === divSlug)
+                  .sort((a, b) => a.name.localeCompare(b.name));
+
+                return divisionBusinessAreas.map((ba, index) => (
+                  <option key={`${ba.name}${index}`} value={ba.pk}>
+                    {ba?.division ? `[${ba?.division?.slug}] ` : ""}
+                    {checkIsHtml(ba.name)
+                      ? sanitizeHtml(ba.name)
+                      : ba.name}{" "}
+                    {ba.is_active ? "" : "(INACTIVE)"}
+                  </option>
+                ));
+              })}
+            </Select>
+
             {/* Filter Project Kind */}
             <Select
               onChange={handleOnlySelectedProjectKindChange}
@@ -324,48 +376,6 @@ export const Projects = () => {
               <option value={"completed"}>Completed and Closed</option>
               <option value={"terminated"}>Terminated</option>
               <option value={"suspended"}>Suspended</option>
-            </Select>
-
-            {/* Filter BA */}
-            <Select
-              onChange={handleOnlySelectedBusinessAreaChange}
-              size={"sm"}
-              // mx={4}
-              rounded={"5px"}
-              style={
-                colorMode === "light"
-                  ? {
-                      color: "black",
-                      backgroundColor: "white",
-                      borderColor: "gray.200",
-                      caretColor: "black !important",
-                    }
-                  : {
-                      color: "white",
-                      borderColor: "white",
-                      caretColor: "black !important",
-                    }
-              }
-            >
-              <option key={"All"} value={"All"} color={"black"}>
-                All Business Areas
-              </option>
-              {orderedDivisionSlugs.flatMap((divSlug) => {
-                // Filter business areas for the current division
-                const divisionBusinessAreas = businessAreas
-                  .filter((ba) => ba.division.slug === divSlug)
-                  .sort((a, b) => a.name.localeCompare(b.name));
-
-                return divisionBusinessAreas.map((ba, index) => (
-                  <option key={`${ba.name}${index}`} value={ba.pk}>
-                    {ba?.division ? `[${ba?.division?.slug}] ` : ""}
-                    {checkIsHtml(ba.name)
-                      ? sanitizeHtml(ba.name)
-                      : ba.name}{" "}
-                    {ba.is_active ? "" : "(INACTIVE)"}
-                  </option>
-                ));
-              })}
             </Select>
           </Grid>
 

@@ -18,14 +18,14 @@ const SearchProjectsByUser = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Flex className="w-full justify-end">
+    <Flex className="relative w-full justify-end">
       <UserSearchDropdown
         isRequired={false}
         label=""
         helperText=""
         setUserFunction={setSelectedUser}
         placeholder="Filter by user"
-        className={clsx("my-0 h-8 text-sm")}
+        className={clsx("z-50 my-0 h-8 text-sm")}
         hideCannotFind
       />
     </Flex>

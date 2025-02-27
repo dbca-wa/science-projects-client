@@ -11,11 +11,12 @@ import { IProjectData } from "../../../types";
 export interface MapSearchFilters {
   onlyActive: boolean;
   onlyInactive: boolean;
+  filterUser: number | null;
   filterBA: string;
   filterProjectKind: string;
   filterProjectStatus: string;
   filterYear: number;
-  selectedLocations?: number[];
+  selectedLocations: number[];
 }
 
 interface IProjectMapSearchContext {
@@ -32,6 +33,7 @@ interface IProjectMapSearchContext {
   onlyActive: boolean;
   onlyInactive: boolean;
   filterBA: string;
+  filterUser: number | null;
   filterProjectKind: string;
   filterProjectStatus: string;
   filterYear: number;
@@ -68,6 +70,7 @@ export const ProjectMapSearchProvider = ({
     filterProjectKind: "All",
     filterProjectStatus: "All",
     filterYear: 0,
+    filterUser: null,
     selectedLocations: [] as number[],
   });
 
@@ -77,6 +80,7 @@ export const ProjectMapSearchProvider = ({
       setState((prev) => ({
         ...prev,
         filterBA: "All",
+        filterUser: null,
         filterProjectStatus: "All",
         filterProjectKind: "All",
         selectedLocations: [],
@@ -103,6 +107,7 @@ export const ProjectMapSearchProvider = ({
             filterProjectKind: state.filterProjectKind,
             filterProjectStatus: state.filterProjectStatus,
             filterYear: state.filterYear,
+            filterUser: state.filterUser,
             selectedLocations: state.selectedLocations,
           },
         );
@@ -129,6 +134,7 @@ export const ProjectMapSearchProvider = ({
     state.onlyInactive,
     state.filterBA,
     state.filterYear,
+    state.filterUser,
     state.filterProjectStatus,
     state.filterProjectKind,
     state.selectedLocations,
@@ -183,6 +189,7 @@ export const ProjectMapSearchProvider = ({
       filterProjectStatus: filters.filterProjectStatus,
       filterProjectKind: filters.filterProjectKind,
       filterYear: filters.filterYear,
+      filterUser: filters.filterUser,
       selectedLocations: filters.selectedLocations ?? prev.selectedLocations,
       currentProjectResultsPage: 1,
     }));

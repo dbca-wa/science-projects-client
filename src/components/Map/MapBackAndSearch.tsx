@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import MapSidebarSection from "./MapSidebarSection";
 import ProjectMapMarker from "./ProjectMapMarker";
+import SearchProjectsByUser from "../Navigation/SearchProjectsByUser";
 
 interface MapLocationsSidebarProps {
   filteredItems: IProjectData[];
@@ -22,7 +23,9 @@ interface MapLocationsSidebarProps {
   filterProjectKind: string;
   filterProjectStatus: string;
   filterBA: string;
+  filterUser: number | null;
   filterYear: number;
+  selectedLocations: number[];
   dbcaRegions: any;
   dbcaDistricts: any;
   nrm: any;
@@ -47,10 +50,12 @@ const MapBackAndSearch = ({
   setSearchFilters,
   onlyActive,
   onlyInactive,
+  filterUser,
   filterProjectKind,
   filterProjectStatus,
   filterBA,
   filterYear,
+  selectedLocations,
   dbcaRegions,
   dbcaDistricts,
   nrm,
@@ -88,6 +93,19 @@ const MapBackAndSearch = ({
     setInputValue(event.target.value);
   };
 
+  const handleFilterUserChange = (userId: number | null) => {
+    setSearchFilters({
+      onlyActive,
+      onlyInactive,
+      filterBA,
+      filterProjectKind,
+      filterProjectStatus,
+      filterYear,
+      selectedLocations,
+      filterUser: userId,
+    });
+  };
+
   // Get first project with areas
   const firstProjectWithArea = filteredItems?.find(
     (project) => project.areas?.length > 0,
@@ -97,15 +115,22 @@ const MapBackAndSearch = ({
 
   return (
     <MapSidebarSection className="pb-0" title="Search">
-      <div className="mt-2">
+      <div className="mt-2 flex h-full flex-col gap-4">
         <Input
           placeholder="Search for a project..."
-          className="w-full"
+          className="h-8 w-full"
           onChange={handleChange}
         />
+        <SearchProjectsByUser handleFilterUserChange={handleFilterUserChange} />
       </div>
+    </MapSidebarSection>
+  );
+};
 
-      {firstProjectWithArea && (
+export default MapBackAndSearch;
+
+{
+  /* {firstProjectWithArea && (
         <ProjectMapMarker
           project={firstProjectWithArea}
           mapRef={mapRef}
@@ -120,9 +145,5 @@ const MapBackAndSearch = ({
           areaImcra={areaImcra}
           areaNrm={areaNrm}
         />
-      )}
-    </MapSidebarSection>
-  );
-};
-
-export default MapBackAndSearch;
+      )} */
+}
