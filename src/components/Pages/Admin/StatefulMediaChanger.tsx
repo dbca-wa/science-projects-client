@@ -11,7 +11,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone";
 import { BsCloudArrowUp } from "react-icons/bs";
 import { ImCross } from "react-icons/im";
@@ -34,6 +34,7 @@ export const StatefulMediaChanger = ({
   clearImageAddedFunctionality,
 }: Props) => {
   const { colorMode } = useColorMode();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState<boolean>(true);
@@ -59,6 +60,12 @@ export const StatefulMediaChanger = ({
     return interval;
   };
 
+  const handleFileSelection = async (files) => {
+    if (files && files.length > 0) {
+      await onFileDrop([files[0]]);
+    }
+  };
+
   const onFileDrop = async (acceptedFile) => {
     handleImageFileCompression({
       acceptedFile: acceptedFile,
@@ -74,23 +81,6 @@ export const StatefulMediaChanger = ({
       startSimulatedProgressFn: startSimulatedProgress,
       progressInterval: progressInterval,
     });
-    // setIsError(false);
-    // setIsUploading(true);
-    // const newProgressInterval = startSimulatedProgress();
-    // setProgressInterval(newProgressInterval);
-
-    // if (acceptedFile[0].type) {
-    // 	if (!acceptedImageTypes.includes(acceptedFile[0].type)) {
-    // 		clearInterval(progressInterval);
-    // 		setIsError(true);
-    // 		return;
-    // 	} else {
-    // 		setSelectedFile(acceptedFile[0]);
-    // 		setSelectedImageUrl(URL.createObjectURL(acceptedFile[0]));
-    // 		clearInterval(progressInterval);
-    // 		setUploadProgress(100);
-    // 	}
-    // }
   };
 
   const onDeleteEntry = (e) => {
@@ -98,6 +88,20 @@ export const StatefulMediaChanger = ({
     setSelectedFile(null);
     setSelectedImageUrl(null);
     setUploadProgress(0);
+  };
+
+  // Handler for file input change event
+  const handleFileInputChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFileSelection(e.target.files);
+    }
+  };
+
+  // Function to trigger file input click
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   useEffect(() => {
@@ -118,6 +122,15 @@ export const StatefulMediaChanger = ({
       onMouseLeave={() => setIsHovered(false)}
       cursor={isHovered ? "pointer" : undefined}
     >
+      {/* Hidden file input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        accept={acceptedImageTypes.join(",")}
+        onChange={handleFileInputChange}
+      />
+
       {isHovered &&
       selectedImageUrl &&
       selectedImageUrl !== null &&
@@ -146,98 +159,106 @@ export const StatefulMediaChanger = ({
       ) : null}
 
       <Dropzone multiple={false} onDrop={onFileDrop}>
-        {({ getRootProps, getInputProps, acceptedFiles }) => (
-          <Box
-            {...getRootProps()}
-            h={72}
-            width={"100%"}
-            border={"1px dashed"}
-            borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-            rounded={"lg"}
-          >
-            {selectedImageUrl &&
-            selectedImageUrl !== undefined &&
-            selectedImageUrl !== null &&
-            !selectedImageUrl.endsWith("undefined") ? (
-              <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
-                <Box overflow={"hidden"} w={"100%"} h={"100%"} rounded={"lg"}>
-                  <Image
-                    rounded={"lg"}
-                    src={
-                      selectedImageUrl
-                        ? selectedImageUrl?.startsWith("/files")
-                          ? `${baseUrl}${selectedImageUrl}`
-                          : selectedImageUrl
-                        : NoImageFile
-                    }
-                    objectFit={"cover"}
-                    w={"100%"}
-                    h={"100%"}
-                  />
+        {({ getRootProps, getInputProps, acceptedFiles }) => {
+          // Extract only the dropzone props without the onClick handler
+          const { onClick, ...rootProps } = getRootProps();
+
+          return (
+            <Box
+              {...rootProps}
+              h={72}
+              width={"100%"}
+              border={"1px dashed"}
+              borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
+              rounded={"lg"}
+              onClick={(e) => {
+                // Prevent default onClick behavior from Dropzone
+                e.stopPropagation();
+                // Trigger our file input instead
+                triggerFileInput();
+              }}
+            >
+              <input {...getInputProps()} />
+              {selectedImageUrl &&
+              selectedImageUrl !== undefined &&
+              selectedImageUrl !== null &&
+              !selectedImageUrl.endsWith("undefined") ? (
+                <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
+                  <Box overflow={"hidden"} w={"100%"} h={"100%"} rounded={"lg"}>
+                    <Image
+                      rounded={"lg"}
+                      src={
+                        selectedImageUrl
+                          ? selectedImageUrl?.startsWith("/files")
+                            ? `${baseUrl}${selectedImageUrl}`
+                            : selectedImageUrl
+                          : NoImageFile
+                      }
+                      objectFit={"cover"}
+                      w={"100%"}
+                      h={"100%"}
+                    />
+                  </Box>
                 </Box>
-              </Box>
-            ) : (
-              <Flex
-                rounded={"lg"}
-                flexDir={"column"}
-                justifyContent={"center"}
-                justifyItems={"center"}
-                w={"100%"}
-                h={"100%"}
-                background={"blackAlpha.800"}
-                zIndex={3}
-              >
-                <Center
+              ) : (
+                <Flex
+                  rounded={"lg"}
                   flexDir={"column"}
                   justifyContent={"center"}
                   justifyItems={"center"}
+                  w={"100%"}
+                  h={"100%"}
+                  background={"blackAlpha.800"}
+                  zIndex={3}
                 >
-                  <BsCloudArrowUp size={"50px"} color={"white"} />
-                </Center>
-
-                <Grid
-                  flexDir={"column"}
-                  alignItems={"center"}
-                  textAlign={"center"}
-                  color={"white"}
-                >
-                  <Text px={8} textAlign={"center"}>
-                    {`${helperText}`}
-                  </Text>
-                </Grid>
-
-                {isUploading ? (
-                  <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
-                    <Box w={"80%"} h={1} px={1}>
-                      <Progress
-                        bg={colorMode === "light" ? "gray.200" : "gray.900"}
-                        colorScheme={
-                          uploadProgress === 100 && selectedFile
-                            ? "green"
-                            : "blue"
-                        }
-                        // isIndeterminate
-                        size={"xs"}
-                        value={uploadProgress}
-                        // hasStripe
-                        // animation={"step-start"}
-                        //
-                      />
-                    </Box>
+                  <Center
+                    flexDir={"column"}
+                    justifyContent={"center"}
+                    justifyItems={"center"}
+                  >
+                    <BsCloudArrowUp size={"50px"} color={"white"} />
                   </Center>
-                ) : null}
 
-                {isError ? (
-                  <Center>
-                    <Text color={"red.500"} mt={4}>
-                      That file is not of the correct type
+                  <Grid
+                    flexDir={"column"}
+                    alignItems={"center"}
+                    textAlign={"center"}
+                    color={"white"}
+                  >
+                    <Text px={8} textAlign={"center"}>
+                      {`${helperText || "Click or drop image here"}`}
                     </Text>
-                  </Center>
-                ) : null}
-              </Flex>
-            )}
-          </Box>
-        )}
+                  </Grid>
+
+                  {isUploading ? (
+                    <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
+                      <Box w={"80%"} h={1} px={1}>
+                        <Progress
+                          bg={colorMode === "light" ? "gray.200" : "gray.900"}
+                          colorScheme={
+                            uploadProgress === 100 && selectedFile
+                              ? "green"
+                              : "blue"
+                          }
+                          size={"xs"}
+                          value={uploadProgress}
+                        />
+                      </Box>
+                    </Center>
+                  ) : null}
+
+                  {isError ? (
+                    <Center>
+                      <Text color={"red.500"} mt={4}>
+                        That file is not of the correct type
+                      </Text>
+                    </Center>
+                  ) : null}
+                </Flex>
+              )}
+            </Box>
+          );
+        }}
       </Dropzone>
     </Box>
   );

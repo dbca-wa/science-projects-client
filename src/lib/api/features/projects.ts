@@ -662,7 +662,7 @@ export const getMapProjectsBasedOnSearchTerm = async (
   },
 ) => {
   try {
-    let url = `projects?page=${page}`;
+    let url = `projects/map?page=${page}`;
 
     if (searchTerm !== "") {
       url += `&searchTerm=${searchTerm}`;
@@ -693,6 +693,7 @@ export const getMapProjectsBasedOnSearchTerm = async (
       if (filters.filterBA === "All") {
         // skip to get all areas
       } else {
+        console.log("BA", filters.filterBA);
         url += `&businessarea=${filters.filterBA}`;
       }
     }

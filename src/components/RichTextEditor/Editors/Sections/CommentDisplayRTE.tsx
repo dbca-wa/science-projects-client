@@ -18,7 +18,7 @@ import { BiSolidLike } from "react-icons/bi";
 // Lexical
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 
 // Lexical Plugins
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";

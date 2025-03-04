@@ -110,8 +110,13 @@ const MapBackAndSearch = ({
   const firstProjectWithArea = filteredItems?.find(
     (project) => project.areas?.length > 0,
   );
+
   console.log("Filtered Items:", filteredItems);
   console.log("First Project with Area:", firstProjectWithArea);
+
+  const filteredItemsWithArea = filteredItems?.filter(
+    (project) => project.areas?.length > 0,
+  );
 
   return (
     <MapSidebarSection className="pb-0" title="Search">
@@ -123,16 +128,10 @@ const MapBackAndSearch = ({
         />
         <SearchProjectsByUser handleFilterUserChange={handleFilterUserChange} />
       </div>
-    </MapSidebarSection>
-  );
-};
 
-export default MapBackAndSearch;
-
-{
-  /* {firstProjectWithArea && (
+      {filteredItems && (
         <ProjectMapMarker
-          project={firstProjectWithArea}
+          projects={filteredItems}
           mapRef={mapRef}
           dbcaRegions={dbcaRegions}
           dbcaDistricts={dbcaDistricts}
@@ -145,5 +144,13 @@ export default MapBackAndSearch;
           areaImcra={areaImcra}
           areaNrm={areaNrm}
         />
-      )} */
-}
+      )}
+
+      <p className="-mb-4 mt-4 w-full text-right text-xs text-gray-500">
+        {filteredItemsWithArea.length}/{filteredItems.length} locations filled
+      </p>
+    </MapSidebarSection>
+  );
+};
+
+export default MapBackAndSearch;
