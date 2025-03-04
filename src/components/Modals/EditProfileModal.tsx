@@ -1,10 +1,7 @@
-// Modal for editing profile section of user
-
 import { useProfile } from "@/lib/hooks/tanstack/useProfile";
 import {
   Box,
   Button,
-  // Box,
   FormLabel,
   Grid,
   Input,
@@ -50,12 +47,12 @@ export const EditProfileModal = ({
   userId,
   currentImage,
 }: IEditProfileModalProps) => {
+  const initialFocusRef = useRef(null);
+  const modalBodyRef = useRef(null);
+
   const imageUrl = useServerImageUrl(currentImage);
-
   const noImageLink = useNoImage();
-
   const { isLoading, profileData: data } = useProfile(userId);
-
   const { colorMode } = useColorMode();
 
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
@@ -63,7 +60,7 @@ export const EditProfileModal = ({
   );
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // Update this useEffect to set the selectedImageUrl when a new file is selected
+  // Effect to create object URL when file is selected
   useEffect(() => {
     if (selectedFile) {
       setSelectedImageUrl(URL.createObjectURL(selectedFile));
@@ -86,17 +83,16 @@ export const EditProfileModal = ({
     handleSubmit,
     formState: { errors, isValid },
     control,
-    // watch,
   } = useForm<IProfileUpdateVariables>();
 
-  // Toast
+  // Toast management
   const toast = useToast();
   const toastIdRef = useRef<ToastId | undefined>(undefined);
   const addToast = (data: UseToastOptions) => {
     toastIdRef.current = toast(data);
   };
 
-  // Mutation, query client, onsubmit, and api function
+  // Query client and mutation setup
   const queryClient = useQueryClient();
 
   const mutation = useMutation<
@@ -104,7 +100,6 @@ export const EditProfileModal = ({
     IProfileUpdateError,
     IProfileUpdateVariables
   >({
-    // Start of mutation handling
     mutationFn: updateProfile,
     onMutate: () => {
       addToast({
@@ -112,10 +107,8 @@ export const EditProfileModal = ({
         description: "One moment!",
         status: "loading",
         position: "top-right",
-        // duration: 3000
       });
     },
-    // Success handling based on API- file - declared interface
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: [`profile`, userId] });
       queryClient.refetchQueries({ queryKey: [`me`] });
@@ -130,10 +123,8 @@ export const EditProfileModal = ({
           isClosable: true,
         });
       }
-      //  Close the modal
       onClose?.();
     },
-    // Error handling based on API - file - declared interface
     onError: (error) => {
       console.log(error);
       if (toastIdRef.current) {
@@ -149,14 +140,13 @@ export const EditProfileModal = ({
     },
   });
 
-  //  When submitting form - starts the mutation
   const onSubmit = async ({
     userPk,
     about,
     expertise,
   }: IProfileUpdateVariables) => {
     const image = selectedFile;
-    // Check if about and expertise fields have changed
+    // Check if fields have changed
     const aboutChanged = about !== undefined && isFieldChanged("about", about);
     const expertiseChanged =
       expertise !== undefined && isFieldChanged("expertise", expertise);
@@ -181,12 +171,32 @@ export const EditProfileModal = ({
     }
   }, [selectedFile]);
 
+  // Reset scroll position and focus on modal open
+  useEffect(() => {
+    if (isOpen) {
+      // Add small delay to ensure modal is fully rendered before scrolling
+      setTimeout(() => {
+        if (modalBodyRef.current) {
+          // Reset scroll position to top
+          modalBodyRef.current.scrollTop = 0;
+
+          // Set focus to the image label
+          if (initialFocusRef.current) {
+            initialFocusRef.current.focus();
+            initialFocusRef.current.blur();
+          }
+        }
+      }, 50);
+    }
+  }, [isOpen]);
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       size={"3xl"}
       scrollBehavior="inside"
+      initialFocusRef={initialFocusRef}
     >
       <ModalOverlay />
       <ModalContent
@@ -198,7 +208,7 @@ export const EditProfileModal = ({
         <ModalCloseButton />
         {!isLoading && (
           <>
-            <ModalBody pos="relative" flex={1}>
+            <ModalBody pos="relative" flex={1} ref={modalBodyRef}>
               <Box userSelect="none">
                 <InputGroup>
                   <Input
@@ -209,8 +219,10 @@ export const EditProfileModal = ({
                 </InputGroup>
               </Box>
               <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
-                <Box>
-                  <FormLabel>Image</FormLabel>
+                <Box id="image-section">
+                  <FormLabel tabIndex={-1} ref={initialFocusRef}>
+                    Image
+                  </FormLabel>
                   <StatefulMediaChangerAvatar
                     helperText={"Upload an image that represents you."}
                     selectedImageUrl={selectedImageUrl}
@@ -235,12 +247,11 @@ export const EditProfileModal = ({
                       <DatabaseRichTextEditor
                         populationData={initialData?.about || ""}
                         label="About"
-                        // hideLabel
                         htmlFor="about"
                         isEdit
                         field={field}
                         registerFn={register}
-                        // isMobile={!isDesktop}
+                        autoFocus={false}
                       />
                     )}
                   />
@@ -254,12 +265,11 @@ export const EditProfileModal = ({
                       <DatabaseRichTextEditor
                         populationData={initialData?.expertise || ""}
                         label="Expertise"
-                        // hideLabel
                         htmlFor="expertise"
                         isEdit
                         field={field}
                         registerFn={register}
-                        // isMobile={!isDesktop}
+                        autoFocus={false}
                       />
                     )}
                   />
