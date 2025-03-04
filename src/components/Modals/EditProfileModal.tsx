@@ -223,21 +223,20 @@ export const EditProfileModal = ({
                   <FormLabel tabIndex={-1} ref={initialFocusRef}>
                     Image
                   </FormLabel>
-                  {selectedImageUrl && (
-                    <StatefulMediaChangerAvatar
-                      helperText={"Upload an image that represents you."}
-                      selectedImageUrl={selectedImageUrl}
-                      setSelectedImageUrl={setSelectedImageUrl}
-                      selectedFile={selectedFile}
-                      setSelectedFile={setSelectedFile}
-                      clearImageAddedFunctionality={async () => {
-                        const data = await removeUserAvatar({
-                          pk: Number(userId),
-                        });
-                        queryClient.refetchQueries();
-                      }}
-                    />
-                  )}
+
+                  <StatefulMediaChangerAvatar
+                    helperText={"Upload an image that represents you."}
+                    selectedImageUrl={selectedImageUrl}
+                    setSelectedImageUrl={setSelectedImageUrl}
+                    selectedFile={selectedFile}
+                    setSelectedFile={setSelectedFile}
+                    clearImageAddedFunctionality={async () => {
+                      const data = await removeUserAvatar({
+                        pk: Number(userId),
+                      });
+                      queryClient.refetchQueries();
+                    }}
+                  />
                 </Box>
 
                 <Box my={2}>

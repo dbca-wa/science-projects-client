@@ -161,7 +161,7 @@ export const StatefulMediaChangerAvatar = ({
     setRotate(0);
   };
 
-  // Function to generate a crop preview
+  // IMPROVED: Function to generate a crop preview
   const generateCropPreview = useCallback(
     async (image: HTMLImageElement, crop: PixelCrop, scale = 1, rotate = 0) => {
       const canvas = document.createElement("canvas");
@@ -174,56 +174,88 @@ export const StatefulMediaChangerAvatar = ({
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
 
-      const pixelRatio = window.devicePixelRatio;
-      canvas.width = crop.width * scaleX * pixelRatio;
-      canvas.height = crop.height * scaleY * pixelRatio;
+      // Calculate the dimensions of the crop area in natural image coordinates
+      const cropWidthNatural = crop.width * scaleX;
+      const cropHeightNatural = crop.height * scaleY;
 
+      // Apply the user-specified scale to determine final dimensions
+      const scaledWidth = cropWidthNatural;
+      const scaledHeight = cropHeightNatural;
+
+      // Calculate extra space needed for rotation
+      let canvasWidth = scaledWidth;
+      let canvasHeight = scaledHeight;
+
+      // If we have rotation, calculate a bounding box for the rotated image
+      // to avoid black corners
+      if (rotate !== 0 && rotate % 360 !== 0) {
+        const rotateRads = (rotate * Math.PI) / 180;
+        const rotatedWidth =
+          Math.abs(Math.cos(rotateRads) * scaledWidth) +
+          Math.abs(Math.sin(rotateRads) * scaledHeight);
+        const rotatedHeight =
+          Math.abs(Math.sin(rotateRads) * scaledWidth) +
+          Math.abs(Math.cos(rotateRads) * scaledHeight);
+
+        canvasWidth = rotatedWidth;
+        canvasHeight = rotatedHeight;
+      }
+
+      // Set device pixel ratio for high-DPI displays
+      const pixelRatio = window.devicePixelRatio || 1;
+      canvas.width = canvasWidth * pixelRatio;
+      canvas.height = canvasHeight * pixelRatio;
+
+      // Apply high-quality settings
       ctx.scale(pixelRatio, pixelRatio);
       ctx.imageSmoothingQuality = "high";
+      ctx.imageSmoothingEnabled = true;
 
+      // Original crop coordinates in natural image coordinates
       const cropX = crop.x * scaleX;
       const cropY = crop.y * scaleY;
-      const rotateRads = (rotate * Math.PI) / 180;
 
+      // Set up the canvas for drawing
       ctx.save();
 
-      // Move the canvas to the center for rotation
-      ctx.translate(
-        canvas.width / 2 / pixelRatio,
-        canvas.height / 2 / pixelRatio,
-      );
-      ctx.rotate(rotateRads);
-      ctx.translate(
-        -canvas.width / 2 / pixelRatio,
-        -canvas.height / 2 / pixelRatio,
-      );
+      // Move to center of canvas for rotation
+      ctx.translate(canvasWidth / 2, canvasHeight / 2);
+      ctx.rotate((rotate * Math.PI) / 180);
+
+      // Scale should be applied here if user applied zoom
+      ctx.scale(scale, scale);
+
+      // Move back to properly position the crop
+      ctx.translate(-scaledWidth / 2, -scaledHeight / 2);
 
       // Draw the cropped image
       ctx.drawImage(
         image,
-        cropX,
-        cropY,
-        crop.width * scaleX,
-        crop.height * scaleY,
-        0,
-        0,
-        crop.width,
-        crop.height,
+        cropX, // sx - source x
+        cropY, // sy - source y
+        cropWidthNatural, // sWidth - source width
+        cropHeightNatural, // sHeight - source height
+        0, // dx - destination x
+        0, // dy - destination y
+        scaledWidth, // dWidth - destination width
+        scaledHeight, // dHeight - destination height
       );
 
       ctx.restore();
 
+      // Create and return the URL for the cropped image
       return new Promise<string>((resolve) => {
         canvas.toBlob(
           (blob) => {
             if (!blob) {
+              console.error("Canvas to Blob conversion failed");
               return;
             }
             const url = URL.createObjectURL(blob);
             resolve(url);
           },
           "image/jpeg",
-          0.95,
+          0.95, // high quality
         );
       });
     },
@@ -234,18 +266,24 @@ export const StatefulMediaChangerAvatar = ({
   useEffect(() => {
     async function updatePreviews() {
       if (completedCrop && imgRef.current) {
-        const previewUrl = await generateCropPreview(
-          imgRef.current,
-          completedCrop,
-          scale,
-          rotate,
-        );
+        try {
+          const previewUrl = await generateCropPreview(
+            imgRef.current,
+            completedCrop,
+            scale,
+            rotate,
+          );
 
-        if (previewUrl) {
-          setPreviewUrls({
-            avatar: previewUrl,
-            profile: previewUrl,
-          });
+          if (previewUrl) {
+            // Use the same preview URL for both avatar and profile
+            // This ensures consistency between previews
+            setPreviewUrls({
+              avatar: previewUrl,
+              profile: previewUrl,
+            });
+          }
+        } catch (error) {
+          console.error("Error generating preview:", error);
         }
       }
     }
@@ -257,34 +295,38 @@ export const StatefulMediaChangerAvatar = ({
   const applyCrop = async () => {
     if (!completedCrop || !imgRef.current) return;
 
-    const croppedImageUrl = await generateCropPreview(
-      imgRef.current,
-      completedCrop,
-      scale,
-      rotate,
-    );
-
-    if (croppedImageUrl) {
-      // Convert the blob URL to a blob, then to a file
-      const response = await fetch(croppedImageUrl);
-      const blob = await response.blob();
-
-      // Create a new file with the cropped image
-      const croppedFile = blobToFile(
-        blob,
-        selectedFile ? selectedFile.name : "cropped-image.jpg",
+    try {
+      const croppedImageUrl = await generateCropPreview(
+        imgRef.current,
+        completedCrop,
+        scale,
+        rotate,
       );
 
-      // Update the selected file with the cropped one
-      setSelectedFile(croppedFile);
+      if (croppedImageUrl) {
+        // Convert the blob URL to a blob, then to a file
+        const response = await fetch(croppedImageUrl);
+        const blob = await response.blob();
 
-      // Update the image URL to show the cropped version
-      setSelectedImageUrl(croppedImageUrl);
+        // Create a new file with the cropped image
+        const croppedFile = blobToFile(
+          blob,
+          selectedFile ? selectedFile.name : "cropped-image.jpg",
+        );
 
-      // Clear the previews
-      setPreviewUrls({ avatar: null, profile: null });
+        // Update the selected file with the cropped one
+        setSelectedFile(croppedFile);
 
-      onClose();
+        // Update the image URL to show the cropped version
+        setSelectedImageUrl(croppedImageUrl);
+
+        // Clear the previews
+        setPreviewUrls({ avatar: null, profile: null });
+
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error applying crop:", error);
     }
   };
 
@@ -393,6 +435,48 @@ export const StatefulMediaChangerAvatar = ({
       setUploadProgress(0);
     }
   }, [isError, progressInterval]);
+
+  // ADDED: Force a new completedCrop when the image loads
+  const handleImageLoad = useCallback(() => {
+    if (imgRef.current) {
+      // Create a default initial crop
+      setTimeout(() => {
+        if (imgRef.current) {
+          const { width, height } = imgRef.current;
+          const imageAspect = width / height;
+
+          // Default to square if no aspect ratio is specified
+          const defaultAspect = aspect || 1;
+
+          // Use makeAspectCrop to create a crop with the correct aspect ratio
+          const initialCrop = makeAspectCrop(
+            {
+              unit: "%",
+              width: 80, // Use a large portion of the image
+            },
+            defaultAspect,
+            width,
+            height,
+          );
+
+          // Center the crop
+          const centeredCrop = centerCrop(initialCrop, width, height);
+          setCrop(centeredCrop);
+
+          // Convert to pixel crop for the completed crop
+          const pixelCrop: PixelCrop = {
+            unit: "px",
+            width: (centeredCrop.width * width) / 100,
+            height: (centeredCrop.height * height) / 100,
+            x: (centeredCrop.x * width) / 100,
+            y: (centeredCrop.y * height) / 100,
+          };
+
+          setCompletedCrop(pixelCrop);
+        }
+      }, 100); // Small delay to ensure image dimensions are calculated
+    }
+  }, [aspect]);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -672,7 +756,7 @@ export const StatefulMediaChangerAvatar = ({
                             ? `${baseUrl}${selectedImageUrl}`
                             : selectedImageUrl
                         }
-                        crossOrigin="anonymous" // Add crossOrigin attribute to prevent canvas tainting
+                        crossOrigin="anonymous"
                         style={{
                           transform: `scale(${scale}) rotate(${rotate}deg)`,
                           transformOrigin: "center center",
@@ -683,67 +767,7 @@ export const StatefulMediaChangerAvatar = ({
                           maxHeight: "70vh",
                         }}
                         draggable="false"
-                        onLoad={() => {
-                          // When image loads
-                          setTimeout(() => {
-                            // Set up initial crop on image load with a slight delay
-                            // to ensure dimensions are correctly calculated
-                            if (imgRef.current) {
-                              const { naturalWidth, naturalHeight } =
-                                imgRef.current;
-                              const imageAspect = naturalWidth / naturalHeight;
-
-                              // Base the initial crop on the image's natural aspect ratio
-                              if (aspect) {
-                                setAspectRatio(aspect); // Use the selected aspect ratio
-
-                                // Also set completedCrop for the aspect ratio case
-                                if (imgRef.current) {
-                                  const { width, height } = imgRef.current;
-                                  const cropObj = crop || {
-                                    unit: "%",
-                                    width: 80,
-                                    height: 80,
-                                    x: 10,
-                                    y: 10,
-                                  };
-                                  const pixelCrop: PixelCrop = {
-                                    unit: "px",
-                                    width: (cropObj.width * width) / 100,
-                                    height: (cropObj.height * height) / 100,
-                                    x: (cropObj.x * width) / 100,
-                                    y: (cropObj.y * height) / 100,
-                                  };
-                                  setCompletedCrop(pixelCrop);
-                                }
-                              } else {
-                                // Create a default crop that respects the image's aspect ratio
-                                const newCrop: Crop = {
-                                  unit: "%", // This is explicitly typed as "%" to satisfy the Crop type
-                                  width: 80,
-                                  height:
-                                    imageAspect > 1 ? 80 / imageAspect : 80,
-                                  x: 10,
-                                  y: 10,
-                                };
-                                setCrop(newCrop);
-
-                                // Convert percentage crop to pixel crop for completedCrop
-                                if (imgRef.current) {
-                                  const { width, height } = imgRef.current;
-                                  const pixelCrop: PixelCrop = {
-                                    unit: "px",
-                                    width: (newCrop.width * width) / 100,
-                                    height: (newCrop.height * height) / 100,
-                                    x: (newCrop.x * width) / 100,
-                                    y: (newCrop.y * height) / 100,
-                                  };
-                                  setCompletedCrop(pixelCrop);
-                                }
-                              }
-                            }
-                          }, 100);
-                        }}
+                        onLoad={handleImageLoad}
                       />
                     </ReactCrop>
                   </Box>
