@@ -752,6 +752,51 @@ export const StatefulMediaChangerAvatar = ({
 
               {/* Right side tools and previews */}
               <Flex flex="1" direction="column" gap={6} overflow="auto" pr={2}>
+                {/* Live previews */}
+                {completedCrop && (
+                  <Box>
+                    <Text fontWeight="medium" mb={2}>
+                      Live Previews
+                    </Text>
+                    <Flex direction="column" gap={4}>
+                      <Box>
+                        <Text fontSize="sm" mb={1}>
+                          Avatar Preview:
+                        </Text>
+                        <Avatar
+                          size="md"
+                          name={username || "User"}
+                          src={previewUrls.avatar || NoImageFile}
+                        />
+                      </Box>
+
+                      <Box>
+                        <Text fontSize="sm" mb={1}>
+                          Profile Preview:
+                        </Text>
+                        <Box
+                          w="150px"
+                          h="150px"
+                          borderRadius="lg"
+                          overflow="hidden"
+                          border="1px solid"
+                          borderColor={
+                            colorMode === "light" ? "gray.200" : "gray.600"
+                          }
+                        >
+                          <img
+                            src={previewUrls.profile || NoImageFile}
+                            alt="Profile preview"
+                            className="h-full w-full object-cover"
+                            onError={(e) =>
+                              console.error("Profile preview image error:", e)
+                            }
+                          />
+                        </Box>
+                      </Box>
+                    </Flex>
+                  </Box>
+                )}
                 {/* Aspect ratio tools */}
                 <Box>
                   <Text fontWeight="medium" mb={2}>
@@ -848,52 +893,6 @@ export const StatefulMediaChangerAvatar = ({
                     </Slider>
                   </Box>
                 </Box>
-
-                {/* Live previews */}
-                {completedCrop && (
-                  <Box>
-                    <Text fontWeight="medium" mb={2}>
-                      Live Previews
-                    </Text>
-                    <Flex direction="column" gap={4}>
-                      <Box>
-                        <Text fontSize="sm" mb={1}>
-                          Avatar Preview:
-                        </Text>
-                        <Avatar
-                          size="md"
-                          name={username || "User"}
-                          src={previewUrls.avatar || NoImageFile}
-                        />
-                      </Box>
-
-                      <Box>
-                        <Text fontSize="sm" mb={1}>
-                          Profile Preview:
-                        </Text>
-                        <Box
-                          w="150px"
-                          h="150px"
-                          borderRadius="lg"
-                          overflow="hidden"
-                          border="1px solid"
-                          borderColor={
-                            colorMode === "light" ? "gray.200" : "gray.600"
-                          }
-                        >
-                          <img
-                            src={previewUrls.profile || NoImageFile}
-                            alt="Profile preview"
-                            className="h-full w-full object-cover"
-                            onError={(e) =>
-                              console.error("Profile preview image error:", e)
-                            }
-                          />
-                        </Box>
-                      </Box>
-                    </Flex>
-                  </Box>
-                )}
               </Flex>
             </Flex>
           </ModalBody>
