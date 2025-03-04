@@ -185,8 +185,6 @@ const DatabaseRichTextEditor = <T,>({
                   >
                     <ContentEditable
                       autoFocus={autoFocus}
-                      aria-autofocus={autoFocus}
-                      aria-auto-focus={autoFocus}
                       style={{
                         background: isEdit ? "white" : undefined,
                         minHeight: "50px",

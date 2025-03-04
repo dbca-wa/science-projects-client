@@ -624,7 +624,7 @@ export const StatefulMediaChangerAvatar = ({
       </Flex>
 
       {/* Enhanced Crop Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <Modal isOpen={isOpen} onClose={onClose} size="full">
         <ModalOverlay />
         <ModalContent maxW="90vw" h="80vh">
           <ModalHeader>Crop and Adjust Image</ModalHeader>

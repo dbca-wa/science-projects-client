@@ -575,27 +575,46 @@ export const ProfilePage = () => {
             <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={8}>
               <Flex flexDir={"column"}>
                 <Text color={subsectionTitleColor} fontSize={"sm"}>
-                  Image
+                  Image {!imageUrl ? "(Not Provided)" : ""}
                 </Text>
-                <Center
-                  width={"100%"}
-                  maxH={"300px"}
-                  bg={"gray.50"}
-                  mt={1}
-                  rounded={"lg"}
-                  overflow={"hidden"}
-                >
-                  <Image
-                    objectFit={"cover"}
-                    src={
-                      imageUrl
-                      // me?.image ? `${baseAPI}${me.image.file}` : "/sad-face.png"
-                    }
-                    top={0}
-                    left={0}
-                    userSelect={"none"}
-                  />
-                </Center>
+                {imageUrl ? (
+                  <Center
+                    width={"100%"}
+                    maxH={"300px"}
+                    bg={"gray.50"}
+                    mt={1}
+                    rounded={"lg"}
+                    overflow={"hidden"}
+                  >
+                    <Image
+                      objectFit={"cover"}
+                      src={
+                        imageUrl
+                        // me?.image ? `${baseAPI}${me.image.file}` : "/sad-face.png"
+                      }
+                      top={0}
+                      left={0}
+                      userSelect={"none"}
+                    />
+                  </Center>
+                ) : (
+                  <Center
+                    width={"100%"}
+                    maxH={"300px"}
+                    bg={"gray.50"}
+                    mt={1}
+                    rounded={"lg"}
+                    overflow={"hidden"}
+                  >
+                    <Image
+                      objectFit={"cover"}
+                      src={"/sad-face.png"}
+                      top={0}
+                      left={0}
+                      userSelect={"none"}
+                    />
+                  </Center>
+                )}
               </Flex>
               <Flex flexDir={"column"}>
                 <Box>
