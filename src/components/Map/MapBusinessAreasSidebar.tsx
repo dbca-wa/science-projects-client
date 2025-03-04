@@ -46,6 +46,7 @@ interface LayerData {
 interface MapBusinessAreasSidebarProps {
   mapRef: React.RefObject<L.Map | null>;
   mapContainerRef: React.RefObject<HTMLDivElement>;
+  filterBA: string;
   baData: IBusinessArea[];
   baLoading: boolean;
   selectedBas: IBusinessArea[];
@@ -55,6 +56,7 @@ interface MapBusinessAreasSidebarProps {
 const MapBusinessAreasSidebar = ({
   mapRef,
   mapContainerRef,
+  filterBA,
   baData,
   baLoading,
   selectedBas,

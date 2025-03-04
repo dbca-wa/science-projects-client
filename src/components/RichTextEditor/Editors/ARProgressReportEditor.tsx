@@ -15,7 +15,7 @@ import { IProjectData } from "@/types";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { useState } from "react";
@@ -140,13 +140,11 @@ export const ARProgressReportEditor = ({
                       // fontSize={"xs"}
                       noOfLines={4}
                       cursor={"pointer"}
-                      onClick={() =>
-                        { 
-                          const url = `/projects/${project?.pk}/progress`;
-                          window.open(url, '_blank');
-                          // navigate(url);
-                        }
-                      }
+                      onClick={() => {
+                        const url = `/projects/${project?.pk}/progress`;
+                        window.open(url, "_blank");
+                        // navigate(url);
+                      }}
                     />
                   </Box>
 
@@ -179,13 +177,11 @@ export const ARProgressReportEditor = ({
                       // fontSize={"xs"}
                       noOfLines={4}
                       cursor={"pointer"}
-                      onClick={() =>
-                        { 
-                          const url = `/projects/${project?.pk}/progress`;
-                          window.open(url, '_blank');
-                          // navigate(url);
-                        }
-                      }
+                      onClick={() => {
+                        const url = `/projects/${project?.pk}/progress`;
+                        window.open(url, "_blank");
+                        // navigate(url);
+                      }}
                     />
                   </Box>
 

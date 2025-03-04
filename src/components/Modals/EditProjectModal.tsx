@@ -801,8 +801,8 @@ export const EditProjectModal = ({
                 </Box>
 
                 {!baLoading && baSet && (
-                  <>
-                    <FormControl isRequired>
+                  <div>
+                    <FormControl isRequired className="pt-4">
                       <FormLabel>Business Area</FormLabel>
 
                       <InputGroup>
@@ -852,7 +852,7 @@ export const EditProjectModal = ({
                       )}
                     </FormControl>
 
-                    <FormControl mb={4}>
+                    <FormControl mb={4} className="pt-4">
                       <FormLabel>Departmental Service</FormLabel>
                       <InputGroup>
                         <Select
@@ -902,7 +902,7 @@ export const EditProjectModal = ({
                         The DBCA service that this project delivers outputs to.
                       </FormHelperText>
                     </FormControl>
-                  </>
+                  </div>
                 )}
               </Flex>
             </Grid>

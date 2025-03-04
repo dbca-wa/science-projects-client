@@ -34,7 +34,7 @@ import {
 import { useNoImage } from "../../lib/hooks/helper/useNoImage";
 import useServerImageUrl from "../../lib/hooks/helper/useServerImageUrl";
 import { IProfile } from "../../types";
-import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
+import { StatefulMediaChangerAvatar } from "../Pages/Admin/StatefulMediaChangerAvatar";
 import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";
 
 interface IEditProfileModalProps {
@@ -211,7 +211,7 @@ export const EditProfileModal = ({
               <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
                 <Box>
                   <FormLabel>Image</FormLabel>
-                  <StatefulMediaChanger
+                  <StatefulMediaChangerAvatar
                     helperText={"Upload an image that represents you."}
                     selectedImageUrl={selectedImageUrl}
                     setSelectedImageUrl={setSelectedImageUrl}
