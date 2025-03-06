@@ -12,8 +12,9 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
-import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
-import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
+import { TreeViewPlugin } from "@/lib/plugins/TreeViewPlugin";
+import { PrepopulateHTMLPlugin } from "@/components/RichTextEditor/Plugins/PrepopulateHTMLPlugin";
+import { ImagePlugin } from "../../Plugins/ImagesPlugin";
 
 interface Props {
   initialConfig: InitialConfigType;
@@ -28,6 +29,7 @@ export const DisplayGuideSRTE = ({
   section,
   shouldShowTree,
 }: Props) => {
+  console.log(data);
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -36,6 +38,7 @@ export const DisplayGuideSRTE = ({
         <ListPlugin />
         <TablePlugin hasCellMerge={true} hasCellBackgroundColor={false} />
         <PrepopulateHTMLPlugin data={data} />
+        <ImagePlugin />
         <RichTextPlugin
           contentEditable={
             <>
