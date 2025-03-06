@@ -2,8 +2,8 @@
 
 import {
   Box,
-  Text,
   Flex,
+  Text,
   useBreakpointValue,
   useColorMode,
 } from "@chakra-ui/react";
@@ -256,9 +256,15 @@ const useToolbar = ({
 
 interface Props {
   allowTable: boolean;
+  allowImages?: boolean;
+  toolbarRef: React.MutableRefObject<HTMLDivElement | null>;
 }
 
-export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
+export const RevisedRichTextToolbar = ({
+  allowTable,
+  allowImages,
+  toolbarRef,
+}: Props) =>
   // { anchorElem }: Props
   {
     // if (!anchorElem) {
@@ -350,6 +356,7 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
       /> */}
 
         <Flex
+          ref={toolbarRef}
           flexWrap="wrap"
           justifyContent="flex-start"
           px={1}
@@ -519,6 +526,12 @@ export const RevisedRichTextToolbar = ({ allowTable }: Props) =>
               <VerticalDivider />
             </>
           ) : null}
+          {allowImages ? (
+            <>
+              <AddImageButton />
+              <VerticalDivider />
+            </>
+          ) : null}
 
           <ElementSelector
             formatBulletList={formatBulletList}
@@ -564,6 +577,7 @@ import {
 } from "react-icons/lu";
 import { MdFormatListBulleted, MdFormatListNumbered } from "react-icons/md";
 import { TbChecklist } from "react-icons/tb";
+import AddImageButton from "../Buttons/AddImageButton";
 import { TableDropdown } from "../Buttons/TableDropdown";
 
 interface ElementProps {

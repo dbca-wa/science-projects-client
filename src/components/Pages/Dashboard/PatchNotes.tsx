@@ -183,6 +183,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               }
             />
             <PatchNoteEntry
+              title={"Crop Avatar on Upload"}
+              kind="feature"
+              description={
+                "Users may now crop the image they use for their avatar, should they choose to. This can be done by uploading an image from 'My SPMS Account' page, hovering over the image, and clicking the button on the top-left to crop. Once cropped, click 'Apply Changes' to update the avatar."
+              }
+            />
+            <PatchNoteEntry
               title={"Project Map"}
               kind="feature"
               description={
