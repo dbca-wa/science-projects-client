@@ -199,8 +199,8 @@ export const UserGridItem = ({
                 {fullName
                   ? fullName?.startsWith("None ")
                     ? username
-                    : fullName.length > 16
-                      ? `${fullName.substring(0, 10)}...`
+                    : fullName.length > 30
+                      ? `${fullName.substring(0, 30)}...`
                       : fullName
                   : username}
               </Button>
