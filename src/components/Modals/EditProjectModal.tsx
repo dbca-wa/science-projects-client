@@ -920,6 +920,7 @@ export const EditProjectModal = ({
                       <AreaCheckAndMaps
                         title="DBCA Districts"
                         areas={dbcaDistricts}
+                        area_type="dbcadistrict"
                         // required={false}
                         selectedAreas={locationData}
                         setSelectedAreas={setLocationData}
@@ -930,6 +931,7 @@ export const EditProjectModal = ({
                       <AreaCheckAndMaps
                         title="IMCRAs"
                         areas={imcra}
+                        area_type="imcra"
                         // required={false}
                         selectedAreas={locationData}
                         setSelectedAreas={setLocationData}
@@ -939,6 +941,7 @@ export const EditProjectModal = ({
                       <AreaCheckAndMaps
                         title="DBCA Regions"
                         areas={dbcaRegions}
+                        area_type="dbcaregion"
                         // required={false}
                         selectedAreas={locationData}
                         setSelectedAreas={setLocationData}
@@ -948,6 +951,7 @@ export const EditProjectModal = ({
                       <AreaCheckAndMaps
                         title="Natural Resource Management Regions"
                         areas={nrm}
+                        area_type="nrm"
                         // required={false}
                         selectedAreas={locationData}
                         setSelectedAreas={setLocationData}
@@ -957,6 +961,7 @@ export const EditProjectModal = ({
                       <AreaCheckAndMaps
                         title="IBRAs"
                         areas={ibra}
+                        area_type="ibra"
                         // required={false}
                         selectedAreas={locationData}
                         setSelectedAreas={setLocationData}

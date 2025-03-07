@@ -86,6 +86,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="DBCA Districts"
                 areas={dbcaDistricts}
+                area_type="dbcadistrict"
                 // required={false}
                 selectedAreas={selectedDistricts}
                 setSelectedAreas={setSelectedDistricts}
@@ -106,6 +107,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="IMCRAs"
                 areas={imcra}
+                area_type="imcra"
                 // required={false}
                 selectedAreas={selectedImcras}
                 setSelectedAreas={setSelectedImcras}
@@ -123,6 +125,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="DBCA Regions"
                 areas={dbcaRegions}
+                area_type="dbcaregion"
                 // required={false}
                 selectedAreas={selectedRegions}
                 setSelectedAreas={setSelectedRegions}
@@ -141,6 +144,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="Natural Resource Management Regions"
                 areas={nrm}
+                area_type="nrm"
                 // required={false}
                 selectedAreas={selectedNrms}
                 setSelectedAreas={setSelectedNrms}
@@ -158,6 +162,7 @@ export const ProjectLocationSection = ({
               <AreaCheckAndMaps
                 title="IBRAs"
                 areas={ibra}
+                area_type="ibra"
                 // required={false}
                 selectedAreas={selectedIbras}
                 setSelectedAreas={setSelectedIbras}
@@ -196,7 +201,7 @@ export const ProjectLocationSection = ({
                     ) {
                       setLocationFilled(true);
                       nextClick(
-                        locationData
+                        locationData,
                         // "locations": [...locationData]
                       );
                       // } else return;
