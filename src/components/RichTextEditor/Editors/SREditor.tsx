@@ -163,6 +163,8 @@ ISREditorProps) => {
 
   const dragBtnMargin = 10;
   const toolBarHeight = 45;
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+
   const [aboveHeightSet, setAboveHeightSet] = useState<boolean>(false);
   const [aboveContentHeight, setAboveContentHeight] = useState<number>();
 
@@ -407,7 +409,10 @@ ISREditorProps) => {
               >
                 {/* Toolbar */}
                 {isEditing === false ? null : (
-                  <RevisedRichTextToolbar allowTable={false} />
+                  <RevisedRichTextToolbar
+                    allowTable={false}
+                    toolbarRef={toolbarRef}
+                  />
                 )}
 
                 <Box pos={"relative"}>

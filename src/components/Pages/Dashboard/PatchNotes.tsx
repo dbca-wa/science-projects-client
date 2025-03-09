@@ -174,7 +174,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             &#127881; SPMS {VERSION} Patch Notes &#127881;
             {/* &#9881;&#65039; */}
           </Text>
-          <List spacing={1} ml={2}>
+          <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
               title={"Search Project By User"}
               kind="feature"
