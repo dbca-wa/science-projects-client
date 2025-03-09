@@ -1,7 +1,12 @@
 import { IProjectData, ISimpleLocationData } from "@/types";
 import L from "leaflet";
-import { useEffect, useRef, useState, useLayoutEffect } from "react";
-import DOMPurify from "dompurify";
+import { useEffect, useRef, useState } from "react";
+import {
+  ProjectPopup,
+  MultiProjectPopup,
+  renderToString,
+  stripHtml,
+} from "./ProjectPopupComponents";
 
 interface ProjectMapMarkerProps {
   projects: IProjectData[];
@@ -32,6 +37,18 @@ const ProjectMapMarker = ({
   areaImcra,
   areaNrm,
 }: ProjectMapMarkerProps) => {
+  const statusDictionary = {
+    new: { label: "New", color: "gray.500" },
+    pending: { label: "Pending Project Plan", color: "yellow.500" },
+    active: { label: "Active (Approved)", color: "green.500" },
+    updating: { label: "Update Requested", color: "yellow.500" }, // previously "red.500"
+    closure_requested: { label: "Closure Requested", color: "orange.500" }, // previously "red.500"
+    closing: { label: "Closure Pending Final Update", color: "red.500" }, // previously "red.500"
+    final_update: { label: "Final Update Requested", color: "red.500" }, // previously "red.500"
+    completed: { label: "Completed and Closed", color: "red.500" }, // preivously blue.500"
+    terminated: { label: "Terminated and Closed", color: "gray.800" },
+    suspended: { label: "Suspended", color: "gray.500" },
+  };
   const markerLayerRef = useRef<L.LayerGroup | null>(null);
   const [matchStats, setMatchStats] = useState({
     total: 0,
@@ -44,13 +61,6 @@ const ProjectMapMarker = ({
       imcra: 0,
     },
   });
-
-  // Function to strip HTML tags and sanitize content
-  const stripHtml = (html: string) => {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = DOMPurify.sanitize(html);
-    return tempDiv.textContent || tempDiv.innerText || "";
-  };
 
   // Normalize strings for comparison
   const normalizeString = (str: string): string => {
@@ -252,7 +262,7 @@ const ProjectMapMarker = ({
               hover:translate-y-1
               cursor-pointer
             ">
-                              <!-- Pin shape - top rounded part -->
+              <!-- Pin shape - top rounded part -->
               <div class="
                 absolute
                 w-8 h-8
@@ -276,7 +286,7 @@ const ProjectMapMarker = ({
               "></div>
               
               <!-- Inner white circle for contrast -->
-                    <div class="
+              <div class="
                 absolute
                 w-6 h-6
                 rounded-full
@@ -334,7 +344,7 @@ const ProjectMapMarker = ({
               hover:translate-y-1
               cursor-pointer
             ">
-                              <!-- Pin shape - top rounded part -->
+              <!-- Pin shape - top rounded part -->
               <div class="
                 absolute
                 w-8 h-8
@@ -390,47 +400,35 @@ const ProjectMapMarker = ({
       }),
     });
 
-    // Create combined popup for all projects at this location
-    const popupContent = `
-      <div class="p-3 max-w-md">
-        <h3 class="font-bold text-lg mb-3">${projects.length} Projects at this Location</h3>
-        <div class="max-h-64 overflow-y-auto">
-          ${projects
-            .map(
-              (project, index) => `
-            <div class="mb-4 pb-3 ${index < projects.length - 1 ? "border-b border-gray-200" : ""}">
-              <h4 class="font-bold text-base">${stripHtml(project.title)}</h4>
-              ${project.tagline ? `<p class="text-sm text-gray-600 mb-2">${stripHtml(project.tagline)}</p>` : ""}
-              <div class="flex flex-col gap-1 text-sm">
-                <div>
-                  <span class="font-medium">Status:</span> ${project.status}
-                </div>
-                <div>
-                  <span class="font-medium">Type:</span> ${project.kind}
-                </div>
-                ${
-                  project.business_area
-                    ? `<div>
-                    <span class="font-medium">Business Area:</span> ${project.business_area.name}
-                  </div>`
-                    : ""
-                }
-                <div>
-                  <span class="font-medium">Year:</span> ${project.year}
-                </div>
-              </div>
-            </div>
-          `,
-            )
-            .join("")}
-        </div>
-      </div>
-    `;
+    // Create popup using the MultiProjectPopup component
+    // Sort it based on status:
+    // Create a lookup object to define the sort order based on status
+    const statusOrder = Object.keys(statusDictionary).reduce(
+      (acc, key, index) => {
+        acc[key] = index;
+        return acc;
+      },
+      {},
+    );
+
+    // Sort the projects based on status order
+    const sortedProjects = [...projects].sort((a, b) => {
+      const orderA =
+        statusOrder[a.status] !== undefined ? statusOrder[a.status] : 999;
+      const orderB =
+        statusOrder[b.status] !== undefined ? statusOrder[b.status] : 999;
+      return orderA - orderB;
+    });
+
+    const popupContent = renderToString(MultiProjectPopup, {
+      projects: sortedProjects,
+    });
 
     marker.bindPopup(popupContent, {
       maxWidth: 300,
-      maxHeight: 300,
-      className: "rounded-lg shadow-lg",
+      maxHeight: 450,
+      className: "rounded-lg shadow-lg overdlow-hidden fixed",
+      autoPanPadding: [50, 50],
     });
 
     marker.addTo(markerLayerRef.current);
@@ -438,34 +436,14 @@ const ProjectMapMarker = ({
 
   // Bind a popup to a marker for a single project
   const bindProjectPopup = (marker: L.Marker, project: IProjectData) => {
-    const popupContent = `
-      <div class="p-3 max-w-md">
-        <h3 class="font-bold text-lg mb-2">${stripHtml(project.title)}</h3>
-        ${project.tagline ? `<p class="text-sm text-gray-600 mb-2">${stripHtml(project.tagline)}</p>` : ""}
-        <div class="flex flex-col gap-2 text-sm">
-          <div>
-            <span class="font-medium">Status:</span> ${project.status}
-          </div>
-          <div>
-            <span class="font-medium">Type:</span> ${project.kind}
-          </div>
-          ${
-            project.business_area
-              ? `<div>
-              <span class="font-medium">Business Area:</span> ${project.business_area.name}
-            </div>`
-              : ""
-          }
-          <div>
-            <span class="font-medium">Year:</span> ${project.year}
-          </div>
-        </div>
-      </div>
-    `;
+    const popupContent = renderToString(ProjectPopup, { project });
 
     marker.bindPopup(popupContent, {
       maxWidth: 300,
-      className: "rounded-lg shadow-lg",
+      maxHeight: 450,
+
+      className: "rounded-lg shadow-lg overflow-hidden max-h-[800px] fixed",
+      autoPanPadding: [50, 50],
     });
   };
 
@@ -495,12 +473,8 @@ const ProjectMapMarker = ({
       statusControl.addTo(mapRef.current);
     }
   }, [matchStats, mapRef.current]);
+
   return null;
-  // return (
-  //   <div className="mt-2 text-xs text-gray-500">
-  //     Mapped {matchStats.matched} of {matchStats.total} projects with areas
-  //   </div>
-  // );
 };
 
 export default ProjectMapMarker;

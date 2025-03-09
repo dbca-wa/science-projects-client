@@ -207,6 +207,8 @@ IPREditorProps) => {
 
   const dragBtnMargin = 10;
   const toolBarHeight = 45;
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+
   const [aboveHeightSet, setAboveHeightSet] = useState<boolean>(false);
   const [aboveContentHeight, setAboveContentHeight] = useState<number>();
 
@@ -650,7 +652,10 @@ IPREditorProps) => {
               >
                 {/* Toolbar */}
                 {isEditingContext === false ? null : (
-                  <RevisedRichTextToolbar allowTable={false} />
+                  <RevisedRichTextToolbar
+                    allowTable={false}
+                    toolbarRef={toolbarRef}
+                  />
                 )}
 
                 <Box pos={"relative"}>
@@ -860,7 +865,10 @@ IPREditorProps) => {
               >
                 {/* Toolbar */}
                 {isEditingAims === false ? null : (
-                  <RevisedRichTextToolbar allowTable={false} />
+                  <RevisedRichTextToolbar
+                    allowTable={false}
+                    toolbarRef={toolbarRef}
+                  />
                 )}
 
                 <Box pos={"relative"}>
@@ -1070,7 +1078,10 @@ IPREditorProps) => {
               >
                 {/* Toolbar */}
                 {isEditingProgress === false ? null : (
-                  <RevisedRichTextToolbar allowTable={false} />
+                  <RevisedRichTextToolbar
+                    allowTable={false}
+                    toolbarRef={toolbarRef}
+                  />
                 )}
 
                 <Box pos={"relative"}>
@@ -1280,7 +1291,10 @@ IPREditorProps) => {
               >
                 {/* Toolbar */}
                 {isEditingImplications === false ? null : (
-                  <RevisedRichTextToolbar allowTable={true} />
+                  <RevisedRichTextToolbar
+                    allowTable={true}
+                    toolbarRef={toolbarRef}
+                  />
                 )}
 
                 <Box pos={"relative"}>
@@ -1490,7 +1504,10 @@ IPREditorProps) => {
               >
                 {/* Toolbar */}
                 {isEditingFuture === false ? null : (
-                  <RevisedRichTextToolbar allowTable={true} />
+                  <RevisedRichTextToolbar
+                    allowTable={true}
+                    toolbarRef={toolbarRef}
+                  />
                 )}
 
                 <Box pos={"relative"}>
