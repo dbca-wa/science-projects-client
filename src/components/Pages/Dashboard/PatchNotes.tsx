@@ -196,13 +196,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "Users can now access a map page to visualise where projects are located as they search. This is a work in progress, and will be expanded upon in future updates. If you have any feedback or suggestions for this feature, please let us know!"
               }
             />
-            {/* <PatchNoteEntry
-              title={"Feedback on Documents"}
-              kind="feature"
-              description={
-                "Business Area leads and the directorate can now provide feedback via the notification email when sending a document back for revisions."
-              }
-            /> */}
+
             <PatchNoteEntry
               title={"Area Selection Bug"}
               kind="fix"
@@ -210,13 +204,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "A bug has been patched which prevented selecting specific areas, and instead selected all areas for a given area type."
               }
             />
-            {/* <PatchNoteEntry
-              title={"Remedy Buttons"}
-              kind="fix"
-              description={
-                "A bug has been patched in the Remedy Problematic Project function which prevented all projects from being updated."
-              }
-            /> */}
+
             <PatchNoteEntry
               title={"Search by ID"}
               kind="update"
@@ -231,6 +219,20 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "For public facing pages, error messages have been updated to be more user-friendly and informative to admins."
               }
             />
+            {/* <PatchNoteEntry
+              title={"Feedback on Documents"}
+              kind="feature"
+              description={
+                "Business Area leads and the directorate can now provide feedback via the notification email when sending a document back for revisions."
+              }
+            /> */}
+            {/* <PatchNoteEntry
+              title={"Remedy Buttons"}
+              kind="fix"
+              description={
+                "A bug has been patched in the Remedy Problematic Project function which prevented all projects from being updated."
+              }
+            /> */}
             {/* <PatchNoteEntry
               title={"Modern Layout Updated"}
               kind="update"
