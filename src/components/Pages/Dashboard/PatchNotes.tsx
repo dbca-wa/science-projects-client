@@ -204,7 +204,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "A bug has been patched which prevented selecting specific areas, and instead selected all areas for a given area type."
               }
             />
-
+            <PatchNoteEntry
+              title={"Email Modal Typo"}
+              kind="fix"
+              description={
+                "Fixed typo on email modal when submitting for approval."
+              }
+            />
             <PatchNoteEntry
               title={"Search by ID"}
               kind="update"

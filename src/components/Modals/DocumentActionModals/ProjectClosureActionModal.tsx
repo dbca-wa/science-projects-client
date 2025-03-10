@@ -303,8 +303,8 @@ export const ProjectClosureActionModal = ({
                       ? stage === 2
                         ? ` Project lead `
                         : ` Business Area Lead (${baLead?.first_name} ${baLead?.last_name}) `
-                      : " members of the Directorate alerting them that "}
-                    alerting them you have{" "}
+                      : " members of the Directorate "}
+                    alerting them that you have{" "}
                     {action === "approve"
                       ? "approved"
                       : action === "send_back"
