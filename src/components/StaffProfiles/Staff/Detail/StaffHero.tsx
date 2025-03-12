@@ -175,7 +175,7 @@ const StaffHero = ({
                     : ""
                 }
                 alt={`Profile of ${staffHeroData?.name}`}
-                className="mr-4 size-[150px] flex-shrink-0 rounded-lg object-cover"
+                className="pointer-events-none mr-4 size-[150px] flex-shrink-0 select-none rounded-lg object-cover"
                 onError={() => setIsImageError(true)}
               />
             )}

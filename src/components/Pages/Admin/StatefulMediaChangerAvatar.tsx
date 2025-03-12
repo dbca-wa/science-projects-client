@@ -482,7 +482,7 @@ export const StatefulMediaChangerAvatar = ({
 
   return (
     <>
-      <Flex direction="row" w="100%" gap={6}>
+      <Flex direction="row" w="100%" gap={6} className="select-none">
         {/* Only show previews if we have an image */}
         {hasValidImage && (
           <Flex
@@ -506,6 +506,7 @@ export const StatefulMediaChangerAvatar = ({
                       : selectedImageUrl
                     : NoImageFile
                 }
+                className="pointer-events-none"
               />
             </Box>
 
@@ -533,6 +534,7 @@ export const StatefulMediaChangerAvatar = ({
                   alt={`Profile of ${username || "User"}`}
                   className="h-full w-full object-cover"
                   onError={() => setIsImageError(true)}
+                  draggable="false"
                 />
               </Box>
             </Box>
@@ -639,6 +641,7 @@ export const StatefulMediaChangerAvatar = ({
                           objectFit={"cover"}
                           w={"100%"}
                           h={"100%"}
+                          draggable="false"
                         />
                       </Box>
                     </Box>
@@ -815,6 +818,7 @@ export const StatefulMediaChangerAvatar = ({
                             onError={(e) =>
                               console.error("Profile preview image error:", e)
                             }
+                            draggable="false"
                           />
                         </Box>
                       </Box>
