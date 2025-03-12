@@ -9,6 +9,7 @@ import { IStaffProfileBaseData, IUserMe } from "@/types";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
 import clsx from "clsx";
 import StaffProfileNavMenuItemButton from "./StaffProfileNavMenuItemButton";
+import { Button } from "@/components/ui/button";
 
 const StaffContent = ({
   buttonsVisible,
@@ -26,6 +27,11 @@ const StaffContent = ({
   const [selectedNav, setSelectedNav] = useState<string>("Overview");
   const { colorMode } = useColorMode();
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  // const [shouldError, setShouldError] = useState(false);
+  // if (shouldError) {
+  //   // This will trigger during render, simulating a failed data requirement
+  //   throw new Error("Failed to load required staff profile data");
+  // }
 
   const CV_TAB_NAMES = ["CV", "Background", "Experience"];
 
@@ -78,6 +84,14 @@ const StaffContent = ({
           !isDesktop && "w-[420px]",
         )}
       >
+        {/* {viewingUser.is_superuser && (
+          <Button
+            className="ml-3 mt-4 bg-red-800"
+            onClick={() => setShouldError(true)}
+          >
+            Trigger error
+          </Button>
+        )} */}
         {selectedNav === "Overview" ? (
           <OverviewSection
             userId={usersPk}

@@ -1,12 +1,14 @@
 // Route for displaying paginated projects
 
+import { BreadCrumb } from "@/components/Base/BreadCrumb";
 import { SearchProjects } from "@/components/Navigation/SearchProjects";
-import { downloadProjectsCSV } from "@/lib/api";
+import { downloadProjectsCSV, getAllBusinessAreas } from "@/lib/api";
+import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
+import { IBusinessArea } from "@/types";
 import {
   Box,
   Button,
   Center,
-  Checkbox,
   Flex,
   Grid,
   Select,
@@ -19,15 +21,13 @@ import {
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
-import { useRef } from "react";
-import { FaDownload } from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
+import { FaDownload, FaMapMarkerAlt } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { Head } from "../components/Base/Head";
 import { PaginatorProject } from "../components/Pages/Projects/PaginatorProject";
 import { useProjectSearchContext } from "../lib/hooks/helper/ProjectSearchContext";
-import { BreadCrumb } from "@/components/Base/BreadCrumb";
-import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
 
 export const Projects = () => {
   const { colorMode } = useColorMode();
@@ -45,52 +45,9 @@ export const Projects = () => {
     filterProjectStatus,
     filterYear,
     totalResults,
+    filterUser,
     setSearchFilters,
   } = useProjectSearchContext();
-
-  const handleOnlyActiveProjectsChange = () => {
-    if (!onlyActive) {
-      setSearchFilters({
-        onlyActive: true,
-        onlyInactive: false,
-        filterBA,
-        filterProjectKind,
-        filterProjectStatus,
-        filterYear,
-      });
-    } else {
-      setSearchFilters({
-        onlyActive: false,
-        onlyInactive: false,
-        filterBA,
-        filterProjectKind,
-        filterProjectStatus,
-        filterYear,
-      });
-    }
-  };
-
-  const handleOnlyInactiveProjectsChange = () => {
-    if (!onlyInactive) {
-      setSearchFilters({
-        onlyActive: false,
-        onlyInactive: true,
-        filterBA,
-        filterProjectKind,
-        filterProjectStatus,
-        filterYear,
-      });
-    } else {
-      setSearchFilters({
-        onlyInactive: false,
-        onlyActive: false,
-        filterBA,
-        filterProjectKind,
-        filterProjectStatus,
-        filterYear,
-      });
-    }
-  };
 
   const handleOnlySelectedStatusChange: React.ChangeEventHandler<
     HTMLSelectElement
@@ -103,6 +60,7 @@ export const Projects = () => {
       filterProjectKind,
       filterProjectStatus: statusValue,
       filterYear,
+      filterUser,
     });
   };
 
@@ -117,6 +75,7 @@ export const Projects = () => {
       filterProjectStatus,
       filterProjectKind: projectKindValue,
       filterYear,
+      filterUser,
     });
   };
 
@@ -180,6 +139,49 @@ export const Projects = () => {
   };
   const { layout } = useLayoutSwitcher();
 
+  const handleOnlySelectedBusinessAreaChange: React.ChangeEventHandler<
+    HTMLSelectElement
+  > = (event) => {
+    const businessAreaValue = event.target.value;
+    // console.log(businessAreaValue);
+    setSearchFilters({
+      onlyActive: onlyActive,
+      onlyInactive: onlyInactive,
+      filterBA: businessAreaValue,
+      filterProjectKind: filterProjectKind,
+      filterProjectStatus: filterProjectStatus,
+      filterYear: filterYear,
+      filterUser,
+    });
+  };
+
+  // Function to check if a string contains HTML tags
+  const checkIsHtml = (data) => {
+    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+    return htmlRegex.test(data);
+  };
+
+  // Function to sanitize HTML content and extract text
+  const sanitizeHtml = (htmlString) => {
+    const doc = new DOMParser().parseFromString(htmlString, "text/html");
+    return doc.body.textContent || "";
+  };
+
+  const [businessAreas, setBusinessAreas] = useState<IBusinessArea[]>([]);
+  const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
+  useEffect(() => {
+    const fetchBusinessAreas = async () => {
+      try {
+        const data = await getAllBusinessAreas();
+        setBusinessAreas(data);
+      } catch (error) {
+        console.error("Error fetching business areas:", error);
+      }
+    };
+
+    fetchBusinessAreas();
+  }, []);
+
   return (
     <>
       {layout === "traditional" && (
@@ -201,8 +203,7 @@ export const Projects = () => {
             fontSize={"sm"}
             color={colorMode === "dark" ? "gray.200" : "gray.600"}
           >
-            Use the filters below to fine-tune. You can ctrl click to open the
-            projects in another tab.
+            Ctrl + Click to open projects in another tab and keep filters.
           </Text>
         </Flex>
 
@@ -211,9 +212,9 @@ export const Projects = () => {
           w={"100%"}
           justifyContent={"flex-end"}
           alignItems={"center"}
+          gap={2}
         >
           <Button
-            mr={4}
             variant={"solid"}
             color={"white"}
             background={colorMode === "light" ? "green.500" : "green.600"}
@@ -238,6 +239,19 @@ export const Projects = () => {
           >
             New Project
           </Button>
+
+          <Button
+            variant={"solid"}
+            color={"white"}
+            background={colorMode === "light" ? "blue.500" : "blue.600"}
+            _hover={{
+              background: colorMode === "light" ? "blue.400" : "blue.500",
+            }}
+            onClick={() => navigate("/projects/map")}
+            leftIcon={<FaMapMarkerAlt />}
+          >
+            Map
+          </Button>
         </Flex>
       </Flex>
 
@@ -255,102 +269,122 @@ export const Projects = () => {
             base: "repeat(1, 1fr)",
             lg: "repeat(2, 1fr)",
           }}
-          gridRowGap={4}
-          gridColumnGap={4}
+          gridGap={4}
           justifyContent="space-between"
         >
-          <Grid gridRowGap={4}>
-            <Grid
-              gridGap={4}
-              gridTemplateColumns={{
-                base: "repeat(1, 1fr)",
-                md: "repeat(2, 1fr)",
-              }}
+          <Grid
+            gridGap={3}
+            gridTemplateColumns={{
+              base: "repeat(1, 1fr)",
+              md: "repeat(1, 1fr)",
+            }}
+            w={"100%"}
+          >
+            {/* Filter BA */}
+            <Select
+              onChange={handleOnlySelectedBusinessAreaChange}
+              size={"sm"}
+              // mx={4}
+              rounded={"5px"}
+              style={
+                colorMode === "light"
+                  ? {
+                      color: "black",
+                      backgroundColor: "white",
+                      borderColor: "gray.200",
+                      caretColor: "black !important",
+                    }
+                  : {
+                      color: "white",
+                      borderColor: "white",
+                      caretColor: "black !important",
+                    }
+              }
             >
-              <Checkbox
-                size="md"
-                colorScheme="green"
-                onChange={handleOnlyActiveProjectsChange}
-                isChecked={onlyActive}
-                isDisabled={onlyInactive}
-              >
-                Only Active
-              </Checkbox>
-              <Checkbox
-                size="md"
-                colorScheme="gray"
-                onChange={handleOnlyInactiveProjectsChange}
-                isChecked={onlyInactive}
-                isDisabled={onlyActive}
-              >
-                Only Inactive
-              </Checkbox>
-            </Grid>
+              <option key={"All"} value={"All"} color={"black"}>
+                All Business Areas
+              </option>
+              {orderedDivisionSlugs.flatMap((divSlug) => {
+                // Filter business areas for the current division
+                const divisionBusinessAreas = businessAreas
+                  .filter((ba) => ba.division.slug === divSlug)
+                  .sort((a, b) => a.name.localeCompare(b.name));
 
-            <Grid
-              gridGap={4}
-              gridTemplateColumns={{
-                base: "repeat(1, 1fr)",
-                md: "repeat(2, 1fr)",
-              }}
-              w={"100%"}
+                return divisionBusinessAreas.map((ba, index) => (
+                  <option key={`${ba.name}${index}`} value={ba.pk}>
+                    {ba?.division ? `[${ba?.division?.slug}] ` : ""}
+                    {checkIsHtml(ba.name)
+                      ? sanitizeHtml(ba.name)
+                      : ba.name}{" "}
+                    {ba.is_active ? "" : "(INACTIVE)"}
+                  </option>
+                ));
+              })}
+            </Select>
+
+            {/* Filter Project Kind */}
+            <Select
+              onChange={handleOnlySelectedProjectKindChange}
+              size={"sm"}
+              rounded={"5px"}
+              style={
+                colorMode === "light"
+                  ? {
+                      color: "black",
+                      borderColor: "gray.100",
+                      caretColor: "black !important",
+                    }
+                  : {
+                      color: "white",
+                      borderColor: "white",
+                      caretColor: "black !important",
+                    }
+              }
             >
-              <Select
-                onChange={handleOnlySelectedProjectKindChange}
-                size={"sm"}
-                rounded={"5px"}
-                style={
-                  colorMode === "light"
-                    ? {
-                        color: "black",
-                        borderColor: "gray.100",
-                        caretColor: "black !important",
-                      }
-                    : {
-                        color: "white",
-                        borderColor: "white",
-                        caretColor: "black !important",
-                      }
-                }
-              >
-                <option value={"All"}>All Kinds</option>
-                <option value={"core_function"}>Core Function</option>
-                <option value={"science"}>Science Project</option>
-                <option value={"student"}>Student Project</option>
-                <option value={"external"}>External Project</option>
-              </Select>
-              <Select
-                onChange={handleOnlySelectedStatusChange}
-                size={"sm"}
-                rounded={"5px"}
-                style={
-                  colorMode === "light"
-                    ? {
-                        color: "black",
-                        borderColor: "gray.100",
-                        caretColor: "black !important",
-                      }
-                    : {
-                        color: "white",
-                        borderColor: "white",
-                        caretColor: "black !important",
-                      }
-                }
-              >
-                <option value={"All"}>All Statuses</option>
-                <option value={"new"}>New</option>
-                <option value={"pending"}>Pending Project Plan</option>
-                <option value={"active"}>Active (Approved)</option>
-                <option value={"updating"}>Update Requested</option>
-                <option value={"closure_requested"}>Closure Requested</option>
-                <option value={"completed"}>Completed and Closed</option>
-                <option value={"terminated"}>Terminated</option>
-                <option value={"suspended"}>Suspended</option>
-              </Select>
-            </Grid>
+              <option value={"All"}>All Kinds</option>
+              <option value={"core_function"}>Core Function</option>
+              <option value={"science"}>Science Project</option>
+              <option value={"student"}>Student Project</option>
+              <option value={"external"}>External Project</option>
+            </Select>
+
+            {/* Filter Status */}
+            <Select
+              onChange={handleOnlySelectedStatusChange}
+              size={"sm"}
+              rounded={"5px"}
+              style={
+                colorMode === "light"
+                  ? {
+                      color: "black",
+                      borderColor: "gray.100",
+                      caretColor: "black !important",
+                    }
+                  : {
+                      color: "white",
+                      borderColor: "white",
+                      caretColor: "black !important",
+                    }
+              }
+            >
+              <option value={"All"}>All Statuses</option>
+              <option value={"new"}>New</option>
+              <option value={"pending"}>Pending Project Plan</option>
+              <option value={"active"}>Active (Approved)</option>
+              <option value={"updating"}>Update Requested</option>
+              <option value={"closure_requested"}>Closure Requested</option>
+              <option value={"completed"}>Completed and Closed</option>
+              <option value={"terminated"}>Terminated</option>
+              <option value={"suspended"}>Suspended</option>
+            </Select>
           </Grid>
 
-          <Flex>
+          <Flex
+            flexDir={"column"}
+            w={"100%"}
+            justifyContent={"space-between"}
+            gridGap={4}
+          >
             <SearchProjects orientation={"vertical"} />
           </Flex>
         </Grid>

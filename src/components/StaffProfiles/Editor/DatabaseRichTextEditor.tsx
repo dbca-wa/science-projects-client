@@ -2,21 +2,21 @@
 
 import { PrepopulateHTMLPlugin } from "@/components/RichTextEditor/Plugins/PrepopulateHTMLPlugin";
 import { $generateHtmlFromNodes } from "@lexical/html";
+import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { HeadingNode } from "@lexical/rich-text";
 import {
   AutoLinkPlugin,
   createLinkMatcherWithRegExp,
 } from "@lexical/react/LexicalAutoLinkPlugin";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
-import { AutoLinkNode, LinkNode } from "@lexical/link";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { HeadingNode } from "@lexical/rich-text";
 
 // Design, React & Other ====================================================================
 
@@ -31,8 +31,8 @@ import { DatabaseRichTextToolbar } from "./DatabaseRichTextToolbar";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { useRef, useState } from "react";
 import RTEDragPlugin from "./RTEDragPlugin";
-import "./staffprofileeditor.css";
 import SaveOnCtrlSPlugin from "./SaveOnCtrlSPlugin";
+import "./staffprofileeditor.css";
 
 // Types ====================================================================================
 
@@ -106,6 +106,7 @@ const DatabaseRichTextEditor = <T,>({
   registerFn: register,
   allowTable,
   isMobile,
+  autoFocus = false,
 }: DatabaseRichTextEditorProps<T>) => {
   const urlRegex = /https?:\/\/[^\s/$.?#].[^\s]*/i;
 
@@ -183,6 +184,7 @@ const DatabaseRichTextEditor = <T,>({
                     }}
                   >
                     <ContentEditable
+                      autoFocus={autoFocus}
                       style={{
                         background: isEdit ? "white" : undefined,
                         minHeight: "50px",

@@ -30,6 +30,7 @@ import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
 import { IUserData } from "../../types";
 import { EmailSiteLinkModal } from "../Modals/Emails/EmailSiteLinkModal";
 import { CreateUserModal } from "../Modals/CreateUserModal";
+import { createPortal } from "react-dom";
 
 interface IUserSearchDropdown {
   onlyInternal?: boolean;
@@ -46,6 +47,9 @@ interface IUserSearchDropdown {
   projectPk?: number;
   isClosed?: boolean;
   ignoreArray?: number[];
+  className?: string;
+  hideCannotFind?: boolean;
+  placeholderColor?: string;
 }
 
 export const UserSearchDropdown = forwardRef(
@@ -65,6 +69,9 @@ export const UserSearchDropdown = forwardRef(
       projectPk,
       isClosed,
       ignoreArray,
+      className,
+      hideCannotFind,
+      placeholderColor,
     }: IUserSearchDropdown,
     ref,
   ) => {
@@ -115,7 +122,7 @@ export const UserSearchDropdown = forwardRef(
     }, [searchTerm]);
 
     const { userLoading, userData } = useFullUserByPk(
-      preselectedUserPk !== undefined ? preselectedUserPk : 0,
+      preselectedUserPk !== undefined ? preselectedUserPk : null,
     );
 
     useEffect(() => {
@@ -158,7 +165,7 @@ export const UserSearchDropdown = forwardRef(
       ) {
         return;
       }
-      setUserFunction(0); // Clear the selected user by setting the userPk to 0 (or any value that represents no user)
+      setUserFunction(null); // Clear the selected user by setting the userPk to 0 (or any value that represents no user)
       if (setUserEmailFunction) {
         setUserEmailFunction("");
       }
@@ -179,6 +186,8 @@ export const UserSearchDropdown = forwardRef(
       <FormControl
         isRequired={isRequired}
         mb={0}
+        my={-4}
+        // p={-2}
         // bg={"red"}
         w={"100%"}
         h={"100%"}
@@ -196,12 +205,42 @@ export const UserSearchDropdown = forwardRef(
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder={placeholder}
+              _placeholder={
+                placeholderColor
+                  ? { color: placeholderColor, marginLeft: "-4px" }
+                  : colorMode === "dark"
+                    ? { color: "gray.300", marginLeft: "-4px" }
+                    : { color: "gray.500", marginLeft: "-4px" }
+              }
               onFocus={() => setIsMenuOpen(true)}
               autoFocus={autoFocus ? true : false}
               autoComplete="off"
+              className={className}
             />
           </InputGroup>
         )}
+
+        {/* {selectedUser ? null : (
+          <Box pos="relative" w="100%">
+            <CustomMenuPortal
+              isOpen={filteredItems.length > 0 && isMenuOpen}
+              referenceElement={inputRef.current}
+              zIndex={9999}
+            >
+              <CustomMenu isOpen={filteredItems.length > 0 && isMenuOpen}>
+                <CustomMenuList minWidth="100%">
+                  {filteredItems.map((user) => (
+                    <CustomMenuItem
+                      key={user.pk}
+                      onClick={() => handleSelectUser(user)}
+                      user={user}
+                    />
+                  ))}
+                </CustomMenuList>
+              </CustomMenu>
+            </CustomMenuPortal>
+          </Box>
+        )} */}
 
         {selectedUser ? null : (
           <Box pos="relative" w="100%">
@@ -222,56 +261,134 @@ export const UserSearchDropdown = forwardRef(
                 {helperText}
             </Box> */}
         <FormHelperText>
-          {showAddUser
+          {hideCannotFind !== true &&
+          hideCannotFind !== undefined &&
+          showAddUser
             ? "Can't find who you're looking for? Use the buttons below to add an external user or email a DBCA staff member with a link to create an account - they must click the link and login."
             : helperText}
         </FormHelperText>
-        {showAddUser && (
-          <>
-            {!ignoreArray ||
-              (ignoreArray?.length < 1 && (
-                <>
-                  <CreateUserModal
-                    onClose={onCloseCreateUserModal}
-                    isOpen={isCreateUserModalOpen}
-                  />
-                  <EmailSiteLinkModal
-                    onClose={onCloseEmailSiteLinkModal}
-                    isOpen={isEmailSiteLinkModalOpen}
-                  />
-                  <Flex mt={4} mb={2} justifyContent={"flex-end"}>
-                    <Button
-                      color={"white"}
-                      bg={colorMode === "light" ? "blue.500" : "blue.600"}
-                      _hover={{
-                        bg: colorMode === "light" ? "blue.400" : "blue.500",
-                      }}
-                      onClick={onOpenCreateUserModal}
-                    >
-                      Add New External User
-                    </Button>
-                    <Button
-                      ml={3}
-                      color={"white"}
-                      bg={colorMode === "light" ? "green.500" : "green.600"}
-                      _hover={{
-                        bg: colorMode === "light" ? "green.400" : "green.500",
-                      }}
-                      onClick={onOpenEmailSiteLinkModal}
-                    >
-                      Send Link to DBCA Staff
-                    </Button>
-                  </Flex>{" "}
-                </>
-              ))}
-          </>
-        )}
+        {hideCannotFind !== true &&
+          hideCannotFind !== undefined &&
+          showAddUser && (
+            <>
+              {!ignoreArray ||
+                (ignoreArray?.length < 1 && (
+                  <>
+                    <CreateUserModal
+                      onClose={onCloseCreateUserModal}
+                      isOpen={isCreateUserModalOpen}
+                    />
+                    <EmailSiteLinkModal
+                      onClose={onCloseEmailSiteLinkModal}
+                      isOpen={isEmailSiteLinkModalOpen}
+                    />
+                    <Flex mt={4} mb={2} justifyContent={"flex-end"}>
+                      <Button
+                        color={"white"}
+                        bg={colorMode === "light" ? "blue.500" : "blue.600"}
+                        _hover={{
+                          bg: colorMode === "light" ? "blue.400" : "blue.500",
+                        }}
+                        onClick={onOpenCreateUserModal}
+                      >
+                        Add New External User
+                      </Button>
+                      <Button
+                        ml={3}
+                        color={"white"}
+                        bg={colorMode === "light" ? "green.500" : "green.600"}
+                        _hover={{
+                          bg: colorMode === "light" ? "green.400" : "green.500",
+                        }}
+                        onClick={onOpenEmailSiteLinkModal}
+                      >
+                        Send Link to DBCA Staff
+                      </Button>
+                    </Flex>{" "}
+                  </>
+                ))}
+            </>
+          )}
       </FormControl>
     );
   },
 );
 
 // =========================================== ADDITIONAL COMPONENTS ====================================================
+
+interface CustomMenuPortalProps {
+  isOpen: boolean;
+  children: React.ReactNode;
+  referenceElement: HTMLElement | null;
+  zIndex?: number;
+}
+
+const CustomMenuPortal = ({
+  isOpen,
+  children,
+  referenceElement,
+  zIndex = 9999,
+}: CustomMenuPortalProps) => {
+  const { colorMode } = useColorMode();
+  const [portalNode, setPortalNode] = useState<HTMLDivElement | null>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+
+  // Create portal element
+  useEffect(() => {
+    if (!portalNode) {
+      const node = document.createElement("div");
+      document.body.appendChild(node);
+      setPortalNode(node);
+
+      return () => {
+        document.body.removeChild(node);
+      };
+    }
+  }, [portalNode]);
+
+  // Update position when reference element changes or when isOpen changes
+  useEffect(() => {
+    if (referenceElement && isOpen) {
+      const updatePosition = () => {
+        const rect = referenceElement.getBoundingClientRect();
+        setPosition({
+          top: rect.bottom + window.scrollY,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+        });
+      };
+
+      updatePosition();
+
+      // Update position on scroll and resize
+      window.addEventListener("scroll", updatePosition);
+      window.addEventListener("resize", updatePosition);
+
+      return () => {
+        window.removeEventListener("scroll", updatePosition);
+        window.removeEventListener("resize", updatePosition);
+      };
+    }
+  }, [referenceElement, isOpen]);
+
+  if (!isOpen || !portalNode) return null;
+
+  return createPortal(
+    <Box
+      pos="fixed"
+      top={`${position.top}px`}
+      left={`${position.left}px`}
+      width={`${position.width}px`}
+      bg={colorMode === "light" ? "white" : "gray.700"}
+      boxShadow="md"
+      zIndex={zIndex}
+      borderRadius="md"
+    >
+      {children}
+    </Box>,
+    portalNode,
+  );
+};
 
 interface CustomMenuProps {
   isOpen: boolean;
@@ -290,20 +407,106 @@ interface CustomMenuListProps {
 
 const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
   const { colorMode } = useColorMode();
-  return (
+  const [portalElement, setPortalElement] = useState<HTMLElement | null>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+
+  // Reference to the input element
+  const inputRef = useRef(null);
+
+  // Find the input element when the component mounts
+  useEffect(() => {
+    // Try to find the input element by traversing up the DOM
+    const findInputElement = () => {
+      // First try to get the input directly (if rendered within the same component)
+      const input = document.querySelector(
+        'input[placeholder="Filter by user"]',
+      );
+      if (input) {
+        inputRef.current = input;
+        return;
+      }
+    };
+
+    findInputElement();
+  }, []);
+
+  // Update position based on the input element
+  useEffect(() => {
+    if (inputRef.current && isOpen) {
+      const updatePosition = () => {
+        const rect = inputRef.current.getBoundingClientRect();
+        setPosition({
+          top: rect.bottom + window.scrollY,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+        });
+      };
+
+      updatePosition();
+
+      // Update position on scroll and resize
+      window.addEventListener("scroll", updatePosition);
+      window.addEventListener("resize", updatePosition);
+
+      return () => {
+        window.removeEventListener("scroll", updatePosition);
+        window.removeEventListener("resize", updatePosition);
+      };
+    }
+  }, [inputRef.current, isOpen]);
+
+  useEffect(() => {
+    // Create the portal element when component mounts
+    const el = document.createElement("div");
+    el.style.position = "fixed";
+    el.style.zIndex = "9999";
+    document.body.appendChild(el);
+    setPortalElement(el);
+
+    // Clean up when component unmounts
+    return () => {
+      document.body.removeChild(el);
+    };
+  }, []);
+
+  if (!isOpen || !portalElement) return null;
+
+  // Use createPortal to render the menu to the portal element
+  return createPortal(
     <Box
-      pos="absolute"
-      w="100%"
+      pos="fixed"
+      top={`${position.top}px`}
+      left={`${position.left}px`}
+      width={`${position.width}px`}
+      minW="200px"
       bg={colorMode === "light" ? "white" : "gray.700"}
       boxShadow="md"
-      zIndex={1}
+      zIndex={9999}
       display={isOpen ? "block" : "none"}
       {...rest}
     >
       {children}
-    </Box>
+    </Box>,
+    portalElement,
   );
 };
+
+// const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
+//   const { colorMode } = useColorMode();
+//   return (
+//     <Box
+//       pos="absolute"
+//       w="100%"
+//       bg={colorMode === "light" ? "white" : "gray.700"}
+//       boxShadow="md"
+//       zIndex={1}
+//       display={isOpen ? "block" : "none"}
+//       {...rest}
+//     >
+//       {children}
+//     </Box>
+//   );
+// };
 
 const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -409,8 +612,8 @@ const SelectedUserInput = ({ user, onClear }: SelectedUserInputProps) => {
       bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
       borderRadius="md"
       px={2}
-      py={1}
-      mr={2}
+      // py={1}
+      // mr={2}
     >
       <Avatar
         size="sm"

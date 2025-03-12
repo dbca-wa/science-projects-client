@@ -12,6 +12,7 @@ import MapSidebarSection from "./MapSidebarSection";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useGetLocationsGeojson } from "@/lib/hooks/tanstack/useGetLocationsGeojson";
+import { IProjectData, ISimpleLocationData } from "@/types";
 
 interface LayerVisibility {
   dbcaRegions: boolean;
@@ -44,11 +45,41 @@ interface LayerData {
 interface MapLocationsSidebarProps {
   mapRef: React.RefObject<L.Map | null>;
   mapContainerRef: React.RefObject<HTMLDivElement>;
+  dbcaRegions: any;
+  dbcaDistricts: any;
+  nrm: any;
+  ibra: any;
+  imcra: any;
+  locationsLoading: boolean;
+  selectedLocations: number[];
+  setFilterLocations?: (locations: number[]) => void;
+  areaDbcaRegions: ISimpleLocationData[];
+  areaDbcaDistricts: ISimpleLocationData[];
+  areaIbra: ISimpleLocationData[];
+  areaImcra: ISimpleLocationData[];
+  areaNrm: ISimpleLocationData[];
+  areaLocationsLoading: boolean;
+  filteredItems: IProjectData[];
 }
 
 const MapLocationsSidebar = ({
   mapRef,
   mapContainerRef,
+  dbcaRegions,
+  dbcaDistricts,
+  nrm,
+  ibra,
+  imcra,
+  locationsLoading,
+  selectedLocations,
+  setFilterLocations,
+  areaDbcaRegions,
+  areaDbcaDistricts,
+  areaIbra,
+  areaImcra,
+  areaNrm,
+  areaLocationsLoading,
+  filteredItems,
 }: MapLocationsSidebarProps) => {
   const [showLabels, setShowLabels] = useState(true);
   const [showColors, setShowColors] = useState(true);
@@ -107,9 +138,6 @@ const MapLocationsSidebar = ({
       }
     });
   };
-
-  const { dbcaRegions, dbcaDistricts, nrm, ibra, imcra, locationsLoading } =
-    useGetLocationsGeojson();
 
   const [selectedRegion, setSelectedRegion] = useState<RegionProperties | null>(
     null,
@@ -299,52 +327,63 @@ const MapLocationsSidebar = ({
         });
 
         regionCenters.forEach((center, name) => {
-          const charactersToAdjustWidth = 20;
-          const labelId = `${layerId}-${name}`;
+          // Create a sanitized id for the label element
+          const sanitizedName = name.replace(/[^\w-]/g, "_");
+          const labelId = `${layerId}-${sanitizedName}`;
 
+          // Create a wrapper div that's precisely sized to the content
+          const labelContainer = document.createElement("div");
+          labelContainer.id = `temp-${labelId}`;
+
+          // Apply consistent styling for all labels
+          labelContainer.className =
+            "bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 transition-all duration-200 cursor-pointer select-none";
+          labelContainer.style.maxWidth = "200px";
+          labelContainer.style.width = "max-content";
+          labelContainer.style.whiteSpace = "normal";
+          labelContainer.style.wordWrap = "break-word";
+          labelContainer.textContent = name;
+
+          // Add the div to the document temporarily to measure its size
+          labelContainer.style.position = "absolute";
+          labelContainer.style.visibility = "hidden";
+          document.body.appendChild(labelContainer);
+
+          // Get the exact dimensions
+          const width = Math.min(labelContainer.offsetWidth, 200);
+          const height = labelContainer.offsetHeight;
+
+          // Remove from DOM
+          document.body.removeChild(labelContainer);
+
+          // Create a div icon with exact size - use the sanitized ID here
           const label = L.divIcon({
+            html: `<div id="${labelId}" class="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 text-balance text-center border border-gray-200/50 transition-all duration-200 cursor-pointer select-none" style="max-width: 175px; width: max-content; white-space: normal; word-wrap: break-word; position: relative;">${name}</div>`,
             className: "",
-            html: `<div id="${labelId}" class="${name.length > charactersToAdjustWidth ? "map-label-full" : "map-label-fit"} bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 break-words transition-all duration-200 w-fit cursor-pointer select-none">${name}</div>`,
-            iconSize: [200, null],
-            iconAnchor: [100, null],
+            iconSize: [width, height],
+            iconAnchor: [width / 2, height / 2],
           });
 
-          const marker = L.marker(center, { icon: label }).addTo(labelGroup);
+          const marker = L.marker(center, {
+            icon: label,
+            zIndexOffset: 0,
+          }).addTo(labelGroup);
 
-          marker.on({
-            mouseover: () => {
-              geoJsonLayer.eachLayer((layer: L.Layer) => {
-                if (layer instanceof L.Path && "feature" in layer) {
-                  const featureName =
-                    layer.feature.properties[layerData[layerId].nameProperty];
-                  if (featureName === name) {
+          // Shared function to highlight both label and region
+          const highlightRegion = (highlight = true) => {
+            // Find and highlight/unhighlight all matching features
+            geoJsonLayer.eachLayer((layer) => {
+              if (layer instanceof L.Path && "feature" in layer) {
+                const featureName =
+                  layer.feature.properties[layerData[layerId].nameProperty];
+                if (featureName === name) {
+                  if (highlight) {
                     layer.setStyle({
                       ...getLayerStyle(true, true),
                       fillColor: layerData[layerId].color,
                     });
                     layer.bringToFront();
-                  }
-                }
-              });
-
-              const labelElement = document.getElementById(labelId);
-              if (labelElement) {
-                labelElement.classList.add(
-                  "bg-blue-200",
-                  "border-blue-200",
-                  "scale-110",
-                  "shadow-xl",
-                  "z-[9999]",
-                );
-                labelElement.classList.remove("bg-white/90", "z-[1]");
-              }
-            },
-            mouseout: () => {
-              geoJsonLayer.eachLayer((layer: L.Layer) => {
-                if (layer instanceof L.Path && "feature" in layer) {
-                  const featureName =
-                    layer.feature.properties[layerData[layerId].nameProperty];
-                  if (featureName === name) {
+                  } else {
                     const subRegion = layerData[layerId].subRegions.find(
                       (sr) => sr.name === featureName,
                     );
@@ -356,10 +395,23 @@ const MapLocationsSidebar = ({
                     });
                   }
                 }
-              });
+              }
+            });
 
-              const labelElement = document.getElementById(labelId);
-              if (labelElement) {
+            // Update label styling
+            const labelElement = document.getElementById(labelId);
+            if (labelElement) {
+              if (highlight) {
+                labelElement.classList.add(
+                  "bg-blue-200",
+                  "border-blue-200",
+                  "scale-110",
+                  "shadow-xl",
+                );
+                labelElement.classList.remove("bg-white/90");
+                labelElement.style.zIndex = "9999";
+                marker.setZIndexOffset(1000);
+              } else {
                 labelElement.classList.remove(
                   "bg-blue-200",
                   "border-blue-200",
@@ -367,25 +419,52 @@ const MapLocationsSidebar = ({
                   "shadow-xl",
                 );
                 labelElement.classList.add("bg-white/90");
+                labelElement.style.zIndex = "auto";
+                marker.setZIndexOffset(0);
               }
-            },
-            click: () => {
+            }
+          };
+
+          // Set up label hover events with proper element targeting
+          marker.getElement().addEventListener("mouseover", (e) => {
+            const target = e.target;
+            if (
+              target &&
+              (target.id === labelId || target.closest(`#${labelId}`))
+            ) {
+              highlightRegion(true);
+            }
+          });
+
+          marker.getElement().addEventListener("mouseout", (e) => {
+            const relatedTarget = e.relatedTarget;
+            if (
+              !relatedTarget ||
+              (relatedTarget.id !== labelId &&
+                (!relatedTarget.closest ||
+                  !relatedTarget.closest(`#${labelId}`)))
+            ) {
+              highlightRegion(false);
+            }
+          });
+
+          marker.getElement().addEventListener("click", (e) => {
+            const target = e.target;
+            if (
+              target &&
+              (target.id === labelId ||
+                (target.closest && target.closest(`#${labelId}`)))
+            ) {
               const bounds = L.latLngBounds([]);
               let foundRegions = false;
 
-              geoJsonLayer.eachLayer((layer: L.Layer) => {
+              geoJsonLayer.eachLayer((layer) => {
                 if (layer instanceof L.Path && "feature" in layer) {
                   const featureName =
                     layer.feature.properties[layerData[layerId].nameProperty];
                   if (featureName === name) {
                     bounds.extend(layer.getBounds());
                     foundRegions = true;
-
-                    layer.setStyle({
-                      ...getLayerStyle(true, true),
-                      fillColor: layerData[layerId].color,
-                    });
-                    layer.bringToFront();
                   }
                 }
               });
@@ -402,20 +481,202 @@ const MapLocationsSidebar = ({
                 const firstMatchingFeature = (geoJsonLayer as any)
                   .getLayers()
                   .find(
-                    (layer: L.Layer) =>
+                    (layer) =>
                       layer instanceof L.Path &&
                       "feature" in layer &&
                       layer.feature.properties[
                         layerData[layerId].nameProperty
                       ] === name,
                   );
+
                 if (firstMatchingFeature) {
                   setSelectedRegion(firstMatchingFeature.feature.properties);
                 }
               }
-            },
+            }
           });
+
+          // Store the name and highlight function with the marker for use in polygon interactions
+          marker.regionName = name;
+          marker.highlightRegion = highlightRegion;
         });
+
+        // regionCenters.forEach((center, name) => {
+        //   const labelId = `${layerId}-${name}`;
+
+        //   // Create a wrapper div that's precisely sized to the content
+        //   const labelContainer = document.createElement("div");
+        //   labelContainer.id = `temp-${labelId}`;
+
+        //   // Apply consistent styling for all labels, removing the conditional class based on length
+        //   labelContainer.className =
+        //     "bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 transition-all duration-200 cursor-pointer select-none";
+        //   labelContainer.style.maxWidth = "200px";
+        //   labelContainer.style.width = "max-content"; // Use max-content to prevent unnecessary wrapping
+        //   labelContainer.style.whiteSpace = "normal"; // Allow wrapping only when needed
+        //   labelContainer.style.wordWrap = "break-word"; // Modern approach for word wrapping
+        //   labelContainer.textContent = name;
+
+        //   // Add the div to the document temporarily to measure its size
+        //   labelContainer.style.position = "absolute";
+        //   labelContainer.style.visibility = "hidden";
+        //   document.body.appendChild(labelContainer);
+
+        //   // Get the exact dimensions
+        //   const width = Math.min(labelContainer.offsetWidth, 200); // Ensure max width is respected
+        //   const height = labelContainer.offsetHeight;
+
+        //   // Remove from DOM
+        //   document.body.removeChild(labelContainer);
+
+        //   // Create a div icon with exact size
+        //   const label = L.divIcon({
+        //     html: `<div id="${labelId}" class="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 transition-all duration-200 cursor-pointer select-none" style="max-width: 200px; width: max-content; white-space: normal; word-wrap: break-word;">${name}</div>`,
+        //     className: "", // Important: empty class to avoid leaflet's default styling
+        //     iconSize: [width, height],
+        //     iconAnchor: [width / 2, height / 2], // Center the icon on the point
+        //   });
+
+        //   const marker = L.marker(center, {
+        //     icon: label,
+        //     zIndexOffset: 0,
+        //   }).addTo(labelGroup);
+
+        //   // Set up event delegation by checking if the mouse is over the actual text div
+        //   marker.getElement().addEventListener("mouseover", (e) => {
+        //     // Only trigger if the mouseover is on the label div itself or its children
+        //     if (e.target.id === labelId || e.target.closest(`#${labelId}`)) {
+        //       // First reset all layers z-index
+        //       geoJsonLayer.eachLayer((layer) => {
+        //         if (layer instanceof L.Path) {
+        //           layer.bringToBack();
+        //         }
+        //       });
+
+        //       // Then highlight and bring forward the current region
+        //       geoJsonLayer.eachLayer((layer) => {
+        //         if (layer instanceof L.Path && "feature" in layer) {
+        //           const featureName =
+        //             layer.feature.properties[layerData[layerId].nameProperty];
+        //           if (featureName === name) {
+        //             layer.setStyle({
+        //               ...getLayerStyle(true, true),
+        //               fillColor: layerData[layerId].color,
+        //             });
+        //             layer.bringToFront();
+        //           }
+        //         }
+        //       });
+
+        //       // Apply styles to the label and increase its z-index
+        //       const labelElement = document.getElementById(labelId);
+        //       if (labelElement) {
+        //         labelElement.classList.add(
+        //           "bg-blue-200",
+        //           "border-blue-200",
+        //           "scale-110",
+        //           "shadow-xl",
+        //         );
+        //         labelElement.classList.remove("bg-white/90");
+        //         labelElement.style.zIndex = "9999";
+        //       }
+
+        //       // Increase marker z-index to ensure it stays on top
+        //       marker.setZIndexOffset(1000);
+        //     }
+        //   });
+
+        //   marker.getElement().addEventListener("mouseout", (e) => {
+        //     // Make sure we're not still within the label element
+        //     if (
+        //       !e.relatedTarget ||
+        //       (!e.relatedTarget.closest(`#${labelId}`) &&
+        //         e.relatedTarget.id !== labelId)
+        //     ) {
+        //       geoJsonLayer.eachLayer((layer) => {
+        //         if (layer instanceof L.Path && "feature" in layer) {
+        //           const featureName =
+        //             layer.feature.properties[layerData[layerId].nameProperty];
+        //           if (featureName === name) {
+        //             const subRegion = layerData[layerId].subRegions.find(
+        //               (sr) => sr.name === featureName,
+        //             );
+        //             const isVisible =
+        //               subRegion?.visible || layerData[layerId].mainVisible;
+        //             layer.setStyle({
+        //               ...getLayerStyle(isVisible),
+        //               fillColor: layerData[layerId].color,
+        //             });
+        //           }
+        //         }
+        //       });
+
+        //       const labelElement = document.getElementById(labelId);
+        //       if (labelElement) {
+        //         labelElement.classList.remove(
+        //           "bg-blue-200",
+        //           "border-blue-200",
+        //           "scale-110",
+        //           "shadow-xl",
+        //         );
+        //         labelElement.classList.add("bg-white/90");
+        //         labelElement.style.zIndex = "auto";
+        //       }
+
+        //       // Reset marker z-index
+        //       marker.setZIndexOffset(0);
+        //     }
+        //   });
+
+        //   marker.getElement().addEventListener("click", (e) => {
+        //     // Only trigger if the click is on the label div itself or its children
+        //     if (e.target.id === labelId || e.target.closest(`#${labelId}`)) {
+        //       const bounds = L.latLngBounds([]);
+        //       let foundRegions = false;
+
+        //       geoJsonLayer.eachLayer((layer) => {
+        //         if (layer instanceof L.Path && "feature" in layer) {
+        //           const featureName =
+        //             layer.feature.properties[layerData[layerId].nameProperty];
+        //           if (featureName === name) {
+        //             bounds.extend(layer.getBounds());
+        //             foundRegions = true;
+
+        //             layer.setStyle({
+        //               ...getLayerStyle(true, true),
+        //               fillColor: layerData[layerId].color,
+        //             });
+        //             layer.bringToFront();
+        //           }
+        //         }
+        //       });
+
+        //       if (foundRegions && bounds.isValid() && mapRef.current) {
+        //         mapRef.current.flyToBounds(bounds, {
+        //           padding: [100, 100],
+        //           duration: 0.5,
+        //           easeLinearity: 0.25,
+        //           animate: true,
+        //           maxZoom: 12,
+        //         });
+
+        //         const firstMatchingFeature = (geoJsonLayer as any)
+        //           .getLayers()
+        //           .find(
+        //             (layer) =>
+        //               layer instanceof L.Path &&
+        //               "feature" in layer &&
+        //               layer.feature.properties[
+        //                 layerData[layerId].nameProperty
+        //               ] === name,
+        //           );
+        //         if (firstMatchingFeature) {
+        //           setSelectedRegion(firstMatchingFeature.feature.properties);
+        //         }
+        //       }
+        //     }
+        //   });
+        // });
       }
     }
   };
@@ -454,61 +715,88 @@ const MapLocationsSidebar = ({
             layer.on({
               mouseover: (e) => {
                 const target = e.target;
+                const regionName = feature.properties[layerInfo.nameProperty];
+
+                // First reset z-index of all features
+                // Use the proper reference to the layer group (the 'layer' variable we're creating in addGeoJSONLayer)
+                const allLayers = layerRefs.current[id]; // This is the correct reference
+                if (allLayers instanceof L.GeoJSON) {
+                  allLayers.eachLayer((l) => {
+                    if (l instanceof L.Path) {
+                      l.bringToBack();
+                    }
+                  });
+                }
+
+                // Then highlight the current polygon
                 target.setStyle({
                   ...getLayerStyle(true, true),
                   fillColor: layerInfo.color,
                 });
                 target.bringToFront();
 
-                const regionName = feature.properties[layerInfo.nameProperty];
+                // Find and highlight the corresponding label
                 const labels = labelGroup.getLayers();
-                labels.forEach((label) => {
-                  const labelDiv = label.getElement();
-                  if (labelDiv && labelDiv.innerHTML.includes(regionName)) {
-                    labelDiv.firstChild.classList.add(
-                      "bg-blue-200",
-                      "border-blue-200",
-                      "scale-110",
-                      "shadow-xl",
-                      "z-[9999]",
-                    );
-                    labelDiv.firstChild.classList.remove(
-                      "bg-white/90",
-                      "z-[1]",
-                    );
+                labels.forEach((label: any) => {
+                  if (label.regionName === regionName) {
+                    // Just update the label styling
+                    const sanitizedName = regionName.replace(/[^\w-]/g, "_");
+                    const labelId = `${id}-${sanitizedName}`;
+                    const labelElement = document.getElementById(labelId);
+
+                    if (labelElement) {
+                      labelElement.classList.add(
+                        "bg-blue-200",
+                        "border-blue-200",
+                        "scale-110",
+                        "shadow-xl",
+                      );
+                      labelElement.classList.remove("bg-white/90");
+                      labelElement.style.zIndex = "9999";
+                    }
+
                     label.setZIndexOffset(1000);
-                  } else {
-                    label.setZIndexOffset(0);
                   }
                 });
               },
+
               mouseout: (e) => {
-                const target = e.target;
+                const regionName = feature.properties[layerInfo.nameProperty];
                 const subRegion = layerInfo.subRegions.find(
-                  (sr) =>
-                    sr.name === feature.properties[layerInfo.nameProperty],
+                  (sr) => sr.name === regionName,
                 );
                 const isVisible = subRegion?.visible || layerInfo.mainVisible;
-                target.setStyle({
+
+                // Reset polygon style
+                e.target.setStyle({
                   ...getLayerStyle(isVisible),
                   fillColor: layerInfo.color,
                 });
 
-                const regionName = feature.properties[layerInfo.nameProperty];
+                // Reset the label styling
                 const labels = labelGroup.getLayers();
-                labels.forEach((label) => {
-                  const labelDiv = label.getElement();
-                  if (labelDiv && labelDiv.innerHTML.includes(regionName)) {
-                    labelDiv.firstChild.classList.remove(
-                      "bg-blue-200",
-                      "border-blue-200",
-                      "scale-110",
-                      "shadow-xl",
-                    );
-                    labelDiv.firstChild.classList.add("bg-white/90");
+                labels.forEach((label: any) => {
+                  if (label.regionName === regionName) {
+                    const sanitizedName = regionName.replace(/[^\w-]/g, "_");
+                    const labelId = `${id}-${sanitizedName}`;
+                    const labelElement = document.getElementById(labelId);
+
+                    if (labelElement) {
+                      labelElement.classList.remove(
+                        "bg-blue-200",
+                        "border-blue-200",
+                        "scale-110",
+                        "shadow-xl",
+                      );
+                      labelElement.classList.add("bg-white/90");
+                      labelElement.style.zIndex = "auto";
+                    }
+
+                    label.setZIndexOffset(0);
                   }
                 });
               },
+
               click: (e) => {
                 if (mapRef.current) {
                   const bounds = e.target.getBounds();
@@ -651,7 +939,7 @@ const MapLocationsSidebar = ({
         </Button>
       </div>
 
-      <Accordion type="multiple" className="space-y-4">
+      <Accordion type="multiple" className="">
         {Object.entries(layerData).map(([key, data]) => {
           const words = key
             .replace(/([A-Z])/g, " $1")
@@ -663,7 +951,7 @@ const MapLocationsSidebar = ({
           ].join(" ");
 
           return (
-            <AccordionItem key={key} value={key} className="border-b pb-4">
+            <AccordionItem key={key} value={key} className="border-b">
               <div className="flex min-h-[40px] w-full items-stretch">
                 <div
                   onClick={() => toggleMainLayer(key)}

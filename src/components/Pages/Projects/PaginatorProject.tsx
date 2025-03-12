@@ -87,6 +87,7 @@ export const PaginatorProject = ({
                   >
                     <ModernProjectCard
                       pk={project.id}
+                      areas={project.areas}
                       image={project.image}
                       title={project?.title}
                       description={project.description}

@@ -156,8 +156,9 @@ export const UserGridItem = ({
           >
             <Box minW={55} mr={4}>
               <Avatar
+                className="pointer-events-none"
+                draggable="false"
                 src={imageUrl}
-                draggable={false}
                 userSelect={"none"}
                 h={55}
                 w={55}
@@ -199,8 +200,8 @@ export const UserGridItem = ({
                 {fullName
                   ? fullName?.startsWith("None ")
                     ? username
-                    : fullName.length > 16
-                      ? `${fullName.substring(0, 10)}...`
+                    : fullName.length > 30
+                      ? `${fullName.substring(0, 30)}...`
                       : fullName
                   : username}
               </Button>

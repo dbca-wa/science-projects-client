@@ -33,6 +33,11 @@ export const UserFeedbackModal = ({
     window.open(teamsWebUrl, "_blank");
   };
 
+  const handleEmailClick = (e) => {
+    e.preventDefault();
+    window.open(`mailto:jarid.prince@dbca.wa.gov.au?subject=SPMS Feedback`);
+  };
+
   return (
     <Modal
       isOpen={isFeedbackModalOpen}
@@ -80,7 +85,7 @@ export const UserFeedbackModal = ({
             </div>
 
             <Button
-              onClick={handleTeamsClick}
+              onClick={handleEmailClick}
               leftIcon={<MdEmail />}
               backgroundColor={colorMode === "light" ? "blue.500" : "blue.600"}
               color={"white"}

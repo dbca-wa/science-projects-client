@@ -1,69 +1,45 @@
-// Script for keeping track of the project search value, whilst allowing
-// search bars to be placed anywhere on the screen and in separate components.
-// exposes variables in ProjectSearchContext to components via the useProjectSearchContext hook.
-
-import { createContext, useState, useContext, useEffect } from "react";
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+} from "react";
 import { getProjectsBasedOnSearchTerm } from "../../api";
 import { IProjectData } from "../../../types";
 
-interface IProjectSearchContext {
-  searchTerm: string;
-  setSearchTerm: (value: string) => void;
-
-  filteredItems: IProjectData[];
-  loading: boolean;
-
-  currentProjectResultsPage: number;
-  setCurrentProjectResultsPage: (value: number) => void;
-  totalPages: number;
-  totalResults: number;
-
-  isOnProjectsPage: boolean;
-  setIsOnProjectsPage: (value: boolean) => void;
-
+interface SearchFilters {
   onlyActive: boolean;
   onlyInactive: boolean;
+  filterUser: number | null;
   filterBA: string;
   filterProjectKind: string;
   filterProjectStatus: string;
   filterYear: number;
-  setSearchFilters: (filters: {
-    onlyActive: boolean;
-    onlyInactive: boolean;
-    filterBA: string;
-    filterProjectKind: string;
-    filterProjectStatus: string;
-    filterYear: number;
-  }) => void;
 }
 
-const ProjectSearchContext = createContext<IProjectSearchContext>({
-  searchTerm: "",
-  setSearchTerm: () => {
-    throw new Error("setSearchTerm function must be implemented");
-  },
-  filteredItems: [],
-  loading: false,
-  currentProjectResultsPage: 1,
-  setCurrentProjectResultsPage: () => {
-    throw new Error("setCurrentPage function must be implemented");
-  },
-  totalPages: 1,
-  totalResults: 0,
-  isOnProjectsPage: false,
-  setIsOnProjectsPage: () => {
-    throw new Error("setIsOnProjectsPage function must be implemented");
-  },
-  onlyActive: false,
-  onlyInactive: false,
-  filterBA: "",
-  filterProjectKind: "",
-  filterProjectStatus: "",
-  filterYear: 0,
-  setSearchFilters: () => {
-    throw new Error("setSearchFilters function must be implemented");
-  },
-});
+interface IProjectSearchContext {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  filteredItems: IProjectData[];
+  loading: boolean;
+  currentProjectResultsPage: number;
+  setCurrentProjectResultsPage: (value: number) => void;
+  totalPages: number;
+  totalResults: number;
+  isOnProjectsPage: boolean;
+  setIsOnProjectsPage: (value: boolean) => void;
+  onlyActive: boolean;
+  onlyInactive: boolean;
+  filterUser: number | null;
+  filterBA: string;
+  filterProjectKind: string;
+  filterProjectStatus: string;
+  filterYear: number;
+  setSearchFilters: (filters: SearchFilters) => void;
+}
+
+const ProjectSearchContext = createContext<IProjectSearchContext | null>(null);
 
 interface IProjectSearchProviderProps {
   children: React.ReactNode;
@@ -72,93 +48,120 @@ interface IProjectSearchProviderProps {
 export const ProjectSearchProvider = ({
   children,
 }: IProjectSearchProviderProps) => {
-  const [isOnProjectsPage, setIsOnProjectsPage] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [filteredItems, setFilteredItems] = useState<IProjectData[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentProjectResultsPage, setCurrentProjectResultsPage] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  // Combine related state into a single object to reduce rerenders
+  const [state, setState] = useState({
+    searchTerm: "",
+    filteredItems: [] as IProjectData[],
+    loading: false,
+    currentProjectResultsPage: 1,
+    totalResults: 0,
+    totalPages: 1,
+    isOnProjectsPage: false,
+    filters: {
+      onlyActive: false,
+      onlyInactive: false,
+      filterBA: "All",
+      filterProjectKind: "All",
+      filterProjectStatus: "All",
+      filterYear: 0,
+      filterUser: null,
+    },
+  });
 
-  const [onlyActive, setOnlyActive] = useState(false);
-  const [onlyInactive, setOnlyInactive] = useState(false);
-  const [filterBA, setFilterBA] = useState("");
-  const [filterProjectKind, setFilterProjectKind] = useState("");
-  const [filterProjectStatus, setFilterProjectStatus] = useState("");
-  const [filterYear, setFilterYear] = useState(0);
+  // Memoize handlers to prevent unnecessary rerenders
+  const setSearchTerm = useCallback((value: string) => {
+    setState((prev) => ({
+      ...prev,
+      searchTerm: value,
+      currentProjectResultsPage: 1,
+    }));
+  }, []);
 
-  const setSearchFilters = (filters: {
-    onlyActive: boolean;
-    onlyInactive: boolean;
-    filterBA: string;
-    filterProjectKind: string;
-    filterProjectStatus: string;
-    filterYear: number;
-  }) => {
-    setOnlyActive(filters.onlyActive);
-    setOnlyInactive(filters.onlyInactive);
-    setFilterBA(filters.filterBA);
-    setFilterProjectStatus(filters.filterProjectStatus);
-    setFilterProjectKind(filters.filterProjectKind);
-    setFilterYear(filters.filterYear);
-    setCurrentProjectResultsPage(1); // Set the current page to 1 when filters change
-  };
+  const setCurrentProjectResultsPage = useCallback((value: number) => {
+    setState((prev) => ({ ...prev, currentProjectResultsPage: value }));
+  }, []);
 
+  const setIsOnProjectsPage = useCallback((value: boolean) => {
+    setState((prev) => ({
+      ...prev,
+      isOnProjectsPage: value,
+      // Reset filters when leaving projects page
+      filters: value
+        ? prev.filters
+        : {
+            ...prev.filters,
+            filterBA: "All",
+            filterProjectStatus: "All",
+            filterProjectKind: "All",
+          },
+    }));
+  }, []);
+
+  const setSearchFilters = useCallback((newFilters: SearchFilters) => {
+    setState((prev) => ({
+      ...prev,
+      currentProjectResultsPage: 1,
+      filters: newFilters,
+    }));
+  }, []);
+
+  // Separate data fetching effect
   useEffect(() => {
-    if (isOnProjectsPage) {
-      setLoading(true);
-      getProjectsBasedOnSearchTerm(searchTerm, currentProjectResultsPage, {
-        onlyActive,
-        onlyInactive,
-        filterBA,
-        filterProjectKind,
-        filterProjectStatus,
-        filterYear,
-      })
-        .then((data) => {
-          setFilteredItems(data.projects);
-          setTotalResults(data.total_results);
-          setTotalPages(data.total_pages);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching users:", error);
-          setLoading(false);
-        });
-    } else {
-      setFilterBA("All");
-      setFilterProjectStatus("All");
-      setFilterProjectKind("All");
-    }
+    let isMounted = true;
+
+    const fetchProjects = async () => {
+      if (!state.isOnProjectsPage) return;
+
+      setState((prev) => ({ ...prev, loading: true }));
+
+      try {
+        const data = await getProjectsBasedOnSearchTerm(
+          state.searchTerm,
+          state.currentProjectResultsPage,
+          state.filters,
+        );
+
+        if (isMounted) {
+          setState((prev) => ({
+            ...prev,
+            filteredItems: data.projects,
+            totalResults: data.total_results,
+            totalPages: data.total_pages,
+            loading: false,
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+        if (isMounted) {
+          setState((prev) => ({ ...prev, loading: false }));
+        }
+      }
+    };
+
+    fetchProjects();
+
+    return () => {
+      isMounted = false;
+    };
   }, [
-    searchTerm,
-    currentProjectResultsPage,
-    isOnProjectsPage,
-    onlyActive,
-    onlyInactive,
-    filterBA,
-    filterYear,
-    filterProjectStatus,
-    filterProjectKind,
+    state.searchTerm,
+    state.currentProjectResultsPage,
+    state.isOnProjectsPage,
+    state.filters,
   ]);
 
   const contextValue: IProjectSearchContext = {
-    searchTerm,
+    searchTerm: state.searchTerm,
     setSearchTerm,
-    filteredItems,
-    loading,
-    currentProjectResultsPage,
+    filteredItems: state.filteredItems,
+    loading: state.loading,
+    currentProjectResultsPage: state.currentProjectResultsPage,
     setCurrentProjectResultsPage,
-    totalPages,
-    totalResults,
-    isOnProjectsPage,
+    totalPages: state.totalPages,
+    totalResults: state.totalResults,
+    isOnProjectsPage: state.isOnProjectsPage,
     setIsOnProjectsPage,
-    onlyActive,
-    onlyInactive,
-    filterBA,
-    filterProjectKind,
-    filterProjectStatus,
-    filterYear,
+    ...state.filters,
     setSearchFilters,
   };
 
@@ -169,6 +172,14 @@ export const ProjectSearchProvider = ({
   );
 };
 
-export const useProjectSearchContext = () => useContext(ProjectSearchContext);
+export const useProjectSearchContext = () => {
+  const context = useContext(ProjectSearchContext);
+  if (!context) {
+    throw new Error(
+      "useProjectSearchContext must be used within a ProjectSearchProvider",
+    );
+  }
+  return context;
+};
 
 export default ProjectSearchContext;
