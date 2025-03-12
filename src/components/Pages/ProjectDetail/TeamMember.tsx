@@ -219,6 +219,7 @@ export const TeamMember = ({
               userSelect="none"
               onClick={onUserOpen}
               cursor="pointer"
+              className="pointer-events-none select-none"
             />
             {is_leader && (
               <Box pos="absolute" color="yellow.300" top={-1} right="38%">
@@ -270,6 +271,7 @@ export const TeamMember = ({
                       src={
                         caretaker?.image ? `${baseURL}${caretaker?.image}` : ""
                       }
+                      className="pointer-events-none select-none"
                     />
                     <Text
                       color="blue.500"

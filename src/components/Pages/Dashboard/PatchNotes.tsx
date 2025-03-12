@@ -30,7 +30,7 @@ const PatchNoteEntry = ({
   description,
 }: {
   title: string;
-  kind: "feature" | "update";
+  kind: "feature" | "update" | "fix";
   description: string;
 }) => {
   return (
@@ -174,41 +174,90 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             &#127881; SPMS {VERSION} Patch Notes &#127881;
             {/* &#9881;&#65039; */}
           </Text>
-          <List spacing={1} ml={2}>
+          <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Custom Title"}
+              title={"Search Project By User"}
               kind="feature"
               description={
-                "Users can now add a custom position title to their profile by clicking their avatar in the navbar, navigating to My SPMS Profile, and filling in information in the Public Appearance section. This title will be displayed on your public profile and in search results, replacing information from HR systems. Note: It is recommended that users first request to update their official title and any other information by contacting Establishment@dbca.wa.gov.au."
+                "By popular demand! Users can now use the projects page to directly search for a user's projects. This feature works with other filters and expands on viewing staff projects by clicking on their account on the users page."
               }
             />
-            {/* <PatchNoteEntry
-              title={"Caretaker mode"}
+            <PatchNoteEntry
+              title={"Crop Avatar on Upload"}
               kind="feature"
               description={
-                "Users can now request and assign a caretaker to manage their workload while away from work. Projects shown on your public profile are those that you are directly involved with. If there are any projects which you are already unofficially managing in a caretaker capacity, request to become that user's caretaker, then assign those projects to that user."
+                "Users may now crop the image they use for their avatar, should they choose to. This can be done by uploading an image from 'My SPMS Account' page, hovering over the image, and clicking the button on the top-left to crop. Once cropped, click 'Apply Changes' to update the avatar."
               }
-            /> */}
-            {/* <PatchNoteEntry
-              title={"Hide Projects From Public Profile"}
+            />
+            <PatchNoteEntry
+              title={"Project Map"}
               kind="feature"
               description={
-                "In addition to caretaker mode, you can directly hide any project you are a member of from your public profile. You can do this by visiting the project's overview tab and clicking the orange 'Hide From Staff Profile' button. This will not impact the project's visibility for other users."
+                "Users can now access a map page to visualise where projects are located as they search. This is a work in progress, and will be expanded upon in future updates. If you have any feedback or suggestions for this feature, please let us know!"
               }
             />
 
             <PatchNoteEntry
-              title={"Staff Profile Publications"}
+              title={"Area Selection Bug"}
+              kind="fix"
+              description={
+                "A bug has been patched which prevented selecting specific areas, and instead selected all areas for a given area type."
+              }
+            />
+            <PatchNoteEntry
+              title={"Email Modal Typo"}
+              kind="fix"
+              description={
+                "Fixed typo on email modal when submitting for approval."
+              }
+            />
+            <PatchNoteEntry
+              title={"Search by ID"}
+              kind="update"
+              description={
+                "Search functionality has been expanded to include the last part of a project's ID (e.g. '123' in EXT-2022-123). Users may filter year and project type as usual. This functionality will only work if there are no leading zeros in the ID search term (type '23' if '023')."
+              }
+            />
+            <PatchNoteEntry
+              title={"Elegant Errors"}
+              kind="update"
+              description={
+                "For public facing pages, error messages have been updated to be more user-friendly and informative to admins."
+              }
+            />
+            {/* <PatchNoteEntry
+              title={"Feedback on Documents"}
               kind="feature"
               description={
-                "Publications belonging to staff are now fetched from the library and displayed on their public profile. Users may also add additional publications."
+                "Business Area leads and the directorate can now provide feedback via the notification email when sending a document back for revisions."
               }
             /> */}
             {/* <PatchNoteEntry
-              title={"Easy Access to links"}
+              title={"Remedy Buttons"}
+              kind="fix"
+              description={
+                "A bug has been patched in the Remedy Problematic Project function which prevented all projects from being updated."
+              }
+            /> */}
+            {/* <PatchNoteEntry
+              title={"Modern Layout Updated"}
               kind="update"
               description={
-                "Access to data catalogue, scientific sites register, and your public profile is available on any page by clicking your name at the top-right of the page and selecting the appropriate link. Data catalogue is now also accessible on the home page."
+                "The second 'modern' layout has been adjusted to implement missing features already present on the default layout."
+              }
+            /> */}
+            {/* <PatchNoteEntry
+              title={"Documentation"}
+              kind="update"
+              description={
+                "Documentation / Quick GUide has been updated to reflect recent changes."
+              }
+            /> */}
+            {/* <PatchNoteEntry
+              title={"Email Feedback"}
+              kind="update"
+              description={
+                "Feedback email submission adjusted to go to shared inbox for ecoinformatics."
               }
             /> */}
             <PatchNoteEntry

@@ -440,6 +440,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             src={user?.image?.file ? user.image.file : user?.image?.old_file}
             size={"2xl"}
             userSelect={"none"}
+            draggable="false"
+            className="pointer-events-none"
           />
 
           <Flex
@@ -568,6 +570,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                     "/dbca.jpg"
                   }
                   objectFit="cover"
+                  className="pointer-events-none select-none"
                 />
                 <Center>
                   <Flex ml={3} flexDir="column">
@@ -815,6 +818,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                               : `${baseAPI}${user?.caretakers[0]?.image}`
                             : noImage
                         }
+                        className="pointer-events-none select-none"
                       />
                       <Box display={"flex"} flexDir={"column"}>
                         <Text
@@ -1175,6 +1179,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           <Flex alignItems={"center"}>
                             <Avatar
                               size="sm"
+                              className="pointer-events-none select-none"
                               name={`${obj.display_first_name} ${obj.display_last_name}`}
                               src={
                                 obj.image

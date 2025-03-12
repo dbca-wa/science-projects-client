@@ -16,6 +16,7 @@ import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 import { DisplayGuideSRTE } from "./Sections/DisplayGuideSRTE";
 import { EditableGuideSRTE } from "./Sections/EditableGuideSRTE";
+import { ImageNode } from "../Nodes/ImageNode";
 
 interface IProps {
   canEdit: boolean;
@@ -163,7 +164,14 @@ export const GuideRichTextEditor = ({
     editable: true,
     theme,
     onError,
-    nodes: [ListNode, ListItemNode, TableCellNode, TableNode, TableRowNode],
+    nodes: [
+      ListNode,
+      ListItemNode,
+      TableCellNode,
+      TableNode,
+      TableRowNode,
+      ImageNode,
+    ],
   };
 
   // if (section === "methodology") {

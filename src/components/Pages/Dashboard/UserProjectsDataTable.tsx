@@ -418,6 +418,7 @@ export const UserProjectsDataTable = ({
                 boxSize={"70px"}
                 rounded={"lg"}
                 ml={4}
+                className="pointer-events-none select-none"
               />
               <Box display={"flex"} flexDir={"column"}>
                 <Text

@@ -150,6 +150,7 @@ export const SetAreasModal = ({
                       <AreaCheckAndMaps
                         title="DBCA Districts"
                         areas={dbcaDistricts}
+                        area_type="dbcadistrict"
                         // required
                         selectedAreas={selectedDistricts}
                         setSelectedAreas={setSelectedDistricts}
@@ -162,6 +163,7 @@ export const SetAreasModal = ({
                       <AreaCheckAndMaps
                         title="IMCRAs"
                         areas={imcra}
+                        area_type="imcra"
                         // required
                         selectedAreas={selectedImcras}
                         setSelectedAreas={setSelectedImcras}
@@ -174,6 +176,7 @@ export const SetAreasModal = ({
                       <AreaCheckAndMaps
                         title="DBCA Regions"
                         areas={dbcaRegions}
+                        area_type="dbcaregion"
                         // required
                         selectedAreas={selectedRegions}
                         setSelectedAreas={setSelectedRegions}
@@ -186,6 +189,7 @@ export const SetAreasModal = ({
                       <AreaCheckAndMaps
                         title="Natural Resource Management Regions"
                         areas={nrm}
+                        area_type="nrm"
                         // required
                         selectedAreas={selectedNrms}
                         setSelectedAreas={setSelectedNrms}
@@ -197,6 +201,7 @@ export const SetAreasModal = ({
                       <AreaCheckAndMaps
                         title="IBRAs"
                         areas={ibra}
+                        area_type="ibra"
                         // required
                         selectedAreas={selectedIbras}
                         setSelectedAreas={setSelectedIbras}

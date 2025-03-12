@@ -748,6 +748,7 @@ export const ProjectOverviewCard = ({
                 objectFit={"cover"}
                 w={"100%"}
                 h={"100%"}
+                className="pointer-events-none select-none"
                 style={{ imageRendering: "crisp-edges", objectFit: "cover" }}
               />
             </Skeleton>

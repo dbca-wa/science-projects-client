@@ -6,7 +6,7 @@ import {
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -50,7 +50,7 @@ export const DisplaySRTE = ({
                   borderRadius: "0 0 25px 25px",
                   outline: "none",
                   overflowY: "scroll",
-                  msOverflowY: "scroll"
+                  msOverflowY: "scroll",
                 }}
               />
             </>

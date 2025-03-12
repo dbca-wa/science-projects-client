@@ -21,7 +21,7 @@ import {
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
@@ -163,6 +163,8 @@ ISREditorProps) => {
 
   const dragBtnMargin = 10;
   const toolBarHeight = 45;
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+
   const [aboveHeightSet, setAboveHeightSet] = useState<boolean>(false);
   const [aboveContentHeight, setAboveContentHeight] = useState<number>();
 
@@ -407,7 +409,10 @@ ISREditorProps) => {
               >
                 {/* Toolbar */}
                 {isEditing === false ? null : (
-                  <RevisedRichTextToolbar allowTable={false} />
+                  <RevisedRichTextToolbar
+                    allowTable={false}
+                    toolbarRef={toolbarRef}
+                  />
                 )}
 
                 <Box pos={"relative"}>

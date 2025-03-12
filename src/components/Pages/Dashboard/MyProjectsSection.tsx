@@ -48,6 +48,7 @@ export const MyProjectsSection = ({ data, loading }: IProjectSection) => {
               >
                 <ModernProjectCard
                   pk={project.pk !== undefined ? project.pk : project.id}
+                  areas={project.areas}
                   image={project.image}
                   title={project.title}
                   description={project.description}

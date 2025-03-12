@@ -17,10 +17,10 @@ import { useGetRTESectionPlaceholder } from "@/lib/hooks/helper/useGetRTESection
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
 import {
   EditorSections,
@@ -96,6 +96,9 @@ export const EditableSRTE = ({
 }: Props) => {
   const dragBtnMargin = 10;
   const toolBarHeight = 37;
+
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
@@ -149,6 +152,7 @@ export const EditableSRTE = ({
                     ? false
                     : true
                 }
+                toolbarRef={toolbarRef}
               />
 
               <Box className="editor-scroller">

@@ -8,7 +8,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { $getRoot } from "lexical";
+import { $getRoot, LexicalNode } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 // import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import DraggableBlockPlugin from "@/components/RichTextEditor/Plugins/DraggableBlockPlugin";
@@ -17,7 +17,7 @@ import { useGetRTESectionPlaceholder } from "@/lib/hooks/helper/useGetRTESection
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import React, { useEffect, useState } from "react";
@@ -28,6 +28,9 @@ import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialSta
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
 import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
 import { RevisedRichTextToolbar } from "../../Toolbar/RevisedRichTextToolbar";
+import { $isImageNode } from "../../Nodes/ImageNode";
+import { ImagePlugin } from "../../Plugins/ImagesPlugin";
+import { set } from "lodash";
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 // import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -77,8 +80,42 @@ export const EditableGuideSRTE = ({
   setCanSave,
   adminOptionsPk,
 }: Props) => {
+  const toolbarRef = React.useRef<HTMLDivElement | null>(null);
+
   const dragBtnMargin = 10;
-  const toolBarHeight = 45;
+  const [toolbarHeight, setToolbarHeight] = useState(37); // Default height
+
+  useEffect(() => {
+    // Initial measurement
+    if (toolbarRef.current) {
+      setToolbarHeight(toolbarRef.current.clientHeight);
+    }
+
+    // Set up a ResizeObserver to detect height changes
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        console.log("Toolbar height changed:", entry.target.clientHeight);
+        setToolbarHeight(entry.target.clientHeight);
+      }
+    });
+
+    // Start observing the toolbar element
+    if (toolbarRef.current) {
+      resizeObserver.observe(toolbarRef.current);
+    }
+
+    // Clean up
+    return () => {
+      if (toolbarRef.current) {
+        resizeObserver.unobserve(toolbarRef.current);
+      }
+      resizeObserver.disconnect();
+    };
+  }, []); // Empty dependency array means this runs once after mount
+
+  // Using the height in your component
+  console.log("Current toolbar height:", toolbarHeight);
+
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
@@ -115,6 +152,44 @@ export const EditableGuideSRTE = ({
   // const [blockType, setBlockType] =
   //   useState<keyof typeof blockTypeToBlockName>("paragraph");
 
+  const processEditorOutput = (editor) => {
+    // First get standard HTML
+    let html = $generateHtmlFromNodes(editor, null);
+
+    // Process editor state to ensure images are included
+    editor.getEditorState().read(() => {
+      // Track if we've added any images
+      let hasAddedImages = false;
+
+      // Find all image nodes
+      editor._editorState._nodeMap.forEach((node) => {
+        if (node.__type === "image") {
+          const src = node.__src;
+          // Check if this image is already in the HTML
+          if (!html.includes(src)) {
+            // If not, add it to the HTML
+            if (!hasAddedImages) {
+              html += '<div class="appended-images">';
+              hasAddedImages = true;
+            }
+
+            const altText = node.__altText || "";
+            const width = node.__width ? ` width="${node.__width}"` : "";
+            const height = node.__height ? ` height="${node.__height}"` : "";
+
+            html += `<img src="${src}" alt="${altText}"${width}${height} style="max-width:100%;">`;
+          }
+        }
+      });
+
+      if (hasAddedImages) {
+        html += "</div>";
+      }
+    });
+
+    return html;
+  };
+
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -122,18 +197,21 @@ export const EditableGuideSRTE = ({
         <TablePlugin hasCellMerge={true} hasCellBackgroundColor={false} />
         <HistoryPlugin />
         <ListPlugin />
+        <ImagePlugin />
 
         <OnChangePlugin
           onChange={(editorState, editor) => {
             editorState.read(() => {
               const root = $getRoot();
-
               setEditorText(root.__cachedText);
-              const newHtml = $generateHtmlFromNodes(editor, null);
+
+              // Get HTML with custom handling for images
+              const newHtml = processEditorOutput(editor);
               setDisplayData(newHtml);
             });
           }}
         />
+
         {/* {data !== undefined && data !== null && ( */}
         <PrepopulateHTMLPlugin data={data} />
         {/* )} */}
@@ -147,7 +225,11 @@ export const EditableGuideSRTE = ({
               maxW={"100%"}
             >
               {/* Toolbar */}
-              <RevisedRichTextToolbar allowTable={true} />
+              <RevisedRichTextToolbar
+                allowTable={true}
+                allowImages={true}
+                toolbarRef={toolbarRef}
+              />
 
               <Box className="editor-scroller">
                 <Box
@@ -182,7 +264,7 @@ export const EditableGuideSRTE = ({
               style={{
                 position: "absolute",
                 left: `${32 + dragBtnMargin}px`,
-                top: `${30 + toolBarHeight}px`,
+                top: `${30 + toolbarHeight}px`,
                 userSelect: "none",
                 pointerEvents: "none",
                 color: "gray",
@@ -196,7 +278,7 @@ export const EditableGuideSRTE = ({
         {floatingAnchorElem !== null && (
           <DraggableBlockPlugin
             anchorElem={floatingAnchorElem}
-            toolbarHeight={toolBarHeight}
+            toolbarHeight={toolbarHeight}
           />
         )}
 
