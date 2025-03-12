@@ -214,6 +214,7 @@ export const ModernProjectCard = ({
               h={"100%"}
               w={"100%"}
               style={{ imageRendering: "crisp-edges", objectFit: "cover" }}
+              className="pointer-events-none select-none"
             />
 
             <Box

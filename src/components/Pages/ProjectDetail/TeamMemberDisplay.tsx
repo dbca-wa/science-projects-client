@@ -221,6 +221,7 @@ export const TeamMemberDisplay = ({
               userSelect={"none"}
               onClick={onUserOpen}
               cursor="pointer"
+              className="pointer-events-none select-none"
             />
             {is_leader && (
               <Box pos={"absolute"} color={"yellow.300"} top={-1} right={"38%"}>
