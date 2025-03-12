@@ -373,10 +373,10 @@ const staffProfilesAppArray = [
 
 export const router = createBrowserRouter(
   [...inAppRouteArray, ...staffProfilesAppArray],
-  {
-    future: {
-      v7_fetcherPersist: true,
-      v7_relativeSplatPath: true,
-    },
-  },
+  // {
+  //   future: {
+  //     v7_fetcherPersist: true,
+  //     v7_relativeSplatPath: true,
+  //   },
+  // },
 );
