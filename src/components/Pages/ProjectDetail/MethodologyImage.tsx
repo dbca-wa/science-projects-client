@@ -40,7 +40,7 @@ export const MethodologyImage = ({
   helperText,
 }: Props) => {
   const { colorMode } = useColorMode();
-  const fileInputRef = useRef(null); // Add this ref for the file input
+  const fileInputRef = useRef(null); // ref for the file input
 
   const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState<boolean>(true);
@@ -253,13 +253,7 @@ export const MethodologyImage = ({
                           w={"100%"}
                           h={"100%"}
                           draggable="false"
-                          style={{
-                            WebkitUserDrag: "none",
-                            KhtmlUserDrag: "none",
-                            MozUserDrag: "none",
-                            OUserDrag: "none",
-                            userDrag: "none",
-                          }}
+                          className="pointer-events-none select-none"
                         />
                       </Box>
                     </Box>

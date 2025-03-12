@@ -56,6 +56,7 @@ root.render(
                 router={router}
                 future={{
                   v7_startTransition: true,
+                  v7_fetcherPersist: true,
                 }}
               />
             </ProjectMapSearchProvider>
