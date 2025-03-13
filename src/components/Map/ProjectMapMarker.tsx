@@ -21,6 +21,8 @@ interface ProjectMapMarkerProps {
   areaIbra: ISimpleLocationData[];
   areaImcra: ISimpleLocationData[];
   areaNrm: ISimpleLocationData[];
+  toggleMapLoading: (loading: boolean) => void;
+  selectedLocations: number[];
 }
 
 const ProjectMapMarker = ({
@@ -36,7 +38,17 @@ const ProjectMapMarker = ({
   areaIbra,
   areaImcra,
   areaNrm,
+  toggleMapLoading,
+  selectedLocations,
 }: ProjectMapMarkerProps) => {
+  // Helper function to determine if a project has a selected location
+  const hasSelectedLocation = (project: IProjectData) => {
+    if (!selectedLocations || selectedLocations.length === 0) return true; // If no locations selected, all are "selected"
+    return project.areas?.some((areaPk) =>
+      selectedLocations.includes(Number(areaPk)),
+    );
+  };
+
   const statusDictionary = {
     new: { label: "New", color: "gray.500" },
     pending: { label: "Pending Project Plan", color: "yellow.500" },
@@ -205,6 +217,9 @@ const ProjectMapMarker = ({
   useEffect(() => {
     if (!mapRef.current) return;
 
+    // Show loading when starting to update markers
+    toggleMapLoading(true);
+
     // Clear existing layers
     if (markerLayerRef.current) {
       markerLayerRef.current.clearLayers();
@@ -233,12 +248,26 @@ const ProjectMapMarker = ({
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
     }
 
+    // Hide loading when done with a small delay to ensure visibility
+    setTimeout(() => {
+      toggleMapLoading(false);
+    }, 500);
+
     return () => {
       if (markerLayerRef.current) {
         markerLayerRef.current.clearLayers();
       }
     };
-  }, [projects, mapRef.current, dbcaRegions, dbcaDistricts, nrm, ibra, imcra]);
+  }, [
+    projects,
+    mapRef.current,
+    dbcaRegions,
+    dbcaDistricts,
+    nrm,
+    ibra,
+    imcra,
+    selectedLocations,
+  ]); // Add selectedLocations to dependencies
 
   // Create a single project marker
   const createSingleMarker = (
@@ -246,6 +275,11 @@ const ProjectMapMarker = ({
     coords: [number, number],
   ) => {
     if (!markerLayerRef.current) return;
+
+    // Determine if this project is in a selected location
+    const isSelected = hasSelectedLocation(project);
+    const markerColor = isSelected ? "green" : "gray";
+    const textColor = isSelected ? "green" : "gray";
 
     const marker = L.marker(coords, {
       title: stripHtml(project.title),
@@ -267,7 +301,7 @@ const ProjectMapMarker = ({
                 absolute
                 w-8 h-8
                 rounded-full
-                bg-green-500
+                bg-${markerColor}-500
                 left-0
                 shadow-md
                 z-10
@@ -277,7 +311,7 @@ const ProjectMapMarker = ({
               <div class="
                 absolute
                 w-4 h-4
-                bg-green-500
+                bg-${markerColor}-500
                 transform rotate-45
                 top-6
                 left-2
@@ -294,7 +328,7 @@ const ProjectMapMarker = ({
                 top-1
                 left-1
                 flex items-center justify-center
-                text-xs font-bold text-green-600
+                text-xs font-bold text-${textColor}-600
                 z-20
               ">1</div>
             </div>
@@ -329,6 +363,12 @@ const ProjectMapMarker = ({
   ) => {
     if (!markerLayerRef.current) return;
 
+    const anySelected = projects.some((project) =>
+      hasSelectedLocation(project),
+    );
+    const markerColor = anySelected ? "green" : "gray";
+    const textColor = anySelected ? "green" : "gray";
+
     const marker = L.marker(coords, {
       title: `${projects.length} projects at this location`,
       icon: L.divIcon({
@@ -349,7 +389,7 @@ const ProjectMapMarker = ({
                 absolute
                 w-8 h-8
                 rounded-full
-                bg-green-500
+                bg-${markerColor}-500
                 left-0
                 shadow-md
                 z-10
@@ -359,7 +399,7 @@ const ProjectMapMarker = ({
               <div class="
                 absolute
                 w-4 h-4
-                bg-green-500
+                bg-${markerColor}-500
                 transform rotate-45
                 top-6
                 left-2
@@ -376,7 +416,7 @@ const ProjectMapMarker = ({
                 top-1
                 left-1
                 flex items-center justify-center
-                text-xs font-bold text-green-600
+                text-xs font-bold text-${textColor}-600
                 z-20
               ">${projects.length}</div>
             </div>
@@ -399,6 +439,8 @@ const ProjectMapMarker = ({
         popupAnchor: [0, -36],
       }),
     });
+
+    marker.addTo(markerLayerRef.current);
 
     // Create popup using the MultiProjectPopup component
     // Sort it based on status:

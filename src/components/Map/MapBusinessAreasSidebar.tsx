@@ -51,7 +51,8 @@ interface MapBusinessAreasSidebarProps {
   baLoading: boolean;
   selectedBas: IBusinessArea[];
   setSelectedBas: React.Dispatch<React.SetStateAction<IBusinessArea[]>>;
-  setIsMapLoading: React.Dispatch<React.SetStateAction<boolean>>; // Add this prop
+  setIsMapLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleMapLoading: (loading: boolean) => void;
 }
 
 const MapBusinessAreasSidebar = ({
@@ -63,6 +64,7 @@ const MapBusinessAreasSidebar = ({
   selectedBas,
   setSelectedBas,
   setIsMapLoading,
+  toggleMapLoading,
 }: MapBusinessAreasSidebarProps) => {
   const [isUpdatingMap, setIsUpdatingMap] = useState(false);
   const prevSelectedBas = useRef<IBusinessArea[]>([]);

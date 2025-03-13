@@ -60,6 +60,7 @@ interface MapLocationsSidebarProps {
   areaNrm: ISimpleLocationData[];
   areaLocationsLoading: boolean;
   filteredItems: IProjectData[];
+  toggleMapLoading: (loading: boolean) => void;
 }
 
 const MapLocationsSidebar = ({
@@ -80,6 +81,7 @@ const MapLocationsSidebar = ({
   areaNrm,
   areaLocationsLoading,
   filteredItems,
+  toggleMapLoading,
 }: MapLocationsSidebarProps) => {
   const [showLabels, setShowLabels] = useState(true);
   const [showColors, setShowColors] = useState(true);
@@ -857,6 +859,9 @@ const MapLocationsSidebar = ({
   ]);
 
   const toggleMainLayer = (layerId) => {
+    if (toggleMapLoading) {
+      toggleMapLoading(true);
+    }
     setLayerData((prev) => {
       const newData = { ...prev };
       const layer = newData[layerId];
@@ -871,6 +876,17 @@ const MapLocationsSidebar = ({
       return newData;
     });
   };
+
+  useEffect(() => {
+    // Skip initial render
+    if (Object.keys(layerData).length === 0) return;
+
+    const timer = setTimeout(() => {
+      if (toggleMapLoading) toggleMapLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [layerData, toggleMapLoading]);
 
   const toggleSubRegion = (layerId: string, subRegionName: string) => {
     setLayerData((prev) => {
