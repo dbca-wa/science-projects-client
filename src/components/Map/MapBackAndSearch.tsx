@@ -8,7 +8,7 @@ import { Input } from "../ui/input";
 import MapSidebarSection from "./MapSidebarSection";
 import ProjectMapMarker from "./ProjectMapMarker";
 import SearchProjectsByUser from "../Navigation/SearchProjectsByUser";
-import { Button } from "../ui/button";
+import clsx from "clsx";
 
 interface MapLocationsSidebarProps {
   filteredItems: IProjectData[];
@@ -116,20 +116,47 @@ const MapBackAndSearch = ({
     (project) => project.areas?.length > 0,
   );
 
-  // console.log("Filtered Items:", filteredItems);
-  // console.log("First Project with Area:", firstProjectWithArea);
-
+  // Filter projects with area
   const filteredItemsWithArea = filteredItems?.filter(
     (project) => project.areas?.length > 0,
   );
 
+  // IMPORTANT: ProjectMapMarker is now rendered outside the accordion content
+  // but still inside the component to maintain its rendering lifecycle
+  const renderProjectMapMarker = () => {
+    if (!filteredItems) return null;
+
+    return (
+      <ProjectMapMarker
+        projects={filteredItems}
+        mapRef={mapRef}
+        dbcaRegions={dbcaRegions}
+        dbcaDistricts={dbcaDistricts}
+        nrm={nrm}
+        ibra={ibra}
+        imcra={imcra}
+        areaDbcaRegions={areaDbcaRegions}
+        areaDbcaDistricts={areaDbcaDistricts}
+        areaIbra={areaIbra}
+        areaImcra={areaImcra}
+        areaNrm={areaNrm}
+        toggleMapLoading={toggleMapLoading}
+        selectedLocations={selectedLocations}
+        selectedBas={selectedBas}
+      />
+    );
+  };
+
   return (
     <>
+      {/* Render ProjectMapMarker outside but before the accordion */}
+      {renderProjectMapMarker()}
+
       <MapSidebarSection className="pb-0" title="Search">
         <div className="mt-2 flex h-full flex-col gap-4">
           <Input
             placeholder="Search for a project..."
-            className="h-8 w-full"
+            className={clsx("z-50 my-0 h-8 text-sm")}
             onChange={handleChange}
           />
           <SearchProjectsByUser
@@ -137,28 +164,9 @@ const MapBackAndSearch = ({
           />
         </div>
 
-        {filteredItems && (
-          <ProjectMapMarker
-            projects={filteredItems}
-            mapRef={mapRef}
-            dbcaRegions={dbcaRegions}
-            dbcaDistricts={dbcaDistricts}
-            nrm={nrm}
-            ibra={ibra}
-            imcra={imcra}
-            areaDbcaRegions={areaDbcaRegions}
-            areaDbcaDistricts={areaDbcaDistricts}
-            areaIbra={areaIbra}
-            areaImcra={areaImcra}
-            areaNrm={areaNrm}
-            toggleMapLoading={toggleMapLoading}
-            selectedLocations={selectedLocations}
-            selectedBas={selectedBas}
-          />
-        )}
-
         <p className="-mb-4 mt-4 w-full text-right text-xs text-gray-500">
-          {filteredItemsWithArea.length}/{filteredItems.length} locations filled
+          {filteredItemsWithArea?.length || 0}/{filteredItems?.length || 0}{" "}
+          locations filled
         </p>
       </MapSidebarSection>
     </>
