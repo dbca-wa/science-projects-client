@@ -18,6 +18,7 @@ const ProjectsMap = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [isMapLoading, setIsMapLoading] = useState(false);
 
   // Project Search context
   const {
@@ -85,6 +86,17 @@ const ProjectsMap = () => {
         ref={mapContainerRef}
         className="absolute bottom-0 left-96 right-0 top-0 z-40"
       />
+
+      {isMapLoading && (
+        <div className="absolute bottom-0 left-96 right-0 top-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm">
+          <div className="flex flex-col items-center rounded-lg bg-white/90 p-4 shadow-lg">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+            <p className="mt-3 text-sm font-medium text-gray-700">
+              Updating map...
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ====== MAP CONTROLS ====== */}
       <MapTopRightControls mapRef={mapRef} mapContainerRef={mapContainerRef} />
@@ -159,6 +171,7 @@ const ProjectsMap = () => {
           baLoading={baLoading}
           selectedBas={selectedBas}
           setSelectedBas={setSelectedBas}
+          setIsMapLoading={setIsMapLoading}
         />
       </div>
 
