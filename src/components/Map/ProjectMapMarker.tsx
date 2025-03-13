@@ -1,4 +1,4 @@
-import { IProjectData, ISimpleLocationData } from "@/types";
+import { IBusinessArea, IProjectData, ISimpleLocationData } from "@/types";
 import L from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -23,6 +23,7 @@ interface ProjectMapMarkerProps {
   areaNrm: ISimpleLocationData[];
   toggleMapLoading: (loading: boolean) => void;
   selectedLocations: number[];
+  selectedBas: IBusinessArea[];
 }
 
 const ProjectMapMarker = ({
@@ -40,7 +41,20 @@ const ProjectMapMarker = ({
   areaNrm,
   toggleMapLoading,
   selectedLocations,
+  selectedBas,
 }: ProjectMapMarkerProps) => {
+  const isProjectSelected = (project: IProjectData) => {
+    return true;
+    // If no business areas are selected, all are considered "selected"
+    if (!selectedBas || selectedBas.length === 0) return true;
+
+    // If the project doesn't have a business area, it shouldn't be selected
+    if (!project.business_area) return false;
+
+    // Check if the project's business area is in the selected list
+    return selectedBas.some((ba) => ba.pk === project.business_area.pk);
+  };
+
   // Helper function to determine if a project has a selected location
   const hasSelectedLocation = (project: IProjectData) => {
     if (!selectedLocations || selectedLocations.length === 0) return true; // If no locations selected, all are "selected"
@@ -267,7 +281,8 @@ const ProjectMapMarker = ({
     ibra,
     imcra,
     selectedLocations,
-  ]); // Add selectedLocations to dependencies
+    selectedBas, // Add this dependency
+  ]);
 
   // Create a single project marker
   const createSingleMarker = (
@@ -277,9 +292,9 @@ const ProjectMapMarker = ({
     if (!markerLayerRef.current) return;
 
     // Determine if this project is in a selected location
-    const isSelected = hasSelectedLocation(project);
-    const markerColor = isSelected ? "green" : "gray";
-    const textColor = isSelected ? "green" : "gray";
+    const isSelected = isProjectSelected(project);
+    const pinBgClass = isSelected ? "bg-green-500" : "bg-gray-500";
+    const textClass = isSelected ? "text-green-600" : "text-gray-600";
 
     const marker = L.marker(coords, {
       title: stripHtml(project.title),
@@ -287,7 +302,6 @@ const ProjectMapMarker = ({
         className: "bg-transparent border-none",
         html: `
           <div class="relative">
-            <!-- Pin with drop shadow effect -->
             <div class="
               relative
               w-10 h-10
@@ -296,22 +310,20 @@ const ProjectMapMarker = ({
               hover:translate-y-1
               cursor-pointer
             ">
-              <!-- Pin shape - top rounded part -->
               <div class="
                 absolute
                 w-8 h-8
                 rounded-full
-                bg-${markerColor}-500
+                ${pinBgClass}
                 left-0
                 shadow-md
                 z-10
               "></div>
               
-              <!-- Pin shape - bottom pointy part -->
               <div class="
                 absolute
                 w-4 h-4
-                bg-${markerColor}-500
+                ${pinBgClass}
                 transform rotate-45
                 top-6
                 left-2
@@ -319,7 +331,6 @@ const ProjectMapMarker = ({
                 z-0
               "></div>
               
-              <!-- Inner white circle for contrast -->
               <div class="
                 absolute
                 w-6 h-6
@@ -328,12 +339,11 @@ const ProjectMapMarker = ({
                 top-1
                 left-1
                 flex items-center justify-center
-                text-xs font-bold text-${textColor}-600
+                text-xs font-bold ${textClass}
                 z-20
               ">1</div>
             </div>
             
-            <!-- Subtle drop shadow for depth -->
             <div class="
               absolute
               w-4 h-1
@@ -363,11 +373,10 @@ const ProjectMapMarker = ({
   ) => {
     if (!markerLayerRef.current) return;
 
-    const anySelected = projects.some((project) =>
-      hasSelectedLocation(project),
-    );
-    const markerColor = anySelected ? "green" : "gray";
-    const textColor = anySelected ? "green" : "gray";
+    const anySelected = projects.some((project) => isProjectSelected(project));
+
+    const pinBgClass = anySelected ? "bg-green-500" : "bg-gray-500";
+    const textClass = anySelected ? "text-green-600" : "text-gray-600";
 
     const marker = L.marker(coords, {
       title: `${projects.length} projects at this location`,
@@ -375,7 +384,6 @@ const ProjectMapMarker = ({
         className: "bg-transparent border-none",
         html: `
           <div class="relative">
-            <!-- Pin with drop shadow effect -->
             <div class="
               relative
               w-8 h-8
@@ -384,22 +392,20 @@ const ProjectMapMarker = ({
               hover:translate-y-1
               cursor-pointer
             ">
-              <!-- Pin shape - top rounded part -->
               <div class="
                 absolute
                 w-8 h-8
                 rounded-full
-                bg-${markerColor}-500
+                ${pinBgClass}
                 left-0
                 shadow-md
                 z-10
               "></div>
               
-              <!-- Pin shape - bottom pointy part -->
               <div class="
                 absolute
                 w-4 h-4
-                bg-${markerColor}-500
+                ${pinBgClass}
                 transform rotate-45
                 top-6
                 left-2
@@ -407,7 +413,6 @@ const ProjectMapMarker = ({
                 z-0
               "></div>
               
-              <!-- White number circle for count -->
               <div class="
                 absolute
                 w-6 h-6
@@ -416,12 +421,11 @@ const ProjectMapMarker = ({
                 top-1
                 left-1
                 flex items-center justify-center
-                text-xs font-bold text-${textColor}-600
+                text-xs font-bold ${textClass}
                 z-20
               ">${projects.length}</div>
             </div>
             
-            <!-- Subtle drop shadow for depth -->
             <div class="
               absolute
               w-4 h-1

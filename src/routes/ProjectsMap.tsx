@@ -171,6 +171,7 @@ const ProjectsMap = () => {
           areaNrm={areaNrm}
           areaLocationsLoading={areaLocationsLoading}
           toggleMapLoading={toggleMapLoading}
+          selectedBas={selectedBas}
         />
 
         {/* LOCATIONS */}
