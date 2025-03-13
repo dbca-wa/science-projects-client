@@ -19,6 +19,37 @@ const ProjectsMap = () => {
   const mapRef = useRef<L.Map | null>(null);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [isMapLoading, setIsMapLoading] = useState(false);
+  const loadingControlRef = useRef<L.Control | null>(null);
+
+  // Add a function to control the map loading state
+  const toggleMapLoading = (loading: boolean) => {
+    setIsMapLoading(loading);
+
+    // Create or remove a loading control on the map
+    if (loading && mapRef.current) {
+      if (!loadingControlRef.current) {
+        const LoadingControl = L.Control.extend({
+          onAdd: function () {
+            const container = L.DomUtil.create("div", "map-loading-control");
+            container.innerHTML = `
+              <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white/90 p-4 shadow-lg">
+                <div class="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+                <p class="mt-3 text-sm font-medium text-gray-700">Updating map...</p>
+              </div>
+            `;
+            return container;
+          },
+        });
+
+        loadingControlRef.current = new LoadingControl({
+          position: "topright",
+        }).addTo(mapRef.current);
+      }
+    } else if (!loading && loadingControlRef.current) {
+      loadingControlRef.current.remove();
+      loadingControlRef.current = null;
+    }
+  };
 
   // Project Search context
   const {
@@ -87,6 +118,7 @@ const ProjectsMap = () => {
         className="absolute bottom-0 left-96 right-0 top-0 z-40"
       />
 
+      {/* Global loading overlay */}
       {isMapLoading && (
         <div className="absolute bottom-0 left-96 right-0 top-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm">
           <div className="flex flex-col items-center rounded-lg bg-white/90 p-4 shadow-lg">
@@ -138,6 +170,7 @@ const ProjectsMap = () => {
           areaImcra={areaImcra}
           areaNrm={areaNrm}
           areaLocationsLoading={areaLocationsLoading}
+          toggleMapLoading={toggleMapLoading}
         />
 
         {/* LOCATIONS */}
@@ -160,6 +193,7 @@ const ProjectsMap = () => {
           areaNrm={areaNrm}
           areaLocationsLoading={areaLocationsLoading}
           filteredItems={filteredItems}
+          toggleMapLoading={toggleMapLoading}
         />
 
         {/* BUSINESS AREAS */}
@@ -171,6 +205,7 @@ const ProjectsMap = () => {
           baLoading={baLoading}
           selectedBas={selectedBas}
           setSelectedBas={setSelectedBas}
+          toggleMapLoading={toggleMapLoading}
           setIsMapLoading={setIsMapLoading}
         />
       </div>

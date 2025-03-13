@@ -37,6 +37,7 @@ interface MapLocationsSidebarProps {
   areaImcra: ISimpleLocationData[];
   areaNrm: ISimpleLocationData[];
   areaLocationsLoading: boolean;
+  toggleMapLoading: (loading: boolean) => void;
 }
 
 const MapBackAndSearch = ({
@@ -66,6 +67,7 @@ const MapBackAndSearch = ({
   areaIbra,
   areaImcra,
   areaNrm,
+  toggleMapLoading,
 }: MapLocationsSidebarProps) => {
   const { baLoading, baData } = useBusinessAreas();
   const [inputValue, setInputValue] = useState("");
@@ -143,6 +145,8 @@ const MapBackAndSearch = ({
           areaIbra={areaIbra}
           areaImcra={areaImcra}
           areaNrm={areaNrm}
+          toggleMapLoading={toggleMapLoading}
+          selectedLocations={selectedLocations}
         />
       )}
 
