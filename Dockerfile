@@ -7,8 +7,6 @@
 FROM oven/bun:1.2.5-alpine AS build_image
 
 WORKDIR /app
-
-# COPY package.json .
 COPY package*.json ./
 
 # Install dependencies, including devDependencies needed for the build process (no --omit=dev)
@@ -56,10 +54,9 @@ RUN mkdir -p /client/node_modules && \
     chmod -R u+rwX /client
 
 # Install serve to serve the built files
-# RUN npm install serve -g
-# Install serve to serve the built files
+# RUN npm install serve -g #FOR NODE
 RUN bun add serve
-RUN bun install -g serve 
+
 # Switch to the bun user
 USER bun
 

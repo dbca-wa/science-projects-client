@@ -14,21 +14,21 @@ export const useGetLocationsGeojson = () => {
         // Load all GeoJSON files in parallel
         const [regionsData, districtsData, nrmData, ibraData, imcraData] =
           await Promise.all([
-            fetch(
-              "/src/scripts/data/optimized/optimized_DBCA_REGION_DATA.geojson",
-            ).then((res) => res.json()),
-            fetch(
-              "/src/scripts/data/optimized/optimized_DBCA_DISTRICT_DATA.geojson",
-            ).then((res) => res.json()),
-            fetch(
-              "/src/scripts/data/optimized/optimized_NRM_DATA.geojson",
-            ).then((res) => res.json()),
-            fetch(
-              "/src/scripts/data/optimized/optimized_IBRA_DATA.geojson",
-            ).then((res) => res.json()),
-            fetch(
-              "/src/scripts/data/optimized/optimized_IMCRA_DATA.geojson",
-            ).then((res) => res.json()),
+            fetch("/data/optimized/optimized_DBCA_REGION_DATA.geojson").then(
+              (res) => res.json(),
+            ),
+            fetch("/data/optimized/optimized_DBCA_DISTRICT_DATA.geojson").then(
+              (res) => res.json(),
+            ),
+            fetch("/data/optimized/optimized_NRM_DATA.geojson").then((res) =>
+              res.json(),
+            ),
+            fetch("/data/optimized/optimized_IBRA_DATA.geojson").then((res) =>
+              res.json(),
+            ),
+            fetch("/data/optimized/optimized_IMCRA_DATA.geojson").then((res) =>
+              res.json(),
+            ),
           ]);
 
         // const [regionsData, districtsData, nrmData, ibraData, imcraData] =
