@@ -2,7 +2,7 @@
 
 # ======================== BUILD IMAGE ========================
 # Uses deps and env vars to bake / build the app
-FROM node:22-alpine3.19 as BUILD_IMAGE
+FROM node:23-alpine3.20 as BUILD_IMAGE
 WORKDIR /app
 
 # COPY package.json .
