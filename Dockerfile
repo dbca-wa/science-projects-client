@@ -4,7 +4,7 @@
 # Uses deps and env vars to bake / build the app
 # FROM node:23-alpine3.20 as BUILD_IMAGE
 # Swap to bun for faster builds
-FROM oven/bun:latest AS build_image 
+FROM oven/bun:1.2.5-alpine AS build_image
 
 WORKDIR /app
 
@@ -13,6 +13,7 @@ COPY package*.json ./
 
 # Install dependencies, including devDependencies needed for the build process (no --omit=dev)
 # RUN npm install
+RUN bun add -d esbuild@0.25.0
 RUN bun install
 
 
@@ -41,7 +42,7 @@ RUN bun run build
 # ======================== PRODUCTION IMAGE ========================
 # Uses baked / buiilt app and server w/o large dependencies
 # FROM node:22-alpine3.19 as PRODUCTION_IMAGE
-FROM oven/bun:slim AS production_image
+FROM oven/bun:1.2.5-slim AS production_image
 
 
 # Copy built files from the build stage to working dir
