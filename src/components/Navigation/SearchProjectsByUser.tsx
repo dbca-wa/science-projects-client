@@ -11,7 +11,7 @@ const SearchProjectsByUser = ({
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
 
   useEffect(() => {
-    console.log("Selected User: ", selectedUser);
+    // console.log("Selected User: ", selectedUser);
     handleFilterUserChange(selectedUser);
   }, [selectedUser]);
 

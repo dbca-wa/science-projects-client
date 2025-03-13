@@ -210,7 +210,7 @@ const ProjectMapMarker = ({
     });
 
     setMatchStats(stats);
-    console.log("Map matching stats:", stats);
+    // console.log("Map matching stats:", stats);
     return locationMap;
   };
 

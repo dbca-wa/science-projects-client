@@ -113,8 +113,8 @@ const MapBackAndSearch = ({
     (project) => project.areas?.length > 0,
   );
 
-  console.log("Filtered Items:", filteredItems);
-  console.log("First Project with Area:", firstProjectWithArea);
+  // console.log("Filtered Items:", filteredItems);
+  // console.log("First Project with Area:", firstProjectWithArea);
 
   const filteredItemsWithArea = filteredItems?.filter(
     (project) => project.areas?.length > 0,
