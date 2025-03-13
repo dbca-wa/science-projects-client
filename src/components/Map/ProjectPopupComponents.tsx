@@ -1,6 +1,8 @@
 import React from "react";
 import { IProjectData } from "@/types";
 import DOMPurify from "dompurify";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 
 // Function to strip HTML tags and sanitize content
 export const stripHtml = (html: string) => {
@@ -50,6 +52,9 @@ const statusDictionary = {
 };
 
 export const ProjectPopup: React.FC<ProjectPopupProps> = ({ project }) => {
+  const baseAPI = useApiEndpoint();
+  const noImage = useNoImage();
+
   const status = statusDictionary[project.status];
 
   return (
@@ -88,6 +93,9 @@ interface MultiProjectPopupProps {
 export const MultiProjectPopup: React.FC<MultiProjectPopupProps> = ({
   projects,
 }) => {
+  const baseAPI = useApiEndpoint();
+  const noImage = useNoImage();
+
   return (
     <div className="max-w-md p-3">
       <h3 className="mb-3 text-lg font-bold">
@@ -135,10 +143,30 @@ export const MultiProjectPopup: React.FC<MultiProjectPopupProps> = ({
 };
 
 // Function to create HTML string from React component
+// Function to create HTML string from React component
 export const renderToString = (
   Component: React.FC<any>,
   props: any,
 ): string => {
+  // Instead of using hooks, directly determine the values
+  // Replicate useApiEndpoint logic
+  const VITE_PRODUCTION_BASE_URL =
+    import.meta.env.VITE_PRODUCTION_BASE_URL || "";
+  let baseAPI = VITE_PRODUCTION_BASE_URL;
+
+  if (baseAPI?.endsWith("/")) {
+    baseAPI = baseAPI.slice(0, -1);
+  }
+
+  // If not in production (during development), use localhost
+  if (process.env.NODE_ENV !== "production") {
+    baseAPI = "http://127.0.0.1:8000";
+  }
+
+  // Replicate useNoImage logic - since we don't have access to colorMode here,
+  // we'll just use the light theme version or you can pass colorMode as a parameter
+  const noImage = "/no-image-light2.jpg";
+
   const tempDiv = document.createElement("div");
 
   // Create a new React root and render the component to it
@@ -149,8 +177,23 @@ export const renderToString = (
   // For a simple component, we can capture its rendering logic
   if (Component === ProjectPopup) {
     const project = props.project;
+
+    // Check if project has an image
+    const hasImage = project.image && project.image.id;
+    const imageUrl = hasImage ? `${project.image.file}` : noImage;
+    // if (hasImage) {
+    //   console.log(imageUrl);
+    // }
+
     root.innerHTML = `
       <div class="p-3 max-w-md">
+        ${
+          hasImage
+            ? `<div class="mb-3 rounded-lg overflow-hidden">
+            <img src="${imageUrl}" alt="${stripHtml(project.title)}" class="w-full object-cover h-40" />
+          </div>`
+            : ""
+        }
         <h3 class="font-bold text-lg mb-2">${stripHtml(project.title)}</h3>
         ${project.tagline ? `<p class="text-sm text-gray-600 mb-2">${stripHtml(project.tagline)}</p>` : ""}
         <div class="flex flex-col gap-2 text-sm">
@@ -180,32 +223,43 @@ export const renderToString = (
         <h3 class="font-bold text-lg mb-3">${projects.length} Projects at this Location</h3>
         <div class="max-h-64 overflow-y-auto">
           ${projects
-            .map(
-              (project, index) => `
-            <div class="mb-4 pb-3 ${index < projects.length - 1 ? "border-b border-gray-200" : ""}">
-              <h4 class="font-bold text-base">${stripHtml(project.title)}</h4>
-              ${project.tagline ? `<p class="text-sm text-gray-600 mb-2">${stripHtml(project.tagline)}</p>` : ""}
-              <div class="flex flex-col gap-1 text-sm">
-                <div>
-                  <span class="font-medium">Status:</span> ${statusDictionary[project.status].label}
+            .map((project, index) => {
+              // Check if project has an image
+              const hasImage = project.image && project.image.id;
+              const imageUrl = hasImage ? `${project.image.file}` : noImage;
+
+              return `
+                <div class="mb-4 pb-3 ${index < projects.length - 1 ? "border-b border-gray-200" : ""}">
+                  ${
+                    hasImage
+                      ? `<div class="mb-2 rounded-lg overflow-hidden">
+                      <img src="${imageUrl}" alt="${stripHtml(project.title)}" class="w-full object-cover h-32" />
+                    </div>`
+                      : ""
+                  }
+                  <h4 class="font-bold text-base">${stripHtml(project.title)}</h4>
+                  ${project.tagline ? `<p class="text-sm text-gray-600 mb-2">${stripHtml(project.tagline)}</p>` : ""}
+                  <div class="flex flex-col gap-1 text-sm">
+                    <div>
+                      <span class="font-medium">Status:</span> ${statusDictionary[project.status].label}
+                    </div>
+                    <div>
+                      <span class="font-medium">Type:</span> ${kindDict[project.kind].string}
+                    </div>
+                    ${
+                      project.business_area
+                        ? `<div>
+                        <span class="font-medium">Business Area:</span> ${project.business_area.name}
+                      </div>`
+                        : ""
+                    }
+                    <div>
+                      <span class="font-medium">Year:</span> ${project.year}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <span class="font-medium">Type:</span> ${kindDict[project.kind].string}
-                </div>
-                ${
-                  project.business_area
-                    ? `<div>
-                    <span class="font-medium">Business Area:</span> ${project.business_area.name}
-                  </div>`
-                    : ""
-                }
-                <div>
-                  <span class="font-medium">Year:</span> ${project.year}
-                </div>
-              </div>
-            </div>
-          `,
-            )
+              `;
+            })
             .join("")}
         </div>
       </div>
