@@ -1,6 +1,6 @@
 import { MapSearchFilters } from "@/lib/hooks/helper/ProjectMapSearchContext";
 import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
-import { IProjectData, ISimpleLocationData } from "@/types";
+import { IBusinessArea, IProjectData, ISimpleLocationData } from "@/types";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
@@ -38,6 +38,7 @@ interface MapLocationsSidebarProps {
   areaNrm: ISimpleLocationData[];
   areaLocationsLoading: boolean;
   toggleMapLoading: (loading: boolean) => void;
+  selectedBas: IBusinessArea[];
 }
 
 const MapBackAndSearch = ({
@@ -68,6 +69,7 @@ const MapBackAndSearch = ({
   areaImcra,
   areaNrm,
   toggleMapLoading,
+  selectedBas,
 }: MapLocationsSidebarProps) => {
   const { baLoading, baData } = useBusinessAreas();
   const [inputValue, setInputValue] = useState("");
@@ -147,6 +149,7 @@ const MapBackAndSearch = ({
           areaNrm={areaNrm}
           toggleMapLoading={toggleMapLoading}
           selectedLocations={selectedLocations}
+          selectedBas={selectedBas}
         />
       )}
 
