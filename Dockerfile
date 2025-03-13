@@ -2,14 +2,19 @@
 
 # ======================== BUILD IMAGE ========================
 # Uses deps and env vars to bake / build the app
-FROM node:23-alpine3.20 as BUILD_IMAGE
+# FROM node:23-alpine3.20 as BUILD_IMAGE
+# Swap to bun for faster builds
+FROM oven/bun:latest AS build_image 
+
 WORKDIR /app
 
 # COPY package.json .
 COPY package*.json ./
 
 # Install dependencies, including devDependencies needed for the build process (no --omit=dev)
-RUN npm install
+# RUN npm install
+RUN bun install
+
 
 # This sets an environment variable named "PATH" to include the "./node_modules/.bin" directory. This ensures that locally installed Node.js modules can be executed directly from the command line without specifying their full path.
 ENV PATH="./node_modules/.bin:$PATH"
@@ -30,27 +35,34 @@ ENV VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL
 ENV VITE_SPMS_VERSION=$VITE_SPMS_VERSION
 
 # This command runs the "npm build" script inside the container (it will use above env variables).
-RUN npm run build 
+# RUN npm run build 
+RUN bun run build 
 
 # ======================== PRODUCTION IMAGE ========================
 # Uses baked / buiilt app and server w/o large dependencies
-FROM node:22-alpine3.19 as PRODUCTION_IMAGE
+# FROM node:22-alpine3.19 as PRODUCTION_IMAGE
+FROM oven/bun:slim AS production_image
+
 
 # Copy built files from the build stage to working dir
 WORKDIR /client
-COPY --from=BUILD_IMAGE /app/dist/ /client/dist/
+COPY --from=build_image /app/dist/ /client/dist/
 
 # Perform operations as root to set ownership and permissions
 USER root
 RUN mkdir -p /client/node_modules && \
-    chown -R node:node /client && \
+    chown -R bun:bun /client && \
     chmod -R u+rwX /client
 
 # Install serve to serve the built files
-RUN npm install serve -g
+# RUN npm install serve -g
+RUN bun install -g serve
+
 
 # Switch to the node user
-USER node
+# USER node
+USER bun
+
 
 EXPOSE 3000
 # Use serve to serve the built files
