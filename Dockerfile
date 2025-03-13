@@ -57,15 +57,13 @@ RUN mkdir -p /client/node_modules && \
 
 # Install serve to serve the built files
 # RUN npm install serve -g
-RUN bun install -g serve
-# Add bun binaries to PATH so serve can be found
-ENV PATH="/usr/local/bin:/.bun/bin:$PATH"
-
-# Switch to the node user
-# USER node
+# Install serve to serve the built files
+RUN bun add serve
+RUN bun install -g serve 
+# Switch to the bun user
 USER bun
 
-
 EXPOSE 3000
-# Use serve to serve the built files
-CMD ["/.bun/bin/serve", "-s", "dist", "-l", "3000"]
+
+# Try running serve directly with bun
+CMD ["serve", "-s", "dist", "-l", "3000"]
