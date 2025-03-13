@@ -31,25 +31,6 @@ export const useGetLocationsGeojson = () => {
             ),
           ]);
 
-        // const [regionsData, districtsData, nrmData, ibraData, imcraData] =
-        //   await Promise.all([
-        //     fetch("/src/scripts/data/raw/DBCA_REGION_DATA.geojson").then(
-        //       (res) => res.json(),
-        //     ),
-        //     fetch("/src/scripts/data/raw/DBCA_DISTRICT_DATA.geojson").then(
-        //       (res) => res.json(),
-        //     ),
-        //     fetch("/src/scripts/data/raw/NRM_DATA.geojson").then((res) =>
-        //       res.json(),
-        //     ),
-        //     fetch("/src/scripts/data/raw/IBRA_DATA.geojson").then((res) =>
-        //       res.json(),
-        //     ),
-        //     fetch("/src/scripts/data/raw/IMCRA_DATA.geojson").then((res) =>
-        //       res.json(),
-        //     ),
-        //   ]);
-
         setDbcaRegions(regionsData);
         setDbcaDistricts(districtsData);
         setNrm(nrmData);
