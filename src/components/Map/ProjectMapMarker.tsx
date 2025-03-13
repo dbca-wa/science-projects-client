@@ -7,6 +7,7 @@ import {
   renderToString,
   stripHtml,
 } from "./ProjectPopupComponents";
+import { useNavigate } from "react-router-dom";
 
 interface ProjectMapMarkerProps {
   projects: IProjectData[];
@@ -44,7 +45,7 @@ const ProjectMapMarker = ({
   selectedBas,
 }: ProjectMapMarkerProps) => {
   const isProjectSelected = (project: IProjectData) => {
-    return true;
+    // return true;
     // If no business areas are selected, all are considered "selected"
     if (!selectedBas || selectedBas.length === 0) return true;
 
@@ -54,6 +55,8 @@ const ProjectMapMarker = ({
     // Check if the project's business area is in the selected list
     return selectedBas.some((ba) => ba.pk === project.business_area.pk);
   };
+
+  const navigate = useNavigate();
 
   // Helper function to determine if a project has a selected location
   const hasSelectedLocation = (project: IProjectData) => {
@@ -493,6 +496,11 @@ const ProjectMapMarker = ({
     });
   };
 
+  // Function to handle navigation back to home
+  const handleNavigateHome = () => {
+    navigate("/");
+  };
+
   useEffect(() => {
     // Create or update the status display when match stats change
     if (mapRef.current && matchStats.total > 0) {
@@ -509,14 +517,31 @@ const ProjectMapMarker = ({
         const div = L.DomUtil.create("div", "map-status-control");
         div.id = "map-status-control";
         div.innerHTML = `
-          <div class="bg-white px-3 py-2 rounded-md shadow-md border border-gray-200 text-sm font-medium">
-            Matched: ${matchStats.matched} / ${matchStats.total}
+          <div class="bg-white px-3 rounded-md shadow-md border border-gray-200 text-sm font-medium flex flex-col justify-center gap-2 w-full py-3">
+            <button id="back-to-home-btn" class="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors duration-200 py-1 px-2 rounded-md hover:bg-blue-50">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              Back to SPMS
+            </button>
+            <div class="text-gray-600 w-full justify-center text-center">
+            <p>Matched: ${matchStats.matched} / ${matchStats.total}</p>
+            </div>
           </div>
         `;
         return div;
       };
 
       statusControl.addTo(mapRef.current);
+
+      // Add click event listener to the button
+      setTimeout(() => {
+        const backButton = document.getElementById("back-to-home-btn");
+        if (backButton) {
+          backButton.addEventListener("click", handleNavigateHome);
+        }
+      }, 0);
     }
   }, [matchStats, mapRef.current]);
 

@@ -8,6 +8,7 @@ import { Input } from "../ui/input";
 import MapSidebarSection from "./MapSidebarSection";
 import ProjectMapMarker from "./ProjectMapMarker";
 import SearchProjectsByUser from "../Navigation/SearchProjectsByUser";
+import { Button } from "../ui/button";
 
 interface MapLocationsSidebarProps {
   filteredItems: IProjectData[];
@@ -123,40 +124,44 @@ const MapBackAndSearch = ({
   );
 
   return (
-    <MapSidebarSection className="pb-0" title="Search">
-      <div className="mt-2 flex h-full flex-col gap-4">
-        <Input
-          placeholder="Search for a project..."
-          className="h-8 w-full"
-          onChange={handleChange}
-        />
-        <SearchProjectsByUser handleFilterUserChange={handleFilterUserChange} />
-      </div>
+    <>
+      <MapSidebarSection className="pb-0" title="Search">
+        <div className="mt-2 flex h-full flex-col gap-4">
+          <Input
+            placeholder="Search for a project..."
+            className="h-8 w-full"
+            onChange={handleChange}
+          />
+          <SearchProjectsByUser
+            handleFilterUserChange={handleFilterUserChange}
+          />
+        </div>
 
-      {filteredItems && (
-        <ProjectMapMarker
-          projects={filteredItems}
-          mapRef={mapRef}
-          dbcaRegions={dbcaRegions}
-          dbcaDistricts={dbcaDistricts}
-          nrm={nrm}
-          ibra={ibra}
-          imcra={imcra}
-          areaDbcaRegions={areaDbcaRegions}
-          areaDbcaDistricts={areaDbcaDistricts}
-          areaIbra={areaIbra}
-          areaImcra={areaImcra}
-          areaNrm={areaNrm}
-          toggleMapLoading={toggleMapLoading}
-          selectedLocations={selectedLocations}
-          selectedBas={selectedBas}
-        />
-      )}
+        {filteredItems && (
+          <ProjectMapMarker
+            projects={filteredItems}
+            mapRef={mapRef}
+            dbcaRegions={dbcaRegions}
+            dbcaDistricts={dbcaDistricts}
+            nrm={nrm}
+            ibra={ibra}
+            imcra={imcra}
+            areaDbcaRegions={areaDbcaRegions}
+            areaDbcaDistricts={areaDbcaDistricts}
+            areaIbra={areaIbra}
+            areaImcra={areaImcra}
+            areaNrm={areaNrm}
+            toggleMapLoading={toggleMapLoading}
+            selectedLocations={selectedLocations}
+            selectedBas={selectedBas}
+          />
+        )}
 
-      <p className="-mb-4 mt-4 w-full text-right text-xs text-gray-500">
-        {filteredItemsWithArea.length}/{filteredItems.length} locations filled
-      </p>
-    </MapSidebarSection>
+        <p className="-mb-4 mt-4 w-full text-right text-xs text-gray-500">
+          {filteredItemsWithArea.length}/{filteredItems.length} locations filled
+        </p>
+      </MapSidebarSection>
+    </>
   );
 };
 
