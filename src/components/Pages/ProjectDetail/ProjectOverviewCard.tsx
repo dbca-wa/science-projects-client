@@ -270,6 +270,9 @@ export const ProjectOverviewCard = ({
     }
 
     if (endYear !== null) {
+      if (startYear === endYear) {
+        return `${startYear}`;
+      }
       return `${startYear}-${endYear}`;
     } else {
       return `${startYear}-`;
