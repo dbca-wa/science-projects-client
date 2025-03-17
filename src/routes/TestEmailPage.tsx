@@ -19,6 +19,11 @@ import {
   Flex,
   Grid,
   Spinner,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
   useColorMode,
   useDisclosure,
@@ -30,6 +35,7 @@ import { Head } from "@/components/Base/Head";
 import { on } from "events";
 import { IEmailModalProps, IUserMe } from "@/types";
 import { AxiosError, AxiosResponse } from "axios";
+import DivisionalEmailLists from "@/components/Emails/DivisionalEmailLists";
 
 interface IWrapper {
   children: React.ReactElement;
@@ -240,42 +246,60 @@ export const TestEmailPage = () => {
   return (
     <>
       <Head title="Emails" />
-      <Box>
-        <Text fontWeight="bold" fontSize="xl">
-          Email Templates
-        </Text>
+      <Tabs>
+        <TabList>
+          <Tab>Divisional Directorate Email Lists</Tab>
 
-        <Grid
-          pt={8}
-          templateColumns={{
-            base: "1fr",
-            lg: "repeat(1, 1fr)",
-            "2xl": "repeat(1, 1fr)",
-          }}
-          gap={4}
-          rowGap={8}
-        >
-          <Box>
-            <EmailPreviewWrapper
-              title="Document Approved"
-              emailComponent={<DocumentApprovedEmail userData={userData} />}
-              ModalComponent={DocumentApprovedEmailModal}
-              emailFunction={sendDocumentApprovedEmail}
-              thisUser={userData}
-            />
-          </Box>
+          <Tab>Templates</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <DivisionalEmailLists />
+          </TabPanel>
+          <TabPanel>
+            <Box>
+              <Text fontWeight="bold" fontSize="xl">
+                Email Templates
+              </Text>
 
-          <Box>
-            <EmailPreviewWrapper
-              title="Document Recalled"
-              emailComponent={<DocumentRecalledEmail userData={userData} />}
-              ModalComponent={DocumentRecalledEmailModal}
-              emailFunction={sendDocumentRecalledEmail}
-              thisUser={userData}
-            />
-          </Box>
-        </Grid>
-      </Box>
+              <Grid
+                pt={8}
+                templateColumns={{
+                  base: "1fr",
+                  lg: "repeat(1, 1fr)",
+                  "2xl": "repeat(1, 1fr)",
+                }}
+                gap={4}
+                rowGap={8}
+              >
+                <Box>
+                  <EmailPreviewWrapper
+                    title="Document Approved"
+                    emailComponent={
+                      <DocumentApprovedEmail userData={userData} />
+                    }
+                    ModalComponent={DocumentApprovedEmailModal}
+                    emailFunction={sendDocumentApprovedEmail}
+                    thisUser={userData}
+                  />
+                </Box>
+
+                <Box>
+                  <EmailPreviewWrapper
+                    title="Document Recalled"
+                    emailComponent={
+                      <DocumentRecalledEmail userData={userData} />
+                    }
+                    ModalComponent={DocumentRecalledEmailModal}
+                    emailFunction={sendDocumentRecalledEmail}
+                    thisUser={userData}
+                  />
+                </Box>
+              </Grid>
+            </Box>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </>
   );
 };

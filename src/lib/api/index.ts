@@ -1,4 +1,5 @@
 export * from "./features/admin";
+export * from "./features/agencies";
 export * from "./features/auth";
 export * from "./features/communications";
 export * from "./features/dashboard";

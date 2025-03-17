@@ -286,7 +286,10 @@ export interface IUserData {
   affiliation: IAffiliation;
   branches?: IBranch[];
   businessAreas?: IBusinessArea[];
+  name?: string;
 }
+
+export type EmailListPerson = IUserData | IEmailListUser;
 
 export interface ICaretakerRequestObject {
   id: number;
@@ -928,7 +931,7 @@ interface IBusinessArea {
   old_id?: number;
   pk?: number;
   slug?: string;
-  division?: IDivision;
+  division?: IDivision | number;
   is_active: boolean;
   name: string;
   focus: string;
@@ -1002,6 +1005,12 @@ interface IAddress {
 
 // DIVISIONS ============================================================================
 
+interface IEmailListUser {
+  pk: number;
+  name: string;
+  email: string;
+}
+
 interface IDivision {
   pk?: number;
   old_id?: number;
@@ -1009,6 +1018,7 @@ interface IDivision {
   slug: string;
   director: number;
   approver: number;
+  directorate_email_list: IEmailListUser[];
 }
 
 // REPORT ============================================================================

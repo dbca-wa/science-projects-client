@@ -6,7 +6,7 @@ import { getAllDivisions } from "../../api";
 import { IDivision } from "@/types";
 
 export const useGetDivisions = () => {
-  const { isPending, data } = useQuery({
+  const { isPending, data, refetch } = useQuery({
     queryKey: ["divisions"],
     queryFn: getAllDivisions,
     retry: false,
@@ -15,5 +15,6 @@ export const useGetDivisions = () => {
   return {
     divsLoading: isPending,
     divsData: data as IDivision[],
+    refetch,
   };
 };
