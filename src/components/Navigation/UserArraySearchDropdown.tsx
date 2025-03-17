@@ -26,15 +26,15 @@ import {
 } from "react";
 import { FaTrash } from "react-icons/fa";
 import { getUsersBasedOnSearchTerm } from "../../lib/api";
-import { IUserData } from "../../types";
+import { IUserData, EmailListPerson } from "../../types";
 import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
 
 interface IUserArraySearchDropdown {
   isRequired: boolean;
-  setterFunction?: (setUserPk?: IUserData) => void;
-  array?: IUserData[];
-  arrayAddFunction?: (setUserPk: IUserData) => void;
-  arrayRemoveFunction?: (setUserPk: IUserData) => void;
+  setterFunction?: (setUserPk?: EmailListPerson) => void;
+  array?: EmailListPerson[];
+  arrayAddFunction?: (setUserPk: EmailListPerson) => void;
+  arrayRemoveFunction?: (setUserPk: EmailListPerson) => void;
   arrayClearFunction?: () => void;
   ignoreUserPks?: number[];
   label: string;
@@ -43,6 +43,8 @@ interface IUserArraySearchDropdown {
   preselectedUserPk?: number;
   isEditable?: boolean;
   autoFocus?: boolean;
+  internalOnly?: boolean;
+  hideInput?: boolean;
 }
 
 export const UserArraySearchDropdown = forwardRef(
@@ -60,6 +62,8 @@ export const UserArraySearchDropdown = forwardRef(
       helperText,
       preselectedUserPk,
       isEditable,
+      internalOnly,
+      hideInput,
     }: IUserArraySearchDropdown,
     ref,
   ) => {
@@ -75,7 +79,7 @@ export const UserArraySearchDropdown = forwardRef(
         getUsersBasedOnSearchTerm(searchTerm, 1, {
           onlySuperuser: false,
           onlyExternal: false,
-          onlyStaff: false,
+          onlyStaff: internalOnly || false,
           businessArea: "All",
         })
           .then((data) => {
@@ -154,6 +158,10 @@ export const UserArraySearchDropdown = forwardRef(
       },
     }));
 
+    function isIUserData(user: EmailListPerson): user is IUserData {
+      return "display_first_name" in user && "display_last_name" in user;
+    }
+
     return (
       <>
         <FormControl isRequired={isRequired} mb={4}>
@@ -211,7 +219,7 @@ export const UserArraySearchDropdown = forwardRef(
               rightIcon={<FaTrash />}
               color={"white"}
             >
-              Clear Secondary users
+              Clear list
             </Button>
           )}
         </FormControl>
@@ -231,7 +239,12 @@ export const UserArraySearchDropdown = forwardRef(
               >
                 <TagLabel pl={1}>
                   {" "}
-                  {`${u.display_first_name} ${u.display_last_name}${u.is_superuser ? " (Superuser)" : u.is_staff ? " (Staff)" : ""}`}
+                  {/* Handle different object structures */}
+                  {
+                    isIUserData(u)
+                      ? `${u.display_first_name} ${u.display_last_name}${u.is_superuser ? " (Superuser)" : u.is_staff ? " (Staff)" : ""}`
+                      : u.name /* For IEmailListUser which has a name property */
+                  }
                 </TagLabel>
                 <TagCloseButton
                   onClick={() => arrayRemoveFunction(u)}

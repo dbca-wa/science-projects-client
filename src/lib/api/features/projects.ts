@@ -221,6 +221,27 @@ export const getDirectorateMembers = async ({
   return res;
 };
 
+export const getDivisionDirectorateMembers = async ({
+  queryKey,
+}: QueryFunctionContext) => {
+  // Extract the division PK from the query key array
+  // Assuming your query key is structured like ['directorateList', divisionPk]
+  const [_key, pk] = queryKey;
+
+  console.log({ _key, pk });
+  if (!pk || typeof pk !== "number") {
+    throw new Error("Division PK is required and must be a number");
+  }
+
+  console.log("Checking with pk:", pk);
+  const response = await instance.get(`agencies/divisions/${pk}/email_list`);
+  if (response.status === 200) {
+    return response.data.directorate_email_list;
+  } else {
+    return [];
+  }
+};
+
 // PROJECT CRUD ==========================================================================
 
 export interface ICreateProjectBaseInfo {

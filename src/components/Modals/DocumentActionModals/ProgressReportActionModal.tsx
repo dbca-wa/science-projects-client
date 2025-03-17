@@ -32,6 +32,7 @@ import {
 import { handleDocumentAction } from "../../../lib/api";
 import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
 import { useDirectorateMembers } from "../../../lib/hooks/tanstack/useDirectorateMembers";
+import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
 
 interface Props {
   userData: IUserMe;
@@ -159,7 +160,8 @@ export const ProgressReportActionModal = ({
     approveProgressReportMutation.mutate(formData);
   };
 
-  const { directorateData, isDirectorateLoading } = useDirectorateMembers();
+  const { directorateData, isDirectorateLoading } =
+    useDivisionDirectorateMembers(baData?.division);
 
   return (
     <Modal
@@ -275,15 +277,13 @@ export const ProgressReportActionModal = ({
                         <Text fontWeight={"semibold"}>Directorate Members</Text>
                         <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
                           {!isDirectorateLoading &&
-                            directorateData
-                              ?.filter((member) => member.is_active) // Filter only active members
-                              .map((member, index) => (
-                                <Center key={index}>
-                                  <Box px={2} w={"100%"}>
-                                    <Text>{`${member.first_name} ${member.last_name}`}</Text>
-                                  </Box>
-                                </Center>
-                              ))}
+                            directorateData?.map((member, index) => (
+                              <Center key={index}>
+                                <Box px={2} w={"100%"}>
+                                  <Text>{`${member.name}`}</Text>
+                                </Box>
+                              </Center>
+                            ))}
                         </Grid>
                       </Box>
                     </>
