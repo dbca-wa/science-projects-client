@@ -175,7 +175,7 @@ export const SearchProjects = ({ orientation }: IProps) => {
         // bg={"red"}
         w={"100%"}
         h={"100%"}
-        gridRowGap={4}
+        // gridRowGap={4}
       >
         {/* Project Business Area Filters */}
 
@@ -200,14 +200,14 @@ export const SearchProjects = ({ orientation }: IProps) => {
           />
         </InputGroup>
 
-        <Box mt={1}>
+        <Box>
           <SearchProjectsByUser
             handleFilterUserChange={handleFilterUserChange}
           />
         </Box>
 
         <Grid
-          mt={1}
+          // mt={1}
           gridGap={4}
           gridTemplateColumns={{
             base: "repeat(1, 1fr)",

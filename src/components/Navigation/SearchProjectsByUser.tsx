@@ -25,7 +25,7 @@ const SearchProjectsByUser = ({
         helperText=""
         setUserFunction={setSelectedUser}
         placeholder="Filter by user"
-        className={clsx("z-50 my-0 h-8 text-sm")}
+        className={clsx("z-50 h-8 text-sm")}
         hideCannotFind
       />
     </Flex>
