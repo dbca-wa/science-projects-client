@@ -1,6 +1,7 @@
 // WIP: Delete User Modal - for removing users from the system all together. Admin only.
 
 import {
+  Box,
   Button,
   Center,
   Flex,
@@ -183,13 +184,13 @@ export const DeactivateUserModal = ({
                 {user?.is_active ? "deactivate" : "reactivate"} this user?
               </Text>
             </Center>
-            <Center mt={4}>
-              <UnorderedList mb={0} pb={0}>
-                <ListItem mb={0} pb={0}>
-                  They will now receive emails
-                </ListItem>
-              </UnorderedList>
-            </Center>
+            <Text mt={4}>
+              They will{" "}
+              {user?.is_active
+                ? "lose access to SPMS but their data will be retained"
+                : "regain access to SPMS"}
+              .
+            </Text>
             <FormControl mt={0} mb={4} userSelect="none">
               <InputGroup>
                 <Input
@@ -199,9 +200,9 @@ export const DeactivateUserModal = ({
                 />
               </InputGroup>
             </FormControl>
-            <Center mt={6} p={5}>
+            <Box mt={6}>
               <Text>If this is okay, please proceed.</Text>
-            </Center>
+            </Box>
           </ModalBody>
           <ModalFooter>
             <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
