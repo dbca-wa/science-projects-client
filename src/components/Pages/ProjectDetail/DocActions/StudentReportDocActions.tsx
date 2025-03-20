@@ -31,6 +31,7 @@ import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { StudentReportActionModal } from "../../../Modals/DocumentActionModals/StudentReportActionModal";
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
+import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
 
 interface IStudentDocumentActions extends ICaretakerPermissions {
   studentReportData: IStudentReport;
@@ -130,6 +131,9 @@ IStudentDocumentActions) => {
   const { baData, baLoading } = useBusinessArea(
     studentReportData?.document?.project?.business_area?.pk,
   );
+  const { isDirectorateLoading, directorateData } =
+    useDivisionDirectorateMembers(baData?.division);
+
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
     studentReportData?.document?.modifier,
@@ -598,6 +602,8 @@ IStudentDocumentActions) => {
                         userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <StudentReportActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             callSameData={callSameData}
                             refetchData={refetchData}
@@ -639,6 +645,8 @@ IStudentDocumentActions) => {
                         userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <StudentReportActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             callSameData={callSameData}
                             refetchData={refetchData}
@@ -772,6 +780,8 @@ IStudentDocumentActions) => {
                         userIsCaretakerOfBaLeader) && (
                         <Center>
                           <StudentReportActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             callSameData={callSameData}
@@ -818,6 +828,8 @@ IStudentDocumentActions) => {
                           ml={3}
                         >
                           <StudentReportActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             callSameData={callSameData}
@@ -843,6 +855,10 @@ IStudentDocumentActions) => {
                             size={"sm"}
                             // onClick={onS3RecallModalOpen}
                             onClick={onS2RecallModalOpen}
+                            disabled={
+                              directorateData?.length < 1 &&
+                              !userData?.is_superuser
+                            }
                           >
                             Recall Approval
                           </Button>
@@ -862,6 +878,8 @@ IStudentDocumentActions) => {
                           ml={3}
                         >
                           <StudentReportActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             callSameData={callSameData}
@@ -887,6 +905,10 @@ IStudentDocumentActions) => {
                             }}
                             size={"sm"}
                             onClick={onS2ApprovalModalOpen}
+                            disabled={
+                              directorateData?.length < 1 &&
+                              !userData?.is_superuser
+                            }
                           >
                             Approve
                           </Button>
@@ -951,6 +973,8 @@ IStudentDocumentActions) => {
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <StudentReportActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             action={"send_back"}
                             refetchData={refetchData}
@@ -992,6 +1016,8 @@ IStudentDocumentActions) => {
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           <StudentReportActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             action={"recall"}
                             refetchData={refetchData}
@@ -1030,6 +1056,8 @@ IStudentDocumentActions) => {
                         ?.directorate_approval_granted && (
                         <Center ml={3} justifyContent={"flex-end"}>
                           <StudentReportActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             action={"approve"}
                             refetchData={refetchData}

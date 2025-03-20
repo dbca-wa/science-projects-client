@@ -35,6 +35,8 @@ import { useDirectorateMembers } from "../../../lib/hooks/tanstack/useDirectorat
 import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
 
 interface Props {
+  directorateData: any;
+  isDirectorateLoading: boolean;
   userData: IUserMe;
   action: "approve" | "recall" | "send_back" | "reopen";
   stage: number;
@@ -49,6 +51,8 @@ interface Props {
 }
 
 export const StudentReportActionModal = ({
+  isDirectorateLoading,
+  directorateData,
   userData,
   stage,
   documentPk,
@@ -158,10 +162,6 @@ export const StudentReportActionModal = ({
     approveStudentReportMutation.mutate(formData);
   };
 
-  // const { directorateData, isDirectorateLoading } = useDirectorateMembers();
-  const { directorateData, isDirectorateLoading } =
-    useDivisionDirectorateMembers(baData?.division);
-
   return (
     <Modal
       isOpen={isOpen}
@@ -256,39 +256,46 @@ export const StudentReportActionModal = ({
                     report?
                   </Text>
                   <br />
-                  <Text>
-                    {action === "approve"
-                      ? "This will send an email to members of the Directorate for approval."
-                      : action === "recall"
-                        ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
-                        : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
-                  </Text>
+                  {directorateData?.length > 1 && (
+                    <>
+                      <Text>
+                        {action === "approve"
+                          ? "This will send an email to members of the Directorate for approval."
+                          : action === "recall"
+                            ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
+                            : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
+                      </Text>
 
-                  {(action === "recall" || action === "approve") && (
-                    <Box
-                      pt={4}
-                      border={"1px solid"}
-                      borderColor={"gray.500"}
-                      rounded={"2xl"}
-                      p={4}
-                      mt={4}
-                    >
-                      <Text fontWeight={"semibold"}>Directorate Members</Text>
-                      <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
-                        {!isDirectorateLoading &&
-                          directorateData?.map((member, index) => (
-                            <Center key={index}>
-                              <Box px={2} w={"100%"}>
-                                <Text>{`${member.name}`}</Text>
-                              </Box>
-                            </Center>
-                          ))}
-                      </Grid>
-                    </Box>
+                      {(action === "recall" || action === "approve") && (
+                        <Box
+                          pt={4}
+                          border={"1px solid"}
+                          borderColor={"gray.500"}
+                          rounded={"2xl"}
+                          p={4}
+                          mt={4}
+                        >
+                          <Text fontWeight={"semibold"}>
+                            Directorate Members
+                          </Text>
+                          <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
+                            {!isDirectorateLoading &&
+                              directorateData?.map((member, index) => (
+                                <Center key={index}>
+                                  <Box px={2} w={"100%"}>
+                                    <Text>{`${member.name}`}</Text>
+                                  </Box>
+                                </Center>
+                              ))}
+                          </Grid>
+                        </Box>
+                      )}
+                    </>
                   )}
+
                   <Checkbox
                     isDisabled={!userData?.is_superuser}
-                    mt={8}
+                    mt={directorateData?.length > 0 ? 8 : 0}
                     isChecked={shouldSendEmail}
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >

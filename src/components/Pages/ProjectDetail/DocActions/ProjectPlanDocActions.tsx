@@ -34,6 +34,7 @@ import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { ProjectPlanActionModal } from "../../../Modals/DocumentActionModals/ProjectPlanActionModal";
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
+import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
 
 interface IProjectPlanDocumentActions extends ICaretakerPermissions {
   projectPlanData: IProjectPlan;
@@ -56,6 +57,13 @@ export const ProjectPlanDocActions = ({
   userIsCaretakerOfMember,
   userIsCaretakerOfProjectLeader,
 }: IProjectPlanDocumentActions) => {
+  const { baData, baLoading } = useBusinessArea(
+    projectPlanData?.document?.project?.business_area?.pk,
+  );
+
+  const { directorateData, isDirectorateLoading } =
+    useDivisionDirectorateMembers(baData?.division);
+
   const { colorMode } = useColorMode();
 
   const {
@@ -118,10 +126,6 @@ export const ProjectPlanDocActions = ({
   } = useDisclosure();
 
   const { userData, userLoading } = useUser();
-
-  const { baData, baLoading } = useBusinessArea(
-    projectPlanData?.document?.project?.business_area?.pk,
-  );
 
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
@@ -581,6 +585,8 @@ export const ProjectPlanDocActions = ({
                         userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <ProjectPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             baData={baData}
@@ -627,6 +633,8 @@ export const ProjectPlanDocActions = ({
                         userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <ProjectPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             baData={baData}
@@ -849,6 +857,8 @@ export const ProjectPlanDocActions = ({
                         // ml={4}
                         >
                           <ProjectPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             action={"send_back"}
@@ -898,6 +908,8 @@ export const ProjectPlanDocActions = ({
                           ml={3}
                         >
                           <ProjectPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             action={"recall"}
@@ -926,6 +938,10 @@ export const ProjectPlanDocActions = ({
                             size={"sm"}
                             // onClick={onS3RecallModalOpen}
                             onClick={onS2RecallModalOpen}
+                            disabled={
+                              directorateData?.length < 1 &&
+                              !userData?.is_superuser
+                            }
                           >
                             Recall Approval
                           </Button>
@@ -944,6 +960,8 @@ export const ProjectPlanDocActions = ({
                           ml={3}
                         >
                           <ProjectPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             action={"approve"}
@@ -972,6 +990,10 @@ export const ProjectPlanDocActions = ({
                             }}
                             size={"sm"}
                             onClick={onS2ApprovalModalOpen}
+                            disabled={
+                              !userData?.is_superuser &&
+                              directorateData?.length < 1
+                            }
                           >
                             Approve
                           </Button>
@@ -1077,6 +1099,8 @@ export const ProjectPlanDocActions = ({
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ProjectPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             action={"send_back"}
                             refetchData={refetchData}
@@ -1123,6 +1147,8 @@ export const ProjectPlanDocActions = ({
                           1 ? null : ( */}
                           <>
                             <ProjectPlanActionModal
+                              directorateData={directorateData}
+                              isDirectorateLoading={isDirectorateLoading}
                               userData={userData}
                               action={"recall"}
                               refetchData={refetchData}
@@ -1215,6 +1241,8 @@ export const ProjectPlanDocActions = ({
                         ?.directorate_approval_granted && (
                         <Center ml={3} justifyContent={"flex-end"}>
                           <ProjectPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             action={"approve"}
                             refetchData={refetchData}

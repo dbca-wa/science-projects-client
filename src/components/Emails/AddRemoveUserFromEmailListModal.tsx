@@ -50,8 +50,9 @@ const AddRemoveUserFromEmailListModal = ({
     toastIdRef.current = toast(data);
   };
 
-  const [usersToAction, setUsersToAction] =
-    useState<EmailListPerson[]>(currentList);
+  const [usersToAction, setUsersToAction] = useState<EmailListPerson[]>(
+    currentList || [],
+  );
 
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
@@ -171,7 +172,9 @@ const AddRemoveUserFromEmailListModal = ({
             {/* Not setting a direct value here, but using setValue in the useEffect instead */}
             <Input
               type="hidden"
-              {...register("usersList", { required: true })}
+              {...register("usersList", {
+                validate: (value) => Array.isArray(value), // This will pass for empty arrays too
+              })}
             />
 
             <UserArraySearchDropdown

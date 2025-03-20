@@ -31,6 +31,7 @@ import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { ProgressReportActionModal } from "../../../Modals/DocumentActionModals/ProgressReportActionModal";
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
+import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
 
 interface IProgressDocumentActions extends ICaretakerPermissions {
   progressReportData: IProgressReport;
@@ -105,6 +106,10 @@ IProgressDocumentActions) => {
   const { baData, baLoading } = useBusinessArea(
     progressReportData?.document?.project?.business_area?.pk,
   );
+
+  const { directorateData, isDirectorateLoading } =
+    useDivisionDirectorateMembers(baData?.division);
+
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
     progressReportData?.document?.modifier,
@@ -584,6 +589,8 @@ IProgressDocumentActions) => {
                         userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <ProgressReportActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             refetchData={refetchData}
                             callSameData={callSameData}
@@ -625,6 +632,8 @@ IProgressDocumentActions) => {
                         userIsCaretakerOfBaLeader) && (
                         <Center justifyContent={"flex-end"}>
                           <ProgressReportActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             callSameData={callSameData}
                             refetchData={refetchData}
@@ -769,6 +778,8 @@ IProgressDocumentActions) => {
                         // ml={4}
                         >
                           <ProgressReportActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             callSameData={callSameData}
                             refetchData={refetchData}
@@ -815,6 +826,8 @@ IProgressDocumentActions) => {
                           ml={3}
                         >
                           <ProgressReportActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             callSameData={callSameData}
                             refetchData={refetchData}
@@ -839,6 +852,10 @@ IProgressDocumentActions) => {
                             }}
                             size={"sm"}
                             onClick={onS2RecallModalOpen}
+                            disabled={
+                              directorateData?.length < 1 &&
+                              !userData?.is_superuser
+                            }
                           >
                             Recall Approval
                           </Button>
@@ -869,6 +886,8 @@ IProgressDocumentActions) => {
                             documentPk={progressReportData?.document?.pk}
                             stage={2}
                             projectData={progressReportData?.document?.project}
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                           />
                           <Button
                             color={"white"}
@@ -883,6 +902,10 @@ IProgressDocumentActions) => {
                             }}
                             size={"sm"}
                             onClick={onS2ApprovalModalOpen}
+                            disabled={
+                              directorateData?.length < 1 &&
+                              !userData?.is_superuser
+                            }
                           >
                             Approve
                           </Button>
@@ -947,6 +970,8 @@ IProgressDocumentActions) => {
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ProgressReportActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             callSameData={callSameData}
                             action={"send_back"}
@@ -988,6 +1013,8 @@ IProgressDocumentActions) => {
                         userData?.business_area?.name === "Directorate") && (
                         <Center mt={3} justifyContent={"flex-start"} ml={3}>
                           <ProgressReportActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             callSameData={callSameData}
                             action={"recall"}
@@ -1027,6 +1054,8 @@ IProgressDocumentActions) => {
                         ?.directorate_approval_granted && (
                         <Center ml={3} justifyContent={"flex-end"}>
                           <ProgressReportActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             callSameData={callSameData}
                             action={"approve"}
