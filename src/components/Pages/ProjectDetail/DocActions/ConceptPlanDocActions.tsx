@@ -116,7 +116,9 @@ IConceptDocumentActions) => {
   } = useDisclosure();
 
   const { userData, userLoading } = useUser();
-
+  const userInDivisionalDirectorate = directorateData?.some(
+    (user) => user.pk === userData?.pk,
+  );
   // useEffect(() => {
   //   console.log({
   //     userIsCaretakerOfMember,
@@ -975,7 +977,7 @@ IConceptDocumentActions) => {
                       conceptPlanData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.name === "Directorate" ||
+                        useuserInDivisionalDirectorate ||
                         userIsCaretakerOfAdmin) && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ConceptPlanActionModal
@@ -1021,7 +1023,7 @@ IConceptDocumentActions) => {
 
                     {conceptPlanData?.document?.directorate_approval_granted &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.name === "Directorate" ||
+                        userInDivisionalDirectorate ||
                         userIsCaretakerOfAdmin) && (
                         // !all_documents?.project_plan &&
                         <Center justifyContent={"flex-start"} ml={3}>
@@ -1081,7 +1083,7 @@ IConceptDocumentActions) => {
                     {conceptPlanData?.document
                       ?.business_area_lead_approval_granted &&
                       (userData?.is_superuser ||
-                        userData?.business_area?.name === "Directorate" ||
+                        userInDivisionalDirectorate ||
                         userIsCaretakerOfAdmin) &&
                       !conceptPlanData?.document
                         ?.directorate_approval_granted && (

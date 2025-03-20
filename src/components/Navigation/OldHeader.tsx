@@ -17,6 +17,7 @@ import {
   Flex,
   Grid,
   HStack,
+  Link,
   MenuGroup,
   MenuItem,
   Text,
@@ -575,7 +576,28 @@ const OldHeader = () => {
         <HStack spacing={2} flexGrow={1}>
           {/* SMPS Logo/Title */}
           <Box>
-            <Button
+            <Link
+              as="a"
+              href="/"
+              px={5}
+              color={"whiteAlpha.700"}
+              display="inline-block"
+              fontSize={18}
+              textDecoration="none"
+              _hover={{ textDecoration: "none", color: "whiteAlpha.900" }}
+              onClick={(e) => {
+                if (
+                  !(e.ctrlKey || e.metaKey || e.button === 2) &&
+                  e.button === 0
+                ) {
+                  e.preventDefault();
+                  navigate("/");
+                }
+              }}
+            >
+              <span className="text-xl font-bold">SPMS</span>
+            </Link>
+            {/* <Button
               px={5}
               color={"whiteAlpha.700"}
               size={"md"}
@@ -591,7 +613,7 @@ const OldHeader = () => {
               }}
             >
               <Text fontSize={18}>SPMS</Text>
-            </Button>
+            </Button> */}
           </Box>
           {shouldShowHamburger ? (
             <Box

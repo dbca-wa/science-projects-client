@@ -176,69 +176,39 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Search Project By User"}
-              kind="feature"
-              description={
-                "By popular demand! Users can now use the projects page to directly search for a user's projects. This feature works with other filters and expands on viewing staff projects by clicking on their account on the users page."
-              }
-            />
-            <PatchNoteEntry
-              title={"Crop Avatar on Upload"}
-              kind="feature"
-              description={
-                "Users may now crop the image they use for their avatar, should they choose to. This can be done by uploading an image from 'My SPMS Account' page, hovering over the image, and clicking the button on the top-left to crop. Once cropped, click 'Apply Changes' to update the avatar."
-              }
-            />
-            <PatchNoteEntry
-              title={"Project Map"}
-              kind="feature"
-              description={
-                "Users can now access a map page to visualise where projects are located as they search. This is a work in progress, and will be expanded upon in future updates. If you have any feedback or suggestions for this feature, please let us know!"
-              }
-            />
-
-            <PatchNoteEntry
-              title={"Area Selection Bug"}
-              kind="fix"
-              description={
-                "A bug has been patched which prevented selecting specific areas, and instead selected all areas for a given area type."
-              }
-            />
-            <PatchNoteEntry
-              title={"Email Modal Typo"}
-              kind="fix"
-              description={
-                "Fixed typo on email modal when submitting for approval."
-              }
-            />
-            <PatchNoteEntry
-              title={"Search by ID"}
-              kind="update"
-              description={
-                "Search functionality has been expanded to include the last part of a project's ID (e.g. '123' in EXT-2022-123). Users may filter year and project type as usual. This functionality will only work if there are no leading zeros in the ID search term (type '23' if '023')."
-              }
-            />
-            <PatchNoteEntry
-              title={"Elegant Errors"}
-              kind="update"
-              description={
-                "For public facing pages, error messages have been updated to be more user-friendly and informative to admins."
-              }
-            />
-            {/* <PatchNoteEntry
               title={"Feedback on Documents"}
               kind="feature"
               description={
                 "Business Area leads and the directorate can now provide feedback via the notification email when sending a document back for revisions."
               }
-            /> */}
-            {/* <PatchNoteEntry
+            />
+            <PatchNoteEntry
+              title={"Mention Users in comments"}
+              kind="feature"
+              description={
+                "Users may not mention each other in the comments section. Doing so will send an email to that user letting them know they were mentioned. This ensures time-sensitive comments are acknowledged."
+              }
+            />
+            <PatchNoteEntry
+              title={"Directorate Level Email Lists"}
+              kind="feature"
+              description={
+                "Added functionality to set list of emails for directorate level approvals, depending on division (expanded from just BCS)."
+              }
+            />
+            <PatchNoteEntry
+              title={"Email Typos"}
+              kind="fix"
+              description={"Typos in email subject lines have been fixed."}
+            />
+            <PatchNoteEntry
               title={"Remedy Buttons"}
               kind="fix"
               description={
                 "A bug has been patched in the Remedy Problematic Project function which prevented all projects from being updated."
               }
-            /> */}
+            />
+
             {/* <PatchNoteEntry
               title={"Modern Layout Updated"}
               kind="update"
@@ -246,13 +216,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "The second 'modern' layout has been adjusted to implement missing features already present on the default layout."
               }
             /> */}
-            {/* <PatchNoteEntry
-              title={"Documentation"}
-              kind="update"
-              description={
-                "Documentation / Quick GUide has been updated to reflect recent changes."
-              }
-            /> */}
+
             {/* <PatchNoteEntry
               title={"Email Feedback"}
               kind="update"
@@ -260,6 +224,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "Feedback email submission adjusted to go to shared inbox for ecoinformatics."
               }
             /> */}
+            <PatchNoteEntry
+              title={"Documentation"}
+              kind="update"
+              description={
+                "Documentation / Quick Guide has been updated to reflect recent changes."
+              }
+            />
             <PatchNoteEntry
               title={"Dependencies"}
               kind="update"

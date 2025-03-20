@@ -258,7 +258,7 @@ export const ProgressReportActionModal = ({
                   </Text>
                   <br />
 
-                  {directorateData?.length > 1 && (
+                  {directorateData?.length > 0 && (
                     <>
                       <Text>
                         {action === "approve"
@@ -299,7 +299,7 @@ export const ProgressReportActionModal = ({
 
                   <Checkbox
                     isDisabled={!userData?.is_superuser}
-                    mt={directorateData?.length > 1 ? 8 : 0}
+                    mt={directorateData?.length < 1 ? 0 : 8}
                     isChecked={shouldSendEmail}
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >

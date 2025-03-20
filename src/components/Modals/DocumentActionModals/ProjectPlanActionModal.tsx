@@ -257,7 +257,7 @@ export const ProjectPlanActionModal = ({
                     plan?
                   </Text>
                   <br />
-                  {directorateData?.length > 1 && (
+                  {directorateData?.length > 0 && (
                     <>
                       <Text>
                         {action === "approve"
