@@ -21,7 +21,7 @@ import {
   UseToastOptions,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   IApproveDocument,
@@ -65,6 +65,9 @@ export const StudentReportActionModal = ({
   // refetchData,
   callSameData,
 }: Props) => {
+  // useEffect(() => {
+  //   console.log(directorateData);
+  // });
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -256,7 +259,7 @@ export const StudentReportActionModal = ({
                     report?
                   </Text>
                   <br />
-                  {directorateData?.length > 1 && (
+                  {directorateData?.length > 0 && (
                     <>
                       <Text>
                         {action === "approve"

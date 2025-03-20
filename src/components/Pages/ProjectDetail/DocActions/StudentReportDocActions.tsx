@@ -1,3 +1,4 @@
+import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
 import {
   Box,
   Button,
@@ -31,7 +32,6 @@ import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { StudentReportActionModal } from "../../../Modals/DocumentActionModals/StudentReportActionModal";
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
-import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
 
 interface IStudentDocumentActions extends ICaretakerPermissions {
   studentReportData: IStudentReport;
@@ -133,6 +133,13 @@ IStudentDocumentActions) => {
   );
   const { isDirectorateLoading, directorateData } =
     useDivisionDirectorateMembers(baData?.division);
+
+  const userInDivisionalDirectorate = directorateData?.some(
+    (user) => user.pk === userData?.pk,
+  );
+  // useEffect(() => {
+  //   console.log("Is Directorate (Divisional): ", userInDivisionalDirectorate);
+  // }, [userData, isDirectorateLoading, directorateData]);
 
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
@@ -970,7 +977,7 @@ IStudentDocumentActions) => {
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userInDivisionalDirectorate) && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <StudentReportActionModal
                             directorateData={directorateData}
@@ -1013,7 +1020,7 @@ IStudentDocumentActions) => {
                       ?.directorate_approval_granted &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userInDivisionalDirectorate) && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           <StudentReportActionModal
                             directorateData={directorateData}

@@ -121,15 +121,17 @@ IConceptDocumentActions) => {
     onOpen: onS3ReopenModalOpen,
     onClose: onS3ReopenModalClose,
   } = useDisclosure();
-
-  const { userData, userLoading } = useUser();
-
   const { baData, baLoading } = useBusinessArea(
     projectClosureData?.document?.project?.business_area?.pk,
   );
 
   const { isDirectorateLoading, directorateData } =
     useDivisionDirectorateMembers(baData?.division);
+
+  const { userData, userLoading } = useUser();
+  const userInDivisionalDirectorate = directorateData?.some(
+    (user) => user.pk === userData?.pk,
+  );
 
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
@@ -1203,7 +1205,7 @@ IConceptDocumentActions) => {
                         "suspended") &&
                     (userData?.is_superuser ||
                       userIsCaretakerOfAdmin ||
-                      userData?.business_area?.name === "Directorate") ? (
+                      userInDivisionalDirectorate) ? (
                       <Button
                         color={"white"}
                         background={
@@ -1227,7 +1229,7 @@ IConceptDocumentActions) => {
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userInDivisionalDirectorate) && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ProjectClosureActionModal
                             isDirectorateLoading={isDirectorateLoading}
@@ -1273,7 +1275,7 @@ IConceptDocumentActions) => {
                       ?.directorate_approval_granted &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userInDivisionalDirectorate) && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           <ProjectClosureActionModal
                             isDirectorateLoading={isDirectorateLoading}
@@ -1351,7 +1353,7 @@ IConceptDocumentActions) => {
                       ?.business_area_lead_approval_granted &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") &&
+                        userInDivisionalDirectorate) &&
                       !projectClosureData?.document
                         ?.directorate_approval_granted && (
                         <Center ml={3} justifyContent={"flex-end"}>

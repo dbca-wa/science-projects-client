@@ -110,6 +110,10 @@ IProgressDocumentActions) => {
   const { directorateData, isDirectorateLoading } =
     useDivisionDirectorateMembers(baData?.division);
 
+  const userInDivisionalDirectorate = directorateData?.some(
+    (user) => user.pk === userData?.pk,
+  );
+
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
     progressReportData?.document?.modifier,
@@ -967,7 +971,7 @@ IProgressDocumentActions) => {
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userInDivisionalDirectorate) && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ProgressReportActionModal
                             isDirectorateLoading={isDirectorateLoading}
@@ -1010,7 +1014,7 @@ IProgressDocumentActions) => {
                       ?.directorate_approval_granted &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userInDivisionalDirectorate) && (
                         <Center mt={3} justifyContent={"flex-start"} ml={3}>
                           <ProgressReportActionModal
                             isDirectorateLoading={isDirectorateLoading}
@@ -1049,7 +1053,7 @@ IProgressDocumentActions) => {
                       ?.business_area_lead_approval_granted &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") &&
+                        userInDivisionalDirectorate) &&
                       !progressReportData?.document
                         ?.directorate_approval_granted && (
                         <Center ml={3} justifyContent={"flex-end"}>

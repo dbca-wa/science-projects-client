@@ -60,9 +60,17 @@ export const ProjectPlanDocActions = ({
   const { baData, baLoading } = useBusinessArea(
     projectPlanData?.document?.project?.business_area?.pk,
   );
+  const { userData, userLoading } = useUser();
 
   const { directorateData, isDirectorateLoading } =
     useDivisionDirectorateMembers(baData?.division);
+
+  const userInDivisionalDirectorate = directorateData?.some(
+    (user) => user.pk === userData?.pk,
+  );
+  // useEffect(() => {
+  //   console.log("Is Directorate (Divisional): ", userInDivisionalDirectorate);
+  // }, [userData, isDirectorateLoading, directorateData]);
 
   const { colorMode } = useColorMode();
 
@@ -124,8 +132,6 @@ export const ProjectPlanDocActions = ({
     onOpen: onOpenCreateProgressReportModal,
     onClose: onCloseCreateProgressReportModal,
   } = useDisclosure();
-
-  const { userData, userLoading } = useUser();
 
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
@@ -1096,7 +1102,7 @@ export const ProjectPlanDocActions = ({
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userInDivisionalDirectorate) && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ProjectPlanActionModal
                             directorateData={directorateData}
@@ -1141,7 +1147,7 @@ export const ProjectPlanDocActions = ({
                     {projectPlanData?.document?.directorate_approval_granted &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") && (
+                        userInDivisionalDirectorate) && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           {/* {all_documents?.progress_reports.length >=
                           1 ? null : ( */}
@@ -1236,7 +1242,7 @@ export const ProjectPlanDocActions = ({
                       ?.business_area_lead_approval_granted &&
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
-                        userData?.business_area?.name === "Directorate") &&
+                        userInDivisionalDirectorate) &&
                       !projectPlanData?.document
                         ?.directorate_approval_granted && (
                         <Center ml={3} justifyContent={"flex-end"}>
