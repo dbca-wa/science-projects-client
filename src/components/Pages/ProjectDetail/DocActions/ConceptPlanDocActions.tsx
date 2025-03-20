@@ -977,7 +977,7 @@ IConceptDocumentActions) => {
                       conceptPlanData?.document
                         ?.directorate_approval_granted === false &&
                       (userData?.is_superuser ||
-                        useuserInDivisionalDirectorate ||
+                        userInDivisionalDirectorate ||
                         userIsCaretakerOfAdmin) && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ConceptPlanActionModal

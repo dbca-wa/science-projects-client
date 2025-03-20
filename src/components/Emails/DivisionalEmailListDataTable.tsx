@@ -213,7 +213,7 @@ const DivisionalEmailListDataTable = ({
                 : { bg: "blue.50", color: "black", cursor: "default" }
             }
           >
-            Direcotrate Email List
+            Directorate Email List
           </Button>
         );
       },

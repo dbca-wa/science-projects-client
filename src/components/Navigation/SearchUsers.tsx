@@ -114,7 +114,7 @@ export const SearchUsers = () => {
   };
 
   return (
-    <Flex>
+    <Flex gap={4}>
       <Select
         onChange={handleOnlySelectedBusinessAreaChange}
         size={"sm"}

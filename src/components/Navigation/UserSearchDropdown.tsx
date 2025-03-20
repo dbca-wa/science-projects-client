@@ -55,7 +55,7 @@ interface IUserSearchDropdown {
 export const UserSearchDropdown = forwardRef(
   (
     {
-      onlyInternal = true, // Default if not set
+      onlyInternal = true,
       autoFocus,
       isRequired,
       setUserFunction,
@@ -76,10 +76,10 @@ export const UserSearchDropdown = forwardRef(
     ref,
   ) => {
     const inputRef = useRef(null);
-    const [searchTerm, setSearchTerm] = useState(""); // Local state for search term
-    const [filteredItems, setFilteredItems] = useState<IUserData[]>([]); // Local state for filtered items
-    const [isMenuOpen, setIsMenuOpen] = useState(isClosed ? false : true); // Stores the menu open state
-    const [selectedUser, setSelectedUser] = useState<IUserData | null>(); // New state to store the selected name
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredItems, setFilteredItems] = useState<IUserData[]>([]);
+    const [isMenuOpen, setIsMenuOpen] = useState(isClosed ? false : true);
+    const [selectedUser, setSelectedUser] = useState<IUserData | null>();
     const [showAddUser, setShowAddUser] = useState<boolean>(false);
 
     const {
@@ -183,15 +183,7 @@ export const UserSearchDropdown = forwardRef(
     }));
 
     return (
-      <FormControl
-        isRequired={isRequired}
-        mb={0}
-        my={-4}
-        // p={-2}
-        // bg={"red"}
-        w={"100%"}
-        h={"100%"}
-      >
+      <FormControl isRequired={isRequired} mb={0} my={0} w={"100%"} h={"100%"}>
         <FormLabel>{label}</FormLabel>
         {selectedUser ? (
           <Box mb={2} color="blue.500">
@@ -200,7 +192,7 @@ export const UserSearchDropdown = forwardRef(
         ) : (
           <InputGroup>
             <Input
-              ref={inputRef} // Attach the ref to the input element
+              ref={inputRef} // Important: Attach the ref to the input element
               type="text"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
@@ -219,32 +211,13 @@ export const UserSearchDropdown = forwardRef(
             />
           </InputGroup>
         )}
-
-        {/* {selectedUser ? null : (
-          <Box pos="relative" w="100%">
-            <CustomMenuPortal
-              isOpen={filteredItems.length > 0 && isMenuOpen}
-              referenceElement={inputRef.current}
-              zIndex={9999}
-            >
-              <CustomMenu isOpen={filteredItems.length > 0 && isMenuOpen}>
-                <CustomMenuList minWidth="100%">
-                  {filteredItems.map((user) => (
-                    <CustomMenuItem
-                      key={user.pk}
-                      onClick={() => handleSelectUser(user)}
-                      user={user}
-                    />
-                  ))}
-                </CustomMenuList>
-              </CustomMenu>
-            </CustomMenuPortal>
-          </Box>
-        )} */}
-
         {selectedUser ? null : (
           <Box pos="relative" w="100%">
-            <CustomMenu isOpen={filteredItems.length > 0 && isMenuOpen}>
+            {/* Pass the inputRef directly to the CustomMenu component */}
+            <CustomMenu
+              isOpen={filteredItems.length > 0 && isMenuOpen}
+              inputRef={inputRef} // Pass the ref to the menu
+            >
               <CustomMenuList minWidth="100%">
                 {filteredItems.map((user) => (
                   <CustomMenuItem
@@ -257,16 +230,13 @@ export const UserSearchDropdown = forwardRef(
             </CustomMenu>
           </Box>
         )}
-        {/* <Box h="50px">
-                {helperText}
-            </Box> */}
         <FormHelperText>
           {hideCannotFind !== true &&
           hideCannotFind !== undefined &&
           showAddUser
             ? "Can't find who you're looking for? Use the buttons below to add an external user or email a DBCA staff member with a link to create an account - they must click the link and login."
             : helperText}
-        </FormHelperText>
+        </FormHelperText>{" "}
         {hideCannotFind !== true &&
           hideCannotFind !== undefined &&
           showAddUser && (
@@ -393,6 +363,7 @@ const CustomMenuPortal = ({
 interface CustomMenuProps {
   isOpen: boolean;
   children: React.ReactNode;
+  inputRef: React.RefObject<HTMLInputElement>; // Add inputRef to the interface
 }
 
 interface CustomMenuItemProps {
@@ -405,32 +376,30 @@ interface CustomMenuListProps {
   children: React.ReactNode;
 }
 
-const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
+const CustomMenu = ({
+  isOpen,
+  children,
+  inputRef,
+  ...rest
+}: CustomMenuProps) => {
   const { colorMode } = useColorMode();
   const [portalElement, setPortalElement] = useState<HTMLElement | null>(null);
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
 
-  // Reference to the input element
-  const inputRef = useRef(null);
-
-  // Find the input element when the component mounts
+  // Create portal element
   useEffect(() => {
-    // Try to find the input element by traversing up the DOM
-    const findInputElement = () => {
-      // First try to get the input directly (if rendered within the same component)
-      const input = document.querySelector(
-        'input[placeholder="Filter by user"]',
-      );
-      if (input) {
-        inputRef.current = input;
-        return;
-      }
-    };
+    const el = document.createElement("div");
+    el.style.position = "fixed";
+    el.style.zIndex = "9999";
+    document.body.appendChild(el);
+    setPortalElement(el);
 
-    findInputElement();
+    return () => {
+      document.body.removeChild(el);
+    };
   }, []);
 
-  // Update position based on the input element
+  // Update position when inputRef changes or when isOpen changes
   useEffect(() => {
     if (inputRef.current && isOpen) {
       const updatePosition = () => {
@@ -455,23 +424,9 @@ const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
     }
   }, [inputRef.current, isOpen]);
 
-  useEffect(() => {
-    // Create the portal element when component mounts
-    const el = document.createElement("div");
-    el.style.position = "fixed";
-    el.style.zIndex = "9999";
-    document.body.appendChild(el);
-    setPortalElement(el);
-
-    // Clean up when component unmounts
-    return () => {
-      document.body.removeChild(el);
-    };
-  }, []);
-
   if (!isOpen || !portalElement) return null;
 
-  // Use createPortal to render the menu to the portal element
+  // Use createPortal to render the menu at the correct position
   return createPortal(
     <Box
       pos="fixed"
@@ -482,7 +437,7 @@ const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
       bg={colorMode === "light" ? "white" : "gray.700"}
       boxShadow="md"
       zIndex={9999}
-      display={isOpen ? "block" : "none"}
+      borderRadius="md"
       {...rest}
     >
       {children}
