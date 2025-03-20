@@ -33,6 +33,7 @@ import { DeleteDocumentModal } from "../../../Modals/DeleteDocumentModal";
 import { ProjectClosureActionModal } from "../../../Modals/DocumentActionModals/ProjectClosureActionModal";
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
+import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
 
 interface IConceptDocumentActions extends ICaretakerPermissions {
   projectClosureData: IProjectClosure;
@@ -126,6 +127,9 @@ IConceptDocumentActions) => {
   const { baData, baLoading } = useBusinessArea(
     projectClosureData?.document?.project?.business_area?.pk,
   );
+
+  const { isDirectorateLoading, directorateData } =
+    useDivisionDirectorateMembers(baData?.division);
 
   const { userData: baLead } = useFullUserByPk(baData?.leader);
   const { userData: modifier, userLoading: modifierLoading } = useFullUserByPk(
@@ -588,6 +592,8 @@ IConceptDocumentActions) => {
                     gridTemplateColumns={"repeat(1, 1fr)"}
                   >
                     <ProjectClosureActionModal
+                      isDirectorateLoading={isDirectorateLoading}
+                      directorateData={directorateData}
                       userData={userData}
                       action={"reopen"}
                       refetchData={refetchData}
@@ -708,6 +714,8 @@ IConceptDocumentActions) => {
                           userIsCaretakerOfBaLeader) && (
                           <>
                             <ProjectClosureActionModal
+                              isDirectorateLoading={isDirectorateLoading}
+                              directorateData={directorateData}
                               userData={userData}
                               refetchData={refetchData}
                               baData={baData}
@@ -812,6 +820,8 @@ IConceptDocumentActions) => {
                             </>
                             <>
                               <ProjectClosureActionModal
+                                isDirectorateLoading={isDirectorateLoading}
+                                directorateData={directorateData}
                                 userData={userData}
                                 refetchData={refetchData}
                                 baData={baData}
@@ -909,6 +919,8 @@ IConceptDocumentActions) => {
                     // gridTemplateColumns={"repeat(2, 1fr)"}
                   >
                     <ProjectClosureActionModal
+                      isDirectorateLoading={isDirectorateLoading}
+                      directorateData={directorateData}
                       userData={userData}
                       action={"reopen"}
                       refetchData={refetchData}
@@ -937,6 +949,8 @@ IConceptDocumentActions) => {
                       // ml={4}
                       >
                         <ProjectClosureActionModal
+                          isDirectorateLoading={isDirectorateLoading}
+                          directorateData={directorateData}
                           userData={userData}
                           refetchData={refetchData}
                           action={"send_back"}
@@ -1030,6 +1044,8 @@ IConceptDocumentActions) => {
                           ml={3}
                         >
                           <ProjectClosureActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             refetchData={refetchData}
                             action={"recall"}
@@ -1058,6 +1074,10 @@ IConceptDocumentActions) => {
                             size={"sm"}
                             // onClick={onS3RecallModalOpen}
                             onClick={onS2RecallModalOpen}
+                            disabled={
+                              directorateData?.length < 1 &&
+                              !userData?.is_superuser
+                            }
                           >
                             Recall Approval
                           </Button>
@@ -1077,6 +1097,8 @@ IConceptDocumentActions) => {
                           ml={3}
                         >
                           <ProjectClosureActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             refetchData={refetchData}
                             action={"approve"}
@@ -1105,6 +1127,10 @@ IConceptDocumentActions) => {
                             }}
                             size={"sm"}
                             onClick={onS2ApprovalModalOpen}
+                            disabled={
+                              directorateData?.length < 1 &&
+                              !userData?.is_superuser
+                            }
                           >
                             Approve
                           </Button>
@@ -1152,6 +1178,8 @@ IConceptDocumentActions) => {
                   </Flex>
                   <Flex justifyContent={"flex-end"} w={"100%"} mt={3}>
                     <ProjectClosureActionModal
+                      isDirectorateLoading={isDirectorateLoading}
+                      directorateData={directorateData}
                       userData={userData}
                       action={"reopen"}
                       refetchData={refetchData}
@@ -1202,6 +1230,8 @@ IConceptDocumentActions) => {
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ProjectClosureActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             action={"send_back"}
                             refetchData={refetchData}
@@ -1246,6 +1276,8 @@ IConceptDocumentActions) => {
                         userData?.business_area?.name === "Directorate") && (
                         <Center justifyContent={"flex-start"} ml={3}>
                           <ProjectClosureActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             action={"recall"}
                             refetchData={refetchData}
@@ -1324,6 +1356,8 @@ IConceptDocumentActions) => {
                         ?.directorate_approval_granted && (
                         <Center ml={3} justifyContent={"flex-end"}>
                           <ProjectClosureActionModal
+                            isDirectorateLoading={isDirectorateLoading}
+                            directorateData={directorateData}
                             userData={userData}
                             action={"approve"}
                             refetchData={refetchData}

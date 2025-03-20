@@ -36,7 +36,8 @@ import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionD
 
 interface Props {
   userData: IUserMe;
-
+  directorateData: any;
+  isDirectorateLoading: boolean;
   action: "approve" | "recall" | "send_back" | "reopen";
   stage: number;
   documentPk: number;
@@ -52,6 +53,8 @@ export const ProjectClosureActionModal = ({
   userData,
   stage,
   documentPk,
+  directorateData,
+  isDirectorateLoading,
   // projectClosurePk,
   action,
   onClose,
@@ -156,9 +159,6 @@ export const ProjectClosureActionModal = ({
     approveProjectClosureMutation.mutate(formData);
   };
 
-  const { directorateData, isDirectorateLoading } =
-    useDivisionDirectorateMembers(baData?.division);
-
   return (
     <Modal
       isOpen={isOpen}
@@ -258,43 +258,50 @@ export const ProjectClosureActionModal = ({
                     {action === "reopen" ? "Project" : "project closure"}?
                   </Text>
                   <br />
-                  <Text>
-                    {action === "approve"
-                      ? "This will send an email to members of the Directorate for approval."
-                      : action === "recall"
-                        ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
-                        : action === "reopen"
-                          ? "This will delete the project closure document and set the status of the project to 'update requested'."
-                          : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
-                  </Text>
-
-                  {stage === 2 && action !== "send_back" && (
+                  {directorateData?.length > 0 && (
                     <>
-                      <Box
-                        pt={4}
-                        border={"1px solid"}
-                        borderColor={"gray.500"}
-                        rounded={"2xl"}
-                        p={4}
-                        mt={4}
-                      >
-                        <Text fontWeight={"semibold"}>Directorate Members</Text>
-                        <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
-                          {!isDirectorateLoading &&
-                            directorateData?.map((member, index) => (
-                              <Center key={index}>
-                                <Box px={2} w={"100%"}>
-                                  <Text>{`${member.name}`}</Text>
-                                </Box>
-                              </Center>
-                            ))}
-                        </Grid>
-                      </Box>
+                      <Text>
+                        {action === "approve"
+                          ? "This will send an email to members of the Directorate for approval."
+                          : action === "recall"
+                            ? "This will return the approval status from 'Granted' to 'Required' and send an email to the Directorate letting them know that you recalled your approval."
+                            : action === "reopen"
+                              ? "This will delete the project closure document and set the status of the project to 'update requested'."
+                              : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
+                      </Text>
+
+                      {stage === 2 && action !== "send_back" && (
+                        <>
+                          <Box
+                            pt={4}
+                            border={"1px solid"}
+                            borderColor={"gray.500"}
+                            rounded={"2xl"}
+                            p={4}
+                            mt={4}
+                          >
+                            <Text fontWeight={"semibold"}>
+                              Directorate Members
+                            </Text>
+                            <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
+                              {!isDirectorateLoading &&
+                                directorateData?.map((member, index) => (
+                                  <Center key={index}>
+                                    <Box px={2} w={"100%"}>
+                                      <Text>{`${member.name}`}</Text>
+                                    </Box>
+                                  </Center>
+                                ))}
+                            </Grid>
+                          </Box>
+                        </>
+                      )}
                     </>
                   )}
+
                   <Checkbox
                     isDisabled={!userData?.is_superuser}
-                    mt={8}
+                    mt={directorateData?.length > 0 ? 8 : 0}
                     isChecked={shouldSendEmail}
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >

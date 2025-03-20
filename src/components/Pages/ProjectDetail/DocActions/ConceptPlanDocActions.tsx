@@ -43,6 +43,7 @@ import { ConceptPlanActionModal } from "../../../Modals/DocumentActionModals/Con
 import { UserProfile } from "../../Users/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
 import useCaretakerPermissions from "@/lib/hooks/helper/useCaretakerPermissions";
+import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
 
 interface IConceptDocumentActions extends ICaretakerPermissions {
   conceptPlanData: IConceptPlan;
@@ -62,6 +63,13 @@ export const ConceptPlanDocActions = ({
   userIsCaretakerOfProjectLeader,
 }: // , projectPk
 IConceptDocumentActions) => {
+  const { baData, baLoading } = useBusinessArea(
+    conceptPlanData?.document?.project?.business_area?.pk,
+  );
+
+  const { directorateData, isDirectorateLoading } =
+    useDivisionDirectorateMembers(baData?.division);
+
   const { colorMode } = useColorMode();
 
   const {
@@ -108,10 +116,6 @@ IConceptDocumentActions) => {
   } = useDisclosure();
 
   const { userData, userLoading } = useUser();
-
-  const { baData, baLoading } = useBusinessArea(
-    conceptPlanData?.document?.project?.business_area?.pk,
-  );
 
   // useEffect(() => {
   //   console.log({
@@ -626,6 +630,8 @@ IConceptDocumentActions) => {
                         userData?.pk === baLead?.pk) && (
                         <Center justifyContent={"flex-end"}>
                           <ConceptPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             baData={baData}
@@ -671,6 +677,8 @@ IConceptDocumentActions) => {
                         userData?.pk === baLead?.pk) && (
                         <Center justifyContent={"flex-end"}>
                           <ConceptPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             baData={baData}
@@ -772,6 +780,8 @@ IConceptDocumentActions) => {
                         // ml={4}
                         >
                           <ConceptPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             action={"send_back"}
@@ -820,6 +830,8 @@ IConceptDocumentActions) => {
                           ml={3}
                         >
                           <ConceptPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             action={"recall"}
@@ -847,6 +859,10 @@ IConceptDocumentActions) => {
                             }}
                             size={"sm"}
                             // onClick={onS3RecallModalOpen}
+                            disabled={
+                              !userData?.is_superuser &&
+                              directorateData?.length < 1
+                            }
                             onClick={onS2RecallModalOpen}
                           >
                             Recall Approval
@@ -865,6 +881,8 @@ IConceptDocumentActions) => {
                           ml={3}
                         >
                           <ConceptPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             refetchData={refetchData}
                             action={"approve"}
@@ -892,6 +910,10 @@ IConceptDocumentActions) => {
                                   : "green.500",
                             }}
                             size={"sm"}
+                            disabled={
+                              !userData?.is_superuser &&
+                              directorateData?.length < 1
+                            }
                             onClick={onS2ApprovalModalOpen}
                           >
                             Approve
@@ -957,6 +979,8 @@ IConceptDocumentActions) => {
                         userIsCaretakerOfAdmin) && (
                         <Center justifyContent={"flex-end"} ml={3}>
                           <ConceptPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             action={"send_back"}
                             refetchData={refetchData}
@@ -987,6 +1011,7 @@ IConceptDocumentActions) => {
                                   : "orange.500",
                             }}
                             size={"sm"}
+                            // disabled={directorateData?.length < 1}
                             onClick={onS3SendbackModalOpen}
                           >
                             Send Back
@@ -1001,6 +1026,8 @@ IConceptDocumentActions) => {
                         // !all_documents?.project_plan &&
                         <Center justifyContent={"flex-start"} ml={3}>
                           <ConceptPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             action={"recall"}
                             refetchData={refetchData}
@@ -1060,6 +1087,8 @@ IConceptDocumentActions) => {
                         ?.directorate_approval_granted && (
                         <Center ml={3} justifyContent={"flex-end"}>
                           <ConceptPlanActionModal
+                            directorateData={directorateData}
+                            isDirectorateLoading={isDirectorateLoading}
                             userData={userData}
                             action={"approve"}
                             refetchData={refetchData}
