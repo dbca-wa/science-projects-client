@@ -24,7 +24,7 @@ import {
 } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
-import { ProjectClosureDocActions } from "./DocActions/ProjectClosureDocActions";
+import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 
 interface Props extends ICaretakerPermissions {
   document: IProjectClosure | null;
@@ -162,10 +162,12 @@ export const ProjectClosureContents = ({
       }}
     >
       {/* <DocumentActions /> */}
-      <ProjectClosureDocActions
-        all_documents={all_documents}
-        projectClosureData={document}
+
+      <UnifiedDocumentActions
+        documentType="projectclosure"
+        documentData={document}
         refetchData={refetch}
+        all_documents={all_documents}
         setToLastTab={setToLastTab}
         isBaLead={isBaLead}
         userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}

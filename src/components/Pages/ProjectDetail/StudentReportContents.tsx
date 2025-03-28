@@ -26,7 +26,7 @@ import {
 import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
-import { StudentReportDocActions } from "./DocActions/StudentReportDocActions";
+import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 
 interface Props extends ICaretakerPermissions {
   documents: IStudentReport[];
@@ -261,10 +261,12 @@ export const StudentReportContents = ({
           }}
         >
           {/* Actions */}
-          <StudentReportDocActions
+
+          <UnifiedDocumentActions
+            documentType="studentreport"
+            documentData={selectedStudentReport}
             refetchData={refetch}
             callSameData={handleSetSameYear}
-            studentReportData={selectedStudentReport}
             documents={documents}
             setToLastTab={setToLastTab}
             isBaLead={isBaLead}
@@ -273,6 +275,7 @@ export const StudentReportContents = ({
             userIsCaretakerOfMember={userIsCaretakerOfMember}
             userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
           />
+
           {/* Editors */}
 
           <RichTextEditor
