@@ -30,6 +30,7 @@ import {
 } from "@/types";
 import { handleDocumentAction } from "@/lib/api";
 import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
+import EmailFeedbackRTE from "./EmailFeedbackRTE";
 
 export type DocumentType =
   | "concept"
@@ -82,6 +83,9 @@ export const UnifiedDocumentActionModal = ({
 
   const [shouldSendEmail, setShouldSendEmail] = useState(true);
   const [feedbackHtml, setFeedbackHtml] = useState("");
+  const [feedbackIsEmpty, setFeedbackIsEmpty] = useState(true);
+  const [feedbackLimitExceeded, setFeedbackLimitExceeded] = useState(false);
+
   const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
     baData?.leader,
   );
@@ -201,9 +205,10 @@ export const UnifiedDocumentActionModal = ({
     // Update form data with checkbox state and feedback
     formData.shouldSendEmail = shouldSendEmail;
 
-    // Only add feedback if sending email and there's feedback to send
+    // Only Add comment if sending email and there's feedback to send
     if (
       shouldSendEmail &&
+      !feedbackIsEmpty &&
       feedbackHtml.trim() &&
       (action === "send_back" || action === "recall")
     ) {
@@ -310,22 +315,23 @@ export const UnifiedDocumentActionModal = ({
                     )}
                     alerting them that you have{" "}
                     {action === "approve"
-                      ? "submitted"
+                      ? "submitted "
                       : action === "reopen"
-                        ? "reopened"
-                        : "recalled"}
+                        ? "reopened "
+                        : "recalled "}
                     this {action === "reopen" ? "project" : "document"}?
                   </Checkbox>
 
                   {showFeedbackField && (
                     <Box mt={4}>
-                      <Text mb={2}>Add feedback (optional):</Text>
-                      <Textarea
-                        value={feedbackHtml}
-                        onChange={(e) => setFeedbackHtml(e.target.value)}
-                        placeholder="Enter any feedback or additional information here..."
-                        size="md"
-                        rows={4}
+                      <Text mb={2}>Add comment (optional):</Text>
+
+                      <EmailFeedbackRTE
+                        onChange={(fcd) => {
+                          setFeedbackHtml(fcd.feedbackHtml);
+                          setFeedbackIsEmpty(fcd.isEmpty);
+                          setFeedbackLimitExceeded(fcd.exceedsLimit);
+                        }}
                       />
                     </Box>
                   )}
@@ -405,13 +411,13 @@ export const UnifiedDocumentActionModal = ({
 
                   {showFeedbackField && (
                     <Box mt={4}>
-                      <Text mb={2}>Add feedback (optional):</Text>
-                      <Textarea
-                        value={feedbackHtml}
-                        onChange={(e) => setFeedbackHtml(e.target.value)}
-                        placeholder="Enter any feedback or additional information here..."
-                        size="md"
-                        rows={4}
+                      <Text mb={2}>Add comment (optional):</Text>
+                      <EmailFeedbackRTE
+                        onChange={(fcd) => {
+                          setFeedbackHtml(fcd.feedbackHtml);
+                          setFeedbackIsEmpty(fcd.isEmpty);
+                          setFeedbackLimitExceeded(fcd.exceedsLimit);
+                        }}
                       />
                     </Box>
                   )}
@@ -465,13 +471,13 @@ export const UnifiedDocumentActionModal = ({
 
                       {showFeedbackField && (
                         <Box mt={4}>
-                          <Text mb={2}>Add feedback (optional):</Text>
-                          <Textarea
-                            value={feedbackHtml}
-                            onChange={(e) => setFeedbackHtml(e.target.value)}
-                            placeholder="Enter any feedback or additional information here..."
-                            size="md"
-                            rows={4}
+                          <Text mb={2}>Add comment (optional):</Text>
+                          <EmailFeedbackRTE
+                            onChange={(fcd) => {
+                              setFeedbackHtml(fcd.feedbackHtml);
+                              setFeedbackIsEmpty(fcd.isEmpty);
+                              setFeedbackLimitExceeded(fcd.exceedsLimit);
+                            }}
                           />
                         </Box>
                       )}
@@ -499,6 +505,7 @@ export const UnifiedDocumentActionModal = ({
               form="approval-form"
               type="submit"
               isLoading={documentActionMutation.isPending}
+              disabled={feedbackLimitExceeded}
               bg={colorMode === "dark" ? "green.500" : "green.400"}
               color={"white"}
               _hover={{
