@@ -179,7 +179,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               title={"Feedback on Documents"}
               kind="feature"
               description={
-                "Business Area leads and the directorate can now provide feedback via the notification email when sending a document back for revisions."
+                "Users may now provide feedback or comments via the notification email when sending a document back for revisions or recalling."
               }
             />
             {/* <PatchNoteEntry
