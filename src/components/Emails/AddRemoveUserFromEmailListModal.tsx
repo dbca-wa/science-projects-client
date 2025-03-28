@@ -73,11 +73,11 @@ const AddRemoveUserFromEmailListModal = ({
   // Debug log to check updates
   useEffect(() => {
     if (divisionPk === 1) {
-      console.log("Users to action updated:", usersToAction);
-      console.log(
-        "Users list for submission:",
-        usersToAction?.map((u) => u.pk),
-      );
+      // console.log("Users to action updated:", usersToAction);
+      // console.log(
+      //   "Users list for submission:",
+      //   usersToAction?.map((u) => u.pk),
+      // );
     }
   }, [usersToAction, divisionPk]);
 
@@ -129,7 +129,7 @@ const AddRemoveUserFromEmailListModal = ({
       usersList: usersToAction?.map((u) => u.pk) || [],
     };
 
-    console.log("Submitting form data:", dataToSubmit);
+    // console.log("Submitting form data:", dataToSubmit);
     addRemoveEmailListMutation.mutate(dataToSubmit);
   };
 

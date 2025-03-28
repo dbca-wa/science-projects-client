@@ -59,7 +59,7 @@ export const ProjectDetail = ({
 
   useEffect(() => {
     if (!isLoading && projectData) {
-      console.log(projectData);
+      // console.log(projectData);
       setLocation(projectData.location);
       setBaseInformation(projectData.project);
       setDetails(projectData.details);

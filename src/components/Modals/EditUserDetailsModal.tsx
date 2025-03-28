@@ -1,10 +1,10 @@
 // Modal for editing user details
 
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
   Box,
-  Image,
   Button,
-  Center,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -22,28 +22,26 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
-  Textarea,
   ToastId,
+  UseToastOptions,
   useColorMode,
   useDisclosure,
   useToast,
-  FormHelperText,
-  TabList,
-  Tabs,
-  Tab,
-  TabPanels,
-  TabPanel,
-  Flex,
-  UseToastOptions,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
-import { IAffiliation, IBranch, IBusinessArea, IUserData } from "../../types";
-import { GiGraduateCap } from "react-icons/gi";
-import { AiFillPhone } from "react-icons/ai";
-import { GrMail } from "react-icons/gr";
-import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { AiFillPhone } from "react-icons/ai";
+import { GiGraduateCap } from "react-icons/gi";
+import { GrMail } from "react-icons/gr";
+import { MdFax } from "react-icons/md";
+import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import {
   IFullUserUpdateVariables,
   MutationError,
@@ -51,16 +49,12 @@ import {
   adminUpdateUser,
   removeUserAvatar,
 } from "../../lib/api";
-import { Controller, useForm } from "react-hook-form";
-import { MdFax } from "react-icons/md";
-import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
-import noImageLink from "/sad-face.png";
 import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
-import { useAffiliations } from "@/lib/hooks/tanstack/useAffiliations";
-import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
-import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";
+import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
+import { IAffiliation, IBranch, IBusinessArea, IUserData } from "../../types";
 import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
+import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
+import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";
 
 interface IModalProps {
   isOpen: boolean;
@@ -263,7 +257,7 @@ export const EditUserDetailsModal = ({
     affiliation,
   }: IFullUserUpdateVariables) => {
     const image = activeOption === "url" ? selectedImageUrl : selectedFile;
-    console.log(affiliation);
+    // console.log(affiliation);
     await fullMutation.mutateAsync({
       display_first_name,
       display_last_name,
@@ -280,13 +274,13 @@ export const EditUserDetailsModal = ({
     });
   };
 
-  useEffect(() => {
-    if (!isValid) {
-      console.log("Form validation errors:", errors);
-    }
-  }, [errors, isValid]);
+  // useEffect(() => {
+  //   if (!isValid) {
+  //     console.log("Form validation errors:", errors);
+  //   }
+  // }, [errors, isValid]);
   const me = useUser();
-  useEffect(() => console.log({ user, userData }), [user, userData]);
+  // useEffect(() => console.log({ user, userData }), [user, userData]);
 
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"3xl"}>

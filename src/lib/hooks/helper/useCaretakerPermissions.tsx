@@ -20,10 +20,14 @@ const PERMISSION_DEFAULTS = {
 const isValidCaretakingRelationship = (
   caretakee: ICaretakerSimpleUserData,
 ): boolean => {
-  console.log("Checking if caretaking relationship is valid:", caretakee);
+  // if (process.env.NODE_ENV === "development") {
+  //   console.log("Checking if caretaking relationship is valid:", caretakee);
+  // }
   if (!caretakee?.end_date) return true;
   const dateIsExpired = checkIfDateExpired(new Date(caretakee.end_date));
-  console.log("Date expired status:", dateIsExpired);
+  // if (process.env.NODE_ENV === "development") {
+  //   console.log("Date expired status:", dateIsExpired);
+  // }
   return !dateIsExpired;
 };
 
@@ -181,17 +185,17 @@ const isCaretakerOfSuperuser = (
 
   const memberUser = members.find((m) => m.user?.pk === userToCheck.pk)?.user;
   if (memberUser?.is_superuser === true) {
-    if (process.env.NODE_ENV === "development") {
-      console.log(
-        `Found superuser in members: ${userToCheck.display_first_name}`,
-      );
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log(
+    //     `Found superuser in members: ${userToCheck.display_first_name}`,
+    //   );
+    // }
     return true;
   }
 
-  if (process.env.NODE_ENV === "development") {
-    console.log(`Checking caretakers of: ${userToCheck.display_first_name}`);
-  }
+  // if (process.env.NODE_ENV === "development") {
+  //   console.log(`Checking caretakers of: ${userToCheck.display_first_name}`);
+  // }
 
   const caretakers = memberUser?.caretakers || userToCheck.caretakers;
 
@@ -199,9 +203,9 @@ const isCaretakerOfSuperuser = (
     caretakers?.some((caretaker) => {
       if (!caretaker || !isValidCaretakeeForUser(myData, caretaker.pk))
         return false;
-      if (process.env.NODE_ENV === "development") {
-        console.log(`Checking caretaker: ${caretaker.display_first_name}`);
-      }
+      // if (process.env.NODE_ENV === "development") {
+      //   console.log(`Checking caretaker: ${caretaker.display_first_name}`);
+      // }
       return isCaretakerOfSuperuser(caretaker, members, visited, myData);
     }) ?? false
   );
@@ -249,7 +253,9 @@ const useCaretakerPermissions = (
         ),
         userIsCaretakerOfAdmin: checkCaretakerOfAdmin(myData, members),
       };
-      logCaretakerPermissions(permissions, myData);
+      if (process.env.NODE_ENV === "development") {
+        logCaretakerPermissions(permissions, myData);
+      }
       return permissions;
     } catch (error) {
       // Log error in development

@@ -155,7 +155,7 @@ export const EditProjectModal = ({
     (details?.external as IExternalProjectDetails)?.budget,
   );
 
-  useEffect(() => console.log(details), [details]);
+  // useEffect(() => console.log(details), [details]);
 
   const [organisation, setOrganisation] = useState(
     (details?.student as IStudentProjectDetails)?.organisation,
@@ -220,7 +220,7 @@ export const EditProjectModal = ({
         if (modifiedString?.startsWith(", ")) {
           modifiedString = modifiedString.substring(2);
         }
-        console.log("MOD:", modifiedString);
+        // console.log("MOD:", modifiedString);
         return modifiedString;
       });
     }
@@ -361,7 +361,7 @@ export const EditProjectModal = ({
   }, [openEditorsCount, closeEditor]);
   const updateProject = async (formData: IEditProject) => {
     setIsUpdating(true);
-    console.log(formData);
+    // console.log(formData);
     await updateProjectMutation.mutate(formData);
     setIsUpdating(false);
   };

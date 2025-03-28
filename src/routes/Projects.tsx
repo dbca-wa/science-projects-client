@@ -168,7 +168,7 @@ export const Projects = () => {
   };
 
   const [businessAreas, setBusinessAreas] = useState<IBusinessArea[]>([]);
-  console.log(businessAreas);
+  // console.log(businessAreas);
   const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
   useEffect(() => {
     const fetchBusinessAreas = async () => {

@@ -1,16 +1,6 @@
 import DocumentApprovedEmail from "@/components/Emails/DocumentApprovedEmail";
 import DocumentRecalledEmail from "@/components/Emails/DocumentRecalledEmail";
-import { DocumentApprovedEmailModal } from "@/components/Modals/Emails/DocumentApprovedEmailModal";
-import {
-  IDocumentApproved,
-  IDocumentReadyEmail,
-  IDocumentRecalled,
-  INewCycleEmail,
-  IProjectClosureEmail,
-  IReviewDocumentEmail,
-  sendDocumentApprovedEmail,
-  sendDocumentRecalledEmail,
-} from "@/lib/api";
+import { INewCycleEmail } from "@/lib/api";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
   Box,
@@ -30,7 +20,6 @@ import {
 } from "@chakra-ui/react";
 import React, { useRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { DocumentRecalledEmailModal } from "@/components/Modals/Emails/DocumentRecalledEmailModal";
 import { Head } from "@/components/Base/Head";
 import { on } from "events";
 import { IEmailModalProps, IUserMe } from "@/types";
@@ -41,95 +30,8 @@ interface IWrapper {
   children: React.ReactElement;
   templateName: string;
   openModalFunction: () => void;
-  props?:
-    | IReviewDocumentEmail
-    | INewCycleEmail
-    | IProjectClosureEmail
-    | IDocumentReadyEmail
-    | IDocumentApproved
-    | IDocumentRecalled;
+  props?: INewCycleEmail;
 }
-
-// const EmailWrapper = ({
-//   children,
-//   openModalFunction,
-//   templateName,
-// }: IWrapper) => {
-//   const { colorMode } = useColorMode();
-
-//   const wrapperRef = useRef(null);
-
-//   return (
-// <Box
-//   alignItems={"center"}
-//   justifyContent={"center"}
-//   w={"100%"}
-//   alignContent={"center"}
-//   //   bg={"gray.50"}
-//   rounded={"xl"}
-//   pos={"relative"}
-//   overflow={"hidden"}
-// >
-// <Box
-//   bg={colorMode === "light" ? "gray.50" : "gray.800"}
-//   pos={"absolute"}
-//   py={2}
-//   justifyContent={"center"}
-//   w={"100%"}
-//   border={"1px solid"}
-//   borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-//   roundedTop={"xl"}
-//   textAlign={"center"}
-// >
-//   <Text fontWeight={"bold"} color={"blue.500"}>
-//     {templateName}
-//   </Text>
-// </Box>
-
-//       <Box
-//         ref={wrapperRef}
-//         border={"1px solid"}
-//         borderColor={"gray.300"}
-//         rounded={"xl"}
-//         minH={"300px"}
-
-//         // bg={colorMode === "light" ? "gray.200" : "gray.700"}
-//       >
-//         {children}
-//       </Box>
-// <Flex
-//   justifyContent={"flex-end"}
-//   mt={-10}
-//   bg={colorMode === "light" ? "gray.200" : "gray.800"}
-//   py={4}
-//   px={6}
-//   border={"1px solid"}
-//   borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-//   rounded={"xl"}
-//   roundedTop={0}
-// >
-//   <Button
-//     bg={colorMode === "light" ? "blue.500" : "blue.500"}
-//     color={"white"}
-//     _hover={{
-//       bg: "blue.400",
-//     }}
-//     onClick={() => {
-//       const html = render(children, {
-//         pretty: true,
-//       });
-
-//       console.log(html);
-
-//       openModalFunction();
-//     }}
-//   >
-//     Send Test Email
-//   </Button>
-// </Flex>
-//     </Box>
-//   );
-// };
 
 // Type for the actual API functions
 type ApiEmailFunction = (
@@ -250,13 +152,13 @@ export const TestEmailPage = () => {
         <TabList>
           <Tab>Divisional Directorate Email Lists</Tab>
 
-          <Tab>Templates</Tab>
+          {/* <Tab>Templates</Tab> */}
         </TabList>
         <TabPanels>
           <TabPanel>
             <DivisionalEmailLists />
           </TabPanel>
-          <TabPanel>
+          {/* <TabPanel>
             <Box>
               <Text fontWeight="bold" fontSize="xl">
                 Email Templates
@@ -297,7 +199,7 @@ export const TestEmailPage = () => {
                 </Box>
               </Grid>
             </Box>
-          </TabPanel>
+          </TabPanel> */}
         </TabPanels>
       </Tabs>
     </>
