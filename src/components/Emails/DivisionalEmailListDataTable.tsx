@@ -76,6 +76,12 @@ export interface DivisionTableDataProps {
   disabledColumns?: Partial<Record<EmailListColumnTypes, boolean>>;
 }
 
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData extends unknown, TValue> {
+    width?: string;
+  }
+}
+
 const DivisionalEmailListDataTable = ({
   data,
   refetchData,
@@ -314,7 +320,14 @@ const DivisionalEmailListDataTable = ({
 
   // Fixed column filter with proper null check
   const columns = columnDefs.filter((column) => {
-    const accessorKeyValue = column.accessorKey as string | undefined;
+    // Use type guard to check if accessorKey exists on this column
+    const hasAccessorKey = "accessorKey" in column;
+
+    // Safely extract the accessorKey if it exists
+    const accessorKeyValue = hasAccessorKey
+      ? (column.accessorKey as string | undefined)
+      : undefined;
+
     return (
       !accessorKeyValue ||
       !disabledColumns[accessorKeyValue as EmailListColumnTypes]

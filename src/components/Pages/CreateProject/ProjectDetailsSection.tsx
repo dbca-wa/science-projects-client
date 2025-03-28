@@ -14,7 +14,7 @@ import "react-calendar/dist/Calendar.css";
 import { useBusinessAreas } from "../../../lib/hooks/tanstack/useBusinessAreas";
 import { useDepartmentalServices } from "../../../lib/hooks/tanstack/useDepartmentalServices";
 import "../../../styles/modalscrollbar.css";
-import { IBusinessArea, IDepartmentalService } from "../../../types";
+import { IBusinessArea, IDepartmentalService, IDivision } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { StartAndEndDateSelector } from "./StartAndEndDateSelector";
 
@@ -190,13 +190,17 @@ export const ProjectDetailsSection = ({
                 {orderedDivisionSlugs.flatMap((divSlug) => {
                   const divisionBusinessAreas = businessAreaList
                     .filter(
-                      (ba) => ba.division.slug === divSlug && ba.is_active,
+                      (ba) =>
+                        (ba.division as IDivision).slug === divSlug &&
+                        ba.is_active,
                     )
                     .sort((a, b) => a.name.localeCompare(b.name));
 
                   return divisionBusinessAreas.map((ba, index) => (
                     <option key={`${ba.name}${index}`} value={ba.pk}>
-                      {ba?.division ? `[${ba?.division?.slug}] ` : ""}
+                      {ba?.division
+                        ? `[${(ba?.division as IDivision)?.slug}] `
+                        : ""}
                       {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}
                       {ba.is_active ? "" : "(INACTIVE)"}
                     </option>

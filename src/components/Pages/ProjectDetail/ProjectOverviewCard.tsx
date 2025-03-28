@@ -33,6 +33,7 @@ import { HiOutlineExternalLink } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import {
   ICaretakerPermissions,
+  IDivision,
   IExtendedProjectDetails,
   IExternalProjectDetails,
   IProjectAreas,
@@ -869,9 +870,10 @@ export const ProjectOverviewCard = ({
                     color={"white"}
                   >
                     {baseInformation?.business_area?.name}{" "}
-                    {baseInformation?.business_area?.division?.slug
-                      ? `(${baseInformation?.business_area?.division?.slug})`
-                      : `(${baseInformation?.business_area?.division?.name})`}
+                    {(baseInformation?.business_area?.division as IDivision)
+                      ?.slug
+                      ? `(${(baseInformation?.business_area?.division as IDivision)?.slug})`
+                      : `(${(baseInformation?.business_area?.division as IDivision)?.name})`}
                   </Tag>
                 </Flex>
               </Flex>

@@ -4,7 +4,7 @@ import { BreadCrumb } from "@/components/Base/BreadCrumb";
 import { SearchProjects } from "@/components/Navigation/SearchProjects";
 import { downloadProjectsCSV, getAllBusinessAreas } from "@/lib/api";
 import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
-import { IBusinessArea } from "@/types";
+import { IBusinessArea, IDivision } from "@/types";
 import {
   Box,
   Button,
@@ -168,6 +168,7 @@ export const Projects = () => {
   };
 
   const [businessAreas, setBusinessAreas] = useState<IBusinessArea[]>([]);
+  console.log(businessAreas);
   const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
   useEffect(() => {
     const fetchBusinessAreas = async () => {
@@ -307,15 +308,18 @@ export const Projects = () => {
               {orderedDivisionSlugs.flatMap((divSlug) => {
                 // Filter business areas for the current division
                 const divisionBusinessAreas = businessAreas
-                  .filter((ba) => ba.division.slug === divSlug)
+                  .filter((ba) => {
+                    const division = ba.division as IDivision;
+                    return division.slug === divSlug;
+                  })
                   .sort((a, b) => a.name.localeCompare(b.name));
 
                 return divisionBusinessAreas.map((ba, index) => (
                   <option key={`${ba.name}${index}`} value={ba.pk}>
-                    {ba?.division ? `[${ba?.division?.slug}] ` : ""}
-                    {checkIsHtml(ba.name)
-                      ? sanitizeHtml(ba.name)
-                      : ba.name}{" "}
+                    {ba?.division
+                      ? `[${(ba?.division as IDivision)?.slug}] `
+                      : ""}
+                    {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
                     {ba.is_active ? "" : "(INACTIVE)"}
                   </option>
                 ));

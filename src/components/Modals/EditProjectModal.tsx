@@ -41,6 +41,7 @@ import {
   IAffiliation,
   IBusinessArea,
   IDepartmentalService,
+  IDivision,
   IExtendedProjectDetails,
   IExternalProjectDetails,
   ISimpleLocationData,
@@ -825,13 +826,16 @@ export const EditProjectModal = ({
                             const divisionBusinessAreas = businessAreaList
                               .filter(
                                 (ba) =>
-                                  ba.division.slug === divSlug && ba.is_active,
+                                  (ba.division as IDivision).slug === divSlug &&
+                                  ba.is_active,
                               )
                               .sort((a, b) => a.name.localeCompare(b.name));
 
                             return divisionBusinessAreas.map((ba, index) => (
                               <option key={`${ba.name}${index}`} value={ba.pk}>
-                                {ba?.division ? `[${ba?.division?.slug}] ` : ""}
+                                {ba?.division
+                                  ? `[${(ba?.division as IDivision)?.slug}] `
+                                  : ""}
                                 {checkIsHtml(ba.name)
                                   ? sanitizeHtml(ba.name)
                                   : ba.name}{" "}
