@@ -1,6 +1,8 @@
 // Used to display the tasks and projects of a user in the traditional layout
 
 import { useGetEndorsementsPendingMyAction } from "@/lib/hooks/tanstack/useGetEndorsementsPendingMyAction";
+import { useGetPendingAdminTasks } from "@/lib/hooks/tanstack/useGetPendingAdminTasks";
+import { useGetPendingCaretakerTasks } from "@/lib/hooks/tanstack/useGetPendingCaretakerTasks";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
   Accordion,
@@ -14,22 +16,19 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
 import { AiFillProject } from "react-icons/ai";
 import { FcHighPriority, FcOk } from "react-icons/fc";
 import { useGetDocumentsPendingMyAction } from "../../../lib/hooks/tanstack/useGetDocumentsPendingMyAction";
 import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
+import { AdminTasksDataTable } from "./AdminTasksDataTable";
 import { DocumentsDataTable } from "./DocumentsDataTable";
 import { EndorsementsDataTable } from "./EndorsementsDataTable";
 import { UserProjectsDataTable } from "./UserProjectsDataTable";
-import { useGetPendingAdminTasks } from "@/lib/hooks/tanstack/useGetPendingAdminTasks";
-import { AdminTasksDataTable } from "./AdminTasksDataTable";
-import { useGetPendingCaretakerTasks } from "@/lib/hooks/tanstack/useGetPendingCaretakerTasks";
 
 export const TraditionalTasksAndProjects = () => {
   const { colorMode } = useColorMode();
   const me = useUser();
-  console.log(me);
+  // console.log(me);
   // useEffect(() => console.log(me));
   const { projectData, projectsLoading } = useGetMyProjects();
   // useEffect(() => console.log(projectData));
@@ -53,12 +52,12 @@ export const TraditionalTasksAndProjects = () => {
   const { pendingCaretakerTasksLoading, pendingCaretakerTaskData } =
     useGetPendingCaretakerTasks(me?.userData?.pk);
 
-  useEffect(() => {
-    if (!pendingCaretakerTasksLoading) {
-      console.log("Caretaker Data:");
-      console.log(pendingCaretakerTaskData);
-    }
-  }, [pendingCaretakerTasksLoading, pendingCaretakerTaskData]);
+  // useEffect(() => {
+  //   if (!pendingCaretakerTasksLoading) {
+  //     console.log("Caretaker Data:");
+  //     console.log(pendingCaretakerTaskData);
+  //   }
+  // }, [pendingCaretakerTasksLoading, pendingCaretakerTaskData]);
 
   // useEffect(() => {
   //   if (!pendingAdminTasksLoading) {

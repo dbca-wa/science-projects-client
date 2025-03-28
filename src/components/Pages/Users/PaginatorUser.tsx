@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useBranches } from "../../../lib/hooks/tanstack/useBranches";
 import { useBusinessAreas } from "../../../lib/hooks/tanstack/useBusinessAreas";
 import { UserGridItem } from "./UserGridItem";
-import { useEffect } from "react";
 
 interface IPaginationProps {
   data: IUserData[];
@@ -42,9 +41,9 @@ export const PaginatorUser = ({
     startPage = Math.max(1, endPage - maxDisplayedPages + 1);
   }
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  // useEffect(() => {
+  //   console.log(data);
+  // }, [data]);
 
   return (
     <Flex flexDir={"column"} minH={"64vh"}>

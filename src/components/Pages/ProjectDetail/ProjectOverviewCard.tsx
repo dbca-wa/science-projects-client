@@ -103,7 +103,7 @@ export const ProjectOverviewCard = ({
   userIsCaretakerOfMember,
   userIsCaretakerOfProjectLeader,
 }: IProjectOverviewCardProps) => {
-  console.log(baseInformation);
+  // console.log(baseInformation);
   // useEffect(() => {
   //   console.log(details);
   // }, [details]);
@@ -457,7 +457,7 @@ export const ProjectOverviewCard = ({
   });
 
   const cancelDeletionRequest = () => {
-    console.log("Cancel deletion request");
+    // console.log("Cancel deletion request");
     cancelAdminTaskRequestMutation.mutate({
       taskPk: baseInformation?.deletion_request_id,
     });

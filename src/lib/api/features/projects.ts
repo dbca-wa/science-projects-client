@@ -204,7 +204,7 @@ export const updateTeamMemberPosition = async (
 export const getProjectTeam = async ({ queryKey }: QueryFunctionContext) => {
   const [_, pk] = queryKey;
   const res = instance.get(`projects/${pk}/team`).then((res) => {
-    console.log("Team Data", res.data);
+    // console.log("Team Data", res.data);
     return res.data;
   });
   return res;
@@ -228,12 +228,12 @@ export const getDivisionDirectorateMembers = async ({
   // Assuming your query key is structured like ['directorateList', divisionPk]
   const [_key, pk] = queryKey;
 
-  console.log({ _key, pk });
+  // console.log({ _key, pk });
   if (!pk || typeof pk !== "number") {
     throw new Error("Division PK is required and must be a number");
   }
 
-  console.log("Checking with pk:", pk);
+  // console.log("Checking with pk:", pk);
   const response = await instance.get(`agencies/divisions/${pk}/email_list`);
   if (response.status === 200) {
     return response.data.directorate_email_list;
@@ -714,7 +714,7 @@ export const getMapProjectsBasedOnSearchTerm = async (
       if (filters.filterBA === "All") {
         // skip to get all areas
       } else {
-        console.log("BA", filters.filterBA);
+        // console.log("BA", filters.filterBA);
         url += `&businessarea=${filters.filterBA}`;
       }
     }

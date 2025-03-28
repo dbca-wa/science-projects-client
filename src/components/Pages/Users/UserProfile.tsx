@@ -27,7 +27,7 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { FiCopy } from "react-icons/fi";
@@ -261,10 +261,10 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
   const { caretakerData, caretakerDataLoading, refetchCaretakerData } =
     useCheckExistingCaretaker();
 
-  useEffect(() => {
-    if (!caretakerDataLoading) console.log(caretakerData);
-    console.log(user);
-  }, [caretakerData, caretakerDataLoading, user]);
+  // useEffect(() => {
+  //   if (!caretakerDataLoading) console.log(caretakerData);
+  //   console.log(user);
+  // }, [caretakerData, caretakerDataLoading, user]);
 
   const viewingUserIsAccount = me?.userData?.pk === user?.pk;
   const viewingUserIsSuper = me?.userData?.is_superuser;
@@ -596,8 +596,8 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                               : ``}
                           </span>
                           <span
-                            onClick={() => console.log(user)}
-                            // style={{ color: "blue.500" }}
+                          // onClick={() => console.log(user)}
+                          // style={{ color: "blue.500" }}
                           >
                             {user.business_area.name}
                           </span>
