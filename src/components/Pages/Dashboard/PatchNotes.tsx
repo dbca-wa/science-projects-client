@@ -182,13 +182,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "Business Area leads and the directorate can now provide feedback via the notification email when sending a document back for revisions."
               }
             />
-            <PatchNoteEntry
+            {/* <PatchNoteEntry
               title={"Mention Users in comments"}
               kind="feature"
               description={
                 "Users may not mention each other in the comments section. Doing so will send an email to that user letting them know they were mentioned. This ensures time-sensitive comments are acknowledged."
               }
-            />
+            /> */}
             <PatchNoteEntry
               title={"Directorate Level Email Lists"}
               kind="feature"
@@ -201,13 +201,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               kind="fix"
               description={"Typos in email subject lines have been fixed."}
             />
-            <PatchNoteEntry
+            {/* <PatchNoteEntry
               title={"Remedy Buttons"}
               kind="fix"
               description={
                 "A bug has been patched in the Remedy Problematic Project function which prevented all projects from being updated."
               }
-            />
+            /> */}
 
             {/* <PatchNoteEntry
               title={"Modern Layout Updated"}
@@ -224,13 +224,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "Feedback email submission adjusted to go to shared inbox for ecoinformatics."
               }
             /> */}
-            <PatchNoteEntry
+            {/* <PatchNoteEntry
               title={"Documentation"}
               kind="update"
               description={
                 "Documentation / Quick Guide has been updated to reflect recent changes."
               }
-            />
+            /> */}
             <PatchNoteEntry
               title={"Dependencies"}
               kind="update"
