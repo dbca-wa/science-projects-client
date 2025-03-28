@@ -15,7 +15,7 @@ import {
 } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
-import { ProjectPlanDocActions } from "./DocActions/ProjectPlanDocActions";
+import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 import { MethodologyImage } from "./MethodologyImage";
 import { ProjectPlanEndorsements } from "./ProjectPlanEndorsements";
 
@@ -89,12 +89,13 @@ export const ProjectPlanContents = ({
         animation: "oscillate 8s ease-in-out infinite",
       }}
     >
-      <ProjectPlanDocActions
-        all_documents={all_documents}
-        projectPlanData={document}
+      <UnifiedDocumentActions
+        documentType="projectplan"
+        documentData={document}
         refetchData={refetch}
-        setToLastTab={setToLastTab}
+        all_documents={all_documents}
         projectAreas={projectAreas}
+        setToLastTab={setToLastTab}
         isBaLead={isBaLead}
         userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
         userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}

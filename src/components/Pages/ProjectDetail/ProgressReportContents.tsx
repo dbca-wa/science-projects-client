@@ -27,7 +27,7 @@ import {
 import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
-import { ProgressReportDocActions } from "./DocActions/ProgressReportDocActions";
+import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 
 interface Props extends ICaretakerPermissions {
   baseAPI: string;
@@ -261,10 +261,11 @@ export const ProgressReportContents = ({
           }}
         >
           {/* Actions */}
-          <ProgressReportDocActions
+          <UnifiedDocumentActions
+            documentType="progressreport"
+            documentData={selectedProgressReport}
             refetchData={refetch}
             callSameData={handleSetSameYear}
-            progressReportData={selectedProgressReport}
             documents={documents}
             setToLastTab={setToLastTab}
             isBaLead={isBaLead}
@@ -273,6 +274,7 @@ export const ProgressReportContents = ({
             userIsCaretakerOfMember={userIsCaretakerOfMember}
             userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
           />
+
           {/* Editors */}
 
           <RichTextEditor

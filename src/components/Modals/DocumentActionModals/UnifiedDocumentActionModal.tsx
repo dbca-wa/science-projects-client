@@ -1,5 +1,3 @@
-// Modal for handling Project Closure Actions
-
 import {
   Button,
   Text,
@@ -19,6 +17,7 @@ import {
   Grid,
   Center,
   UseToastOptions,
+  Textarea,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -28,41 +27,49 @@ import {
   IBusinessArea,
   IProjectData,
   IUserMe,
-} from "../../../types";
-import { handleDocumentAction } from "../../../lib/api";
-import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
-import { useDirectorateMembers } from "../../../lib/hooks/tanstack/useDirectorateMembers";
-import { useDivisionDirectorateMembers } from "@/lib/hooks/tanstack/useDivisionDirectorateMembers";
+} from "@/types";
+import { handleDocumentAction } from "@/lib/api";
+import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
 
-interface Props {
+export type DocumentType =
+  | "concept"
+  | "projectplan"
+  | "progressreport"
+  | "studentreport"
+  | "projectclosure";
+export type ActionType = "approve" | "recall" | "send_back" | "reopen";
+
+interface UnifiedDocumentActionModalProps {
   userData: IUserMe;
-  directorateData: any;
-  isDirectorateLoading: boolean;
-  action: "approve" | "recall" | "send_back" | "reopen";
+  action: ActionType;
   stage: number;
   documentPk: number;
-  projectClosurePk: number;
+  documentType: DocumentType;
   projectData: IProjectData;
   baData: IBusinessArea;
   isOpen: boolean;
-  refetchData: () => void;
+  refetchData?: () => void;
+  callSameData?: () => void; // Alternative refresh function used in some components
   onClose: () => void;
+  directorateData: any;
+  isDirectorateLoading: boolean;
 }
 
-export const ProjectClosureActionModal = ({
+export const UnifiedDocumentActionModal = ({
   userData,
   stage,
   documentPk,
-  directorateData,
-  isDirectorateLoading,
-  // projectClosurePk,
+  documentType,
   action,
   onClose,
   isOpen,
   projectData,
   baData,
   refetchData,
-}: Props) => {
+  callSameData,
+  directorateData,
+  isDirectorateLoading,
+}: UnifiedDocumentActionModalProps) => {
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -74,23 +81,50 @@ export const ProjectClosureActionModal = ({
   };
 
   const [shouldSendEmail, setShouldSendEmail] = useState(true);
+  const [feedbackHtml, setFeedbackHtml] = useState("");
   const { userData: baLead, userLoading: baLeadLoading } = useFullUserByPk(
     baData?.leader,
   );
 
-  const sendEmail = async () => {
-    if (!baLeadLoading && baLead !== undefined && baData !== undefined) {
-      if (shouldSendEmail) {
-        console.log(
-          `Sending Email to ${baLead?.first_name} ${baLead?.last_name}`,
-        );
-      } else {
-        console.log("No email sent");
-      }
+  // Get proper document type name for display
+  const getDocumentTypeName = () => {
+    switch (documentType) {
+      case "concept":
+        return "Concept Plan";
+      case "projectplan":
+        return "Project Plan";
+      case "progressreport":
+        return "Progress Report";
+      case "studentreport":
+        return "Student Report";
+      case "projectclosure":
+        return "Project Closure";
+      default:
+        return "Document";
     }
   };
 
-  const approveProjectClosureMutation = useMutation({
+  const documentTypeName = getDocumentTypeName();
+
+  // Get description of what happens on approval (stage 3)
+  const getFinalApprovalDescription = () => {
+    switch (documentType) {
+      case "concept":
+        return "This will provide final approval for this concept plan, creating a project plan.";
+      case "projectplan":
+        return "This will provide final approval for this project plan, enabling creation of progress reports.";
+      case "progressreport":
+        return "This will provide final approval for this progress report, adding it to the projects in the Annual Report.";
+      case "studentreport":
+        return "This will provide final approval for this student report, adding it to the Annual Report.";
+      case "projectclosure":
+        return "This will provide final approval for this project closure, closing the project.";
+      default:
+        return "This will provide final approval for this document.";
+    }
+  };
+
+  const documentActionMutation = useMutation({
     mutationFn: handleDocumentAction,
     onMutate: () => {
       addToast({
@@ -100,7 +134,9 @@ export const ProjectClosureActionModal = ({
             ? "Approving"
             : action === "recall"
               ? "Recalling"
-              : "Sending Back"
+              : action === "reopen"
+                ? "Reopening"
+                : "Sending Back"
         }`,
         position: "top-right",
       });
@@ -109,12 +145,14 @@ export const ProjectClosureActionModal = ({
       if (toastIdRef.current) {
         toast.update(toastIdRef.current, {
           title: "Success",
-          description: `Document ${
+          description: `${documentTypeName} ${
             action === "approve"
               ? "Approved"
               : action === "recall"
                 ? "Recalled"
-                : "Sent Back"
+                : action === "reopen"
+                  ? "Reopened"
+                  : "Sent Back"
           }`,
           status: "success",
           position: "top-right",
@@ -123,11 +161,14 @@ export const ProjectClosureActionModal = ({
         });
       }
       reset();
-      await refetchData();
-      await sendEmail();
+
+      // Call the appropriate refresh function
+      if (refetchData) await refetchData();
+      if (callSameData) callSameData();
 
       onClose();
 
+      // Invalidate project query to refresh data
       setTimeout(() => {
         queryClient.invalidateQueries({
           queryKey: ["projects", projectData?.pk],
@@ -142,8 +183,10 @@ export const ProjectClosureActionModal = ({
               ? "Approve"
               : action === "recall"
                 ? "Recall"
-                : "Send Back"
-          } project closure`,
+                : action === "reopen"
+                  ? "Reopen"
+                  : "Send Back"
+          } ${documentTypeName}`,
           description: `${error}`,
           status: "error",
           position: "top-right",
@@ -154,9 +197,42 @@ export const ProjectClosureActionModal = ({
     },
   });
 
-  const onApprove = (formData: IApproveDocument) => {
+  const onSubmit = (formData: IApproveDocument) => {
+    // Update form data with checkbox state and feedback
     formData.shouldSendEmail = shouldSendEmail;
-    approveProjectClosureMutation.mutate(formData);
+
+    // Only add feedback if sending email and there's feedback to send
+    if (
+      shouldSendEmail &&
+      feedbackHtml.trim() &&
+      (action === "send_back" || action === "recall")
+    ) {
+      formData.feedbackHTML = feedbackHtml;
+    }
+
+    documentActionMutation.mutate(formData);
+  };
+
+  const getActionButtonText = () => {
+    if (action === "approve") {
+      return stage === 1 ? "Submit" : "Approve";
+    } else if (action === "recall") {
+      return "Recall";
+    } else if (action === "reopen") {
+      return "Reopen";
+    } else {
+      return "Send Back";
+    }
+  };
+
+  const showFeedbackField =
+    (action === "send_back" || action === "recall") && shouldSendEmail;
+
+  // Get appropriate modal header text
+  const getModalHeaderText = () => {
+    const actionText = getActionButtonText();
+    const documentText = action === "reopen" ? "Project" : "Document";
+    return `${actionText} ${documentText}?`;
   };
 
   return (
@@ -165,33 +241,21 @@ export const ProjectClosureActionModal = ({
       onClose={onClose}
       size={"lg"}
       scrollBehavior="inside"
-      // isCentered={true}
     >
       <ModalOverlay />
       <ModalContent
         color={colorMode === "light" ? "black" : "white"}
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
-        <ModalHeader>
-          {action === "approve"
-            ? stage === 1
-              ? "Submit"
-              : "Approve"
-            : action === "recall"
-              ? "Recall"
-              : action === "reopen"
-                ? "Reopen"
-                : "Send Back"}{" "}
-          {action === "reopen" ? "Project" : "Document"}?
-        </ModalHeader>
+        <ModalHeader>{getModalHeaderText()}</ModalHeader>
         <ModalCloseButton />
 
         <ModalBody
           as="form"
           id="approval-form"
-          onSubmit={handleSubmit(onApprove)}
+          onSubmit={handleSubmit(onSubmit)}
         >
-          {!baLead ? null : ( // || isDirectorateLoading || directorateData?.length < 1
+          {!baLead ? null : (
             <>
               <Input
                 type="hidden"
@@ -216,9 +280,9 @@ export const ProjectClosureActionModal = ({
                   <Text fontWeight={"bold"}>Stage 1</Text>
                   <br />
                   <Text>
-                    In your capacity as Project Lead, would you like to{" "}
-                    {action === "approve" ? "submit" : action} this{" "}
-                    {action === "reopen" ? "Project" : "project closure"}?
+                    {action === "approve"
+                      ? `In your capacity as Project Lead, would you like to submit this ${documentTypeName.toLowerCase()} to the business area lead?`
+                      : `In your capacity as Project Lead, would you like to ${action} this ${documentTypeName.toLowerCase()}?`}
                   </Text>
                   <br />
                   <Text>
@@ -226,7 +290,7 @@ export const ProjectClosureActionModal = ({
                       ? "This will send an email to the Business Area Lead for approval."
                       : action === "reopen"
                         ? "This will delete the project closure document and set the status of the project to 'update requested'."
-                        : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been recalled your submission."}
+                        : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been recalled from your approval."}
                   </Text>
 
                   <Checkbox
@@ -236,17 +300,35 @@ export const ProjectClosureActionModal = ({
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
                     Send an email to the business area lead{" "}
-                    <strong>
-                      ({baLead.first_name} {baLead.last_name} - {baLead.email})
-                    </strong>{" "}
+                    {baLead && (
+                      <>
+                        <strong>
+                          ({baLead.first_name} {baLead.last_name} -{" "}
+                          {baLead.email})
+                        </strong>{" "}
+                      </>
+                    )}
                     alerting them that you have{" "}
                     {action === "approve"
                       ? "submitted"
                       : action === "reopen"
                         ? "reopened"
-                        : "recalled"}{" "}
-                    this {action === "approve" ? "document" : "project"}?
+                        : "recalled"}
+                    this {action === "reopen" ? "project" : "document"}?
                   </Checkbox>
+
+                  {showFeedbackField && (
+                    <Box mt={4}>
+                      <Text mb={2}>Add feedback (optional):</Text>
+                      <Textarea
+                        value={feedbackHtml}
+                        onChange={(e) => setFeedbackHtml(e.target.value)}
+                        placeholder="Enter any feedback or additional information here..."
+                        size="md"
+                        rows={4}
+                      />
+                    </Box>
+                  )}
                 </Box>
               ) : stage === 2 ? (
                 <Box>
@@ -254,11 +336,11 @@ export const ProjectClosureActionModal = ({
                   <br />
                   <Text>
                     In your capacity as Business Area Lead, would you like to{" "}
-                    {action === "send_back" ? "send back" : action} this
-                    {action === "reopen" ? "Project" : "project closure"}?
+                    {action === "send_back" ? "send back" : action} this{" "}
+                    {documentTypeName.toLowerCase()}?
                   </Text>
                   <br />
-                  {directorateData?.length > 0 && (
+                  {directorateData?.length < 1 ? null : (
                     <>
                       <Text>
                         {action === "approve"
@@ -270,8 +352,8 @@ export const ProjectClosureActionModal = ({
                               : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
                       </Text>
 
-                      {stage === 2 && action !== "send_back" && (
-                        <>
+                      {(action === "recall" || action === "approve") &&
+                        stage === 2 && (
                           <Box
                             pt={4}
                             border={"1px solid"}
@@ -294,14 +376,13 @@ export const ProjectClosureActionModal = ({
                                 ))}
                             </Grid>
                           </Box>
-                        </>
-                      )}
+                        )}
                     </>
                   )}
 
                   <Checkbox
                     isDisabled={!userData?.is_superuser}
-                    mt={directorateData?.length > 0 ? 8 : 0}
+                    mt={directorateData?.length < 1 ? 0 : 8}
                     isChecked={shouldSendEmail}
                     onChange={() => setShouldSendEmail(!shouldSendEmail)}
                   >
@@ -316,9 +397,24 @@ export const ProjectClosureActionModal = ({
                       ? "approved"
                       : action === "send_back"
                         ? "sent back"
-                        : "reopened"}{" "}
+                        : action === "reopen"
+                          ? "reopened"
+                          : "recalled"}{" "}
                     this {action === "reopen" ? "project" : "document"}?
                   </Checkbox>
+
+                  {showFeedbackField && (
+                    <Box mt={4}>
+                      <Text mb={2}>Add feedback (optional):</Text>
+                      <Textarea
+                        value={feedbackHtml}
+                        onChange={(e) => setFeedbackHtml(e.target.value)}
+                        placeholder="Enter any feedback or additional information here..."
+                        size="md"
+                        rows={4}
+                      />
+                    </Box>
+                  )}
                 </Box>
               ) : (
                 <Box>
@@ -326,19 +422,17 @@ export const ProjectClosureActionModal = ({
                   <br />
                   <Text>
                     In your capacity as Directorate, would you like to{" "}
-                    {action === "approve"
-                      ? "submit"
-                      : action === "send_back"
-                        ? "send back"
-                        : action}{" "}
-                    this {action === "reopen" ? "Project" : "project closure"}?
+                    {action === "send_back" ? "send back" : action} this{" "}
+                    {documentTypeName.toLowerCase()}?
                   </Text>
                   <br />
                   <Text>
                     {action === "approve"
-                      ? "This will provide final approval for this project closure, closing the project."
+                      ? getFinalApprovalDescription()
                       : action === "recall"
-                        ? "This will return the directorate approval status from 'Granted' to 'Required'. The project will also be reopened."
+                        ? documentType === "projectclosure"
+                          ? "This will return the directorate approval status from 'Granted' to 'Required'. The project will also be reopened."
+                          : "This will return the approval status from 'Granted' to 'Required'."
                         : action === "reopen"
                           ? "This will delete the project closure document and set the status of the project to 'update requested'."
                           : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been sent back for revision."}
@@ -368,6 +462,19 @@ export const ProjectClosureActionModal = ({
                         Send an email to Business Area Lead alerting them that
                         you have sent this document back?
                       </Checkbox>
+
+                      {showFeedbackField && (
+                        <Box mt={4}>
+                          <Text mb={2}>Add feedback (optional):</Text>
+                          <Textarea
+                            value={feedbackHtml}
+                            onChange={(e) => setFeedbackHtml(e.target.value)}
+                            placeholder="Enter any feedback or additional information here..."
+                            size="md"
+                            rows={4}
+                          />
+                        </Box>
+                      )}
                     </>
                   )}
                 </Box>
@@ -384,32 +491,21 @@ export const ProjectClosureActionModal = ({
           </Center>
         ) : (
           <ModalFooter>
-            <Button
-              // variant="ghost"
-              mr={3}
-              onClick={onClose}
-            >
+            <Button mr={3} onClick={onClose}>
               Cancel
             </Button>
+
             <Button
               form="approval-form"
               type="submit"
-              isLoading={approveProjectClosureMutation.isPending}
+              isLoading={documentActionMutation.isPending}
               bg={colorMode === "dark" ? "green.500" : "green.400"}
               color={"white"}
               _hover={{
                 bg: colorMode === "dark" ? "green.400" : "green.300",
               }}
             >
-              {action === "approve"
-                ? stage === 1
-                  ? "Submit"
-                  : "Approve"
-                : action === "recall"
-                  ? "Recall"
-                  : action === "reopen"
-                    ? "Reopen"
-                    : "Send Back"}
+              {getActionButtonText()}
             </Button>
           </ModalFooter>
         )}

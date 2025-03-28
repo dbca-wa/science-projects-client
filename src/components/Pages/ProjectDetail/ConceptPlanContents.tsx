@@ -12,7 +12,7 @@ import {
 } from "../../../types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
-import { ConceptPlanDocActions } from "./DocActions/ConceptPlanDocActions";
+import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 
 interface Props extends ICaretakerPermissions {
   all_documents: IProjectDocuments;
@@ -74,11 +74,12 @@ Props) => {
         animation: "oscillate 8s ease-in-out infinite",
       }}
     >
-      <ConceptPlanDocActions
-        all_documents={all_documents}
-        conceptPlanData={document}
-        members={members}
+      <UnifiedDocumentActions
+        documentType="concept"
+        documentData={document}
         refetchData={refetch}
+        all_documents={all_documents}
+        isBaLead={isBaLead}
         userIsCaretakerOfAdmin={userIsCaretakerOfAdmin}
         userIsCaretakerOfBaLeader={userIsCaretakerOfBaLeader}
         userIsCaretakerOfMember={userIsCaretakerOfMember}
