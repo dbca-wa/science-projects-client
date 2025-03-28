@@ -543,42 +543,28 @@ export const handleDocumentAction = async ({
   action,
   stage,
   documentPk,
-  shouldSendEmail,
+  shouldSendEmail = false,
+  feedbackHTML,
 }: IApproveDocument) => {
-  let url = "";
-  if (action === "approve") {
-    url = `documents/actions/approve`;
-  } else if (action === "recall") {
-    url = `documents/actions/recall`;
-  } else if (action === "send_back") {
-    url = `documents/actions/send_back`;
-  } else if (action === "reopen") {
-    url = `documents/actions/reopen`;
+  const url = `documents/actions/${action}`;
+
+  const params = {
+    action,
+    stage,
+    documentPk,
+    shouldSendEmail,
+  };
+
+  if (shouldSendEmail && feedbackHTML) {
+    params["feedbackHTML"] = feedbackHTML;
   }
 
-  let params = {};
-  if (!shouldSendEmail) {
-    params = {
-      action: action,
-      stage: stage,
-      documentPk: documentPk,
-      shouldSendEmail: false,
-    };
-  } else {
-    params = {
-      action: action,
-      stage: stage,
-      documentPk: documentPk,
-      shouldSendEmail: true,
-    };
-  }
-
-  // console.log(params)
+  console.log({ ...params, url });
 
   return instance
     .post(url, params, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
       },
     })
     .then((res) => res.data);

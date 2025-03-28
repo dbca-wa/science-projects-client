@@ -1,7 +1,7 @@
 // User Search component - works/appears on the Users page with UserSearchContext
 
 import { getAllBusinessAreas } from "@/lib/api";
-import { IBusinessArea } from "@/types";
+import { IBusinessArea, IDivision } from "@/types";
 import {
   Flex,
   Input,
@@ -141,12 +141,12 @@ export const SearchUsers = () => {
         {orderedDivisionSlugs.flatMap((divSlug) => {
           // Filter business areas for the current division
           const divisionBusinessAreas = businessAreas
-            .filter((ba) => ba.division.slug === divSlug)
+            .filter((ba) => (ba.division as IDivision).slug === divSlug)
             .sort((a, b) => a.name.localeCompare(b.name));
 
           return divisionBusinessAreas.map((ba, index) => (
             <option key={`${ba.name}${index}`} value={ba.pk}>
-              {ba?.division ? `[${ba?.division?.slug}] ` : ""}
+              {ba?.division ? `[${(ba?.division as IDivision)?.slug}] ` : ""}
               {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}{" "}
               {ba.is_active ? "" : "(INACTIVE)"}
             </option>

@@ -52,6 +52,7 @@ import {
   BusinessAreaImage,
   IBusinessArea,
   IBusinessAreaUpdate,
+  IDivision,
 } from "../../../types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
@@ -278,7 +279,9 @@ export const BusinessAreaItemDisplay = ({
 
   const { divsLoading, divsData } = useGetDivisions();
 
-  const [baDivision, setBaDivision] = useState<number>(division.pk);
+  const [baDivision, setBaDivision] = useState<number>(
+    (division as IDivision).pk,
+  );
 
   const [imageLoaded, setImageLoaded] = useState(false);
 

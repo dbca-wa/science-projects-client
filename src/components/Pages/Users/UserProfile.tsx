@@ -1,7 +1,16 @@
 // The drawer content that pops out when clicking on a user grid item
 
+import { BecomeCaretakerModal } from "@/components/Modals/Caretakers/BecomeCaretakerModal";
+import { CancelCaretakerRequestModal } from "@/components/Modals/Caretakers/CancelCaretakerRequestModal";
+import { CaretakerModeConfirmModal } from "@/components/Modals/Caretakers/CaretakerModeConfirmModal";
+import { RemoveCaretakerModal } from "@/components/Modals/Caretakers/RemoveCaretakerModal";
+import { SetCaretakerAdminModal } from "@/components/Modals/Caretakers/SetCaretakerAdminModal";
+import { SetCaretakerForMyAccountModal } from "@/components/Modals/Caretakers/SetCaretakerForMyAccountModal";
 import { DeactivateUserModal } from "@/components/Modals/DeactivateUserModal";
 import { RequestMergeUserModal } from "@/components/Modals/RequestMergeUserModal";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import { useCheckExistingCaretaker } from "@/lib/hooks/tanstack/useCheckExistingCaretaker";
 import { useInvolvedProjects } from "@/lib/hooks/tanstack/useInvolvedProjects";
 import {
   Avatar,
@@ -14,8 +23,8 @@ import {
   Spacer,
   Spinner,
   Text,
-  useColorMode,
   Tooltip,
+  useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -34,18 +43,6 @@ import { DeleteUserModal } from "../../Modals/DeleteUserModal";
 import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
 import { PromoteUserModal } from "../../Modals/PromoteUserModal";
 import { UserProjectsDataTable } from "../Dashboard/UserProjectsDataTable";
-import { CaretakerModeConfirmModal } from "@/components/Modals/Caretakers/CaretakerModeConfirmModal";
-import { SetCaretakerAdminModal } from "@/components/Modals/Caretakers/SetCaretakerAdminModal";
-import { formatDate } from "date-fns";
-import { useNoImage } from "@/lib/hooks/helper/useNoImage";
-import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
-import { RemoveCaretakerModal } from "@/components/Modals/Caretakers/RemoveCaretakerModal";
-import { BecomeCaretakerModal } from "@/components/Modals/Caretakers/BecomeCaretakerModal";
-import { SetCaretakerForMyAccountModal } from "@/components/Modals/Caretakers/SetCaretakerForMyAccountModal";
-import { useCheckExistingCaretaker } from "@/lib/hooks/tanstack/useCheckExistingCaretaker";
-import { CancelCaretakerRequestModal } from "@/components/Modals/Caretakers/CancelCaretakerRequestModal";
-import { view } from "framer-motion";
-import { on } from "events";
 
 interface Props {
   pk: number;

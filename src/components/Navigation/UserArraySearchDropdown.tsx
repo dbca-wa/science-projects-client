@@ -31,7 +31,9 @@ import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
 
 interface IUserArraySearchDropdown {
   isRequired: boolean;
-  setterFunction?: (setUserPk?: EmailListPerson) => void;
+  setterFunction?:
+    | ((setUserPk?: EmailListPerson) => void)
+    | ((setUserPk?: IUserData) => void);
   array?: EmailListPerson[];
   arrayAddFunction?: (setUserPk: EmailListPerson) => void;
   arrayRemoveFunction?: (setUserPk: EmailListPerson) => void;

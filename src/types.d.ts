@@ -819,6 +819,7 @@ interface ITaskDocument {
 
 export interface IApproveDocument {
   shouldSendEmail?: boolean;
+  feedbackHTML?: string;
   action: "approve" | "recall" | "send_back" | "reopen";
   stage: number; // 1-3
   documentPk: number;
@@ -1018,7 +1019,7 @@ interface IDivision {
   slug: string;
   director: number;
   approver: number;
-  directorate_email_list: IEmailListUser[];
+  directorate_email_list?: IEmailListUser[];
 }
 
 // REPORT ============================================================================
