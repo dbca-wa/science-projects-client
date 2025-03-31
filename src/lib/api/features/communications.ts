@@ -58,6 +58,41 @@ export const createDocumentComment = async ({
   return res;
 };
 
+// Interface for mentioned user
+export interface MentionedUser {
+  id: number;
+  name: string;
+  email: string;
+}
+
+// Interface for commenter
+export interface Commenter {
+  id: number;
+  name: string;
+  email: string;
+}
+
+// Interface for notification data - matching the Django view's expected format
+export interface NotificationData {
+  documentId: number;
+  projectId: number;
+  commenter: Commenter;
+  mentionedUsers: MentionedUser[];
+  // documentKind: string;
+}
+
+/**
+ * Send email notifications to mentioned users
+ */
+export const sendMentionNotifications = async (data: NotificationData) => {
+  console.log("Sending notification", data);
+  const response = await instance.post(
+    "documents/notifications/mentions",
+    data,
+  );
+  return response.data;
+};
+
 export interface IDeleteComment {
   commentPk: number | string;
   documentPk: number | string;

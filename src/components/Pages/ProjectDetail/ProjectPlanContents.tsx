@@ -289,9 +289,11 @@ export const ProjectPlanContents = ({
 
       <Box pb={6} mt={4}>
         <CommentSection
+          // projectPk={document?.document?.project?.pk}
           baseAPI={baseAPI}
           documentID={document?.document?.pk}
           userData={userData}
+          project={document?.document?.project}
         />
       </Box>
     </motion.div>

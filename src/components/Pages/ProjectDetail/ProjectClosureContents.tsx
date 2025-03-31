@@ -289,9 +289,11 @@ export const ProjectClosureContents = ({
       )}
 
       <CommentSection
-        documentID={document?.pk}
+        // projectPk={document?.document?.project?.pk}
+        documentID={document?.document?.pk}
         userData={userData}
         baseAPI={baseAPI}
+        project={document?.document?.project}
       />
     </motion.div>
   );

@@ -294,9 +294,11 @@ export const StudentReportContents = ({
             documentsCount={documents.length}
           />
           <CommentSection
+            // projectPk={selectedStudentReport?.document?.project?.pk}
             baseAPI={baseAPI}
             documentID={selectedStudentReport?.document?.pk}
             userData={userData}
+            project={selectedStudentReport?.document?.project}
           />
         </motion.div>
       )}

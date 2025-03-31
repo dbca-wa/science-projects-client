@@ -359,9 +359,11 @@ export const ProgressReportContents = ({
 
           {selectedProgressReport?.document && (
             <CommentSection
+              // projectPk={selectedProgressReport?.document?.project?.pk}
               baseAPI={baseAPI}
               documentID={selectedProgressReport?.document?.pk}
               userData={userData}
+              project={selectedProgressReport?.document?.project}
             />
           )}
         </motion.div>

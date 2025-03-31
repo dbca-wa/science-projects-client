@@ -1,8 +1,8 @@
 import { $generateNodesFromDOM } from "@lexical/html";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useEffect, useState } from "react";
-// import { $generateNodesFromDOM, $getRoot, $getList, ListItemNode, ListNode } from "@lexical/html";
 import { $createParagraphNode, $getRoot } from "lexical";
+
 interface HTMLPrepopulationProp {
   data: string;
   setPopulationInProgress?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -22,8 +22,8 @@ export const PrepopulateCommentDisplayPlugin = ({
 
   const [fixedText, setFixedText] = useState(data);
   const isHtml = checkIsHtml(data);
+
   useEffect(() => {
-    // console.log("IS Html:", isHtml);
     if (!isHtml) {
       if (data === "") {
         setFixedText(
@@ -72,6 +72,34 @@ export const PrepopulateCommentDisplayPlugin = ({
     return text.replace(/&nbsp;/g, " ");
   };
 
+  const processMentions = (dom: Document) => {
+    // Find spans with mention data attributes
+    const mentionSpans = dom.querySelectorAll("span[data-user-id]");
+
+    mentionSpans.forEach((span) => {
+      // Cast the Element to HTMLElement to access style property
+      const htmlSpan = span as HTMLElement;
+
+      // Ensure the class is set
+      htmlSpan.className = "mention";
+
+      // Apply styling directly to ensure it renders properly
+      htmlSpan.style.backgroundColor = "rgba(24, 119, 232, 0.2)";
+      htmlSpan.style.paddingLeft = "5px";
+      htmlSpan.style.paddingRight = "5px";
+      htmlSpan.style.borderRadius = "5px";
+      htmlSpan.style.color = "#1877e8";
+      htmlSpan.style.fontWeight = "500";
+
+      // Ensure the @ symbol is present at the beginning
+      if (htmlSpan.textContent && !htmlSpan.textContent.startsWith("@")) {
+        htmlSpan.textContent = `@${htmlSpan.textContent}`;
+      }
+    });
+
+    return dom;
+  };
+
   const [editor] = useLexicalComposerContext();
   const [hasRendered, setHasRendered] = useState(false);
 
@@ -90,6 +118,9 @@ export const PrepopulateCommentDisplayPlugin = ({
         // Parse the replaced data
         const parser = new DOMParser();
         const dom = parser.parseFromString(replacedData, "text/html");
+
+        // Process mentions to ensure styling is preserved
+        processMentions(dom);
 
         const removableNulls = Array.from(dom.querySelectorAll("span")).filter(
           (span) => {
@@ -110,7 +141,6 @@ export const PrepopulateCommentDisplayPlugin = ({
             const firstChild = root.getFirstChild();
             // Remove any empty paragraph node caused by the Lexical 0.12.3 update
             if (firstChild !== null) {
-              // console.log("CHILD", firstChild.getTextContent());
               if (
                 firstChild.getTextContent() === "" ||
                 firstChild.getTextContent() === "null" ||
@@ -122,10 +152,8 @@ export const PrepopulateCommentDisplayPlugin = ({
             }
 
             if (node !== null) {
-              // console.log(node);
               if (node.__type === "text" && bunchOfNodes.length <= 1) {
-                //
-                // console.log("BUNCHONODES", bunchOfNodes);
+                // Handle text nodes
               } else {
                 try {
                   root.append(node);
@@ -149,5 +177,6 @@ export const PrepopulateCommentDisplayPlugin = ({
       setHasRendered(true);
     }
   }, [hasRendered]);
+
   return null;
 };

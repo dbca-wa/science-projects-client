@@ -1,6 +1,10 @@
-// Has mention and hashtag functionality
-
-import { IBranch, IBusinessArea, IUserData, IUserMe } from "@/types";
+import {
+  IBranch,
+  IBusinessArea,
+  IProjectData,
+  IUserData,
+  IUserMe,
+} from "@/types";
 import { Avatar, Box, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { useState } from "react";
 
@@ -19,17 +23,12 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import "../../../styles/texteditor.css";
-// import {
-//   $getRoot,
-// } from "lexical";
 
 import useDistilledHtml from "@/lib/hooks/helper/useDistilledHtml";
-// import useServerImageUrl from "@/lib/hooks/useServerImageUrl";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { PostCommentButton } from "../Buttons/PostCommentButton";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";
 import MentionsPlugin, { MentionNode } from "../Plugins/MentionsPlugin";
-// import useApiEndpoint from "@/lib/hooks/useApiEndpoint";
 
 interface Props {
   baseAPI: string;
@@ -38,6 +37,7 @@ interface Props {
   refetchDocumentComments: () => void;
   businessAreas: IBusinessArea[];
   branches: IBranch[];
+  project?: IProjectData; // Add project info prop
 }
 
 export const CommentRichTextEditor = ({
@@ -47,13 +47,10 @@ export const CommentRichTextEditor = ({
   refetchDocumentComments,
   businessAreas,
   branches,
+  project, // Add project to destructured props
 }: Props) => {
   const { colorMode } = useColorMode();
   const [comment, setComment] = useState("");
-
-  // const usersImage = useServerImageUrl(userData?.image?.file);
-
-  // useEffect(() => console.log(userData, usersImage))
 
   const generateTheme = (colorMode) => {
     return {
@@ -100,23 +97,21 @@ export const CommentRichTextEditor = ({
     };
   };
 
-  // Generate the theme based on the current colorMode
-  //   const theme = generateTheme(colorMode);
   // Catch errors that occur during Lexical updates
   const onError = (error: Error) => {
     console.log(error);
   };
   const theme = generateTheme(colorMode);
-  // const [editorText, setEditorText] = useState<string | null>("");
 
   const distilled = useDistilledHtml(comment);
 
+  // IMPORTANT: Add MentionNode to both config objects
   const lightInitialConfig = {
     namespace: "Comments",
     editable: true,
     theme: generateTheme("light"),
     onError,
-    nodes: [ListNode, ListItemNode],
+    nodes: [ListNode, ListItemNode, MentionNode],
   };
 
   const darkInitialConfig = {
@@ -149,13 +144,11 @@ export const CommentRichTextEditor = ({
               <HistoryPlugin />
               <ListPlugin />
               <CustomPastePlugin />
-              <MentionsPlugin />
+              <MentionsPlugin projectPk={project?.pk} />
 
               <OnChangePlugin
                 onChange={(editorState, editor) => {
                   editorState.read(() => {
-                    // const root = $getRoot();
-                    // setEditorText(root.__cachedText);
                     const newHtml = $generateHtmlFromNodes(editor, null);
                     setComment(newHtml);
                   });
@@ -164,30 +157,16 @@ export const CommentRichTextEditor = ({
               <RichTextPlugin
                 contentEditable={
                   <Box zIndex={2}>
-                    {/* Toolbar */}
-
-                    {/* <SimpleRichTextToolbar
-                        editorRef={editorRef}
-                        selectedNodeType={selectedNodeType}
-                        setSelectedNodeType={setSelectedNodeType}
-                      /> */}
                     <UserContainer
                       userData={userData as IUserData}
                       baseAPI={baseAPI}
-                      // image={
-                      //   userData?.image?.file?.startsWith("http") ?
-                      //     userData?.image?.file :
-                      //     `${baseAPI}${userData?.image?.file}`
-                      // }
                       businessAreas={businessAreas}
                       branches={branches}
                     />
                     <ContentEditable
                       style={{
-                        // minHeight: "50px",
                         width: "100%",
                         height: "auto",
-                        // padding: "32px",
                         paddingLeft: "76px",
                         paddingRight: "90px",
                         marginTop: -24,
@@ -205,6 +184,7 @@ export const CommentRichTextEditor = ({
                         comment={comment}
                         documentId={documentId}
                         userData={userData}
+                        project={project} // Pass project to the PostCommentButton
                       />
                     </Box>
                   </Box>
@@ -244,11 +224,7 @@ interface UserContainerProps {
 
 const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
   const [editor] = useLexicalComposerContext();
-
   const { colorMode } = useColorMode();
-  // const imageUrl = useServerImageUrl(userData?.image?.file);
-
-  // console.log(userData)
 
   return (
     <Box
@@ -259,12 +235,7 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
         editor.focus();
       }}
     >
-      <Flex
-        flexDir="row"
-        // color="gray.500"
-        sx={{ alignSelf: "flex-start" }}
-        mt={2}
-      >
+      <Flex flexDir="row" sx={{ alignSelf: "flex-start" }} mt={2}>
         {userData?.image ? (
           <Avatar
             size={"md"}
@@ -307,7 +278,6 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
               color={
                 colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
               }
-              // w={"100%"}
             >
               {`${userData?.first_name} ${userData?.last_name}`}
             </Text>

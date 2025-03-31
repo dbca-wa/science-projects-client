@@ -19,6 +19,7 @@ import {
 } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import {
   $applyNodeReplacement,
+  $createTextNode,
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
@@ -29,7 +30,7 @@ import {
   Spread,
   TextNode,
 } from "lexical";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as ReactDOM from "react-dom";
 
 // import "@/styles/mentions.css";
@@ -104,6 +105,9 @@ const mentionsCache = new Map();
 export type SerializedMentionNode = Spread<
   {
     mentionName: string;
+    userId: number;
+    userEmail: string;
+    userName: string;
   },
   SerializedTextNode
 >;
@@ -112,9 +116,12 @@ const convertMentionElement = (
   domNode: HTMLElement,
 ): DOMConversionOutput | null => {
   const textContent = domNode.textContent;
+  const userId = parseInt(domNode.getAttribute("data-user-id") || "0", 10);
+  const userEmail = domNode.getAttribute("data-user-email") || "";
+  const userName = domNode.getAttribute("data-user-name") || "";
 
   if (textContent !== null) {
-    const node = $createMentionNode(textContent);
+    const node = $createMentionNode(textContent, userId, userEmail, userName);
     return {
       node,
     };
@@ -122,28 +129,51 @@ const convertMentionElement = (
 
   return null;
 };
-// const mentionStyle = "background-color: rgba(24, 119, 232, 0.2)";
+
+// const mentionStyle = {
+//   backgroundColor: "rgba(24, 119, 232, 0.2)",
+//   paddingLeft: "5px",
+//   paddingRight: "5px",
+//   borderRadius: "5px",
+// };
 
 const mentionStyle = {
-  // color: "orange",
   backgroundColor: "rgba(24, 119, 232, 0.2)",
   paddingLeft: "5px",
   paddingRight: "5px",
   borderRadius: "5px",
+  color: "#1877e8", // Add a distinct color for mentions
+  fontWeight: "500", // Make mentions slightly bolder
 };
-// 13, 180, 185
+
 export class MentionNode extends TextNode {
   __mention: string;
+  __userId: number;
+  __userEmail: string;
+  __userName: string;
 
   static getType(): string {
     return "mention";
   }
 
   static clone(node: MentionNode): MentionNode {
-    return new MentionNode(node.__mention, node.__text, node.__key);
+    return new MentionNode(
+      node.__mention,
+      node.__userId,
+      node.__userEmail,
+      node.__userName,
+      node.__text,
+      node.__key,
+    );
   }
+
   static importJSON(serializedNode: SerializedMentionNode): MentionNode {
-    const node = $createMentionNode(serializedNode.mentionName);
+    const node = $createMentionNode(
+      serializedNode.mentionName,
+      serializedNode.userId,
+      serializedNode.userEmail,
+      serializedNode.userName,
+    );
     node.setTextContent(serializedNode.text);
     node.setFormat(serializedNode.format);
     node.setDetail(serializedNode.detail);
@@ -152,15 +182,28 @@ export class MentionNode extends TextNode {
     return node;
   }
 
-  constructor(mentionName: string, text?: string, key?: NodeKey) {
+  constructor(
+    mentionName: string,
+    userId: number = 0,
+    userEmail: string = "",
+    userName: string = "",
+    text?: string,
+    key?: NodeKey,
+  ) {
     super(text ?? mentionName, key);
     this.__mention = mentionName;
+    this.__userId = userId;
+    this.__userEmail = userEmail;
+    this.__userName = userName;
   }
 
   exportJSON(): SerializedMentionNode {
     return {
       ...super.exportJSON(),
       mentionName: this.__mention,
+      userId: this.__userId,
+      userEmail: this.__userEmail,
+      userName: this.__userName,
       type: "mention",
       version: 1,
     };
@@ -168,48 +211,46 @@ export class MentionNode extends TextNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
+
+    // Apply styling
     Object.assign(dom.style, mentionStyle);
-    // dom.style.cssText = mentionStyle;
+
+    // Add classes and data attributes
     dom.className = "mention";
+
+    // These attributes need to be more persistent for sanitization
+    dom.setAttribute("data-user-id", String(this.__userId));
+    dom.setAttribute("data-user-email", this.__userEmail);
+    dom.setAttribute("data-user-name", this.__userName);
+
+    // Add extra attribute for mention detection that's less likely to be sanitized
+    dom.setAttribute("data-lexical-mention", "true");
+
     return dom;
   }
 
   exportDOM(): DOMExportOutput {
     const element = document.createElement("span");
     element.setAttribute("data-lexical-mention", "true");
+    element.setAttribute("data-user-id", String(this.__userId));
+    element.setAttribute("data-user-email", this.__userEmail);
+    element.setAttribute("data-user-name", this.__userName);
     element.textContent = this.__text;
     return { element };
   }
 
-  static importDOM(): DOMConversionMap | null {
-    return {
-      span: (domNode: HTMLElement) => {
-        if (!domNode.hasAttribute("data-lexical-mention")) {
-          return null;
-        }
-        return {
-          conversion: convertMentionElement,
-          priority: 1,
-        };
-      },
-    };
-  }
-
-  isTextEntity(): true {
-    return true;
-  }
-
-  canInsertTextBefore(): boolean {
-    return false;
-  }
-
-  canInsertTextAfter(): boolean {
-    return false;
+  getUserName(): string {
+    return this.__userName;
   }
 }
 
-export const $createMentionNode = (mentionName: string): MentionNode => {
-  const mentionNode = new MentionNode(mentionName);
+export const $createMentionNode = (
+  mentionName: string,
+  userId: number = 0,
+  userEmail: string = "",
+  userName: string = "",
+): MentionNode => {
+  const mentionNode = new MentionNode(mentionName, userId, userEmail, userName);
   mentionNode.setMode("segmented").toggleDirectionless();
   return $applyNodeReplacement(mentionNode);
 };
@@ -219,13 +260,16 @@ export const $isMentionNode = (
 ): node is MentionNode => {
   return node instanceof MentionNode;
 };
-
 // =================== ABOVE IS MENTION NODE, PRIMARILY FROM LEXICAL.DEV ======================================
 
 const realLookupService = {
-  search(string: string, callback: (results: Array<IUserData>) => void): void {
+  search(
+    string: string,
+    projectPk: number,
+    callback: (results: Array<IUserData>) => void,
+  ): void {
     setTimeout(() => {
-      getInternalUsersBasedOnSearchTerm(string, true)
+      getInternalUsersBasedOnSearchTerm(string, true, projectPk)
         .then((data) => {
           // console.log(data.users);
           // setFilteredItems(data.users);
@@ -239,7 +283,10 @@ const realLookupService = {
   },
 };
 
-const useMentionLookupService = (mentionString: string | null) => {
+const useMentionLookupService = (
+  mentionString: string | null,
+  projectPk: number,
+) => {
   const [results, setResults] = useState<Array<IUserData>>([]);
 
   useEffect(() => {
@@ -258,7 +305,7 @@ const useMentionLookupService = (mentionString: string | null) => {
     }
 
     mentionsCache.set(mentionString, null);
-    realLookupService.search(mentionString, (newResults) => {
+    realLookupService.search(mentionString, projectPk, (newResults) => {
       mentionsCache.set(mentionString, newResults);
       setResults(newResults);
     });
@@ -306,16 +353,6 @@ class CustomMentionTypeheadOption extends MenuOption {
     super(`${user.first_name} ${user.last_name}`);
     this.user = user;
   }
-  // name: string;
-  // picture: React.JSX.Element;
-  // pk: number;
-
-  // constructor(name: string, picture: React.JSX.Element, pk: number) {
-  //   super(name);
-  //   this.name = name;
-  //   this.picture = picture;
-  //   this.pk = pk;
-  // }
 }
 
 interface CustomMentionsTypeheadMenuItemProps {
@@ -365,8 +402,6 @@ const CustomMentionsTypeheadMenuItem = ({
       id={`typehead-item-${index}`}
       ref={option.setRefElement}
     >
-      {/* <CustomMenuItem user={option.user} onClick={onClick} />
-       */}
       <Flex
         as="button"
         type="button"
@@ -377,9 +412,8 @@ const CustomMentionsTypeheadMenuItem = ({
         onClick={onClick}
         onMouseOver={() => setIsHovered(true)}
         onMouseOut={() => setIsHovered(false)}
-        bg={isHovered ? "gray.200" : "transparent"}
+        bg={isSelected ? "gray.200" : isHovered ? "gray.100" : "transparent"}
         alignItems="center"
-        // {...rest}
       >
         <Avatar
           src={
@@ -408,6 +442,7 @@ const CustomMentionsTypeheadMenuItem = ({
                   : "green.500"
                 : "gray.500"
             }
+            fontWeight={isSelected ? "medium" : "normal"}
           >
             {`${
               option.user.first_name === "None"
@@ -429,86 +464,56 @@ const CustomMentionsTypeheadMenuItem = ({
   );
 };
 
-{
-  /* <CustomMenuItem onClick={() => console.log(option)} user={option} /> */
-}
+// Store mentioned users to track who needs to be notified
+export const mentionedUsers = new Set<{ id: number; email: string }>();
 
-// interface CustomMenuItemProps extends FlexProps {
-//   onClick: () => void;
-//   user: IUserData;
-// }
+// Helper function to extract mentioned users from HTML
+export const extractMentionedUsers = (
+  html: string,
+): Array<{ id: number; email: string; name: string }> => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
 
-// const CustomMenuItem = ({ onClick, user, ...rest }: CustomMenuItemProps) => {
-//   const [isHovered, setIsHovered] = useState(false);
+  // Look for spans with data-user-id attribute (more reliable than class)
+  const mentionSpans = doc.querySelectorAll("span[data-user-id]");
 
-//   const handleClick = () => {
-//     onClick();
-//   };
+  // console.log("Found mention spans:", mentionSpans.length);
 
-//   return (
-//     <Flex
-//       as="button"
-//       type="button"
-//       w="100%"
-//       textAlign="left"
-//       p={2}
-//       onClick={handleClick}
-//       onMouseOver={() => setIsHovered(true)}
-//       onMouseOut={() => setIsHovered(false)}
-//       bg={isHovered ? "gray.200" : "transparent"}
-//       alignItems="center"
-//       {...rest}
-//     >
-//       <Avatar
-//         src={
-//           user?.image?.file
-//             ? user.image.file
-//             : user?.image?.old_file
-//             ? user.image.old_file
-//             : undefined
-//         }
-//         h={"30px"}
-//         w={"30px"}
-//       />
-//       <Box
-//         display="flex"
-//         alignItems="center"
-//         justifyContent="start"
-//         ml={3}
-//         h="100%"
-//       >
-//         <Text
-//           ml={2}
-//           color={
-//             user.is_staff
-//               ? user.is_superuser
-//                 ? "blue.500"
-//                 : "green.500"
-//               : "gray.500"
-//           }
-//         >
-//           {`${user.first_name === "None" ? user.username : user.first_name} ${
-//             user.last_name === "None" ? "" : user.last_name
-//           } ${
-//             user.is_staff
-//               ? user.is_superuser
-//                 ? "(Admin)"
-//                 : "(Staff)"
-//               : "(External)"
-//           }`}
-//         </Text>
-//       </Box>
-//     </Flex>
-//   );
-// };
+  // Fallback: Look for spans that contain text starting with @
+  if (mentionSpans.length === 0) {
+    const allSpans = doc.querySelectorAll("span");
+    const atMentionSpans = Array.from(allSpans).filter((span) =>
+      span.textContent?.trim().startsWith("@"),
+    );
+    console.log("Fallback @ spans:", atMentionSpans.length);
+  }
 
-export default function NewMentionsPlugin(): React.JSX.Element | null {
+  const users: Array<{ id: number; email: string; name: string }> = [];
+
+  mentionSpans.forEach((span) => {
+    const userId = parseInt(span.getAttribute("data-user-id") || "0", 10);
+    const userEmail = span.getAttribute("data-user-email") || "";
+    const userName = span.getAttribute("data-user-name") || "";
+
+    console.log("Found mention:", { userId, userEmail, userName });
+
+    if (userId && userEmail) {
+      users.push({ id: userId, email: userEmail, name: userName });
+    }
+  });
+
+  console.log("Extracted users:", users);
+  return users;
+};
+
+export default function NewMentionsPlugin({
+  projectPk,
+}: {
+  projectPk: number;
+}): React.JSX.Element | null {
   const [editor] = useLexicalComposerContext();
-
   const [queryString, setQueryString] = useState<string | null>(null);
-
-  const results = useMentionLookupService(queryString);
-
+  const results = useMentionLookupService(queryString, projectPk);
   const checkForSlashTriggerMatch = useBasicTypeaheadTriggerMatch("/", {
     minLength: 0,
   });
@@ -516,19 +521,7 @@ export default function NewMentionsPlugin(): React.JSX.Element | null {
   const options = useMemo(
     () =>
       results
-        .map(
-          (result) =>
-            // <p>ji</p>
-            new CustomMentionTypeheadOption(
-              result,
-              // `${result?.first_name} ${result?.last_name}`,
-              // <i className="icon user" />
-            ),
-          // <CustomMenuItem
-          //   user={result}
-          //   onClick={() => console.log(result?.first_name)}
-          // />
-        )
+        .map((result) => new CustomMentionTypeheadOption(result))
         .slice(0, SUGGESTION_LIST_LENGTH_LIMIT),
     [results],
   );
@@ -540,11 +533,38 @@ export default function NewMentionsPlugin(): React.JSX.Element | null {
       closeMenu: () => void,
     ) => {
       editor.update(() => {
-        const mentionNode = $createMentionNode(selectedOption.user.first_name);
+        const user = selectedOption.user;
+        const displayName =
+          user.first_name === "None"
+            ? user.username
+            : `${user.first_name} ${user.last_name === "None" ? "" : user.last_name}`;
+
+        const userId = user.pk || 0;
+        const userEmail = user.email || "";
+        const userName =
+          `${user.first_name} ${user.last_name}`.trim() || user.username || "";
+
+        // Add @ symbol to the display text
+        const mentionDisplayText = `@${displayName}`;
+
+        const mentionNode = $createMentionNode(
+          mentionDisplayText,
+          userId,
+          userEmail,
+          userName,
+        );
         if (nodeToReplace) {
           nodeToReplace.replace(mentionNode);
         }
         mentionNode.select();
+
+        // Insert a space after the mention
+        const spaceNode = $createTextNode(" ");
+        mentionNode.insertAfter(spaceNode);
+
+        // Place the selection after the space
+        spaceNode.select();
+
         closeMenu();
       });
     },
@@ -562,6 +582,12 @@ export default function NewMentionsPlugin(): React.JSX.Element | null {
     [checkForSlashTriggerMatch, editor],
   );
 
+  // We'll use a ref instead of state to avoid re-render cycles
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // Use a ref to track initialization rather than state
+  const hasInitializedRef = useRef(false);
+
   return (
     <LexicalTypeaheadMenuPlugin<CustomMentionTypeheadOption>
       onQueryChange={setQueryString}
@@ -575,19 +601,55 @@ export default function NewMentionsPlugin(): React.JSX.Element | null {
         anchorElementRef.current && results.length
           ? ReactDOM.createPortal(
               <Box
-                // className="typeahead-popover mentions-menu"
                 background={"#fff"}
                 w={"250px"}
                 boxShadow={"0px 5px 10px rgba(0, 0, 0, 0.3)"}
                 borderRadius={"8px"}
-                // position={"fixed"}
                 zIndex={999999999}
-                // pos={"fixed"}
-                // top={0}
-                // left={0}
                 position="absolute"
                 top={`${anchorElementRef.current.offsetHeight - 15}px`}
                 left={`${anchorElementRef.current.offsetWidth - 17.5}px`}
+                onKeyDown={(e) => {
+                  // Handle keyboard navigation
+                  if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    const nextIndex =
+                      selectedIndex === options.length - 1
+                        ? 0
+                        : selectedIndex + 1;
+                    setHighlightedIndex(nextIndex);
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    const prevIndex =
+                      selectedIndex === 0
+                        ? options.length - 1
+                        : selectedIndex - 1;
+                    setHighlightedIndex(prevIndex);
+                  } else if (e.key === "Enter" || e.key === "Tab") {
+                    e.preventDefault();
+                    selectOptionAndCleanUp(options[selectedIndex]);
+                  } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    // Close the menu
+                    setQueryString(null);
+                  }
+                }}
+                tabIndex={0} // Make the box focusable
+                ref={(element) => {
+                  // Store the element reference
+                  dropdownRef.current = element;
+
+                  // Focus only once when first created
+                  if (element && !hasInitializedRef.current) {
+                    // Try to focus after a brief delay to ensure DOM is ready
+                    setTimeout(() => {
+                      if (element) {
+                        element.focus();
+                        hasInitializedRef.current = true;
+                      }
+                    }, 50);
+                  }
+                }}
               >
                 <UnorderedList
                   css={{
@@ -630,38 +692,3 @@ export default function NewMentionsPlugin(): React.JSX.Element | null {
     />
   );
 }
-
-// function MentionsTypeaheadMenuItem({
-//   index,
-//   isSelected,
-//   onClick,
-//   onMouseEnter,
-//   option,
-// }: {
-//   index: number;
-//   isSelected: boolean;
-//   onClick: () => void;
-//   onMouseEnter: () => void;
-//   option: MentionTypeaheadOption;
-// }) {
-//   let className = "item";
-//   if (isSelected) {
-//     className += " selected";
-//   }
-//   return (
-//     <li
-//       key={option.key}
-//       tabIndex={-1}
-//       className={className}
-//       ref={option.setRefElement}
-//       role="option"
-//       aria-selected={isSelected}
-//       id={"typeahead-item-" + index}
-//       onMouseEnter={onMouseEnter}
-//       onClick={onClick}
-//     >
-//       {option.picture}
-//       <span className="text">{option.name}</span>
-//     </li>
-//   );
-// }
