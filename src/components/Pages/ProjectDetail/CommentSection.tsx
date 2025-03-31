@@ -3,7 +3,7 @@ import { CommentDisplayRTE } from "@/components/RichTextEditor/Editors/Sections/
 import { useBranches } from "@/lib/hooks/tanstack/useBranches";
 import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
 import { useGetDocumentComments } from "@/lib/hooks/tanstack/useGetDocumentComments";
-import { IMainDoc, IUserData, IUserMe } from "@/types";
+import { IMainDoc, IProjectData, IUserData, IUserMe } from "@/types";
 import {
   Box,
   Center,
@@ -30,8 +30,14 @@ interface Props {
   documentID: number;
   userData: IUserMe;
   baseAPI: string;
+  project: IProjectData;
 }
-export const CommentSection = ({ documentID, userData, baseAPI }: Props) => {
+export const CommentSection = ({
+  documentID,
+  userData,
+  baseAPI,
+  project,
+}: Props) => {
   const { colorMode } = useColorMode();
 
   const { documentCommentsLoading, documentCommentsData, refetchComments } =
@@ -60,9 +66,20 @@ export const CommentSection = ({ documentID, userData, baseAPI }: Props) => {
       p={4}
       my={2}
     >
-      <Text fontWeight={"bold"} fontSize={"xl"} mb={2}>
-        Comments
-      </Text>
+      <div className="flex items-center justify-between">
+        <Text fontWeight={"bold"} fontSize={"xl"} mb={2}>
+          Comments
+        </Text>
+
+        <Text
+          fontWeight={"semibold"}
+          fontSize={"xs"}
+          mb={2}
+          textColor={"gray.500"}
+        >
+          Type @ followed by a team member's name to mention them
+        </Text>
+      </div>
       <Box mb={2}>
         <CommentRichTextEditor
           baseAPI={baseAPI}
@@ -71,6 +88,7 @@ export const CommentSection = ({ documentID, userData, baseAPI }: Props) => {
           refetchDocumentComments={refetchInterceptedFunction}
           branches={branches?.branchesData}
           businessAreas={businessAreas?.baData}
+          project={project}
         />
       </Box>
       {!isRepainting && !documentCommentsLoading ? (

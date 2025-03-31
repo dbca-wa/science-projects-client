@@ -182,13 +182,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "Users may now provide feedback or comments via the notification email when sending a document back for revisions or recalling."
               }
             />
-            {/* <PatchNoteEntry
+            <PatchNoteEntry
               title={"Mention Users in comments"}
               kind="feature"
               description={
-                "Users may not mention each other in the comments section. Doing so will send an email to that user letting them know they were mentioned. This ensures time-sensitive comments are acknowledged."
+                "Users may now mention each other in the comments section for documents. Doing so will send an email to that user letting them know they were mentioned. This ensures time-sensitive comments are acknowledged."
               }
-            /> */}
+            />
             <PatchNoteEntry
               title={"Directorate Level Email Lists"}
               kind="feature"

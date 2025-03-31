@@ -183,9 +183,11 @@ Props) => {
 
       {document?.document && (
         <CommentSection
+          // projectPk={document?.document?.project?.pk}
           baseAPI={baseAPI}
           documentID={document?.document?.pk}
           userData={userData}
+          project={document?.document?.project}
         />
       )}
     </motion.div>
