@@ -43,11 +43,7 @@ export const EmailSiteLinkModal = ({ isOpen, onClose }: Props) => {
     const checkEmailExists = async (email) => {
       const doesEmailExist = await getDoesUserWithEmailExist(email);
       if (doesEmailExist === true) {
-        if (email !== "jarid.prince@dbca.wa.gov.au") {
-          setEmailExists(true);
-        } else {
-          setEmailExists(false);
-        }
+        setEmailExists(true);
       } else {
         if (emailExists) {
           setEmailExists(false);

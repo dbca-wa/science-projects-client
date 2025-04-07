@@ -12,50 +12,6 @@ import { AxiosError, AxiosResponse } from "axios";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-{
-  /* <TabPanel>
-            <Box>
-              <Text fontWeight="bold" fontSize="xl">
-                Email Templates
-              </Text>
-
-              <Grid
-                pt={8}
-                templateColumns={{
-                  base: "1fr",
-                  lg: "repeat(1, 1fr)",
-                  "2xl": "repeat(1, 1fr)",
-                }}
-                gap={4}
-                rowGap={8}
-              >
-                <Box>
-                  <EmailPreviewWrapper
-                    title="Document Approved"
-                    emailComponent={
-                      <DocumentApprovedEmail userData={userData} />
-                    }
-                    ModalComponent={DocumentApprovedEmailModal}
-                    emailFunction={sendDocumentApprovedEmail}
-                    thisUser={userData}
-                  />
-                </Box>
-
-                <Box>
-                  <EmailPreviewWrapper
-                    title="Document Recalled"
-                    emailComponent={
-                      <DocumentRecalledEmail userData={userData} />
-                    }
-                    ModalComponent={DocumentRecalledEmailModal}
-                    emailFunction={sendDocumentRecalledEmail}
-                    thisUser={userData}
-                  />
-                </Box>
-              </Grid>
-            </Box>
-          </TabPanel> */
-}
 interface IWrapper {
   children: React.ReactElement;
   templateName: string;

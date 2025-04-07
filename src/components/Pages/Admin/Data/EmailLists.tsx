@@ -78,13 +78,7 @@ export const EmailLists = () => {
     const emailString = activeProjectLeadEmailList
       ?.map((user) => user.email)
       .join(",");
-    // const mailToLink = `mailto:${emailString}?subject=${subject}`;
-    // console.log(emailList);
-    // console.log("EMAIL STRING: ", emailString);
     const mailToLink = `mailto:${emailString}?subject=SPMS:`;
-    // const mailToLink = `mailto:jarid.prince@dbca.wa.gov.au,rory.mcauley@dbca.wa.gov.au?subject=SPMS:`;
-
-    // jarid.prince@dbca.wa.gov.au
     const link = document.createElement("a");
     link.href = mailToLink;
     document.body.appendChild(link);

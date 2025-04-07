@@ -30,7 +30,9 @@ interface Props {
     | "partnerships"
     | "collaborations"
     | "student_projects"
-    | "publications";
+    | "publications"
+    | "dbca_banner"
+    | "dbca_image";
   helperText?: string;
   reportMediaData: any;
   reportPk: number;
@@ -54,6 +56,8 @@ export const ReportMediaChanger = ({
     student_projects: "Student Projects Chapter Image",
     publications: "Publications Chapter Image",
     rear_cover: "Rear Cover Page",
+    dbca_banner: "DBCA Banner (bottom of front page)",
+    dbca_image: "DBCA Logo Page Headers",
   };
 
   const [uploadedFile, setUploadedFile] = useState<File>();

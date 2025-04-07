@@ -501,7 +501,9 @@ interface IReportMediaUploadProps {
     | "partnerships"
     | "collaborations"
     | "student_projects"
-    | "publications";
+    | "publications"
+    | "dbca_image"
+    | "dbca_banner";
 }
 
 export const uploadReportMediaImage = async ({
@@ -548,7 +550,9 @@ interface IReportMediaDeleteProps {
     | "partnerships"
     | "collaborations"
     | "student_projects"
-    | "publications";
+    | "publications"
+    | "dbca_image"
+    | "dbca_banner";
 }
 
 export const deleteReportMediaImage = async ({

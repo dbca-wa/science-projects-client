@@ -43,6 +43,28 @@ export const AnnualReportMedia = ({ reportId }: Props) => {
 
           <ReportMediaChanger
             reportMediaData={reportMediaData}
+            section={"dbca_banner"}
+            reportPk={
+              reportMediaData[0]?.report?.id
+                ? reportMediaData[0]?.report?.id
+                : reportId
+            }
+            refetchData={refetchMedia}
+          />
+
+          <ReportMediaChanger
+            reportMediaData={reportMediaData}
+            section={"dbca_image"}
+            reportPk={
+              reportMediaData[0]?.report?.id
+                ? reportMediaData[0]?.report?.id
+                : reportId
+            }
+            refetchData={refetchMedia}
+          />
+
+          <ReportMediaChanger
+            reportMediaData={reportMediaData}
             section={"sdchart"}
             reportPk={
               reportMediaData[0]?.report?.id
