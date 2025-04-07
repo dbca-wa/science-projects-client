@@ -244,7 +244,7 @@ export const ProjectDetail = ({
                   bg: colorMode === "light" ? "orange.400" : "orange.500",
                 }}
                 onClick={() => {
-                  const email = "jarid.prince@dbca.wa.gov.au";
+                  const email = "ecoinformatics.admin@dbca.wa.gov.au";
                   window.location.href = `mailto:${email}?subject=Feedback on Project ${projectPk}&body=I have feedback on project ${projectPk} and would like to report an issue.`;
                 }}
                 leftIcon={<Mail />}

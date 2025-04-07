@@ -1,6 +1,5 @@
 import { Head } from "@/components/Base/Head";
 import HomeConfetti from "@/components/Fun/HomeConfetti";
-import { UserFeedbackModal } from "@/components/Modals/UserFeedbackModal";
 import theme from "@/theme";
 import { IUserMe } from "@/types";
 import {
@@ -61,43 +60,10 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
 
   const [welcomeUser, setWelcomeUser] = useState("");
   const [spmsText, setSpmsText] = useState("Science Project Management System");
-  // const [annualReportText, setAnnualReportText] = useState("Annual Report");
   const [shouldConcat, setShouldConcat] = useState(false);
-  // const [startDate, setStartDate] = useState<string>();
-  // const teamsChatUrl = "msteams:/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
-  // const teamsWebUrl =
-  //   "https://teams.microsoft.com/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
-
-  // const handleTeamsClick = (e) => {
-  //   e.preventDefault();
-  //   window.open(teamsWebUrl, "_blank");
-  // };
-
-  const {
-    isOpen: isFeedbackModalOpen,
-    onOpen: onOpenFeedbackModal,
-    onClose: onCloseFeedbackModal,
-  } = useDisclosure();
-
-  // useEffect(() => {
-  //   confetti({
-  //     particleCount: 100,
-  //     spread: 360,
-  //     origin: {
-  //       x: 0.385,
-  //       y: 0.3,
-  //     },
-  //   });
-
-  //   setTimeout(() => {
-  //     confetti.reset();
-  //   }, 5000);
-  // }, []);
-
   const { colorMode } = useColorMode();
 
   const handleResize = useCallback(() => {
-    // 1150 = the breakpoint at which issues occur with text overlaying
     if (window.innerWidth < 1150) {
       setWelcomeUser("");
       setShouldConcat(true);
@@ -136,10 +102,6 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
   return (
     <>
       <HomeConfetti />
-      <UserFeedbackModal
-        isFeedbackModalOpen={isFeedbackModalOpen}
-        onCloseFeedbackModal={onCloseFeedbackModal}
-      />
       <Box
         mt={5}
         bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
@@ -263,8 +225,9 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             color={"white"}
             bg={"blue.500"}
             _hover={{ bg: "blue.400" }}
-            onClick={onOpenFeedbackModal}
             mt={4}
+            as={Link}
+            href={`mailto:ecoinformatics.admin@dbca.wa.gov.au?subject=SPMS Feedback`}
           >
             Submit Feedback
           </Button>
