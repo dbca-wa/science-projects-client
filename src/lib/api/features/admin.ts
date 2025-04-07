@@ -502,7 +502,7 @@ interface IReportMediaUploadProps {
     | "collaborations"
     | "student_projects"
     | "publications"
-    | "dbca_image"
+    | "dbca_banner_cropped"
     | "dbca_banner";
 }
 
@@ -551,7 +551,7 @@ interface IReportMediaDeleteProps {
     | "collaborations"
     | "student_projects"
     | "publications"
-    | "dbca_image"
+    | "dbca_banner_cropped"
     | "dbca_banner";
 }
 
