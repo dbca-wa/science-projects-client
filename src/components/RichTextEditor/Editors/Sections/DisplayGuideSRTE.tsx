@@ -1,5 +1,3 @@
-import { GuideSections } from "@/lib/api";
-import { useGetRTESectionPlaceholder } from "@/lib/hooks/helper/useGetRTESectionPlaceholder";
 import { Box, Spacer, Text } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
@@ -15,11 +13,12 @@ import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { TreeViewPlugin } from "@/lib/plugins/TreeViewPlugin";
 import { PrepopulateHTMLPlugin } from "@/components/RichTextEditor/Plugins/PrepopulateHTMLPlugin";
 import { ImagePlugin } from "../../Plugins/ImagesPlugin";
+import { useGetRTESectionPlaceholder } from "@/lib/hooks/helper/useGetRTESectionPlaceholder";
 
 interface Props {
   initialConfig: InitialConfigType;
   data: string;
-  section: GuideSections;
+  section: string; // Changed from GuideSections enum to string for field_key
   shouldShowTree: boolean;
 }
 
@@ -29,7 +28,9 @@ export const DisplayGuideSRTE = ({
   section,
   shouldShowTree,
 }: Props) => {
-  console.log(data);
+  // Try to derive a placeholder from the section key
+  const placeholder = useGetRTESectionPlaceholder(section);
+
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -69,8 +70,7 @@ export const DisplayGuideSRTE = ({
                 }}
               >
                 <Text color={"gray.500"} fontSize={"14px"}>
-                  {`Press the edit button to add 
-                        ${useGetRTESectionPlaceholder(section)}.`}
+                  {`Press the edit button to add ${placeholder}.`}
                 </Text>
               </Box>
               <Spacer pb={2} />

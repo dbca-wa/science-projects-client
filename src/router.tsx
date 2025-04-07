@@ -36,6 +36,7 @@ import { error } from "console";
 import ProjectsMap from "./routes/ProjectsMap";
 import ErrorBoundary from "./components/Base/ErrorBoundary";
 import ErrorPage from "./components/Base/ErrorPage";
+import DevGuide from "./components/Pages/UserGuide/DevGuide";
 
 const inAppRouteArray = [
   // Login
@@ -315,6 +316,15 @@ const inAppRouteArray = [
             <LayoutCheckWrapper>
               <HowTo />
             </LayoutCheckWrapper>
+          </ContentWrapper>
+        ),
+      },
+
+      {
+        path: "devguide",
+        element: (
+          <ContentWrapper>
+            <DevGuide />
           </ContentWrapper>
         ),
       },

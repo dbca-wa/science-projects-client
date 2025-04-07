@@ -8,11 +8,9 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { $getRoot, LexicalNode } from "lexical";
+import { $getRoot } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
-// import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import DraggableBlockPlugin from "@/components/RichTextEditor/Plugins/DraggableBlockPlugin";
-import { GuideSections } from "@/lib/api";
 import { useGetRTESectionPlaceholder } from "@/lib/hooks/helper/useGetRTESectionPlaceholder";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
@@ -28,19 +26,15 @@ import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialSta
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";
 import ListMaxIndentLevelPlugin from "../../Plugins/ListMaxIndentLevelPlugin";
 import { RevisedRichTextToolbar } from "../../Toolbar/RevisedRichTextToolbar";
-import { $isImageNode } from "../../Nodes/ImageNode";
 import { ImagePlugin } from "../../Plugins/ImagesPlugin";
-import { set } from "lodash";
-// import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-// import { SimpleRichTextToolbar } from "../../Toolbar/SimpleRichTextToolbar";
-// import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 interface Props {
   initialConfig: InitialConfigType;
   editorRef: React.MutableRefObject<any>;
   originalData?: string;
   data: string;
-  section: GuideSections;
+  section: string; // Field name in the database
+  fieldKey?: string; // Optional override for the API field_key parameter
   isUpdate: boolean;
 
   editorText: string;
@@ -59,11 +53,14 @@ interface Props {
   adminOptionsPk: number;
 
   refetch: () => void;
+  // Updated to match the string parameter pattern for the handleSave in GuideOptionsBar
+  onSave?: (content: string) => Promise<boolean>;
 }
 
 export const EditableGuideSRTE = ({
   refetch,
   section,
+  fieldKey, // Added fieldKey prop
   isUpdate,
   initialConfig,
   editorRef,
@@ -79,6 +76,7 @@ export const EditableGuideSRTE = ({
   canSave,
   setCanSave,
   adminOptionsPk,
+  onSave, // Use the external onSave function
 }: Props) => {
   const toolbarRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -94,7 +92,6 @@ export const EditableGuideSRTE = ({
     // Set up a ResizeObserver to detect height changes
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        console.log("Toolbar height changed:", entry.target.clientHeight);
         setToolbarHeight(entry.target.clientHeight);
       }
     });
@@ -113,9 +110,6 @@ export const EditableGuideSRTE = ({
     };
   }, []); // Empty dependency array means this runs once after mount
 
-  // Using the height in your component
-  console.log("Current toolbar height:", toolbarHeight);
-
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
@@ -133,24 +127,6 @@ export const EditableGuideSRTE = ({
       setEditorText(root.__cachedText);
     }
   }, [editorRef, setEditorText]);
-
-  // const blockTypeToBlockName = {
-  //   bullet: "Bulleted List",
-  //   check: "Check List",
-  //   code: "Code Block",
-  //   h1: "Heading 1",
-  //   h2: "Heading 2",
-  //   h3: "Heading 3",
-  //   h4: "Heading 4",
-  //   h5: "Heading 5",
-  //   h6: "Heading 6",
-  //   number: "Numbered List",
-  //   paragraph: "Normal",
-  //   quote: "Quote",
-  // };
-
-  // const [blockType, setBlockType] =
-  //   useState<keyof typeof blockTypeToBlockName>("paragraph");
 
   const processEditorOutput = (editor) => {
     // First get standard HTML
@@ -190,6 +166,43 @@ export const EditableGuideSRTE = ({
     return html;
   };
 
+  // Try to get a placeholder based on section name
+  const placeholderText = useGetRTESectionPlaceholder(section);
+
+  // Create an adapter function to bridge between the onSave signatures
+  const handleSave = async (content: string): Promise<boolean> => {
+    if (!content) {
+      console.error(
+        "EditableGuideSRTE: handleSave received undefined or empty content",
+      );
+      return false;
+    }
+
+    console.log(
+      `EditableGuideSRTE: handleSave called with content length: ${content.length}`,
+    );
+    console.log(`Content sample: ${content.substring(0, 50)}...`);
+
+    if (onSave) {
+      // Call the external onSave with the content directly
+      try {
+        const effectiveFieldKey = fieldKey || section;
+        console.log(
+          `Handling save for ${effectiveFieldKey} with content length: ${content.length}`,
+        );
+
+        // onSave expects just the content string
+        const result = await onSave(content);
+
+        return !!result; // Convert any result to boolean
+      } catch (error) {
+        console.error("Error in handleSave adapter:", error);
+        return false;
+      }
+    }
+    return true; // Default success if no save handler provided
+  };
+
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
@@ -212,18 +225,13 @@ export const EditableGuideSRTE = ({
           }}
         />
 
-        {/* {data !== undefined && data !== null && ( */}
         <PrepopulateHTMLPlugin data={data} />
-        {/* )} */}
         <CustomPastePlugin />
 
         {/* Text Area */}
         <RichTextPlugin
           contentEditable={
-            <Box
-              // mr={3}
-              maxW={"100%"}
-            >
+            <Box maxW={"100%"}>
               {/* Toolbar */}
               <RevisedRichTextToolbar
                 allowTable={true}
@@ -236,14 +244,12 @@ export const EditableGuideSRTE = ({
                   className="editor"
                   ref={onRef}
                   style={{
-                    // background: "red",
                     marginLeft: `${dragBtnMargin}px`,
                   }}
                 >
                   <ContentEditable
                     style={{
                       minHeight: "50px",
-                      // width: "100%",
                       maxWidth: "100%",
                       height: "auto",
                       padding: "32px",
@@ -251,12 +257,9 @@ export const EditableGuideSRTE = ({
                       borderRadius: "0 0 25px 25px",
                       outline: "none",
                     }}
-
-                    // autoFocus
                   />
                 </Box>
               </Box>
-              {/* <Box>Editor: {editorText}</Box> */}
             </Box>
           }
           placeholder={
@@ -270,7 +273,7 @@ export const EditableGuideSRTE = ({
                 color: "gray",
               }}
             >
-              {`Enter ${useGetRTESectionPlaceholder(section)}..`}
+              {`Enter ${placeholderText}..`}
             </Box>
           }
           ErrorBoundary={LexicalErrorBoundary}
@@ -291,13 +294,14 @@ export const EditableGuideSRTE = ({
             setShouldShowTree={setShouldShowTree}
             rawHTML={displayData}
             section={section}
+            fieldKey={fieldKey} // Pass fieldKey to GuideOptionsBar
             isUpdate={isUpdate}
             canSave={canSave}
             setCanSave={setCanSave}
             editorIsOpen={isEditorOpen}
             setIsEditorOpen={setIsEditorOpen}
             refetch={refetch}
-            // setDisplayData={setDisplayData}
+            onSave={handleSave} // Pass our adapter function
           />
         </Box>
         {shouldShowTree ? <TreeViewPlugin /> : null}

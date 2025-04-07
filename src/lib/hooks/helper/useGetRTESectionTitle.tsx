@@ -3,12 +3,14 @@ import { EditorSubsections } from "@/types";
 import { useState, useEffect } from "react";
 
 export const useGetRTESectionTitle = (
-  section: GuideSections | EditorSubsections,
+  section: GuideSections | EditorSubsections | string, // Add string type for dynamic sections
 ) => {
   const [sectionText, setSectionText] = useState("");
 
   useEffect(() => {
+    // Handle all existing cases first to maintain backward compatibility
     switch (section) {
+      // Project fields
       case "description":
         setSectionText("Description");
         break;
@@ -114,6 +116,8 @@ export const useGetRTESectionTitle = (
       case "externalAims":
         setSectionText("External Aims");
         break;
+
+      // Guide section keys
       case "guide_report":
         setSectionText("Annual Report");
         break;
@@ -148,6 +152,24 @@ export const useGetRTESectionTitle = (
         setSectionText("Admin");
         break;
       default:
+        // Handle dynamic guide section keys
+        if (typeof section === "string") {
+          if (section.startsWith("guide_")) {
+            // Extract title from guide section key
+            const sectionName = section.replace(/^guide_/, "");
+
+            // Format the section name
+            const formattedTitle = sectionName
+              .split("_")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ");
+
+            setSectionText(formattedTitle);
+            break;
+          }
+        }
+
+        // Fallback to default
         setSectionText("Scientific Outputs");
     }
   }, [section]);

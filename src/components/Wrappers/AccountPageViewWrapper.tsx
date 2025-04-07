@@ -11,12 +11,14 @@ export const AccountPageViewWrapper = ({ children }: IPageViewProps) => {
     <Box
       minH={"90vh"}
       height="100%"
+      w={"full"}
       display="flex"
       flexDirection="column"
       flex={1}
       overflowX={"hidden"}
+      flexShrink={0}
     >
-      <Box overflowY="auto" flex="1" p={3} overflowX={"hidden"}>
+      <Box overflowY="auto" flex="1" p={3} overflowX={"hidden"} w={"full"}>
         {children}
       </Box>
     </Box>
