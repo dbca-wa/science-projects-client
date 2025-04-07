@@ -10,22 +10,30 @@ import "../../../styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
-import { GuideSections } from "@/lib/api";
 import { useGetRTESectionTitle } from "@/lib/hooks/helper/useGetRTESectionTitle";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 import { DisplayGuideSRTE } from "./Sections/DisplayGuideSRTE";
 import { EditableGuideSRTE } from "./Sections/EditableGuideSRTE";
 import { ImageNode } from "../Nodes/ImageNode";
+import axios from "axios";
 
 interface IProps {
   canEdit: boolean;
   data: string;
   titleTextSize?: string;
-  section: GuideSections;
+  section: string; // Changed from GuideSections enum to string for dynamic field keys
+  fieldKey?: string; // Optional field key override for API calls
+  fieldTitle?: string; // Optional title to display (if provided)
   adminOptionsPk: number;
   isUpdate: boolean;
   refetch: () => void;
+  // Updated to match the saveGuideContentToDB signature
+  onSave?: (params: {
+    fieldKey: string;
+    content: string;
+    adminOptionsPk: number;
+  }) => Promise<any>;
 }
 
 export const GuideRichTextEditor = ({
@@ -33,9 +41,12 @@ export const GuideRichTextEditor = ({
   data,
   titleTextSize,
   section,
+  fieldKey, // Added fieldKey prop
+  fieldTitle,
   adminOptionsPk,
   isUpdate,
   refetch,
+  onSave,
 }: IProps) => {
   const [shouldShowTree, setShouldShowTree] = useState(false);
   const { colorMode } = useColorMode();
@@ -155,12 +166,8 @@ export const GuideRichTextEditor = ({
   const [editorText, setEditorText] = useState<string | null>("");
   const editorRef = useRef(null);
 
-  // useEffect(() => {
-  //     setDisplayData(data);
-  // }, [data])
-
   const initialConfig = {
-    namespace: "Annual Report Document Editor",
+    namespace: "Guide Document Editor",
     editable: true,
     theme,
     onError,
@@ -173,10 +180,6 @@ export const GuideRichTextEditor = ({
       ImageNode,
     ],
   };
-
-  // if (section === "methodology") {
-  //   initialConfig.nodes.push(ImageNode)
-  // }
 
   const uneditableInitialCOnfig = {
     ...initialConfig,
@@ -194,11 +197,69 @@ export const GuideRichTextEditor = ({
   const [displayData, setDisplayData] = useState(data);
 
   useEffect(() => {
-    // console.log("DISPLAY DATA:", displayData);
     setPrepopulationData(displayData);
   }, [displayData]);
 
   const [prepopulationData, setPrepopulationData] = useState(displayData);
+
+  // New save handler to use the dynamic guide content endpoint
+  // This function receives a content string and must create the proper object for onSave
+  const handleDynamicContentSave = async (
+    content: string,
+  ): Promise<boolean> => {
+    try {
+      console.log(
+        `GuideRichTextEditor: handleDynamicContentSave called with content length: ${content ? content.length : "undefined"}`,
+      );
+      console.log(
+        `Content sample: ${content ? content.substring(0, 50) + "..." : "undefined"}`,
+      );
+
+      // Ensure content is not undefined
+      if (!content) {
+        console.error(
+          "Content is undefined or empty in handleDynamicContentSave",
+        );
+        return false;
+      }
+
+      // Determine which field key to use
+      const effectiveFieldKey = fieldKey || section;
+      console.log(`Using field key: ${effectiveFieldKey}`);
+
+      if (onSave) {
+        // Use the callback with the proper parameter structure
+        console.log("Calling provided onSave function with object parameters");
+        const result = await onSave({
+          fieldKey: effectiveFieldKey,
+          content: content,
+          adminOptionsPk: adminOptionsPk,
+        });
+        return !!result;
+      } else {
+        // Legacy approach - fallback for backward compatibility
+        console.log("Using legacy API endpoint");
+        // Use PUT instead of POST, with the right data structure
+        const response = await axios.put(
+          `/api/v1/adminoptions/${adminOptionsPk}/`,
+          {
+            guide_content: {
+              [effectiveFieldKey]: content,
+            },
+          },
+        );
+        // Refresh data
+        refetch();
+        return !!response.data;
+      }
+    } catch (error) {
+      console.error("Error saving content:", error);
+      return false;
+    }
+  };
+
+  // Get section title - use fieldTitle if provided, otherwise try to derive from section name
+  const sectionTitle = fieldTitle || useGetRTESectionTitle(section);
 
   return (
     // Wrapper
@@ -216,7 +277,7 @@ export const GuideRichTextEditor = ({
             fontWeight={"bold"}
             fontSize={titleTextSize ? titleTextSize : "xl"}
           >
-            {useGetRTESectionTitle(section)}
+            {sectionTitle}
           </Text>
         </Flex>
 
@@ -239,9 +300,7 @@ export const GuideRichTextEditor = ({
 
       <Box
         pos={"relative"}
-        // w={"100%"}
         maxW={"100%"}
-        // bg={"gray.100"}
         roundedBottom={20}
         boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
         bg={
@@ -256,12 +315,12 @@ export const GuideRichTextEditor = ({
       >
         {isEditorOpen ? (
           <EditableGuideSRTE
-            // key={prepopulationData}
             adminOptionsPk={adminOptionsPk}
             initialConfig={initialConfig}
             editorRef={editorRef}
             data={prepopulationData}
             section={section}
+            fieldKey={fieldKey} // Pass fieldKey to EditableGuideSRTE
             isUpdate={isUpdate}
             displayData={displayData}
             editorText={editorText}
@@ -274,6 +333,8 @@ export const GuideRichTextEditor = ({
             canSave={canSave}
             setCanSave={setCanSave}
             refetch={refetch}
+            // Pass the adapter function which has the right signature for EditableGuideSRTE
+            onSave={handleDynamicContentSave}
           />
         ) : (
           <DisplayGuideSRTE

@@ -41,29 +41,246 @@ export const updateAdminOptions = async (formData: IAdminOptions) => {
   });
 };
 
-export type GuideSections =
-  | "guide_admin"
-  | "guide_about"
-  | "guide_login"
-  | "guide_profile"
-  | "guide_user_creation"
-  | "guide_user_view"
-  | "guide_project_creation"
-  | "guide_project_view"
-  | "guide_project_team"
-  | "guide_documents"
-  | "guide_report";
+export enum GuideSections {
+  ADMIN = "guide_admin",
+  ABOUT = "guide_about",
+  LOGIN = "guide_login",
+  USER_PROFILE = "guide_profile",
+  USER_CREATION = "guide_user_creation",
+  USER_VIEW = "guide_user_view",
+  PROJECT_CREATION = "guide_project_creation",
+  PROJECT_VIEW = "guide_project_view",
+  TEAM = "guide_project_team",
+  DOCUMENTS = "guide_documents",
+  REPORT = "guide_report",
+}
 
+export interface ContentType {
+  fieldKey: string;
+  content: string;
+  adminOptionsPk: number;
+}
+
+// New types for dynamic guide content
+export interface ContentField {
+  id?: string;
+  title?: string;
+  field_key: string;
+  description?: string;
+  order: number;
+}
+
+export interface GuideSection {
+  id: string;
+  title: string;
+  order: number;
+  show_divider_after: boolean;
+  category?: string;
+  is_active: boolean;
+  content_fields: ContentField[];
+}
+
+// Fetch all guide sections
+export const getGuideSections = async () => {
+  try {
+    const response = await instance.get("adminoptions/guide-sections/");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching guide sections:", error);
+    throw error;
+  }
+};
+
+// Create a new guide section
+export const createGuideSection = async (section: GuideSection) => {
+  try {
+    const response = await instance.post(
+      "adminoptions/guide-sections/",
+      section,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating guide section:", error);
+    throw error;
+  }
+};
+
+// Update an existing guide section
+export const updateGuideSection = async (section: GuideSection) => {
+  try {
+    const response = await instance.put(
+      `adminoptions/guide-sections/${section.id}/`,
+      section,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating guide section:", error);
+    throw error;
+  }
+};
+
+// Delete a guide section
+export const deleteGuideSection = async (sectionId: string) => {
+  try {
+    await instance.delete(`adminoptions/guide-sections/${sectionId}/`);
+    return true;
+  } catch (error) {
+    console.error("Error deleting guide section:", error);
+    throw error;
+  }
+};
+
+// Add a content field to a section
+export const addContentField = async (
+  sectionId: string,
+  field: ContentField,
+) => {
+  try {
+    const response = await instance.post(`adminoptions/content-fields/`, {
+      ...field,
+      section: sectionId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error adding content field:", error);
+    throw error;
+  }
+};
+
+// Update a content field
+export const updateContentField = async (
+  fieldId: string,
+  field: Partial<ContentField>,
+) => {
+  try {
+    const response = await instance.patch(
+      `adminoptions/content-fields/${fieldId}/`,
+      field,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating content field:", error);
+    throw error;
+  }
+};
+
+// Delete a content field
+export const deleteContentField = async (fieldId: string) => {
+  try {
+    await instance.delete(`adminoptions/content-fields/${fieldId}/`);
+    return true;
+  } catch (error) {
+    console.error("Error deleting content field:", error);
+    throw error;
+  }
+};
+
+export const saveGuideContentToDB = async ({
+  fieldKey,
+  content,
+  adminOptionsPk,
+}: {
+  fieldKey: string;
+  content: string;
+  adminOptionsPk: number;
+}) => {
+  try {
+    console.log(
+      `Saving content for field ${fieldKey}, length: ${content.length}`,
+    );
+
+    const url = `adminoptions/${adminOptionsPk}`;
+    console.log("API URL:", url);
+
+    // Create an object with the field_key as the property name and content as the value
+    const data = {
+      guide_content: {
+        [fieldKey]: content,
+      },
+    };
+
+    console.log("Data structure:", JSON.stringify(data, null, 2));
+
+    const response = await instance.put(url, data);
+
+    console.log("Save response:", response.status, response.statusText);
+    console.log("Response data:", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error saving guide content:", error);
+
+    // More detailed error logging
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.error("Error response data:", error.response.data);
+      console.error("Error response status:", error.response.status);
+      console.error("Error response headers:", error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error("Error request:", error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error("Error message:", error.message);
+    }
+
+    throw error;
+  }
+};
+
+// Reorder guide sections
+export const reorderGuideSections = async (sectionIds: string[]) => {
+  try {
+    const response = await instance.post(
+      `adminoptions/guide-sections/reorder/`,
+      {
+        section_ids: sectionIds,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error reordering sections:", error);
+    throw error;
+  }
+};
+
+// Reorder content fields within a section
+export const reorderContentFields = async (
+  sectionId: string,
+  fieldIds: string[],
+) => {
+  try {
+    const response = await instance.post(
+      `adminoptions/guide-sections/${sectionId}/reorder_fields/`,
+      {
+        field_ids: fieldIds,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error reordering content fields:", error);
+    throw error;
+  }
+};
+
+// Update interface to accept string or enum for section
 export interface IHTMLGuideSave {
   htmlData: string;
   isUpdate: boolean;
   adminOptionsPk: null | number;
-  section: null | GuideSections;
+  section: string | GuideSections; // Accept either a string or enum value
   softRefetch?: () => void;
   setIsEditorOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   canSave: boolean;
 }
 
+// Extended interface with onSave callback for dynamic content
+export interface IHTMLGuideSaveExtended extends IHTMLGuideSave {
+  onSave?: (content: string) => Promise<boolean>;
+}
+
+// Keep existing function unchanged
 export const saveGuideHtmlToDB = async ({
   htmlData,
   adminOptionsPk,
@@ -73,9 +290,9 @@ export const saveGuideHtmlToDB = async ({
 }: IHTMLGuideSave) => {
   const urlType = isUpdate ? instance.put : instance.post;
   const params = {
-    [section]: htmlData,
+    [section as string]: htmlData, // Cast to string for safety
   };
-  return urlType(`adminoptions/${adminOptionsPk}`, params, {
+  return urlType(`adminoptions/${adminOptionsPk}/`, params, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { FaBook, FaGamepad, FaUserCircle } from "react-icons/fa";
+import { FaBook, FaFileCode, FaGamepad, FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { GoTriangleDown } from "react-icons/go";
 import { SiReadthedocs } from "react-icons/si";
@@ -32,6 +32,7 @@ import { useUser } from "../../lib/hooks/tanstack/useUser";
 import { INavitar } from "../../types";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
+import { useMaintainer } from "@/lib/hooks/tanstack/useMaintainer";
 
 export const Navitar = ({
   isModern,
@@ -45,6 +46,7 @@ export const Navitar = ({
 
   const baseAPI = useApiEndpoint();
   const noImage = useNoImage();
+  const { maintainerData, maintainerLoading } = useMaintainer();
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -198,7 +200,7 @@ export const Navitar = ({
             textAlign={"center"}
             zIndex={isOpen ? 2 : 1}
           >
-            {userData?.pk === 101073 && (
+            {userData?.pk === maintainerData?.pk && (
               <>
                 <MenuItem
                   onClick={() => {
@@ -208,7 +210,17 @@ export const Navitar = ({
                 >
                   {<FaGamepad />}
 
-                  <Text ml={2}>Playground</Text>
+                  <Text ml={2}>Dev Guide</Text>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/devguide");
+                  }}
+                  zIndex={isOpen ? 2 : 1}
+                >
+                  {<FaFileCode />}
+
+                  <Text ml={2}>Dev Guide</Text>
                 </MenuItem>
               </>
             )}

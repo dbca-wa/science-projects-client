@@ -1,13 +1,20 @@
-// A button to control whether the box is editable.
-// This will by default be implemented once a document has been approved.
-// Only the system, directorate or program leader can click the button again to enable editing.
-
 import { ToastId, useToast, UseToastOptions } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { FaSave } from "react-icons/fa";
-import { IHTMLGuideSave, saveGuideHtmlToDB } from "../../../lib/api";
+import {
+  IHTMLGuideSave,
+  saveGuideContentToDB,
+  saveGuideHtmlToDB,
+} from "../../../lib/api";
 import { BaseOptionsButton } from "./BaseOptionsButton";
+
+// Extended interface to support dynamic saving
+interface ExtendedIHTMLGuideSave extends IHTMLGuideSave {
+  // Updated the type signature to match our actual implementation
+  onSave?: (content: string) => Promise<boolean>;
+  fieldKey?: string; // Make fieldKey optional again, but we'll use section as fallback
+}
 
 export const GuideSaveButton = ({
   htmlData,
@@ -17,57 +24,119 @@ export const GuideSaveButton = ({
   softRefetch,
   setIsEditorOpen,
   canSave,
-}: IHTMLGuideSave) => {
+  onSave, // Dynamic saving function
+  fieldKey, // Added fieldKey prop
+}: ExtendedIHTMLGuideSave) => {
   const toast = useToast();
-  const toastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    toastIdRef.current = toast(data);
-  };
+  const [btnLoading, setBtnLoading] = useState(false);
 
-  const htmlSaveGuide = useMutation({
-    mutationFn: saveGuideHtmlToDB,
-    onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Updating...",
-        position: "top-right",
-      });
-    },
-    onSuccess: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Success",
-          description: `Saved Text`,
+  // Implement the second handleSave function
+  const handleSave = async () => {
+    if (!canSave) return;
+
+    setBtnLoading(true);
+    // Use fieldKey if provided, otherwise fall back to section
+    const effectiveFieldKey = fieldKey || section;
+
+    console.log("Save button clicked for field:", effectiveFieldKey);
+    console.log(
+      "HTML data:",
+      typeof htmlData,
+      htmlData ? htmlData.substring(0, 50) + "..." : "undefined",
+    );
+    console.log("HTML data length:", htmlData ? htmlData.length : 0);
+    console.log("Admin options PK:", adminOptionsPk);
+
+    try {
+      let success = false;
+
+      if (onSave) {
+        // Dynamic saving method - onSave expects just the content string
+        console.log("Using dynamic save method for field:", effectiveFieldKey);
+
+        if (!htmlData) {
+          console.error("HTML data is undefined or empty");
+          toast({
+            title: "Error",
+            description: "No content to save",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+          setBtnLoading(false);
+          return;
+        }
+
+        // Direct call to saveGuideContentToDB instead of going through the adapter chain
+        // This is for debugging and can be removed later
+        try {
+          console.log("Direct call to saveGuideContentToDB with params:");
+          const params = {
+            fieldKey: effectiveFieldKey,
+            content: htmlData,
+            adminOptionsPk: adminOptionsPk,
+          };
+          console.log(
+            "Params:",
+            JSON.stringify({
+              fieldKey: params.fieldKey,
+              contentLength: params.content
+                ? params.content.length
+                : "undefined",
+              adminOptionsPk: params.adminOptionsPk,
+            }),
+          );
+          const directResult = await saveGuideContentToDB(params);
+          success = !!directResult;
+        } catch (directError) {
+          console.error("Error in direct call:", directError);
+
+          // Now let's try the regular onSave call as a fallback
+          console.log("Trying regular onSave call as fallback");
+          const result = await onSave(htmlData);
+          success = !!result;
+        }
+      }
+
+      if (success) {
+        toast({
+          title: "Content saved",
           status: "success",
-          position: "top-right",
           duration: 3000,
           isClosable: true,
         });
-      }
 
-      setTimeout(() => {
+        // Make sure refetch is called
         if (softRefetch) {
+          console.log("Refetching data after save");
           softRefetch();
         }
-        setIsEditorOpen(false);
-      }, 350);
-    },
-    onError: (error) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Could Not Update",
-          description: `${error}`,
+
+        // Close the editor
+        setTimeout(() => {
+          setIsEditorOpen(false);
+        }, 300);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save content",
           status: "error",
-          position: "top-right",
-          duration: 3000,
+          duration: 5000,
           isClosable: true,
         });
       }
-    },
-  });
+    } catch (error: any) {
+      console.error("Error saving content:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save content",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
 
-  const saveToDB = (formData: IHTMLGuideSave) => {
-    htmlSaveGuide.mutate(formData);
+    setBtnLoading(false);
   };
 
   return (
@@ -75,16 +144,9 @@ export const GuideSaveButton = ({
       icon={FaSave}
       colorScheme="green"
       canRunFunction={canSave}
-      onClick={() =>
-        saveToDB({
-          htmlData,
-          isUpdate,
-          adminOptionsPk,
-          section,
-          canSave,
-        })
-      }
+      onClick={handleSave}
       toolTipText="Save changes"
+      isLoading={btnLoading}
     />
   );
 };

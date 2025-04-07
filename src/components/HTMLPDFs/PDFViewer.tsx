@@ -233,7 +233,7 @@ Props) => {
     ) {
       timer = setInterval(() => {
         setGenerationTime((prevTime) => prevTime + 1000); // Increase by 1 second (1000 milliseconds)
-        if (generationTime >= 10000) {
+        if (generationTime >= 30000) {
           setShowRestartMessage(true); // Show restart message after 10 seconds
         }
       }, 1000); // Run every second
@@ -283,7 +283,7 @@ Props) => {
         <Flex>
           <Text fontSize={"sm"} color={"gray.500"} mr={2}>
             {showRestartMessage
-              ? "Generation taking longer than expected. Please try again."
+              ? "Generation taking longer than expected. If generation time exceeds one minute, please try again."
               : null}
           </Text>
           <Text fontSize={"sm"} color={"gray.500"} mr={2}>

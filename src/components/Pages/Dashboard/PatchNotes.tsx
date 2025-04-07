@@ -64,14 +64,14 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
   // const [annualReportText, setAnnualReportText] = useState("Annual Report");
   const [shouldConcat, setShouldConcat] = useState(false);
   // const [startDate, setStartDate] = useState<string>();
-  const teamsChatUrl = "msteams:/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
-  const teamsWebUrl =
-    "https://teams.microsoft.com/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
+  // const teamsChatUrl = "msteams:/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
+  // const teamsWebUrl =
+  //   "https://teams.microsoft.com/l/chat/0/0?users=jarid.prince@dbca.wa.gov.au";
 
-  const handleTeamsClick = (e) => {
-    e.preventDefault();
-    window.open(teamsWebUrl, "_blank");
-  };
+  // const handleTeamsClick = (e) => {
+  //   e.preventDefault();
+  //   window.open(teamsWebUrl, "_blank");
+  // };
 
   const {
     isOpen: isFeedbackModalOpen,
@@ -169,45 +169,23 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
             fontWeight={"semibold"}
             // onClick={() => localStorage.removeItem("confettiCount")}
           >
-            {/* &#127881;  &#127881; */}
-            {/* &#9881;&#65039; */}
             &#127881; SPMS {VERSION} Patch Notes &#127881;
-            {/* &#9881;&#65039; */}
           </Text>
           <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Feedback on Documents"}
-              kind="feature"
-              description={
-                "Users may now provide feedback or comments via the notification email when sending a document back for revisions or recalling."
-              }
-            />
-            <PatchNoteEntry
-              title={"Mention Users in comments"}
-              kind="feature"
-              description={
-                "Users may now mention each other in the comments section for documents. Doing so will send an email to that user letting them know they were mentioned. This ensures time-sensitive comments are acknowledged."
-              }
-            />
-            <PatchNoteEntry
-              title={"Directorate Level Email Lists"}
-              kind="feature"
-              description={
-                "Added functionality to set list of emails for directorate level approvals, depending on division (expanded from just BCS)."
-              }
-            />
-            <PatchNoteEntry
-              title={"Email Typos"}
-              kind="fix"
-              description={"Typos in email subject lines have been fixed."}
-            />
-            {/* <PatchNoteEntry
               title={"Remedy Buttons"}
               kind="fix"
               description={
                 "A bug has been patched in the Remedy Problematic Project function which prevented all projects from being updated."
               }
-            /> */}
+            />
+            <PatchNoteEntry
+              title={"Map State"}
+              kind="fix"
+              description={
+                "The projects map has been updated to fix a bug which sometimes caused toggling labels to not work."
+              }
+            />
 
             {/* <PatchNoteEntry
               title={"Modern Layout Updated"}
@@ -216,21 +194,32 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "The second 'modern' layout has been adjusted to implement missing features already present on the default layout."
               }
             /> */}
-
-            {/* <PatchNoteEntry
-              title={"Email Feedback"}
-              kind="update"
-              description={
-                "Feedback email submission adjusted to go to shared inbox for ecoinformatics."
-              }
-            /> */}
-            {/* <PatchNoteEntry
+            <PatchNoteEntry
               title={"Documentation"}
               kind="update"
               description={
                 "Documentation / Quick Guide has been updated to reflect recent changes."
               }
-            /> */}
+            />
+            <PatchNoteEntry
+              title={"SEO"}
+              kind="update"
+              description={"Improved SEO for public-facing pages"}
+            />
+            <PatchNoteEntry
+              title={"Project Updates"}
+              kind="update"
+              description={
+                "Updated select project's approval and annual report structuring"
+              }
+            />
+            <PatchNoteEntry
+              title={"User feedback email address"}
+              kind="update"
+              description={
+                "Feedback is now sent to the ecoinformatics shared mailbox (ecoinformatics.admin@dbca.wa.gov.au). Feedback via Teams has been removed."
+              }
+            />
             <PatchNoteEntry
               title={"Dependencies"}
               kind="update"
@@ -245,12 +234,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               change, please send an email to{" "}
             </Text>
             <Link
-              href={`mailto:jarid.prince@dbca.wa.gov.au?subject=SPMS Feedback`}
+              href={`mailto:ecoinformatics.admin@dbca.wa.gov.au?subject=SPMS Feedback`}
               color={colorMode === "light" ? "blue.400" : "blue.300"}
             >
-              jarid.prince@dbca.wa.gov.au
+              ecoinformatics.admin@dbca.wa.gov.au
             </Link>
-            <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
+            .
+            {/* <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
               {" "}
               or{" "}
             </Text>
@@ -260,7 +250,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               color={colorMode === "light" ? "blue.400" : "blue.300"}
             >
               message on Teams.
-            </Link>
+            </Link> */}
           </span>
           <Text as={"span"} fontSize={"16px"} fontWeight={"normal"}>
             {" "}

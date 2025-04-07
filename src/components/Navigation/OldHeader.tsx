@@ -595,7 +595,7 @@ const OldHeader = () => {
                 }
               }}
             >
-              <span className="text-xl font-bold">SPMS</span>
+              <span className="select-none text-xl font-bold">SPMS</span>
             </Link>
             {/* <Button
               px={5}

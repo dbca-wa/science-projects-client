@@ -12,14 +12,16 @@ interface BaseOptionsButtonProps {
   onClick: () => void;
   toolTipText: string;
   canRunFunction: boolean;
+  isLoading?: boolean; // New optional prop for loading state
 }
 
 export const BaseOptionsButton = ({
-  colorScheme,
+  colorScheme = "blue", // Provide default value
   icon: buttonIcon,
   onClick,
   toolTipText,
   canRunFunction,
+  isLoading = false, // Default to false for backward compatibility
 }: BaseOptionsButtonProps) => {
   const { colorMode } = useColorMode();
   const { closeEditor } = useEditorContext();
@@ -52,21 +54,25 @@ export const BaseOptionsButton = ({
         onClick={handleClick}
         rounded={"full"}
         data-tip="Click to Save"
-        isDisabled={!canRunFunction}
+        isDisabled={!canRunFunction || isLoading} // Disable when loading
+        isLoading={isLoading} // Add loading state
         p={0}
         m={0}
         maxW={{ base: "35px", lg: "35px" }}
         maxH={{ base: "40px", lg: "40px" }}
       >
-        <Icon
-          as={buttonIcon}
-          boxSize={{
-            base: 5,
-            lg: 6,
-          }}
-          w={{ base: "20px", lg: "20px" }}
-          h={{ base: "20px", lg: "20px" }}
-        />
+        {/* Only show icon when not loading */}
+        {!isLoading && (
+          <Icon
+            as={buttonIcon}
+            boxSize={{
+              base: 5,
+              lg: 6,
+            }}
+            w={{ base: "20px", lg: "20px" }}
+            h={{ base: "20px", lg: "20px" }}
+          />
+        )}
       </Button>
       <span className="tooltip-text">{toolTipText}</span>
     </div>

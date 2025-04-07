@@ -2,11 +2,12 @@ import { Head } from "@/components/Base/Head";
 import { GuideRichTextEditor } from "@/components/RichTextEditor/Editors/GuideRichTextEditor";
 import { AccountPageViewWrapper } from "@/components/Wrappers/AccountPageViewWrapper";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
-import { Box, Flex, useBreakpointValue, useColorMode } from "@chakra-ui/react";
+import { Box, Flex, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { SideMenuButton } from "../Account/SideMenuButton";
 import { useAdminOptions } from "@/lib/hooks/tanstack/useAdminOptions";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
+import { SideMenuSectionDivider } from "./SidebarSectionDivider";
 
 interface ISectionProps {
   isSuperUser: boolean;
@@ -342,30 +343,6 @@ const GuideAnnualReportSection = ({
 };
 
 // ==========================================================================
-
-export const SideMenuSectionDivider = () => {
-  const isOver750 = useBreakpointValue({
-    false: true,
-    sm: false,
-    md: false,
-    "768px": true,
-    mdlg: true,
-    lg: true,
-    xlg: true,
-  });
-  return (
-    <Box
-      w={"100%"}
-      p={2}
-      mb={4}
-      position={"relative"}
-      // display={"flex"}
-      ml={isOver750 ? 4 : undefined}
-    >
-      <hr />
-    </Box>
-  );
-};
 
 export const UserGuide = () => {
   const { manuallyCheckAndToggleDialog } = useEditorContext();
