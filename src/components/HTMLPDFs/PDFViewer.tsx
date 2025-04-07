@@ -144,7 +144,6 @@ Props) => {
   });
 
   const beginUnapprovedProjectDocPDFGeneration = (formData: IDocGen) => {
-    // console.log(formData);
     unapprovedAnnualReportPDFGenerationMutation.mutate(formData);
   };
 
