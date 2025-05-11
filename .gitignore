@@ -2,4 +2,3 @@ node_modules
 *.env
 *.unlighthouse/*
 *.DS_Store
-src/.DS_Store
