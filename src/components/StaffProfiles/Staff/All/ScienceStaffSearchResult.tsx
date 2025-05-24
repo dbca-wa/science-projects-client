@@ -87,7 +87,7 @@ const ScienceStaffSearchResult = ({
           <span className="flex items-center">
             <Building className="mt-[2px] self-start" size={"15px"} />
             <p className="ml-2 flex-1 text-balance text-sm">
-              {division}, {unit}
+              {division}. {unit}
             </p>
           </span>
         )}

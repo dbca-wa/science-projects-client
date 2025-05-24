@@ -1247,10 +1247,11 @@ export const getPublicProfileCVData = async ({
   return res;
 };
 
-export const getStaffProfiles = async ({ searchTerm, page }) => {
+export const getStaffProfiles = async ({ searchTerm, page, showHidden }) => {
   const params = new URLSearchParams();
   if (searchTerm) params.append("searchTerm", searchTerm);
   params.append("page", page.toString());
+  if (showHidden) params.append("showHidden", "true");
 
   const res = await instance
     .get(`users/staffprofiles?${params}`)
