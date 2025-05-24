@@ -2,26 +2,43 @@ import ScienceStaffSearchBar from "@/components/StaffProfiles/Staff/All/ScienceS
 import ScienceStaffSearchResult from "@/components/StaffProfiles/Staff/All/ScienceStaffSearchResult";
 import StaffResultSkeleton from "@/components/StaffProfiles/StaffResultSkeleton";
 import { useScienceStaffProfileList } from "@/lib/hooks/tanstack/useScienceStaffProfileList";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { useMediaQuery } from "@/lib/utils/useMediaQuery";
-import { Grid } from "@chakra-ui/react";
+import { Grid, Button as ChakraButton } from "@chakra-ui/react";
 import { useSearchParams } from "react-router-dom";
+import { Head } from "@/components/Base/Head";
+import { Button } from "@/components/ui/button";
+import clsx from "clsx";
+import { useState } from "react";
 
 export const ScienceStaff = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchTerm = searchParams.get("searchTerm") || "";
   const page = parseInt(searchParams.get("page") || "1", 10);
+  const showHidden = searchParams.get("showHidden") === "true";
 
   const { scienceStaffData, scienceStaffLoading } = useScienceStaffProfileList({
     searchTerm,
     page,
+    showHidden, // New flag for admins
   });
-  // console.log(scienceStaffData);
+
+  const { userData, userLoading } = useUser();
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({
       searchTerm,
       page: newPage.toString(),
+      ...(showHidden && { showHidden: "true" }), // Preserve showHidden state
+    });
+  };
+
+  const toggleHiddenProfiles = () => {
+    setSearchParams({
+      searchTerm,
+      page: "1", // Reset to page 1 when toggling
+      showHidden: showHidden ? "false" : "true",
     });
   };
 
@@ -37,11 +54,30 @@ export const ScienceStaff = () => {
     <div className="p-4">
       <Head title="DBCA | Staff Profiles" isStandalone />
       <h2 className="mb-4 text-center text-xl font-bold">Search BCS Staff</h2>
+
+      {/* Admin Toggle Button - only show for superusers */}
+      {userData?.is_superuser && (
+        <div className="mb-4 flex justify-center">
+          <ChakraButton
+            onClick={toggleHiddenProfiles}
+            colorScheme={showHidden ? "red" : "blue"}
+            variant="outline"
+            size="sm"
+          >
+            {showHidden ? "Hide Hidden Profiles" : "Show Hidden Profiles"}
+          </ChakraButton>
+        </div>
+      )}
+
       <div className={`flex justify-center pt-4`}>
         <ScienceStaffSearchBar
           searchTerm={searchTerm}
           onSearch={(newSearchTerm) =>
-            setSearchParams({ searchTerm: newSearchTerm, page: "1" })
+            setSearchParams({
+              searchTerm: newSearchTerm,
+              page: "1",
+              ...(showHidden && { showHidden: "true" }), // Preserve showHidden state
+            })
           }
         />
       </div>
@@ -67,6 +103,11 @@ export const ScienceStaff = () => {
                     scienceStaffData?.page * 16,
                     scienceStaffData?.total_results,
                   )} results${searchTerm ? ` for '${searchTerm}'` : ""} out of ${scienceStaffData?.total_results}`}
+            {scienceStaffData?.showing_hidden && (
+              <span className="ml-2 font-medium text-red-600">
+                (including hidden profiles)
+              </span>
+            )}
           </p>
           <Grid
             gridTemplateColumns={
@@ -86,24 +127,20 @@ export const ScienceStaff = () => {
                 getDisplayName(a).localeCompare(getDisplayName(b)),
               )
               ?.map((user, index) => {
-                // console.log(user);
                 return (
                   <ScienceStaffSearchResult
-                    key={index}
+                    key={user.pk || index} // Use pk as key for better performance
                     pk={user?.pk}
                     name={`${user?.display_first_name ?? user?.first_name} ${user?.display_last_name ?? user?.last_name}`}
                     position={
                       user.custom_title_on && user.custom_title
                         ? `${user.custom_title[0].toUpperCase()}${user.custom_title.slice(1)}`
                         : user?.position
-                      // user?.business_area_led
-                      //   ? `Business Area Leader, ${user.business_area_led}`
-                      //   : user?.position
                     }
                     is_hidden={user?.is_hidden}
                     location={user?.location}
                     unit={user?.unit}
-                    division={user?.division} // branch={user?.branch}
+                    division={user?.division}
                   />
                 );
               })}
@@ -114,29 +151,11 @@ export const ScienceStaff = () => {
             totalPages={scienceStaffData?.total_pages}
             onPageChange={handlePageChange}
           />
-          {/* <div className="mt-4 flex justify-between">
-            <button
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page <= 1}
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page >= scienceStaffData.total_pages}
-            >
-              Next
-            </button>
-          </div> */}
         </div>
       )}
     </div>
   );
 };
-
-import { Head } from "@/components/Base/Head";
-import { Button } from "@/components/ui/button";
-import clsx from "clsx";
 
 interface PaginationProps {
   currentPage: number;
@@ -149,7 +168,7 @@ const Pagination = ({
   currentPage,
   totalPages,
   onPageChange,
-  totalResults, // Destructure the prop
+  totalResults,
 }: PaginationProps) => {
   const pageNumbers = [];
 
