@@ -135,39 +135,11 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Remedy Buttons"}
-              kind="fix"
-              description={
-                "A bug has been patched in the Remedy Problematic Project function which prevented all projects from being updated."
-              }
-            />
-            <PatchNoteEntry
-              title={"Map State"}
-              kind="fix"
-              description={
-                "The projects map has been updated to fix a bug which sometimes caused toggling labels to not work."
-              }
+              title={"Adjsut User Select Dropdown"}
+              kind="update"
+              description={"Prevent scrolling to the top on selection of user."}
             />
 
-            {/* <PatchNoteEntry
-              title={"Modern Layout Updated"}
-              kind="update"
-              description={
-                "The second 'modern' layout has been adjusted to implement missing features already present on the default layout."
-              }
-            /> */}
-            <PatchNoteEntry
-              title={"Documentation"}
-              kind="update"
-              description={
-                "Documentation / Quick Guide has been updated to reflect recent changes."
-              }
-            />
-            <PatchNoteEntry
-              title={"SEO"}
-              kind="update"
-              description={"Improved SEO for public-facing pages"}
-            />
             <PatchNoteEntry
               title={"Project Updates"}
               kind="update"

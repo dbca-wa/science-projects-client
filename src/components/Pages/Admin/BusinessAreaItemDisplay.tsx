@@ -601,6 +601,9 @@ export const BusinessAreaItemDisplay = ({
                   autoComplete="off"
                   value={nameData}
                   onChange={(e) => setNameData(e.target.value)}
+                  tabIndex={-1}
+                  // trapFocus={false}
+                  // restoreFocus={false}
                   // {...register("name", { required: true })}
                 />
               </FormControl>
@@ -609,6 +612,7 @@ export const BusinessAreaItemDisplay = ({
                 <FormControl mb={2}>
                   <FormLabel>Division</FormLabel>
                   <Select
+                    tabIndex={-1}
                     value={baDivision}
                     // defaultValue={baDivision}
                     onChange={(e) => {
@@ -653,6 +657,7 @@ export const BusinessAreaItemDisplay = ({
                 value={introductionData}
                 setValueFunction={setIntroductionData}
                 setValueAsPlainText={false}
+                tabbable={false}
               />
 
               <UnboundStatefulEditor
@@ -664,6 +669,7 @@ export const BusinessAreaItemDisplay = ({
                 value={focusData}
                 setValueFunction={setFocusData}
                 setValueAsPlainText={false}
+                tabbable={false}
               />
 
               <FormControl isRequired pb={4}>

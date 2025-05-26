@@ -26,6 +26,7 @@ interface Props {
   setValueFunction: React.Dispatch<React.SetStateAction<string>>;
   initialConfig: InitialConfigType;
   shouldFocus?: boolean;
+  tabbable?: boolean;
   // editorRef: any;
 }
 
@@ -39,6 +40,7 @@ export const SimpleStatefulPlainTE = ({
   value,
   setValueFunction,
   shouldFocus,
+  tabbable,
 }: Props) => {
   const [firstRender, setFirstRender] = useState(true);
 
@@ -82,6 +84,7 @@ export const SimpleStatefulPlainTE = ({
             <Box zIndex={2}>
               {/* Toolbar */}
               <ContentEditable
+                tabIndex={tabbable ? undefined : -1}
                 style={{
                   minHeight: "50px",
                   width: "100%",
