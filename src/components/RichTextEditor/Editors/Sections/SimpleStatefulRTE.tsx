@@ -27,6 +27,7 @@ interface Props {
   initialConfig: InitialConfigType;
   shouldFocus?: boolean;
   buttonSize?: "sm" | "md" | "lg";
+  tabbable?: boolean;
   // editorRef: any;
 }
 
@@ -41,6 +42,7 @@ export const SimpleStatefulRTE = ({
   setValueFunction,
   shouldFocus,
   buttonSize,
+  tabbable,
 }: Props) => {
   const [firstRender, setFirstRender] = useState(true);
 
@@ -92,6 +94,7 @@ export const SimpleStatefulRTE = ({
               ) : null}
 
               <ContentEditable
+                tabIndex={tabbable ? undefined : -1}
                 style={{
                   minHeight: "50px",
                   width: "100%",

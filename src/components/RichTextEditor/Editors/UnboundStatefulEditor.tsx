@@ -30,6 +30,7 @@ interface IProps {
   helperTextColor?: string;
   isPlain?: boolean;
   buttonSize?: "sm" | "md" | "lg";
+  tabbable?: boolean;
 }
 
 export const UnboundStatefulEditor = ({
@@ -47,6 +48,7 @@ export const UnboundStatefulEditor = ({
   helperTextColor,
   isPlain,
   buttonSize,
+  tabbable,
 }: IProps) => {
   const { colorMode } = useColorMode();
 
@@ -138,6 +140,7 @@ export const UnboundStatefulEditor = ({
               setValueAsPlainText={setValueAsPlainText}
               setValueFunction={setValueFunction}
               shouldFocus={shouldFocus ? shouldFocus : undefined}
+              tabbable={tabbable ? tabbable : undefined}
             />
           ) : (
             <SimpleStatefulRTE
@@ -150,6 +153,7 @@ export const UnboundStatefulEditor = ({
               setValueFunction={setValueFunction}
               shouldFocus={shouldFocus ? shouldFocus : undefined}
               buttonSize={buttonSize}
+              tabbable={tabbable ? tabbable : undefined}
             />
           )}
         </Box>
