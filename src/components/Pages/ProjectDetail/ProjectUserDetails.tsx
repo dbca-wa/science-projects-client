@@ -145,8 +145,13 @@ export const ProjectUserDetails = ({
   const [userRole, setUserRole] = useState(role);
   const [shortCodeValue, setShortCodeValue] = useState(shortCode);
 
+  // Add validation state to ensure role isnt blank
+  const [isRoleValid, setIsRoleValid] = useState(userRole !== "");
+
+  // Update the role handler to include validation
   const handleUpdateRole = (newRole: string) => {
     setUserRole(newRole);
+    setIsRoleValid(newRole !== ""); // Validate role is not empty
   };
 
   const handleUpdateFTE = (newFTE: number) => {
@@ -577,14 +582,16 @@ export const ProjectUserDetails = ({
               <InputGroup>
                 <Select
                   variant="filled"
-                  placeholder="Select a Role for the User"
+                  placeholder="Select a Role for the User" // This will show when no role is selected
                   onChange={(e) => handleUpdateRole(e.target.value)}
                   value={userRole}
+                  isInvalid={!isRoleValid} // Show error state (all users need role)
                   isDisabled={
                     humanReadableRoleName(userRole) === "Project Leader" &&
                     !me?.userData.is_superuser
                   }
                 >
+                  {/* NO empty option - force user to pick a real role */}
                   {user?.is_staff ? (
                     <>
                       <option value="technical">Technical Support</option>
@@ -595,16 +602,16 @@ export const ProjectUserDetails = ({
                       <option value="academicsuper">Academic Supervisor</option>
                       <option value="consulted">Consulted Peer</option>
                       <option value="externalcol">External Collaborator</option>
-                      {/* <option value="externalpeer">External Peer</option> */}
                       <option value="group">Involved Group</option>
-                      {/* <option value="supervising">Project Leader</option> */}
                       <option value="student">Supervised Student</option>
                     </>
                   )}
-                </Select>
+                </Select>{" "}
               </InputGroup>
-              <FormHelperText>
-                The role this team member fills within this project.
+              <FormHelperText color={!isRoleValid ? "red.500" : undefined}>
+                {!isRoleValid
+                  ? "Please select a role for this team member"
+                  : "The role this team member fills within this project."}
               </FormHelperText>
             </FormControl>
           </>
@@ -679,6 +686,7 @@ export const ProjectUserDetails = ({
             background: colorMode === "light" ? "blue.400" : "blue.500",
           }}
           mt={4}
+          isDisabled={!isRoleValid} // Disable if no role selected
           onClick={() =>
             updateProjectUser({
               projectPk: project_id,
@@ -689,7 +697,7 @@ export const ProjectUserDetails = ({
             })
           }
         >
-          Save Changes
+          {!isRoleValid ? "Please Select a Role" : "Save Changes"}
         </Button>
       </Flex>
 
