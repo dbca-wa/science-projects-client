@@ -135,25 +135,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Adjsut User Select Dropdown"}
+              title={"Optomise Queries to O(1) time complexity where possible"}
               kind="update"
-              description={"Prevent scrolling to the top on selection of user."}
+              description={
+                "Improved average query time by 90%, reducing load on database."
+              }
             />
 
-            <PatchNoteEntry
-              title={"Project Updates"}
-              kind="update"
-              description={
-                "Updated select project's approval and annual report structuring"
-              }
-            />
-            <PatchNoteEntry
-              title={"User feedback email address"}
-              kind="update"
-              description={
-                "Feedback is now sent to the ecoinformatics shared mailbox (ecoinformatics.admin@dbca.wa.gov.au). Feedback via Teams has been removed."
-              }
-            />
             <PatchNoteEntry
               title={"Dependencies"}
               kind="update"
