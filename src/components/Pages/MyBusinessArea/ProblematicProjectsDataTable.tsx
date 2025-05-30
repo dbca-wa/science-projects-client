@@ -658,7 +658,7 @@ export const ProblematicProjectsDataTable = ({ projectData }: Props) => {
             <TableRow>
               <TableCell colSpan={columns?.length} className="h-24 text-center">
                 {/* <Text mt={4} mx={2}> */}
-                You are currently not associated with any projects.
+                :)
                 {/* </Text> */}
               </TableCell>
             </TableRow>
