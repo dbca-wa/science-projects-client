@@ -7,6 +7,7 @@ export const useUserPublications = (employee_id: string) => {
     queryKey: ["publications", employee_id],
     queryFn: getPublicationsForUser,
     retry: false,
+    enabled: employee_id && employee_id !== "null", // Only run if valid ID (not null)
   });
   return {
     isLoading: isPending,
