@@ -3,46 +3,19 @@ import instance from "../axiosInstance";
 
 export interface IDocGen {
   document_pk: number;
+  genkind?: "all" | "approved"; // Optional, defaults to 'all'
 }
 
-export const generateAnnualReportPDF = async ({ document_pk }: IDocGen) => {
-  //   // Use import.meta.url directly to get the base URL
-  //   const cssFileURL = "/texteditor.css";
-
-  //   // Import the CSS file using Vite's import function
-  //   const cssFileContents = await fetch(cssFileURL)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error(`Failed to fetch ${cssFileURL}`);
-  //       }
-  //       return response.text();
-  //     })
-  //     .then((cssFileContent) => {
-  //       // console.log({ cssFileURL, cssFileContent });
-  //       // Send the object as JSON
-  //       const css_content = JSON.stringify(cssFileContent);
-  //       // You can send jsonString to your server using an HTTP request (e.g., fetch or axios)
-  //       // console.log(css_content); // Log the JSON string for verification
-  //       return css_content;
-  //     });
-
-  const res = await instance.post(
-    `documents/reports/${document_pk}/generate_pdf`,
-    // { css_content: cssFileContents },
-  );
-  // console.log(res.data);
-  return { res };
-};
-
-export const generateAnnualReportUnapprovedPDF = async ({
+export const generateAnnualReportPDF = async ({
   document_pk,
+  genkind = "all", // Default to 'all' if not specified
 }: IDocGen) => {
   const res = await instance.post(
-    `documents/reports/${document_pk}/unapproved_generate_pdf`,
+    `documents/reports/${document_pk}/generate_pdf`,
+    { genkind },
   );
   return { res };
 };
-
 export const cancelAnnualReportPDF = async ({ document_pk }: IDocGen) => {
   const res = await instance.post(
     `documents/reports/${document_pk}/cancel_doc_gen`,
@@ -52,26 +25,6 @@ export const cancelAnnualReportPDF = async ({ document_pk }: IDocGen) => {
 };
 
 export const generateProjectDocument = async ({ document_pk }: IDocGen) => {
-  // Use import.meta.url directly to get the base URL
-  //   const cssFileURL = "/texteditor.css";
-
-  //   // Import the CSS file using Vite's import function
-  //   const cssFileContents = await fetch(cssFileURL)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error(`Failed to fetch ${cssFileURL}`);
-  //       }
-  //       return response.text();
-  //     })
-  //     .then((cssFileContent) => {
-  //       // console.log({ cssFileURL, cssFileContent });
-  //       // Send the object as JSON
-  //       const css_content = JSON.stringify(cssFileContent);
-  //       // You can send jsonString to your server using an HTTP request (e.g., fetch or axios)
-  //       // console.log(css_content); // Log the JSON string for verification
-  //       return css_content;
-  //     });
-
   const res = await instance.post(
     `documents/generate_project_document/${document_pk}`,
     // { css_content: cssFileContents },

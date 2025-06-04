@@ -2,7 +2,6 @@ import {
   IDocGen,
   cancelAnnualReportPDF,
   generateAnnualReportPDF,
-  generateAnnualReportUnapprovedPDF,
 } from "@/lib/api";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import { useGetAnnualReportPDF } from "@/lib/hooks/tanstack/useGetAnnualReportPDF";
@@ -98,53 +97,18 @@ Props) => {
     },
   });
 
-  const unapprovedAnnualReportPDFGenerationMutation = useMutation({
-    mutationFn: generateAnnualReportUnapprovedPDF,
-    onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Generating AR PDF",
-        position: "top-right",
-      });
-    },
-    onSuccess: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Success",
-          description: `Annual Report PDF Generated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-      queryClient.invalidateQueries({
-        queryKey: [
-          "annualReportPDF",
-          thisReport?.pk ? thisReport.pk : thisReport.id,
-        ],
-      });
-    },
-    onError: (error: AxiosError) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Could Not Generate AR PDF",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-  });
+  const beginApprovedProjectDocPDFGeneration = (formData: IDocGen) => {
+    annualReportPDFGenerationMutation.mutate({
+      ...formData,
+      genkind: "approved",
+    });
+  };
 
   const beginUnapprovedProjectDocPDFGeneration = (formData: IDocGen) => {
-    unapprovedAnnualReportPDFGenerationMutation.mutate(formData);
+    annualReportPDFGenerationMutation.mutate({
+      ...formData,
+      genkind: "all",
+    });
   };
 
   const cancelDocGenerationMutation = useMutation({
@@ -209,9 +173,7 @@ Props) => {
     cancelDocGenerationMutation.mutate(formData);
   };
 
-  const beginProjectDocPDFGeneration = (formData: IDocGen) => {
-    annualReportPDFGenerationMutation.mutate(formData);
-  };
+  const beginProjectDocPDFGeneration = beginApprovedProjectDocPDFGeneration;
 
   const { pdfDocumentData, pdfDocumentDataLoading } = useGetAnnualReportPDF(
     thisReport?.pk ? thisReport.pk : thisReport?.id,
@@ -227,28 +189,22 @@ Props) => {
     let timer;
     if (
       pdfDocumentData?.report?.pdf_generation_in_progress === true ||
-      annualReportPDFGenerationMutation.isPending ||
-      unapprovedAnnualReportPDFGenerationMutation.isPending
+      annualReportPDFGenerationMutation.isPending
     ) {
       timer = setInterval(() => {
-        setGenerationTime((prevTime) => prevTime + 1000); // Increase by 1 second (1000 milliseconds)
+        setGenerationTime((prevTime) => prevTime + 1000);
         if (generationTime >= 30000) {
-          setShowRestartMessage(true); // Show restart message after 10 seconds
+          setShowRestartMessage(true);
         }
-      }, 1000); // Run every second
+      }, 1000);
     } else {
-      clearInterval(timer); // Stop the timer when generation is not in progress
-      setGenerationTime(0); // Reset generation time
-      setShowRestartMessage(false); // Hide restart message
+      clearInterval(timer);
+      setGenerationTime(0);
+      setShowRestartMessage(false);
     }
 
-    return () => clearInterval(timer); // Cleanup timer on component unmount or when pdf_generation_in_progress changes
-  }, [
-    pdfDocumentData,
-    generationTime,
-    annualReportPDFGenerationMutation,
-    unapprovedAnnualReportPDFGenerationMutation,
-  ]);
+    return () => clearInterval(timer);
+  }, [pdfDocumentData, generationTime, annualReportPDFGenerationMutation]);
 
   useEffect(() => {
     if (!pdfDocumentDataLoading && pdfDocumentData !== undefined) {
@@ -340,8 +296,6 @@ Props) => {
           */}
           {(annualReportPDFGenerationMutation.isPending &&
             !cancelDocGenerationMutation.isSuccess) ||
-          (unapprovedAnnualReportPDFGenerationMutation.isPending &&
-            !cancelDocGenerationMutation.isSuccess) ||
           pdfDocumentData?.report?.pdf_generation_in_progress ? (
             <Button
               size={"sm"}
@@ -403,10 +357,8 @@ Props) => {
             type="submit"
             form="pdf-generation-form"
             isLoading={
-              (annualReportPDFGenerationMutation.isPending &&
-                !cancelDocGenerationMutation.isPending) ||
-              (unapprovedAnnualReportPDFGenerationMutation.isPending &&
-                !cancelDocGenerationMutation.isPending)
+              annualReportPDFGenerationMutation.isPending &&
+              !cancelDocGenerationMutation.isPending
             }
           >
             <Box mr={2}>
@@ -429,8 +381,6 @@ Props) => {
             isDisabled={
               pdfDocumentData?.report?.pdf_generation_in_progress ||
               (annualReportPDFGenerationMutation.isPending &&
-                !cancelDocGenerationMutation.isSuccess) ||
-              (unapprovedAnnualReportPDFGenerationMutation.isPending &&
                 !cancelDocGenerationMutation.isSuccess)
             }
             type="submit"
@@ -438,8 +388,6 @@ Props) => {
             isLoading={
               pdfDocumentData?.report?.pdf_generation_in_progress ||
               (annualReportPDFGenerationMutation.isPending &&
-                !cancelDocGenerationMutation.isSuccess) ||
-              (unapprovedAnnualReportPDFGenerationMutation.isPending &&
                 !cancelDocGenerationMutation.isSuccess)
             }
           >
@@ -471,10 +419,10 @@ Props) => {
               width="100%"
               height={`${determineDPI() / 3.9}px`}
               style={{
-                border: "1px solid black",
+                // border: "1px solid black",
                 borderRadius: "20px",
               }}
-            ></iframe>
+            />
           )
         ) : (
           <Center>
