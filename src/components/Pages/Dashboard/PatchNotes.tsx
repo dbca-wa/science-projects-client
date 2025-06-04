@@ -135,10 +135,26 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Optomise Queries to O(1) time complexity where possible"}
+              title={"Optimise Queries to O(1) time complexity where possible"}
               kind="update"
               description={
-                "Improved average query time by 90%, reducing load on database."
+                "Improved average query time by 90%, reducing load on database and improving speed."
+              }
+            />
+
+            <PatchNoteEntry
+              title={"Optimise PDF Rendering for annual report"}
+              kind="update"
+              description={
+                "Deduplicated Annual Report rendering logic for approved/unapproved reports and improved performance from quadratic/cubic to linearithmic."
+              }
+            />
+
+            <PatchNoteEntry
+              title={"Adjusted IT Asset logic"}
+              kind="update"
+              description={
+                "In response to hierarchical changes in Ascender system, fixed logic to fetch profiles by their correct divisional name."
               }
             />
 
