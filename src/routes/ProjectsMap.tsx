@@ -120,7 +120,7 @@ const ProjectsMap = () => {
 
       {/* Global loading overlay */}
       {isMapLoading && (
-        <div className="absolute bottom-0 left-96 right-0 top-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm">
+        <div className="absolute bottom-0 left-96 right-0 top-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-xs">
           <div className="flex flex-col items-center rounded-lg bg-white/90 p-4 shadow-lg">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
             <p className="mt-3 text-sm font-medium text-gray-700">

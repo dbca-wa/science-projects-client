@@ -113,7 +113,7 @@ export const AffiliationItemDisplay = ({ pk, name }: IAffiliation) => {
               borderWidth="1px"
               _hover={{ bg: "gray.400" }}
               _expanded={{ bg: "blue.400" }}
-              _focus={{ boxShadow: "outline" }}
+              _focus={{ boxShadow: "outline-solid" }}
             >
               <Flex alignItems={"center"} justifyContent={"center"}>
                 <MdMoreVert />

@@ -339,7 +339,7 @@ const MapLocationsSidebar = ({
 
           // Apply consistent styling for all labels
           labelContainer.className =
-            "bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 transition-all duration-200 cursor-pointer select-none";
+            "bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 transition-all duration-200 cursor-pointer select-none";
           labelContainer.style.maxWidth = "200px";
           labelContainer.style.width = "max-content";
           labelContainer.style.whiteSpace = "normal";
@@ -360,7 +360,7 @@ const MapLocationsSidebar = ({
 
           // Create a div icon with exact size - use the sanitized ID here
           const label = L.divIcon({
-            html: `<div id="${labelId}" class="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 text-balance text-center border border-gray-200/50 transition-all duration-200 cursor-pointer select-none" style="max-width: 175px; width: max-content; white-space: normal; word-wrap: break-word; position: relative;">${name}</div>`,
+            html: `<div id="${labelId}" class="bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 text-balance text-center border border-gray-200/50 transition-all duration-200 cursor-pointer select-none" style="max-width: 175px; width: max-content; white-space: normal; word-wrap: break-word; position: relative;">${name}</div>`,
             className: "",
             iconSize: [width, height],
             iconAnchor: [width / 2, height / 2],
@@ -512,7 +512,7 @@ const MapLocationsSidebar = ({
 
         //   // Apply consistent styling for all labels, removing the conditional class based on length
         //   labelContainer.className =
-        //     "bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 transition-all duration-200 cursor-pointer select-none";
+        //     "bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 transition-all duration-200 cursor-pointer select-none";
         //   labelContainer.style.maxWidth = "200px";
         //   labelContainer.style.width = "max-content"; // Use max-content to prevent unnecessary wrapping
         //   labelContainer.style.whiteSpace = "normal"; // Allow wrapping only when needed
@@ -533,7 +533,7 @@ const MapLocationsSidebar = ({
 
         //   // Create a div icon with exact size
         //   const label = L.divIcon({
-        //     html: `<div id="${labelId}" class="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 transition-all duration-200 cursor-pointer select-none" style="max-width: 200px; width: max-content; white-space: normal; word-wrap: break-word;">${name}</div>`,
+        //     html: `<div id="${labelId}" class="bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-lg shadow-lg text-sm font-medium text-gray-800 border border-gray-200/50 transition-all duration-200 cursor-pointer select-none" style="max-width: 200px; width: max-content; white-space: normal; word-wrap: break-word;">${name}</div>`,
         //     className: "", // Important: empty class to avoid leaflet's default styling
         //     iconSize: [width, height],
         //     iconAnchor: [width / 2, height / 2], // Center the icon on the point
@@ -971,7 +971,7 @@ const MapLocationsSidebar = ({
               <div className="flex min-h-[40px] w-full items-stretch">
                 <div
                   onClick={() => toggleMainLayer(key)}
-                  className="flex flex-shrink-0 cursor-pointer select-none items-center space-x-2 px-1 pr-4"
+                  className="flex shrink-0 cursor-pointer select-none items-center space-x-2 px-1 pr-4"
                 >
                   <Checkbox id={key} checked={data.mainVisible} />
                   <span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">

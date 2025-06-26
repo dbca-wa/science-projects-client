@@ -355,7 +355,7 @@ const ProjectMapMarker = ({
               opacity-20
               bottom-0
               left-2
-              blur-sm
+              blur-xs
             "></div>
           </div>
         `,
@@ -437,7 +437,7 @@ const ProjectMapMarker = ({
               opacity-20
               bottom-0
               left-2
-              blur-sm
+              blur-xs
             "></div>
           </div>
         `,

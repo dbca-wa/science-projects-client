@@ -107,24 +107,20 @@ export const updateProgressReportSection = async ({
 
 export const getLatestActiveStudentReports = async () => {
   return instance.get(`documents/latest_active_student_reports`).then((res) => {
-    console.log(res.data);
     return res.data;
   });
 };
 
 export const getLatestActiveProgressReports = async () => {
-  console.log();
   return instance
     .get(`documents/latest_active_progress_reports`)
     .then((res) => {
-      console.log(res.data);
       return res.data;
     });
 };
 
 export const getLatestUnapprovedReports = async () => {
   return instance.get(`documents/latest_inactive_reports`).then((res) => {
-    console.log(res.data);
     return res.data;
   });
 };

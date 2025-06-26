@@ -594,7 +594,7 @@ const ElementSelector = ({
       // placement="bottom"
     >
       {" "}
-      <Box className="tooltip-container flex-grow">
+      <Box className="tooltip-container grow">
         <MenuButton
           as={Button}
           variant={"ghost"}

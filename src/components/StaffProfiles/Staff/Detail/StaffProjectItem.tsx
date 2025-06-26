@@ -107,7 +107,7 @@ const StaffProjectItem = ({
       {/* Vertical line that spans full height */}
       <div
         className={clsx(
-          "absolute left-0 top-6 -ml-0.5 w-[1px] bg-gray-200",
+          "absolute left-0 top-6 -ml-0.5 w-px bg-gray-200",
           {
             // Style depending on the position of the item in the list
 

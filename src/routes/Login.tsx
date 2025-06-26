@@ -173,6 +173,8 @@ export const Login = ({ onClose }: IIsModal) => {
                   />
 
                   <Input
+                    border={"1px solid"}
+                    borderColor={"gray.300"}
                     isInvalid={Boolean(errors.username?.message)}
                     variant={"filled"}
                     placeholder={"Username"}
@@ -194,6 +196,8 @@ export const Login = ({ onClose }: IIsModal) => {
                     }
                   />
                   <Input
+                    border={"1px solid"}
+                    borderColor={"gray.300"}
                     isInvalid={Boolean(errors.password?.message)}
                     variant={"filled"}
                     placeholder={"Password"}

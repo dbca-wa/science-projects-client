@@ -104,7 +104,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
       <HomeConfetti />
       <Box
         mt={5}
-        bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
+        bgColor={colorMode === "dark" ? "gray.700" : "gray.200"}
         color={colorMode === "dark" ? "white" : "black"}
         rounded={6}
         flexDir={"column"}

@@ -174,9 +174,9 @@ export const ProfilePage = () => {
     window.location.href = url;
   };
 
-  useEffect(() => {
-    console.log(me);
-  }, [me]);
+  // useEffect(() => {
+  //   console.log(me);
+  // }, [me]);
 
   return (
     <Box h={"100%"}>

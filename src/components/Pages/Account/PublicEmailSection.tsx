@@ -94,7 +94,7 @@ const PublicEmailSection = ({ me }: { me: IUserMe }) => {
     <Flex
       w={"100%"}
       mb={8}
-      className="flex-grow"
+      className="grow"
       as="form"
       id="update-public-email-form"
       onSubmit={handleUpdatePublicEmailSubmit(beginUpdatePublicEmail)}

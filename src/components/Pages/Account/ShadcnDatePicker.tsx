@@ -36,9 +36,9 @@ export const ShadcnDatePicker = ({
 
   return (
     <Popover open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
-      <PopoverTrigger asChild className="z-[9999]">
+      <PopoverTrigger asChild className="z-9999">
         <Button
-          variant={"outline"}
+          variant={"outline-solid"}
           className={cn(
             "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground",
@@ -49,9 +49,9 @@ export const ShadcnDatePicker = ({
           {date ? format(date, "PPP") : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="z-[9999] w-auto p-0">
+      <PopoverContent className="z-9999 w-auto p-0">
         <Calendar
-          className="z-[9999]"
+          className="z-9999"
           mode="single"
           selected={date}
           onSelect={handleSelect}

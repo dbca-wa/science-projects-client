@@ -145,7 +145,7 @@ export const AddressItemDisplay = ({
               borderWidth="1px"
               _hover={{ bg: "gray.400" }}
               _expanded={{ bg: "blue.400" }}
-              _focus={{ boxShadow: "outline" }}
+              _focus={{ boxShadow: "outline-solid" }}
               alignItems={"center"}
               justifyContent={"center"}
             >
