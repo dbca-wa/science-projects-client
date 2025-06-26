@@ -160,7 +160,7 @@ export const ServiceItemDisplay = ({
               borderWidth="1px"
               _hover={{ bg: "gray.400" }}
               _expanded={{ bg: "blue.400" }}
-              _focus={{ boxShadow: "outline" }}
+              _focus={{ boxShadow: "outline-solid" }}
               mr={4}
             >
               <Flex alignItems={"center"} justifyContent={"center"}>

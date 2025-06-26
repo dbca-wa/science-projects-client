@@ -126,7 +126,7 @@ const CustomTitleSection = ({ me }: { me: IUserMe }) => {
   return (
     <Flex
       w="100%"
-      className="flex-grow flex-col gap-4"
+      className="grow flex-col gap-4"
       as="form"
       id="update-custom-title-form"
       onSubmit={handleSubmit(onSubmit)}

@@ -58,7 +58,7 @@ const MapSidebarSection = ({
         <h3 className="text-sm font-semibold text-muted-foreground">{title}</h3>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-gray-100 focus:outline-none"
+          className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-gray-100 focus:outline-hidden"
           aria-expanded={isOpen}
           aria-controls={`content-${title.replace(/\s+/g, "-").toLowerCase()}`}
         >

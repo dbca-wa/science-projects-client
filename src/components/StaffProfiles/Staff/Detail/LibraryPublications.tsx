@@ -151,7 +151,7 @@ const PublicationText = ({ publication }: IPublicationTextProps) => {
 
   return (
     <div
-      className="mb-4 text-sm leading-relaxed text-gray-700 [&>a]:text-blue-500 [&>a]:no-underline hover:[&>a]:text-blue-700 hover:[&>a]:underline [&>b]:mx-1 [&>i]:italic [&>i]:text-gray-600"
+      className="mb-4 text-sm leading-relaxed text-gray-700 [&>a]:text-blue-500 [&>a]:no-underline [&>a]:hover:text-blue-700 [&>a]:hover:underline [&>b]:mx-1 [&>i]:italic [&>i]:text-gray-600"
       dangerouslySetInnerHTML={{ __html: processedText }}
     />
   );

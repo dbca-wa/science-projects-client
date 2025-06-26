@@ -31,7 +31,7 @@ const StaffProfileNavMenuItemButton = ({
           setterFn(title);
         }}
         className={clsx(
-          `-mb-[1px] mr-2 cursor-pointer appearance-none rounded-sm border-none py-2 text-lg outline-none hover:text-black/90 dark:hover:text-gray-100`,
+          `-mb-px mr-2 cursor-pointer appearance-none rounded-sm border-none py-2 text-lg outline-hidden hover:text-black/90 dark:hover:text-gray-100`,
           title === "Overview" && isDesktop && "pr-4",
           // title === "Publications" && "pl-4",
           (title === "Projects" ||

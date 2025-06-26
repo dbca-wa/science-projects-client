@@ -1,7 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
+@config '../tailwind.config.ts';
+
+/*
+  Tailwind v4 compatibility for border colors
+  Only affects elements that explicitly use borders
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+/* CSS Custom Properties for Design System */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -36,10 +51,6 @@
     --keyboard-height: env(keyboard-inset-height);
   }
 
-  .drawer-content {
-    padding-bottom: var(--keyboard-height);
-  }
-
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -71,77 +82,57 @@
   }
 }
 
+/* Base styles - NO global border application */
 @layer base {
-  * {
-    @apply border-border;
-  }
   body {
     @apply bg-background text-foreground;
+    overscroll-behavior-y: none;
   }
+
   html {
-    overflow-y: scroll; /* Enables vertical scrolling */
-    overflow-x: hidden; /* Hides horizontal overflow if needed */
-    scrollbar-width: none; /* Hides scrollbar in Firefox */
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-width: none;
+  }
+
+  .drawer-content {
+    padding-bottom: var(--keyboard-height);
   }
 }
 
-@keyframes pulse {
-  0% {
-    opacity: 0.5;
+/* Utility classes */
+@layer utilities {
+  @keyframes pulse {
+    0% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.5;
+    }
   }
-  50% {
-    opacity: 1;
+
+  /* Table styling utilities */
+  .table-header-row {
+    background-color: transparent;
+    color: inherit;
   }
-  100% {
-    opacity: 0.5;
+
+  .table-header-row:hover {
+    background-color: transparent !important;
+    color: inherit !important;
+    cursor: default;
   }
-}
 
-/* Remove hover highlight for table headers */
-.table-header-row {
-  background-color: transparent; /* Ensure background is transparent */
-  color: inherit; /* Inherit the text color */
-}
-
-.table-header-row:hover {
-  background-color: transparent !important; /* Prevent background change on hover */
-  color: inherit !important; /* Prevent text color change on hover */
-  cursor: default; /* Change cursor to default to indicate no interaction */
-}
-
-/* Remove hover highlight for table body rows */
-/* .table-body-row {
-  background-color: transparent; 
-  color: inherit; 
-}
-
-.table-body-row:hover {
-  background-color: gray !important; 
-  color: inherit !important; 
-  cursor: pointer; 
-} */
-
-/* Custom CSS for hiding scrollbar */
-.no-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, and Opera */
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none; /* Internet Explorer and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-body {
-  overscroll-behavior-y: none;
-}
-
-
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
+  /* Scrollbar hiding utilities */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

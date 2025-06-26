@@ -88,7 +88,7 @@ export const CurrentReport = () => {
             variant={"enclosed"}
             onChange={(index) => {
               manuallyCheckAndToggleDialog(() => {
-                console.log("changed");
+                // console.log("changed");
                 setActiveTabIndex(index);
               });
             }}
