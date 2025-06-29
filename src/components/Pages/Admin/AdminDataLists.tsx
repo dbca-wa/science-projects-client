@@ -1,16 +1,33 @@
 import { Head } from "@/components/Base/Head";
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { useState } from "react";
 import { AllProblematicProjects } from "./Data/AllProblematicProjects";
 import { EmailLists } from "./Data/EmailLists";
 import { StaffUsers } from "./Data/StaffUsers";
 import StaffProfileEmails from "./Data/StaffProfileEmails";
+import UnapprovedProjectsThisFY from "./Data/UnapprovedProjectsThisFY";
 
 export const AdminDataLists = () => {
+  const [loadedTabs, setLoadedTabs] = useState<Set<number>>(new Set([0])); // Start with first tab loaded
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleTabChange = (index: number) => {
+    setActiveTab(index);
+    // Mark this tab as loaded
+    setLoadedTabs((prev) => new Set(prev).add(index));
+  };
+
   return (
     <>
       <Head title="Data" />
-      <Tabs isFitted variant={"enclosed"}>
+      <Tabs
+        isFitted
+        variant={"enclosed"}
+        index={activeTab}
+        onChange={handleTabChange}
+      >
         <TabList>
+          <Tab>Unapproved Projects</Tab>
           <Tab>Problematic Projects</Tab>
           <Tab>Email List</Tab>
           <Tab>Staff Profile List</Tab>
@@ -18,25 +35,22 @@ export const AdminDataLists = () => {
         </TabList>
 
         <TabPanels>
-          {/* Problematic Projects */}
+          {/* Unapproved projects this FY */}
           <TabPanel>
-            <AllProblematicProjects />
+            {loadedTabs.has(0) && <UnapprovedProjectsThisFY />}
           </TabPanel>
+
+          {/* Problematic Projects */}
+          <TabPanel>{loadedTabs.has(1) && <AllProblematicProjects />}</TabPanel>
 
           {/* Emails */}
-          <TabPanel>
-            <EmailLists />
-          </TabPanel>
+          <TabPanel>{loadedTabs.has(2) && <EmailLists />}</TabPanel>
 
           {/* Active Staff Profile Emails */}
-          <TabPanel>
-            <StaffProfileEmails />
-          </TabPanel>
+          <TabPanel>{loadedTabs.has(3) && <StaffProfileEmails />}</TabPanel>
 
           {/* Staff */}
-          <TabPanel>
-            <StaffUsers />
-          </TabPanel>
+          <TabPanel>{loadedTabs.has(4) && <StaffUsers />}</TabPanel>
         </TabPanels>
       </Tabs>
     </>

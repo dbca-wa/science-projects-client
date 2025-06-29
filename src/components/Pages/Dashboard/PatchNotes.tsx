@@ -135,13 +135,63 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Staff Profile Edit and Delete"}
-              kind="update"
+              title={"Admin | View All Unapproved Docs"}
+              kind="feature"
               description={
-                "Fixed a bug causing staff profile section edits and deletes by non-admin staff to fail"
+                "Added functionality to view all unapproved documents for admins in a given FY and send bump emails"
               }
             />
-
+            <PatchNoteEntry
+              title={
+                "Admin | Show all projects with a closure that are not closed"
+              }
+              kind="feature"
+              description={
+                "Added functionality to view all projects with a project closure that are not in a closed state (for handling projects that were previously closed as suspended)"
+              }
+            />
+            <PatchNoteEntry
+              title={"Admin | Set Maintainer"}
+              kind="feature"
+              description={
+                "Added functionality to set the maintainer of SPMS going forward"
+              }
+            />
+            <PatchNoteEntry
+              title={"Fixed map toggle states"}
+              kind="fix"
+              description={
+                "Fixed a bug causing map toggling to work incorrectly - labels and colours now adhere to state set by user correctly"
+              }
+            />
+            <PatchNoteEntry
+              title={"Annual Report banner"}
+              kind="fix"
+              description={
+                "Adjusted the display of annual report banner image to remedy issues in production (caused by OIM rules/changes)"
+              }
+            />
+            <PatchNoteEntry
+              title={"Mentions"}
+              kind="update"
+              description={
+                "Users can now mention users in the project team and business area on project documents. By default, a comment with no mention will email the team (if email is an internal - dbca one)"
+              }
+            />
+            <PatchNoteEntry
+              title={"Allow Same Name"}
+              kind="update"
+              description={
+                "Allow adding users with same name if email is not the same"
+              }
+            />
+            <PatchNoteEntry
+              title={"Vite and Tailwind Updates"}
+              kind="update"
+              description={
+                "Updated core dependencies for frontend to new major versions for improved performance"
+              }
+            />
             <PatchNoteEntry
               title={"Dependencies"}
               kind="update"

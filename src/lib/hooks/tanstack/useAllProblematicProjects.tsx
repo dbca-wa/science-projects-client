@@ -6,6 +6,7 @@ import { getAllProblematicProjects } from "../../api";
 import { IProjectData } from "@/types";
 
 export interface IProblematicData {
+  open_closed: IProjectData[];
   no_members: IProjectData[];
   no_leader: IProjectData[];
   multiple_leads: IProjectData[];

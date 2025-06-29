@@ -18,6 +18,7 @@ import {
   Grid,
   HStack,
   Link,
+  MenuDivider,
   MenuGroup,
   MenuItem,
   Text,
@@ -266,6 +267,26 @@ const AdminMenuContents = ({
         color={"gray.500"}
         textAlign={"center"}
       >
+        <MenuItem onClick={handleReviewData}>
+          {<PiListMagnifyingGlassDuotone />}
+          <Text ml={2}>Lists</Text>
+        </MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              // Handle Ctrl + Click (or Command + Click on Mac)
+              window.open(`/crud/emails`, "_blank"); // Opens in a new tab
+            } else {
+              // Normal click handling
+              navigate("/crud/emails");
+            }
+          }}
+        >
+          {<MdEmail />}
+          <Text ml={2}>Emails</Text>
+        </MenuItem>
+
+        <MenuDivider />
         <MenuItem
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
@@ -337,20 +358,6 @@ const AdminMenuContents = ({
           {<GoOrganization />}
           <Text ml={2}>Divisions</Text>
         </MenuItem>
-        <MenuItem
-          onClick={(e) => {
-            if (e.ctrlKey || e.metaKey) {
-              // Handle Ctrl + Click (or Command + Click on Mac)
-              window.open(`/crud/emails`, "_blank"); // Opens in a new tab
-            } else {
-              // Normal click handling
-              navigate("/crud/emails");
-            }
-          }}
-        >
-          {<MdEmail />}
-          <Text ml={2}>Emails</Text>
-        </MenuItem>
 
         <MenuItem
           onClick={(e) => {
@@ -394,11 +401,6 @@ const AdminMenuContents = ({
         >
           {<MdOutlineSettingsSuggest />}
           <Text ml={2}>Services</Text>
-        </MenuItem>
-
-        <MenuItem onClick={handleReviewData}>
-          {<PiListMagnifyingGlassDuotone />}
-          <Text ml={2}>View Data Lists</Text>
         </MenuItem>
       </MenuGroup>
 
@@ -595,7 +597,7 @@ const OldHeader = () => {
                 }
               }}
             >
-              <span className="select-none text-xl font-bold">SPMS</span>
+              <span className="text-xl font-bold select-none">SPMS</span>
             </Link>
             {/* <Button
               px={5}
