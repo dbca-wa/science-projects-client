@@ -689,6 +689,10 @@ export const getAllProblematicProjects = async () => {
   return res;
 };
 
+export const getAllUnapprovedProjectsThisFY = async () => {
+  return instance.get(`projects/unapprovedFY`).then((res) => res.data);
+};
+
 export const getBranchesBasedOnSearchTerm = async (
   searchTerm: string,
   page: number,
@@ -1134,6 +1138,18 @@ export const remedyMemberlessProjects = async ({
   console.log(projects);
   const res = instance
     .post(`projects/remedy/memberless`, { projects: projects })
+    .then((res) => {
+      return res.data;
+    });
+  return res;
+};
+
+export const remedyOpenClosedProjects = async ({
+  projects,
+}: IRemedyProblematicProjects) => {
+  console.log(projects);
+  const res = instance
+    .post(`projects/remedy/open_closed`, { projects: projects })
     .then((res) => {
       return res.data;
     });

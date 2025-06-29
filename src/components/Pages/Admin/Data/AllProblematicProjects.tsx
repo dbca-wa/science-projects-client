@@ -22,9 +22,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { AccordionItem } from "@radix-ui/react-accordion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TbRefresh } from "react-icons/tb";
 import { UserProjectsDataTable } from "../../Dashboard/UserProjectsDataTable";
+import { RemedyOpenClosedModalContent } from "@/components/Modals/Admin/RemedyOpenClosedModalContent";
 
 export const AllProblematicProjects = () => {
   const { colorMode } = useColorMode();
@@ -35,20 +36,32 @@ export const AllProblematicProjects = () => {
 
   const fetchProblematicProjects = async () => {
     setFetchingData(true);
-    if (problematicProjectData !== null) {
-      setproblematicProjectData(null);
-    }
-    await getAllProblematicProjects().then((res) => {
+    try {
+      const res = await getAllProblematicProjects();
       console.log(res);
       setproblematicProjectData(res);
+    } catch (error) {
+      console.error("Error fetching problematic projects:", error);
+    } finally {
       setFetchingData(false);
-    });
+    }
   };
+
+  // Auto-fetch data on component mount
+  useEffect(() => {
+    fetchProblematicProjects();
+  }, []);
 
   const {
     isOpen: isRemedyNoMembersModalOpen,
     onOpen: onOpenRemedyNoMembersModal,
     onClose: onCloseRemedyNoMembersModal,
+  } = useDisclosure();
+
+  const {
+    isOpen: isRemedyOpenClosedModalOpen,
+    onOpen: onOpenRemedyOpenClosedModal,
+    onClose: onCloseRemedyOpenClosedModal,
   } = useDisclosure();
 
   const {
@@ -71,6 +84,19 @@ export const AllProblematicProjects = () => {
 
   return (
     <>
+      {/* Open Closed */}
+      <BaseModal
+        isOpen={isRemedyOpenClosedModalOpen}
+        onClose={onCloseRemedyOpenClosedModal}
+        modalTitle="Remedy Open Close Projects"
+      >
+        <RemedyOpenClosedModalContent
+          projects={problematicProjectData?.open_closed}
+          refreshDataFn={fetchProblematicProjects}
+          onClose={onCloseRemedyNoMembersModal}
+        />
+      </BaseModal>
+
       {/* Memberless */}
       <BaseModal
         isOpen={isRemedyNoMembersModalOpen}
@@ -128,7 +154,7 @@ export const AllProblematicProjects = () => {
           <Text fontSize={"x-large"} py={4} flex={1}>
             Problematic Project Lists
           </Text>
-          {!fetchingData && problematicProjectData && (
+          {problematicProjectData && (
             <Box justifyContent={"flex-end"}>
               <Button
                 bg={colorMode === "light" ? "blue.500" : "blue.500"}
@@ -160,37 +186,40 @@ export const AllProblematicProjects = () => {
           </Center>
         ) : (
           <>
-            {!problematicProjectData ? (
-              <Center
-                w={"100%"}
-                h={"500px"}
-                flexDir={"column"}
-                //   bg={"Red"}
-              >
-                <Button
-                  bg={colorMode === "light" ? "blue.500" : "blue.500"}
-                  color={"white"}
-                  _hover={{
-                    bg: colorMode === "light" ? "blue.400" : "blue.400",
-                  }}
-                  onClick={fetchProblematicProjects}
-                  isDisabled={fetchingData}
-                  size={"lg"}
-                  my={4}
-                >
-                  Check Data
-                </Button>
-                <Text
-                  color={"gray.500"}
-                  fontSize={"x-large"}
-                  fontWeight={"bold"}
-                >
-                  Press "Check Data" to get the latest information on
-                  problematic projects
-                </Text>
-              </Center>
-            ) : (
+            {problematicProjectData && (
               <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger>
+                    <Text fontSize={"large"} py={4}>
+                      Projects With Approved Closure That Are Open (
+                      {problematicProjectData?.open_closed?.length || 0})
+                    </Text>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Flex pb={8} justifyContent={"flex-end"}>
+                      <Button
+                        bg={colorMode === "light" ? "green.500" : "green.600"}
+                        color={"white"}
+                        _hover={{
+                          bg: colorMode === "light" ? "green.400" : "green.500",
+                        }}
+                        onClick={onOpenRemedyOpenClosedModal}
+                      >
+                        Remedy
+                      </Button>
+                    </Flex>
+                    <UserProjectsDataTable
+                      projectData={problematicProjectData?.open_closed}
+                      defaultSorting={"business_area"}
+                      disabledColumns={{
+                        kind: true,
+                        title: false,
+                        role: true,
+                      }}
+                      noDataString={"No results"}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
                 <AccordionItem value="item-1">
                   <AccordionTrigger>
                     <Text fontSize={"large"} py={4}>

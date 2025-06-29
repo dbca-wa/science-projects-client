@@ -66,21 +66,19 @@ export const CommentSection = ({
       p={4}
       my={2}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col items-center justify-between">
         <Text fontWeight={"bold"} fontSize={"xl"} mb={2}>
           Comments
         </Text>
-
-        <Text
-          fontWeight={"semibold"}
-          fontSize={"xs"}
-          mb={2}
-          textColor={"gray.500"}
-        >
-          Type @ followed by a team member's name to mention them
+        <Text fontWeight={"semibold"} fontSize={"xs"} textColor={"gray.500"}>
+          Type @ followed by a user's name to mention them.
+        </Text>
+        <Text fontWeight={"semibold"} fontSize={"xs"} textColor={"gray.500"}>
+          By default (no @ used) staff team members and the business area lead
+          will be emailed with a link to the document.{" "}
         </Text>
       </div>
-      <Box mb={2}>
+      <Box mt={4} mb={2}>
         <CommentRichTextEditor
           baseAPI={baseAPI}
           userData={userData}
