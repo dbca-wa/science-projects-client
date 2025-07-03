@@ -73,11 +73,9 @@ export const CommentSection = ({
           Comments
         </Text>
         <Text fontWeight={"semibold"} fontSize={"xs"} textColor={"gray.500"}>
-          Type @ followed by a user's name to mention them.
-        </Text>
-        <Text fontWeight={"semibold"} fontSize={"xs"} textColor={"gray.500"}>
-          By default (no @ used) staff team members and the business area lead
-          will be emailed with a link to the document.{" "}
+          Type @ followed by a user's name to mention them. An email will be
+          sent to mentioned users. Note: You can mention team members, BA leads,
+          and admin.
         </Text>
       </div>
       <Box mt={4} mb={2}>

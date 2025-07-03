@@ -582,11 +582,8 @@ export default function NewMentionsPlugin({
     [checkForSlashTriggerMatch, editor],
   );
 
-  // We'll use a ref instead of state to avoid re-render cycles
+  // ref instead of state to avoid re-render cycles (not using for focus)
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  // Use a ref to track initialization rather than state
-  const hasInitializedRef = useRef(false);
 
   return (
     <LexicalTypeaheadMenuPlugin<CustomMentionTypeheadOption>
@@ -634,21 +631,11 @@ export default function NewMentionsPlugin({
                     setQueryString(null);
                   }
                 }}
-                tabIndex={0} // Make the box focusable
+                tabIndex={0} // make the box focusable for keyboard events
                 ref={(element) => {
-                  // Store the element reference
+                  // Store the element reference but DON'T auto-focus
                   dropdownRef.current = element;
-
-                  // Focus only once when first created
-                  if (element && !hasInitializedRef.current) {
-                    // Try to focus after a brief delay to ensure DOM is ready
-                    setTimeout(() => {
-                      if (element) {
-                        element.focus();
-                        hasInitializedRef.current = true;
-                      }
-                    }, 50);
-                  }
+                  // removed auto-focus logic
                 }}
               >
                 <UnorderedList
