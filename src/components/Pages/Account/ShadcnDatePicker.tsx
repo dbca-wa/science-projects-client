@@ -38,7 +38,7 @@ export const ShadcnDatePicker = ({
     <Popover open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <PopoverTrigger asChild className="z-9999">
         <Button
-          variant={"outline-solid"}
+          variant={"outline"}
           className={cn(
             "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground",
