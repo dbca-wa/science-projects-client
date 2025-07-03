@@ -27,7 +27,7 @@ export const AdminDataLists = () => {
         onChange={handleTabChange}
       >
         <TabList>
-          <Tab>Unapproved Projects</Tab>
+          <Tab>Unapproved Docs</Tab>
           <Tab>Problematic Projects</Tab>
           <Tab>Email List</Tab>
           <Tab>Staff Profile List</Tab>
