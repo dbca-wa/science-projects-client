@@ -1,4 +1,4 @@
-import { remedyOpenClosedProjects } from "@/lib/api";
+import { remedyExternallyLedProjects } from "@/lib/api";
 import { IProjectData } from "@/types";
 import {
   Box,
@@ -17,18 +17,17 @@ import { AxiosError } from "axios";
 import { useRef } from "react";
 
 interface Props {
-  projects: IProjectData[];
+  documentsRequiringAction: [];
   refreshDataFn: () => void;
   onClose: () => void;
 }
 
-export const RemedyOpenClosedModalContent = ({
-  projects,
+export const BumpEmailModalContent = ({
+  documentsRequiringAction,
   refreshDataFn,
   onClose,
 }: Props) => {
   const { colorMode } = useColorMode();
-
   const toast = useToast();
   const toastIdRef = useRef<ToastId | undefined>(undefined);
   const addToast = (data: UseToastOptions) => {
@@ -36,11 +35,11 @@ export const RemedyOpenClosedModalContent = ({
   };
 
   const mutation = useMutation({
-    mutationFn: remedyOpenClosedProjects,
+    mutationFn: sendBumpEmails,
     onMutate: () => {
       addToast({
         status: "loading",
-        title: "Attempting to remedy open closed projects",
+        title: "Sending bump email/s",
         position: "top-right",
       });
     },
@@ -76,30 +75,24 @@ export const RemedyOpenClosedModalContent = ({
     },
   });
 
-  const onRemedy = () => {
-    mutation.mutate({ projects: projects?.map((p) => p.pk) });
+  const onSend = () => {
+    mutation.mutate({ 
+        documentsRequiringAction: documentsRequiringAction,
+        // document id
+        // document kind
+        // project id
+        // project title
+        // user to take action
+        // capacity they must take action
+        // user requesting they take action
+     });
   };
 
   return (
     <>
       <Box>
-        <List>
-          <ListItem>
-            - All (open) projects with an approved project closure will be
-            affected
-          </ListItem>
-          <ListItem>
-            - The function will delete the project closure (as it was likely
-            created from previous suspension functionality; suspend no longer
-            creates closures)
-          </ListItem>
-          <ListItem>
-            - This will set the state of those projects to active
-          </ListItem>
-        </List>
-        <Text color={colorMode === "light" ? "red.500" : "red.300"} my={2}>
-          Caution: This will update all open projects with fully approved
-          closures
+        <Text color={colorMode === "light" ? "blue.500" : "blue.300"} my={2}>
+          This will send an email to the person that needs to take action for this document. Are you sure?
         </Text>
         <Flex justifyContent={"flex-end"} py={4}>
           <Box>
@@ -109,9 +102,9 @@ export const RemedyOpenClosedModalContent = ({
               _hover={{
                 bg: "green.400",
               }}
-              onClick={onRemedy}
+              onClick={onSend}
             >
-              Remedy
+              Send
             </Button>
           </Box>
         </Flex>

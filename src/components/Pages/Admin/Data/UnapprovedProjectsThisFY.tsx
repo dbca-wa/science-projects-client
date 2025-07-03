@@ -1217,10 +1217,83 @@ const UnapprovedProjectsThisFY = () => {
             if (!doc.directorate_approval_granted) return 2;
             return 3;
           };
-          return (
-            getFirstPendingLevel(rowA.original) -
-            getFirstPendingLevel(rowB.original)
-          );
+
+          const getWaitingOnEmail = (doc: UnapprovedDocument) => {
+            if (!doc.project_lead_approval_granted)
+              return doc.project_leader_email || "";
+            if (!doc.business_area_lead_approval_granted)
+              return doc.business_area_leader_email || "";
+            return ""; // No sub-sorting for directorate level
+          };
+
+          const hasMissingData = (doc: UnapprovedDocument) => {
+            // Check if project lead approval is needed but no email exists
+            if (
+              !doc.project_lead_approval_granted &&
+              !doc.project_leader_email
+            ) {
+              return true;
+            }
+            // Check if business area lead approval is needed but no email exists
+            if (
+              !doc.business_area_lead_approval_granted &&
+              !doc.business_area_leader_email
+            ) {
+              return true;
+            }
+            return false;
+          };
+
+          const hasExternalEmail = (doc: UnapprovedDocument) => {
+            // Check if project lead approval is needed and has external email
+            if (
+              !doc.project_lead_approval_granted &&
+              doc.project_leader_email
+            ) {
+              return !doc.project_leader_email.endsWith("@dbca.wa.gov.au");
+            }
+            // Check if business area lead approval is needed and has external email
+            if (
+              !doc.business_area_lead_approval_granted &&
+              doc.business_area_leader_email
+            ) {
+              return !doc.business_area_leader_email.endsWith(
+                "@dbca.wa.gov.au",
+              );
+            }
+            return false;
+          };
+
+          const levelA = getFirstPendingLevel(rowA.original);
+          const levelB = getFirstPendingLevel(rowB.original);
+
+          // First sort by approval level
+          if (levelA !== levelB) {
+            return levelA - levelB;
+          }
+
+          // Within the same approval level, prioritize by data quality
+          const missingDataA = hasMissingData(rowA.original);
+          const missingDataB = hasMissingData(rowB.original);
+
+          // Missing data comes first (higher priority)
+          if (missingDataA !== missingDataB) {
+            return missingDataA ? -1 : 1;
+          }
+
+          const externalEmailA = hasExternalEmail(rowA.original);
+          const externalEmailB = hasExternalEmail(rowB.original);
+
+          // External emails come second (medium priority)
+          if (externalEmailA !== externalEmailB) {
+            return externalEmailA ? -1 : 1;
+          }
+
+          // Finally, sort alphabetically by the person we're waiting on
+          const emailA = getWaitingOnEmail(rowA.original).toLowerCase();
+          const emailB = getWaitingOnEmail(rowB.original).toLowerCase();
+
+          return emailA.localeCompare(emailB);
         },
       },
     ],
@@ -1292,6 +1365,50 @@ const UnapprovedProjectsThisFY = () => {
             </div>
 
             <div className="flex flex-col gap-4 rounded-xl border border-gray-300 p-4 select-none">
+              {/* Search Bar */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="relative max-w-md flex-1">
+                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <Input
+                      placeholder="Search by project title..."
+                      value={searchQuery}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      className="pr-10 pl-10"
+                    />
+                    {searchQuery && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearSearch}
+                        className="absolute top-1/2 right-1 h-auto -translate-y-1/2 p-1 hover:bg-gray-100"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  {/* Show improved search feedback */}
+                  {searchQuery && (
+                    <span className="text-sm text-gray-500">
+                      {isSearching
+                        ? "Searching..."
+                        : `${filteredData.length} result${filteredData.length !== 1 ? "s" : ""} found`}
+                    </span>
+                  )}
+                </div>
+                {selectedRowsCount > 0 && (
+                  <Button
+                    onClick={handleBumpSelected}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Bump Selected ({selectedRowsCount})
+                  </Button>
+                )}
+              </div>
+
+              <Separator />
+
               {/* Document Type Filters */}
               <div className="space-y-2">
                 <p className="text-sm font-medium">Kind</p>
@@ -1364,48 +1481,6 @@ const UnapprovedProjectsThisFY = () => {
                     ))}
                 </div>
               </div>
-            </div>
-
-            {/* Search Bar */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="relative max-w-md flex-1">
-                  <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <Input
-                    placeholder="Search by project title..."
-                    value={searchQuery}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    className="pr-10 pl-10"
-                  />
-                  {searchQuery && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleClearSearch}
-                      className="absolute top-1/2 right-1 h-auto -translate-y-1/2 p-1 hover:bg-gray-100"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-                {/* Show improved search feedback */}
-                {searchQuery && (
-                  <span className="text-sm text-gray-500">
-                    {isSearching
-                      ? "Searching..."
-                      : `${filteredData.length} result${filteredData.length !== 1 ? "s" : ""} found`}
-                  </span>
-                )}
-              </div>
-              {selectedRowsCount > 0 && (
-                <Button
-                  onClick={handleBumpSelected}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  Bump Selected ({selectedRowsCount})
-                </Button>
-              )}
             </div>
 
             {/* Data Table */}
