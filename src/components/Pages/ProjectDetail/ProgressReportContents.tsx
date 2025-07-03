@@ -360,6 +360,7 @@ export const ProgressReportContents = ({
           {selectedProgressReport?.document && (
             <CommentSection
               // projectPk={selectedProgressReport?.document?.project?.pk}
+              documentKind={selectedProgressReport?.document?.kind}
               baseAPI={baseAPI}
               documentID={selectedProgressReport?.document?.pk}
               userData={userData}

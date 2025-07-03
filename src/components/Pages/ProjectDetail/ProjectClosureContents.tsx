@@ -290,6 +290,7 @@ export const ProjectClosureContents = ({
 
       <CommentSection
         // projectPk={document?.document?.project?.pk}
+        documentKind={document?.document?.kind}
         documentID={document?.document?.pk}
         userData={userData}
         baseAPI={baseAPI}

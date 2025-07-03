@@ -72,18 +72,29 @@ export interface Commenter {
   email: string;
 }
 
-// Interface for notification data - matching the Django view's expected format
-export interface NotificationData {
-  documentId: number;
-  projectId: number;
-  commenter: Commenter;
-  mentionedUsers: MentionedUser[];
-  // documentKind: string;
-}
-
 /**
  * Send email notifications to mentioned users
  */
+// Interface for notification data - matching the Django view's expected format
+
+interface NotificationData {
+  documentId: number;
+  projectId: number;
+  commenter: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  mentionedUsers: Array<{
+    id: number;
+    name: string;
+    email: string;
+  }>;
+  documentKind?: string;
+  commentContent: string;
+}
+
+// Updated API function
 export const sendMentionNotifications = async (data: NotificationData) => {
   console.log("Sending notification", data);
   const response = await instance.post(

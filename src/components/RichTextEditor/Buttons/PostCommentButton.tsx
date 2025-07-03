@@ -16,6 +16,7 @@ import { extractMentionedUsers } from "../Plugins/MentionsPlugin";
 export const PostCommentButton = ({
   distilled,
   documentId,
+  documentKind,
   userData,
   comment,
   refetchComments,
@@ -24,18 +25,8 @@ export const PostCommentButton = ({
   const [editor] = useLexicalComposerContext();
   const { colorMode } = useColorMode();
 
-  // Log the comment content for debugging
-  // useEffect(() => {
-  //   if (comment && comment.includes("@")) {
-  //     console.log("Comment contains @:", comment);
-  //     const debugMentions = extractMentionedUsers(comment);
-  //     console.log("Debug extracted mentions:", debugMentions);
-  //   }
-  // }, [comment]);
-
   const postComment = () => {
     if (distilled.length > 1) {
-      // Debug: Check if the comment contains mention spans
       console.log("Posting comment with content:", comment);
 
       const data = {
@@ -65,7 +56,6 @@ export const PostCommentButton = ({
     toastIdRef.current = toast(data);
   };
 
-  // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
   const postCommentMutation = useMutation({
     mutationFn: createDocumentComment,
@@ -90,45 +80,38 @@ export const PostCommentButton = ({
 
       console.log("Comment posted successfully:", data);
 
-      // Store a copy of the original comment for mention extraction
+      // Store the original comment content
       const originalComment = comment;
 
       // Extract mentioned users from the comment HTML
       const mentionedUsers = extractMentionedUsers(originalComment);
       console.log("Extracted mentioned users:", mentionedUsers);
 
-      // If there are mentioned users, send notifications
-      if (mentionedUsers.length > 0) {
-        // Format mentioned users according to the backend's expected format
-        const formattedMentionedUsers = mentionedUsers.map((user) => ({
-          id: user.id,
-          name: user.name || "User",
-          email: user.email,
-        }));
+      // Always send notifications - either to mentioned users or default recipients
+      const formattedMentionedUsers = mentionedUsers.map((user) => ({
+        id: user.id,
+        name: user.name || "User",
+        email: user.email,
+      }));
 
-        // Create commenter object
-        const commenter = {
-          id: userData.pk,
-          name: `${userData.first_name} ${userData.last_name}`.trim(),
-          email: userData.email,
-        };
+      const commenter = {
+        id: userData.pk,
+        name: `${userData.first_name} ${userData.last_name}`.trim(),
+        email: userData.email,
+      };
 
-        console.log("Sending notification with data:", {
-          documentId,
-          projectId: project?.pk,
-          commenter,
-          mentionedUsers: formattedMentionedUsers,
-        });
+      // Send notification with comment content
+      const notificationData = {
+        documentId,
+        projectId: project?.pk,
+        commenter,
+        mentionedUsers: formattedMentionedUsers,
+        documentKind: documentKind || "document",
+        commentContent: originalComment, // Include the full comment content
+      };
 
-        sendNotificationsMutation.mutate({
-          documentId,
-          projectId: project?.pk,
-          commenter,
-          mentionedUsers: formattedMentionedUsers,
-        });
-      } else {
-        console.log("No mentioned users found in the comment");
-      }
+      console.log("Sending notification with data:", notificationData);
+      sendNotificationsMutation.mutate(notificationData);
 
       queryClient.invalidateQueries({
         queryKey: ["documentComments", documentId],

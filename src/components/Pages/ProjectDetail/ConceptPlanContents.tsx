@@ -186,6 +186,7 @@ Props) => {
           // projectPk={document?.document?.project?.pk}
           baseAPI={baseAPI}
           documentID={document?.document?.pk}
+          documentKind={document?.document?.kind}
           userData={userData}
           project={document?.document?.project}
         />
