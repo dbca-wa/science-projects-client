@@ -175,7 +175,7 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               title={"Mentions"}
               kind="update"
               description={
-                "Users can now mention users in the project team and business area on project documents. By default, a comment with no mention will email the team (if email is an internal - dbca one)"
+                "Users can now mention users in the project team and business area on project documents. By default, a comment with no mention will not email anyone"
               }
             />
             <PatchNoteEntry
