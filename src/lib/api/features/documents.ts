@@ -535,6 +535,38 @@ export const downloadProjectDocument = async ({
     .then((res) => res.data);
 };
 
+export interface ISendBumpEmails {
+  documentsRequiringAction: Array<{
+    documentId: number;
+    documentKind: string;
+    projectId: number;
+    projectTitle: string;
+    userToTakeAction: number;
+    actionCapacity: string;
+    requestingUser: number;
+  }>;
+}
+
+export const sendBumpEmails = async ({
+  documentsRequiringAction,
+}: ISendBumpEmails) => {
+  const url = `documents/sendbumpemails`;
+
+  const params = {
+    documentsRequiringAction,
+  };
+
+  console.log({ ...params, url });
+
+  return instance
+    .post(url, params, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => res.data);
+};
+
 export const handleDocumentAction = async ({
   action,
   stage,

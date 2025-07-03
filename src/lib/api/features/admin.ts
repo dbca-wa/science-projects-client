@@ -1144,12 +1144,21 @@ export const remedyMemberlessProjects = async ({
   return res;
 };
 
+export interface IRemedyProblematicProjects {
+  projects: number[];
+  status?: "active" | "suspended" | "completed" | "terminated";
+}
+
 export const remedyOpenClosedProjects = async ({
   projects,
+  status = "active",
 }: IRemedyProblematicProjects) => {
-  console.log(projects);
+  console.log(projects, status);
   const res = instance
-    .post(`projects/remedy/open_closed`, { projects: projects })
+    .post(`projects/remedy/open_closed`, {
+      projects: projects,
+      status: status,
+    })
     .then((res) => {
       return res.data;
     });

@@ -33,8 +33,38 @@ import {
 import { useState, useEffect, useMemo, useCallback, memo, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
+import { BumpEmailData } from "@/types";
+import {
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+} from "@chakra-ui/react";
+import { BumpEmailModalContent } from "@/components/Modals/Admin/BumpEmailModalContent";
 
 // Types based on backend response
+// interface UnapprovedDocument {
+//   project_id: number;
+//   document_id: number;
+//   kind:
+//     | "concept"
+//     | "projectplan"
+//     | "progressreport"
+//     | "studentreport"
+//     | "projectclosure";
+//   project_title: string;
+//   project_leader_email: string | null;
+//   business_area_leader_email: string | null;
+//   business_area_name: string | null;
+//   project_lead_approval_granted: boolean;
+//   business_area_lead_approval_granted: boolean;
+//   directorate_approval_granted: boolean;
+//   status: string;
+//   created_at: string;
+//   modified_at: string;
+// }
 interface UnapprovedDocument {
   project_id: number;
   document_id: number;
@@ -45,15 +75,47 @@ interface UnapprovedDocument {
     | "studentreport"
     | "projectclosure";
   project_title: string;
+
+  // Project leader details
+  project_leader_id: number | null;
   project_leader_email: string | null;
+  project_leader_first_name: string | null;
+  project_leader_last_name: string | null;
+
+  // Business area leader details
+  business_area_leader_id: number | null;
   business_area_leader_email: string | null;
+  business_area_leader_first_name: string | null;
+  business_area_leader_last_name: string | null;
   business_area_name: string | null;
+
+  // Action taker details (who needs to approve next)
+  user_to_take_action_id: number | null;
+  user_to_take_action_email: string | null;
+  user_to_take_action_first_name: string | null;
+  user_to_take_action_last_name: string | null;
+  action_capacity: string | null;
+
+  // Approval status
   project_lead_approval_granted: boolean;
   business_area_lead_approval_granted: boolean;
   directorate_approval_granted: boolean;
+
+  // Document metadata
   status: string;
   created_at: string;
-  modified_at: string;
+  updated_at: string;
+
+  // Helper fields from backend
+  is_bumpable: boolean;
+  has_missing_leader_info: boolean;
+  has_external_email: boolean;
+
+  // Requesting user details
+  requesting_user_id: number;
+  requesting_user_email: string;
+  requesting_user_first_name: string;
+  requesting_user_last_name: string;
 }
 
 interface UnapprovedProjectsData {
@@ -178,69 +240,146 @@ const isDbcaEmail = (email: string | null): boolean => {
   return email ? email.endsWith("@dbca.wa.gov.au") : false;
 };
 
-// Helper function to determine if a document is bumpable
+// // Helper function to determine if a document is bumpable
+// const isDocumentBumpable = (doc: UnapprovedDocument): boolean => {
+//   // If project lead approval is not granted and we have a DBCA email
+//   if (!doc.project_lead_approval_granted) {
+//     return isDbcaEmail(doc.project_leader_email);
+//   }
+
+//   // If business area lead approval is not granted and we have a DBCA email
+//   if (!doc.business_area_lead_approval_granted) {
+//     return isDbcaEmail(doc.business_area_leader_email);
+//   }
+
+//   // Directorate approvals are not bumpable
+//   return false;
+// };
+
+// // Helper function to determine if a document has missing leader info
+// const hasMissingLeaderInfo = (doc: UnapprovedDocument): boolean => {
+//   // Check if project lead approval is needed but no email exists
+//   if (!doc.project_lead_approval_granted && !doc.project_leader_email) {
+//     return true;
+//   }
+
+//   // Check if business area lead approval is needed but no email exists
+//   if (
+//     !doc.business_area_lead_approval_granted &&
+//     !doc.business_area_leader_email
+//   ) {
+//     return true;
+//   }
+
+//   return false;
+// };
+
+// // Helper function to determine if a document has external email
+// const hasExternalEmailState = (doc: UnapprovedDocument): boolean => {
+//   // Check if project lead approval is needed and has external email
+//   if (!doc.project_lead_approval_granted && doc.project_leader_email) {
+//     return !isDbcaEmail(doc.project_leader_email);
+//   }
+
+//   // Check if business area lead approval is needed and has external email
+//   if (
+//     !doc.business_area_lead_approval_granted &&
+//     doc.business_area_leader_email
+//   ) {
+//     return !isDbcaEmail(doc.business_area_leader_email);
+//   }
+
+//   return false;
+// };
+
 const isDocumentBumpable = (doc: UnapprovedDocument): boolean => {
-  // If project lead approval is not granted and we have a DBCA email
-  if (!doc.project_lead_approval_granted) {
-    return isDbcaEmail(doc.project_leader_email);
-  }
-
-  // If business area lead approval is not granted and we have a DBCA email
-  if (!doc.business_area_lead_approval_granted) {
-    return isDbcaEmail(doc.business_area_leader_email);
-  }
-
-  // Directorate approvals are not bumpable
-  return false;
+  return doc.is_bumpable;
 };
 
-// Helper function to determine if a document has missing leader info
 const hasMissingLeaderInfo = (doc: UnapprovedDocument): boolean => {
-  // Check if project lead approval is needed but no email exists
-  if (!doc.project_lead_approval_granted && !doc.project_leader_email) {
-    return true;
-  }
-
-  // Check if business area lead approval is needed but no email exists
-  if (
-    !doc.business_area_lead_approval_granted &&
-    !doc.business_area_leader_email
-  ) {
-    return true;
-  }
-
-  return false;
+  return doc.has_missing_leader_info;
 };
 
-// Helper function to determine if a document has external email
 const hasExternalEmailState = (doc: UnapprovedDocument): boolean => {
-  // Check if project lead approval is needed and has external email
-  if (!doc.project_lead_approval_granted && doc.project_leader_email) {
-    return !isDbcaEmail(doc.project_leader_email);
-  }
+  return doc.has_external_email;
+};
 
-  // Check if business area lead approval is needed and has external email
+const createBumpDataFromDocument = (
+  doc: UnapprovedDocument,
+): BumpEmailData | null => {
+  // Check if document is bumpable and has required data
   if (
-    !doc.business_area_lead_approval_granted &&
-    doc.business_area_leader_email
+    !doc.is_bumpable ||
+    !doc.user_to_take_action_id ||
+    !doc.user_to_take_action_email
   ) {
-    return !isDbcaEmail(doc.business_area_leader_email);
+    return null;
   }
 
-  return false;
+  return {
+    documentId: doc.document_id,
+    documentKind: doc.kind,
+    projectId: doc.project_id,
+    projectTitle: parseTitle(doc.project_title),
+    userToTakeAction: doc.user_to_take_action_id,
+    userToTakeActionEmail: doc.user_to_take_action_email,
+    userToTakeActionFirstName: doc.user_to_take_action_first_name || "",
+    userToTakeActionLastName: doc.user_to_take_action_last_name || "",
+    actionCapacity: doc.action_capacity || "",
+    requestingUser: doc.requesting_user_id,
+    requestingUserEmail: doc.requesting_user_email,
+    requestingUserFirstName: doc.requesting_user_first_name,
+    requestingUserLastName: doc.requesting_user_last_name,
+  };
 };
 
 // Pre-process documents to avoid repeated calculations
+// const preprocessDocument = (doc: UnapprovedDocument) => {
+//   return {
+//     ...doc,
+//     _cached: {
+//       cleanTitle: parseTitle(doc.project_title).toLowerCase(),
+//       isBumpable: isDocumentBumpable(doc),
+//       hasMissingInfo: hasMissingLeaderInfo(doc),
+//       hasExternalEmail: hasExternalEmailState(doc),
+//     },
+//   };
+// };
 const preprocessDocument = (doc: UnapprovedDocument) => {
   return {
     ...doc,
     _cached: {
       cleanTitle: parseTitle(doc.project_title).toLowerCase(),
-      isBumpable: isDocumentBumpable(doc),
-      hasMissingInfo: hasMissingLeaderInfo(doc),
-      hasExternalEmail: hasExternalEmailState(doc),
+      isBumpable: doc.is_bumpable,
+      hasMissingInfo: doc.has_missing_leader_info,
+      hasExternalEmail: doc.has_external_email,
     },
   };
+};
+
+// Helper function to extract user info from document
+const extractUserInfoFromDocument = (doc: UnapprovedDocument) => {
+  // Determine who needs to take action and their details
+  if (!doc.project_lead_approval_granted && doc.project_leader_email) {
+    return {
+      email: doc.project_leader_email,
+      capacity: "Project Lead",
+      userId: null, // TODO
+    };
+  }
+
+  if (
+    !doc.business_area_lead_approval_granted &&
+    doc.business_area_leader_email
+  ) {
+    return {
+      email: doc.business_area_leader_email,
+      capacity: "Business Area Lead",
+      userId: null, // TODO
+    };
+  }
+
+  return null;
 };
 
 // optimised cell components with display names for debugging
@@ -314,139 +453,231 @@ const extractNameFromEmail = (email: string | null): string | null => {
   return nameParts.length > 0 ? nameParts.join(" ") : localPart;
 };
 
+// const WaitingOnCell = memo(
+//   ({
+//     document_id,
+//     project_lead_approval_granted,
+//     business_area_lead_approval_granted,
+//     directorate_approval_granted,
+//     project_leader_email,
+//     business_area_leader_email,
+//     onBumpClick,
+//   }: {
+//     document_id: number;
+//     project_lead_approval_granted: boolean;
+//     business_area_lead_approval_granted: boolean;
+//     directorate_approval_granted: boolean;
+//     project_leader_email: string | null;
+//     business_area_leader_email: string | null;
+//     onBumpClick: (documentId: number, email: string, type: string) => void;
+//   }) => {
+//     const pendingInfo = useMemo(() => {
+//       // Determine the first pending approval level in hierarchy
+//       if (!project_lead_approval_granted) {
+//         const hasDbcaEmail = isDbcaEmail(project_leader_email);
+//         return {
+//           badge: (
+//             <Badge
+//               key="project"
+//               variant="secondary"
+//               className="w-full bg-blue-100 py-[5px] text-blue-800"
+//             >
+//               Project Lead
+//             </Badge>
+//           ),
+//           email: project_leader_email,
+//           name: extractNameFromEmail(project_leader_email),
+//           type: "Project Lead",
+//           showBump: hasDbcaEmail,
+//           missingInfo: !project_leader_email,
+//           nonDbcaEmail: project_leader_email && !hasDbcaEmail,
+//         };
+//       }
+
+//       if (!business_area_lead_approval_granted) {
+//         const hasDbcaEmail = isDbcaEmail(business_area_leader_email);
+//         return {
+//           badge: (
+//             <Badge
+//               key="ba"
+//               variant="secondary"
+//               className="w-full bg-orange-100 py-[5px] text-orange-800"
+//             >
+//               BA Lead
+//             </Badge>
+//           ),
+//           email: business_area_leader_email,
+//           name: extractNameFromEmail(business_area_leader_email),
+//           type: "Business Area Lead",
+//           showBump: hasDbcaEmail,
+//           missingInfo: !business_area_leader_email,
+//           nonDbcaEmail: business_area_leader_email && !hasDbcaEmail,
+//         };
+//       }
+
+//       if (!directorate_approval_granted) {
+//         return {
+//           badge: (
+//             <Badge
+//               key="dir"
+//               variant="secondary"
+//               className="w-full bg-red-100 py-[5px] text-red-800"
+//             >
+//               Directorate
+//             </Badge>
+//           ),
+//           email: null,
+//           name: null,
+//           type: "Directorate",
+//           showBump: false,
+//           missingInfo: false,
+//           nonDbcaEmail: false,
+//         };
+//       }
+
+//       // All approvals granted - shouldn't happen in this view but handle gracefully
+//       return {
+//         badge: null,
+//         email: null,
+//         name: null,
+//         type: null,
+//         showBump: false,
+//         missingInfo: false,
+//         nonDbcaEmail: false,
+//       };
+//     }, [
+//       project_lead_approval_granted,
+//       business_area_lead_approval_granted,
+//       directorate_approval_granted,
+//       project_leader_email,
+//       business_area_leader_email,
+//     ]);
+
+//     const handleBumpClick = useCallback(
+//       (e: React.MouseEvent) => {
+//         e.stopPropagation();
+//         if (pendingInfo.email && pendingInfo.type) {
+//           onBumpClick(document_id, pendingInfo.email, pendingInfo.type);
+//         }
+//       },
+//       [document_id, pendingInfo.email, pendingInfo.type, onBumpClick],
+//     );
+
+//     if (!pendingInfo.badge) {
+//       return <span className="text-sm text-gray-500">All approved</span>;
+//     }
+
+//     return (
+//       <div className="flex w-full flex-col items-center gap-3">
+//         {pendingInfo.missingInfo ? (
+//           <span className="text-center text-xs font-medium text-red-600">
+//             No email assigned
+//           </span>
+//         ) : pendingInfo.nonDbcaEmail ? (
+//           <span className="text-center text-xs font-medium text-yellow-600">
+//             External email
+//           </span>
+//         ) : (
+//           pendingInfo.name && (
+//             <span className="text-center text-xs font-medium text-gray-600">
+//               {pendingInfo.name}
+//             </span>
+//           )
+//         )}
+//         {pendingInfo.badge}
+//         {pendingInfo.showBump && (
+//           <Button
+//             size="sm"
+//             variant="outline"
+//             onClick={handleBumpClick}
+//             className="h-auto w-full flex-shrink-0 cursor-pointer px-2 py-1 text-xs"
+//           >
+//             Bump
+//           </Button>
+//         )}
+//       </div>
+//     );
+//   },
+// );
+
 const WaitingOnCell = memo(
   ({
-    document_id,
-    project_lead_approval_granted,
-    business_area_lead_approval_granted,
-    directorate_approval_granted,
-    project_leader_email,
-    business_area_leader_email,
+    document,
     onBumpClick,
   }: {
-    document_id: number;
-    project_lead_approval_granted: boolean;
-    business_area_lead_approval_granted: boolean;
-    directorate_approval_granted: boolean;
-    project_leader_email: string | null;
-    business_area_leader_email: string | null;
+    document: UnapprovedDocument;
     onBumpClick: (documentId: number, email: string, type: string) => void;
   }) => {
-    const pendingInfo = useMemo(() => {
-      // Determine the first pending approval level in hierarchy
-      if (!project_lead_approval_granted) {
-        const hasDbcaEmail = isDbcaEmail(project_leader_email);
-        return {
-          badge: (
-            <Badge
-              key="project"
-              variant="secondary"
-              className="w-full bg-blue-100 py-[5px] text-blue-800"
-            >
-              Project Lead
-            </Badge>
-          ),
-          email: project_leader_email,
-          name: extractNameFromEmail(project_leader_email),
-          type: "Project Lead",
-          showBump: hasDbcaEmail,
-          missingInfo: !project_leader_email,
-          nonDbcaEmail: project_leader_email && !hasDbcaEmail,
-        };
-      }
-
-      if (!business_area_lead_approval_granted) {
-        const hasDbcaEmail = isDbcaEmail(business_area_leader_email);
-        return {
-          badge: (
-            <Badge
-              key="ba"
-              variant="secondary"
-              className="w-full bg-orange-100 py-[5px] text-orange-800"
-            >
-              BA Lead
-            </Badge>
-          ),
-          email: business_area_leader_email,
-          name: extractNameFromEmail(business_area_leader_email),
-          type: "Business Area Lead",
-          showBump: hasDbcaEmail,
-          missingInfo: !business_area_leader_email,
-          nonDbcaEmail: business_area_leader_email && !hasDbcaEmail,
-        };
-      }
-
-      if (!directorate_approval_granted) {
-        return {
-          badge: (
-            <Badge
-              key="dir"
-              variant="secondary"
-              className="w-full bg-red-100 py-[5px] text-red-800"
-            >
-              Directorate
-            </Badge>
-          ),
-          email: null,
-          name: null,
-          type: "Directorate",
-          showBump: false,
-          missingInfo: false,
-          nonDbcaEmail: false,
-        };
-      }
-
-      // All approvals granted - shouldn't happen in this view but handle gracefully
-      return {
-        badge: null,
-        email: null,
-        name: null,
-        type: null,
-        showBump: false,
-        missingInfo: false,
-        nonDbcaEmail: false,
-      };
-    }, [
-      project_lead_approval_granted,
-      business_area_lead_approval_granted,
-      directorate_approval_granted,
-      project_leader_email,
-      business_area_leader_email,
-    ]);
-
     const handleBumpClick = useCallback(
       (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (pendingInfo.email && pendingInfo.type) {
-          onBumpClick(document_id, pendingInfo.email, pendingInfo.type);
+        if (document.user_to_take_action_email && document.action_capacity) {
+          onBumpClick(
+            document.document_id,
+            document.user_to_take_action_email,
+            document.action_capacity,
+          );
         }
       },
-      [document_id, pendingInfo.email, pendingInfo.type, onBumpClick],
+      [document, onBumpClick],
     );
 
-    if (!pendingInfo.badge) {
+    // Determine badge color based on action capacity
+    const getBadgeColor = (capacity: string | null) => {
+      switch (capacity) {
+        case "Project Lead":
+          return "bg-blue-100 text-blue-800";
+        case "Business Area Lead":
+          return "bg-orange-100 text-orange-800";
+        case "Directorate":
+          return "bg-red-100 text-red-800";
+        default:
+          return "bg-gray-100 text-gray-800";
+      }
+    };
+
+    const displayName = useMemo(() => {
+      if (
+        document.user_to_take_action_first_name &&
+        document.user_to_take_action_last_name
+      ) {
+        return `${document.user_to_take_action_first_name} ${document.user_to_take_action_last_name}`;
+      } else if (document.user_to_take_action_email) {
+        return extractNameFromEmail(document.user_to_take_action_email);
+      }
+      return null;
+    }, [document]);
+
+    if (!document.action_capacity) {
       return <span className="text-sm text-gray-500">All approved</span>;
     }
 
     return (
       <div className="flex w-full flex-col items-center gap-3">
-        {pendingInfo.missingInfo ? (
+        {document.has_missing_leader_info ? (
           <span className="text-center text-xs font-medium text-red-600">
             No email assigned
           </span>
-        ) : pendingInfo.nonDbcaEmail ? (
+        ) : document.has_external_email ? (
           <span className="text-center text-xs font-medium text-yellow-600">
             External email
           </span>
         ) : (
-          pendingInfo.name && (
+          displayName && (
             <span className="text-center text-xs font-medium text-gray-600">
-              {pendingInfo.name}
+              {displayName}
             </span>
           )
         )}
-        {pendingInfo.badge}
-        {pendingInfo.showBump && (
+
+        <Badge
+          variant="secondary"
+          className={`w-full py-[5px] ${getBadgeColor(document.action_capacity)}`}
+        >
+          {document.action_capacity}
+        </Badge>
+
+        {document.is_bumpable && (
           <Button
             size="sm"
             variant="outline"
@@ -460,6 +691,7 @@ const WaitingOnCell = memo(
     );
   },
 );
+
 WaitingOnCell.displayName = "WaitingOnCell";
 
 // optimised checkbox component
@@ -569,17 +801,7 @@ const TableRowOptimised = memo(
         </TableCell>
         <TableCell className="w-1/5 min-w-48 overflow-hidden">
           <div className="flex justify-center">
-            <WaitingOnCell
-              document_id={doc.document_id}
-              project_lead_approval_granted={doc.project_lead_approval_granted}
-              business_area_lead_approval_granted={
-                doc.business_area_lead_approval_granted
-              }
-              directorate_approval_granted={doc.directorate_approval_granted}
-              project_leader_email={doc.project_leader_email}
-              business_area_leader_email={doc.business_area_leader_email}
-              onBumpClick={onBumpClick}
-            />
+            <WaitingOnCell document={doc} onBumpClick={onBumpClick} />
           </div>
         </TableCell>
       </TableRow>
@@ -662,6 +884,10 @@ const UnapprovedProjectsThisFY = () => {
   const [unapprovedProjectsData, setUnapprovedProjectsData] =
     useState<UnapprovedProjectsData | null>(null);
 
+  useEffect(() => {
+    if (!fetchingData) console.log(unapprovedProjectsData);
+  }, [fetchingData, unapprovedProjectsData]);
+
   // Use refs for immediate state to avoid render delays
   const selectedRowsRef = useRef<Set<number>>(new Set());
   const [selectedRowsCount, setSelectedRowsCount] = useState(0);
@@ -673,6 +899,11 @@ const UnapprovedProjectsThisFY = () => {
   const [selectedApprovalLevel, setSelectedApprovalLevel] = useState<
     ApprovalLevel | "unset"
   >("unset");
+
+  // Bump states
+  const [isBumpModalOpen, setIsBumpModalOpen] = useState(false);
+  const [bumpDocuments, setBumpDocuments] = useState<BumpEmailData[]>([]);
+  const [isSingleBump, setIsSingleBump] = useState(false);
 
   // Search state with advanced debouncing
   const {
@@ -977,11 +1208,85 @@ const UnapprovedProjectsThisFY = () => {
     debouncedSearchQuery,
   ]);
 
+  // Handle individual document bump (from row button)
+  // const handleBumpClick = useCallback(
+  //   (documentId: number, email: string, type: string) => {
+  //     const document = filteredData.find(
+  //       (doc) => doc.document_id === documentId,
+  //     );
+  //     if (!document) return;
+
+  //     const bumpData: BumpEmailData = {
+  //       documentId: document.document_id,
+  //       documentKind: document.kind,
+  //       projectId: document.project_id,
+  //       projectTitle: parseTitle(document.project_title),
+  //       userToTakeAction: 0, // TODO
+  //       userToTakeActionEmail: email,
+  //       actionCapacity: type,
+  //       requestingUser: 0, // TODO
+  //     };
+
+  //     setBumpDocuments([bumpData]);
+  //     setIsSingleBump(true);
+  //     setIsBumpModalOpen(true);
+  //   },
+  //   [filteredData],
+  // );
+
+  // // Handle bulk bump (from "Bump Selected" button)
+  // const handleBumpSelected = useCallback(() => {
+  //   const selectedIds = Array.from(selectedRowsRef.current);
+  //   const selectedDocuments = filteredData.filter((doc) =>
+  //     selectedIds.includes(doc.document_id),
+  //   );
+
+  //   const bumpData: BumpEmailData[] = selectedDocuments
+  //     .map((doc) => {
+  //       const userInfo = extractUserInfoFromDocument(doc);
+  //       if (!userInfo) return null;
+
+  //       return {
+  //         documentId: doc.document_id,
+  //         documentKind: doc.kind,
+  //         projectId: doc.project_id,
+  //         projectTitle: parseTitle(doc.project_title),
+  //         userToTakeAction: userInfo.userId || 0, // TODO
+  //         userToTakeActionEmail: userInfo.email,
+  //         actionCapacity: userInfo.capacity,
+  //         requestingUser: 0, // TODO
+  //       };
+  //     })
+  //     .filter((item): item is BumpEmailData => item !== null);
+
+  //   if (bumpData.length === 0) {
+  //     console.warn("No valid documents to bump");
+  //     return;
+  //   }
+
+  //   setBumpDocuments(bumpData);
+  //   setIsSingleBump(false);
+  //   setIsBumpModalOpen(true);
+  // }, [filteredData]);
+
   const handleBumpClick = useCallback(
     (documentId: number, email: string, type: string) => {
-      console.log(`Sending email to ${type}: ${email}`);
+      const document = filteredData.find(
+        (doc) => doc.document_id === documentId,
+      );
+      if (!document) return;
+
+      const bumpData = createBumpDataFromDocument(document);
+      if (!bumpData) {
+        console.warn("Cannot create bump data for document", documentId);
+        return;
+      }
+
+      setBumpDocuments([bumpData]);
+      setIsSingleBump(true);
+      setIsBumpModalOpen(true);
     },
-    [],
+    [filteredData],
   );
 
   const handleBumpSelected = useCallback(() => {
@@ -989,8 +1294,26 @@ const UnapprovedProjectsThisFY = () => {
     const selectedDocuments = filteredData.filter((doc) =>
       selectedIds.includes(doc.document_id),
     );
-    console.log("Bumping selected documents:", selectedDocuments);
+
+    const bumpData: BumpEmailData[] = selectedDocuments
+      .map(createBumpDataFromDocument)
+      .filter((item): item is BumpEmailData => item !== null);
+
+    if (bumpData.length === 0) {
+      console.warn("No valid documents to bump");
+      return;
+    }
+
+    setBumpDocuments(bumpData);
+    setIsSingleBump(false);
+    setIsBumpModalOpen(true);
   }, [filteredData]);
+
+  const handleCloseBumpModal = () => {
+    setIsBumpModalOpen(false);
+    setBumpDocuments([]);
+    setIsSingleBump(false);
+  };
 
   const handleRowClick = useCallback(
     (doc: UnapprovedDocument, e: React.MouseEvent) => {
@@ -1011,11 +1334,11 @@ const UnapprovedProjectsThisFY = () => {
       if (doc.project_id === undefined) {
         console.log("The Pk is undefined. Potentially use 'id' instead.");
       } else {
-        if (e.ctrlKey || e.metaKey) {
-          window.open(`/projects/${doc.project_id}/${urlkind}`, "_blank"); // Opens in a new tab
-        } else {
-          navigate(`/projects/${doc.project_id}/${urlkind}`);
-        }
+        // if (e.ctrlKey || e.metaKey) {
+        window.open(`/projects/${doc.project_id}/${urlkind}`, "_blank"); // Opens in a new tab
+        // } else {
+        //   navigate(`/projects/${doc.project_id}/${urlkind}`);
+        // }
       }
     },
     [navigate],
@@ -1348,6 +1671,27 @@ const UnapprovedProjectsThisFY = () => {
       ) : (
         unapprovedProjectsData && (
           <div className="space-y-4">
+            {/* Bump Modal */}
+            {isBumpModalOpen && (
+              <Modal isOpen={isBumpModalOpen} onClose={handleCloseBumpModal}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>
+                    {isSingleBump ? "Send Bump Email" : "Send Bulk Bump Emails"}
+                  </ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <BumpEmailModalContent
+                      documentsRequiringAction={bumpDocuments}
+                      refreshDataFn={fetchUnapprovedProjectsThisFY}
+                      onClose={handleCloseBumpModal}
+                      isSingleDocument={isSingleBump}
+                    />
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
+            )}
+
             {/* Summary and Bump Button */}
             <div className="flex items-center justify-between border-b py-2">
               <h2 className="text-lg font-medium">
@@ -1522,29 +1866,24 @@ const UnapprovedProjectsThisFY = () => {
                   </TableHeader>
                   <TableBody>
                     {table.getRowModel().rows?.length ? (
-                      table
-                        .getRowModel()
-                        .rows.map((row) => (
+                      table.getRowModel().rows.map((row) => {
+                        const doc = row.original;
+                        return (
                           <TableRowOptimised
-                            key={row.original.document_id}
+                            key={doc.document_id}
                             row={row}
                             isSelected={selectedRowsRef.current.has(
-                              row.original.document_id,
+                              doc.document_id,
                             )}
-                            isBumpable={bumpableDocumentIds.has(
-                              row.original.document_id,
-                            )}
-                            hasMissingInfo={missingInfoDocumentIds.has(
-                              row.original.document_id,
-                            )}
-                            hasExternalEmail={externalEmailDocumentIds.has(
-                              row.original.document_id,
-                            )}
+                            isBumpable={doc.is_bumpable}
+                            hasMissingInfo={doc.has_missing_leader_info}
+                            hasExternalEmail={doc.has_external_email}
                             onSelectRow={handleSelectRow}
                             onRowClick={handleRowClick}
                             onBumpClick={handleBumpClick}
                           />
-                        ))
+                        );
+                      })
                     ) : (
                       <TableRow>
                         <TableCell

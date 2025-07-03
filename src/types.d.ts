@@ -19,6 +19,22 @@ declare global {
   }
 }
 
+interface BumpEmailData {
+  documentId: number;
+  documentKind: string;
+  projectId: number;
+  projectTitle: string;
+  userToTakeAction: number;
+  userToTakeActionEmail: string;
+  userToTakeActionFirstName: string;
+  userToTakeActionLastName: string;
+  actionCapacity: string;
+  requestingUser: number;
+  requestingUserEmail: string;
+  requestingUserFirstName: string;
+  requestingUserLastName: string;
+}
+
 export interface ITAssetData {
   id: number;
   email?: string;
