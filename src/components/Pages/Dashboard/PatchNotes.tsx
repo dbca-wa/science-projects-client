@@ -150,27 +150,27 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
                 "Added functionality to view all projects with a project closure that are not in a closed state (for handling projects that were previously closed as suspended)"
               }
             />
-            <PatchNoteEntry
+            {/* <PatchNoteEntry
               title={"Admin | Set Maintainer"}
               kind="feature"
               description={
                 "Added functionality to set the maintainer of SPMS going forward"
               }
-            />
-            <PatchNoteEntry
+            /> */}
+            {/* <PatchNoteEntry
               title={"Fixed map toggle states"}
               kind="fix"
               description={
                 "Fixed a bug causing map toggling to work incorrectly - labels and colours now adhere to state set by user correctly"
               }
-            />
-            <PatchNoteEntry
+            /> */}
+            {/* <PatchNoteEntry
               title={"Annual Report banner"}
               kind="fix"
               description={
                 "Adjusted the display of annual report banner image to remedy issues in production (caused by OIM rules/changes)"
               }
-            />
+            /> */}
             <PatchNoteEntry
               title={"Mentions"}
               kind="update"

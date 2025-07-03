@@ -7,6 +7,7 @@ import {
 } from "@/types";
 import { Avatar, Box, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { useState } from "react";
+import { TreeViewPlugin } from "@/lib/plugins/TreeViewPlugin";
 
 // Lexical
 import { $generateHtmlFromNodes } from "@lexical/html";
@@ -34,6 +35,7 @@ interface Props {
   baseAPI: string;
   userData: IUserMe;
   documentId: number;
+  documentKind: string;
   refetchDocumentComments: () => void;
   businessAreas: IBusinessArea[];
   branches: IBranch[];
@@ -44,6 +46,7 @@ export const CommentRichTextEditor = ({
   baseAPI,
   userData,
   documentId,
+  documentKind,
   refetchDocumentComments,
   businessAreas,
   branches,
@@ -183,6 +186,7 @@ export const CommentRichTextEditor = ({
                         distilled={distilled}
                         comment={comment}
                         documentId={documentId}
+                        documentKind={documentKind}
                         userData={userData}
                         project={project} // Pass project to the PostCommentButton
                       />
@@ -206,6 +210,7 @@ export const CommentRichTextEditor = ({
                 ErrorBoundary={LexicalErrorBoundary}
               />
               <ClearEditorPlugin />
+              {/* <TreeViewPlugin /> */}
             </LexicalComposer>
           </Box>
         </Box>

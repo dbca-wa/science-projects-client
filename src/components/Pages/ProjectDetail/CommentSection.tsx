@@ -28,12 +28,14 @@ export interface IDocumentComment {
 
 interface Props {
   documentID: number;
+  documentKind: string;
   userData: IUserMe;
   baseAPI: string;
   project: IProjectData;
 }
 export const CommentSection = ({
   documentID,
+  documentKind,
   userData,
   baseAPI,
   project,
@@ -83,6 +85,7 @@ export const CommentSection = ({
           baseAPI={baseAPI}
           userData={userData}
           documentId={documentID}
+          documentKind={documentKind}
           refetchDocumentComments={refetchInterceptedFunction}
           branches={branches?.branchesData}
           businessAreas={businessAreas?.baData}

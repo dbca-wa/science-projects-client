@@ -297,6 +297,7 @@ export const StudentReportContents = ({
             // projectPk={selectedStudentReport?.document?.project?.pk}
             baseAPI={baseAPI}
             documentID={selectedStudentReport?.document?.pk}
+            documentKind={selectedStudentReport?.document?.kind}
             userData={userData}
             project={selectedStudentReport?.document?.project}
           />

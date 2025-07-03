@@ -233,6 +233,9 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
           });
           if (onSuccess) {
             onSuccess();
+            if (isModal) {
+              onClose();
+            }
           }
           if (location.pathname === "/users") {
             window.location.reload(); // Manually trigger a reload if already on the /users route - potentially change to be less jarring
@@ -356,8 +359,8 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
               <FormHelperText color="blue.500">Checking name...</FormHelperText>
             )}
             {nameExists && (
-              <FormHelperText color="red.500">
-                User with this name already exists.
+              <FormHelperText color="orange.500">
+                Warning: User with this name already exists.
               </FormHelperText>
             )}
             {firstNameError && (
@@ -431,8 +434,8 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
               isValidEmail &&
               emailsMatch &&
               firstName.length > 1 &&
-              lastName.length > 1 &&
-              !nameExists && (
+              lastName.length > 1 && (
+                // !nameExists && #enabling same name
                 <FormHelperText color="green.500">
                   All fields complete. Press Add User.
                 </FormHelperText>
@@ -509,8 +512,9 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
               !lastName ||
               !email ||
               !emailsMatch ||
-              emailExists ||
-              nameExists
+              emailExists
+              // ||
+              // nameExists
             }
           >
             Add User
