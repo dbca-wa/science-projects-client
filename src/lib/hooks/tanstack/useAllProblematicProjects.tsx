@@ -6,11 +6,13 @@ import { getAllProblematicProjects } from "../../api";
 import { IProjectData } from "@/types";
 
 export interface IProblematicData {
+  no_progress: IProjectData[];
   open_closed: IProjectData[];
   no_members: IProjectData[];
   no_leader: IProjectData[];
   multiple_leads: IProjectData[];
   external_leader: IProjectData[];
+  inactive_lead_active_project: IProjectData[];
 }
 
 export const useAllProblematicProjects = () => {
