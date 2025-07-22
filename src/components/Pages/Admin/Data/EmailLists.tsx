@@ -1,5 +1,5 @@
 import { ProjectLeadEmailModal } from "@/components/Modals/ProjectLeadEmailModal";
-import { getEmailProjectList } from "@/lib/api";
+import { downloadBCSStaffCSV, getEmailProjectList } from "@/lib/api";
 import {
   Box,
   Button,
@@ -120,6 +120,14 @@ export const EmailLists = () => {
           <Text fontSize={"x-large"} py={4} flex={1}>
             Email List
           </Text>
+          <div className="flex gap-2">
+            <Button onClick={() => downloadBCSStaffCSV({ in_spms: true })}>
+              Download SPMS BCS Staff
+            </Button>
+            <Button onClick={() => downloadBCSStaffCSV({ in_spms: false })}>
+              Download All BCS Staff
+            </Button>
+          </div>
           {!fetchingData && activeProjectLeadEmailList && (
             <Flex justifyContent={"flex-end"}>
               <Button
