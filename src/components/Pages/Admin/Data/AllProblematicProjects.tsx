@@ -191,6 +191,51 @@ export const AllProblematicProjects = () => {
                 <AccordionItem value="item-1">
                   <AccordionTrigger>
                     <Text fontSize={"large"} py={4}>
+                      Projects with progress Reports with no updates since
+                      creation this FY (
+                      {problematicProjectData?.no_progress?.length || 0})
+                    </Text>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <UserProjectsDataTable
+                      projectData={problematicProjectData?.no_progress}
+                      defaultSorting={"business_area"}
+                      disabledColumns={{
+                        kind: true,
+                        title: false,
+                        role: true,
+                      }}
+                      noDataString={"No results"}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                  <AccordionTrigger>
+                    <Text fontSize={"large"} py={4}>
+                      ACTIVE Projects with INACTIVE Staff Leaders (
+                      {problematicProjectData?.inactive_lead_active_project
+                        ?.length || 0}
+                      )
+                    </Text>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <UserProjectsDataTable
+                      projectData={
+                        problematicProjectData?.inactive_lead_active_project
+                      }
+                      defaultSorting={"business_area"}
+                      disabledColumns={{
+                        kind: true,
+                        title: false,
+                        role: true,
+                      }}
+                      noDataString={"No results"}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-3">
+                  <AccordionTrigger>
+                    <Text fontSize={"large"} py={4}>
                       Projects With Approved Closure That Are Open (
                       {problematicProjectData?.open_closed?.length || 0})
                     </Text>
@@ -220,7 +265,7 @@ export const AllProblematicProjects = () => {
                     />
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="item-1">
+                <AccordionItem value="item-4">
                   <AccordionTrigger>
                     <Text fontSize={"large"} py={4}>
                       Projects with No Members (
@@ -253,7 +298,7 @@ export const AllProblematicProjects = () => {
                   </AccordionContent>
                 </AccordionItem>
                 <Divider />
-                <AccordionItem value="item-2">
+                <AccordionItem value="item-5">
                   <AccordionTrigger>
                     <Text fontSize={"large"} py={4}>
                       Projects with Members but No Leader Role (
@@ -286,7 +331,7 @@ export const AllProblematicProjects = () => {
                   </AccordionContent>
                 </AccordionItem>
                 <Divider />
-                <AccordionItem value="item-3">
+                <AccordionItem value="item-6">
                   <AccordionTrigger>
                     <Text fontSize={"large"} py={4}>
                       Projects with Multiple Project Leader Roles (
@@ -319,7 +364,7 @@ export const AllProblematicProjects = () => {
                   </AccordionContent>
                 </AccordionItem>
                 <Divider />
-                <AccordionItem value="item-4">
+                <AccordionItem value="item-7">
                   <AccordionTrigger>
                     <Text fontSize={"large"} py={4}>
                       Projects with Leaders Set to External User (
@@ -352,6 +397,7 @@ export const AllProblematicProjects = () => {
                     />
                   </AccordionContent>
                 </AccordionItem>
+
                 <Divider />
               </Accordion>
             )}
