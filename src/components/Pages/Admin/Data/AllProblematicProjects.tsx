@@ -191,7 +191,7 @@ export const AllProblematicProjects = () => {
                 <AccordionItem value="item-1">
                   <AccordionTrigger>
                     <Text fontSize={"large"} py={4}>
-                      Projects with progress Reports with no updates since
+                      Projects with progress reports with no updates since
                       creation this FY (
                       {problematicProjectData?.no_progress?.length || 0})
                     </Text>
