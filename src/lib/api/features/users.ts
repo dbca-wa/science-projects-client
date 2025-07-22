@@ -15,6 +15,36 @@ import instance from "../axiosInstance";
 import { QueryFunctionContext } from "@tanstack/react-query";
 import { AxiosHeaders } from "axios";
 
+export interface IDownloadBCSStaffCSVParams {
+  in_spms?: boolean; // Optional parameter to filter by SPMS users
+}
+
+export const downloadBCSStaffCSV = async (
+  params: IDownloadBCSStaffCSVParams = {},
+) => {
+  try {
+    const response = await instance.post("users/download_bcs_csv", params, {
+      responseType: "blob",
+    });
+
+    // Create a blob URL and trigger download
+    const blob = new Blob([response.data], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `bcs_staff_${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error downloading BCS staff CSV:", error);
+    throw error;
+  }
+};
+
 export const checkStaffStatusApiCall = async (pk: number) => {
   try {
     const res = await instance.post(`users/is_staff/${pk}`);
