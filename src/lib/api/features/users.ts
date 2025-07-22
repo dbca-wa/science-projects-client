@@ -17,6 +17,7 @@ import { AxiosHeaders } from "axios";
 
 export interface IDownloadBCSStaffCSVParams {
   in_spms?: boolean; // Optional parameter to filter by SPMS users
+  is_active?: boolean;
 }
 
 export const downloadBCSStaffCSV = async (
