@@ -6,6 +6,10 @@ import {
   Center,
   Divider,
   Flex,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Spinner,
   Text,
   useColorMode,
@@ -22,6 +26,7 @@ import {
 import { MdEmail } from "react-icons/md";
 import { TbRefresh } from "react-icons/tb";
 import { FaFileDownload } from "react-icons/fa";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 export interface IUserDataTableEntry {
   pk: number;
@@ -120,14 +125,37 @@ export const EmailLists = () => {
           <Text fontSize={"x-large"} py={4} flex={1}>
             Email List
           </Text>
+
           <div className="flex gap-2">
-            <Button onClick={() => downloadBCSStaffCSV({ in_spms: true })}>
-              Download SPMS BCS Staff
-            </Button>
-            <Button onClick={() => downloadBCSStaffCSV({ in_spms: false })}>
-              Download All BCS Staff
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                Download BCS SPMS
+              </MenuButton>
+              <MenuList>
+                <MenuItem
+                  onClick={() =>
+                    downloadBCSStaffCSV({ in_spms: true, is_active: true })
+                  }
+                >
+                  Active Users
+                </MenuItem>
+                <MenuItem
+                  onClick={() =>
+                    downloadBCSStaffCSV({ in_spms: true, is_active: false })
+                  }
+                >
+                  Inactive Users
+                </MenuItem>
+              </MenuList>
+            </Menu>
+            <Button
+              colorScheme="green"
+              onClick={() => downloadBCSStaffCSV({ in_spms: false })}
+            >
+              Download All BCS
             </Button>
           </div>
+
           {!fetchingData && activeProjectLeadEmailList && (
             <Flex justifyContent={"flex-end"}>
               <Button
