@@ -156,6 +156,13 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
               }
             />
             <PatchNoteEntry
+              title={"Admin | Generate Annual Report"}
+              kind="fix"
+              description={
+                "Fixed and optimised AR generation to include a specific non-BCS project in a BCS BA"
+              }
+            />
+            <PatchNoteEntry
               title={"Dependencies"}
               kind="update"
               description={"Servers and dependencies updated."}
