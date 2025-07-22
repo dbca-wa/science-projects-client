@@ -135,61 +135,24 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Admin | View All Unapproved Docs"}
+              title={"Admin | No Progress Projects"}
               kind="feature"
               description={
-                "Added functionality to view all unapproved documents for admins in a given FY and send bump emails"
+                "Added functionality to view all projects with progress reports for this FY that have no progress since creation"
               }
             />
             <PatchNoteEntry
-              title={
-                "Admin | Show all projects with a closure that are not closed"
-              }
+              title={"Admin | Inactive Staff Leader Projects"}
               kind="feature"
               description={
-                "Added functionality to view all projects with a project closure that are not in a closed state (for handling projects that were previously closed as suspended)"
+                "Added functionality to view all active projects with an inactive staff lead"
               }
             />
-            {/* <PatchNoteEntry
-              title={"Admin | Set Maintainer"}
+            <PatchNoteEntry
+              title={"Admin | Download BCS Staff Button"}
               kind="feature"
               description={
-                "Added functionality to set the maintainer of SPMS going forward"
-              }
-            /> */}
-            {/* <PatchNoteEntry
-              title={"Fixed map toggle states"}
-              kind="fix"
-              description={
-                "Fixed a bug causing map toggling to work incorrectly - labels and colours now adhere to state set by user correctly"
-              }
-            /> */}
-            {/* <PatchNoteEntry
-              title={"Annual Report banner"}
-              kind="fix"
-              description={
-                "Adjusted the display of annual report banner image to remedy issues in production (caused by OIM rules/changes)"
-              }
-            /> */}
-            <PatchNoteEntry
-              title={"Mentions"}
-              kind="update"
-              description={
-                "Users can now mention users in the project team and business area on project documents. By default, a comment with no mention will not email anyone"
-              }
-            />
-            <PatchNoteEntry
-              title={"Allow Same Name"}
-              kind="update"
-              description={
-                "Allow adding users with same name if email is not the same"
-              }
-            />
-            <PatchNoteEntry
-              title={"Vite and Tailwind Updates"}
-              kind="update"
-              description={
-                "Updated core dependencies for frontend to new major versions for improved performance"
+                "Added functionality to download staff list belonging to BCS for emailing"
               }
             />
             <PatchNoteEntry
