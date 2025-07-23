@@ -8,7 +8,7 @@ import {
   AccordionContent,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { getAllProblematicProjects } from "@/lib/api";
+import { getAllProblematicProjects, getEmailProjectList } from "@/lib/api";
 import { IProblematicData } from "@/lib/hooks/tanstack/useAllProblematicProjects";
 import {
   Box,
@@ -26,6 +26,7 @@ import { useState, useEffect } from "react";
 import { TbRefresh } from "react-icons/tb";
 import { UserProjectsDataTable } from "../../Dashboard/UserProjectsDataTable";
 import { RemedyOpenClosedModalContent } from "@/components/Modals/Admin/RemedyOpenClosedModalContent";
+import { FaFileDownload } from "react-icons/fa";
 
 export const AllProblematicProjects = () => {
   const { colorMode } = useColorMode();
@@ -81,6 +82,35 @@ export const AllProblematicProjects = () => {
     onOpen: onOpenRemedyExternalLeadersModal,
     onClose: onCloseRemedyExternalLeadersModal,
   } = useDisclosure();
+
+  const [isProcessingEmailList, setIsProcessingEmailList] = useState(false);
+
+  const downloadEmailList = async () => {
+    try {
+      setIsProcessingEmailList(true);
+      const { file_content } = await getEmailProjectList({
+        shouldDownloadList: true,
+      });
+
+      const contentString = Object.values(file_content).join("");
+      const blob = new Blob([contentString], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+
+      // Create temporary link for download
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "project_leads_list.txt";
+      link.click();
+
+      // Open in new tab and cleanup
+      window.open(url, "_blank");
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading email list:", error);
+    } finally {
+      setIsProcessingEmailList(false);
+    }
+  };
 
   return (
     <>
@@ -219,6 +249,20 @@ export const AllProblematicProjects = () => {
                     </Text>
                   </AccordionTrigger>
                   <AccordionContent>
+                    <Flex pb={8} justifyContent={"flex-end"}>
+                      <Button
+                        bg={colorMode === "light" ? "green.500" : "green.600"}
+                        color={"white"}
+                        _hover={{
+                          bg: colorMode === "light" ? "green.400" : "green.500",
+                        }}
+                        onClick={downloadEmailList}
+                        leftIcon={<FaFileDownload />}
+                        isDisabled={isProcessingEmailList}
+                      >
+                        Download TXT List
+                      </Button>
+                    </Flex>
                     <UserProjectsDataTable
                       projectData={
                         problematicProjectData?.inactive_lead_active_project
