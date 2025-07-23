@@ -15,7 +15,7 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UserDataTable } from "./UserDataTable";
 import {
   Accordion,
@@ -118,6 +118,10 @@ export const EmailLists = () => {
     document.body.removeChild(openLink);
   };
 
+  useEffect(() => {
+    fetchLeadEmails();
+  }, []);
+
   return (
     <>
       <Box>
@@ -126,44 +130,9 @@ export const EmailLists = () => {
             Email List
           </Text>
 
-          <div className="flex gap-2">
-            <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                Download BCS SPMS
-              </MenuButton>
-              <MenuList>
-                <MenuItem
-                  onClick={() =>
-                    downloadBCSStaffCSV({ in_spms: true, is_active: true })
-                  }
-                >
-                  Active Users
-                </MenuItem>
-                <MenuItem
-                  onClick={() =>
-                    downloadBCSStaffCSV({ in_spms: true, is_active: false })
-                  }
-                >
-                  Inactive Users
-                </MenuItem>
-              </MenuList>
-            </Menu>
-            <Button
-              colorScheme="green"
-              onClick={() => downloadBCSStaffCSV({ in_spms: false })}
-            >
-              Download All BCS
-            </Button>
-          </div>
-
           {!fetchingData && activeProjectLeadEmailList && (
-            <Flex justifyContent={"flex-end"}>
-              <Button
-                bg={colorMode === "light" ? "orange.500" : "orange.500"}
-                color={"white"}
-                _hover={{
-                  bg: colorMode === "light" ? "orange.400" : "orange.400",
-                }}
+            <div className="flex gap-2">
+              {/* <Button
                 onClick={downloadEmailList}
                 isDisabled={
                   fetchingData ||
@@ -174,8 +143,44 @@ export const EmailLists = () => {
                 mr={2}
                 leftIcon={<FaFileDownload />}
               >
-                Download List
-              </Button>
+                Download List (TXT)
+              </Button> */}
+
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  rightIcon={<ChevronDownIcon />}
+                  bg={colorMode === "light" ? "orange.500" : "orange.500"}
+                  color={"white"}
+                  _hover={{
+                    bg: colorMode === "light" ? "orange.400" : "orange.400",
+                  }}
+                >
+                  Download BCS Staff (CSV)
+                </MenuButton>
+                <MenuList>
+                  <MenuItem
+                    onClick={() => downloadBCSStaffCSV({ in_spms: false })}
+                  >
+                    All
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() =>
+                      downloadBCSStaffCSV({ in_spms: true, is_active: true })
+                    }
+                  >
+                    SPMS | Active Users
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() =>
+                      downloadBCSStaffCSV({ in_spms: true, is_active: false })
+                    }
+                  >
+                    SPMS | Inactive Users
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+
               <Button
                 bg={colorMode === "light" ? "green.500" : "green.500"}
                 color={"white"}
@@ -186,12 +191,11 @@ export const EmailLists = () => {
                 isDisabled={
                   fetchingData || activeProjectLeadEmailList?.length < 1
                 }
-                mr={2}
                 leftIcon={<MdEmail />}
               >
-                Send Emails to DBCA Leads
+                Email Leads
               </Button>
-              <Button
+              {/* <Button
                 bg={colorMode === "light" ? "blue.500" : "blue.500"}
                 color={"white"}
                 _hover={{
@@ -202,8 +206,8 @@ export const EmailLists = () => {
                 leftIcon={<TbRefresh />}
               >
                 Refresh Data
-              </Button>
-            </Flex>
+              </Button> */}
+            </div>
             // <Button
             //   onClick={onProjectLeadEmailModalOpen}
             //   bg={colorMode === "light" ? "green.500" : "green.500"}
