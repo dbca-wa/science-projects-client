@@ -132,20 +132,6 @@ export const EmailLists = () => {
 
           {!fetchingData && activeProjectLeadEmailList && (
             <div className="flex gap-2">
-              {/* <Button
-                onClick={downloadEmailList}
-                isDisabled={
-                  fetchingData ||
-                  !fileContent ||
-                  (activeProjectLeadEmailList?.length < 1 &&
-                    inactiveLeadList?.length < 1)
-                }
-                mr={2}
-                leftIcon={<FaFileDownload />}
-              >
-                Download List (TXT)
-              </Button> */}
-
               <Menu>
                 <MenuButton
                   as={Button}
