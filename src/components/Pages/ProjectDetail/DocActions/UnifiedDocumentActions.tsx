@@ -352,6 +352,7 @@ export const UnifiedDocumentActions = ({
                 ? modals.s2Reopen.onOpen
                 : modals.s1Reopen.onOpen
           }
+          mt={3}
         >
           {userData?.is_superuser || userIsCaretakerOfAdmin
             ? "Delete Closure"
