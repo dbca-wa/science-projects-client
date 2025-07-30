@@ -296,7 +296,7 @@ export const BusinessAreasCRUD = () => {
 
           <Modal isOpen={addIsOpen} onClose={onAddClose} size={"2xl"}>
             <ModalOverlay />
-            <ModalContent>
+            <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
               <ModalCloseButton onClick={onAddClose} />
               <ModalHeader>Add Business Area</ModalHeader>
               <ModalBody>

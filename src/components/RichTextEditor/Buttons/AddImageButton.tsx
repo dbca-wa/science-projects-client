@@ -19,6 +19,7 @@ import {
   Image as ChakraImage,
   useToast,
   useDisclosure,
+  useColorMode,
 } from "@chakra-ui/react";
 import { FaUpload, FaImage } from "react-icons/fa";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -164,10 +165,12 @@ const AddImageModal = ({ isOpen, onClose }: AddImageModalProps) => {
     }
   };
 
+  const { colorMode } = useColorMode();
+
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="xl">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
         <ModalHeader>Add Image</ModalHeader>
         <ModalCloseButton />
 

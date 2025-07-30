@@ -174,7 +174,10 @@ export const EditMembershipModal = ({
       scrollBehavior="inside"
     >
       <ModalOverlay />
-      <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+      <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
+        bg={colorMode === "light" ? "white" : "gray.800"}
+      >
         <Flex
           direction="column"
           height="100%"

@@ -22,7 +22,7 @@ export const ToggleDarkMode = ({
   showText,
   asMenuItem,
 }: IOptionalToggleDarkProps) => {
-  const { toggleColorMode } = useColorMode();
+  const { toggleColorMode, colorMode } = useColorMode();
   const colorToggleIcon = useColorModeValue(<FaMoon />, <FaSun />);
   const keyColorMode = useColorModeValue("light", "dark");
   const iconButtonColorScheme = useColorModeValue("blue", "orange");
@@ -40,7 +40,11 @@ export const ToggleDarkMode = ({
   };
 
   return asMenuItem ? (
-    <MenuItem onClick={handleClick} zIndex={2}>
+    <MenuItem
+      onClick={handleClick}
+      zIndex={2}
+      color={colorMode === "dark" ? "gray.400" : null}
+    >
       {colorToggleIcon}
       <Text ml={2}> Toggle Dark Mode</Text>
     </MenuItem>

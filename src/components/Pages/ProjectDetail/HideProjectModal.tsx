@@ -174,7 +174,10 @@ const HideProjectModal = ({
       <Flex
       // as={"form"} onSubmit={handleSubmit(onSubmit)}
       >
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>
             {!projectIsHiddenFromStaffProfile ? "Hide" : "Show"} Project From
             Staff Profile

@@ -115,7 +115,7 @@ export const AddLegacyReportPDFModal = ({
     >
       <ModalOverlay />
       <ModalContent
-        color={colorMode === "light" ? "black" : "white"}
+        color={colorMode === "dark" ? "gray.400" : null}
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
         <ModalHeader>Add Legacy PDF</ModalHeader>

@@ -16,11 +16,11 @@ export const BreadCrumb = ({
 
   const handleUnderscores = (text: string) => {
     let updated = text;
-    if (text.includes('_')) {
-      updated = updated.replaceAll('_', ' ');
+    if (text.includes("_")) {
+      updated = updated.replaceAll("_", " ");
     }
     return updated;
-  }
+  };
 
   return (
     <>
@@ -32,6 +32,7 @@ export const BreadCrumb = ({
         pos={"relative"}
         justifyContent={"space-between"}
         userSelect={"none"}
+        color={colorMode === "dark" ? "gray.400" : null}
       >
         <Flex>
           <Button

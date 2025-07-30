@@ -73,6 +73,7 @@ import { SidebarNavMenu } from "./SidebarNavMenu";
 
 const ProjectMenuContents = () => {
   const navigate = useNavigate();
+  const { colorMode } = useColorMode();
   return (
     <>
       <MenuGroup
@@ -91,6 +92,7 @@ const ProjectMenuContents = () => {
               navigate("/projects/browse");
             }
           }}
+          color={colorMode === "dark" ? "gray.400" : null}
         >
           {<CgBrowse />}
           <Text ml={2}>Browse Projects</Text>
@@ -105,6 +107,7 @@ const ProjectMenuContents = () => {
               navigate("/projects/add");
             }
           }}
+          color={colorMode === "dark" ? "gray.400" : null}
         >
           {<CgPlayListAdd />}
           <Text ml={2}>Create New Project</Text>
@@ -114,43 +117,11 @@ const ProjectMenuContents = () => {
   );
 };
 
-// const GuideContents = () => {
-//   const navigate = useNavigate();
-
-//   return (
-//     <>
-//       <MenuGroup
-//         title="View"
-//         fontSize={"12px"}
-//         color={"gray.500"}
-//         textAlign={"center"}
-//       >
-//         <MenuItem
-//           onClick={(e) => {
-//             if (e.ctrlKey || e.metaKey) {
-//               // Handle Ctrl + Click (or Command + Click on Mac)
-//               window.open(`/guide`, "_blank"); // Opens in a new tab
-//             } else {
-//               // Normal click handling
-//               navigate("/guide");
-//             }
-//           }}
-//         >
-//           <FaBookBookmark />
-
-//           {/* {<AiFillPrinter />} */}
-//           <Text ml={2}>View Quick Guide</Text>
-//         </MenuItem>
-//       </MenuGroup>
-//     </>
-//   );
-// };
-
 const ReportMenuContents = () => {
   const navigate = useNavigate();
 
   const { userData } = useUser();
-
+  const { colorMode } = useColorMode();
   return (
     <>
       <MenuGroup
@@ -170,6 +141,7 @@ const ReportMenuContents = () => {
                 navigate("/reports/current");
               }
             }}
+            color={colorMode === "dark" ? "gray.400" : null}
           >
             <MdOutlineAccessTimeFilled />
 
@@ -188,6 +160,7 @@ const ReportMenuContents = () => {
               navigate("/reports");
             }
           }}
+          color={colorMode === "dark" ? "gray.400" : null}
         >
           {<CgViewList />}
           <Text ml={2}>Published Reports</Text>
@@ -204,6 +177,7 @@ const UserMenuContents = () => {
     onOpen: onCreateUserOpen,
     onClose: onCreateUserClose,
   } = useDisclosure();
+  const { colorMode } = useColorMode();
 
   return (
     <>
@@ -228,12 +202,16 @@ const UserMenuContents = () => {
               navigate("/users");
             }
           }}
+          color={colorMode === "dark" ? "gray.400" : null}
         >
           {<ImUsers />}
           <Text ml={2}>Browse SPMS Users</Text>
         </MenuItem>
 
-        <MenuItem onClick={onCreateUserOpen}>
+        <MenuItem
+          onClick={onCreateUserOpen}
+          color={colorMode === "dark" ? "gray.400" : null}
+        >
           {<FaUserPlus />}
           <Text ml={2}>Add New User</Text>
         </MenuItem>
@@ -259,6 +237,7 @@ const AdminMenuContents = ({
   handleReviewData,
 }: AdminProps) => {
   const navigate = useNavigate();
+  const { colorMode } = useColorMode();
   return (
     <>
       <MenuGroup
@@ -267,11 +246,15 @@ const AdminMenuContents = ({
         color={"gray.500"}
         textAlign={"center"}
       >
-        <MenuItem onClick={handleReviewData}>
+        <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
+          onClick={handleReviewData}
+        >
           {<PiListMagnifyingGlassDuotone />}
           <Text ml={2}>Lists</Text>
         </MenuItem>
         <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -285,9 +268,9 @@ const AdminMenuContents = ({
           {<MdEmail />}
           <Text ml={2}>Emails</Text>
         </MenuItem>
-
         <MenuDivider />
         <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -302,6 +285,7 @@ const AdminMenuContents = ({
           <Text ml={2}>Addresses</Text>
         </MenuItem>
         <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -315,8 +299,8 @@ const AdminMenuContents = ({
           {<RiTeamFill />}
           <Text ml={2}>Affiliations</Text>
         </MenuItem>
-
         <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -331,6 +315,7 @@ const AdminMenuContents = ({
           <Text ml={2}>Branches</Text>
         </MenuItem>
         <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -345,6 +330,7 @@ const AdminMenuContents = ({
           <Text ml={2}>Business Areas</Text>
         </MenuItem>
         <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -358,8 +344,8 @@ const AdminMenuContents = ({
           {<GoOrganization />}
           <Text ml={2}>Divisions</Text>
         </MenuItem>
-
         <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -374,6 +360,7 @@ const AdminMenuContents = ({
           <Text ml={2}>Locations</Text>
         </MenuItem>
         <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -387,8 +374,8 @@ const AdminMenuContents = ({
           {<MdManageHistory />}
           <Text ml={2}>Report Info</Text>
         </MenuItem>
-
         <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -415,15 +402,24 @@ const AdminMenuContents = ({
           <Text ml={2}>Dump Data</Text>
         </MenuItem> */}
 
-        <MenuItem onClick={handleBatchApproveOldReports}>
+        <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
+          onClick={handleBatchApproveOldReports}
+        >
           {<MdVerifiedUser />}
           <Text ml={2}>Batch Approve Old Reports</Text>
         </MenuItem>
-        <MenuItem onClick={handleBatchApproveReports}>
+        <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
+          onClick={handleBatchApproveReports}
+        >
           {<FcApproval />}
           <Text ml={2}>Batch Approve Reports</Text>
         </MenuItem>
-        <MenuItem onClick={handleNewReportCycle}>
+        <MenuItem
+          color={colorMode === "dark" ? "gray.400" : null}
+          onClick={handleNewReportCycle}
+        >
           {<HiDocumentPlus />}
           <Text ml={2}>Open Annual Report Cycle</Text>
         </MenuItem>

@@ -258,7 +258,10 @@ export const AddUserToProjectModal = ({
       scrollBehavior="inside"
     >
       <ModalOverlay />
-      <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+      <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
+        bg={colorMode === "light" ? "white" : "gray.800"}
+      >
         <ModalHeader>Add To Project</ModalHeader>
         <ModalCloseButton />
 

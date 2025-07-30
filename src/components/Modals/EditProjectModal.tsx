@@ -421,6 +421,7 @@ export const EditProjectModal = ({
       <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
         <ModalOverlay />
         <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
           bg={colorMode === "light" ? "white" : "gray.800"}
           overflow={"hidden"}
           w={"100%"}

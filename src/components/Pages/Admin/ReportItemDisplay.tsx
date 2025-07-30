@@ -280,7 +280,10 @@ export const ReportItemDisplay = ({
 
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Delete Report</ModalHeader>
           <ModalBody>
             <Box>
@@ -348,6 +351,7 @@ export const ReportItemDisplay = ({
 
           <ModalBody>
             <ModalContent
+              color={colorMode === "dark" ? "gray.400" : null}
               bg={colorMode === "light" ? "gray.100" : "gray.800"}
               p={4}
               pb={16}
@@ -445,7 +449,11 @@ export const ReportItemDisplay = ({
       >
         <ModalOverlay />
         <ModalBody>
-          <ModalContent bg={colorMode === "light" ? "white" : "gray.800"} p={4}>
+          <ModalContent
+            color={colorMode === "dark" ? "gray.400" : null}
+            bg={colorMode === "light" ? "white" : "gray.800"}
+            p={4}
+          >
             <ModalHeader>Update {reportData?.year} Report</ModalHeader>
 
             <ModalCloseButton />

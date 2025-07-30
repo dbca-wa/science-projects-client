@@ -176,7 +176,10 @@ export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
       </Grid>
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Delete Branch</ModalHeader>
           <ModalBody>
             <Box>
@@ -219,6 +222,7 @@ export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
         <ModalHeader>Update Branch</ModalHeader>
         <ModalBody>
           <ModalContent
+            color={colorMode === "dark" ? "gray.400" : null}
             bg={colorMode === "light" ? "white" : "gray.800"}
             p={4}
             px={6}

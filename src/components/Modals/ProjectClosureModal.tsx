@@ -144,7 +144,10 @@ export const ProjectClosureModal = ({
         onSubmit={handleSubmit(closeProject)}
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>
             Are you sure you want to close this project?
           </ModalHeader>

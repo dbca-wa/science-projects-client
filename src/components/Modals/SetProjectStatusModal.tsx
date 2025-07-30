@@ -105,7 +105,10 @@ export const SetProjectStatusModal = ({
         as={"form"}
         // onSubmit={handleSubmit(setAreas)}
       >
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Set Project Areas</ModalHeader>
           <ModalCloseButton />
 

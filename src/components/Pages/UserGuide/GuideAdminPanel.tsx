@@ -35,6 +35,7 @@ import {
   IconButton,
   useDisclosure,
   useToast,
+  useColorMode,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import {
@@ -222,11 +223,12 @@ const GuideSectionForm: React.FC<GuideSectionFormProps> = ({
       setNewCategory("");
     }
   };
+  const { colorMode } = useColorMode();
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
         <ModalHeader>
           {isEditing ? "Edit Guide Section" : "Create Guide Section"}
         </ModalHeader>

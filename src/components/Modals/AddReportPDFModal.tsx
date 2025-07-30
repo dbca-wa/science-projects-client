@@ -118,7 +118,7 @@ export const AddReportPDFModal = ({
     <Modal isOpen={isAddPDFOpen} onClose={onAddPDFClose} size={"sm"}>
       <ModalOverlay />
       <ModalContent
-        color={colorMode === "light" ? "black" : "white"}
+        color={colorMode === "dark" ? "gray.400" : null}
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
         <ModalHeader>Add PDF to Report</ModalHeader>

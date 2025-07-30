@@ -43,7 +43,10 @@ export const ExternalInternalSPConfirmationModal = ({
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
       <ModalOverlay />
       <Flex>
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Is this an externally led project?</ModalHeader>
           <ModalCloseButton />
 

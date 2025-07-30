@@ -43,7 +43,10 @@ export const CaretakerSetModal = ({ isOpen, onClose }: IAddUserModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"3xl"}>
       <ModalOverlay />
-      <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+      <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
+        bg={colorMode === "light" ? "white" : "gray.800"}
+      >
         <ModalHeader>Set User Caretaker</ModalHeader>
         <ModalCloseButton />
         <ModalBody>

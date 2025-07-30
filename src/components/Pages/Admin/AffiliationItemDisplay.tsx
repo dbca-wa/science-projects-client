@@ -128,7 +128,10 @@ export const AffiliationItemDisplay = ({ pk, name }: IAffiliation) => {
       </Grid>
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Delete Affiliation</ModalHeader>
           <ModalBody>
             <Box>
@@ -171,6 +174,7 @@ export const AffiliationItemDisplay = ({ pk, name }: IAffiliation) => {
         <ModalHeader>Update Affiliation</ModalHeader>
         <ModalBody>
           <ModalContent
+            color={colorMode === "dark" ? "gray.400" : null}
             bg={colorMode === "light" ? "white" : "gray.800"}
             p={4}
             px={6}
