@@ -373,6 +373,7 @@ export const AffiliationsCRUD = () => {
             <ModalHeader>Merge Affiliations</ModalHeader>
             <ModalBody>
               <ModalContent
+                color={colorMode === "dark" ? "gray.400" : null}
                 bg={colorMode === "light" ? "white" : "gray.800"}
                 p={4}
                 px={6}

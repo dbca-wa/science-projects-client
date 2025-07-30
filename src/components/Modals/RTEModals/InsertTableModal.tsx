@@ -58,11 +58,15 @@ export const InsertTableModal = ({ isOpen, activeEditor, onClose }: Props) => {
       isOpen={isOpen}
       onClose={onClose}
       size={"md"}
-    // isCentered={true}
+      // isCentered={true}
     >
       {" "}
       <ModalOverlay />
-      <ModalContent bg={colorMode === "light" ? "white" : "gray.800"} p={4}>
+      <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
+        bg={colorMode === "light" ? "white" : "gray.800"}
+        p={4}
+      >
         <ModalHeader mt={5}>Insert Table</ModalHeader>
         <ModalCloseButton />
         <ModalBody mb={5}>

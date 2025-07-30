@@ -106,7 +106,10 @@ export const DeleteCommentModal = ({
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
       <ModalOverlay />
       <Flex as={"form"} onSubmit={handleSubmit(deleteComment)}>
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Delete Comment?</ModalHeader>
           <ModalCloseButton />
 

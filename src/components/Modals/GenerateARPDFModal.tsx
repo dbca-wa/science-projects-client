@@ -127,7 +127,10 @@ export const GenerateARPDFModal = ({ isOpen, onClose, thisReport }: Props) => {
         onSubmit={handleSubmit(generatePDF)}
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Generate PDF?</ModalHeader>
           <ModalCloseButton />
 

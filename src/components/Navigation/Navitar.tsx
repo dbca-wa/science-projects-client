@@ -207,20 +207,11 @@ export const Navitar = ({
                     navigate("/crud/test");
                   }}
                   zIndex={isOpen ? 2 : 1}
+                  color={colorMode === "dark" ? "gray.400" : null}
                 >
                   {<FaGamepad />}
 
-                  <Text ml={2}>Dev Guide</Text>
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    navigate("/devguide");
-                  }}
-                  zIndex={isOpen ? 2 : 1}
-                >
-                  {<FaFileCode />}
-
-                  <Text ml={2}>Dev Guide</Text>
+                  <Text ml={2}>Test</Text>
                 </MenuItem>
               </>
             )}
@@ -230,6 +221,7 @@ export const Navitar = ({
                 // window.open("https://sdis.readthedocs.io", "_blank");
               }}
               zIndex={isOpen ? 2 : 1}
+              color={colorMode === "dark" ? "gray.400" : null}
             >
               {<SiReadthedocs />}
               <Text ml={2}>Quick Guide</Text>
@@ -252,6 +244,7 @@ export const Navitar = ({
                 window.open("https://data.bio.wa.gov.au/", "_blank");
               }}
               zIndex={isOpen ? 2 : 1}
+              color={colorMode === "dark" ? "gray.400" : null}
             >
               {<FaBook />}
               <Text ml={2}>Data Catalogue</Text>
@@ -264,6 +257,7 @@ export const Navitar = ({
                 );
               }}
               zIndex={isOpen ? 2 : 1}
+              color={colorMode === "dark" ? "gray.400" : null}
             >
               {<TbWorldWww />}
               <Text ml={2}>Scientific Sites Register</Text>
@@ -283,6 +277,7 @@ export const Navitar = ({
                 navigate("/users/me");
               }}
               zIndex={isOpen ? 2 : 1}
+              color={colorMode === "dark" ? "gray.400" : null}
             >
               {<FaUserCircle />}
               <Text ml={2}>
@@ -303,13 +298,18 @@ export const Navitar = ({
                 }
               }}
               zIndex={isOpen ? 2 : 1}
+              color={colorMode === "dark" ? "gray.400" : null}
             >
               {<FaUserCircle />}
               <Text ml={2}>My Public Profile</Text>
             </MenuItem>
 
             {userData?.is_superuser && (
-              <MenuItem onClick={onLogOut} zIndex={isOpen ? 2 : 1}>
+              <MenuItem
+                onClick={onLogOut}
+                zIndex={isOpen ? 2 : 1}
+                color={colorMode === "dark" ? "gray.400" : null}
+              >
                 {<FiLogOut />}
                 <Text ml={2}>Logout</Text>
               </MenuItem>

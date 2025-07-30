@@ -276,6 +276,7 @@ export const GuideRichTextEditor = ({
             py={2}
             fontWeight={"bold"}
             fontSize={titleTextSize ? titleTextSize : "xl"}
+            color={colorMode === "dark" ? "gray.400" : null}
           >
             {sectionTitle}
           </Text>

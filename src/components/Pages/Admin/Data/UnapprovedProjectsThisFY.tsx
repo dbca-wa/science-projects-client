@@ -41,6 +41,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  useColorMode,
 } from "@chakra-ui/react";
 import { BumpEmailModalContent } from "@/components/Modals/Admin/BumpEmailModalContent";
 
@@ -1661,6 +1662,8 @@ const UnapprovedProjectsThisFY = () => {
     "directorate",
   ];
 
+  const { colorMode } = useColorMode();
+
   return (
     <div className="flex flex-col space-y-4">
       {fetchingData ? (
@@ -1675,7 +1678,7 @@ const UnapprovedProjectsThisFY = () => {
             {isBumpModalOpen && (
               <Modal isOpen={isBumpModalOpen} onClose={handleCloseBumpModal}>
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
                   <ModalHeader>
                     {isSingleBump ? "Send Bump Email" : "Send Bulk Bump Emails"}
                   </ModalHeader>

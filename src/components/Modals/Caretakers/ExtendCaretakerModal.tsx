@@ -194,7 +194,10 @@ export const ExtendCaretakerModal = ({
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
       <ModalOverlay />
       <Flex>
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Extend Caretaker?</ModalHeader>
           <ModalCloseButton />
 

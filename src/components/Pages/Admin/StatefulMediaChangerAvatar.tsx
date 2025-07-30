@@ -713,7 +713,11 @@ export const StatefulMediaChangerAvatar = ({
       {/* Enhanced Crop Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="full">
         <ModalOverlay />
-        <ModalContent maxW="90vw" h="80vh">
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          maxW="90vw"
+          h="80vh"
+        >
           <ModalHeader>Crop and Adjust Image</ModalHeader>
           <ModalCloseButton />
           <ModalBody overflow="hidden" h="full">

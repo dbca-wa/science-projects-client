@@ -164,7 +164,10 @@ export const NewCycleModal = ({ isOpen, onClose }: IModalProps) => {
       <Flex
       // as={"form"} onSubmit={handleSubmit(onSubmit)}
       >
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Open New Report Cycle?</ModalHeader>
           <ModalCloseButton />
 

@@ -114,7 +114,7 @@ export const ApproveProgressReportModal = ({
     <Modal isOpen={isOpen} onClose={onClose} size={"lg"}>
       <ModalOverlay />
       <ModalContent
-        color={colorMode === "light" ? "black" : "white"}
+        color={colorMode === "dark" ? "gray.400" : null}
         bg={colorMode === "light" ? "white" : "gray.800"}
       >
         <ModalHeader>

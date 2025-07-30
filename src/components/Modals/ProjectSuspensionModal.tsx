@@ -116,7 +116,10 @@ export const ProjectSuspensionModal = ({
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
       <ModalOverlay />
       <Flex as={"form"} onSubmit={handleSubmit(suspendProject)}>
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>
             Are you sure you want to{" "}
             {projectStatus !== "suspended" ? "suspend" : "unsuspend"} this

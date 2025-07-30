@@ -110,7 +110,7 @@ export const EditMyBusinessAreaModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
         <ModalCloseButton onClick={onClose} />
         <ModalHeader>Edit Business Area</ModalHeader>
         <ModalBody>

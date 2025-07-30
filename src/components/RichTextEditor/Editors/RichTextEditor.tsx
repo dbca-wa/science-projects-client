@@ -242,6 +242,7 @@ export const RichTextEditor = ({
             // pt={1}
             // pl={4}
             // paddingBottom={"12px"}
+            color={colorMode === "dark" ? "gray.400" : null}
             my={0}
             py={2}
             fontWeight={"bold"}

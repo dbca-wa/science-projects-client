@@ -477,7 +477,10 @@ export const BusinessAreaItemDisplay = ({
       </Grid>
       <Modal isOpen={isActiveModalOpen} onClose={onActiveModalClose}>
         <ModalOverlay />
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>
             {is_active ? "Deactivate Business Area?" : "Activate Business Area"}
           </ModalHeader>
@@ -520,7 +523,10 @@ export const BusinessAreaItemDisplay = ({
       </Modal>
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Delete Business Area</ModalHeader>
           <ModalBody>
             <Box>
@@ -568,6 +574,7 @@ export const BusinessAreaItemDisplay = ({
         <ModalHeader>Update Business Area</ModalHeader>
         <ModalBody>
           <ModalContent
+            color={colorMode === "dark" ? "gray.400" : null}
             bg={colorMode === "light" ? "white" : "gray.800"}
             p={4}
             px={6}

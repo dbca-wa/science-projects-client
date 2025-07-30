@@ -41,7 +41,7 @@ export const ChangePasswordModal = ({
   };
 
   const handleConfirmPasswordChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setConfirmPassword(event.target.value);
     setPasswordsMatch(event.target.value === password);
@@ -57,7 +57,10 @@ export const ChangePasswordModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent bg={"white"}>
+      <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
+        bg={"white"}
+      >
         <ModalHeader>Add User</ModalHeader>
         <ModalCloseButton />
         <form onSubmit={handleSubmit}>

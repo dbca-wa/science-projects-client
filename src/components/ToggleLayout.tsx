@@ -6,6 +6,7 @@ import {
   IconButton,
   MenuItem,
   Text,
+  useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -30,6 +31,7 @@ export const ToggleLayout = ({
     "whiteAlpha.400",
     "whiteAlpha.500",
   );
+  const { colorMode } = useColorMode();
   const layouts = {
     traditional: {
       key: "traditional",
@@ -51,7 +53,11 @@ export const ToggleLayout = ({
   };
 
   return asMenuItem ? (
-    <MenuItem onClick={handleClick} zIndex={2}>
+    <MenuItem
+      color={colorMode === "dark" ? "gray.400" : null}
+      onClick={handleClick}
+      zIndex={2}
+    >
       {layouts[layout].icon}
       <Text ml={2}>Toggle Layout</Text>
     </MenuItem>

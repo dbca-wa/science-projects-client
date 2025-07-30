@@ -145,7 +145,10 @@ export const LocationItemDisplay = ({
       </Grid>
       <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
         <ModalOverlay />
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Delete Business Area</ModalHeader>
           <ModalBody>
             <Box>
@@ -189,6 +192,7 @@ export const LocationItemDisplay = ({
         <ModalHeader>Update Location</ModalHeader>
         <ModalBody>
           <ModalContent
+            color={colorMode === "dark" ? "gray.400" : null}
             bg={colorMode === "light" ? "white" : "gray.800"}
             p={4}
             px={6}

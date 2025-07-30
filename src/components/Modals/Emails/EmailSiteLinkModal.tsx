@@ -174,7 +174,11 @@ export const EmailSiteLinkModal = ({ isOpen, onClose }: Props) => {
     >
       {" "}
       <ModalOverlay />
-      <ModalContent bg={colorMode === "light" ? "white" : "gray.800"} p={4}>
+      <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
+        bg={colorMode === "light" ? "white" : "gray.800"}
+        p={4}
+      >
         {!userLoading ? (
           <>
             <ModalHeader mt={5}>Send Link to SPMS</ModalHeader>

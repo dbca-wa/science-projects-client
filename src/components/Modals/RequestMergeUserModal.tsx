@@ -117,7 +117,10 @@ export const RequestMergeUserModal = ({
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
       <ModalOverlay />
       <Flex as={"form"} onSubmit={handleSubmit(requestUserMerge)}>
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Request Merge?</ModalHeader>
           <ModalCloseButton />
 

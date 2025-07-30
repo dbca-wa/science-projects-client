@@ -167,7 +167,10 @@ export const EditPersonalInformationModal = ({
       scrollBehavior="inside"
     >
       <ModalOverlay />
-      <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+      <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
+        bg={colorMode === "light" ? "white" : "gray.800"}
+      >
         <ModalHeader>Edit Personal Information</ModalHeader>
         <ModalCloseButton />
         <ModalBody as={"form"} onSubmit={handleSubmit(onSubmit)}>

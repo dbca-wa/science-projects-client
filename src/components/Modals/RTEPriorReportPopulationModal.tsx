@@ -164,7 +164,10 @@ export const RTEPriorReportPopulationModal = ({
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose}>
       <ModalOverlay />
-      <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+      <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
+        bg={colorMode === "light" ? "white" : "gray.800"}
+      >
         <ModalHeader>Populate With Prior Data?</ModalHeader>
         <ModalCloseButton />
         <Flex as={"form"} id="promotion-form" onSubmit={handleSubmit(onSubmit)}>

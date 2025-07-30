@@ -22,7 +22,10 @@ export const CreateProjectPageModal = ({ isOpen, onClose }: IModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
       <ModalOverlay />
-      <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+      <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
+        bg={colorMode === "light" ? "white" : "gray.800"}
+      >
         <ModalHeader>Create Project</ModalHeader>
         <ModalCloseButton />
 
