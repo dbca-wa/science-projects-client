@@ -130,19 +130,63 @@ export interface IAdminOptions {
   pk: number;
   email_options: string;
   updated_at: Date;
-  created_at: Data;
+  created_at: Date;
   maintainer: IMiniUser;
-  guide_admin: string;
-  guide_about: string;
-  guide_login: string;
-  guide_profile: string;
-  guide_user_creation: string;
-  guide_user_view: string;
-  guide_project_creation: string;
-  guide_project_view: string;
-  guide_project_team: string;
-  guide_documents: string;
-  guide_report: string;
+
+  // New guide_content field (JSON object with dynamic keys)
+  guide_content: {
+    [key: string]: string; // Allows any field key with string content
+  };
+
+  // Legacy fields - keeping for backward compatibility
+  guide_admin?: string; // Made optional since we're transitioning away from these
+  guide_about?: string;
+  guide_login?: string;
+  guide_profile?: string;
+  guide_user_creation?: string;
+  guide_user_view?: string;
+  guide_project_creation?: string;
+  guide_project_view?: string;
+  guide_project_team?: string;
+  guide_documents?: string;
+  guide_report?: string;
+}
+
+export interface IGuideContent {
+  guide_admin?: string;
+  guide_about?: string;
+  guide_login?: string;
+  guide_profile?: string;
+  guide_user_creation?: string;
+  guide_user_view?: string;
+  guide_project_creation?: string;
+  guide_project_view?: string;
+  guide_project_team?: string;
+  guide_documents?: string;
+  guide_report?: string;
+  [key: string]: string | undefined; // Allow additional dynamic fields
+}
+
+export interface IAdminOptionsTypeSafe {
+  pk: number;
+  email_options: string;
+  updated_at: Date;
+  created_at: Date;
+  maintainer: IMiniUser;
+  guide_content: IGuideContent;
+
+  // Legacy fields - keeping for backward compatibility
+  guide_admin?: string;
+  guide_about?: string;
+  guide_login?: string;
+  guide_profile?: string;
+  guide_user_creation?: string;
+  guide_user_view?: string;
+  guide_project_creation?: string;
+  guide_project_view?: string;
+  guide_project_team?: string;
+  guide_documents?: string;
+  guide_report?: string;
 }
 
 export interface IConceptPlanGenerationData {
