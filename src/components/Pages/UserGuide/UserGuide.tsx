@@ -369,7 +369,11 @@ export const UserGuide = () => {
           content = (
             <GuideAboutSection
               isSuperUser={userData?.is_superuser}
-              sectionData={adminOptionsData?.guide_about}
+              // Changed from adminOptionsData?.guide_about to:
+              sectionData={
+                adminOptionsData?.guide_content?.guide_about ||
+                adminOptionsData?.guide_about
+              }
               adminOptionsPk={adminOptionsData.pk}
               refetch={refetch}
             />
@@ -379,7 +383,11 @@ export const UserGuide = () => {
           content = (
             <GuideAdminSection
               isSuperUser={userData?.is_superuser}
-              sectionData={adminOptionsData?.guide_admin}
+              // Changed from adminOptionsData?.guide_admin to:
+              sectionData={
+                adminOptionsData?.guide_content?.guide_admin ||
+                adminOptionsData?.guide_admin
+              }
               adminOptionsPk={adminOptionsData.pk}
               refetch={refetch}
             />
@@ -390,7 +398,11 @@ export const UserGuide = () => {
           content = (
             <GuideLoginSection
               isSuperUser={userData?.is_superuser}
-              sectionData={adminOptionsData?.guide_login}
+              // Changed from adminOptionsData?.guide_login to:
+              sectionData={
+                adminOptionsData?.guide_content?.guide_login ||
+                adminOptionsData?.guide_login
+              }
               adminOptionsPk={adminOptionsData.pk}
               refetch={refetch}
             />
@@ -401,7 +413,11 @@ export const UserGuide = () => {
           content = (
             <GuideUserProfileSection
               isSuperUser={userData?.is_superuser}
-              sectionData={adminOptionsData?.guide_profile}
+              // Changed from adminOptionsData?.guide_profile to:
+              sectionData={
+                adminOptionsData?.guide_content?.guide_profile ||
+                adminOptionsData?.guide_profile
+              }
               adminOptionsPk={adminOptionsData.pk}
               refetch={refetch}
             />
@@ -412,8 +428,15 @@ export const UserGuide = () => {
             <GuideUsersSection
               isSuperUser={userData?.is_superuser}
               adminOptionsPk={adminOptionsData.pk}
-              sectionDataA={adminOptionsData.guide_user_creation}
-              sectionDataB={adminOptionsData.guide_user_view}
+              // Changed these too:
+              sectionDataA={
+                adminOptionsData?.guide_content?.guide_user_creation ||
+                adminOptionsData?.guide_user_creation
+              }
+              sectionDataB={
+                adminOptionsData?.guide_content?.guide_user_view ||
+                adminOptionsData?.guide_user_view
+              }
               refetch={refetch}
             />
           );
@@ -423,8 +446,15 @@ export const UserGuide = () => {
             <GuideProjectsSection
               isSuperUser={userData?.is_superuser}
               adminOptionsPk={adminOptionsData.pk}
-              sectionDataA={adminOptionsData.guide_project_creation}
-              sectionDataB={adminOptionsData.guide_project_view}
+              // Changed these too:
+              sectionDataA={
+                adminOptionsData?.guide_content?.guide_project_creation ||
+                adminOptionsData?.guide_project_creation
+              }
+              sectionDataB={
+                adminOptionsData?.guide_content?.guide_project_view ||
+                adminOptionsData?.guide_project_view
+              }
               refetch={refetch}
             />
           );
@@ -433,7 +463,11 @@ export const UserGuide = () => {
           content = (
             <GuideTeamsSection
               isSuperUser={userData?.is_superuser}
-              sectionData={adminOptionsData?.guide_project_team}
+              // Changed:
+              sectionData={
+                adminOptionsData?.guide_content?.guide_project_team ||
+                adminOptionsData?.guide_project_team
+              }
               adminOptionsPk={adminOptionsData.pk}
               refetch={refetch}
             />
@@ -443,7 +477,11 @@ export const UserGuide = () => {
           content = (
             <GuideDocumentsSection
               isSuperUser={userData?.is_superuser}
-              sectionData={adminOptionsData?.guide_documents}
+              // Changed:
+              sectionData={
+                adminOptionsData?.guide_content?.guide_documents ||
+                adminOptionsData?.guide_documents
+              }
               adminOptionsPk={adminOptionsData.pk}
               refetch={refetch}
             />
@@ -453,7 +491,11 @@ export const UserGuide = () => {
           content = (
             <GuideAnnualReportSection
               isSuperUser={userData?.is_superuser}
-              sectionData={adminOptionsData?.guide_report}
+              // Changed:
+              sectionData={
+                adminOptionsData?.guide_content?.guide_report ||
+                adminOptionsData?.guide_report
+              }
               adminOptionsPk={adminOptionsData.pk}
               refetch={refetch}
             />
