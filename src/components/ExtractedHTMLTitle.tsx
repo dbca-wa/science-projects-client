@@ -1,12 +1,20 @@
-import { Box, TextProps } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import DOMPurify from "dompurify";
 
-interface Props extends TextProps {
+interface Props {
   htmlContent: string;
-  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onClick?: (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void;
   textBefore?: string;
   extraText?: string;
+  className?: string; // For future Tailwind migration
+  style?: React.CSSProperties; // Standard CSS styles
+
+  // Chakra-like props for backward compatibility
+  color?: string;
+  fontWeight?: string | number;
+  fontSize?: string | number;
+  noOfLines?: number;
+  [key: string]: any; // Allow other props to pass through
 }
 
 export const ExtractedHTMLTitle: React.FC<Props> = ({
@@ -14,7 +22,13 @@ export const ExtractedHTMLTitle: React.FC<Props> = ({
   onClick,
   textBefore,
   extraText,
-  ...textProps
+  className,
+  style,
+  color,
+  fontWeight,
+  fontSize,
+  noOfLines,
+  ...otherProps
 }) => {
   const [content, setContent] = useState("");
 
@@ -34,11 +48,56 @@ export const ExtractedHTMLTitle: React.FC<Props> = ({
     }
   }, [htmlContent]);
 
+  // Convert Chakra-like props to CSS styles
+  const combinedStyle: React.CSSProperties = {
+    ...style,
+    ...(color && { color }),
+    ...(fontWeight && { fontWeight }),
+    ...(fontSize && { fontSize }),
+    ...(noOfLines && {
+      display: "-webkit-box",
+      WebkitLineClamp: noOfLines,
+      WebkitBoxOrient: "vertical",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+    }),
+  };
+
+  // Filter out props that shouldn't be passed to DOM elements
+  const {
+    userSelect,
+    cursor,
+    transition,
+    transform,
+    boxShadow,
+    borderRadius,
+    padding,
+    margin,
+    width,
+    height,
+    display,
+    position,
+    zIndex,
+    backgroundColor,
+    border,
+    borderColor,
+    opacity,
+    visibility,
+    pointerEvents,
+    // Add any other Chakra props that might cause issues
+    ...validDomProps
+  } = otherProps;
+
   return (
-    <Box {...textProps} onClick={onClick}>
+    <span
+      onClick={onClick}
+      className={className}
+      style={combinedStyle}
+      {...validDomProps}
+    >
       {textBefore && textBefore !== undefined ? textBefore : null}
       <span dangerouslySetInnerHTML={{ __html: content }} />
       {extraText && extraText !== undefined ? extraText : null}
-    </Box>
+    </span>
   );
 };
