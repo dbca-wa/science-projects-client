@@ -167,6 +167,26 @@ export class MentionNode extends TextNode {
     );
   }
 
+  // importDOM method now required by lexical
+  static importDOM(): DOMConversionMap | null {
+    return {
+      span: (node: Node) => {
+        if (
+          node instanceof HTMLElement &&
+          (node.hasAttribute("data-lexical-mention") ||
+            node.hasAttribute("data-user-id") ||
+            node.classList.contains("mention"))
+        ) {
+          return {
+            conversion: convertMentionElement,
+            priority: 1,
+          };
+        }
+        return null;
+      },
+    };
+  }
+
   static importJSON(serializedNode: SerializedMentionNode): MentionNode {
     const node = $createMentionNode(
       serializedNode.mentionName,
@@ -235,6 +255,9 @@ export class MentionNode extends TextNode {
     element.setAttribute("data-user-id", String(this.__userId));
     element.setAttribute("data-user-email", this.__userEmail);
     element.setAttribute("data-user-name", this.__userName);
+    element.className = "mention";
+    // Apply the mention styling
+    Object.assign(element.style, mentionStyle);
     element.textContent = this.__text;
     return { element };
   }

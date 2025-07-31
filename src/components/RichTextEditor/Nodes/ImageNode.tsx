@@ -1,5 +1,7 @@
 // ImageNode.tsx - Fixed implementation
 import type {
+  DOMConversionMap,
+  DOMConversionOutput,
   DOMExportOutput,
   EditorConfig,
   LexicalNode,
@@ -28,6 +30,18 @@ export type ImagePayload = {
   key?: NodeKey;
 };
 
+// Helper function to convert HTML img elements to ImageNode
+function $convertImageElement(domNode: Node): null | DOMConversionOutput {
+  if (domNode instanceof HTMLImageElement) {
+    const { alt: altText, src } = domNode;
+    const width = domNode.width || undefined;
+    const height = domNode.height || undefined;
+    const node = $createImageNode({ altText, src, width, height });
+    return { node };
+  }
+  return null;
+}
+
 export class ImageNode extends DecoratorNode<JSX.Element> {
   __src: string;
   __altText: string;
@@ -46,6 +60,16 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       node.__height,
       node.__key,
     );
+  }
+
+  // importDOM method now required by lexical
+  static importDOM(): DOMConversionMap | null {
+    return {
+      img: (node: Node) => ({
+        conversion: $convertImageElement,
+        priority: 0,
+      }),
+    };
   }
 
   constructor(
