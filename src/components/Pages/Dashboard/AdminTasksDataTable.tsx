@@ -40,7 +40,7 @@ const returnHTMLTitle = (titleData) => {
   if (tag) {
     return tag.textContent;
   } else {
-    console.log(wrapper.innerHTML);
+    // console.log(wrapper.innerHTML);
     return wrapper.innerHTML;
   }
 };
@@ -148,56 +148,6 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
         return indexA - indexB;
       },
     },
-    // {
-    //   accessorKey: "kind",
-    //   header: ({ column }) => {
-    //     const isSorted = column.getIsSorted();
-    //     let sortIcon = <ArrowUpDown className="ml-2 h-4 w-4" />;
-
-    //     if (isSorted === "asc") {
-    //       sortIcon = <ArrowDown className="ml-2 h-4 w-4" />;
-    //     } else if (isSorted === "desc") {
-    //       sortIcon = <ArrowUp className="ml-2 h-4 w-4" />;
-    //     }
-
-    //     return (
-    //       <Button
-    //         // variant="ghost"
-    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    //         className="w-full text-center"
-    //         rightIcon={sortIcon}
-    //         // p={0}
-    //         // m={0}
-    //         bg={"transparent"}
-    //         _hover={
-    //           colorMode === "dark"
-    //             ? { bg: "blue.400", color: "white" }
-    //             : { bg: "blue.50", color: "black" }
-    //         }
-    //       >
-    //         Kind
-    //       </Button>
-    //     );
-    //   },
-    //   cell: ({ row }) => {
-    //     if (isDocTypeTask(row.original)) {
-    //       const originalKindData: docKinds = row.original.kind as docKinds;
-    //       //   console.log(originalKindData);
-    //       return (
-    //         <Box className="text-center align-middle font-medium">
-    //           {docKindsDict[originalKindData].title}
-    //         </Box>
-    //       );
-    //     }
-    //   },
-    //   sortingFn: (rowA, rowB) => {
-    //     const kindA: docKinds = rowA.getValue("kind");
-    //     const kindB: docKinds = rowB.getValue("kind");
-    //     const indexA = docKindsOrder.indexOf(kindA);
-    //     const indexB = docKindsOrder.indexOf(kindB);
-    //     return indexA - indexB;
-    //   },
-    // },
     {
       accessorKey: "requester",
       header: ({ column }) => {
@@ -278,7 +228,7 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
         );
       },
       cell: ({ row }) => {
-        console.log(row.original);
+        // console.log(row.original);
         let originalReasonData = row.original.reason;
         const formattedDate = formatDate(
           row.original.created_at,
@@ -332,20 +282,15 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
               {taskKindsDict[row.original.action].description}
             </Text>
             {row?.original?.action === "deleteproject" ? (
-              <Text
-                color={"red.400"}
-                fontWeight={"semibold"}
-                fontSize={"x-small"}
-                px={4}
-              >
-                <div className="inline-flex gap-1">
-                  <Text>Project:</Text>
+              <div className="px-4">
+                <span className="text-xs font-semibold text-red-400">
+                  Project:{" "}
                   <ExtractedHTMLTitle
                     htmlContent={row.original.project?.title}
-                  />
-                  <Text> ({row.original.project?.pk})</Text>
-                </div>
-              </Text>
+                  />{" "}
+                  ({row.original.project?.pk})
+                </span>
+              </div>
             ) : null}
 
             {/* Group text so it appears next to each other - on same line in same sentence */}
@@ -394,7 +339,7 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
       },
     },
   ];
-  //   console.log(combinedData);
+
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -403,18 +348,6 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
         ...task,
         // taskType: task.action as const,
       })) || []),
-      //   ...(pendingProjectDocumentData?.team?.map((teamTask) => ({
-      //     ...teamTask,
-      //     taskType: "team" as const,
-      //   })) || []),
-      //   ...(pendingProjectDocumentData?.ba?.map((baTask) => ({
-      //     ...baTask,
-      //     taskType: "ba" as const,
-      //   })) || []),
-      //   ...(pendingProjectDocumentData?.directorate?.map((directorateTask) => ({
-      //     ...directorateTask,
-      //     taskType: "directorate" as const,
-      //   })) || []),
     ]);
   }, [pendingAdminTaskData]);
 
@@ -431,10 +364,8 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    // onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
-      //   //   columnVisibility,
     },
   });
 
@@ -474,9 +405,7 @@ export const AdminTasksDataTable = ({ pendingAdminTaskData }: Props) => {
           ) : (
             <TableRow>
               <TableCell colSpan={columns?.length} className="h-24 text-center">
-                {/* <Text mt={4} mx={2}> */}
                 All done!
-                {/* </Text> */}
               </TableCell>
             </TableRow>
           )}
