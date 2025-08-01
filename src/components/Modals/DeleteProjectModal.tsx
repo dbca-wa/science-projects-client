@@ -97,7 +97,10 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
       <ModalOverlay />
       <Flex as={"form"} onSubmit={handleSubmit(deleteProject)}>
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Delete Project?</ModalHeader>
           <ModalCloseButton />
 

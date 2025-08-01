@@ -200,6 +200,7 @@ export const EditProfileModal = ({
     >
       <ModalOverlay />
       <ModalContent
+        color={colorMode === "dark" ? "gray.400" : null}
         bg={colorMode === "light" ? "white" : "gray.800"}
         as="form"
         onSubmit={handleSubmit(onSubmit)}

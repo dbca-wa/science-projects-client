@@ -145,7 +145,10 @@ export const ActionAdminRequestModal = ({
     <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
       <ModalOverlay />
       <Flex as={"form"} onSubmit={handleSubmit(handleTask)}>
-        <ModalContent bg={colorMode === "light" ? "white" : "gray.800"}>
+        <ModalContent
+          color={colorMode === "dark" ? "gray.400" : null}
+          bg={colorMode === "light" ? "white" : "gray.800"}
+        >
           <ModalHeader>Approve Request?</ModalHeader>
           <ModalCloseButton />
 
