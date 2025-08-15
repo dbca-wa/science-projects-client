@@ -135,31 +135,10 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Admin | No Progress Projects"}
+              title={"Custom Project Images"}
               kind="feature"
               description={
-                "Added functionality to view all projects with progress reports for this FY that have no progress since creation"
-              }
-            />
-            <PatchNoteEntry
-              title={"Admin | Inactive Staff Leader Projects"}
-              kind="feature"
-              description={
-                "Added functionality to view all active projects with an inactive staff lead"
-              }
-            />
-            <PatchNoteEntry
-              title={"Admin | Download BCS Staff Button"}
-              kind="feature"
-              description={
-                "Added functionality to download staff list belonging to BCS for emailing"
-              }
-            />
-            <PatchNoteEntry
-              title={"Admin | Generate Annual Report"}
-              kind="fix"
-              description={
-                "Fixed and optimised AR generation to include a specific non-BCS project in a BCS BA"
+                "Added functionality to crop, zoom, and preview images for projects"
               }
             />
             <PatchNoteEntry
