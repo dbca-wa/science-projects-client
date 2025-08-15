@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
 import { IUserData } from "../../../types";
-import { StatefulMediaChanger } from "../Admin/StatefulMediaChanger";
+import { StatefulMediaChangerProject } from "../Admin/StatefulMediaChangerProject";
 import TagInput from "./TagInput";
 
 interface IProjectBaseInformationProps {
@@ -52,15 +52,6 @@ export const ProjectBaseInformation = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>("");
 
-  // const handleFileInputChange = (
-  //   event: React.ChangeEvent<HTMLInputElement>
-  // ) => {
-  //   const files = event.target.files;
-  //   if (files && files.length > 0) {
-  //     setSelectedFile(files[0]);
-  //   }
-  // };
-
   const queryClient = useQueryClient();
   const meData = queryClient.getQueryData<IUserData>(["me"]);
 
@@ -92,12 +83,23 @@ export const ProjectBaseInformation = ({
     }
   }, [titleLengthError, projectTitle, MAX_TITLE_LENGTH, MIN_TITLE_LENGTH]);
 
+  // Helper function to extract plain text from HTML for project title
+  const getPlainTextFromHTML = (htmlString: string) => {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = htmlString;
+    const tag = wrapper.querySelector("p, span");
+    return tag ? tag.textContent || "" : "";
+  };
+
   useEffect(() => {
+    const plainTitle = getPlainTextFromHTML(projectTitle);
+
     if (
-      projectTitle !== "" &&
+      plainTitle !== "" &&
+      plainTitle.length > 0 &&
       projectSummary !== "" &&
       keywords.length !== 0 &&
-      // selectedFile !== null &&
+      // selectedFile !== null && // Image is optional for project creation
       meData !== undefined &&
       meData.pk !== 0 &&
       meData.pk !== undefined &&
@@ -120,27 +122,27 @@ export const ProjectBaseInformation = ({
 
   return (
     <>
-      <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridColumnGap={10}>
+      {/* ============================ HIDING PROJECT YEAR ============================ */}
+      <InputGroup>
+        <VisuallyHiddenInput
+          type="text"
+          placeholder="Year"
+          value={currentYear}
+        />
+      </InputGroup>
+
+      {/* ============================ HIDING PROJECT KIND ============================ */}
+      <InputGroup>
+        <VisuallyHiddenInput
+          type="text"
+          placeholder="Kind"
+          value={projectKind}
+        />
+      </InputGroup>
+
+      {/* ============================ FIRST ROW: PROJECT TITLE AND KEYWORDS ============================ */}
+      <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridColumnGap={6} mb={4}>
         <Box>
-          {/* ============================ HIDING PROJECT YEAR ============================ */}
-          <InputGroup>
-            <VisuallyHiddenInput
-              type="text"
-              placeholder="Year"
-              value={currentYear}
-            />
-          </InputGroup>
-
-          {/* ============================ HIDING PROJECT KIND ============================ */}
-          <InputGroup>
-            <VisuallyHiddenInput
-              type="text"
-              placeholder="Kind"
-              value={projectKind}
-            />
-          </InputGroup>
-
-          {/* ============================ PROJECT TITLE ============================ */}
           <UnboundStatefulEditor
             title="Project Title"
             // allowInsertButton
@@ -161,38 +163,42 @@ export const ProjectBaseInformation = ({
             // isPlain={true}
             shouldFocus={true}
           />
-
-          {/* ============================ TAGS ============================ */}
-          <TagInput setTagFunction={setKeywords} />
-
-          {/* ============================ PROJECT SUMMARY ============================ */}
-          <UnboundStatefulEditor
-            title="Project Summary"
-            // allowInsertButton
-            helperText={
-              "A concise project summary, or any additional useful information."
-            }
-            showToolbar={true}
-            showTitle={true}
-            isRequired={true}
-            value={projectSummary}
-            setValueFunction={setProjectSummary}
-            setValueAsPlainText={false}
-            shouldFocus={false}
-          />
         </Box>
 
-        {/* ============================ IMAGE ============================ */}
-        <Box mb={4}>
-          <StatefulMediaChanger
-            helperText={"Upload an image that represents the project."}
-            selectedImageUrl={selectedImageUrl}
-            setSelectedImageUrl={setSelectedImageUrl}
-            selectedFile={selectedFile}
-            setSelectedFile={setSelectedFile}
-          />
+        <Box>
+          <TagInput setTagFunction={setKeywords} />
         </Box>
       </Grid>
+
+      {/* ============================ SECOND ROW: PROJECT SUMMARY ============================ */}
+      <Box mb={6}>
+        <UnboundStatefulEditor
+          title="Project Summary"
+          // allowInsertButton
+          helperText={
+            "A concise project summary, or any additional useful information."
+          }
+          showToolbar={true}
+          showTitle={true}
+          isRequired={true}
+          value={projectSummary}
+          setValueFunction={setProjectSummary}
+          setValueAsPlainText={false}
+          shouldFocus={false}
+        />
+      </Box>
+
+      {/* ============================ THIRD ROW: IMAGE SECTION (SPANNING FULL WIDTH) ============================ */}
+      <Box mb={4}>
+        <StatefulMediaChangerProject
+          helperText={"Upload an image that represents the project."}
+          selectedImageUrl={selectedImageUrl}
+          setSelectedImageUrl={setSelectedImageUrl}
+          selectedFile={selectedFile}
+          setSelectedFile={setSelectedFile}
+          projectTitle={getPlainTextFromHTML(projectTitle)}
+        />
+      </Box>
 
       {/* ============================ SUBMISSION/CANCEL ============================ */}
       <Flex w={"100%"} justifyContent={"flex-end"} pb={4}>

@@ -57,6 +57,7 @@ import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateS
 import TagInput from "../Pages/CreateProject/TagInput";
 import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
+import { StatefulMediaChangerProject } from "../Pages/Admin/StatefulMediaChangerProject";
 
 interface Props {
   projectPk: string | number;
@@ -670,12 +671,21 @@ export const EditProjectModal = ({
                     helperText={"These can be changed at any time"}
                   />
 
-                  <StatefulMediaChanger
+                  {/* <StatefulMediaChanger
                     helperText={"Upload an image that represents the project."}
                     selectedImageUrl={selectedImageUrl}
                     setSelectedImageUrl={setSelectedImageUrl}
                     selectedFile={selectedFile}
                     setSelectedFile={setSelectedFile}
+                  /> */}
+
+                  <StatefulMediaChangerProject
+                    helperText={"Upload an image that represents the project."}
+                    selectedImageUrl={selectedImageUrl}
+                    setSelectedImageUrl={setSelectedImageUrl}
+                    selectedFile={selectedFile}
+                    setSelectedFile={setSelectedFile}
+                    projectTitle={projectTitle} // Optional: for better alt text
                   />
                 </Box>
               </Box>
