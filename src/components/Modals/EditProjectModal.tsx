@@ -394,11 +394,34 @@ export const EditProjectModal = ({
         });
       }
 
-      setTimeout(() => {
-        queryClient.invalidateQueries({
+      // setTimeout(() => {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["projects", projectPk],
+      //   });
+      //   refetchData();
+      //   onClose();
+      // }, 350);
+
+      // Enhanced cache invalidation for Safari
+      setTimeout(async () => {
+        // Invalidate all related queries
+        await queryClient.invalidateQueries({
           queryKey: ["projects", projectPk],
         });
-        refetchData();
+        await queryClient.invalidateQueries({
+          queryKey: ["project", projectPk],
+        });
+
+        // Force remove from cache and refetch
+        queryClient.removeQueries({
+          queryKey: ["project", projectPk],
+        });
+
+        // Refetch with a small delay to ensure cache is cleared
+        setTimeout(() => {
+          refetchData();
+        }, 100);
+
         onClose();
       }, 350);
     },
