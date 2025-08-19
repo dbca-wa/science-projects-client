@@ -148,7 +148,6 @@ export const ModernDashboard = ({ activeTab }: IDashProps) => {
             <Box mb={2}>
               <Quote />
             </Box>
-            <PatchNotes userData={userData} />
 
             <Box mt={1}>
               {pendingEndorsementsDataLoading === false &&

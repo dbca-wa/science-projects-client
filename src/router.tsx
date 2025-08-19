@@ -20,6 +20,7 @@ import { CreateProject } from "./routes/CreateProject";
 import { CreateUser } from "./routes/CreateUser";
 import { CurrentReport } from "./routes/CurrentReport";
 import { Dashboard } from "./routes/Dashboard";
+import PatchNotesPage from "./routes/PatchNotesPage";
 import { ErrorHandler } from "./routes/ErrorHandler";
 import { HowTo } from "./routes/HowTo";
 import { Login } from "./routes/Login";
@@ -72,6 +73,15 @@ const inAppRouteArray = [
         element: (
           <ContentWrapper>
             <MyBusinessArea />
+          </ContentWrapper>
+        ),
+      },
+
+      {
+        path: "patchnotes",
+        element: (
+          <ContentWrapper>
+            <PatchNotesPage />
           </ContentWrapper>
         ),
       },
