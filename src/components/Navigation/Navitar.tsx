@@ -33,6 +33,7 @@ import { INavitar } from "../../types";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { useMaintainer } from "@/lib/hooks/tanstack/useMaintainer";
+import { MdSpeakerNotes } from "react-icons/md";
 
 export const Navitar = ({
   isModern,
@@ -215,6 +216,19 @@ export const Navitar = ({
                 </MenuItem>
               </>
             )}
+
+            <MenuItem
+              onClick={() => {
+                navigate("/patchnotes");
+              }}
+              zIndex={isOpen ? 2 : 1}
+              color={colorMode === "dark" ? "gray.400" : null}
+            >
+              {<MdSpeakerNotes />}
+
+              <Text ml={2}>Patch Notes</Text>
+            </MenuItem>
+
             <MenuItem
               onClick={() => {
                 navigate("/guide");

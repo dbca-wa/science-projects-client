@@ -20,7 +20,6 @@ import theme from "@/theme";
 import { FaDatabase } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
-import { PatchNotes } from "./PatchNotes";
 import { CreateProjectPageModal } from "@/components/Modals/CreateProjectPageModal";
 
 export const TraditionalDashboard = () => {
@@ -46,7 +45,6 @@ export const TraditionalDashboard = () => {
   }, [handleResize]);
   return (
     <>
-      <PatchNotes userData={userData} />
       <CreateProjectPageModal isOpen={isOpen} onClose={onClose} />
       <Grid
         my={5}

@@ -135,10 +135,10 @@ export const PatchNotes = ({ userData }: IUserInterface) => {
           </Text>
           <List spacing={1} ml={2} userSelect={"none"}>
             <PatchNoteEntry
-              title={"Custom Project Images"}
-              kind="feature"
+              title={"Patch Notes Moved"}
+              kind="update"
               description={
-                "Added functionality to crop, zoom, and preview images for projects"
+                "To prevent clutter, patch notes have been moved to a separate page"
               }
             />
             <PatchNoteEntry
