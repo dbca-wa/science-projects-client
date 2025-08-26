@@ -24,7 +24,6 @@ import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
 import { IDashProps } from "../../../types";
 import { Admin } from "./Admin";
 import { MyProjectsSection } from "./MyProjectsSection";
-import { PatchNotes } from "./WelcomeBox";
 
 export const ModernDashboard = ({ activeTab }: IDashProps) => {
   const location = useLocation();
