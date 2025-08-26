@@ -219,18 +219,6 @@ export const Navitar = ({
 
             <MenuItem
               onClick={() => {
-                navigate("/patchnotes");
-              }}
-              zIndex={isOpen ? 2 : 1}
-              color={colorMode === "dark" ? "gray.400" : null}
-            >
-              {<MdSpeakerNotes />}
-
-              <Text ml={2}>Patch Notes</Text>
-            </MenuItem>
-
-            <MenuItem
-              onClick={() => {
                 navigate("/guide");
                 // window.open("https://sdis.readthedocs.io", "_blank");
               }}

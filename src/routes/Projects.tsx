@@ -22,12 +22,15 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { useEffect, useRef, useState } from "react";
-import { FaDownload, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCaretDown, FaDownload, FaMapMarkerAlt } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { Head } from "../components/Base/Head";
 import { PaginatorProject } from "../components/Pages/Projects/PaginatorProject";
 import { useProjectSearchContext } from "../lib/hooks/helper/ProjectSearchContext";
+import { useWindowWidth } from "@/lib/utils/useWindowWidth";
+import { DownloadProjectsCSVButton } from "@/components/Pages/Projects/DownloadProjectsCSVButton";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 
 export const Projects = () => {
   const { colorMode } = useColorMode();
@@ -81,62 +84,6 @@ export const Projects = () => {
 
   const navigate = useNavigate();
 
-  const toast = useToast();
-  const toastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    toastIdRef.current = toast(data);
-  };
-
-  const downloadProjectCSVMutation = useMutation({
-    mutationFn: downloadProjectsCSV,
-    onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Generating Projects CSV",
-        position: "top-right",
-      });
-    },
-    onSuccess: (response: { res: AxiosResponse<any, any> } | Blob) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Success",
-          description: `Projects CSV Downloaded`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-        const downloadUrl = window.URL.createObjectURL(response as Blob);
-        const link = document.createElement("a");
-        link.href = downloadUrl;
-        link.setAttribute("download", "projects.csv");
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(downloadUrl);
-      }
-    },
-    onError: (error: AxiosError) => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
-          title: "Could Not Generate Projects CSV",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    },
-  });
-
-  const runDownloadCSVMutation = () => {
-    downloadProjectCSVMutation.mutate();
-  };
   const { layout } = useLayoutSwitcher();
 
   const handleOnlySelectedBusinessAreaChange: React.ChangeEventHandler<
@@ -183,6 +130,11 @@ export const Projects = () => {
     fetchBusinessAreas();
   }, []);
 
+  const windowWidth = useWindowWidth(200); // 200ms debounce
+  const showMapButton = windowWidth > 900;
+
+  const { userData, userLoading } = useUser();
+
   return (
     <>
       {layout === "traditional" && (
@@ -215,18 +167,9 @@ export const Projects = () => {
           alignItems={"center"}
           gap={2}
         >
-          <Button
-            variant={"solid"}
-            color={"white"}
-            background={colorMode === "light" ? "green.500" : "green.600"}
-            _hover={{
-              background: colorMode === "light" ? "green.400" : "green.500",
-            }}
-            onClick={runDownloadCSVMutation}
-            leftIcon={<FaDownload />}
-          >
-            CSV
-          </Button>
+          {!userLoading && userData.is_superuser ? (
+            <DownloadProjectsCSVButton />
+          ) : null}
 
           <Button
             variant={"solid"}
@@ -241,18 +184,20 @@ export const Projects = () => {
             New Project
           </Button>
 
-          <Button
-            variant={"solid"}
-            color={"white"}
-            background={colorMode === "light" ? "blue.500" : "blue.600"}
-            _hover={{
-              background: colorMode === "light" ? "blue.400" : "blue.500",
-            }}
-            onClick={() => navigate("/projects/map")}
-            leftIcon={<FaMapMarkerAlt />}
-          >
-            Map
-          </Button>
+          {showMapButton ? (
+            <Button
+              variant={"solid"}
+              color={"white"}
+              background={colorMode === "light" ? "blue.500" : "blue.600"}
+              _hover={{
+                background: colorMode === "light" ? "blue.400" : "blue.500",
+              }}
+              onClick={() => navigate("/projects/map")}
+              leftIcon={<FaMapMarkerAlt />}
+            >
+              Map
+            </Button>
+          ) : null}
         </Flex>
       </Flex>
 
