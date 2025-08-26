@@ -61,7 +61,7 @@ export const WelcomeBox = ({ userData, showNotes }: IUserInterface) => {
 
   useEffect(() => {
     setWelcomeUser(
-      `Hello ${userData?.display_first_name ?? userData?.first_name} ${userData?.display_last_name ?? userData?.last_name}! Welcome to SPMS, DBCA's portal for science project documentation, approval and reporting.`,
+      `Hello ${userData?.display_first_name ?? userData?.first_name} ${userData?.display_last_name ?? userData?.last_name}! Welcome to SPMS, DBCA's portal for science project planning, approval and reporting.`,
     );
   }, []);
 
