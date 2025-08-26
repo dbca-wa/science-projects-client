@@ -4,11 +4,6 @@ import {
   Button,
   Center,
   Grid,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -16,11 +11,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useUser } from "../../../lib/hooks/tanstack/useUser";
 import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
 // import { IDashProps } from "../../../types";
+import { CreateProjectPageModal } from "@/components/Modals/CreateProjectPageModal";
 import theme from "@/theme";
 import { FaDatabase } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 import { TbWorldWww } from "react-icons/tb";
-import { CreateProjectPageModal } from "@/components/Modals/CreateProjectPageModal";
+import { WelcomeBox } from "./WelcomeBox";
 
 export const TraditionalDashboard = () => {
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -46,6 +42,8 @@ export const TraditionalDashboard = () => {
   return (
     <>
       <CreateProjectPageModal isOpen={isOpen} onClose={onClose} />
+      <WelcomeBox userData={userData} showNotes={false} />
+
       <Grid
         my={5}
         templateColumns={{
@@ -100,6 +98,7 @@ export const TraditionalDashboard = () => {
           Create Project
         </Button>
       </Grid>
+
       <TraditionalTasksAndProjects
       // onAddTaskOpen={onAddTaskOpen}
       />

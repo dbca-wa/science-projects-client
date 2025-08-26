@@ -52,6 +52,7 @@ import {
   MdManageHistory,
   MdOutlineAccessTimeFilled,
   MdOutlineSettingsSuggest,
+  MdSpeakerNotes,
   MdVerifiedUser,
 } from "react-icons/md";
 import {
@@ -246,6 +247,16 @@ const AdminMenuContents = ({
         color={"gray.500"}
         textAlign={"center"}
       >
+        <MenuItem
+          onClick={() => {
+            navigate("/patchnotes");
+          }}
+          color={colorMode === "dark" ? "gray.400" : null}
+        >
+          {<MdSpeakerNotes />}
+
+          <Text ml={2}>Patch Notes</Text>
+        </MenuItem>
         <MenuItem
           color={colorMode === "dark" ? "gray.400" : null}
           onClick={handleReviewData}

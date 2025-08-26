@@ -932,3 +932,11 @@ export const downloadProjectsCSV = () => {
     })
     .then((res) => res.data);
 };
+
+export const downloadProjectsCSVAR = () => {
+  return instance
+    .get(`projects/download-ar`, {
+      responseType: "blob",
+    })
+    .then((res) => res.data);
+};

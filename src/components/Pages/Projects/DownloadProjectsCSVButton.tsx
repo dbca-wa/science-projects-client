@@ -1,85 +1,189 @@
-// A button to download projects to a csv. TODO: Limit to admins.
-
-import { Button, ToastId, useColorMode, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  ToastId,
+  useColorMode,
+  useToast,
+} from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
-import { FaDownload } from "react-icons/fa";
-import { downloadProjectsCSV } from "../../../lib/api";
+import { useRef } from "react";
+import { FaCaretDown } from "react-icons/fa";
+import { downloadProjectsCSV, downloadProjectsCSVAR } from "../../../lib/api";
+import { AxiosError, AxiosResponse } from "axios";
 
 export const DownloadProjectsCSVButton = () => {
-  const { colorMode } = useColorMode();
-  const [
-    isDownloadProjectsButtonDisabled,
-    setIsDownloadProjectsButtonDisabled,
-  ] = useState(false);
-
   const toast = useToast();
-  const [onMutateToastId, setOnMutateToastId] = useState<ToastId>();
+  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const { colorMode } = useColorMode();
 
-  const downloadAllProjectsMutation = useMutation({
+  // Unified toast helper
+  const showToast = (
+    status: "loading" | "success" | "error",
+    title: string,
+    description?: string,
+    duration?: number | null,
+  ) => {
+    if (toastIdRef.current) {
+      toast.update(toastIdRef.current, {
+        status,
+        title,
+        description,
+        position: "top-right",
+        duration: duration === undefined ? 3000 : duration,
+        isClosable: status !== "loading",
+      });
+    } else {
+      toastIdRef.current = toast({
+        status,
+        title,
+        description,
+        position: "top-right",
+        duration: duration === undefined ? 3000 : duration,
+        isClosable: status !== "loading",
+      });
+    }
+  };
+
+  // Full CSV download mutation
+  const downloadFullCSVMutation = useMutation({
     mutationFn: downloadProjectsCSV,
     onMutate: () => {
-      setIsDownloadProjectsButtonDisabled(true);
-      const toastId = toast({
-        position: "top-right",
-        status: "loading",
-        title: "Downloading",
-        duration: null,
-        description: "Downloading Projects CSV...",
-      });
-      setOnMutateToastId(toastId);
+      showToast("loading", "Generating Full Projects CSV", undefined, null);
     },
-    onSuccess: () => {
-      toast({
-        position: "top-right",
-        status: "success",
-        title: "Complete!",
-        isClosable: true,
-        description: "All Projects CSV Download Complete.",
-      });
-      setTimeout(() => {
-        setIsDownloadProjectsButtonDisabled(false);
-      }, 5000);
+    onSuccess: (response: { res: AxiosResponse<any, any> } | Blob) => {
+      showToast("success", "Success", "Full Projects CSV Downloaded");
 
-      if (onMutateToastId) {
-        toast.close(onMutateToastId);
-      }
+      // Handle file download
+      const downloadUrl = window.URL.createObjectURL(response as Blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute("download", "projects-full.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
     },
-    onError: () => {
-      toast({
-        position: "top-right",
-        status: "error",
-        title: "Error!",
-        isClosable: true,
-        description: "Unable to download Projects CSV.",
-      });
+    onError: (error: AxiosError) => {
+      const errorMessage = error?.response?.data
+        ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
+        : "Unable to download Full Projects CSV";
+      showToast("error", "Download Failed", errorMessage);
+    },
+    onSettled: () => {
+      // Clean up toast reference after mutation completes
       setTimeout(() => {
-        setIsDownloadProjectsButtonDisabled(false);
-      }, 5000);
-      if (onMutateToastId) {
-        toast.close(onMutateToastId);
-      }
+        toastIdRef.current = undefined;
+      }, 100);
     },
   });
 
-  const downloadAllProjectsCSV = () => {
-    downloadAllProjectsMutation.mutate();
-    console.log("Downloading...");
+  // Annual report CSV download mutation
+  const downloadAnnualReportMutation = useMutation({
+    mutationFn: downloadProjectsCSVAR,
+    onMutate: () => {
+      showToast("loading", "Generating Annual Report CSV", undefined, null);
+    },
+    onSuccess: (response: { res: AxiosResponse<any, any> } | Blob) => {
+      showToast("success", "Success", "Annual Report CSV Downloaded");
+
+      // Handle file download
+      const downloadUrl = window.URL.createObjectURL(response as Blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute("download", "projects-annual-report.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    },
+    onError: (error: AxiosError) => {
+      const errorMessage = error?.response?.data
+        ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
+        : "Unable to download Annual Report CSV";
+      showToast("error", "Download Failed", errorMessage);
+    },
+    onSettled: () => {
+      // Clean up toast reference after mutation completes
+      setTimeout(() => {
+        toastIdRef.current = undefined;
+      }, 100);
+    },
+  });
+
+  // Check if any mutation is running
+  const isLoading =
+    downloadFullCSVMutation.isPending || downloadAnnualReportMutation.isPending;
+
+  const handleFullDownload = () => {
+    downloadFullCSVMutation.mutate();
   };
+
+  const handleAnnualReportDownload = () => {
+    downloadAnnualReportMutation.mutate();
+  };
+
   return (
-    <Button
-      leftIcon={<FaDownload />}
-      variant={"solid"}
-      bgColor={colorMode === "light" ? `green.500` : `green.600`}
-      color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-      _hover={{
-        bg: colorMode === "light" ? `green.600` : `green.400`,
-        color: colorMode === "light" ? `white` : `white`,
-      }}
-      onClick={downloadAllProjectsCSV}
-      isDisabled={isDownloadProjectsButtonDisabled}
-    >
-      Download Projects
-    </Button>
+    <Menu>
+      <MenuButton
+        as={Button}
+        variant="solid"
+        color="white"
+        background={colorMode === "light" ? "green.500" : "green.600"}
+        _hover={{
+          background: colorMode === "light" ? "green.400" : "green.500",
+        }}
+        _active={{
+          background: colorMode === "light" ? "green.600" : "green.700",
+        }}
+        rightIcon={<FaCaretDown />}
+        isLoading={isLoading}
+        disabled={isLoading}
+        loadingText="Downloading..."
+      >
+        CSV
+      </MenuButton>
+      <MenuList
+        bg={colorMode === "light" ? "white" : "gray.800"}
+        borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
+      >
+        <MenuItem
+          onClick={handleFullDownload}
+          isDisabled={isLoading}
+          _hover={
+            !isLoading
+              ? {
+                  bg: colorMode === "light" ? "gray.100" : "gray.700",
+                }
+              : {}
+          }
+          _disabled={{
+            opacity: 0.6,
+            cursor: "not-allowed",
+          }}
+        >
+          Full
+        </MenuItem>
+        <MenuItem
+          onClick={handleAnnualReportDownload}
+          isDisabled={isLoading}
+          _hover={
+            !isLoading
+              ? {
+                  bg: colorMode === "light" ? "gray.100" : "gray.700",
+                }
+              : {}
+          }
+          _disabled={{
+            opacity: 0.6,
+            cursor: "not-allowed",
+          }}
+        >
+          Annual Report
+        </MenuItem>
+      </MenuList>
+    </Menu>
   );
 };
