@@ -114,7 +114,7 @@ export const WelcomeBox = ({ userData, showNotes }: IUserInterface) => {
           </Text>
 
           <div className="mt-6 flex items-center justify-between">
-            <p className="text-blue-500">{VERSION}</p>
+            <p className="text-blue-500">Version {VERSION}</p>
             <Button
               variant={"solid"}
               color={"white"}
