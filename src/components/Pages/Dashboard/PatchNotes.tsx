@@ -17,17 +17,10 @@ const PatchNotes = () => {
         </Text>
         <List spacing={1} ml={2} userSelect={"none"}>
           <PatchNoteEntry
-            title={"CSV Download & Options"}
-            kind="update"
+            title={"Prince Issues Fixed"}
+            kind="fix"
             description={
-              "CSV Download now has two options - download all projects adn download this year's. Backend updated with extra column and title adjustments."
-            }
-          />
-          <PatchNoteEntry
-            title={"Patch Notes Moved"}
-            kind="update"
-            description={
-              "To prevent clutter, patch notes have been moved to a separate page"
+              "Prince does not yet support Debian 13. Base docker image downgraded to compatable version"
             }
           />
           <PatchNoteEntry
