@@ -18,9 +18,9 @@ ENV PATH="./node_modules/.bin:$PATH"
 COPY . .
 
 # Set default values for environment variables (This is set on github action for production test and main builds)
-ARG VITE_PRODUCTION_BASE_URL=https://127.0.0.1:3000/
-ARG VITE_PRODUCTION_BACKEND_API_URL=https://127.0.0.1:8000/v1/api/
-ARG VITE_PRODUCTION_PROFILES_BASE_URL=https://127.0.0.1:3000/staff/
+ARG VITE_PRODUCTION_BASE_URL=http://127.0.0.1:3000/
+ARG VITE_PRODUCTION_BACKEND_API_URL=http://127.0.0.1:8000/api/v1/
+ARG VITE_PRODUCTION_PROFILES_BASE_URL=http://127.0.0.1:3000/staff/
 ARG VITE_SPMS_VERSION=3.0.0
 
 # Set environment variables for runtime access
