@@ -97,7 +97,9 @@ export const NavMenu = ({
           <Flex>
             {leftIcon ? (
               <Box display={"flex"}>
-                <Center mr={menuName ? 1.5 : 0}><Icon as={leftIcon} /></Center>
+                <Center mr={menuName ? 1.5 : 0}>
+                  <Icon as={leftIcon} />
+                </Center>
 
                 <Center mr={menuName ? 1.5 : 0}>
                   <Text>{menuName}</Text>
