@@ -8,18 +8,23 @@ on:
 jobs:
   build_and_push_test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker
-        run: docker login --username idabblewith --password ${{ secrets.GH_PAT }} ghcr.io
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get the tag name
         id: tag
-        # run: echo "::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}"
         run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
 
       - name: Build and Push Test Image
         env:
@@ -35,21 +40,23 @@ jobs:
 
   build_and_push_production:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
-      # If necessary for latest tag
-      # - name: Delay Start
-      #   run: sleep 40
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker
-        run: docker login --username idabblewith --password ${{ secrets.GH_PAT }} ghcr.io
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get the tag name
         id: tag
-        # run: echo "::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}"
         run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
 
       - name: Build and Push Production Image
         env:
@@ -62,64 +69,3 @@ jobs:
           docker push ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }}
           docker tag ghcr.io/dbca-wa/science-projects-client:${{ steps.tag.outputs.TAG_NAME }} ghcr.io/dbca-wa/science-projects-client:latest
           docker push ghcr.io/dbca-wa/science-projects-client:latest
-
-  # cleanup:
-  #   name: Cleanup old tags (keep latest 16)
-  #   runs-on: ubuntu-latest
-  #   needs: [build_and_push_production, build_and_push_test]
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-
-  #     - name: Run tag cleanup script
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: |
-  #         echo "Fetching list of tags..."
-  #         page=1
-  #         tags=""
-  #         while :; do
-  #             result=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/${{ github.repository }}/tags?page=$page&per_page=100" | jq -r '.[] | .name + " " + (.commit.committer.date)')
-  #             [[ -z "$result" ]] && break
-  #             tags+="$result"$'\n'
-  #             ((page++))
-  #         done
-
-  #         # Prepare a list to hold all tags
-  #         tag_list=()
-  #         while IFS= read -r line; do
-  #             tag_list+=("$line")
-  #         done <<< "$tags"
-
-  #         # Sort tags by push date (latest first)
-  #         IFS=$'\n' sorted_tags=($(sort -r -t ' ' -k 2 <<< "${tag_list[*]}"))
-
-  #         # Keep the latest 16 tags
-  #         keep_tags=("${sorted_tags[@]:0:16}")
-  #         keep_tags_names=()
-  #         for tag in "${keep_tags[@]}"; do
-  #             tag_name=$(echo "$tag" | cut -d ' ' -f 1)
-  #             keep_tags_names+=("$tag_name")
-  #         done
-
-  #         echo "Keeping latest 16 tags: ${keep_tags_names[*]}"
-
-  #         # Loop through each tag and delete if not in keep list
-  #         for line in "${sorted_tags[@]}"; do
-  #             tag_name=$(echo "$line" | cut -d ' ' -f 1)
-
-  #             if ! [[ " ${keep_tags_names[*]} " =~ " $tag_name " ]]; then
-  #                 if [ "$DRY_RUN" == "true" ]; then
-  #                     echo "Dry run: would delete tag $tag_name"
-  #                 else
-  #                     echo "Deleting tag $tag_name..."
-  #                     # Uncomment below to actually delete the tags
-  #                     # curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-  #                     # https://api.github.com/repos/${{ github.repository }}/git/refs/tags/$tag_name
-  #                 fi
-  #             else
-  #                 echo "Keeping tag $tag_name"
-  #             fi
-  #         done
