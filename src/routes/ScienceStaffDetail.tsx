@@ -181,7 +181,7 @@ const ScienceStaffDetail = () => {
             )}
           </div>
           <div
-            className={`absolute right-0 top-3 flex-col overflow-hidden px-8 md:px-10 lg:px-11 ${!isDesktop && "flex-col"}`}
+            className={`absolute top-3 right-0 flex-col overflow-hidden px-8 md:px-10 lg:px-11 ${!isDesktop && "flex-col"}`}
           >
             <div className={`flex items-center justify-center gap-2`}>
               {(viewingUser?.pk === Number(staffBaseData?.user?.pk) ||

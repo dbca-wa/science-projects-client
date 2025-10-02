@@ -23,7 +23,7 @@ export const ScienceStaffLayout = ({ children }: { children: ReactNode }) => {
         display="flex"
         flexDirection="column"
         pos={"fixed"}
-        // bg={"red.300"}
+        bg={"white"}
       >
         <Box
           minH={"full"}
