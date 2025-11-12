@@ -1,4 +1,4 @@
-import { AddReportModal } from "@/components/Modals/AddReportModal";
+import { AddReportModal } from "@/shared/components/Modals/AddReportModal";
 import {
   Box,
   Button,
@@ -12,10 +12,10 @@ import {
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { getAllReports } from "@/lib/api";
-import { IReport } from "@/types";
-import { ReportItemDisplay } from "@/components/Pages/Admin/ReportItemDisplay";
-import { Head } from "@/components/Base/Head";
+import { getAllReports } from "@/shared/lib/api";
+import type { IReport } from "@/shared/types/index.d";
+import { ReportItemDisplay } from "@/shared/components/Pages/Admin/ReportItemDisplay";
+import { Head } from "@/shared/components/Base/Head";
 
 export const ReportsCRUD = () => {
   const {

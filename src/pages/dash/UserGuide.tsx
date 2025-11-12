@@ -1,13 +1,13 @@
-import { Head } from "@/components/Base/Head";
-import { GuideRichTextEditor } from "@/components/RichTextEditor/Editors/GuideRichTextEditor";
-import { AccountPageViewWrapper } from "@/components/Wrappers/AccountPageViewWrapper";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
+import { Head } from "@/shared/components/Base/Head";
+import { SideMenuButton } from "@/shared/components/Pages/Account/SideMenuButton";
+import { SideMenuSectionDivider } from "@/shared/components/Pages/UserGuide/SidebarSectionDivider";
+import { GuideRichTextEditor } from "@/shared/components/RichTextEditor/Editors/GuideRichTextEditor";
+import { AccountPageViewWrapper } from "@/shared/components/Wrappers/AccountPageViewWrapper";
+import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { useAdminOptions } from "@/shared/hooks/tanstack/useAdminOptions";
+import { useUser } from "@/shared/hooks/tanstack/useUser";
 import { Box, Flex, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { SideMenuButton } from "@/components/Pages/Account/SideMenuButton";
-import { useAdminOptions } from "@/lib/hooks/tanstack/useAdminOptions";
-import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
-import { SideMenuSectionDivider } from "@/components/Pages/UserGuide/SidebarSectionDivider";
 
 interface ISectionProps {
   isSuperUser: boolean;
@@ -33,7 +33,7 @@ const GuideAboutSection = ({
       <GuideRichTextEditor
         key={`guide_about${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={"guide_about"}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}
@@ -58,7 +58,7 @@ const GuideLoginSection = ({
       <GuideRichTextEditor
         key={`guide_login${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={"guide_login"}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}
@@ -83,7 +83,7 @@ const GuideUserProfileSection = ({
       <GuideRichTextEditor
         key={`guide_profile${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={"guide_profile"}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}
@@ -107,7 +107,7 @@ const GuideCreateProjectSection = ({
     <GuideRichTextEditor
       key={`${documentType}${editorKey}`} // Change the key to force a re-render
       canEdit={isSuperUser}
-      data={sectionData}
+      data={sectionData ?? ""}
       section={`${documentType}`}
       adminOptionsPk={adminOptionsPk}
       isUpdate={true}
@@ -131,7 +131,7 @@ const GuideViewProjectSection = ({
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={`${documentType}`}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}
@@ -181,7 +181,7 @@ const GuideCreateUsersSection = ({
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={`${documentType}`}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}
@@ -206,7 +206,7 @@ const GuideViewUsersSection = ({
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={`${documentType}`}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}
@@ -257,7 +257,7 @@ const GuideTeamsSection = ({
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={`${documentType}`}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}
@@ -282,7 +282,7 @@ const GuideDocumentsSection = ({
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={`${documentType}`}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}
@@ -307,7 +307,7 @@ const GuideAdminSection = ({
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={`${documentType}`}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}
@@ -332,7 +332,7 @@ const GuideAnnualReportSection = ({
       <GuideRichTextEditor
         key={`${documentType}${editorKey}`} // Change the key to force a re-render
         canEdit={isSuperUser}
-        data={sectionData}
+        data={sectionData ?? ""}
         section={`${documentType}`}
         adminOptionsPk={adminOptionsPk}
         isUpdate={true}

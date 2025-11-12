@@ -1,4 +1,12 @@
-import { AffiliationSearchDropdown } from "@/components/Navigation/AffiliationSearchDropdown";
+import { Head } from "@/shared/components/Base/Head";
+import { AffiliationSearchDropdown } from "@/shared/components/Navigation/AffiliationSearchDropdown";
+import { AffiliationItemDisplay } from "@/shared/components/Pages/Admin/AffiliationItemDisplay";
+import {
+  createAffiliation,
+  getAllAffiliations,
+  mergeAffiliations,
+} from "@/shared/lib/api";
+import type { IAffiliation, IMergeAffiliation } from "@/shared/types/index.d";
 import {
   Box,
   Button,
@@ -23,8 +31,8 @@ import {
   ModalOverlay,
   Spinner,
   Text,
-  ToastId,
-  UseToastOptions,
+  type ToastId,
+  type UseToastOptions,
   VStack,
   useColorMode,
   useDisclosure,
@@ -33,14 +41,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  createAffiliation,
-  getAllAffiliations,
-  mergeAffiliations,
-} from "@/lib/api";
-import { IAffiliation, IMergeAffiliation } from "@/types";
-import { AffiliationItemDisplay } from "@/components/Pages/Admin/AffiliationItemDisplay";
-import { Head } from "@/components/Base/Head";
 
 export const AffiliationsCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IAffiliation>();
@@ -85,12 +85,12 @@ export const AffiliationsCRUD = () => {
   } = useDisclosure();
 
   const queryClient = useQueryClient();
-  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const ToastIdRef = useRef<ToastId | undefined>(undefined);
   const mergeToast = (data) => {
-    toastIdRef.current = toast(data);
+    ToastIdRef.current = toast(data);
   };
   const addToast = (data: UseToastOptions) => {
-    toastIdRef.current = toast(data);
+    ToastIdRef.current = toast(data);
   };
   const creationMutation = useMutation({
     mutationFn: createAffiliation,
@@ -102,8 +102,8 @@ export const AffiliationsCRUD = () => {
       });
     },
     onSuccess: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
+      if (ToastIdRef.current) {
+        toast.update(ToastIdRef.current, {
           title: "Success",
           description: `Created`,
           status: "success",
@@ -116,8 +116,8 @@ export const AffiliationsCRUD = () => {
       queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     },
     onError: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
+      if (ToastIdRef.current) {
+        toast.update(ToastIdRef.current, {
           title: "Failed",
           description: `Something went wrong!`,
           status: "error",
@@ -139,8 +139,8 @@ export const AffiliationsCRUD = () => {
       });
     },
     onSuccess: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
+      if (ToastIdRef.current) {
+        toast.update(ToastIdRef.current, {
           title: "Merged!",
           description: `The affiliations are now one!`,
           status: "success",
@@ -155,8 +155,8 @@ export const AffiliationsCRUD = () => {
       queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     },
     onError: () => {
-      if (toastIdRef.current) {
-        toast.update(toastIdRef.current, {
+      if (ToastIdRef.current) {
+        toast.update(ToastIdRef.current, {
           title: "Failed",
           description: `Something went wrong!`,
           status: "error",

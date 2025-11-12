@@ -1,7 +1,15 @@
 // Route for handling information regarding the report for the year.
 
-// import { AnnualReportPrintPreview } from "@/components/Pages/CurrentReport/AnnualReportPrintPreview";
-import { LatestReportsNotYetApproved } from "@/components/Pages/CurrentReport/LatestReportsNotYetApproved";
+// import { AnnualReportPrintPreview } from "@/shared/components/Pages/CurrentReport/AnnualReportPrintPreview";
+import { Head } from "@/shared/components/Base/Head";
+import { PDFViewer } from "@/shared/components/HTMLPDFs/PDFViewer";
+import { AnnualReportDetails } from "@/shared/components/Pages/CurrentReport/AnnualReportDetails";
+import { AnnualReportMedia } from "@/shared/components/Pages/CurrentReport/AnnualReportMedia";
+import { LatestReportsNotYetApproved } from "@/shared/components/Pages/CurrentReport/LatestReportsNotYetApproved";
+import { ParticipatingProjectReports } from "@/shared/components/Pages/CurrentReport/ParticipatingProjectReports";
+import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { getLatestReportingYear } from "@/shared/lib/api";
+import type { IReport } from "@/shared/types/index.d";
 import {
   Box,
   Center,
@@ -16,15 +24,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { Head } from "@/components/Base/Head";
-import { AnnualReportDetails } from "@/components/Pages/CurrentReport/AnnualReportDetails";
-import { AnnualReportMedia } from "@/components/Pages/CurrentReport/AnnualReportMedia";
-import { ParticipatingProjectReports } from "@/components/Pages/CurrentReport/ParticipatingProjectReports";
-import { getLatestReportingYear } from "@/lib/api";
-import { IReport } from "@/types";
-import { PDFViewer } from "@/components/HTMLPDFs/PDFViewer";
-import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
-// import { CeleryTest } from "@/components/HTMLPDFs/CeleryTest";
+// import { CeleryTest } from "@/shared/components/HTMLPDFs/CeleryTest";
 
 export const CurrentReport = () => {
   const [latestYear, setLatestYear] = useState<number | null>(null);

@@ -18,12 +18,12 @@ export const CurrentPageContext = createContext<{
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router-dom";
-import { LayoutSwitcherProvider } from "./lib/hooks/helper/LayoutSwitcherContext";
-import { ProjectSearchProvider } from "./lib/hooks/helper/ProjectSearchContext";
-import { UserSearchProvider } from "./lib/hooks/helper/UserSearchContext";
-import { router } from "./router";
-import theme from "./theme";
-import { ProjectMapSearchProvider } from "./lib/hooks/helper/ProjectMapSearchContext";
+import { LayoutSwitcherProvider } from "@/shared/hooks/helper/LayoutSwitcherContext";
+import { ProjectSearchProvider } from "@/shared/hooks/helper/ProjectSearchContext";
+import { UserSearchProvider } from "@/shared/hooks/helper/UserSearchContext";
+import { router } from "@/router";
+import theme from "@/theme";
+import { ProjectMapSearchProvider } from "@/shared/hooks/helper/ProjectMapSearchContext";
 // import { RouterProvider, createRouter } from "react-router-dom";
 // import { routeTree } from "./routeTree.gen";
 
@@ -54,10 +54,10 @@ root.render(
             <ProjectMapSearchProvider>
               <RouterProvider
                 router={router}
-                future={{
-                  v7_startTransition: true,
-                  v7_fetcherPersist: true,
-                }}
+                // future={{
+                //   v7_startTransition: true,
+                //   v7_fetcherPersist: true,
+                // }}
               />
             </ProjectMapSearchProvider>
           </ProjectSearchProvider>

@@ -2,14 +2,14 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 
 // Layouts, Guards & Boundaries =====================================================
 
-import { Root } from "@/components/Base/Root";
-import ErrorBoundary from "@/components/Base/ErrorBoundary";
-import { ErrorHandler } from "@/components/Base/ErrorHandler";
-import { ScienceStaffLayout } from "@/components/StaffProfiles/ScienceStaffLayout";
-import { LayoutCheckWrapper } from "@/components/Wrappers/LayoutCheckWrapper";
-import { AdminOnlyPage } from "@/components/Wrappers/AdminOnlyPage";
-import { ContentWrapper } from "@/components/Wrappers/ContentWrapper";
-import { ProtectedPage } from "@/components/Wrappers/ProtectedPage";
+import { Root } from "@/shared/components/Base/Root";
+import ErrorBoundary from "@/shared/components/Base/ErrorBoundary";
+import { ErrorHandler } from "@/shared/components/Base/ErrorHandler";
+import { ScienceStaffLayout } from "@/shared/components/StaffProfiles/ScienceStaffLayout";
+import { LayoutCheckWrapper } from "@/shared/components/Wrappers/LayoutCheckWrapper";
+import { AdminOnlyPage } from "@/shared/components/Wrappers/AdminOnlyPage";
+import { ContentWrapper } from "@/shared/components/Wrappers/ContentWrapper";
+import { ProtectedPage } from "@/shared/components/Wrappers/ProtectedPage";
 
 // Pages ===========================================================================
 
@@ -37,7 +37,7 @@ import { Dashboard } from "@/pages/dash/Dashboard";
 import { UserGuide } from "@/pages/dash/UserGuide";
 
 // Errors
-import ErrorPage from "@/components/Base/ErrorPage";
+import ErrorPage from "@/shared/components/Base/ErrorPage";
 
 // Projects
 import { CreateProject } from "@/pages/projects/CreateProject";

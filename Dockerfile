@@ -8,7 +8,6 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies, including devDependencies needed for the build process (no --omit=dev)
-# RUN npm install
 RUN bun install
 
 # This sets an environment variable named "PATH" to include the "./node_modules/.bin" directory. This ensures that locally installed Node.js modules can be executed directly from the command line without specifying their full path.
@@ -29,13 +28,11 @@ ENV VITE_PRODUCTION_BACKEND_API_URL=$VITE_PRODUCTION_BACKEND_API_URL
 ENV VITE_PRODUCTION_PROFILES_BASE_URL=$VITE_PRODUCTION_PROFILES_BASE_URL
 ENV VITE_SPMS_VERSION=$VITE_SPMS_VERSION
 
-# This command runs the "npm build" script inside the container (it will use above env variables).
-# RUN npm run build 
+# This command runs the build script inside the container (it will use above env variables).
 RUN bun run build 
 
 # ======================== PRODUCTION IMAGE ========================
-# Uses baked / buiilt app and server w/o large dependencies
-# FROM node:22-alpine3.19 as PRODUCTION_IMAGE
+# Uses baked / built app and server w/o large dependencies
 FROM oven/bun:1.2.14-slim AS production_image
 
 

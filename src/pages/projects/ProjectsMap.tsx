@@ -1,18 +1,18 @@
-import { Head } from "@/components/Base/Head";
-// import MapHeatmapToggle from "@/components/Map/HeatMapToggle";
-import MapBackAndSearch from "@/components/Map/MapBackAndSearch";
-import MapBusinessAreasSidebar from "@/components/Map/MapBusinessAreasSidebar";
-// import MapHeatLayer from "@/components/Map/MapHeatLayer"; // Import new component
-import MapLocationsSidebar from "@/components/Map/MapLocationsSidebar";
-import MapTopRightControls from "@/components/Map/MapTopRightControls";
-import { useProjectMapSearchContext } from "@/lib/hooks/helper/ProjectMapSearchContext";
-import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
-import { useGetLocations } from "@/lib/hooks/tanstack/useGetLocations";
-import { useGetLocationsGeojson } from "@/lib/hooks/tanstack/useGetLocationsGeojson";
-import { IBusinessArea } from "@/types";
+import { Head } from "@/shared/components/Base/Head";
+// import MapHeatmapToggle from "@/shared/components/Map/HeatMapToggle";
+import MapBackAndSearch from "@/shared/components/Map/MapBackAndSearch";
+import MapBusinessAreasSidebar from "@/shared/components/Map/MapBusinessAreasSidebar";
+// import MapHeatLayer from "@/shared/components/Map/MapHeatLayer"; // Import new component
+import MapLocationsSidebar from "@/shared/components/Map/MapLocationsSidebar";
+import MapTopRightControls from "@/shared/components/Map/MapTopRightControls";
+import { useProjectMapSearchContext } from "@/shared/hooks/helper/ProjectMapSearchContext";
+import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
+import { useGetLocations } from "@/shared/hooks/tanstack/useGetLocations";
+import { useGetLocationsGeojson } from "@/shared/hooks/tanstack/useGetLocationsGeojson";
+import type { IBusinessArea } from "@/shared/types/index.d";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ProjectsMap = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -115,12 +115,12 @@ const ProjectsMap = () => {
       {/* ====== MAP ====== */}
       <div
         ref={mapContainerRef}
-        className="absolute bottom-0 left-96 right-0 top-0 z-40"
+        className="absolute top-0 right-0 bottom-0 left-96 z-40"
       />
 
       {/* Global loading overlay */}
       {isMapLoading && (
-        <div className="absolute bottom-0 left-96 right-0 top-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-xs">
+        <div className="absolute top-0 right-0 bottom-0 left-96 z-50 flex items-center justify-center bg-white/30 backdrop-blur-xs">
           <div className="flex flex-col items-center rounded-lg bg-white/90 p-4 shadow-lg">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
             <p className="mt-3 text-sm font-medium text-gray-700">
@@ -140,7 +140,7 @@ const ProjectsMap = () => {
       /> */}
 
       {/* ====== SIDEBAR ====== */}
-      <div className="absolute left-0 top-0 z-50 h-full w-96 overflow-y-auto bg-white shadow-lg">
+      <div className="absolute top-0 left-0 z-50 h-full w-96 overflow-y-auto bg-white shadow-lg">
         {/* BACK & SEARCH */}
         <MapBackAndSearch
           filteredItems={filteredItems}

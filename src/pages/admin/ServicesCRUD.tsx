@@ -1,40 +1,39 @@
-import {
-  Text,
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  Flex,
-  FormControl,
-  Input,
-  InputGroup,
-  VStack,
-  useDisclosure,
-  Center,
-  Spinner,
-  Grid,
-  DrawerOverlay,
-  DrawerCloseButton,
-  DrawerHeader,
-  FormLabel,
-  useToast,
-  useColorMode,
-} from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Head } from "@/shared/components/Base/Head";
+import { UserSearchDropdown } from "@/shared/components/Navigation/UserSearchDropdown";
+import { ServiceItemDisplay } from "@/shared/components/Pages/Admin/ServiceItemDisplay";
 import {
   createDepartmentalService,
   getAllDepartmentalServices,
-} from "@/lib/api";
-import { useQueryClient } from "@tanstack/react-query";
-import { IDepartmentalService } from "@/types";
-import { ServiceItemDisplay } from "@/components/Pages/Admin/ServiceItemDisplay";
+} from "@/shared/lib/api";
+import type { IDepartmentalService } from "@/shared/types/index.d";
+import {
+  Box,
+  Button,
+  Center,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  Flex,
+  FormControl,
+  FormLabel,
+  Grid,
+  Input,
+  InputGroup,
+  Spinner,
+  Text,
+  VStack,
+  useColorMode,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { UserSearchDropdown } from "@/components/Navigation/UserSearchDropdown";
-import { Head } from "@/components/Base/Head";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
 export const ServicesCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IDepartmentalService>();

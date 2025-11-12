@@ -1,8 +1,9 @@
-import { Head } from "@/components/Base/Head";
-import DivisionalEmailLists from "@/components/Emails/DivisionalEmailLists";
-import EmailStylingPage from "@/components/Modals/Emails/EmailStylingPage";
-import { useMaintainer } from "@/lib/hooks/tanstack/useMaintainer";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
+import { Head } from "@/shared/components/Base/Head";
+import DivisionalEmailLists from "@/shared/components/Emails/DivisionalEmailLists";
+import EmailStylingPage from "@/shared/components/Modals/Emails/EmailStylingPage";
+import { useMaintainer } from "@/shared/hooks/tanstack/useMaintainer";
+import { useUser } from "@/shared/hooks/tanstack/useUser";
+
 import {
   Center,
   Spinner,

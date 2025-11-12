@@ -1,12 +1,12 @@
 // Route for handling Updating and Reviewing Account
 
+import { Head } from "@/shared/components/Base/Head";
+import CaretakerModePage from "@/shared/components/Pages/Account/Caretaking/CaretakerMode";
+import { ProfilePage } from "@/shared/components/Pages/Account/ProfilePage";
+import { SideMenuButton } from "@/shared/components/Pages/Account/SideMenuButton";
+import { AccountPageViewWrapper } from "@/shared/components/Wrappers/AccountPageViewWrapper";
 import { Box, Flex, useColorMode } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
-import { Head } from "@/components/Base/Head";
-import { SideMenuButton } from "@/components/Pages/Account/SideMenuButton";
-import { ProfilePage } from "@/components/Pages/Account/ProfilePage";
-import { AccountPageViewWrapper } from "@/components/Wrappers/AccountPageViewWrapper";
-import CaretakerModePage from "@/components/Pages/Account/Caretaking/CaretakerMode";
+import { useEffect, useState } from "react";
 
 export const AccountEdit = () => {
   const { colorMode } = useColorMode();

@@ -1,3 +1,8 @@
+import { Head } from "@/shared/components/Base/Head";
+import { UserSearchDropdown } from "@/shared/components/Navigation/UserSearchDropdown";
+import { BranchItemDisplay } from "@/shared/components/Pages/Admin/BranchItemDisplay";
+import { createBranch, getAllBranches } from "@/shared/lib/api";
+import type { IBranch } from "@/shared/types/index.d";
 import {
   Box,
   Button,
@@ -24,11 +29,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createBranch, getAllBranches } from "@/lib/api";
-import { IBranch } from "@/types";
-import { UserSearchDropdown } from "@/components/Navigation/UserSearchDropdown";
-import { BranchItemDisplay } from "@/components/Pages/Admin/BranchItemDisplay";
-import { Head } from "@/components/Base/Head";
 
 export const BranchesCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IBranch>();

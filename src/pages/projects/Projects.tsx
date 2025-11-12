@@ -1,10 +1,16 @@
 // Route for displaying paginated projects
 
-import { BreadCrumb } from "@/components/Base/BreadCrumb";
-import { SearchProjects } from "@/components/Navigation/SearchProjects";
-import { downloadProjectsCSV, getAllBusinessAreas } from "@/lib/api";
-import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
-import { IBusinessArea, IDivision } from "@/types";
+import { BreadCrumb } from "@/shared/components/Base/BreadCrumb";
+import { Head } from "@/shared/components/Base/Head";
+import { SearchProjects } from "@/shared/components/Navigation/SearchProjects";
+import { DownloadProjectsCSVButton } from "@/shared/components/Pages/Projects/DownloadProjectsCSVButton";
+import { PaginatorProject } from "@/shared/components/Pages/Projects/PaginatorProject";
+import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
+import { useProjectSearchContext } from "@/shared/hooks/helper/ProjectSearchContext";
+import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { getAllBusinessAreas } from "@/shared/lib/api";
+import type { IBusinessArea, IDivision } from "@/shared/types/index.d";
+import { useWindowWidth } from "@/shared/utils/useWindowWidth";
 import {
   Box,
   Button,
@@ -14,23 +20,12 @@ import {
   Select,
   Spinner,
   Text,
-  ToastId,
-  useColorMode,
-  useToast,
-  UseToastOptions,
+  useColorMode
 } from "@chakra-ui/react";
-import { useMutation } from "@tanstack/react-query";
-import { AxiosError, AxiosResponse } from "axios";
-import { useEffect, useRef, useState } from "react";
-import { FaCaretDown, FaDownload, FaMapMarkerAlt } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import { Head } from "@/components/Base/Head";
-import { PaginatorProject } from "@/components/Pages/Projects/PaginatorProject";
-import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
-import { useWindowWidth } from "@/lib/utils/useWindowWidth";
-import { DownloadProjectsCSVButton } from "@/components/Pages/Projects/DownloadProjectsCSVButton";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
 
 export const Projects = () => {
   const { colorMode } = useColorMode();

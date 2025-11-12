@@ -1,5 +1,22 @@
 // Route for displaying the Project Details of a given project.
 
+import { Head } from "@/shared/components/Base/Head";
+import { ConceptPlanContents } from "@/shared/components/Pages/ProjectDetail/ConceptPlanContents";
+import { ManageTeam } from "@/shared/components/Pages/ProjectDetail/ManageTeam";
+import { ProgressReportContents } from "@/shared/components/Pages/ProjectDetail/ProgressReportContents";
+import { ProjectClosureContents } from "@/shared/components/Pages/ProjectDetail/ProjectClosureContents";
+import { ProjectOverviewCard } from "@/shared/components/Pages/ProjectDetail/ProjectOverviewCard";
+import { ProjectPlanContents } from "@/shared/components/Pages/ProjectDetail/ProjectPlanContents";
+import { StudentReportContents } from "@/shared/components/Pages/ProjectDetail/StudentReportContents";
+import { useProject } from "@/shared/hooks/tanstack/useProject";
+import { useUser } from "@/shared/hooks/tanstack/useUser";
+import type {
+  IExtendedProjectDetails,
+  IProjectAreas,
+  IProjectData,
+  IProjectDocuments,
+  IProjectMember,
+} from "@/shared/types/index.d";
 import {
   Box,
   Button,
@@ -17,29 +34,12 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Head } from "@/components/Base/Head";
-import { ConceptPlanContents } from "@/components/Pages/ProjectDetail/ConceptPlanContents";
-import { ManageTeam } from "@/components/Pages/ProjectDetail/ManageTeam";
-import { ProgressReportContents } from "@/components/Pages/ProjectDetail/ProgressReportContents";
-import { ProjectClosureContents } from "@/components/Pages/ProjectDetail/ProjectClosureContents";
-import { ProjectOverviewCard } from "@/components/Pages/ProjectDetail/ProjectOverviewCard";
-import { ProjectPlanContents } from "@/components/Pages/ProjectDetail/ProjectPlanContents";
-import { StudentReportContents } from "@/components/Pages/ProjectDetail/StudentReportContents";
-import { useProject } from "@/lib/hooks/tanstack/useProject";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
-import {
-  IExtendedProjectDetails,
-  IProjectAreas,
-  IProjectData,
-  IProjectDocuments,
-  IProjectMember,
-} from "@/types";
-// import { ProgressReportSelector } from "@/components/Pages/ProjectDetail/ProgressReportSelector";
-import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
-import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
+// import { ProgressReportSelector } from "@/shared/components/Pages/ProjectDetail/ProgressReportSelector";
+import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import useCaretakerPermissions from "@/shared/hooks/helper/useCaretakerPermissions";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Mail } from "lucide-react";
-import useCaretakerPermissions from "@/lib/hooks/helper/useCaretakerPermissions";
 
 export const ProjectDetail = ({
   selectedTab,

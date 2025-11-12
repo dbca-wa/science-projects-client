@@ -1,23 +1,22 @@
 // Route for handling Project Creation
 
+import { TypewriterText } from "@/shared/components/Animations/TypewriterText";
+import { Head } from "@/shared/components/Base/Head";
+import { NewProjectCard } from "@/shared/components/Pages/CreateProject/NewProjectCard";
+import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
 import {
   Box,
-  Text,
   Button,
   Grid,
   GridItem,
-  useColorMode,
-  Flex,
+  Text,
+  useColorMode
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { NewProjectCard } from "@/components/Pages/CreateProject/NewProjectCard";
-import { Head } from "@/components/Base/Head";
-import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
-import { TypewriterText } from "@/components/Animations/TypewriterText";
-import { MdScience } from "react-icons/md";
-import { GiMaterialsScience } from "react-icons/gi";
-import { RiBook3Fill } from "react-icons/ri";
 import { FaUserFriends } from "react-icons/fa";
+import { GiMaterialsScience } from "react-icons/gi";
+import { MdScience } from "react-icons/md";
+import { RiBook3Fill } from "react-icons/ri";
 
 export const CreateProject = () => {
   // #1E5456 Dark Green

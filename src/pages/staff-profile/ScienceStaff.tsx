@@ -1,14 +1,14 @@
-import ScienceStaffSearchBar from "@/components/StaffProfiles/Staff/All/ScienceStaffSearchBar";
-import ScienceStaffSearchResult from "@/components/StaffProfiles/Staff/All/ScienceStaffSearchResult";
-import StaffResultSkeleton from "@/components/StaffProfiles/StaffResultSkeleton";
-import { useScienceStaffProfileList } from "@/lib/hooks/tanstack/useScienceStaffProfileList";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
-import { useMediaQuery } from "@/lib/utils/useMediaQuery";
-import { Grid, Button as ChakraButton } from "@chakra-ui/react";
-import { useSearchParams } from "react-router-dom";
-import { Head } from "@/components/Base/Head";
-import { Button } from "@/components/ui/button";
+import { Head } from "@/shared/components/Base/Head";
+import ScienceStaffSearchBar from "@/shared/components/StaffProfiles/Staff/All/ScienceStaffSearchBar";
+import ScienceStaffSearchResult from "@/shared/components/StaffProfiles/Staff/All/ScienceStaffSearchResult";
+import StaffResultSkeleton from "@/shared/components/StaffProfiles/StaffResultSkeleton";
+import { Button } from "@/shared/components/ui/button";
+import { useScienceStaffProfileList } from "@/shared/hooks/tanstack/useScienceStaffProfileList";
+import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useMediaQuery } from "@/shared/utils/useMediaQuery";
+import { Button as ChakraButton, Grid } from "@chakra-ui/react";
 import clsx from "clsx";
+import { useSearchParams } from "react-router-dom";
 
 export const ScienceStaff = () => {
   const [searchParams, setSearchParams] = useSearchParams();

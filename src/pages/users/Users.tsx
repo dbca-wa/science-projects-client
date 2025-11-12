@@ -1,28 +1,28 @@
 // Route for displaying users.
 
-import { BreadCrumb } from "@/components/Base/BreadCrumb";
-import { IUserData } from "@/types";
-import { Head } from "@/components/Base/Head";
-import { useUserSearchContext } from "@/lib/hooks/helper/UserSearchContext";
+import { BreadCrumb } from "@/shared/components/Base/BreadCrumb";
+import { Head } from "@/shared/components/Base/Head";
+import { CreateUserModal } from "@/shared/components/Modals/CreateUserModal";
+import { SearchUsers } from "@/shared/components/Navigation/SearchUsers";
+import { PaginatorUser } from "@/shared/components/Pages/Users/PaginatorUser";
+import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
+import { useUserSearchContext } from "@/shared/hooks/helper/UserSearchContext";
+import { type IUserData } from "@/shared/types/index.d";
 import {
   Box,
   Button,
   Center,
   Checkbox,
   Flex,
-  Text,
   Grid,
   Spinner,
   Stack,
+  Text,
+  useBreakpointValue,
   useColorMode,
   useDisclosure,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { CreateUserModal } from "@/components/Modals/CreateUserModal";
-import { PaginatorUser } from "@/components/Pages/Users/PaginatorUser";
-import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
-import { SearchUsers } from "@/components/Navigation/SearchUsers";
 
 export const Users = () => {
   const {
