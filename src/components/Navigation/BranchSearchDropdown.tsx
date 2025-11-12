@@ -20,9 +20,9 @@ import {
   useRef,
   useState,
 } from "react";
-import { getBranchesBasedOnSearchTerm } from "../../lib/api";
-import { useBranch } from "../../lib/hooks/tanstack/useBranch";
-import { IBranch } from "../../types";
+import { getBranchesBasedOnSearchTerm } from "@/lib/api";
+import { useBranch } from "@/lib/hooks/tanstack/useBranch";
+import { IBranch } from "@/types";
 
 interface IBranchSearchDropdown {
   isRequired: boolean;

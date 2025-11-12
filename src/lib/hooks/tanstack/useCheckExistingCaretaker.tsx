@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { checkCaretakerStatus } from "../../api";
-import { ICheckCaretakerStatus } from "../../../types";
+import { ICheckCaretakerStatus } from "@/types";
 
 export const useCheckExistingCaretaker = () => {
   const { isPending, data, refetch } = useQuery({

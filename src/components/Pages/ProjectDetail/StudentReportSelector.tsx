@@ -1,5 +1,5 @@
 import { Select } from "@chakra-ui/react";
-import { IStudentReport } from "../../../types";
+import { IStudentReport } from "@/types";
 
 // Similar component for Student Reports Tab
 interface StudentReportsTabProps {
@@ -12,7 +12,7 @@ export const StudentReportsSelector: React.FC<StudentReportsTabProps> = ({
   onYearSelect,
 }) => {
   const years = Array.from(
-    new Set(documents.map((report) => report.year))
+    new Set(documents.map((report) => report.year)),
   ).sort((a, b) => b - a);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

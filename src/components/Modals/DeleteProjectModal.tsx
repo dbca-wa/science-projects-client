@@ -21,7 +21,7 @@ import {
   Button,
   UseToastOptions,
 } from "@chakra-ui/react";
-import { deleteProjectCall } from "../../lib/api";
+import { deleteProjectCall } from "@/lib/api";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";

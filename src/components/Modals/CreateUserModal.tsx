@@ -1,6 +1,6 @@
 // Modal version of CreateUser component
 
-import { CreateUser } from "@/routes/CreateUser";
+import { CreateUser } from "@/pages/users/CreateUser";
 import {
   Modal,
   ModalOverlay,

@@ -11,10 +11,10 @@ import {
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import "react-calendar/dist/Calendar.css";
-import { useBusinessAreas } from "../../../lib/hooks/tanstack/useBusinessAreas";
-import { useDepartmentalServices } from "../../../lib/hooks/tanstack/useDepartmentalServices";
+import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
+import { useDepartmentalServices } from "@/lib/hooks/tanstack/useDepartmentalServices";
 import "../../../styles/modalscrollbar.css";
-import { IBusinessArea, IDepartmentalService, IDivision } from "../../../types";
+import { IBusinessArea, IDepartmentalService, IDivision } from "@/types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { StartAndEndDateSelector } from "./StartAndEndDateSelector";
 

@@ -27,16 +27,16 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { IDepartmentalService } from "../../../types";
+import { IDepartmentalService } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
 import { UserProfile } from "../Users/UserProfile";
 import {
   deleteDepartmentalService,
   updateDepartmentalService,
-} from "../../../lib/api";
+} from "@/lib/api";
 import { useState } from "react";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";

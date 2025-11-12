@@ -1,42 +1,66 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
-import { Root } from "./components/Base/Root";
-import { AddressesCRUD } from "./components/Pages/Admin/AddressesCRUD";
-import { AdminDataLists } from "./components/Pages/Admin/AdminDataLists";
-import { AffiliationsCRUD } from "./components/Pages/Admin/AffiliationsCRUD";
-import { BranchesCRUD } from "./components/Pages/Admin/BranchesCRUD";
-import { BusinessAreasCRUD } from "./components/Pages/Admin/BusinessAreasCRUD";
-import { DivisionsCRUD } from "./components/Pages/Admin/DivisionsCRUD";
-import { LocationsCRUD } from "./components/Pages/Admin/LocationsCRUD";
-import { ReportsCRUD } from "./components/Pages/Admin/ReportsCRUD";
-import { ServicesCRUD } from "./components/Pages/Admin/ServicesCRUD";
-import { MyBusinessArea } from "./components/Pages/MyBusinessArea/MyBusinessArea";
-import { UserGuide } from "./components/Pages/UserGuide/UserGuide";
-import { AdminOnlyPage } from "./components/Wrappers/AdminOnlyPage";
-import { ContentWrapper } from "./components/Wrappers/ContentWrapper";
-import { LayoutCheckWrapper } from "./components/Wrappers/LayoutCheckWrapper";
-import { ProtectedPage } from "./components/Wrappers/ProtectedPage";
-import { AccountEdit } from "./routes/AccountEdit";
-import { CreateProject } from "./routes/CreateProject";
-import { CreateUser } from "./routes/CreateUser";
-import { CurrentReport } from "./routes/CurrentReport";
-import { Dashboard } from "./routes/Dashboard";
-import PatchNotesPage from "./routes/PatchNotesPage";
-import { ErrorHandler } from "./routes/ErrorHandler";
-import { HowTo } from "./routes/HowTo";
-import { Login } from "./routes/Login";
-import { ProjectDetail } from "./routes/ProjectDetail";
-import { Projects } from "./routes/Projects";
-import { Reports } from "./routes/Reports";
-import { ScienceStaff } from "./routes/ScienceStaff";
-import ScienceStaffDetail from "./routes/ScienceStaffDetail";
-import { TestEmailPage } from "./routes/TestEmailPage";
-import { TestPlayground } from "./routes/TestPlayground";
-import { Users } from "./routes/Users";
-import { ScienceStaffLayout } from "./components/StaffProfiles/ScienceStaffLayout";
-import { error } from "console";
-import ProjectsMap from "./routes/ProjectsMap";
-import ErrorBoundary from "./components/Base/ErrorBoundary";
-import ErrorPage from "./components/Base/ErrorPage";
+
+// Layouts, Guards & Boundaries =====================================================
+
+import { Root } from "@/components/Base/Root";
+import ErrorBoundary from "@/components/Base/ErrorBoundary";
+import { ErrorHandler } from "@/components/Base/ErrorHandler";
+import { ScienceStaffLayout } from "@/components/StaffProfiles/ScienceStaffLayout";
+import { LayoutCheckWrapper } from "@/components/Wrappers/LayoutCheckWrapper";
+import { AdminOnlyPage } from "@/components/Wrappers/AdminOnlyPage";
+import { ContentWrapper } from "@/components/Wrappers/ContentWrapper";
+import { ProtectedPage } from "@/components/Wrappers/ProtectedPage";
+
+// Pages ===========================================================================
+
+// Admin
+import PatchNotesPage from "@/pages/admin/PatchNotesPage";
+import { AddressesCRUD } from "@/pages/admin/AddressesCRUD";
+import { AffiliationsCRUD } from "@/pages/admin/AffiliationsCRUD";
+import { BranchesCRUD } from "@/pages/admin/BranchesCRUD";
+import { BusinessAreasCRUD } from "@/pages/admin/BusinessAreasCRUD";
+import { DivisionsCRUD } from "@/pages/admin/DivisionsCRUD";
+import { LocationsCRUD } from "@/pages/admin/LocationsCRUD";
+import { ReportsCRUD } from "@/pages/admin/ReportsCRUD";
+import { ServicesCRUD } from "@/pages/admin/ServicesCRUD";
+import { AdminDataLists } from "@/pages/admin/AdminDataLists";
+
+// Auth
+import { Login } from "@/pages/auth/Login";
+
+// Business Area
+import { MyBusinessArea } from "@/pages/business-area/MyBusinessArea";
+
+// Dash
+import { HowTo } from "@/pages/dash/HowTo";
+import { Dashboard } from "@/pages/dash/Dashboard";
+import { UserGuide } from "@/pages/dash/UserGuide";
+
+// Errors
+import ErrorPage from "@/components/Base/ErrorPage";
+
+// Projects
+import { CreateProject } from "@/pages/projects/CreateProject";
+import { ProjectDetail } from "@/pages/projects/ProjectDetail";
+import { Projects } from "@/pages/projects/Projects";
+import ProjectsMap from "@/pages/projects/ProjectsMap";
+
+// Reports
+import { Reports } from "@/pages/reports/Reports";
+import { CurrentReport } from "@/pages/reports/CurrentReport";
+
+// Staff Profile
+import { ScienceStaff } from "@/pages/staff-profile/ScienceStaff";
+import ScienceStaffDetail from "@/pages/staff-profile/ScienceStaffDetail";
+
+// Users
+import { AccountEdit } from "@/pages/users/AccountEdit";
+import { Users } from "@/pages/users/Users";
+import { CreateUser } from "@/pages/users/CreateUser";
+
+// Test
+import { TestEmailPage } from "@/pages/test/TestEmailPage";
+import { TestPlayground } from "@/pages/test/TestPlayground";
 
 const inAppRouteArray = [
   // Login

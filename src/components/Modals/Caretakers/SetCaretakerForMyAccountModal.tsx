@@ -37,9 +37,9 @@ import {
   adminSetCaretaker,
   deleteUserAdmin,
   requestCaretaker,
-} from "../../../lib/api";
+} from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUserSearchContext } from "../../../lib/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "@/lib/hooks/helper/UserSearchContext";
 import { ICaretakerEntry, IUserMe } from "@/types";
 import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
 import { ShadcnDatePicker } from "../../Pages/Account/ShadcnDatePicker";

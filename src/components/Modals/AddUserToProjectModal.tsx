@@ -43,9 +43,9 @@ import {
   INewMember,
   checkStaffStatusApiCall,
   createTeamMember,
-} from "../../lib/api";
+} from "@/lib/api";
 import { useLocation, useNavigate } from "react-router-dom";
-import { CustomAxiosError } from "../../types";
+import { CustomAxiosError } from "@/types";
 
 interface IAddUserToProjectModalProps {
   isOpen: boolean;

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { IProjectMember } from "../../../types";
+import { IProjectMember } from "@/types";
 
 export const useCheckUserInTeam = (
   mePk: number | string | undefined,
-  members: IProjectMember[]
+  members: IProjectMember[],
 ) => {
   const [userInTeam, setUserInTeam] = useState<boolean>(false);
 

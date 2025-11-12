@@ -7,7 +7,7 @@ import {
   IProjectClosure,
   IProjectPlan,
   IStudentReport,
-} from "../../../types";
+} from "@/types";
 
 interface IDocumentActions {
   tabType: string;

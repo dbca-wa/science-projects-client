@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { IProjectMember } from "../../../types";
+import { IProjectMember } from "@/types";
 
 export const useCheckUserIsTeamLeader = (
   mePk: number | string | undefined,
-  members: IProjectMember[]
+  members: IProjectMember[],
 ) => {
   const [userIsLeader, setUserIsLeader] = useState<boolean>(false);
 
@@ -21,7 +21,7 @@ export const useCheckUserIsTeamLeader = (
     }
 
     const leaderInTeam = members.find(
-      (member) => member.is_leader && member.user?.pk === mePk
+      (member) => member.is_leader && member.user?.pk === mePk,
     );
 
     if (leaderInTeam) {

@@ -1,7 +1,7 @@
 // Hook used to fetch a quote
 
 import { useQuery } from "@tanstack/react-query";
-import { IQuote } from "../../../types";
+import { IQuote } from "@/types";
 import { getQuote } from "../../api";
 
 export const useQuote = () => {

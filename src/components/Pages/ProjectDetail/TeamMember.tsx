@@ -25,7 +25,7 @@ import {
   IImageData,
   IUserData,
   IUserMe,
-} from "../../../types";
+} from "@/types";
 import { ProjectUserDetails } from "./ProjectUserDetails";
 import { UserProfile } from "../Users/UserProfile";
 

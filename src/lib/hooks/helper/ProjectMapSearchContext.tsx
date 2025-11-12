@@ -6,7 +6,7 @@ import {
   useCallback,
 } from "react";
 import { getMapProjectsBasedOnSearchTerm } from "../../api";
-import { IProjectData } from "../../../types";
+import { IProjectData } from "@/types";
 
 export interface MapSearchFilters {
   onlyActive: boolean;

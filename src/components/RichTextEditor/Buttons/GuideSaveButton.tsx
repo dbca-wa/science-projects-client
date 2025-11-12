@@ -6,7 +6,7 @@ import {
   IHTMLGuideSave,
   saveGuideContentToDB,
   saveGuideHtmlToDB,
-} from "../../../lib/api";
+} from "@/lib/api";
 import { BaseOptionsButton } from "./BaseOptionsButton";
 
 // Extended interface to support dynamic saving

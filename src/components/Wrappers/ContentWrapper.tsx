@@ -1,7 +1,7 @@
 // Simple wrapper to ensure content is padded and 100% of the height of the other wrappers
 
 import { Box, useColorMode } from "@chakra-ui/react";
-import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
 
 interface IPageWrapperProps {
   children: React.ReactNode;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaUnderline } from "react-icons/fa";
-import { IToolbarButton } from "../../../types";
+import { IToolbarButton } from "@/types";
 import { BaseToolbarButton } from "./BaseToolbarButton";
 
 export const UnderlineButton = ({ onClick }: IToolbarButton) => {

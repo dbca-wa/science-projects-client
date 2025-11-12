@@ -8,9 +8,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
-import { useUser } from "../../../lib/hooks/tanstack/useUser";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
-// import { IDashProps } from "../../../types";
+// import { IDashProps } from "@/types";
 import { CreateProjectPageModal } from "@/components/Modals/CreateProjectPageModal";
 import theme from "@/theme";
 import { FaDatabase } from "react-icons/fa";

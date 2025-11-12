@@ -25,8 +25,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { requestMergeUserCall } from "../../lib/api";
-import { IMakeRequestToAdmins } from "../../types";
+import { requestMergeUserCall } from "@/lib/api";
+import { IMakeRequestToAdmins } from "@/types";
 
 interface Props {
   primaryUserPk: number;

@@ -19,7 +19,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import React, { useEffect, useState } from "react";
-import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
+import { TreeViewPlugin } from "@/lib/plugins/TreeViewPlugin";
 import { GuideOptionsBar } from "../../OptionsBar/GuideOptionsBar";
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";

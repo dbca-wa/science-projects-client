@@ -60,7 +60,7 @@ import {
   PiListMagnifyingGlassDuotone,
 } from "react-icons/pi";
 import { RiAdminFill, RiOrganizationChart, RiTeamFill } from "react-icons/ri";
-import { useUser } from "../../lib/hooks/tanstack/useUser";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { BatchApproveModal } from "../Modals/BatchApproveModal";
 import { BatchApproveOldModal } from "../Modals/BatchApproveOldModal";
 import { CreateUserModal } from "../Modals/CreateUserModal";

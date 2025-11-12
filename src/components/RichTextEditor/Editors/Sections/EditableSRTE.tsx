@@ -21,12 +21,8 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import React, { useEffect, useRef, useState } from "react";
-import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
-import {
-  EditorSections,
-  EditorSubsections,
-  EditorType,
-} from "../../../../types";
+import { TreeViewPlugin } from "@/lib/plugins/TreeViewPlugin";
+import { EditorSections, EditorSubsections, EditorType } from "@/types";
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";

@@ -13,7 +13,7 @@ import {
 // import { TaskDisplayCard } from "./TaskDisplayCard"
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { IMainDoc } from "../../../types";
+import { IMainDoc } from "@/types";
 import { ModernDocumentTaskDisplayCard } from "./ModernDocumentTaskDisplayCard";
 import { ModernEndorsementTaskDisplayCard } from "./ModernEndorsementTaskDisplayCard";
 

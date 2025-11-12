@@ -48,10 +48,10 @@ import {
   MutationSuccess,
   adminUpdateUser,
   removeUserAvatar,
-} from "../../lib/api";
-import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
-import { useFullUserByPk } from "../../lib/hooks/tanstack/useFullUserByPk";
-import { IAffiliation, IBranch, IBusinessArea, IUserData } from "../../types";
+} from "@/lib/api";
+import { useUserSearchContext } from "@/lib/hooks/helper/UserSearchContext";
+import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
+import { IAffiliation, IBranch, IBusinessArea, IUserData } from "@/types";
 import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
 import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
 import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";

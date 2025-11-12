@@ -4,7 +4,7 @@ import { Box, Image, Spinner, useColorMode } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
 import dayImage from "../../assets/80mile.jpg";
 import nightImage from "../../assets/night.webp";
-import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
 import OldHeader from "../Navigation/OldHeader";
 import { TraditionalPageWrapper } from "../Wrappers/TraditionalPageWrapper";
 import { Footer } from "./Footer";

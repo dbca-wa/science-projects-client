@@ -41,7 +41,7 @@ import {
   IProjectDocuments,
   IProjectMember,
   IStudentProjectDetails,
-} from "../../../types";
+} from "@/types";
 import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
 // import { AiFillDollarCircle } from "react-icons/ai";
 
@@ -56,12 +56,12 @@ import { IoCreate } from "react-icons/io5";
 import { MdBusinessCenter, MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 import { VscOrganization } from "react-icons/vsc";
-import { useLayoutSwitcher } from "../../../lib/hooks/helper/LayoutSwitcherContext";
-import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
-import { useCheckUserIsTeamLeader } from "../../../lib/hooks/helper/useCheckUserIsTeamLeader";
-import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
-import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
-import { useUser } from "../../../lib/hooks/tanstack/useUser";
+import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
+import { useCheckUserInTeam } from "@/lib/hooks/helper/useCheckUserInTeam";
+import { useCheckUserIsTeamLeader } from "@/lib/hooks/helper/useCheckUserIsTeamLeader";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import useServerImageUrl from "@/lib/hooks/helper/useServerImageUrl";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
 import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";

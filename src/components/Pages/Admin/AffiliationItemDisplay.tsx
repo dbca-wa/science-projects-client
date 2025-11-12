@@ -25,8 +25,8 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteAffiliation, updateAffiliation } from "../../../lib/api";
-import { IAffiliation } from "../../../types";
+import { deleteAffiliation, updateAffiliation } from "@/lib/api";
+import { IAffiliation } from "@/types";
 import { TextButtonFlex } from "../../TextButtonFlex";
 
 export const AffiliationItemDisplay = ({ pk, name }: IAffiliation) => {

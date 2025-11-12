@@ -34,7 +34,7 @@ import {
   MutationError,
   MutationSuccess,
   IExtendCaretakerProps,
-} from "../../../lib/api";
+} from "@/lib/api";
 import { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/types";
 import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
 import React from "react";

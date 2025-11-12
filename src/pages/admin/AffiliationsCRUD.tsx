@@ -37,9 +37,9 @@ import {
   createAffiliation,
   getAllAffiliations,
   mergeAffiliations,
-} from "../../../lib/api";
-import { IAffiliation, IMergeAffiliation } from "../../../types";
-import { AffiliationItemDisplay } from "./AffiliationItemDisplay";
+} from "@/lib/api";
+import { IAffiliation, IMergeAffiliation } from "@/types";
+import { AffiliationItemDisplay } from "@/components/Pages/Admin/AffiliationItemDisplay";
 import { Head } from "@/components/Base/Head";
 
 export const AffiliationsCRUD = () => {

@@ -6,7 +6,7 @@ import {
   useCallback,
 } from "react";
 import { getProjectsBasedOnSearchTerm } from "../../api";
-import { IProjectData } from "../../../types";
+import { IProjectData } from "@/types";
 
 interface SearchFilters {
   onlyActive: boolean;

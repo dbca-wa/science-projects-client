@@ -25,7 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { getEmailProjectList } from "../../lib/api";
+import { getEmailProjectList } from "@/lib/api";
 import { AxiosError } from "axios";
 
 interface IModalProps {

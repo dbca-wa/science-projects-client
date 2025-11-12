@@ -12,7 +12,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 
 import { useGetRTESectionTitle } from "@/lib/hooks/helper/useGetRTESectionTitle";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { EditorSections, EditorSubsections, EditorType } from "../../../types";
+import { EditorSections, EditorSubsections, EditorType } from "@/types";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 import { DisplaySRTE } from "./Sections/DisplaySRTE";
 import { EditableSRTE } from "./Sections/EditableSRTE";

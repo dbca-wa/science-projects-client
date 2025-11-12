@@ -22,14 +22,14 @@ import {
   UseToastOptions,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "@/lib/hooks/helper/UserSearchContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AdminSwitchVar,
   MutationError,
   MutationSuccess,
   switchAdmin,
-} from "../../lib/api";
+} from "@/lib/api";
 import { useForm } from "react-hook-form";
 
 interface IModalProps {

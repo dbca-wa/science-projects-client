@@ -3,7 +3,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { BsGripVertical } from "react-icons/bs";
 import { TeamMember } from "./TeamMember";
-import { IProjectMember, IUserData, IUserMe } from "../../../types";
+import { IProjectMember, IUserData, IUserMe } from "@/types";
 
 interface SortableTeamMemberProps {
   tm: IProjectMember;

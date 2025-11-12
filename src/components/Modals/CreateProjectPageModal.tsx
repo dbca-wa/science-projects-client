@@ -1,6 +1,6 @@
 // WIP: Delete User Modal - for removing users from the system all together. Admin only.
 
-import { CreateProject } from "@/routes/CreateProject";
+import { CreateProject } from "@/pages/projects/CreateProject";
 import {
   Modal,
   ModalBody,

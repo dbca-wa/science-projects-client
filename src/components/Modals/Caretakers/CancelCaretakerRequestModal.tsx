@@ -25,7 +25,7 @@ import {
   MutationError,
   MutationSuccess,
   cancelCaretakerRequest,
-} from "../../../lib/api";
+} from "@/lib/api";
 
 interface IModalProps {
   isOpen: boolean;

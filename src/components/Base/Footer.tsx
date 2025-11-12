@@ -1,7 +1,7 @@
 // Component for Traditional version footer
 
 import { Box, Center, Link, Text } from "@chakra-ui/react";
-import { useCurrentYear } from "../../lib/hooks/helper/useCurrentYear";
+import { useCurrentYear } from "@/lib/hooks/helper/useCurrentYear";
 
 export const Footer = () => {
   const currentYear = useCurrentYear();

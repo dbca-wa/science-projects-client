@@ -27,10 +27,10 @@ import {
   IProfileUpdateVariables,
   removeUserAvatar,
   updateProfile,
-} from "../../lib/api";
-import { useNoImage } from "../../lib/hooks/helper/useNoImage";
-import useServerImageUrl from "../../lib/hooks/helper/useServerImageUrl";
-import { IProfile } from "../../types";
+} from "@/lib/api";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import useServerImageUrl from "@/lib/hooks/helper/useServerImageUrl";
+import { IProfile } from "@/types";
 import { StatefulMediaChangerAvatar } from "../Pages/Admin/StatefulMediaChangerAvatar";
 import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";
 

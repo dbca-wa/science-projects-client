@@ -29,7 +29,7 @@ import {
   MutationError,
   MutationSuccess,
   removeCaretaker,
-} from "../../../lib/api";
+} from "@/lib/api";
 import {
   ICaretakerEntry,
   ICaretakerObject,

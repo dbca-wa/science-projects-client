@@ -4,7 +4,7 @@
 
 import { createContext, useState, useContext, useEffect } from "react";
 import { getUsersBasedOnSearchTerm } from "../../api";
-import { IUserData } from "../../../types";
+import { IUserData } from "@/types";
 
 interface IUserSearchContext {
   searchTerm: string;
