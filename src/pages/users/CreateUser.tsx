@@ -1,5 +1,15 @@
 // Component/Route for handling user creation and the accomponying validation
 
+import { TypewriterText } from "@/shared/components/Animations/TypewriterText";
+import { Head } from "@/shared/components/Base/Head";
+import { AffiliationSearchDropdown } from "@/shared/components/Navigation/AffiliationSearchDropdown";
+import {
+  type UserData,
+  createUser,
+  getDoesUserWithEmailExist,
+  getDoesUserWithFullNameExist,
+} from "@/shared/lib/api";
+import { type IAffiliation } from "@/shared/types/index.d";
 import {
   Box,
   Button,
@@ -17,21 +27,11 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { GrMail } from "react-icons/gr";
 import { RiNumber1, RiNumber2 } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom";
-import { TypewriterText } from "@/components/Animations/TypewriterText";
-import { Head } from "@/components/Base/Head";
-import {
-  UserData,
-  createUser,
-  getDoesUserWithEmailExist,
-  getDoesUserWithFullNameExist,
-} from "@/lib/api";
-import { AffiliationSearchDropdown } from "@/components/Navigation/AffiliationSearchDropdown";
-import { IAffiliation } from "@/types";
-import { motion } from "framer-motion";
 
 // interface UserData {
 // 	username: string;
@@ -234,7 +234,7 @@ export const CreateUser = ({ onSuccess, isModal, onClose }: IProps) => {
           if (onSuccess) {
             onSuccess();
             if (isModal) {
-              onClose();
+              onClose?.();
             }
           }
           if (location.pathname === "/users") {

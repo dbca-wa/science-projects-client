@@ -1,13 +1,13 @@
-import { Head, StaffUserData } from "@/components/Base/Head";
-import ToggleStaffProfileVisibilityModal from "@/components/Modals/ToggleStaffProfileVisibilityModal";
-import { BaseToggleOptionsButton } from "@/components/RichTextEditor/Buttons/BaseToggleOptionsButton";
-import StaffContent from "@/components/StaffProfiles/Staff/Detail/StaffContent";
-import StaffHero from "@/components/StaffProfiles/Staff/Detail/StaffHero";
-import StaffNotFound from "@/components/StaffProfiles/Staff/StaffNotFound";
-import { Button } from "@/components/ui/button";
-import { useCheckStaffProfile } from "@/lib/hooks/tanstack/useCheckStaffProfile";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
-import { useMediaQuery } from "@/lib/utils/useMediaQuery";
+import { Head, type StaffUserData } from "@/shared/components/Base/Head";
+import ToggleStaffProfileVisibilityModal from "@/shared/components/Modals/ToggleStaffProfileVisibilityModal";
+import { BaseToggleOptionsButton } from "@/shared/components/RichTextEditor/Buttons/BaseToggleOptionsButton";
+import StaffContent from "@/shared/components/StaffProfiles/Staff/Detail/StaffContent";
+import StaffHero from "@/shared/components/StaffProfiles/Staff/Detail/StaffHero";
+import StaffNotFound from "@/shared/components/StaffProfiles/Staff/StaffNotFound";
+import { Button } from "@/shared/components/ui/button";
+import { useCheckStaffProfile } from "@/shared/hooks/tanstack/useCheckStaffProfile";
+import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import {
   Box,
   Center,
@@ -17,7 +17,7 @@ import {
   Tooltip,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { IoArrowBackCircle } from "react-icons/io5";
 import { MdArrowBack } from "react-icons/md";
@@ -164,7 +164,7 @@ const ScienceStaffDetail = () => {
             ) : (
               <>
                 <StaffHero
-                  usersPk={usersPk}
+                  usersPk={usersPk ?? ""}
                   buttonsVisible={buttonsVisible}
                   viewingUser={viewingUser}
                   refetchBaseData={refetch}
@@ -207,7 +207,7 @@ const ScienceStaffDetail = () => {
                     {isDesktop ? (
                       <ChakraButton
                         onClick={() => {
-                          if (process.env.NODE_ENV === "development") {
+                          if (import.meta.env.MODE === "development") {
                             navigate("/users/me");
                           } else {
                             setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);
@@ -224,7 +224,7 @@ const ScienceStaffDetail = () => {
                     ) : (
                       <ChakraButton
                         onClick={() => {
-                          if (process.env.NODE_ENV === "development") {
+                          if (import.meta.env.MODE === "development") {
                             navigate("/users/me");
                           } else {
                             setHref(`${VITE_PRODUCTION_BASE_URL}users/me`);

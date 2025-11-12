@@ -1,30 +1,28 @@
+import { BusinessAreaEditableDisplay } from "@/shared/components/Pages/MyBusinessArea/BusinessAreaEditableDisplay";
+import { ProblematicProjectsDataTable } from "@/shared/components/Pages/MyBusinessArea/ProblematicProjectsDataTable";
+import {
+  IPendingProjectDocumentData,
+  UnapprovedDocumentsDataTable,
+} from "@/shared/components/Pages/MyBusinessArea/UnapprovedDocumentsDataTable";
+import { useMyBusinessAreas } from "@/shared/hooks/tanstack/useMyBusinessAreas";
+import { useUser } from "@/shared/hooks/tanstack/useUser";
 import {
   getProblematicProjectsForBusinessAreas,
   getUnapprovedDocsForBusinessAreas,
-} from "@/lib/api";
-import { useMyBusinessAreas } from "@/lib/hooks/tanstack/useMyBusinessAreas";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
-import { IMainDoc, IProjectData } from "@/types";
+} from "@/shared/lib/api";
+import type { IMainDoc, IProjectData } from "@/shared/types/index.d";
 import {
   Box,
   Center,
-  List,
-  ListItem,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
   Text,
-  useColorMode,
+  useColorMode
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { BusinessAreaEditableDisplay } from "@/components/Pages/MyBusinessArea/BusinessAreaEditableDisplay";
-import { ProblematicProjectsDataTable } from "@/components/Pages/MyBusinessArea/ProblematicProjectsDataTable";
-import {
-  IPendingProjectDocumentData,
-  UnapprovedDocumentsDataTable,
-} from "@/components/Pages/MyBusinessArea/UnapprovedDocumentsDataTable";
 // Show BAs how their BA will display on AR
 
 export const MyBusinessArea = () => {

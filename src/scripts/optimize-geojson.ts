@@ -80,7 +80,7 @@ async function main() {
   } catch (error) {
     console.error("Mapshaper is not installed. Installing...");
     try {
-      await execAsync("npm install -g mapshaper");
+      await execAsync("bun install -g mapshaper");
       console.log("✓ Mapshaper installed successfully");
     } catch (installError) {
       console.error("Failed to install mapshaper:", installError);

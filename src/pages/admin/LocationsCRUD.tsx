@@ -1,3 +1,11 @@
+import { Head } from "@/shared/components/Base/Head";
+import { LocationItemDisplay } from "@/shared/components/Pages/Admin/LocationItemDisplay";
+import { createLocation, getAllLocations } from "@/shared/lib/api";
+import type {
+  IAddLocationForm,
+  ISimpleLocationData,
+  OrganisedLocationData,
+} from "@/shared/types/index.d";
 import {
   Box,
   Button,
@@ -27,16 +35,8 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import _ from "lodash";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createLocation, getAllLocations } from "@/lib/api";
-import {
-  IAddLocationForm,
-  ISimpleLocationData,
-  OrganisedLocationData,
-} from "@/types";
-import { LocationItemDisplay } from "@/components/Pages/Admin/LocationItemDisplay";
-import { Head } from "@/components/Base/Head";
 
 export const LocationsCRUD = () => {
   const { register, handleSubmit } = useForm<IAddLocationForm>();

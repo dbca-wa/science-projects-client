@@ -1,24 +1,24 @@
 // Route for reviewing all reports.
 
+import { Head } from "@/shared/components/Base/Head";
+import { AddLegacyReportPDFModal } from "@/shared/components/Modals/AddLegacyReportPDFModal";
+import { AddReportPDFModal } from "@/shared/components/Modals/AddReportPDFModal";
+import { AnnualReportPDFGridItem } from "@/shared/components/Pages/Reports/AnnualReportPDFGridItem";
+import { useGetARARsWithPDF } from "@/shared/hooks/tanstack/useGetARARsWithPDF";
+import { useGetLegacyARPDFs } from "@/shared/hooks/tanstack/useGetLegacyARPDFs";
+import { useUser } from "@/shared/hooks/tanstack/useUser";
 import {
   Box,
   Button,
+  Center,
   Flex,
   Grid,
-  useDisclosure,
-  useColorMode,
   Spinner,
   Text,
-  Center,
+  useColorMode,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { Head } from "@/components/Base/Head";
-import { AddReportPDFModal } from "@/components/Modals/AddReportPDFModal";
-import { useGetARARsWithPDF } from "@/lib/hooks/tanstack/useGetARARsWithPDF";
 import { motion } from "framer-motion";
-import { AnnualReportPDFGridItem } from "@/components/Pages/Reports/AnnualReportPDFGridItem";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
-import { AddLegacyReportPDFModal } from "@/components/Modals/AddLegacyReportPDFModal";
-import { useGetLegacyARPDFs } from "@/lib/hooks/tanstack/useGetLegacyARPDFs";
 
 export const Reports = () => {
   const {

@@ -1,5 +1,12 @@
 // Route to handle Login of user - now working with
 
+import { useUser } from "@/shared/hooks/tanstack/useUser";
+import {
+  logInOrdinary,
+  type IUsernameLoginError,
+  type IUsernameLoginSuccess,
+  type IUsernameLoginVariables,
+} from "@/shared/lib/api";
 import {
   Box,
   Button,
@@ -8,24 +15,17 @@ import {
   InputGroup,
   InputLeftElement,
   VStack,
-  useToast,
-  ToastId,
   useColorMode,
-  UseToastOptions,
+  useToast,
+  type ToastId,
+  type UseToastOptions,
 } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
-import { FaLock, FaUser } from "react-icons/fa";
-import {
-  IUsernameLoginError,
-  IUsernameLoginSuccess,
-  IUsernameLoginVariables,
-  logInOrdinary,
-} from "@/lib/api";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FaLock, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "@/lib/hooks/tanstack/useUser";
 const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
 interface ILoginData {
@@ -48,10 +48,10 @@ export const Login = ({ onClose }: IIsModal) => {
   } = useForm<ILoginData>();
 
   const toast = useToast();
-  const toastIdRef = useRef<ToastId | undefined>(undefined);
+  const ToastIdRef = useRef<ToastId | undefined>(undefined);
 
   const addToast = (data: UseToastOptions) => {
-    toastIdRef.current = toast(data);
+    ToastIdRef.current = toast(data);
   };
 
   const mutation = useMutation<
@@ -79,8 +79,8 @@ export const Login = ({ onClose }: IIsModal) => {
         queryClient.refetchQueries({ queryKey: ["me"] });
 
         // Show the toast
-        if (toastIdRef.current) {
-          toast.update(toastIdRef.current, {
+        if (ToastIdRef.current) {
+          toast.update(ToastIdRef.current, {
             title: "Logged in",
             description: "Welcome back!",
             status: "success",
@@ -101,8 +101,8 @@ export const Login = ({ onClose }: IIsModal) => {
       },
 
       onError: (error) => {
-        if (toastIdRef.current) {
-          toast.update(toastIdRef.current, {
+        if (ToastIdRef.current) {
+          toast.update(ToastIdRef.current, {
             title: "Login failed",
             description: error.message,
             status: "error",
@@ -118,8 +118,8 @@ export const Login = ({ onClose }: IIsModal) => {
     mutation.mutate({ username, password });
   };
 
-  const buildType = process.env.NODE_ENV;
-  // useEffect(() => console.log(process.env.NODE_ENV))
+  const buildType = import.meta.env.MODE;
+  // useEffect(() => console.log(import.meta.env.MODE))
   const { userData, userLoading } = useUser();
   useEffect(() => {
     if (!userLoading && userData?.pk !== undefined) {

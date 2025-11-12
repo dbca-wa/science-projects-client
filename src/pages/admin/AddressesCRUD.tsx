@@ -1,3 +1,8 @@
+import { Head } from "@/shared/components/Base/Head";
+import { BranchSearchDropdown } from "@/shared/components/Navigation/BranchSearchDropdown";
+import { AddressItemDisplay } from "@/shared/components/Pages/Admin/AddressItemDisplay";
+import { createAddress, getAllAddresses } from "@/shared/lib/api";
+import type { IAddress, IBranch } from "@/shared/types/index.d";
 import {
   Box,
   Button,
@@ -26,11 +31,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createAddress, getAllAddresses } from "@/lib/api";
-import { IAddress, IBranch } from "@/types";
-import { BranchSearchDropdown } from "@/components/Navigation/BranchSearchDropdown";
-import { AddressItemDisplay } from "@/components/Pages/Admin/AddressItemDisplay";
-import { Head } from "@/components/Base/Head";
 
 export const AddressesCRUD = () => {
   const { register, handleSubmit, watch, reset } = useForm<IAddress>();

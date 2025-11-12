@@ -1,11 +1,11 @@
-import { Head } from "@/components/Base/Head";
+import { Head } from "@/shared/components/Base/Head";
+import { AllProblematicProjects } from "@/shared/components/Pages/Admin/Data/AllProblematicProjects";
+import { EmailLists } from "@/shared/components/Pages/Admin/Data/EmailLists";
+import StaffProfileEmails from "@/shared/components/Pages/Admin/Data/StaffProfileEmails";
+import { StaffUsers } from "@/shared/components/Pages/Admin/Data/StaffUsers";
+import UnapprovedProjectsThisFY from "@/shared/components/Pages/Admin/Data/UnapprovedProjectsThisFY";
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { useState } from "react";
-import { AllProblematicProjects } from "@/components/Pages/Admin/Data/AllProblematicProjects";
-import { EmailLists } from "@/components/Pages/Admin/Data/EmailLists";
-import { StaffUsers } from "@/components/Pages/Admin/Data/StaffUsers";
-import StaffProfileEmails from "@/components/Pages/Admin/Data/StaffProfileEmails";
-import UnapprovedProjectsThisFY from "@/components/Pages/Admin/Data/UnapprovedProjectsThisFY";
 
 export const AdminDataLists = () => {
   const [loadedTabs, setLoadedTabs] = useState<Set<number>>(new Set([0])); // Start with first tab loaded
