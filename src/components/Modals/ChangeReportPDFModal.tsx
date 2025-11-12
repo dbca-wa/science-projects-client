@@ -29,7 +29,7 @@ import {
   deleteLegacyFinalAnnualReportPDF,
   updateLegacyReportPDF,
   updateReportPDF,
-} from "../../lib/api";
+} from "@/lib/api";
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
 
 interface Props {

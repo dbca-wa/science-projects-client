@@ -13,10 +13,10 @@ import {
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProjectSearchContext } from "../../../lib/hooks/helper/ProjectSearchContext";
-import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
-import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
-import { IProjectData } from "../../../types";
+import { useProjectSearchContext } from "@/lib/hooks/helper/ProjectSearchContext";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import useServerImageUrl from "@/lib/hooks/helper/useServerImageUrl";
+import { IProjectData } from "@/types";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 
 export const ModernProjectCard = ({

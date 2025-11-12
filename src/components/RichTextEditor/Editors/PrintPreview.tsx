@@ -11,7 +11,7 @@ import "../../../styles/texteditor.css";
 import { ListItemNode, ListNode } from "@lexical/list";
 
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { EditorSections, EditorSubsections, EditorType } from "../../../types";
+import { EditorSections, EditorSubsections, EditorType } from "@/types";
 
 interface IProps {
   canEdit: boolean;

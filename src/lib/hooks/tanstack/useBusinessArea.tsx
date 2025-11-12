@@ -3,7 +3,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getSingleBusinessArea } from "../../api";
-import { IBusinessArea } from "../../../types";
+import { IBusinessArea } from "@/types";
 
 export const useBusinessArea = (baPk: number) => {
   const { isPending, data } = useQuery({

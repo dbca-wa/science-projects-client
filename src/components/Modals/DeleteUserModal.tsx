@@ -31,9 +31,9 @@ import {
   MutationError,
   MutationSuccess,
   deleteUserAdmin,
-} from "../../lib/api";
+} from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
-import { useUserSearchContext } from "../../lib/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "@/lib/hooks/helper/UserSearchContext";
 
 interface IModalProps {
   isOpen: boolean;

@@ -19,10 +19,10 @@ import { useEffect, useState } from "react";
 import {
   getFullProjectSimple,
   getMyProjectsBasedOnSearchTerm,
-} from "../../lib/api";
-import { useNoImage } from "../../lib/hooks/helper/useNoImage";
-import { useUser } from "../../lib/hooks/tanstack/useUser";
-import { IProjectData } from "../../types";
+} from "@/lib/api";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
+import { IProjectData } from "@/types";
 import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";
 
 interface IProjectSearchDropdown {

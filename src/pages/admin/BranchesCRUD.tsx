@@ -1,56 +1,50 @@
 import {
-  Text,
   Box,
   Button,
+  Center,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   FormControl,
-  Input,
-  InputGroup,
-  VStack,
-  useDisclosure,
-  Center,
-  Spinner,
-  Grid,
-  DrawerOverlay,
-  DrawerCloseButton,
-  DrawerHeader,
   FormLabel,
-  useToast,
+  Grid,
+  Input,
+  Spinner,
+  Text,
+  VStack,
   useColorMode,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  createDepartmentalService,
-  getAllDepartmentalServices,
-} from "../../../lib/api";
-import { useQueryClient } from "@tanstack/react-query";
-import { IDepartmentalService } from "../../../types";
-import { ServiceItemDisplay } from "./ServiceItemDisplay";
-import { AxiosError } from "axios";
-import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { createBranch, getAllBranches } from "@/lib/api";
+import { IBranch } from "@/types";
+import { UserSearchDropdown } from "@/components/Navigation/UserSearchDropdown";
+import { BranchItemDisplay } from "@/components/Pages/Admin/BranchItemDisplay";
 import { Head } from "@/components/Base/Head";
 
-export const ServicesCRUD = () => {
-  const { register, handleSubmit, watch } = useForm<IDepartmentalService>();
-  const [selectedDirector, setSelectedDirector] = useState<number>();
-  const nameData = watch("name");
-
+export const BranchesCRUD = () => {
+  const { register, handleSubmit, watch } = useForm<IBranch>();
   const toast = useToast();
   const {
     isOpen: addIsOpen,
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
+  const [selectedUser, setSelectedUser] = useState<number>();
+
+  const nameData = watch("name");
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: createDepartmentalService,
+    mutationFn: createBranch,
     onSuccess: () => {
       toast({
         status: "success",
@@ -58,31 +52,33 @@ export const ServicesCRUD = () => {
         position: "top-right",
       });
       onAddClose();
-      queryClient.invalidateQueries({ queryKey: ["departmentalServices"] });
+      queryClient.invalidateQueries({ queryKey: ["branches"] });
     },
     onError: () => {
-      console.log("error");
       toast({
         status: "error",
         title: "Failed",
         position: "top-right",
       });
     },
-    onMutate: () => {
-      console.log("mutation");
-    },
   });
-  const onSubmit = (formData: IDepartmentalService) => {
+
+  const onSubmitBranchCreation = (formData: IBranch) => {
     mutation.mutate(formData);
   };
-  const { isLoading, data: slices } = useQuery<IDepartmentalService[]>({
-    queryFn: getAllDepartmentalServices,
-    queryKey: ["departmentalServices"],
+
+  const onSubmit = (formData: IBranch) => {
+    formData.manager = selectedUser;
+    mutation.mutate(formData);
+  };
+
+  const { isLoading, data: slices } = useQuery<IBranch[]>({
+    queryFn: getAllBranches,
+    queryKey: ["branches"],
   });
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredSlices, setFilteredSlices] = useState<IDepartmentalService[]>(
-    [],
-  );
+
+  const [filteredSlices, setFilteredSlices] = useState<IBranch[]>([]);
   const [countOfItems, setCountOfItems] = useState(0);
 
   const handleSearchChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -104,7 +100,7 @@ export const ServicesCRUD = () => {
   }, [slices, searchTerm]);
 
   useEffect(() => {
-    // Initialize filteredSlices with all items
+    // Initialize filteredSlices with all items when no filters are applied
     if (!searchTerm && slices) {
       setFilteredSlices(slices);
       setCountOfItems(slices.length);
@@ -114,8 +110,7 @@ export const ServicesCRUD = () => {
   const { colorMode } = useColorMode();
   return (
     <>
-      <Head title="Services" />
-
+      <Head title="Branches" />
       {isLoading ? (
         <Center h={"200px"}>
           <Spinner />
@@ -125,13 +120,13 @@ export const ServicesCRUD = () => {
           <Box maxW={"100%"} maxH={"100%"}>
             <Box>
               <Text fontWeight={"semibold"} fontSize={"lg"}>
-                Departmental Services ({countOfItems})
+                Branches ({countOfItems})
               </Text>
             </Box>
             <Flex width={"100%"} mt={4}>
               <Input
                 type="text"
-                placeholder="Search service by name"
+                placeholder="Search branch by name"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 w={"65%"}
@@ -152,7 +147,7 @@ export const ServicesCRUD = () => {
               </Flex>
             </Flex>
             <Grid
-              gridTemplateColumns="5fr 4fr 1fr"
+              gridTemplateColumns="6fr 3fr 3fr"
               mt={4}
               width="100%"
               p={3}
@@ -160,10 +155,10 @@ export const ServicesCRUD = () => {
               borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
             >
               <Flex justifyContent="flex-start">
-                <Text as="b">Service</Text>
+                <Text as="b">Branch</Text>
               </Flex>
               <Flex>
-                <Text as="b">Executive Director</Text>
+                <Text as="b">Manager</Text>
               </Flex>
               <Flex justifyContent="flex-end" mr={2}>
                 <Text as="b">Change</Text>
@@ -174,11 +169,13 @@ export const ServicesCRUD = () => {
               {filteredSlices
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((s) => (
-                  <ServiceItemDisplay
+                  <BranchItemDisplay
                     key={s.pk}
                     pk={s.pk}
                     name={s.name}
-                    director={s.director}
+                    manager={s.manager}
+                    agency={s.agency}
+                    old_id={s.old_id}
                   />
                 ))}
             </Grid>
@@ -188,7 +185,7 @@ export const ServicesCRUD = () => {
             <DrawerOverlay />
             <DrawerContent>
               <DrawerCloseButton />
-              <DrawerHeader>Add Service</DrawerHeader>
+              <DrawerHeader>Add Branch</DrawerHeader>
               <DrawerBody>
                 <VStack
                   spacing={10}
@@ -196,50 +193,33 @@ export const ServicesCRUD = () => {
                   id="add-form"
                   onSubmit={handleSubmit(onSubmit)}
                 >
+                  <Input
+                    {...register("agency", { required: true })}
+                    value={1}
+                    required
+                    type="hidden"
+                  />
                   <FormControl>
                     <FormLabel>Name</FormLabel>
-                    <InputGroup>
-                      {/* <InputLeftAddon children={<FaSign />} /> */}
-                      <Input
-                        autoComplete="off"
-                        autoFocus
-                        {...register("name", { required: true })}
-                        required
-                        type="text"
-                      />
-                    </InputGroup>
+                    <Input
+                      autoFocus
+                      autoComplete="off"
+                      {...register("name", { required: true })}
+                    />
                   </FormControl>
-
                   <FormControl>
                     <UserSearchDropdown
-                      {...register("director", { required: true })}
+                      {...register("manager", { required: true })}
                       onlyInternal={false}
                       isRequired={true}
-                      setUserFunction={setSelectedDirector}
-                      label="Director"
-                      placeholder="Search for a user..."
-                      isEditable
-                      helperText={"The director of the Service"}
+                      setUserFunction={setSelectedUser}
+                      label="Manager"
+                      placeholder="Search for a user"
+                      helperText={"The manager of the branch."}
                     />
                   </FormControl>
                   {mutation.isError ? (
-                    <Box mt={4}>
-                      {Object.keys(
-                        (mutation.error as AxiosError).response.data,
-                      ).map((key) => (
-                        <Box key={key}>
-                          {(
-                            (mutation.error as AxiosError).response.data[
-                              key
-                            ] as string[]
-                          ).map((errorMessage, index) => (
-                            <Text key={`${key}-${index}`} color="red.500">
-                              {`${key}: ${errorMessage}`}
-                            </Text>
-                          ))}
-                        </Box>
-                      ))}
-                    </Box>
+                    <Text color={"red.500"}>Something went wrong</Text>
                   ) : null}
                 </VStack>
               </DrawerBody>
@@ -247,6 +227,15 @@ export const ServicesCRUD = () => {
                 <Button
                   // form="add-form"
                   // type="submit"
+                  onClick={() => {
+                    console.log("clicked");
+                    onSubmitBranchCreation({
+                      old_id: 1, //default
+                      agency: 1, // dbca
+                      name: nameData,
+                      manager: selectedUser,
+                    });
+                  }}
                   isLoading={mutation.isPending}
                   color={"white"}
                   background={colorMode === "light" ? "blue.500" : "blue.600"}
@@ -255,13 +244,6 @@ export const ServicesCRUD = () => {
                   }}
                   size="lg"
                   width={"100%"}
-                  onClick={() => {
-                    onSubmit({
-                      old_id: 1,
-                      name: nameData,
-                      director: selectedDirector,
-                    });
-                  }}
                 >
                   Create
                 </Button>

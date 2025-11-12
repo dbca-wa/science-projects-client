@@ -33,10 +33,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaArrowLeft } from "react-icons/fa";
 import { HiAcademicCap } from "react-icons/hi";
-import { IEditProject, updateProjectDetails } from "../../lib/api";
-import { useBusinessAreas } from "../../lib/hooks/tanstack/useBusinessAreas";
-import { useDepartmentalServices } from "../../lib/hooks/tanstack/useDepartmentalServices";
-import { useGetLocations } from "../../lib/hooks/tanstack/useGetLocations";
+import { IEditProject, updateProjectDetails } from "@/lib/api";
+import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
+import { useDepartmentalServices } from "@/lib/hooks/tanstack/useDepartmentalServices";
+import { useGetLocations } from "@/lib/hooks/tanstack/useGetLocations";
 import {
   IAffiliation,
   IBusinessArea,
@@ -48,7 +48,7 @@ import {
   ISmallService,
   IStudentProjectDetails,
   ProjectImage,
-} from "../../types";
+} from "@/types";
 import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
 import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
 import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";

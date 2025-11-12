@@ -25,12 +25,12 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createDivision, getAllDivisions } from "../../../lib/api";
+import { createDivision, getAllDivisions } from "@/lib/api";
 import _ from "lodash";
 import { useQueryClient } from "@tanstack/react-query";
-import { IDivision } from "../../../types";
-import { DivisionItemDisplay } from "./DivisionItemDisplay";
-import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { IDivision } from "@/types";
+import { DivisionItemDisplay } from "@/components/Pages/Admin/DivisionItemDisplay";
+import { UserSearchDropdown } from "@/components/Navigation/UserSearchDropdown";
 import { Head } from "@/components/Base/Head";
 
 export const DivisionsCRUD = () => {

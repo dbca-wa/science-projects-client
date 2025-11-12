@@ -11,7 +11,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { FaEdit } from "react-icons/fa";
-import { ISmallReport, IUserMe } from "../../../types";
+import { ISmallReport, IUserMe } from "@/types";
 import { ChangeReportPDFModal } from "../../Modals/ChangeReportPDFModal";
 
 interface Props {

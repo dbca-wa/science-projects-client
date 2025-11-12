@@ -17,24 +17,24 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Head } from "../components/Base/Head";
-import { ConceptPlanContents } from "../components/Pages/ProjectDetail/ConceptPlanContents";
-import { ManageTeam } from "../components/Pages/ProjectDetail/ManageTeam";
-import { ProgressReportContents } from "../components/Pages/ProjectDetail/ProgressReportContents";
-import { ProjectClosureContents } from "../components/Pages/ProjectDetail/ProjectClosureContents";
-import { ProjectOverviewCard } from "../components/Pages/ProjectDetail/ProjectOverviewCard";
-import { ProjectPlanContents } from "../components/Pages/ProjectDetail/ProjectPlanContents";
-import { StudentReportContents } from "../components/Pages/ProjectDetail/StudentReportContents";
-import { useProject } from "../lib/hooks/tanstack/useProject";
-import { useUser } from "../lib/hooks/tanstack/useUser";
+import { Head } from "@/components/Base/Head";
+import { ConceptPlanContents } from "@/components/Pages/ProjectDetail/ConceptPlanContents";
+import { ManageTeam } from "@/components/Pages/ProjectDetail/ManageTeam";
+import { ProgressReportContents } from "@/components/Pages/ProjectDetail/ProgressReportContents";
+import { ProjectClosureContents } from "@/components/Pages/ProjectDetail/ProjectClosureContents";
+import { ProjectOverviewCard } from "@/components/Pages/ProjectDetail/ProjectOverviewCard";
+import { ProjectPlanContents } from "@/components/Pages/ProjectDetail/ProjectPlanContents";
+import { StudentReportContents } from "@/components/Pages/ProjectDetail/StudentReportContents";
+import { useProject } from "@/lib/hooks/tanstack/useProject";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import {
   IExtendedProjectDetails,
   IProjectAreas,
   IProjectData,
   IProjectDocuments,
   IProjectMember,
-} from "../types";
-// import { ProgressReportSelector } from "../components/Pages/ProjectDetail/ProgressReportSelector";
+} from "@/types";
+// import { ProgressReportSelector } from "@/components/Pages/ProjectDetail/ProgressReportSelector";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 import { ArrowBackIcon } from "@chakra-ui/icons";

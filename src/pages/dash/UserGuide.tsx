@@ -4,10 +4,10 @@ import { AccountPageViewWrapper } from "@/components/Wrappers/AccountPageViewWra
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { Box, Flex, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { SideMenuButton } from "../Account/SideMenuButton";
+import { SideMenuButton } from "@/components/Pages/Account/SideMenuButton";
 import { useAdminOptions } from "@/lib/hooks/tanstack/useAdminOptions";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
-import { SideMenuSectionDivider } from "./SidebarSectionDivider";
+import { SideMenuSectionDivider } from "@/components/Pages/UserGuide/SidebarSectionDivider";
 
 interface ISectionProps {
   isSuperUser: boolean;

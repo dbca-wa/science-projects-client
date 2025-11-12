@@ -4,7 +4,7 @@ import { Button, Center, Flex, Icon, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import React from "react";
 import { AiFillHome } from "react-icons/ai";
-import { useUpdatePage } from "../../lib/hooks/helper/useUpdatePage";
+import { useUpdatePage } from "@/lib/hooks/helper/useUpdatePage";
 
 export const ModernBreadcrumb = () => {
   const { currentPage, updatePageContext } = useUpdatePage();
@@ -15,19 +15,20 @@ export const ModernBreadcrumb = () => {
 
   const handleUnderscores = (text: string) => {
     let updated = text;
-    if (text.includes('_')) {
-      updated = updated.replaceAll('_', ' ');
+    if (text.includes("_")) {
+      updated = updated.replaceAll("_", " ");
     }
     return updated;
-  }
-
+  };
 
   const pages = currentPage.split("/").filter((page) => page !== "");
   const breadcrumbItems = pages.map((page, index) => {
     const isLast = index === pages.length - 1;
     const path = `/${pages.slice(0, index + 1).join("/")}`;
     const handleClick = () => updatePageContext(path);
-    const capitalizedPage = handleUnderscores(page.charAt(0).toUpperCase() + page.slice(1));
+    const capitalizedPage = handleUnderscores(
+      page.charAt(0).toUpperCase() + page.slice(1),
+    );
 
     return (
       <React.Fragment key={page}>

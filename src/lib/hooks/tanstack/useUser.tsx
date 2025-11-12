@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getMe } from "../../api";
-import { IUserMe } from "../../../types";
+import { IUserMe } from "@/types";
 
 export const useUser = () => {
   const { isPending, data, isError, refetch } = useQuery({

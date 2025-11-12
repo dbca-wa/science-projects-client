@@ -18,10 +18,10 @@ import { useEffect, useState } from "react";
 import {
   getFullProjectSimple,
   getMyProjectsBasedOnSearchTerm,
-} from "../../lib/api";
-import { useUser } from "../../lib/hooks/tanstack/useUser";
-import { IMidDoc } from "../../types";
-// import { useNoImage } from "../../lib/hooks/useNoImage";
+} from "@/lib/api";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
+import { IMidDoc } from "@/types";
+// import { useNoImage } from "@/lib/hooks/useNoImage";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
 import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";
 

@@ -20,7 +20,7 @@ import {
   UseToastOptions,
 } from "@chakra-ui/react";
 import { useRef, useState } from "react";
-import { useCurrentYear } from "../../lib/hooks/helper/useCurrentYear";
+import { useCurrentYear } from "@/lib/hooks/helper/useCurrentYear";
 import { IconType } from "react-icons";
 import { ProjectDetailsSection } from "../Pages/CreateProject/ProjectDetailsSection";
 import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSection";
@@ -36,11 +36,11 @@ import {
   MutationError,
   ProjectCreationMutationSuccess,
   createProject,
-} from "../../lib/api";
+} from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection";
-import { useUser } from "../../lib/hooks/tanstack/useUser";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { ExternalInternalSPConfirmationModal } from "./ExternalInternalSPConfirmationModal";
 
 interface INewProjectModalProps {

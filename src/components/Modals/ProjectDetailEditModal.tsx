@@ -16,7 +16,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useCurrentYear } from "../../lib/hooks/helper/useCurrentYear";
+import { useCurrentYear } from "@/lib/hooks/helper/useCurrentYear";
 import { IconType } from "react-icons";
 import { ProjectDetailsSection } from "../Pages/CreateProject/ProjectDetailsSection";
 import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSection";
@@ -27,11 +27,11 @@ import {
   ICreateProjectDetails,
   ICreateProjectExternalDetails,
   ICreateProjectStudentDetails,
-} from "../../lib/api";
+} from "@/lib/api";
 import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
 import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection";
-import { IExtendedProjectDetails, IProjectData } from "../../types";
-import { useUser } from "../../lib/hooks/tanstack/useUser";
+import { IExtendedProjectDetails, IProjectData } from "@/types";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 
 interface IEditProjectDetailsProps {
   projectType: string;

@@ -2,7 +2,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useUser } from "../../lib/hooks/tanstack/useUser";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 
 interface IAdminOnlyPageProps {
   children: React.ReactNode;

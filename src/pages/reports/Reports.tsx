@@ -11,11 +11,11 @@ import {
   Text,
   Center,
 } from "@chakra-ui/react";
-import { Head } from "../components/Base/Head";
-import { AddReportPDFModal } from "../components/Modals/AddReportPDFModal";
-import { useGetARARsWithPDF } from "../lib/hooks/tanstack/useGetARARsWithPDF";
+import { Head } from "@/components/Base/Head";
+import { AddReportPDFModal } from "@/components/Modals/AddReportPDFModal";
+import { useGetARARsWithPDF } from "@/lib/hooks/tanstack/useGetARARsWithPDF";
 import { motion } from "framer-motion";
-import { AnnualReportPDFGridItem } from "../components/Pages/Reports/AnnualReportPDFGridItem";
+import { AnnualReportPDFGridItem } from "@/components/Pages/Reports/AnnualReportPDFGridItem";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { AddLegacyReportPDFModal } from "@/components/Modals/AddLegacyReportPDFModal";
 import { useGetLegacyARPDFs } from "@/lib/hooks/tanstack/useGetLegacyARPDFs";

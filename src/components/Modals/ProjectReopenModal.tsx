@@ -22,7 +22,7 @@ import {
   Box,
   UseToastOptions,
 } from "@chakra-ui/react";
-import { openProjectCall } from "../../lib/api";
+import { openProjectCall } from "@/lib/api";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

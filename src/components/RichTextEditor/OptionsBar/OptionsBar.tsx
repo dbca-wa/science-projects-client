@@ -2,7 +2,7 @@
 
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { Flex, Grid } from "@chakra-ui/react";
-import { EditorSections, EditorSubsections, EditorType } from "../../../types";
+import { EditorSections, EditorSubsections, EditorType } from "@/types";
 import { ClearButton } from "../Buttons/ClearButton";
 import { SaveButton } from "../Buttons/SaveButton";
 import { TreeButton } from "../Buttons/TreeButton";

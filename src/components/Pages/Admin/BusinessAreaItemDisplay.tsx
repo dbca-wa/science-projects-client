@@ -43,17 +43,17 @@ import {
   activateBusinessArea,
   deleteBusinessArea,
   updateBusinessArea,
-} from "../../../lib/api";
-import useApiEndpoint from "../../../lib/hooks/helper/useApiEndpoint";
-import useDistilledHtml from "../../../lib/hooks/helper/useDistilledHtml";
-import { useNoImage } from "../../../lib/hooks/helper/useNoImage";
-import { useFullUserByPk } from "../../../lib/hooks/tanstack/useFullUserByPk";
+} from "@/lib/api";
+import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";
+import useDistilledHtml from "@/lib/hooks/helper/useDistilledHtml";
+import { useNoImage } from "@/lib/hooks/helper/useNoImage";
+import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
 import {
   BusinessAreaImage,
   IBusinessArea,
   IBusinessAreaUpdate,
   IDivision,
-} from "../../../types";
+} from "@/types";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
 import { UserProfile } from "../Users/UserProfile";

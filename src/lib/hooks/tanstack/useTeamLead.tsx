@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getTeamLead } from "../../api";
-import { IUserMe } from "../../../types";
+import { IUserMe } from "@/types";
 
 export const useTeamLead = (projectPk: number) => {
   const { isPending, data } = useQuery({

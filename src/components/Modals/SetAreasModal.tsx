@@ -18,7 +18,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { ISetProjectAreas, setProjectAreas } from "../../lib/api";
+import { ISetProjectAreas, setProjectAreas } from "@/lib/api";
 import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 
 interface Props {

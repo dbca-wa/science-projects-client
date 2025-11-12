@@ -9,7 +9,6 @@ import { useSearchParams } from "react-router-dom";
 import { Head } from "@/components/Base/Head";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
-import { useState } from "react";
 
 export const ScienceStaff = () => {
   const [searchParams, setSearchParams] = useSearchParams();

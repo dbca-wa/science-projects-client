@@ -38,7 +38,7 @@ import {
   IPIUpdateSuccess,
   IPIUpdateVariables,
   updatePersonalInformation,
-} from "../../lib/api";
+} from "@/lib/api";
 
 interface IEditPIModalProps {
   isOpen: boolean;

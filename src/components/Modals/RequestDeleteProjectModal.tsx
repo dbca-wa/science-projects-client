@@ -23,11 +23,11 @@ import {
   Box,
   UseToastOptions,
 } from "@chakra-ui/react";
-import { requestDeleteProjectCall } from "../../lib/api";
+import { requestDeleteProjectCall } from "@/lib/api";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { IMakeRequestToAdmins } from "../../types";
+import { IMakeRequestToAdmins } from "@/types";
 import { AxiosError } from "axios";
 
 interface Props {

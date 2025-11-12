@@ -2,10 +2,10 @@
 
 import { Box, Flex, useColorMode } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { Head } from "../components/Base/Head";
-import { SideMenuButton } from "../components/Pages/Account/SideMenuButton";
-import { ProfilePage } from "../components/Pages/Account/ProfilePage";
-import { AccountPageViewWrapper } from "../components/Wrappers/AccountPageViewWrapper";
+import { Head } from "@/components/Base/Head";
+import { SideMenuButton } from "@/components/Pages/Account/SideMenuButton";
+import { ProfilePage } from "@/components/Pages/Account/ProfilePage";
+import { AccountPageViewWrapper } from "@/components/Wrappers/AccountPageViewWrapper";
 import CaretakerModePage from "@/components/Pages/Account/Caretaking/CaretakerMode";
 
 export const AccountEdit = () => {

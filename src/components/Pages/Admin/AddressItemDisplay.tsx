@@ -26,8 +26,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteAddress, updateAddress } from "../../../lib/api";
-import { IAddress, IBranch } from "../../../types";
+import { deleteAddress, updateAddress } from "@/lib/api";
+import { IAddress, IBranch } from "@/types";
 import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
 import { TextButtonFlex } from "../../TextButtonFlex";
 

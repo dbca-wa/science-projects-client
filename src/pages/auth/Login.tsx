@@ -21,11 +21,11 @@ import {
   IUsernameLoginSuccess,
   IUsernameLoginVariables,
   logInOrdinary,
-} from "../lib/api";
+} from "@/lib/api";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../lib/hooks/tanstack/useUser";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
 const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;
 
 interface ILoginData {

@@ -18,7 +18,7 @@ import {
 import { useEffect, useState } from "react";
 import { HiAcademicCap } from "react-icons/hi";
 import { IoIosCreate } from "react-icons/io";
-import { ICreateProjectStudentDetails } from "../../../lib/api";
+import { ICreateProjectStudentDetails } from "@/lib/api";
 import "../../../styles/modalscrollbar.css";
 
 interface IProjectStudentProps {

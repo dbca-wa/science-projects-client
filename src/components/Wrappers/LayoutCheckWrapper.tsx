@@ -1,7 +1,7 @@
 // A wrapper to check whether a component for rendering components only in the modern layout
 
 import { useEffect, useState } from "react";
-import { useLayoutSwitcher } from "../../lib/hooks/helper/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
 
 interface IProtectedPageProps {
   children: React.ReactNode;

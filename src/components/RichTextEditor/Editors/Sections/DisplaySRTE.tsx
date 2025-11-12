@@ -11,8 +11,8 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
-import { TreeViewPlugin } from "../../../../lib/plugins/TreeViewPlugin";
-import { EditorSubsections } from "../../../../types";
+import { TreeViewPlugin } from "@/lib/plugins/TreeViewPlugin";
+import { EditorSubsections } from "@/types";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 
 interface Props {

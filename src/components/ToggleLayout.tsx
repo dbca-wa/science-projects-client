@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { RiLayout3Fill, RiLayoutTopFill } from "react-icons/ri";
-import { useLayoutSwitcher } from "../lib/hooks/helper/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/lib/hooks/helper/LayoutSwitcherContext";
 import { useEditorContext } from "@/lib/hooks/helper/EditorBlockerContext";
 
 interface IOptionalToggleLayoutProps {

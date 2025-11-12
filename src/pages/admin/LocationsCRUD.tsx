@@ -29,13 +29,13 @@ import { AxiosError } from "axios";
 import _ from "lodash";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createLocation, getAllLocations } from "../../../lib/api";
+import { createLocation, getAllLocations } from "@/lib/api";
 import {
   IAddLocationForm,
   ISimpleLocationData,
   OrganisedLocationData,
-} from "../../../types";
-import { LocationItemDisplay } from "./LocationItemDisplay";
+} from "@/types";
+import { LocationItemDisplay } from "@/components/Pages/Admin/LocationItemDisplay";
 import { Head } from "@/components/Base/Head";
 
 export const LocationsCRUD = () => {

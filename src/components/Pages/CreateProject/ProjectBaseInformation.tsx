@@ -13,7 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import "../../../styles/modalscrollbar.css";
-import { IUserData } from "../../../types";
+import { IUserData } from "@/types";
 import { StatefulMediaChangerProject } from "../Admin/StatefulMediaChangerProject";
 import TagInput from "./TagInput";
 

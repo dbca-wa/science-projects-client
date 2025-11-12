@@ -18,8 +18,8 @@ import {
 import { motion } from "framer-motion";
 import { AiFillProject } from "react-icons/ai";
 import { FcHighPriority, FcOk } from "react-icons/fc";
-import { useGetDocumentsPendingMyAction } from "../../../lib/hooks/tanstack/useGetDocumentsPendingMyAction";
-import { useGetMyProjects } from "../../../lib/hooks/tanstack/useGetMyProjects";
+import { useGetDocumentsPendingMyAction } from "@/lib/hooks/tanstack/useGetDocumentsPendingMyAction";
+import { useGetMyProjects } from "@/lib/hooks/tanstack/useGetMyProjects";
 import { AdminTasksDataTable } from "./AdminTasksDataTable";
 import { DocumentsDataTable } from "./DocumentsDataTable";
 import { EndorsementsDataTable } from "./EndorsementsDataTable";

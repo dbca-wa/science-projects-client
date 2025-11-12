@@ -24,11 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import {
-  MutationError,
-  MutationSuccess,
-  removeCaretaker,
-} from "../../../lib/api";
+import { MutationError, MutationSuccess, removeCaretaker } from "@/lib/api";
 import { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/types";
 import { useFormattedDate } from "@/lib/hooks/helper/useFormattedDate";
 

@@ -25,8 +25,8 @@ import {
   useState,
 } from "react";
 import { FaTrash } from "react-icons/fa";
-import { getUsersBasedOnSearchTerm } from "../../lib/api";
-import { IUserData, EmailListPerson } from "../../types";
+import { getUsersBasedOnSearchTerm } from "@/lib/api";
+import { IUserData, EmailListPerson } from "@/types";
 import { useFullUserByPk } from "@/lib/hooks/tanstack/useFullUserByPk";
 
 interface IUserArraySearchDropdown {

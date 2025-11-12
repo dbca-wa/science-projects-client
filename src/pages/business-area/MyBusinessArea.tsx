@@ -19,12 +19,12 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { BusinessAreaEditableDisplay } from "./BusinessAreaEditableDisplay";
-import { ProblematicProjectsDataTable } from "./ProblematicProjectsDataTable";
+import { BusinessAreaEditableDisplay } from "@/components/Pages/MyBusinessArea/BusinessAreaEditableDisplay";
+import { ProblematicProjectsDataTable } from "@/components/Pages/MyBusinessArea/ProblematicProjectsDataTable";
 import {
   IPendingProjectDocumentData,
   UnapprovedDocumentsDataTable,
-} from "./UnapprovedDocumentsDataTable";
+} from "@/components/Pages/MyBusinessArea/UnapprovedDocumentsDataTable";
 // Show BAs how their BA will display on AR
 
 export const MyBusinessArea = () => {

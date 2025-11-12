@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-// import { ICreateProjectExternalDetails } from "../../../lib/api";
+// import { ICreateProjectExternalDetails } from "@/lib/api";
 import "../../../styles/modalscrollbar.css";
 
 interface IProjectExternalProps {

@@ -26,8 +26,8 @@ import {
   useState,
 } from "react";
 import { FaTrash } from "react-icons/fa";
-import { getAffiliationsBasedOnSearchTerm } from "../../lib/api";
-import { IAffiliation } from "../../types";
+import { getAffiliationsBasedOnSearchTerm } from "@/lib/api";
+import { IAffiliation } from "@/types";
 
 interface IAffiliationSearchDropdown {
   isRequired: boolean;

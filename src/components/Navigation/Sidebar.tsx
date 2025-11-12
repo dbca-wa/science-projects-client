@@ -25,7 +25,7 @@ import { PiBookOpenTextFill } from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
 import { SiReadthedocs } from "react-icons/si";
 import { TbLayoutGridAdd } from "react-icons/tb";
-import { useUpdatePage } from "../../lib/hooks/helper/useUpdatePage";
+import { useUpdatePage } from "@/lib/hooks/helper/useUpdatePage";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { AnimatedToggleButton } from "./AnimatedToggleButton";

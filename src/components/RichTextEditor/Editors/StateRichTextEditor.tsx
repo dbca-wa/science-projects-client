@@ -1,7 +1,7 @@
 // The basic rich text editor component; does not allow sticky notes, emotes, etc.
 
 import "../../../styles/texteditor.css";
-import { EditorSubsections, EditorType } from "../../../types";
+import { EditorSubsections, EditorType } from "@/types";
 
 import { Box, useColorMode } from "@chakra-ui/react";
 import { ListItemNode, ListNode } from "@lexical/list";

@@ -31,11 +31,8 @@ import {
 } from "react";
 import { FaTrash } from "react-icons/fa";
 import { GrOrganization } from "react-icons/gr";
-import {
-  createAffiliation,
-  getAffiliationsBasedOnSearchTerm,
-} from "../../lib/api";
-import { IAffiliation } from "../../types";
+import { createAffiliation, getAffiliationsBasedOnSearchTerm } from "@/lib/api";
+import { IAffiliation } from "@/types";
 
 interface IAffiliationSearchDropdown {
   isRequired: boolean;

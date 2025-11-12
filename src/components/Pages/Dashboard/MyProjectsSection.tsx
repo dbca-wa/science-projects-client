@@ -2,7 +2,7 @@
 
 import { Box, Center, Grid, Spinner, Text } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { IProjectData } from "../../../types";
+import { IProjectData } from "@/types";
 import { ModernProjectCard } from "../Projects/ModernProjectCard";
 
 interface IProjectSection {

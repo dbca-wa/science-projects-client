@@ -17,8 +17,8 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import useServerImageUrl from "../../../lib/hooks/helper/useServerImageUrl";
-import { IUserData } from "../../../types";
+import useServerImageUrl from "@/lib/hooks/helper/useServerImageUrl";
+import { IUserData } from "@/types";
 import { UserProfile } from "./UserProfile";
 
 interface BoxContainerProps extends BoxProps {

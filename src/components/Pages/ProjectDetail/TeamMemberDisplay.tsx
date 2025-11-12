@@ -24,7 +24,7 @@ import {
   IBusinessArea,
   ICaretakerSimpleUserData,
   IImageData,
-} from "../../../types";
+} from "@/types";
 import { ProjectUserDetails } from "./ProjectUserDetails";
 import { UserProfile } from "../Users/UserProfile";
 import useApiEndpoint from "@/lib/hooks/helper/useApiEndpoint";

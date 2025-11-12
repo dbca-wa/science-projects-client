@@ -29,11 +29,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createBusinessArea, getAllBusinessAreas } from "../../../lib/api";
-import { IBusinessArea, IBusinessAreaCreate } from "../../../types";
-import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
-import { BusinessAreaItemDisplay } from "./BusinessAreaItemDisplay";
-import { StatefulMediaChanger } from "./StatefulMediaChanger";
+import { createBusinessArea, getAllBusinessAreas } from "@/lib/api";
+import { IBusinessArea, IBusinessAreaCreate } from "@/types";
+import { UserSearchDropdown } from "@/components/Navigation/UserSearchDropdown";
+import { BusinessAreaItemDisplay } from "@/components/Pages/Admin/BusinessAreaItemDisplay";
+import { StatefulMediaChanger } from "@/components/Pages/Admin/StatefulMediaChanger";
 import { Head } from "@/components/Base/Head";
 
 export const BusinessAreasCRUD = () => {

@@ -26,10 +26,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-import { updateTeamMemberPosition } from "../../../lib/api";
-import { useProjectTeam } from "../../../lib/hooks/tanstack/useProjectTeam";
-import { useUser } from "../../../lib/hooks/tanstack/useUser";
-import { ICaretakerPermissions, IProjectMember } from "../../../types";
+import { updateTeamMemberPosition } from "@/lib/api";
+import { useProjectTeam } from "@/lib/hooks/tanstack/useProjectTeam";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
+import { ICaretakerPermissions, IProjectMember } from "@/types";
 import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
 import { TeamMember } from "./TeamMember";
 import { TeamMemberDisplay } from "./TeamMemberDisplay";

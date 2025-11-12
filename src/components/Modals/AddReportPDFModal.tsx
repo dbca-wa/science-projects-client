@@ -18,9 +18,9 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "../../lib/hooks/tanstack/useUser";
-import { addPDFToReport } from "../../lib/api";
-import { useGetARARsWithoputPDF } from "../../lib/hooks/tanstack/useGetARARsWithoputPDF";
+import { useUser } from "@/lib/hooks/tanstack/useUser";
+import { addPDFToReport } from "@/lib/api";
+import { useGetARARsWithoputPDF } from "@/lib/hooks/tanstack/useGetARARsWithoputPDF";
 import { SingleFileStateUpload } from "../SingleFileStateUpload";
 
 interface Props {

@@ -14,14 +14,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
-import { useCheckUserInTeam } from "../../../lib/hooks/helper/useCheckUserInTeam";
+import { useCheckUserInTeam } from "@/lib/hooks/helper/useCheckUserInTeam";
 import {
   ICaretakerPermissions,
   IProjectClosure,
   IProjectDocuments,
   IProjectMember,
   IUserMe,
-} from "../../../types";
+} from "@/types";
 import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
