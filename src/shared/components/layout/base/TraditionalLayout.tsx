@@ -5,8 +5,8 @@ import { Outlet } from "react-router-dom";
 import dayImage from "@/assets/80mile.jpg";
 import nightImage from "@/assets/night.webp";
 import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
-import OldHeader from "../Navigation/OldHeader";
-import { TraditionalPageWrapper } from "../Wrappers/TraditionalPageWrapper";
+import OldHeader from "../../Navigation/OldHeader";
+import { TraditionalPageWrapper } from "../wrappers/TraditionalPageWrapper";
 import { Footer } from "./Footer";
 
 export const TraditionalLayout = () => {
