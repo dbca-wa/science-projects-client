@@ -1,4 +1,6 @@
 node_modules
+.docs
+README.md
 *.env
 *.unlighthouse/*
 *.DS_Store
