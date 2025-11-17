@@ -1,7 +1,7 @@
 // Route for handling errors - used in Router to determine/display what error is produced on page.
 
 import { useRouteError } from "react-router-dom";
-import { ProtectedPage } from "../Wrappers/ProtectedPage";
+import { ProtectedPage } from "../wrappers/ProtectedPage";
 import { NotFound } from "@/pages/errors/NotFound";
 import { OtherError } from "@/pages/errors/OtherError";
 
