@@ -5,6 +5,7 @@ import StaffResultSkeleton from "@/shared/components/StaffProfiles/StaffResultSk
 import { Button } from "@/shared/components/ui/button";
 import { useScienceStaffProfileList } from "@/shared/hooks/tanstack/useScienceStaffProfileList";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
+import type { IUserMe } from "@/shared/types";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import { Button as ChakraButton, Grid } from "@chakra-ui/react";
 import clsx from "clsx";
@@ -43,7 +44,7 @@ export const ScienceStaff = () => {
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const getDisplayName = (user) => {
+  const getDisplayName = (user: IUserMe) => {
     const firstName = user?.display_first_name ?? user?.first_name;
     const lastName = user?.display_last_name ?? user?.last_name;
     return `${firstName} ${lastName}`.toLowerCase(); // lowercase for case-insensitive sorting
@@ -122,10 +123,10 @@ export const ScienceStaff = () => {
             py={4}
           >
             {scienceStaffData?.users
-              ?.sort((a, b) =>
+              ?.sort((a: IUserMe, b: IUserMe) =>
                 getDisplayName(a).localeCompare(getDisplayName(b)),
               )
-              ?.map((user, index) => {
+              ?.map((user: IUserMe, index: number) => {
                 return (
                   <ScienceStaffSearchResult
                     key={user.pk || index} // Use pk as key for better performance
