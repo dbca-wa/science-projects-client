@@ -1,4 +1,4 @@
-import { useGetRTESectionPlaceholder } from "@/shared/hooks/helper/useGetRTESectionPlaceholder";
+import { useGetRTESectionPlaceholder } from "@/features/reports/utils/useGetRTESectionPlaceholder";
 import { Box, Spacer, Text } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {

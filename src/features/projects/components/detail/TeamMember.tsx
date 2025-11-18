@@ -1,4 +1,4 @@
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import {
   Avatar,
   Box,

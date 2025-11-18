@@ -22,7 +22,7 @@ import {
   type UseToastOptions,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { useUserSearchContext } from "@/shared/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AdminSwitchVar,

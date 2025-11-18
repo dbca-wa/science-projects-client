@@ -32,7 +32,7 @@ import { ListItemNode, ListNode } from "@lexical/list";
 
 import { DeleteCommentModal } from "@/shared/components/Modals/DeleteCommentModal";
 import { createCommentReaction } from "@/shared/lib/api";
-import { useFormattedDate } from "@/shared/hooks/helper/useFormattedDate";
+import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, useAnimation } from "framer-motion";

@@ -30,7 +30,7 @@ import {
   requestCaretaker,
 } from "@/shared/lib/api";
 import type { ICaretakerEntry } from "@/shared/types/index.d";
-import { useFormattedDate } from "@/shared/hooks/helper/useFormattedDate";
+import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 
 interface IModalProps {
   isOpen: boolean;

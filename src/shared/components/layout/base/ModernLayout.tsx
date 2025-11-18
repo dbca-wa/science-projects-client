@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 import { Box, Spinner } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import { ModernHeader } from "../../Navigation/ModernHeader";
 import { Sidebar } from "../../Navigation/Sidebar";
 import { ModernPageWrapper } from "../wrappers/ModernPageWrapper";

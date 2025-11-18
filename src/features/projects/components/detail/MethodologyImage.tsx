@@ -1,5 +1,5 @@
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import type { IProjectPlan } from "@/shared/types/index.d";
 import {
   Box,
@@ -16,7 +16,7 @@ import Dropzone from "react-dropzone";
 import { BsCloudArrowUp } from "react-icons/bs";
 import { ImCross } from "react-icons/im";
 import { SaveMethodologyImageButton } from "./SaveMethodologyImageButton";
-import { handleImageFileCompression } from "@/shared/hooks/helper/handleImageFileCompression";
+import { handleImageFileCompression } from "@/shared/utils/imageCompression";
 
 interface Props {
   maxUploadSizeInMb: number;

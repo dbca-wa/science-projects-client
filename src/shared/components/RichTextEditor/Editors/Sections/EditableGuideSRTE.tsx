@@ -11,7 +11,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $getRoot } from "lexical";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 import DraggableBlockPlugin from "@/shared/components/RichTextEditor/Plugins/DraggableBlockPlugin";
-import { useGetRTESectionPlaceholder } from "@/shared/hooks/helper/useGetRTESectionPlaceholder";
+import { useGetRTESectionPlaceholder } from "@/features/reports/utils/useGetRTESectionPlaceholder";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";

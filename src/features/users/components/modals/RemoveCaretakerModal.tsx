@@ -25,37 +25,29 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import {
-  becomeCaretaker,
   MutationError,
   MutationSuccess,
   removeCaretaker,
 } from "@/shared/lib/api";
-import {
-  ICaretakerEntry,
-  ICaretakerObject,
-  ISimpleIdProp,
-  IUserData,
-} from "@/shared/types/index.d";
-import { useFormattedDate } from "@/shared/hooks/helper/useFormattedDate";
+import type { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/shared/types/index.d";
+import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 
 interface IModalProps {
   isOpen: boolean;
-  myPk: number;
   onClose: () => void;
-  user: IUserData;
+  caretakerObject: ICaretakerObject | null;
   refetch: () => void;
 }
 
-export const BecomeCaretakerModal = ({
+export const RemoveCaretakerModal = ({
   isOpen,
-  myPk,
-  user,
   onClose,
+  caretakerObject,
   refetch,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
   const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
-
+  console.log(caretakerObject);
   useEffect(() => {
     if (isToastOpen) {
       onClose();
@@ -76,16 +68,17 @@ export const BecomeCaretakerModal = ({
 
   const queryClient = useQueryClient();
 
-  const becomeCaretakerMutation = useMutation<
+  const removeCaretakerMutation = useMutation<
     MutationSuccess,
     MutationError,
-    ICaretakerEntry
+    ISimpleIdProp
   >({
     // Start of mutation handling
-    mutationFn: becomeCaretaker,
+    mutationFn: removeCaretaker,
     onMutate: () => {
+      console.log("onMutate");
       addToast({
-        title: "Requesting Caretaker...",
+        title: "Removing Caretaker...",
         description: "One moment!",
         status: "loading",
         position: "top-right",
@@ -97,30 +90,32 @@ export const BecomeCaretakerModal = ({
       if (ToastIdRef.current) {
         toast.update(ToastIdRef.current, {
           title: "Success",
-          description: `Request made.`,
+          description: `Caretaker removed.`,
           status: "success",
           position: "top-right",
           duration: 3000,
           isClosable: true,
         });
       }
+
+      // Explicitly call refetch after invalidating queries
       queryClient
         .invalidateQueries({
           queryKey: ["caretakers"],
         })
-        .then(() =>
+        .then((r) =>
           queryClient.invalidateQueries({
-            queryKey: ["pendingAdminTasks"],
+            queryKey: ["myCaretakerStatus"],
           }),
         )
-        .then(() => refetch())
-        .then(() => onClose());
+        .then((r) => refetch()) // Explicit call to refetch
+        .then((r) => onClose());
     },
+
     // Error handling based on API - file - declared interface
     onError: (error) => {
       console.log(error);
-      let errorMessage =
-        "An error occurred while requesting to become caretaker"; // Default error message
+      let errorMessage = "An error occurred while removing a caretaker"; // Default error message
 
       const collectErrors = (data, prefix = "") => {
         if (typeof data === "string") {
@@ -166,15 +161,17 @@ export const BecomeCaretakerModal = ({
     },
   });
 
-  const onSubmit = async () => {
+  const onSubmit = async (formData: ISimpleIdProp) => {
     // console.log(formData);
-    await becomeCaretakerMutation.mutateAsync({
-      userPk: user?.pk,
-      caretakerPk: myPk,
-      reason: "other",
-      endDate: null,
+    await removeCaretakerMutation.mutateAsync({
+      id: caretakerObject?.caretaker_obj_id
+        ? caretakerObject.caretaker_obj_id
+        : caretakerObject?.id,
     });
   };
+
+  // const formattedStart = useFormattedDate(startDate);
+  const formattedEnd = useFormattedDate(caretakerObject?.end_date);
 
   return (
     <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
@@ -184,22 +181,24 @@ export const BecomeCaretakerModal = ({
           color={colorMode === "dark" ? "gray.400" : null}
           bg={colorMode === "light" ? "white" : "gray.800"}
         >
-          <ModalHeader>Become Caretaker?</ModalHeader>
+          <ModalHeader>Remove Caretaker?</ModalHeader>
           <ModalCloseButton />
 
           <ModalBody>
             <Center>
               <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to become {user?.display_first_name}{" "}
-                {user?.display_last_name}&apos;s caretaker?
+                Are you sure you want to remove{" "}
+                {caretakerObject?.caretaker?.display_first_name}{" "}
+                {caretakerObject?.caretaker?.display_last_name} as caretaker?
               </Text>
             </Center>
             <Text mt={4}>
-              A request will be made to admins to approve your request.
+              They will immedediately lose permissions to act on the user's
+              behalf.
             </Text>
 
             <Text mt={4}>
-              If you would still like to proceed, press "Become Caretaker".
+              If you would still like to proceed, press "Remove Caretaker".
             </Text>
           </ModalBody>
           <ModalFooter>
@@ -209,15 +208,22 @@ export const BecomeCaretakerModal = ({
               </Button>
               <Button
                 color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
+                background={colorMode === "light" ? "red.500" : "red.600"}
                 _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
+                  background: colorMode === "light" ? "red.400" : "red.500",
                 }} // isDisabled={!changesMade}
-                isLoading={becomeCaretakerMutation.isPending}
-                onClick={() => onSubmit()}
+                isLoading={removeCaretakerMutation.isPending}
+                onClick={() =>
+                  onSubmit({
+                    id:
+                      caretakerObject?.id !== undefined
+                        ? caretakerObject.id
+                        : caretakerObject?.caretaker_obj_id,
+                  })
+                }
                 ml={3}
               >
-                Become Caretaker
+                Remove Caretaker
               </Button>
             </Grid>
           </ModalFooter>

@@ -22,8 +22,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import {
   ColumnDef,
   Row,

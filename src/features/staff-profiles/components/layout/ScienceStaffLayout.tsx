@@ -2,11 +2,11 @@ import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import { Box, Flex } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import "@/main.css";
-import "@/shared/components/StaffProfiles/science_staff.css";
-import ScienceHeader from "./Header/ScienceHeader";
-import ScienceFooter from "./Footer/ScienceFooter";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import ErrorBoundary from "../Base/ErrorBoundary";
+import "@/features/staff-profiles/styles/science_staff.css";
+import ScienceHeader from "../Header/ScienceHeader";
+import ScienceFooter from "../Footer/ScienceFooter";
+import { useUser } from "@/features/users/hooks/useUser";
+import ErrorBoundary from "@/shared/components/layout/base/ErrorBoundary";
 
 export const ScienceStaffLayout = ({ children }: { children: ReactNode }) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");

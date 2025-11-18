@@ -4,7 +4,7 @@ import { Button, Center, Flex, Icon, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Fragment } from "react";
 import { AiFillHome } from "react-icons/ai";
-import { useUpdatePage } from "@/shared/hooks/helper/useUpdatePage";
+import { useUpdatePage } from "@/shared/hooks/useUpdatePage";
 
 export const ModernBreadcrumb = () => {
   const { currentPage, updatePageContext } = useUpdatePage();

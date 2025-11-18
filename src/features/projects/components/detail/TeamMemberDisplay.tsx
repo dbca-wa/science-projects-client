@@ -27,7 +27,7 @@ import type {
 } from "@/shared/types/index.d";
 import { ProjectUserDetails } from "./ProjectUserDetails";
 import { UserProfile } from "../Users/UserProfile";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 
 interface ITeamMember {
   user_id: number;

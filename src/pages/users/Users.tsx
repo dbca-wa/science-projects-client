@@ -5,8 +5,8 @@ import { Head } from "@/shared/components/Base/Head";
 import { CreateUserModal } from "@/shared/components/Modals/CreateUserModal";
 import { SearchUsers } from "@/shared/components/Navigation/SearchUsers";
 import { PaginatorUser } from "@/shared/components/Pages/Users/PaginatorUser";
-import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
-import { useUserSearchContext } from "@/shared/hooks/helper/UserSearchContext";
+import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 import { type IUserData } from "@/shared/types/index.d";
 import {
   Box,

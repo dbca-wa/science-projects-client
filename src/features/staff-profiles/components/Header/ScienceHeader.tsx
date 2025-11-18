@@ -1,5 +1,5 @@
 import { Button } from "@/shared/components/ui/button";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useUser } from "@/features/users/hooks/useUser";
 
 const DesktopHeader = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const VITE_PRODUCTION_BASE_URL = import.meta.env.VITE_PRODUCTION_BASE_URL;

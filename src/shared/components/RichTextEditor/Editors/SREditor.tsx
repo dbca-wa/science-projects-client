@@ -47,7 +47,7 @@ import { FcApproval } from "react-icons/fc";
 import { MdApproval } from "react-icons/md";
 import { TiTick } from "react-icons/ti";
 import { ApproveProgressReportModal } from "@/shared/components/Modals/RTEModals/ApproveProgressReportModal";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 
 interface ISREditorProps {
   isEditing: boolean;

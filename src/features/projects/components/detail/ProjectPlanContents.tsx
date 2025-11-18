@@ -3,8 +3,8 @@
 import { Box, Grid, Text, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useCheckUserInTeam } from "@/shared/hooks/helper/useCheckUserInTeam";
-import { useCheckUserIsTeamLeader } from "@/shared/hooks/helper/useCheckUserIsTeamLeader";
+import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
+import { useCheckUserIsTeamLeader } from "@/features/projects/hooks/useCheckUserIsTeamLeader";
 import type {
   ICaretakerPermissions,
   IProjectAreas,

@@ -1,5 +1,5 @@
 import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
-import { useProjectSearchContext } from "@/shared/hooks/helper/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import type { ITaskEndorsement } from "@/shared/types/index.d";
 import { Box, Center, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";

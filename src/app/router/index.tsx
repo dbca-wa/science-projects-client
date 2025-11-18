@@ -1,78 +1,146 @@
-import { Navigate, createBrowserRouter } from "react-router-dom";
+import { Suspense, createElement } from "react";
+import { Navigate, type RouteObject, createBrowserRouter } from "react-router-dom";
 
-// Layouts, Guards & Boundaries =====================================================
+// Route Configuration
+import { ROUTES_CONFIG, ROUTE_REDIRECTS, type RouteConfig } from "@/app/config/routes.config";
 
-import { ErrorHandler } from "@/shared/components/Base/ErrorHandler";
-import { Root } from "@/shared/components/Base/Root";
-import { ScienceStaffLayout } from "@/shared/components/StaffProfiles/ScienceStaffLayout";
-import { AdminOnlyPage } from "@/shared/components/Wrappers/AdminOnlyPage";
-import { ContentWrapper } from "@/shared/components/Wrappers/ContentWrapper";
-import { LayoutCheckWrapper } from "@/shared/components/Wrappers/LayoutCheckWrapper";
-import { ProtectedPage } from "@/shared/components/Wrappers/ProtectedPage";
+// Layouts, Guards & Boundaries
+import { ErrorHandler } from "@/shared/components/layout/base/ErrorHandler";
+import { Root } from "@/shared/components/layout/base/Root";
+import ErrorPage from "@/shared/components/layout/base/ErrorPage";
+import { ScienceStaffLayout } from "@/features/staff-profiles/components/layout/ScienceStaffLayout";
+import { AdminOnlyPage } from "@/shared/components/layout/wrappers/AdminOnlyPage";
+import { ContentWrapper } from "@/shared/components/layout/wrappers/ContentWrapper";
+import { LayoutCheckWrapper } from "@/shared/components/layout/wrappers/LayoutCheckWrapper";
+import { ProtectedPage } from "@/shared/components/layout/wrappers/ProtectedPage";
+import { LoadingFallback } from "@/shared/components/layout/LoadingFallback";
 
-// Pages ===========================================================================
+/**
+ * Wrap a route element with appropriate wrappers based on configuration
+ */
+const wrapRouteElement = (
+  route: RouteConfig
+): JSX.Element => {
+  const Component = route.component;
+  const props = route.componentProps || {};
+  const wrapper = route.wrapper;
+  const requiresAuth = route.requiresAuth ?? true;
+  
+  let element = (
+    <Suspense fallback={<LoadingFallback />}>
+      {createElement(Component, props)}
+    </Suspense>
+  );
 
-// Admin
-import { AddressesCRUD } from "@/pages/admin/AddressesCRUD";
-import { AdminDataLists } from "@/pages/admin/AdminDataLists";
-import { AffiliationsCRUD } from "@/pages/admin/AffiliationsCRUD";
-import { BranchesCRUD } from "@/pages/admin/BranchesCRUD";
-import { BusinessAreasCRUD } from "@/pages/admin/BusinessAreasCRUD";
-import { DivisionsCRUD } from "@/pages/admin/DivisionsCRUD";
-import { LocationsCRUD } from "@/pages/admin/LocationsCRUD";
-import PatchNotesPage from "@/pages/admin/PatchNotesPage";
-import { ReportsCRUD } from "@/pages/admin/ReportsCRUD";
-import { ServicesCRUD } from "@/pages/admin/ServicesCRUD";
+  // Handle staff profile wrapper (special case - different layout)
+  if (wrapper === "staffProfile") {
+    return (
+      <ScienceStaffLayout>
+        <Suspense fallback={<LoadingFallback />}>
+          {createElement(Component, props)}
+        </Suspense>
+      </ScienceStaffLayout>
+    );
+  }
 
-// Auth
-import { Login } from "@/pages/auth/Login";
+  // Apply specific wrapper
+  if (wrapper === "admin") {
+    element = <AdminOnlyPage>{element}</AdminOnlyPage>;
+  } else if (wrapper === "layoutCheck") {
+    element = <LayoutCheckWrapper>{element}</LayoutCheckWrapper>;
+  }
 
-// Business Area
-import { MyBusinessArea } from "@/pages/business-area/MyBusinessArea";
+  // Wrap with ContentWrapper for authenticated routes
+  if (requiresAuth) {
+    element = <ContentWrapper>{element}</ContentWrapper>;
+  }
 
-// Dash
-import { Dashboard } from "@/pages/dash/Dashboard";
-import { HowTo } from "@/pages/dash/HowTo";
-import { UserGuide } from "@/pages/dash/UserGuide";
+  return element;
+};
 
-// Errors
-import ErrorPage from "@/shared/components/Base/ErrorPage";
+/**
+ * Generate route objects from configuration
+ */
+const generateRoutes = (): RouteObject[] => {
+  const routes: RouteObject[] = [];
 
-// Projects
-import { CreateProject } from "@/pages/projects/CreateProject";
-import { ProjectDetail } from "@/pages/projects/ProjectDetail";
-import { Projects } from "@/pages/projects/Projects";
-import ProjectsMap from "@/pages/projects/ProjectsMap";
+  // Login route (no auth required)
+  const loginRoute = ROUTES_CONFIG.find((r) => r.path === "/login");
+  if (loginRoute) {
+    routes.push({
+      path: loginRoute.path,
+      element: wrapRouteElement(loginRoute),
+    });
+  }
 
-// Reports
-import { CurrentReport } from "@/pages/reports/CurrentReport";
-import { Reports } from "@/pages/reports/Reports";
+  // Projects map route (special case - outside main layout)
+  const projectsMapRoute = ROUTES_CONFIG.find(
+    (r) => r.path === "/projects"
+  )?.children?.find((c) => c.path === "/projects/map");
+  if (projectsMapRoute) {
+    routes.push({
+      path: projectsMapRoute.path,
+      element: wrapRouteElement(projectsMapRoute),
+    });
+  }
 
-// Staff Profile
-import { ScienceStaff } from "@/pages/staff-profile/ScienceStaff";
-import ScienceStaffDetail from "@/pages/staff-profile/ScienceStaffDetail";
+  // Staff profile routes (public, special layout)
+  const staffRoutes = ROUTES_CONFIG.filter(
+    (r) => r.path.startsWith("/staff")
+  );
+  staffRoutes.forEach((route) => {
+    routes.push({
+      path: route.path,
+      element: wrapRouteElement(route),
+      errorElement: <ErrorPage />,
+    });
+  });
 
-// Users
-import { AccountEdit } from "@/pages/users/AccountEdit";
-import { CreateUser } from "@/pages/users/CreateUser";
-import { Users } from "@/pages/users/Users";
+  // Main protected routes
+  const protectedChildren: RouteObject[] = [];
 
-// Test
-import { TestEmailPage } from "@/pages/test/TestEmailPage";
-import { TestPlayground } from "@/pages/test/TestPlayground";
+  ROUTES_CONFIG.forEach((route) => {
+    // Skip routes already handled
+    if (
+      route.path === "/login" ||
+      route.path.startsWith("/staff") ||
+      route.path === "/projects/map"
+    ) {
+      return;
+    }
 
-const inAppRouteArray = [
-  // Login
-  {
-    path: "login",
-    element: <Login />,
-  },
+    // Add main route
+    if (route.requiresAuth !== false) {
+      protectedChildren.push({
+        path: route.path === "/" ? "" : route.path.substring(1), // Remove leading slash for children
+        element: wrapRouteElement(route),
+      });
 
-  {
-    path: "projects/map",
-    element: <ProjectsMap />,
-  },
-  {
+      // Add child routes
+      if (route.children) {
+        route.children.forEach((child) => {
+          // Skip projects/map as it's already handled
+          if (child.path === "/projects/map") return;
+
+          protectedChildren.push({
+            path: child.path.substring(1), // Remove leading slash
+            element: wrapRouteElement(child),
+          });
+        });
+      }
+    }
+  });
+
+  // Add redirects
+  ROUTE_REDIRECTS.forEach((redirect) => {
+    protectedChildren.push({
+      path: redirect.from.substring(1), // Remove leading slash
+      element: <Navigate to={redirect.to} replace />,
+    });
+  });
+
+  // Main protected route with Root layout
+  routes.push({
     path: "/",
     element: (
       <ProtectedPage>
@@ -80,335 +148,13 @@ const inAppRouteArray = [
       </ProtectedPage>
     ),
     errorElement: <ErrorHandler />,
-    children: [
-      // Sidebar Routes
-      {
-        path: "",
-        element: (
-          <ContentWrapper>
-            <Dashboard />
-          </ContentWrapper>
-        ),
-      },
+    children: protectedChildren,
+  });
 
-      {
-        path: "my_business_area",
-        element: (
-          <ContentWrapper>
-            <MyBusinessArea />
-          </ContentWrapper>
-        ),
-      },
+  return routes;
+};
 
-      {
-        path: "patchnotes",
-        element: (
-          <ContentWrapper>
-            <PatchNotesPage />
-          </ContentWrapper>
-        ),
-      },
-
-      // ADMIN
-      {
-        path: "crud",
-        element: (
-          <ContentWrapper>
-            <Dashboard activeTab={2} />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/test",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <TestPlayground />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/data",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <AdminDataLists />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/reports",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <ReportsCRUD />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/businessareas",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <BusinessAreasCRUD />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/services",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <ServicesCRUD />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/divisions",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <DivisionsCRUD />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/locations",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <LocationsCRUD />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/affiliations",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <AffiliationsCRUD />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/addresses",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <AddressesCRUD />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "crud/branches",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <BranchesCRUD />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-
-      {
-        path: "crud/emails",
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <TestEmailPage />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-
-      // Reports
-      {
-        path: "reports",
-
-        element: (
-          <ContentWrapper>
-            <Reports />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "reports/current", // change to :year
-        element: (
-          <ContentWrapper>
-            <AdminOnlyPage>
-              <CurrentReport />
-            </AdminOnlyPage>
-          </ContentWrapper>
-        ),
-      },
-      // Projects
-      {
-        path: "projects",
-        element: (
-          <ContentWrapper>
-            <Projects />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "projects/add",
-        element: (
-          <ContentWrapper>
-            <CreateProject />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "projects/:projectPk/overview",
-        element: (
-          <ContentWrapper>
-            <ProjectDetail selectedTab="overview" />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "projects/:projectPk/concept",
-        element: (
-          <ContentWrapper>
-            <ProjectDetail selectedTab="concept" />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "projects/:projectPk/project",
-        element: (
-          <ContentWrapper>
-            <ProjectDetail selectedTab="project" />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "projects/:projectPk/progress",
-        element: (
-          <ContentWrapper>
-            <ProjectDetail selectedTab="progress" />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "projects/:projectPk/student",
-        element: (
-          <ContentWrapper>
-            <ProjectDetail selectedTab="student" />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "projects/:projectPk/closure",
-        element: (
-          <ContentWrapper>
-            <ProjectDetail selectedTab="closure" />
-          </ContentWrapper>
-        ),
-      },
-      // Users
-      {
-        path: "users",
-        element: (
-          <ContentWrapper>
-            <Users />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "users/add",
-        element: (
-          <ContentWrapper>
-            <CreateUser />
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "users/me",
-        element: (
-          <ContentWrapper>
-            <AccountEdit />
-          </ContentWrapper>
-        ),
-      },
-      // Other
-      {
-        path: "howto",
-        element: (
-          <ContentWrapper>
-            <LayoutCheckWrapper>
-              <HowTo />
-            </LayoutCheckWrapper>
-          </ContentWrapper>
-        ),
-      },
-      {
-        path: "guide",
-        element: (
-          <ContentWrapper>
-            <UserGuide />
-          </ContentWrapper>
-        ),
-      },
-
-      // REDIRECTS
-      {
-        path: "dashboard",
-        element: <Navigate to="/" replace />,
-      },
-      {
-        path: "reports/browse",
-        element: <Navigate to="/reports" replace />,
-      },
-      {
-        path: "projects/browse",
-        element: <Navigate to="/projects" replace />,
-      },
-      {
-        path: "users/browse",
-        element: <Navigate to="/users" replace />,
-      },
-    ],
-  },
-];
-
-const staffProfilesAppArray = [
-  {
-    path: "/staff",
-    element: (
-      <ScienceStaffLayout>
-        <ScienceStaff />
-      </ScienceStaffLayout>
-    ),
-    // errorElement: <ErrorHandler />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/staff/:staffProfilePk",
-    element: (
-      <ScienceStaffLayout>
-        <ScienceStaffDetail />
-      </ScienceStaffLayout>
-    ),
-    errorElement: <ErrorPage />,
-  },
-];
-
-export const router = createBrowserRouter(
-  [...inAppRouteArray, ...staffProfilesAppArray],
-  // {
-  //   future: {
-  //     v7_fetcherPersist: true,
-  //     v7_relativeSplatPath: true,
-  //   },
-  // },
-);
+/**
+ * Create and export the router
+ */
+export const router = createBrowserRouter(generateRoutes());

@@ -13,7 +13,7 @@ import { OptionsBar } from "../../OptionsBar/OptionsBar";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 // import { RichTextToolbar } from "../../Toolbar/RichTextToolbar";
 import DraggableBlockPlugin from "@/shared/components/RichTextEditor/Plugins/DraggableBlockPlugin";
-import { useGetRTESectionPlaceholder } from "@/shared/hooks/helper/useGetRTESectionPlaceholder";
+import { useGetRTESectionPlaceholder } from "@/features/reports/utils/useGetRTESectionPlaceholder";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";

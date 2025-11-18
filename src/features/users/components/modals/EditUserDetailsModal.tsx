@@ -49,7 +49,7 @@ import {
   adminUpdateUser,
   removeUserAvatar,
 } from "@/shared/lib/api";
-import { useUserSearchContext } from "@/shared/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
 import type { IAffiliation, IBranch, IBusinessArea, IUserData } from "@/shared/types/index.d";
 import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";

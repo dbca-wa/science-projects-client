@@ -35,9 +35,9 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 // import { ProgressReportSelector } from "@/shared/components/Pages/ProjectDetail/ProgressReportSelector";
-import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import useCaretakerPermissions from "@/shared/hooks/helper/useCaretakerPermissions";
+import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import useCaretakerPermissions from "@/features/users/hooks/useCaretakerPermissions";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { Mail } from "lucide-react";
 

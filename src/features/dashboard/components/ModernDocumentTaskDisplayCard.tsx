@@ -1,5 +1,5 @@
 import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
-import { useProjectSearchContext } from "@/shared/hooks/helper/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import type { IMainDoc } from "@/shared/types/index.d";
 import { Box, Text, Flex, useColorMode, Center } from "@chakra-ui/react";
 import { motion } from "framer-motion";

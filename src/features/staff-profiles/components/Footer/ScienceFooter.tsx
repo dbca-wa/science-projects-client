@@ -1,6 +1,6 @@
 import { Separator } from "@/shared/components/ui/separator";
 import { Button } from "@/shared/components/ui/button";
-import { useCurrentYear } from "@/shared/hooks/helper/useCurrentYear";
+import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 
 const MobileFooter = ({ currentYear }: { currentYear: number }) => {
   return (

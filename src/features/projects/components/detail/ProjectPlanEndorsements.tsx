@@ -15,7 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { ISpecialEndorsement } from "@/shared/lib/api";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import type { ICaretakerPermissions, IProjectPlan, IUserMe } from "@/shared/types/index.d";
 import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
 import { SingleFileStateUpload } from "../../SingleFileStateUpload";

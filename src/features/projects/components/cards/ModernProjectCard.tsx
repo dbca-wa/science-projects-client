@@ -13,9 +13,9 @@ import {
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProjectSearchContext } from "@/shared/hooks/helper/ProjectSearchContext";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
-import useServerImageUrl from "@/shared/hooks/helper/useServerImageUrl";
+import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
+import { useNoImage } from "@/shared/hooks/useNoImage";
+import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
 import type { IProjectData } from "@/shared/types/index.d";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 

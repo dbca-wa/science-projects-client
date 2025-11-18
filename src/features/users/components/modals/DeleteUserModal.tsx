@@ -33,7 +33,7 @@ import {
   deleteUserAdmin,
 } from "@/shared/lib/api";
 import { useMutation } from "@tanstack/react-query";
-import { useUserSearchContext } from "@/shared/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 
 interface IModalProps {
   isOpen: boolean;

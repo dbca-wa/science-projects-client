@@ -1,6 +1,6 @@
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import { type IMyBAUpdateSubmissionData, updateMyBa } from "@/shared/lib/api";
-import useDistilledHtml from "@/shared/hooks/helper/useDistilledHtml";
+import useDistilledHtml from "@/shared/hooks/useDistilledHtml";
 import {
   Button,
   FormControl,

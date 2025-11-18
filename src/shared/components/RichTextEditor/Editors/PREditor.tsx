@@ -45,7 +45,7 @@ import { RevisedRichTextToolbar } from "../Toolbar/RevisedRichTextToolbar";
 import type { IProgressReportDisplayData } from "./ARProgressReportHandler";
 import { ApproveProgressReportModal } from "@/shared/components/Modals/RTEModals/ApproveProgressReportModal";
 import { TiTick } from "react-icons/ti";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 
 interface IPREditorProps {
   // isEditing: boolean;

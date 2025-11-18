@@ -3,7 +3,7 @@ import { SideMenuButton } from "@/shared/components/Pages/Account/SideMenuButton
 import { SideMenuSectionDivider } from "@/shared/components/Pages/UserGuide/SidebarSectionDivider";
 import { GuideRichTextEditor } from "@/shared/components/RichTextEditor/Editors/GuideRichTextEditor";
 import { AccountPageViewWrapper } from "@/shared/components/Wrappers/AccountPageViewWrapper";
-import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { useAdminOptions } from "@/shared/hooks/tanstack/useAdminOptions";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 import { Box, Flex, useColorMode } from "@chakra-ui/react";

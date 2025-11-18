@@ -14,7 +14,7 @@ import {
 import { useEffect, useState, type ChangeEventHandler, type ChangeEvent } from "react";
 import { FiSearch } from "react-icons/fi";
 import { getAllProjectsYears } from "@/shared/lib/api";
-import { useProjectSearchContext } from "@/shared/hooks/helper/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import SearchProjectsByUser from "./SearchProjectsByUser";
 
 interface IProps {

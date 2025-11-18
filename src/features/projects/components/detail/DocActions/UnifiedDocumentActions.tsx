@@ -3,7 +3,7 @@ import { DeleteDocumentModal } from "@/shared/components/Modals/DeleteDocumentMo
 import { UnifiedDocumentActionModal } from "@/shared/components/Modals/DocumentActionModals/UnifiedDocumentActionModal";
 import { SetAreasModal } from "@/shared/components/Modals/SetAreasModal";
 import { type ISetProjectStatusProps, setProjectStatus } from "@/shared/lib/api";
-import { useFormattedDate } from "@/shared/hooks/helper/useFormattedDate";
+import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { useBusinessArea } from "@/shared/hooks/tanstack/useBusinessArea";
 import { useDivisionDirectorateMembers } from "@/shared/hooks/tanstack/useDivisionDirectorateMembers";
 import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";

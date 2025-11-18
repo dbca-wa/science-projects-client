@@ -7,7 +7,7 @@ import { AnnualReportDetails } from "@/shared/components/Pages/CurrentReport/Ann
 import { AnnualReportMedia } from "@/shared/components/Pages/CurrentReport/AnnualReportMedia";
 import { LatestReportsNotYetApproved } from "@/shared/components/Pages/CurrentReport/LatestReportsNotYetApproved";
 import { ParticipatingProjectReports } from "@/shared/components/Pages/CurrentReport/ParticipatingProjectReports";
-import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { getLatestReportingYear } from "@/shared/lib/api";
 import type { IReport } from "@/shared/types/index.d";
 import {

@@ -36,7 +36,7 @@ import {
   IExtendCaretakerProps,
 } from "@/shared/lib/api";
 import type { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/shared/types/index.d";
-import { useFormattedDate } from "@/shared/hooks/helper/useFormattedDate";
+import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { type FC } from "react";
 import { ShadcnDatePicker } from "../../Pages/Account/ShadcnDatePicker";
 

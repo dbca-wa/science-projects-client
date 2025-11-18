@@ -1,6 +1,6 @@
 import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
 // import { useProjectSearchContext } from "@/shared/hooks/ProjectSearchContext";
-import { useBoxShadow } from "@/shared/hooks/helper/useBoxShadow";
+import { useBoxShadow } from "@/shared/hooks/useBoxShadow";
 import type { IMainDoc } from "@/shared/types/index.d";
 import {
   Box,
@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { HiDocumentCheck } from "react-icons/hi2";
-import { useProjectSearchContext } from "@/shared/hooks/helper/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 
 interface IProps {
   inputKind:

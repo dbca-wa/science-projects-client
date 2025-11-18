@@ -3,7 +3,7 @@
 import type { IProjectData } from "@/shared/types/index.d";
 import { Box, Button, Center, Flex, Grid, Spinner } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import { ModernProjectCard } from "./ModernProjectCard";
 
 interface IPaginationProps {

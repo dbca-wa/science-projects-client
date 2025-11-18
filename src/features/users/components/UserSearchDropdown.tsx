@@ -1,7 +1,7 @@
 // Dropdown search component for users. Displays 5 users below the search box.
 
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import { CloseIcon } from "@chakra-ui/icons";
 import {
   Avatar,

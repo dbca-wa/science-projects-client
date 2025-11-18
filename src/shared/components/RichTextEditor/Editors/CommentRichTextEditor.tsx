@@ -25,7 +25,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import "@/styles/texteditor.css";
 
-import useDistilledHtml from "@/shared/hooks/helper/useDistilledHtml";
+import useDistilledHtml from "@/shared/hooks/useDistilledHtml";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { PostCommentButton } from "../Buttons/PostCommentButton";
 import { CustomPastePlugin } from "../Plugins/CustomPastePlugin";

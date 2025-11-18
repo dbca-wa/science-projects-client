@@ -27,7 +27,7 @@ import { useEffect, useRef, useState } from "react";
 import { AiFillCloseCircle, AiFillEdit, AiFillEye } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-import useServerImageUrl from "@/shared/hooks/helper/useServerImageUrl";
+import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 import { EditMembershipModal } from "../../Modals/EditMembershipModal";
 import { EditPersonalInformationModal } from "../../Modals/EditPersonalInformationModal";

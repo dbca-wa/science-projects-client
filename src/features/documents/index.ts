@@ -29,6 +29,10 @@ export { useGetEndorsementsPendingMyAction } from "./hooks/useGetEndorsementsPen
 // Services
 export * from "./services/documents.service";
 
+// Utils
+export * from "./utils/documentConstants";
+export * from "./utils/documentStageConstants";
+
 // Types
 export type {
   EditorType,

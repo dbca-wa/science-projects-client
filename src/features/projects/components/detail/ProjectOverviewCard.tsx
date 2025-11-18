@@ -56,11 +56,11 @@ import { IoCreate } from "react-icons/io5";
 import { MdBusinessCenter, MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 import { VscOrganization } from "react-icons/vsc";
-import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
-import { useCheckUserInTeam } from "@/shared/hooks/helper/useCheckUserInTeam";
-import { useCheckUserIsTeamLeader } from "@/shared/hooks/helper/useCheckUserIsTeamLeader";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
-import useServerImageUrl from "@/shared/hooks/helper/useServerImageUrl";
+import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
+import { useCheckUserIsTeamLeader } from "@/features/projects/hooks/useCheckUserIsTeamLeader";
+import { useNoImage } from "@/shared/hooks/useNoImage";
+import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
 import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
@@ -77,7 +77,7 @@ import { ActionAdminRequestModal } from "@/shared/components/Modals/ActionAdminR
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cancelAdminTaskRequestCall } from "@/shared/lib/api";
 import { AxiosError } from "axios";
-import useCaretakerPermissions from "@/shared/hooks/helper/useCaretakerPermissions";
+import useCaretakerPermissions from "@/features/users/hooks/useCaretakerPermissions";
 import HideProjectModal from "./HideProjectModal";
 
 interface IProjectOverviewCardProps extends ICaretakerPermissions {

@@ -30,6 +30,9 @@ export { default as RTEPriorReportPopulationModal } from "./components/modals/RT
 // PDF Components
 export { default as PDFViewer } from "./components/pdfs/PDFViewer";
 
+// Email Components
+export { default as NewCycleOpenEmail } from "./components/emails/NewCycleOpenEmail";
+
 // ============================================================================
 // Hooks
 // ============================================================================

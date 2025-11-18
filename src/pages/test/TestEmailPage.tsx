@@ -1,6 +1,6 @@
 import { Head } from "@/shared/components/Base/Head";
-import DivisionalEmailLists from "@/shared/components/Emails/DivisionalEmailLists";
-import EmailStylingPage from "@/shared/components/Modals/Emails/EmailStylingPage";
+import DivisionalEmailLists from "@/features/admin/components/emails/DivisionalEmailLists";
+// import EmailStylingPage from "@/shared/components/Modals/Emails/EmailStylingPage"; // Component does not exist
 import { useMaintainer } from "@/shared/hooks/tanstack/useMaintainer";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 
@@ -35,7 +35,7 @@ export const TestEmailPage = () => {
       <Tabs>
         <TabList>
           <Tab>Divisional Directorate Email Lists</Tab>
-          {isMaintainer ? <Tab>Email Styling Page</Tab> : null}
+          {/* {isMaintainer ? <Tab>Email Styling Page</Tab> : null} */}
 
           {/* <Tab>Templates</Tab> */}
         </TabList>
@@ -43,11 +43,11 @@ export const TestEmailPage = () => {
           <TabPanel>
             <DivisionalEmailLists />
           </TabPanel>
-          {isMaintainer ? (
+          {/* {isMaintainer ? (
             <TabPanel>
               <EmailStylingPage />
             </TabPanel>
-          ) : null}
+          ) : null} */}
         </TabPanels>
       </Tabs>
     </>

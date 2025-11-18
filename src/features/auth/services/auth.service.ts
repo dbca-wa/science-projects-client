@@ -1,4 +1,4 @@
-import instance from "../axiosInstance";
+import instance from "@/shared/lib/api/axiosInstance";
 
 // AUTHENTICATION ==============================================================
 

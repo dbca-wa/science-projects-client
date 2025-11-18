@@ -8,8 +8,8 @@ import { SetCaretakerAdminModal } from "@/shared/components/Modals/Caretakers/Se
 import { SetCaretakerForMyAccountModal } from "@/shared/components/Modals/Caretakers/SetCaretakerForMyAccountModal";
 import { DeactivateUserModal } from "@/shared/components/Modals/DeactivateUserModal";
 import { RequestMergeUserModal } from "@/shared/components/Modals/RequestMergeUserModal";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import { useCheckExistingCaretaker } from "@/shared/hooks/tanstack/useCheckExistingCaretaker";
 import { useInvolvedProjects } from "@/shared/hooks/tanstack/useInvolvedProjects";
 import {
@@ -32,9 +32,9 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { FiCopy } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { useCopyText } from "@/shared/hooks/helper/useCopyText";
-import { useFormattedDate } from "@/shared/hooks/helper/useFormattedDate";
-import { useUpdatePage } from "@/shared/hooks/helper/useUpdatePage";
+import { useCopyText } from "@/shared/hooks/useCopyText";
+import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
+import { useUpdatePage } from "@/shared/hooks/useUpdatePage";
 import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 import type { IBranch, IBusinessArea } from "@/shared/types/index.d";
