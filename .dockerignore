@@ -2,6 +2,7 @@ node_modules
 .git
 .github
 .vscode
+docs
 **/.vite.config.ts.timestamp*
 .gitignore
 .gitattributes
