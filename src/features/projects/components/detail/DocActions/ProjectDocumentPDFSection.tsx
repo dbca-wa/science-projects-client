@@ -3,7 +3,7 @@ import {
   cancelProjectDocumentGeneration,
   generateProjectDocument,
 } from "@/shared/lib/api";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import {
   IConceptPlan,
   IProgressReport,

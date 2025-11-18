@@ -2,8 +2,8 @@ import {
   deleteReportMediaImage,
   uploadReportMediaImage,
 } from "@/shared/lib/api";
-import { handleImageFileCompression } from "@/shared/hooks/helper/handleImageFileCompression";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import { handleImageFileCompression } from "@/shared/utils/imageCompression";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import {
   Box,
   Center,

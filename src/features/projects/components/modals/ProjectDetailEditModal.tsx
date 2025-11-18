@@ -16,7 +16,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useCurrentYear } from "@/shared/hooks/helper/useCurrentYear";
+import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { IconType } from "react-icons";
 import { ProjectDetailsSection } from "../Pages/CreateProject/ProjectDetailsSection";
 import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSection";

@@ -39,8 +39,8 @@ import {
   removeTeamMemberFromProject,
   updateProjectMember,
 } from "@/shared/lib/api";
-import { useCopyText } from "@/shared/hooks/helper/useCopyText";
-import { useFormattedDate } from "@/shared/hooks/helper/useFormattedDate";
+import { useCopyText } from "@/shared/hooks/useCopyText";
+import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 

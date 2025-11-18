@@ -1,8 +1,8 @@
 // An auth wrapper for components meant only for Admins
 
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useEffect, useState, ReactNode } from "react";
+import { useUser } from "@/features/users/hooks/useUser";
 
 interface IAdminOnlyPageProps {
   children: ReactNode;

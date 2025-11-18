@@ -13,7 +13,7 @@ import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { TreeViewPlugin } from "@/shared/lib/plugins/TreeViewPlugin";
 import { PrepopulateHTMLPlugin } from "@/shared/components/RichTextEditor/Plugins/PrepopulateHTMLPlugin";
 import { ImagePlugin } from "../../Plugins/ImagesPlugin";
-import { useGetRTESectionPlaceholder } from "@/shared/hooks/helper/useGetRTESectionPlaceholder";
+import { useGetRTESectionPlaceholder } from "@/features/reports/utils/useGetRTESectionPlaceholder";
 
 interface Props {
   initialConfig: InitialConfigType;

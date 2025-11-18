@@ -7,8 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import type { IMainDoc } from "@/shared/types/index.d";
 import {
   Avatar,

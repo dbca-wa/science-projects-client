@@ -1,7 +1,7 @@
 import { ExtendCaretakerModal } from "@/shared/components/Modals/Caretakers/ExtendCaretakerModal";
 import { RemoveCaretakerModal } from "@/shared/components/Modals/Caretakers/RemoveCaretakerModal";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import { checkIfDateExpired } from "@/shared/utils/checkIfDateExpired";
 import type { ICaretakerSubsections } from "@/shared/types/index.d";
 import {

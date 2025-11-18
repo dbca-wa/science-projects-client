@@ -3,7 +3,7 @@
 import { TypewriterText } from "@/shared/components/Animations/TypewriterText";
 import { Head } from "@/shared/components/Base/Head";
 import { NewProjectCard } from "@/shared/components/Pages/CreateProject/NewProjectCard";
-import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import {
   Box,
   Button,

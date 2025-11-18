@@ -1,5 +1,5 @@
-import replaceDarkWithLight from "@/shared/hooks/helper/replaceDarkWithLight";
-import { useCurrentYear } from "@/shared/hooks/helper/useCurrentYear";
+import replaceDarkWithLight from "@/shared/utils/htmlHelpers";
+import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { useInvolvedProjects } from "@/shared/hooks/tanstack/useInvolvedProjects";
 import { useNavigate } from "react-router-dom";
 import SimpleSkeletonSection from "../../SimpleSkeletonSection";

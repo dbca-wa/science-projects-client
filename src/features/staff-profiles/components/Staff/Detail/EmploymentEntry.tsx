@@ -1,4 +1,4 @@
-import { useCurrentYear } from "@/shared/hooks/helper/useCurrentYear";
+import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import type { IStaffEmploymentEntry } from "@/shared/types/index.d";
 import { useState } from "react";

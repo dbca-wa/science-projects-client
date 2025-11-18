@@ -3,7 +3,7 @@
 import { Head } from "@/shared/components/Base/Head";
 import { ModernDashboard } from "@/shared/components/Pages/Dashboard/ModernDashboard";
 import { TraditionalDashboard } from "@/shared/components/Pages/Dashboard/TraditionalDashboard";
-import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
+import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import { type IDashProps } from "@/shared/types/index.d";
 import { Box } from "@chakra-ui/react";
 

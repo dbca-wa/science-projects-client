@@ -1,6 +1,6 @@
 // A component for toggling the dark mode
 
-import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import {
   Box,
   Button,

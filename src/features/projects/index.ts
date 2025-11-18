@@ -66,6 +66,9 @@ export { ProjectSuspensionModal } from "./components/modals/ProjectSuspensionMod
 export { RequestDeleteProjectModal } from "./components/modals/RequestDeleteProjectModal";
 export { SetProjectStatusModal } from "./components/modals/SetProjectStatusModal";
 
+// Components - Emails
+export { default as ProjectClosureEmail } from "./components/emails/ProjectClosureEmail";
+
 // Components - Map
 export { HeatMapToggle } from "./components/map/HeatMapToggle";
 export { MapBackAndSearch } from "./components/map/MapBackAndSearch";
@@ -97,3 +100,4 @@ export * from "./services/projects.service";
 // Utils
 export { useDistlledProjectTitle } from "./utils/useDistlledProjectTitle";
 export { useGetConceptPlanData } from "./utils/useGetConceptPlanData";
+export * from "./utils/projectConstants";

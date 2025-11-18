@@ -28,8 +28,8 @@ import {
   removeUserAvatar,
   updateProfile,
 } from "@/shared/lib/api";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
-import useServerImageUrl from "@/shared/hooks/helper/useServerImageUrl";
+import { useNoImage } from "@/shared/hooks/useNoImage";
+import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
 import type { IProfile } from "@/shared/types/index.d";
 import { StatefulMediaChangerAvatar } from "../Pages/Admin/StatefulMediaChangerAvatar";
 import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";

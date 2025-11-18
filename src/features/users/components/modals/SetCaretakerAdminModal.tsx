@@ -39,12 +39,12 @@ import {
   requestCaretaker,
 } from "@/shared/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUserSearchContext } from "@/shared/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 import type { ICaretakerEntry, IUserMe } from "@/shared/types/index.d";
-import { useFormattedDate } from "@/shared/hooks/helper/useFormattedDate";
+import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { ShadcnDatePicker } from "../../Pages/Account/ShadcnDatePicker";
 import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
-import useCaretakingChain from "@/shared/hooks/helper/useCaretakingChain";
+import useCaretakingChain from "@/features/users/hooks/useCaretakingChain";
 
 interface IModalProps {
   isOpen: boolean;

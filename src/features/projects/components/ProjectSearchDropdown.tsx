@@ -1,6 +1,6 @@
 // Dropdown search component for users. Displays 5 users below the search box.
 
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { CloseIcon } from "@chakra-ui/icons";
 import {
   Avatar,
@@ -20,7 +20,7 @@ import {
   getFullProjectSimple,
   getMyProjectsBasedOnSearchTerm,
 } from "@/shared/lib/api";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 import type { IProjectData } from "@/shared/types/index.d";
 import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";

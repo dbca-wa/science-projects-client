@@ -18,12 +18,12 @@ export const CurrentPageContext = createContext<{
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router-dom";
-import { LayoutSwitcherProvider } from "@/shared/hooks/helper/LayoutSwitcherContext";
-import { ProjectSearchProvider } from "@/shared/hooks/helper/ProjectSearchContext";
-import { UserSearchProvider } from "@/shared/hooks/helper/UserSearchContext";
-import { router } from "@/router";
+import { LayoutSwitcherProvider } from "@/shared/hooks/LayoutSwitcherContext";
+import { ProjectSearchProvider } from "@/features/projects/hooks/ProjectSearchContext";
+import { UserSearchProvider } from "@/features/users/hooks/UserSearchContext";
+import { router } from "@/app/router";
 import theme from "@/theme";
-import { ProjectMapSearchProvider } from "@/shared/hooks/helper/ProjectMapSearchContext";
+import { ProjectMapSearchProvider } from "@/features/projects/hooks/ProjectMapSearchContext";
 // import { RouterProvider, createRouter } from "react-router-dom";
 // import { routeTree } from "./routeTree.gen";
 

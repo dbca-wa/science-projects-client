@@ -3,7 +3,7 @@
 import { Button, Icon, useColorMode } from "@chakra-ui/react";
 import { IconType } from "react-icons";
 import "@/styles/texteditor.css";
-import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { useEffect } from "react";
 
 interface BaseToggleOptionsButtonProps {

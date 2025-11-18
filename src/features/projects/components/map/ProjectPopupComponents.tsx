@@ -1,8 +1,8 @@
 import { type FC, type ReactNode } from "react";
 import type { IProjectData } from "@/shared/types/index.d";
 import DOMPurify from "dompurify";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 
 // Function to strip HTML tags and sanitize content
 export const stripHtml = (html: string) => {

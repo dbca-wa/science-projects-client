@@ -56,7 +56,7 @@ import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
 import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
 import TagInput from "../Pages/CreateProject/TagInput";
 import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
-import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { StatefulMediaChangerProject } from "../Pages/Admin/StatefulMediaChangerProject";
 
 interface Props {

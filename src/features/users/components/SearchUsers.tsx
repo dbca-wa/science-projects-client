@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState, type ChangeEventHandler, type ChangeEvent } from "react";
 import { FiSearch } from "react-icons/fi";
-import { useUserSearchContext } from "@/shared/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 
 export const SearchUsers = () => {
   const {

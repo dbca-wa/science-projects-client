@@ -1,4 +1,4 @@
-import { useCurrentYear } from "@/shared/hooks/helper/useCurrentYear";
+import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import type { IProjectData } from "@/shared/types/index.d";
 import { type FC, type ReactNode } from "react";

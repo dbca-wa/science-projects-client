@@ -10,7 +10,7 @@ import "@/styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
-import { useGetRTESectionTitle } from "@/shared/hooks/helper/useGetRTESectionTitle";
+import { useGetRTESectionTitle } from "@/features/reports/utils/useGetRTESectionTitle";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { HideEditorButton } from "../Buttons/HideEditorButton";
 import { DisplayGuideSRTE } from "./Sections/DisplayGuideSRTE";

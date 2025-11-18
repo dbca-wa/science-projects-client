@@ -9,7 +9,7 @@ import {
 import type { IMiniEndorsement } from "@/shared/types/index.d";
 import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
 
-import { useProjectSearchContext } from "@/shared/hooks/helper/ProjectSearchContext";
+import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import {
   ColumnDef,
   SortingState,

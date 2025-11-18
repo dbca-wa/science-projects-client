@@ -1,10 +1,10 @@
 // Route for handling Updating and Reviewing Account
 
-import { Head } from "@/shared/components/Base/Head";
-import CaretakerModePage from "@/shared/components/Pages/Account/Caretaking/CaretakerMode";
-import { ProfilePage } from "@/shared/components/Pages/Account/ProfilePage";
-import { SideMenuButton } from "@/shared/components/Pages/Account/SideMenuButton";
-import { AccountPageViewWrapper } from "@/shared/components/Wrappers/AccountPageViewWrapper";
+import { Head } from "@/shared/components/layout/base/Head";
+import CaretakerModePage from "@/features/users/components/account/Caretaking/CaretakerMode";
+import { ProfilePage } from "@/features/users/components/account/ProfilePage";
+import { SideMenuButton } from "@/features/users/components/account/SideMenuButton";
+import { AccountPageViewWrapper } from "@/shared/components/layout/wrappers/AccountPageViewWrapper";
 import { Box, Flex, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 

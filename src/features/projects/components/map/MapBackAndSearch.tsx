@@ -1,4 +1,4 @@
-import { MapSearchFilters } from "@/shared/hooks/helper/ProjectMapSearchContext";
+import { MapSearchFilters } from "@/features/projects/hooks/ProjectMapSearchContext";
 import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
 import type { IBusinessArea, IProjectData, ISimpleLocationData } from "@/shared/types/index.d";
 import L from "leaflet";

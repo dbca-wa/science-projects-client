@@ -1,6 +1,6 @@
 import { RemoveCaretakerModal } from "@/shared/components/Modals/Caretakers/RemoveCaretakerModal";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import type { ICaretakerObject, ICaretakerSimpleUserData } from "@/shared/types/index.d";
 import {
   Avatar,

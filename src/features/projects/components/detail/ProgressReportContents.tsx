@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BsPlus } from "react-icons/bs";
 import { getProgressReportForYear } from "@/shared/lib/api";
-import { useCheckUserInTeam } from "@/shared/hooks/helper/useCheckUserInTeam";
+import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
 import { useGetProgressReportAvailableReportYears } from "@/shared/hooks/tanstack/useGetProgressReportAvailableReportYears";
 import type {
   ICaretakerPermissions,

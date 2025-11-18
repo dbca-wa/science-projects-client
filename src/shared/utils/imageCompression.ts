@@ -1,6 +1,10 @@
+/**
+ * Image compression utilities for handling file uploads
+ */
+
 import imageCompression from "browser-image-compression";
 
-interface Props {
+interface ImageCompressionProps {
   acceptedImageTypes: string[];
   maxSizeMB: number;
   maxWidthOrHeight: number;
@@ -15,6 +19,13 @@ interface Props {
   startSimulatedProgressFn: () => NodeJS.Timeout;
 }
 
+/**
+ * Converts a Blob to a File object
+ *
+ * @param blob - Blob to convert
+ * @param fileName - Name for the resulting file
+ * @returns File object
+ */
 export const blobToFile = (blob: Blob, fileName: string): File => {
   const file = new File([blob], fileName, {
     type: blob.type,
@@ -23,6 +34,13 @@ export const blobToFile = (blob: Blob, fileName: string): File => {
   return file;
 };
 
+/**
+ * Handles image file compression with progress tracking
+ * Validates file type and compresses if file size exceeds maximum
+ *
+ * @param props - Configuration and callback functions for compression
+ * @returns Compressed file or undefined if error occurs
+ */
 export const handleImageFileCompression = async ({
   acceptedFile,
   acceptedImageTypes,
@@ -36,7 +54,7 @@ export const handleImageFileCompression = async ({
   setProgressIntervalFn,
   startSimulatedProgressFn,
   progressInterval,
-}: Props) => {
+}: ImageCompressionProps) => {
   setIsErrorFn(false);
   setIsUploadingFn(true);
   const newProgressInterval = startSimulatedProgressFn();

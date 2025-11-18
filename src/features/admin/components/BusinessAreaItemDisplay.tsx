@@ -44,9 +44,9 @@ import {
   deleteBusinessArea,
   updateBusinessArea,
 } from "@/shared/lib/api";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import useDistilledHtml from "@/shared/hooks/helper/useDistilledHtml";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import useDistilledHtml from "@/shared/hooks/useDistilledHtml";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
 import {
   BusinessAreaImage,

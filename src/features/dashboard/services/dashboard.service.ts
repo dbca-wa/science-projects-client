@@ -1,4 +1,4 @@
-import instance from "../axiosInstance";
+import instance from "@/shared/lib/api/axiosInstance";
 
 export const getQuote = async () => {
   return instance.get(`quotes/random/`).then((res) => res.data);

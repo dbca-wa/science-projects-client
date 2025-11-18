@@ -34,7 +34,7 @@ import {
   deactivateUserAdmin,
 } from "@/shared/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUserSearchContext } from "@/shared/hooks/helper/UserSearchContext";
+import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 import type { IUserData } from "@/shared/types/index.d";
 
 interface IModalProps {

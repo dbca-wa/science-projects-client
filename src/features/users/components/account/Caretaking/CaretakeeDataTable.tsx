@@ -32,10 +32,10 @@ import {
 } from "@chakra-ui/react";
 import { useMedia } from "react-use";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import type { ICaretakerSimpleUserData, IUserMe } from "@/shared/types/index.d";
-import getAllIndirectCaretakees from "@/shared/hooks/helper/getAllIndirectCaretakees";
+import getAllIndirectCaretakees from "@/features/users/utils/getAllIndirectCaretakees";
 import { FaArrowRight, FaEllipsisVertical } from "react-icons/fa6";
 import { RemoveCaretakerModal } from "@/shared/components/Modals/Caretakers/RemoveCaretakerModal";
 import { ChevronDownIcon } from "@chakra-ui/icons";

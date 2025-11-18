@@ -44,6 +44,11 @@ export { default as AffiliationCreateSearchDropdown } from "./components/Affilia
 export { default as AffiliationSearchDropdown } from "./components/AffiliationSearchDropdown";
 export { default as BranchSearchDropdown } from "./components/BranchSearchDropdown";
 
+// Email Components
+export { default as AddRemoveUserFromEmailListModal } from "./components/emails/AddRemoveUserFromEmailListModal";
+export { default as DivisionalEmailListDataTable } from "./components/emails/DivisionalEmailListDataTable";
+export { default as DivisionalEmailLists } from "./components/emails/DivisionalEmailLists";
+
 // Hooks
 export { default as useAffiliation } from "./hooks/useAffiliation";
 export { default as useAffiliations } from "./hooks/useAffiliations";

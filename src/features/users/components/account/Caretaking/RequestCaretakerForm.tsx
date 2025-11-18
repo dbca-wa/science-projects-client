@@ -18,7 +18,7 @@ import { ShadcnDatePicker } from "../ShadcnDatePicker";
 import { UserSearchDropdown } from "@/shared/components/Navigation/UserSearchDropdown";
 import { FaRunning } from "react-icons/fa";
 import { CaretakerModeConfirmModal } from "@/shared/components/Modals/Caretakers/CaretakerModeConfirmModal";
-import useCaretakingChain from "@/shared/hooks/helper/useCaretakingChain";
+import useCaretakingChain from "@/features/users/hooks/useCaretakingChain";
 
 const RequestCaretakerForm = ({
   userData,

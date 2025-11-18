@@ -2,7 +2,7 @@
 
 import { useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useCheckUserInTeam } from "@/shared/hooks/helper/useCheckUserInTeam";
+import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
 import {
   ICaretakerPermissions,
   IConceptPlan,

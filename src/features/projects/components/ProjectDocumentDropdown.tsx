@@ -22,7 +22,7 @@ import {
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 import type { IMidDoc } from "@/shared/types/index.d";
 // import { useNoImage } from "@/shared/hooks/useNoImage";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";
 
 interface IProjectDocumentDropdown {

@@ -1,6 +1,6 @@
-import { handleImageFileCompression } from "@/shared/hooks/helper/handleImageFileCompression";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import { handleImageFileCompression } from "@/shared/utils/imageCompression";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import {
   Box,
   Center,

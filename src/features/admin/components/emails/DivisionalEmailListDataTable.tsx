@@ -36,9 +36,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-import { useProjectSearchContext } from "@/shared/hooks/helper/ProjectSearchContext";
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
-import { useNoImage } from "@/shared/hooks/helper/useNoImage";
+import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
+import { useNoImage } from "@/shared/hooks/useNoImage";
 import {
   ArrowDown,
   ArrowUp,

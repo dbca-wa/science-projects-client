@@ -26,7 +26,7 @@ import {
   type IUpdateProjectDescription,
   updateProjectDescription,
 } from "@/shared/lib/api";
-import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 
 interface IEditDescriptionProps {
   projectId: number;

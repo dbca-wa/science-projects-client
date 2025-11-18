@@ -1,6 +1,6 @@
 // Sidebar for modern version
 
-import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { useUser } from "@/shared/hooks/tanstack/useUser";
 import {
   Box,
@@ -25,7 +25,7 @@ import { PiBookOpenTextFill } from "react-icons/pi";
 import { RiAdminFill } from "react-icons/ri";
 import { SiReadthedocs } from "react-icons/si";
 import { TbLayoutGridAdd } from "react-icons/tb";
-import { useUpdatePage } from "@/shared/hooks/helper/useUpdatePage";
+import { useUpdatePage } from "@/shared/hooks/useUpdatePage";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { AnimatedToggleButton } from "./AnimatedToggleButton";

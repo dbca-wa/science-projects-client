@@ -11,8 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { RiLayout3Fill, RiLayoutTopFill } from "react-icons/ri";
-import { useLayoutSwitcher } from "@/shared/hooks/helper/LayoutSwitcherContext";
-import { useEditorContext } from "@/shared/hooks/helper/EditorBlockerContext";
+import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
+import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 
 interface IOptionalToggleLayoutProps {
   showText?: boolean;

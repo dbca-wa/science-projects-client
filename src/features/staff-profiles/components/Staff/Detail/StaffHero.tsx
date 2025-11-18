@@ -1,4 +1,4 @@
-import useApiEndpoint from "@/shared/hooks/helper/useApiEndpoint";
+import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useStaffProfileHero } from "@/shared/hooks/tanstack/useStaffProfileHero";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import type { IStaffProfileBaseData, IUserMe } from "@/shared/types/index.d";

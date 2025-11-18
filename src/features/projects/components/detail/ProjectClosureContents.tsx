@@ -14,7 +14,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
-import { useCheckUserInTeam } from "@/shared/hooks/helper/useCheckUserInTeam";
+import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
 import type {
   ICaretakerPermissions,
   IProjectClosure,

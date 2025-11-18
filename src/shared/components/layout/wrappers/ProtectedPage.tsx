@@ -1,6 +1,6 @@
 // An auth wrapper for displaying content only to users who are logged in
 
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useUser } from "@/features/users/hooks/useUser";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 

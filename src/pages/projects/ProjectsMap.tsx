@@ -5,7 +5,7 @@ import MapBusinessAreasSidebar from "@/shared/components/Map/MapBusinessAreasSid
 // import MapHeatLayer from "@/shared/components/Map/MapHeatLayer"; // Import new component
 import MapLocationsSidebar from "@/shared/components/Map/MapLocationsSidebar";
 import MapTopRightControls from "@/shared/components/Map/MapTopRightControls";
-import { useProjectMapSearchContext } from "@/shared/hooks/helper/ProjectMapSearchContext";
+import { useProjectMapSearchContext } from "@/features/projects/hooks/ProjectMapSearchContext";
 import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
 import { useGetLocations } from "@/shared/hooks/tanstack/useGetLocations";
 import { useGetLocationsGeojson } from "@/shared/hooks/tanstack/useGetLocationsGeojson";

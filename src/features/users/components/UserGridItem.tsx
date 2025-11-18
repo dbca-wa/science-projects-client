@@ -17,7 +17,7 @@ import {
   useColorMode,
   useDisclosure,
 } from "@chakra-ui/react";
-import useServerImageUrl from "@/shared/hooks/helper/useServerImageUrl";
+import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
 import type { IUserData } from "@/shared/types/index.d";
 import { UserProfile } from "./UserProfile";
 
