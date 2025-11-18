@@ -894,9 +894,9 @@ export const ProjectOverviewCard = ({
                     {(details?.student as IStudentProjectDetails)?.organisation
                       ? `${(
                           details?.student as IStudentProjectDetails
-                        )?.organisation[0]?.toUpperCase()}${(
+                        )?.organisation.split('; ').join(', ')[0]?.toUpperCase()}${(
                           details?.student as IStudentProjectDetails
-                        )?.organisation.slice(1)}`
+                        )?.organisation.split('; ').join(', ').slice(1)}`
                       : "No organisation listed"}
                   </Text>
                 </Flex>
@@ -931,7 +931,7 @@ export const ProjectOverviewCard = ({
                       ?.collaboration_with
                       ? `${
                           (details?.external as IExternalProjectDetails)
-                            ?.collaboration_with
+                            ?.collaboration_with.split('; ').join(', ')
                         }`
                       : null}
                   </Text>

@@ -15,7 +15,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { useState } from "react";
 import { CustomFocusPlugin } from "../../Plugins/CustomFocusPlugin";
 import { RevisedSimpleRichTextToolbar } from "../../Toolbar/RevisedSimpleRichTextToolbar";
-import { PrepopulateCommentDisplayPlugin } from "./../../Plugins/PrepopulateCommentDisplayPlugin";
+import { PrepopulateCommentDisplayPlugin } from "../../Plugins/PrepopulateCommentDisplayPlugin";
 
 interface Props {
   allowInsertButton?: boolean;

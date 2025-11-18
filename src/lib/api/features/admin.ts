@@ -786,6 +786,12 @@ export const mergeAffiliations = async (formData: IMergeAffiliation) => {
     .then((res) => res.data);
 };
 
+export const cleanOrphanedAffiliations = async () => {
+  return instance
+    .post("agencies/affiliations/clean_orphaned")
+    .then((res) => res.data);
+};
+
 export const updateAffiliation = async (formData: IAffiliation) => {
   return instance
     .put(`agencies/affiliations/${formData.pk}`, formData)
