@@ -47,16 +47,16 @@ export const ProjectExternalSection = ({
     setCollaborationWith((prevString) => {
       let updatedString = prevString.trim(); // Remove any leading or trailing spaces
 
-      // Add a comma and a space if not already present
-      if (updatedString && !/,\s*$/.test(updatedString)) {
-        updatedString += ", ";
+      // Add a semicolon and a space if not already present
+      if (updatedString && !/;\s*$/.test(updatedString)) {
+        updatedString += "; ";
       }
 
       // Append affiliation name
       updatedString += affiliation.name.trim();
 
-      // Check if the first two characters are a space and comma, remove them
-      if (updatedString?.startsWith(", ")) {
+      // Check if the first two characters are a space and semicolon, remove them
+      if (updatedString?.startsWith("; ")) {
         updatedString = updatedString.substring(2);
       }
 
@@ -69,11 +69,11 @@ export const ProjectExternalSection = ({
     affiliation: IAffiliation,
   ) => {
     setCollaborationWith((prevString) => {
-      const regex = new RegExp(`.{0,2}${affiliation.name.trim()}\\s*`, "g");
-      let updatedString = prevString.replace(regex, "").trim();
-      if (updatedString?.startsWith(", ")) {
-        updatedString = updatedString.substring(2);
-      }
+      // Use safe split/filter/join approach instead of regex
+      const affiliations = prevString
+        .split("; ")
+        .filter((a) => a.trim() !== affiliation.name.trim());
+      const updatedString = affiliations.join("; ");
       return updatedString;
     });
 

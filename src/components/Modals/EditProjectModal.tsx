@@ -172,14 +172,33 @@ export const EditProjectModal = ({
     IAffiliation[] | null
   >([]);
 
+  // Initialize collaboratingPartnersArray from existing affiliation strings on load
+  useEffect(() => {
+    const affiliationString = collaborationWith || organisation;
+    if (affiliationString && affiliationString.length > 0 && collaboratingPartnersArray.length === 0) {
+      const affiliationNames = affiliationString
+        .split('; ')
+        .map((name) => name.trim())
+        .filter((name) => name.length > 0);
+      
+      // Create affiliation objects with names (PKs will be undefined, but that's okay for filtering)
+      const affiliationObjects = affiliationNames.map((name) => ({
+        name,
+        pk: undefined, // PK not needed for name-based filtering
+      } as IAffiliation));
+      
+      setCollaboratingPartnersArray(affiliationObjects);
+    }
+  }, [collaborationWith, organisation]);
+
   const addCollaboratingPartnersPkToArray = (affiliation: IAffiliation) => {
     if (collaborationWith !== undefined) {
       setCollaborationWith((prevString) => {
         let updatedString = prevString.trim(); // Remove any leading or trailing spaces
 
-        // Add a comma and a space if not already present
-        if (updatedString && !/,\s*$/.test(updatedString)) {
-          updatedString += ", ";
+        // Add a semicolon and a space if not already present
+        if (updatedString && !/;\s*$/.test(updatedString)) {
+          updatedString += "; ";
         }
 
         // Append affiliation name
@@ -192,9 +211,9 @@ export const EditProjectModal = ({
       setOrganisation((prevString) => {
         let updatedString = prevString.trim(); // Remove any leading or trailing spaces
 
-        // Add a comma and a space if not already present
-        if (updatedString && !/,\s*$/.test(updatedString)) {
-          updatedString += ", ";
+        // Add a semicolon and a space if not already present
+        if (updatedString && !/;\s*$/.test(updatedString)) {
+          updatedString += "; ";
         }
 
         // Append affiliation name
@@ -210,37 +229,30 @@ export const EditProjectModal = ({
   const removeCollaboratingPartnersPkFromArray = (
     affiliation: IAffiliation,
   ) => {
-    // console.log()
     if (collaborationWith !== undefined) {
       setCollaborationWith((prevString) => {
-        // Remove affiliation name along with optional preceding characters
-        const regex = new RegExp(`.{0,2}${affiliation.name.trim()}\\s*`, "g");
-        let modifiedString = prevString.replace(regex, "");
-
-        // Check if the first two characters are a space and comma, remove them
-        if (modifiedString?.startsWith(", ")) {
-          modifiedString = modifiedString.substring(2);
-        }
-        // console.log("MOD:", modifiedString);
-        return modifiedString;
+        // Safe removal using split/filter/join approach
+        const affiliations = prevString
+          .split("; ")
+          .filter((a) => a.trim() !== affiliation.name.trim());
+        return affiliations.join("; ");
       });
     }
 
     if (organisation !== undefined) {
       setOrganisation((prevString) => {
-        // const regex = new RegExp(`.{0,2}${affiliation.name}\\s*`, 'g');
-        // return prevString.replace(regex, '');
-        // Remove affiliation name along with optional preceding characters
-        const regex = new RegExp(`.{0,2}${affiliation.name.trim()}\\s*`, "g");
-        let modifiedString = prevString.replace(regex, "");
-
-        // Check if the first two characters are a space and comma, remove them
-        if (modifiedString?.startsWith(", ")) {
-          modifiedString = modifiedString.substring(2);
-        }
-        return modifiedString;
+        // Safe removal using split/filter/join approach
+        const affiliations = prevString
+          .split("; ")
+          .filter((a) => a.trim() !== affiliation.name.trim());
+        return affiliations.join("; ");
       });
     }
+
+    // Also remove from the array so autocomplete filtering works
+    setCollaboratingPartnersArray((prev) =>
+      prev.filter((item) => item.pk !== affiliation.pk)
+    );
   };
 
   const clearCollaboratingPartnersPkArray = () => {
@@ -533,8 +545,9 @@ export const EditProjectModal = ({
                     <Flex flexWrap="wrap" gap={2} pt={0} pb={2}>
                       {collaborationWith?.length > 0 &&
                         collaborationWith
-                          .split(", ")
+                          .split("; ")
                           .map((item) => item.trim())
+                          .filter((item) => item.length > 0)
                           ?.map((aff, index) => (
                             <Tag
                               key={index}
@@ -555,26 +568,18 @@ export const EditProjectModal = ({
                               <TagLabel pl={1}>{aff}</TagLabel>
                               <TagCloseButton
                                 onClick={() => {
-                                  setCollaboratingPartnersArray([]);
+                                  // Remove from string
                                   setCollaborationWith((prevString) => {
-                                    // Remove affiliation name along with optional preceding characters
-                                    const regex = new RegExp(
-                                      `.{0,2}${aff}\\s*`,
-                                      "g",
-                                    );
-                                    let modifiedString = prevString.replace(
-                                      regex,
-                                      "",
-                                    );
-
-                                    // Check if the first two characters are a space and comma, remove them
-                                    if (modifiedString?.startsWith(", ")) {
-                                      modifiedString =
-                                        modifiedString.substring(2);
-                                    }
-                                    // console.log("MOD:", modifiedString)
-                                    return modifiedString;
+                                    // Safe removal using split/filter/join approach
+                                    const affiliations = prevString
+                                      .split("; ")
+                                      .filter((a) => a.trim() !== aff.trim());
+                                    return affiliations.join("; ");
                                   });
+                                  // Remove from array by name (since we don't have pk here)
+                                  setCollaboratingPartnersArray((prev) =>
+                                    prev.filter((item) => item.name.trim() !== aff.trim())
+                                  );
                                 }}
                                 userSelect={"none"}
                                 tabIndex={-1}
@@ -610,8 +615,9 @@ export const EditProjectModal = ({
                     <Flex flexWrap="wrap" gap={2} pt={0} pb={2}>
                       {organisation?.length > 0 &&
                         organisation
-                          .split(", ")
+                          .split("; ")
                           .map((item) => item.trim())
+                          .filter((item) => item.length > 0)
                           ?.map((aff, index) => (
                             <Tag
                               key={index}
@@ -632,49 +638,31 @@ export const EditProjectModal = ({
                               <TagLabel pl={1}>{aff}</TagLabel>
                               <TagCloseButton
                                 onClick={() => {
-                                  setCollaboratingPartnersArray([]);
+                                  // Remove from strings
                                   if (collaborationWith !== undefined) {
                                     setCollaborationWith((prevString) => {
-                                      // Remove affiliation name along with optional preceding characters
-                                      const regex = new RegExp(
-                                        `.{0,2}${aff}\\s*`,
-                                        "g",
-                                      );
-                                      let modifiedString = prevString.replace(
-                                        regex,
-                                        "",
-                                      );
-
-                                      // Check if the first two characters are a space and comma, remove them
-                                      if (modifiedString?.startsWith(", ")) {
-                                        modifiedString =
-                                          modifiedString.substring(2);
-                                      }
-                                      return modifiedString;
+                                      // Safe removal using split/filter/join approach
+                                      const affiliations = prevString
+                                        .split("; ")
+                                        .filter((a) => a.trim() !== aff.trim());
+                                      return affiliations.join("; ");
                                     });
                                   }
 
                                   if (organisation !== undefined) {
                                     setOrganisation((prevString) => {
-                                      // Remove affiliation name along with optional preceding characters
-                                      const regex = new RegExp(
-                                        `.{0,2}${aff}\\s*`,
-                                        "g",
-                                      );
-                                      let modifiedString = prevString.replace(
-                                        regex,
-                                        "",
-                                      );
-
-                                      // Check if the first two characters are a space and comma, remove them
-                                      if (modifiedString?.startsWith(", ")) {
-                                        modifiedString =
-                                          modifiedString.substring(2);
-                                      }
-                                      // console.log("MOD:", modifiedString)
-                                      return modifiedString;
+                                      // Safe removal using split/filter/join approach
+                                      const affiliations = prevString
+                                        .split("; ")
+                                        .filter((a) => a.trim() !== aff.trim());
+                                      return affiliations.join("; ");
                                     });
                                   }
+                                  
+                                  // Remove from array by name (since we don't have pk here)
+                                  setCollaboratingPartnersArray((prev) =>
+                                    prev.filter((item) => item.name.trim() !== aff.trim())
+                                  );
                                 }}
                                 userSelect={"none"}
                                 tabIndex={-1}

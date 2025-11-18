@@ -34,6 +34,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
+  cleanOrphanedAffiliations,
   createAffiliation,
   getAllAffiliations,
   mergeAffiliations,
@@ -82,6 +83,12 @@ export const AffiliationsCRUD = () => {
     isOpen: mergeIsOpen,
     onOpen: onMergeOpen,
     onClose: onMergeClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: cleanIsOpen,
+    onOpen: onCleanOpen,
+    onClose: onCleanClose,
   } = useDisclosure();
 
   const queryClient = useQueryClient();
@@ -152,6 +159,43 @@ export const AffiliationsCRUD = () => {
       clearSecondaryAffiliationArray();
       setPrimaryAffiliation(null);
       onMergeClose();
+      queryClient.invalidateQueries({ queryKey: ["affiliations"] });
+    },
+    onError: () => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Failed",
+          description: `Something went wrong!`,
+          status: "error",
+          position: "top-right",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    },
+  });
+
+  const cleanMutation = useMutation({
+    mutationFn: cleanOrphanedAffiliations,
+    onMutate: () => {
+      addToast({
+        status: "loading",
+        title: "Cleaning orphaned affiliations...",
+        position: "top-right",
+      });
+    },
+    onSuccess: (data) => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, {
+          title: "Cleanup Complete!",
+          description: data.message,
+          status: "success",
+          position: "top-right",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+      onCleanClose();
       queryClient.invalidateQueries({ queryKey: ["affiliations"] });
     },
     onError: () => {
@@ -266,6 +310,20 @@ export const AffiliationsCRUD = () => {
               />
 
               <Flex justifyContent={"flex-end"} w={"100%"}>
+                <Button
+                  mr={4}
+                  onClick={onCleanOpen}
+                  color={"white"}
+                  background={
+                    colorMode === "light" ? "blue.500" : "blue.600"
+                  }
+                  _hover={{
+                    background:
+                      colorMode === "light" ? "blue.400" : "blue.500",
+                  }}
+                >
+                  Clean
+                </Button>
                 <Button
                   mr={4}
                   onClick={onMergeOpen}
@@ -467,6 +525,62 @@ export const AffiliationsCRUD = () => {
                     }
                   >
                     Merge
+                  </Button>
+                </Grid>
+              </ModalContent>
+            </ModalBody>
+          </Modal>
+
+          <Modal isOpen={cleanIsOpen} onClose={onCleanClose}>
+            <ModalOverlay />
+            <ModalHeader>Clean Orphaned Affiliations</ModalHeader>
+            <ModalBody>
+              <ModalContent
+                color={colorMode === "dark" ? "gray.400" : null}
+                bg={colorMode === "light" ? "white" : "gray.800"}
+                p={4}
+                px={6}
+              >
+                <VStack spacing={4}>
+                  <Box justifyContent={"start"} w={"100%"}>
+                    <Text>
+                      This will remove all affiliations that have no links to any projects or users.
+                    </Text>
+                    <Text mt={2} color={"orange.500"}>
+                      Warning: This action cannot be undone. Orphaned affiliations will be permanently deleted.
+                    </Text>
+                  </Box>
+
+                  {cleanMutation.isError ? (
+                    <Text color={"red.500"}>Something went wrong</Text>
+                  ) : null}
+                </VStack>
+
+                <Grid
+                  w={"100%"}
+                  justifyContent={"end"}
+                  gridTemplateColumns={"repeat(2, 1fr)"}
+                  gridGap={4}
+                  mt={4}
+                >
+                  <Button onClick={onCleanClose} size="lg">
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => cleanMutation.mutate()}
+                    isLoading={cleanMutation.isPending}
+                    color={"white"}
+                    background={
+                      colorMode === "light" ? "blue.500" : "blue.600"
+                    }
+                    _hover={{
+                      background:
+                        colorMode === "light" ? "blue.400" : "blue.500",
+                    }}
+                    size="lg"
+                    isDisabled={cleanMutation.isPending}
+                  >
+                    Clean
                   </Button>
                 </Grid>
               </ModalContent>
