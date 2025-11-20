@@ -247,11 +247,15 @@ const useToolbar = ({
 interface Props {
   buttonSize?: "sm" | "md" | "lg";
   allowInserts?: boolean;
+  hideBold?: boolean;
+  hideUnderline?: boolean;
 }
 
 export const RevisedSimpleRichTextToolbar = ({
   allowInserts,
   buttonSize,
+  hideBold,
+  hideUnderline,
 }: Props) => {
   const [editor] = useLexicalComposerContext();
   const [
@@ -342,18 +346,20 @@ export const RevisedSimpleRichTextToolbar = ({
         <VerticalDivider />
 
         <>
-          <RevisedBaseToolbarButton
-            buttonSize={buttonSize}
-            ariaLabel="Format text as Bold"
-            isActive={isBold}
-            variant={"ghost"}
-            isDisabled={false}
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
-            }}
-          >
-            <FaBold />
-          </RevisedBaseToolbarButton>
+          {!hideBold && (
+            <RevisedBaseToolbarButton
+              buttonSize={buttonSize}
+              ariaLabel="Format text as Bold"
+              isActive={isBold}
+              variant={"ghost"}
+              isDisabled={false}
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+              }}
+            >
+              <FaBold />
+            </RevisedBaseToolbarButton>
+          )}
           <RevisedBaseToolbarButton
             buttonSize={buttonSize}
             ariaLabel="Format text as Italic"
@@ -366,18 +372,20 @@ export const RevisedSimpleRichTextToolbar = ({
           >
             <FaItalic />
           </RevisedBaseToolbarButton>
-          <RevisedBaseToolbarButton
-            buttonSize={buttonSize}
-            ariaLabel="Format text as Underlined"
-            isActive={isUnderline}
-            variant={"ghost"}
-            isDisabled={false}
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
-            }}
-          >
-            <FaUnderline />
-          </RevisedBaseToolbarButton>
+          {!hideUnderline && (
+            <RevisedBaseToolbarButton
+              buttonSize={buttonSize}
+              ariaLabel="Format text as Underlined"
+              isActive={isUnderline}
+              variant={"ghost"}
+              isDisabled={false}
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
+              }}
+            >
+              <FaUnderline />
+            </RevisedBaseToolbarButton>
+          )}
           <VerticalDivider />
         </>
 

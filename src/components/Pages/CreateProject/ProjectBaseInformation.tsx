@@ -162,6 +162,8 @@ export const ProjectBaseInformation = ({
             setValueAsPlainText={false}
             // isPlain={true}
             shouldFocus={true}
+            hideBold={!meData?.is_superuser}
+            hideUnderline={!meData?.is_superuser}
           />
         </Box>
 

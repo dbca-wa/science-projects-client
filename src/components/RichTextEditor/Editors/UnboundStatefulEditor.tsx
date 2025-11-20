@@ -31,6 +31,8 @@ interface IProps {
   isPlain?: boolean;
   buttonSize?: "sm" | "md" | "lg";
   tabbable?: boolean;
+  hideBold?: boolean;
+  hideUnderline?: boolean;
 }
 
 export const UnboundStatefulEditor = ({
@@ -49,6 +51,8 @@ export const UnboundStatefulEditor = ({
   isPlain,
   buttonSize,
   tabbable,
+  hideBold,
+  hideUnderline,
 }: IProps) => {
   const { colorMode } = useColorMode();
 
@@ -154,6 +158,8 @@ export const UnboundStatefulEditor = ({
               shouldFocus={shouldFocus ? shouldFocus : undefined}
               buttonSize={buttonSize}
               tabbable={tabbable ? tabbable : undefined}
+              hideBold={hideBold}
+              hideUnderline={hideUnderline}
             />
           )}
         </Box>
