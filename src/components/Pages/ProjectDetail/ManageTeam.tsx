@@ -8,7 +8,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { BsPlus, BsGripVertical } from "react-icons/bs";
+import { BsPlus } from "react-icons/bs";
 import {
   DndContext,
   closestCenter,
@@ -31,7 +31,6 @@ import { useProjectTeam } from "@/lib/hooks/tanstack/useProjectTeam";
 import { useUser } from "@/lib/hooks/tanstack/useUser";
 import { ICaretakerPermissions, IProjectMember } from "@/types";
 import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
-import { TeamMember } from "./TeamMember";
 import { TeamMemberDisplay } from "./TeamMemberDisplay";
 import { useBranches } from "@/lib/hooks/tanstack/useBranches";
 import { useBusinessAreas } from "@/lib/hooks/tanstack/useBusinessAreas";
@@ -78,7 +77,7 @@ export const ManageTeam = ({
       const leaderMember = sortedTeam.find(
         (member) => member.is_leader === true,
       );
-      if (leaderMember) {
+      if (leaderMember && leaderMember.user) {
         setLeaderPk(leaderMember.user.pk);
       }
       setRearrangedTeam(sortedTeam);
@@ -131,12 +130,14 @@ export const ManageTeam = ({
     // Visual feedback
     setTimeout(() => {
       const newBackgroundColors = { ...backgroundColors };
-      newBackgroundColors[updatedTeam[newIndex].user.pk] = "green.400";
-      setBackgroundColors(newBackgroundColors);
+      if (updatedTeam[newIndex].user) {
+        newBackgroundColors[updatedTeam[newIndex].user.pk] = "green.400";
+        setBackgroundColors(newBackgroundColors);
 
-      setTimeout(() => {
-        setBackgroundColors({});
-      }, 250);
+        setTimeout(() => {
+          setBackgroundColors({});
+        }, 250);
+      }
     }, 150);
 
     await refetchTeamData();
@@ -148,15 +149,15 @@ export const ManageTeam = ({
   };
 
   const { userLoading, userData } = useUser();
-  const { branchesLoading, branchesData } = useBranches();
-  const { baLoading, baData } = useBusinessAreas();
+  const { branchesData } = useBranches();
+  const { baData } = useBusinessAreas();
 
   const canManageTeam =
     userData.is_superuser ||
     userIsCaretakerOfAdmin ||
     userIsCaretakerOfProjectLeader ||
     userIsCaretakerOfBaLeader ||
-    userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user.pk;
+    userData.pk === rearrangedTeam.find((tm) => tm.is_leader)?.user?.pk;
 
   return (
     !userLoading &&
@@ -235,11 +236,11 @@ export const ManageTeam = ({
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={rearrangedTeam.map((tm) => String(tm.pk))}
+                items={rearrangedTeam.filter((tm) => tm.user).map((tm) => String(tm.pk))}
                 strategy={verticalListSortingStrategy}
               >
                 <div>
-                  {rearrangedTeam.map((tm, index) => (
+                  {rearrangedTeam.filter((tm) => tm.user).map((tm, index) => (
                     <SortableTeamMember
                       key={tm.pk}
                       tm={tm}
@@ -262,7 +263,7 @@ export const ManageTeam = ({
             </DndContext>
           ) : (
             <Grid rounded="xl" mt={4} overflow="hidden">
-              {rearrangedTeam.map((tm, index) => (
+              {rearrangedTeam.filter((tm) => tm.user).map((tm, index) => (
                 <TeamMemberDisplay
                   key={index}
                   ba_leader={ba_leader}

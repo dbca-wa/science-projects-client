@@ -47,6 +47,7 @@ import {
   ISimpleLocationData,
   ISmallService,
   IStudentProjectDetails,
+  IUserData,
   ProjectImage,
 } from "@/types";
 import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
@@ -359,6 +360,7 @@ export const EditProjectModal = ({
 
   const { register } = useForm<IEditProject>();
   const queryClient = useQueryClient();
+  const meData = queryClient.getQueryData<IUserData>(["me"]);
   const toast = useToast();
   const toastIdRef = useRef<ToastId | undefined>(undefined);
   const addToast = (data: UseToastOptions) => {
@@ -504,6 +506,8 @@ export const EditProjectModal = ({
                   value={projectTitle}
                   setValueFunction={setProjectTitle}
                   setValueAsPlainText={false}
+                  hideBold={!meData?.is_superuser}
+                  hideUnderline={!meData?.is_superuser}
                 />
                 {(details?.external as IExternalProjectDetails)?.project ? (
                   <Grid

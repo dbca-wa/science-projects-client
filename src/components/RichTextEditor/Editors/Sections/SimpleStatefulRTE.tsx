@@ -28,6 +28,8 @@ interface Props {
   shouldFocus?: boolean;
   buttonSize?: "sm" | "md" | "lg";
   tabbable?: boolean;
+  hideBold?: boolean;
+  hideUnderline?: boolean;
   // editorRef: any;
 }
 
@@ -43,6 +45,8 @@ export const SimpleStatefulRTE = ({
   shouldFocus,
   buttonSize,
   tabbable,
+  hideBold,
+  hideUnderline,
 }: Props) => {
   const [firstRender, setFirstRender] = useState(true);
 
@@ -90,6 +94,8 @@ export const SimpleStatefulRTE = ({
                 <RevisedSimpleRichTextToolbar
                   buttonSize={buttonSize}
                   allowInserts={allowInsertButton}
+                  hideBold={hideBold}
+                  hideUnderline={hideUnderline}
                 />
               ) : null}
 
