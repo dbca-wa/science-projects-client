@@ -1,12 +1,12 @@
 // Route to handle Login of user - now working with
 
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   logInOrdinary,
   type IUsernameLoginError,
   type IUsernameLoginSuccess,
   type IUsernameLoginVariables,
-} from "@/shared/lib/api";
+} from "@/features/auth/services/auth.service";
 import {
   Box,
   Button,

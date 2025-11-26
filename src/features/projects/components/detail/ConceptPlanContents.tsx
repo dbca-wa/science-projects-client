@@ -2,15 +2,15 @@
 
 import { useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
+import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
 import {
   ICaretakerPermissions,
   IConceptPlan,
   IProjectDocuments,
   IProjectMember,
   IUserMe,
-} from "@/shared/types/index.d";
-import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
+} from "@/shared/types";
+import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 

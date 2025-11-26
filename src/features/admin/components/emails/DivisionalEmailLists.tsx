@@ -1,4 +1,4 @@
-import { useGetDivisions } from "@/shared/hooks/tanstack/useGetDivisions";
+import { useGetDivisions } from "@/features/admin/hooks/useGetDivisions";
 import { Spinner } from "@chakra-ui/react";
 import { useEffect } from "react";
 import DivisionalEmailListDataTable from "./DivisionalEmailListDataTable";

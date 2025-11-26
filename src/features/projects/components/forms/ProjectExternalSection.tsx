@@ -1,8 +1,8 @@
 // Tab data for Project External Project info on the creation page.
 
-import { AffiliationCreateSearchDropdown } from "@/shared/components/Navigation/AffiliationCreateSearchDropdown";
+import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import type { IAffiliation } from "@/shared/types/index.d";
+import type { IAffiliation } from "@/shared/types";
 import {
   Box,
   Button,

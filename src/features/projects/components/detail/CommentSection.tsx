@@ -1,9 +1,9 @@
 import { CommentRichTextEditor } from "@/shared/components/RichTextEditor/Editors/CommentRichTextEditor";
 import { CommentDisplayRTE } from "@/shared/components/RichTextEditor/Editors/Sections/CommentDisplayRTE";
-import { useBranches } from "@/shared/hooks/tanstack/useBranches";
-import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
-import { useGetDocumentComments } from "@/shared/hooks/tanstack/useGetDocumentComments";
-import type { IMainDoc, IProjectData, IUserData, IUserMe } from "@/shared/types/index.d";
+import { useBranches } from "@/features/admin/hooks/useBranches";
+import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
+import { useGetDocumentComments } from "@/features/documents/hooks/useGetDocumentComments";
+import type { IMainDoc, IProjectData, IUserData, IUserMe } from "@/shared/types";
 import {
   Box,
   Center,

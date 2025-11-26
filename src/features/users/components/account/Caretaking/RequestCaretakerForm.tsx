@@ -1,4 +1,4 @@
-import type { IUserMe } from "@/shared/types/index.d";
+import type { IUserMe } from "@/shared/types";
 import {
   Button,
   Flex,
@@ -15,9 +15,9 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { ShadcnDatePicker } from "../ShadcnDatePicker";
-import { UserSearchDropdown } from "@/shared/components/Navigation/UserSearchDropdown";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import { FaRunning } from "react-icons/fa";
-import { CaretakerModeConfirmModal } from "@/shared/components/Modals/Caretakers/CaretakerModeConfirmModal";
+import { CaretakerModeConfirmModal } from "@/features/users/components/modals/CaretakerModeConfirmModal";
 import useCaretakingChain from "@/features/users/hooks/useCaretakingChain";
 
 const RequestCaretakerForm = ({

@@ -1,4 +1,4 @@
-import type { ProjectStatus } from "@/shared/types/index.d";
+import type { ProjectStatus } from "@/shared/types";
 import {
   Button,
   Flex,
@@ -19,7 +19,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { type ISetProjectStatusProps, setProjectStatus } from "@/shared/lib/api";
+import { type ISetProjectStatusProps, setProjectStatus } from "@/features/projects/services/projects.service";
 
 interface Props {
   projectPk: string | number;

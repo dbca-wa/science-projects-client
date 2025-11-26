@@ -36,7 +36,7 @@ import {
 } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useState } from "react";
-import { UserProfile } from "../../Users/UserProfile";
+import { UserProfile } from "@/features/users/components/UserProfile";
 import { IUserDataTableEntry } from "./EmailLists";
 import { FcApproval, FcCancel } from "react-icons/fc";
 

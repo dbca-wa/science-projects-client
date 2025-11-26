@@ -27,11 +27,11 @@ import {
   Box,
   type UseToastOptions,
 } from "@chakra-ui/react";
-import { type ISpawnDocument, spawnNewEmptyDocument } from "@/shared/lib/api";
+import { type ISpawnDocument, spawnNewEmptyDocument } from "@/features/reports/services/reports.service";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { useGetProgressReportAvailableReportYears } from "@/shared/hooks/tanstack/useGetProgressReportAvailableReportYears";
+import { useGetProgressReportAvailableReportYears } from "@/features/reports/hooks/useGetProgressReportAvailableReportYears";
 
 interface Props {
   projectPk: string | number;

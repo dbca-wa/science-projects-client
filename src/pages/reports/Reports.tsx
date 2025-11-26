@@ -1,12 +1,12 @@
 // Route for reviewing all reports.
 
-import { Head } from "@/shared/components/Base/Head";
-import { AddLegacyReportPDFModal } from "@/shared/components/Modals/AddLegacyReportPDFModal";
-import { AddReportPDFModal } from "@/shared/components/Modals/AddReportPDFModal";
-import { AnnualReportPDFGridItem } from "@/shared/components/Pages/Reports/AnnualReportPDFGridItem";
-import { useGetARARsWithPDF } from "@/shared/hooks/tanstack/useGetARARsWithPDF";
-import { useGetLegacyARPDFs } from "@/shared/hooks/tanstack/useGetLegacyARPDFs";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { Head } from "@/shared/components/layout/base/Head";
+import { AddLegacyReportPDFModal } from "@/features/reports/components/modals/AddLegacyReportPDFModal";
+import { AddReportPDFModal } from "@/features/reports/components/modals/AddReportPDFModal";
+import { AnnualReportPDFGridItem } from "@/features/reports/components/AnnualReportPDFGridItem";
+import { useGetARARsWithPDF } from "@/features/reports/hooks/useGetARARsWithPDF";
+import { useGetLegacyARPDFs } from "@/features/reports/hooks/useGetLegacyARPDFs";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   Box,
   Button,

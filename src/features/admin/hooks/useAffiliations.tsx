@@ -1,7 +1,7 @@
 // Simple hook to get branches data and save it in a query key.
 // Exposes data and loading states of query
 
-import { getAllAffiliations } from "@/shared/lib/api";
+import { getAllAffiliations } from "@/features/admin/services/admin.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useAffiliations = () => {

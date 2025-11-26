@@ -1,7 +1,7 @@
-import { CancelCaretakerRequestModal } from "@/shared/components/Modals/Caretakers/CancelCaretakerRequestModal";
+import { CancelCaretakerRequestModal } from "@/features/users/components/modals/CancelCaretakerRequestModal";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import type { ICaretakerSubsections } from "@/shared/types/index.d";
+import type { ICaretakerSubsections } from "@/shared/types";
 import {
   Avatar,
   Box,

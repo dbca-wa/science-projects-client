@@ -3,7 +3,7 @@
 import { Box, Button, Flex, Grid, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { useGetLocations } from "@/shared/hooks/tanstack/useGetLocations";
+import { useGetLocations } from "@/features/admin/hooks/useGetLocations";
 import "@/styles/modalscrollbar.css";
 import { AreaCheckAndMaps } from "./AreaCheckAndMaps";
 

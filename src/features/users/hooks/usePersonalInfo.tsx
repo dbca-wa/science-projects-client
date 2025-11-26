@@ -1,8 +1,8 @@
 // Simple hook for getting the full profile data
 // Exposes that data and the state of the query loading
 
-import { getPersonalInformation } from "@/shared/lib/api";
-import type { IPersonalInformation } from "@/shared/types/index.d";
+import { getPersonalInformation } from "@/features/users/services/users.service";
+import type { IPersonalInformation } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const usePersonalInfo = (userId: undefined | string | number) => {

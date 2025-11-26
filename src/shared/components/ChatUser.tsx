@@ -1,6 +1,6 @@
 // Display of users above their message in chat route
 
-import type { IBranch, IBusinessArea, IImageData, IUserData } from "@/shared/types/index.d";
+import type { IBranch, IBusinessArea, IImageData, IUserData } from "@/shared/types";
 import {
 	Avatar,
 	Box,
@@ -15,7 +15,7 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 import { type FC, memo } from "react";
-import { UserProfile } from "../Users/UserProfile";
+import { UserProfile } from "@/features/users/components/UserProfile";
 
 interface ChatUserProps {
 	baseAPI: string;

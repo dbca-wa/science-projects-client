@@ -1,22 +1,22 @@
 // Route for displaying the Project Details of a given project.
 
-import { Head } from "@/shared/components/Base/Head";
-import { ConceptPlanContents } from "@/shared/components/Pages/ProjectDetail/ConceptPlanContents";
-import { ManageTeam } from "@/shared/components/Pages/ProjectDetail/ManageTeam";
-import { ProgressReportContents } from "@/shared/components/Pages/ProjectDetail/ProgressReportContents";
-import { ProjectClosureContents } from "@/shared/components/Pages/ProjectDetail/ProjectClosureContents";
-import { ProjectOverviewCard } from "@/shared/components/Pages/ProjectDetail/ProjectOverviewCard";
-import { ProjectPlanContents } from "@/shared/components/Pages/ProjectDetail/ProjectPlanContents";
-import { StudentReportContents } from "@/shared/components/Pages/ProjectDetail/StudentReportContents";
-import { useProject } from "@/shared/hooks/tanstack/useProject";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { Head } from "@/shared/components/layout/base/Head";
+import { ConceptPlanContents } from "@/features/projects/components/detail/ConceptPlanContents";
+import { ManageTeam } from "@/features/projects/components/detail/ManageTeam";
+import { ProgressReportContents } from "@/features/projects/components/detail/ProgressReportContents";
+import { ProjectClosureContents } from "@/features/projects/components/detail/ProjectClosureContents";
+import { ProjectOverviewCard } from "@/features/projects/components/detail/ProjectOverviewCard";
+import { ProjectPlanContents } from "@/features/projects/components/detail/ProjectPlanContents";
+import { StudentReportContents } from "@/features/projects/components/detail/StudentReportContents";
+import { useProject } from "@/features/projects/hooks/useProject";
+import { useUser } from "@/features/users/hooks/useUser";
 import type {
   IExtendedProjectDetails,
   IProjectAreas,
   IProjectData,
   IProjectDocuments,
   IProjectMember,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import {
   Box,
   Button,
@@ -34,7 +34,7 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import { ProgressReportSelector } from "@/shared/components/Pages/ProjectDetail/ProgressReportSelector";
+// import { ProgressReportSelector } from "@/features/projects/components/detail/ProgressReportSelector";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import useCaretakerPermissions from "@/features/users/hooks/useCaretakerPermissions";

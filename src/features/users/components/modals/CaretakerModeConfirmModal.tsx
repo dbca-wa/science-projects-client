@@ -28,8 +28,8 @@ import {
   MutationError,
   MutationSuccess,
   requestCaretaker,
-} from "@/shared/lib/api";
-import type { ICaretakerEntry } from "@/shared/types/index.d";
+} from "@/features/users/services/users.service";
+import type { ICaretakerEntry } from "@/shared/types";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 
 interface IModalProps {

@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import { getAllUnapprovedProjectsThisFY } from "@/shared/lib/api";
+import { getAllUnapprovedProjectsThisFY } from "@/features/admin/services/admin.service";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -33,7 +33,7 @@ import {
 import { useState, useEffect, useMemo, useCallback, memo, useRef } from "react";
 import { Separator } from "@/shared/components/ui/separator";
 import { useNavigate } from "react-router-dom";
-import type { BumpEmailData } from "@/shared/types/index.d";
+import type { BumpEmailData } from "@/shared/types";
 import {
   Modal,
   ModalBody,
@@ -43,7 +43,7 @@ import {
   ModalOverlay,
   useColorMode,
 } from "@chakra-ui/react";
-import { BumpEmailModalContent } from "@/shared/components/Modals/Admin/BumpEmailModalContent";
+import { BumpEmailModalContent } from "@/features/admin/components/modals/BumpEmailModalContent";
 
 // Types based on backend response
 // interface UnapprovedDocument {

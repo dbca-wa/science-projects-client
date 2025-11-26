@@ -19,7 +19,7 @@ import {
   Button,
   type UseToastOptions,
 } from "@chakra-ui/react";
-import { IDeleteComment, deleteCommentCall } from "@/shared/lib/api";
+import { IDeleteComment, deleteCommentCall } from "@/features/documents/services/documents.service";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

@@ -4,8 +4,8 @@ import { Input } from "@/shared/components/ui/input";
 import {
   type IUpdateStaffOverviewSection,
   updateStaffProfileOverviewSection,
-} from "@/shared/lib/api";
-import type { IStaffOverviewData } from "@/shared/types/index.d";
+} from "@/features/staff-profiles/services/staff-profiles.service";
+import type { IStaffOverviewData } from "@/shared/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";

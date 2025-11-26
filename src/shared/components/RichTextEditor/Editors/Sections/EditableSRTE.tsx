@@ -22,7 +22,7 @@ import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import React, { useEffect, useRef, useState } from "react";
 import { TreeViewPlugin } from "@/shared/lib/plugins/TreeViewPlugin";
-import type { EditorSections, EditorSubsections, EditorType } from "@/shared/types/index.d";
+import type { EditorSections, EditorSubsections, EditorType } from "@/shared/types";
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import { EditorTextInitialStatePlugin } from "../../Plugins/EditorTextInitialStatePlugin";
 import FloatingToolbarPlugin from "../../Plugins/FloatingToolbarPlugin";

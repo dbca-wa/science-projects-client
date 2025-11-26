@@ -1,7 +1,7 @@
 import type {
   BusinessAreaImage,
   IBusinessAreaCreate,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import type { QueryFunctionContext } from "@tanstack/react-query";
 import instance from "@/shared/lib/api/axiosInstance";
 

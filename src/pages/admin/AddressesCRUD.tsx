@@ -1,8 +1,8 @@
-import { Head } from "@/shared/components/Base/Head";
-import { BranchSearchDropdown } from "@/shared/components/Navigation/BranchSearchDropdown";
-import { AddressItemDisplay } from "@/shared/components/Pages/Admin/AddressItemDisplay";
-import { createAddress, getAllAddresses } from "@/shared/lib/api";
-import type { IAddress, IBranch } from "@/shared/types/index.d";
+import { Head } from "@/shared/components/layout/base/Head";
+import { BranchSearchDropdown } from "@/features/admin/components/BranchSearchDropdown";
+import { AddressItemDisplay } from "@/features/admin/components/AddressItemDisplay";
+import { createAddress, getAllAddresses } from "@/features/admin/services/admin.service";
+import type { IAddress, IBranch } from "@/shared/types";
 import {
   Box,
   Button,

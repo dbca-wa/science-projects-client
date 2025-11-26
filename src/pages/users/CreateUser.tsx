@@ -1,15 +1,15 @@
 // Component/Route for handling user creation and the accomponying validation
 
 import { TypewriterText } from "@/shared/components/Animations/TypewriterText";
-import { Head } from "@/shared/components/Base/Head";
-import { AffiliationSearchDropdown } from "@/shared/components/Navigation/AffiliationSearchDropdown";
+import { Head } from "@/shared/components/layout/base/Head";
+import { AffiliationSearchDropdown } from "@/features/admin/components/AffiliationSearchDropdown";
 import {
   type UserData,
   createUser,
   getDoesUserWithEmailExist,
   getDoesUserWithFullNameExist,
-} from "@/shared/lib/api";
-import { type IAffiliation } from "@/shared/types/index.d";
+} from "@/features/users/services/users.service";
+import { type IAffiliation } from "@/shared/types";
 import {
   Box,
   Button,

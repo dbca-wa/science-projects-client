@@ -1,6 +1,6 @@
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import type { IProjectPlan } from "@/shared/types/index.d";
+import type { IProjectPlan } from "@/shared/types";
 import {
   Box,
   Center,

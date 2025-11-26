@@ -35,18 +35,18 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteReport, updateReport } from "@/shared/lib/api";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
-import type { IReport } from "@/shared/types/index.d";
-import { UserProfile } from "../Users/UserProfile";
+import { deleteReport, updateReport } from "@/features/admin/services/admin.service";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
+import type { IReport } from "@/shared/types";
+import { UserProfile } from "@/features/users/components/UserProfile";
 // import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { useGetFullReport } from "@/shared/hooks/tanstack/useGetFullReport";
-import { useGetReportMedia } from "@/shared/hooks/tanstack/useGetReportMedia";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { TextButtonFlex } from "../../TextButtonFlex";
+import { useGetFullReport } from "@/features/reports/hooks/useGetFullReport";
+import { useGetReportMedia } from "@/features/reports/hooks/useGetReportMedia";
+import { useUser } from "@/features/users/hooks/useUser";
+import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
+import { TextButtonFlex } from "@/shared/components/TextButtonFlex";
 import { ReportMediaChanger } from "./ReportMediaChanger";
 
 export const ReportItemDisplay = ({

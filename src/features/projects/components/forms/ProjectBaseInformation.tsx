@@ -13,8 +13,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import "@/styles/modalscrollbar.css";
-import type { IUserData } from "@/shared/types/index.d";
-import { StatefulMediaChangerProject } from "../Admin/StatefulMediaChangerProject";
+import type { IUserData } from "@/shared/types";
+import { StatefulMediaChangerProject } from "@/features/admin/components/StatefulMediaChangerProject";
 import TagInput from "./TagInput";
 
 interface IProjectBaseInformationProps {
@@ -162,6 +162,8 @@ export const ProjectBaseInformation = ({
             setValueAsPlainText={false}
             // isPlain={true}
             shouldFocus={true}
+            hideBold={!meData?.is_superuser}
+            hideUnderline={!meData?.is_superuser}
           />
         </Box>
 

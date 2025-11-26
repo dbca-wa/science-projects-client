@@ -9,7 +9,7 @@ import { Box, useColorMode } from "@chakra-ui/react";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
 import "@/styles/texteditor.css";
-import type { EditorSubsections, EditorType } from "@/shared/types/index.d";
+import type { EditorSubsections, EditorType } from "@/shared/types";
 import { SimpleEditableRTE } from "./Sections/SimpleEditableRTE";
 
 interface IProps {

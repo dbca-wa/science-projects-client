@@ -17,7 +17,7 @@ import {
   DialogTrigger,
 } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
-import DatabaseRichTextEditor from "../../Editor/DatabaseRichTextEditor";
+import DatabaseRichTextEditor from "@/features/staff-profiles/components/Editor/DatabaseRichTextEditor";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/shared/components/ui/input";
 import { type ToastId, useToast, type UseToastOptions } from "@chakra-ui/react";
@@ -25,7 +25,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   type IUpdateProjectDescription,
   updateProjectDescription,
-} from "@/shared/lib/api";
+} from "@/features/projects/services/projects.service";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 
 interface IEditDescriptionProps {

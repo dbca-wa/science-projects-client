@@ -1,5 +1,5 @@
-import PatchNotes from "@/shared/components/Pages/Dashboard/PatchNotes";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import PatchNotes from "@/features/dashboard/components/PatchNotes";
+import { useUser } from "@/features/users/hooks/useUser";
 
 const PatchNotesPage = () => {
   const { userData } = useUser();

@@ -1,5 +1,5 @@
-import { type INewCycleEmail } from "@/shared/lib/api";
-import type { IEmailModalProps, IUserMe } from "@/shared/types/index.d";
+import { type INewCycleEmail } from "@/features/projects/services/projects.service";
+import type { IEmailModalProps, IUserMe } from "@/shared/types";
 import {
   Box,
   Button,

@@ -1,16 +1,16 @@
-import { BusinessAreaEditableDisplay } from "@/shared/components/Pages/MyBusinessArea/BusinessAreaEditableDisplay";
-import { ProblematicProjectsDataTable } from "@/shared/components/Pages/MyBusinessArea/ProblematicProjectsDataTable";
+import { BusinessAreaEditableDisplay } from "@/features/business-areas/components/BusinessAreaEditableDisplay";
+import { ProblematicProjectsDataTable } from "@/features/business-areas/components/ProblematicProjectsDataTable";
 import {
   IPendingProjectDocumentData,
   UnapprovedDocumentsDataTable,
-} from "@/shared/components/Pages/MyBusinessArea/UnapprovedDocumentsDataTable";
-import { useMyBusinessAreas } from "@/shared/hooks/tanstack/useMyBusinessAreas";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+} from "@/features/business-areas/components/UnapprovedDocumentsDataTable";
+import { useMyBusinessAreas } from "@/features/business-areas/hooks/useMyBusinessAreas";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   getProblematicProjectsForBusinessAreas,
   getUnapprovedDocsForBusinessAreas,
-} from "@/shared/lib/api";
-import type { IMainDoc, IProjectData } from "@/shared/types/index.d";
+} from "@/features/users/services/users.service";
+import type { IMainDoc, IProjectData } from "@/shared/types";
 import {
   Box,
   Center,

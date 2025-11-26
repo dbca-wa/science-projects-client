@@ -2,10 +2,10 @@ import {
   IDocGen,
   cancelAnnualReportPDF,
   generateAnnualReportPDF,
-} from "@/shared/lib/api";
+} from "@/features/reports/services/reports.service";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
-import { useGetAnnualReportPDF } from "@/shared/hooks/tanstack/useGetAnnualReportPDF";
-import type { IReport } from "@/shared/types/index.d";
+import { useGetAnnualReportPDF } from "@/features/reports/hooks/useGetAnnualReportPDF";
+import type { IReport } from "@/shared/types";
 import {
   Box,
   Button,

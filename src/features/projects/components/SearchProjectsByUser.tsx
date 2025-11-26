@@ -1,6 +1,6 @@
 import { Flex, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { UserSearchDropdown } from "./UserSearchDropdown";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import clsx from "clsx";
 
 const SearchProjectsByUser = ({

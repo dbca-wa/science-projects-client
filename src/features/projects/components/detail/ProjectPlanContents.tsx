@@ -3,8 +3,8 @@
 import { Box, Grid, Text, useColorMode } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
-import { useCheckUserIsTeamLeader } from "@/features/projects/hooks/useCheckUserIsTeamLeader";
+import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
+import { useCheckUserIsTeamLeader } from "@/features/users/hooks/useCheckUserIsTeamLeader";
 import type {
   ICaretakerPermissions,
   IProjectAreas,
@@ -12,8 +12,8 @@ import type {
   IProjectMember,
   IProjectPlan,
   IUserMe,
-} from "@/shared/types/index.d";
-import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
+} from "@/shared/types";
+import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 import { MethodologyImage } from "./MethodologyImage";

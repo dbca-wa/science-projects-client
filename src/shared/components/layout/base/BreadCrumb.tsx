@@ -2,7 +2,7 @@
 
 import { Flex, Button, useColorMode } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import type { IBreadCrumbProps } from "@/shared/types/index.d";
+import type { IBreadCrumbProps } from "@/shared/types";
 
 export const BreadCrumb = ({
   subDirOne,

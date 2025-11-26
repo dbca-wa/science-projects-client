@@ -1,10 +1,10 @@
-import { Head } from "@/shared/components/Base/Head";
-import ScienceStaffSearchBar from "@/shared/components/StaffProfiles/Staff/All/ScienceStaffSearchBar";
-import ScienceStaffSearchResult from "@/shared/components/StaffProfiles/Staff/All/ScienceStaffSearchResult";
-import StaffResultSkeleton from "@/shared/components/StaffProfiles/StaffResultSkeleton";
+import { Head } from "@/shared/components/layout/base/Head";
+import ScienceStaffSearchBar from "@/features/staff-profiles/components/Staff/All/ScienceStaffSearchBar";
+import ScienceStaffSearchResult from "@/features/staff-profiles/components/Staff/All/ScienceStaffSearchResult";
+import StaffResultSkeleton from "@/features/staff-profiles/components/StaffResultSkeleton";
 import { Button } from "@/shared/components/ui/button";
-import { useScienceStaffProfileList } from "@/shared/hooks/tanstack/useScienceStaffProfileList";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useScienceStaffProfileList } from "@/features/staff-profiles/hooks/useScienceStaffProfileList";
+import { useUser } from "@/features/users/hooks/useUser";
 import type { IUserMe } from "@/shared/types";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import { Button as ChakraButton, Grid } from "@chakra-ui/react";

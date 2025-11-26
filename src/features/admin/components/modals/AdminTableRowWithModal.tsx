@@ -1,5 +1,5 @@
 import { useDisclosure } from "@chakra-ui/react";
-import { TableCell, TableRow } from "../ui/table";
+import { TableCell, TableRow } from "@/shared/components/ui/table";
 import { flexRender } from "@tanstack/react-table";
 import { ActionAdminRequestModal } from "./ActionAdminRequestModal";
 

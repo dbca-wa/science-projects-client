@@ -1,5 +1,5 @@
-import { type IUpdatePublicEmail, updatePublicEmail } from "@/shared/lib/api";
-import type { IUserMe } from "@/shared/types/index.d";
+import { type IUpdatePublicEmail, updatePublicEmail } from "@/features/users/services/users.service";
+import type { IUserMe } from "@/shared/types";
 import {
   Button,
   Flex,

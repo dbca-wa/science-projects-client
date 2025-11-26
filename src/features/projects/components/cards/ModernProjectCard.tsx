@@ -16,8 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
-import type { IProjectData } from "@/shared/types/index.d";
-import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
+import type { IProjectData } from "@/shared/types";
+import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
 
 export const ModernProjectCard = ({
   pk,

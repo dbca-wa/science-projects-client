@@ -27,9 +27,9 @@ import {
   IBusinessArea,
   IProjectData,
   IUserMe,
-} from "@/shared/types/index.d";
-import { handleDocumentAction } from "@/shared/lib/api";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
+} from "@/shared/types";
+import { handleDocumentAction } from "@/features/documents/services/documents.service";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
 import EmailFeedbackRTE from "./EmailFeedbackRTE";
 
 export type DocumentType =

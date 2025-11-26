@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import { batchApproveProgressAndStudentReports } from "@/shared/lib/api";
+import { batchApproveProgressAndStudentReports } from "@/features/users/services/users.service";
 import { AxiosError } from "axios";
 
 interface IModalProps {

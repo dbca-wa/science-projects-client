@@ -4,7 +4,7 @@ import type {
   IProjectData,
   IUserData,
   IUserMe,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import { Avatar, Box, Flex, Text, useColorMode } from "@chakra-ui/react";
 import { useState } from "react";
 // import { TreeViewPlugin } from "@/shared/lib/plugins/TreeViewPlugin";

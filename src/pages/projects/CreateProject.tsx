@@ -1,8 +1,8 @@
 // Route for handling Project Creation
 
 import { TypewriterText } from "@/shared/components/Animations/TypewriterText";
-import { Head } from "@/shared/components/Base/Head";
-import { NewProjectCard } from "@/shared/components/Pages/CreateProject/NewProjectCard";
+import { Head } from "@/shared/components/layout/base/Head";
+import { NewProjectCard } from "@/features/projects/components/forms/NewProjectCard";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import {
   Box,

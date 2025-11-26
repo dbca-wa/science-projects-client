@@ -1,12 +1,12 @@
-import { Head, type StaffUserData } from "@/shared/components/Base/Head";
-import ToggleStaffProfileVisibilityModal from "@/shared/components/Modals/ToggleStaffProfileVisibilityModal";
+import { Head, type StaffUserData } from "@/shared/components/layout/base/Head";
+import ToggleStaffProfileVisibilityModal from "@/features/staff-profiles/components/modals/ToggleStaffProfileVisibilityModal";
 import { BaseToggleOptionsButton } from "@/shared/components/RichTextEditor/Buttons/BaseToggleOptionsButton";
-import StaffContent from "@/shared/components/StaffProfiles/Staff/Detail/StaffContent";
-import StaffHero from "@/shared/components/StaffProfiles/Staff/Detail/StaffHero";
-import StaffNotFound from "@/shared/components/StaffProfiles/Staff/StaffNotFound";
+import StaffContent from "@/features/staff-profiles/components/Staff/Detail/StaffContent";
+import StaffHero from "@/features/staff-profiles/components/Staff/Detail/StaffHero";
+import StaffNotFound from "@/features/staff-profiles/components/Staff/StaffNotFound";
 import { Button } from "@/shared/components/ui/button";
-import { useCheckStaffProfile } from "@/shared/hooks/tanstack/useCheckStaffProfile";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useCheckStaffProfile } from "@/features/staff-profiles/hooks/useCheckStaffProfile";
+import { useUser } from "@/features/users/hooks/useUser";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import {
   Box,

@@ -1,7 +1,7 @@
 // A simple hook which talks to the api to get the latest report's active and approved progress reports.
 // Exposes that data as well as the state of the query (loading or not)
 
-import { getLatestActiveProgressReports } from "@/shared/lib/api";
+import { getLatestActiveProgressReports } from "@/features/reports/services/reports.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useLatestYearsActiveProgressReports = () => {

@@ -1,5 +1,5 @@
-import { useCheckExistingCaretaker } from "@/shared/hooks/tanstack/useCheckExistingCaretaker";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useCheckExistingCaretaker } from "@/features/users/hooks/useCheckExistingCaretaker";
+import { useUser } from "@/features/users/hooks/useUser";
 import { Box, Spinner, Text, useColorMode } from "@chakra-ui/react";
 import CaretakersAndRequestsSection from "./CaretakersAndRequestsSection";
 import { MemoizedCaretakeeSection } from "./MemoizedCaretakeeSection";

@@ -41,8 +41,8 @@ import type {
   IProjectDocuments,
   IProjectMember,
   IStudentProjectDetails,
-} from "@/shared/types/index.d";
-import { ProjectDetailEditModal } from "../../Modals/ProjectDetailEditModal";
+} from "@/shared/types";
+import { ProjectDetailEditModal } from "@/features/projects/components/modals/ProjectDetailEditModal";
 // import { AiFillDollarCircle } from "react-icons/ai";
 
 import { useEffect, useRef, useState } from "react";
@@ -57,25 +57,25 @@ import { MdBusinessCenter, MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 import { VscOrganization } from "react-icons/vsc";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
-import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
-import { useCheckUserIsTeamLeader } from "@/features/projects/hooks/useCheckUserIsTeamLeader";
+import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
+import { useCheckUserIsTeamLeader } from "@/features/users/hooks/useCheckUserIsTeamLeader";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import { ExtractedHTMLTitle } from "../../ExtractedHTMLTitle";
-import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
-import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
-import { DeleteProjectModal } from "../../Modals/DeleteProjectModal";
-import { EditProjectModal } from "../../Modals/EditProjectModal";
-import { ProjectClosureModal } from "../../Modals/ProjectClosureModal";
-import { ProjectReopenModal } from "../../Modals/ProjectReopenModal";
-import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
-import { ProjectSuspensionModal } from "@/shared/components/Modals/ProjectSuspensionModal";
-import { SetProjectStatusModal } from "@/shared/components/Modals/SetProjectStatusModal";
-import { RequestDeleteProjectModal } from "@/shared/components/Modals/RequestDeleteProjectModal";
-import { ActionAdminRequestModal } from "@/shared/components/Modals/ActionAdminRequestModal";
+import { useUser } from "@/features/users/hooks/useUser";
+import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
+import { CreateProgressReportModal } from "@/features/reports/components/modals/CreateProgressReportModal";
+import { CreateStudentReportModal } from "@/features/reports/components/modals/CreateStudentReportModal";
+import { DeleteProjectModal } from "@/features/projects/components/modals/DeleteProjectModal";
+import { EditProjectModal } from "@/features/projects/components/modals/EditProjectModal";
+import { ProjectClosureModal } from "@/features/projects/components/modals/ProjectClosureModal";
+import { ProjectReopenModal } from "@/features/projects/components/modals/ProjectReopenModal";
+import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
+import { ProjectSuspensionModal } from "@/features/projects/components/modals/ProjectSuspensionModal";
+import { SetProjectStatusModal } from "@/features/projects/components/modals/SetProjectStatusModal";
+import { RequestDeleteProjectModal } from "@/features/projects/components/modals/RequestDeleteProjectModal";
+import { ActionAdminRequestModal } from "@/features/admin/components/modals/ActionAdminRequestModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { cancelAdminTaskRequestCall } from "@/shared/lib/api";
+import { cancelAdminTaskRequestCall } from "@/features/admin/services/admin.service";
 import { AxiosError } from "axios";
 import useCaretakerPermissions from "@/features/users/hooks/useCaretakerPermissions";
 import HideProjectModal from "./HideProjectModal";

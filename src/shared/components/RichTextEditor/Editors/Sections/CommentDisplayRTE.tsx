@@ -1,7 +1,7 @@
 // Has mention and hashtag functionality
 
-import { ChatUser } from "@/shared/components/Pages/Chat/ChatUser";
-import type { IBranch, IBusinessArea, ICommentReaction, IUserData } from "@/shared/types/index.d";
+import { ChatUser } from "@/shared/components/ChatUser";
+import type { IBranch, IBusinessArea, ICommentReaction, IUserData } from "@/shared/types";
 import {
   Box,
   Center,
@@ -30,10 +30,10 @@ import "@/styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
-import { DeleteCommentModal } from "@/shared/components/Modals/DeleteCommentModal";
-import { createCommentReaction } from "@/shared/lib/api";
+import { DeleteCommentModal } from "@/features/documents/components/modals/DeleteCommentModal";
+import { createCommentReaction } from "@/features/documents/services/documents.service";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useUser } from "@/features/users/hooks/useUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, useAnimation } from "framer-motion";
 import { useForm } from "react-hook-form";

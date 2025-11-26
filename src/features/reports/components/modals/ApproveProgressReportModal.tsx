@@ -4,7 +4,7 @@ import { IStudentReportDisplayData } from "@/shared/components/RichTextEditor/Ed
 import {
   IApproveProgressReport,
   approveProgressReport,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import {
   Box,
   Button,

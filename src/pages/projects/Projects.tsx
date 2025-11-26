@@ -1,15 +1,15 @@
 // Route for displaying paginated projects
 
-import { BreadCrumb } from "@/shared/components/Base/BreadCrumb";
-import { Head } from "@/shared/components/Base/Head";
-import { SearchProjects } from "@/shared/components/Navigation/SearchProjects";
-import { DownloadProjectsCSVButton } from "@/shared/components/Pages/Projects/DownloadProjectsCSVButton";
-import { PaginatorProject } from "@/shared/components/Pages/Projects/PaginatorProject";
+import { BreadCrumb } from "@/shared/components/layout/base/BreadCrumb";
+import { Head } from "@/shared/components/layout/base/Head";
+import { SearchProjects } from "@/features/projects/components/SearchProjects";
+import { DownloadProjectsCSVButton } from "@/features/projects/components/DownloadProjectsCSVButton";
+import { PaginatorProject } from "@/features/projects/components/PaginatorProject";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import { getAllBusinessAreas } from "@/shared/lib/api";
-import type { IBusinessArea, IDivision } from "@/shared/types/index.d";
+import { useUser } from "@/features/users/hooks/useUser";
+import { getAllBusinessAreas } from "@/features/business-areas/services/business-areas.service";
+import type { IBusinessArea, IDivision } from "@/shared/types";
 import { useWindowWidth } from "@/shared/utils/useWindowWidth";
 import {
   Box,

@@ -1,5 +1,5 @@
-import type { GuideSections } from "@/shared/lib/api";
-import type { EditorSubsections } from "@/shared/types/index.d";
+import type { GuideSections } from "@/features/admin/services/admin.service";
+import type { EditorSubsections } from "@/shared/types";
 import { useEffect, useState } from "react";
 
 export const useGetRTESectionTitle = (

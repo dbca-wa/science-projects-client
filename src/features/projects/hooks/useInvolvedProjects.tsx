@@ -1,5 +1,5 @@
-import { getUsersProjects } from "@/shared/lib/api";
-import type { IProjectData } from "@/shared/types/index.d";
+import { getUsersProjects } from "@/features/users/services/users.service";
+import type { IProjectData } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useInvolvedProjects = (pk: number) => {

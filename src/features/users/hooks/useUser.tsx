@@ -1,7 +1,7 @@
 // Hook used to determine the user. Used on login and getting full profile from pk in data.
 
-import { getMe } from "@/shared/lib/api";
-import type { IUserMe } from "@/shared/types/index.d";
+import { getMe } from "@/features/users/services/users.service";
+import type { IUserMe } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useUser = () => {

@@ -1,7 +1,7 @@
 import {
   deleteReportMediaImage,
   uploadReportMediaImage,
-} from "@/shared/lib/api";
+} from "@/features/admin/services/admin.service";
 import { handleImageFileCompression } from "@/shared/utils/imageCompression";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import {

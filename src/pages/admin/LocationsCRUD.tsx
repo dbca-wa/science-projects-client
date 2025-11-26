@@ -1,11 +1,11 @@
-import { Head } from "@/shared/components/Base/Head";
-import { LocationItemDisplay } from "@/shared/components/Pages/Admin/LocationItemDisplay";
-import { createLocation, getAllLocations } from "@/shared/lib/api";
+import { Head } from "@/shared/components/layout/base/Head";
+import { LocationItemDisplay } from "@/features/admin/components/LocationItemDisplay";
+import { createLocation, getAllLocations } from "@/features/admin/services/admin.service";
 import type {
   IAddLocationForm,
   ISimpleLocationData,
   OrganisedLocationData,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import {
   Box,
   Button,

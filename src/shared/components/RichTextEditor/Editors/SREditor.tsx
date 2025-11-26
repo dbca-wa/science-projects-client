@@ -2,8 +2,8 @@ import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
 import {
   ISaveStudentReport,
   updateStudentReportProgress,
-} from "@/shared/lib/api";
-import type { IProjectData, IProjectMember } from "@/shared/types/index.d";
+} from "@/features/reports/services/reports.service";
+import type { IProjectData, IProjectMember } from "@/shared/types";
 import {
   Box,
   Button,
@@ -46,7 +46,7 @@ import type { IStudentReportDisplayData } from "./ARStudentReportHandler";
 import { FcApproval } from "react-icons/fc";
 import { MdApproval } from "react-icons/md";
 import { TiTick } from "react-icons/ti";
-import { ApproveProgressReportModal } from "@/shared/components/Modals/RTEModals/ApproveProgressReportModal";
+import { ApproveProgressReportModal } from "@/features/reports/components/modals/ApproveProgressReportModal";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 
 interface ISREditorProps {

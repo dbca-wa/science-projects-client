@@ -14,15 +14,15 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/shared/components/ui/drawer";
-import { useStaffOverview } from "@/shared/hooks/tanstack/useStaffOverview";
+import { useStaffOverview } from "@/features/staff-profiles/hooks/useStaffOverview";
 import hasMeaningfulContent from "@/shared/utils/hasMeaningfulContent";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import type { IStaffOverviewData, IUserMe } from "@/shared/types/index.d";
+import type { IStaffOverviewData, IUserMe } from "@/shared/types";
 import React, { useRef, useState } from "react";
 import { MdEdit } from "react-icons/md";
-import DatabaseRichTextEditor from "../../Editor/DatabaseRichTextEditor";
-import EditStaffOverviewContent from "../../Modals/EditStaffOverviewContent";
-import SimpleSkeletonSection from "../../SimpleSkeletonSection";
+import DatabaseRichTextEditor from "@/features/staff-profiles/components/Editor/DatabaseRichTextEditor";
+import EditStaffOverviewContent from "@/features/staff-profiles/components/Modals/EditStaffOverviewContent";
+import SimpleSkeletonSection from "@/features/staff-profiles/components/SimpleSkeletonSection";
 import AddItemButton from "./AddItemButton";
 import Subsection from "./Subsection";
 

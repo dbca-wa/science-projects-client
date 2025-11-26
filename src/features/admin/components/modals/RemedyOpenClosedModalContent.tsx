@@ -1,5 +1,5 @@
-import { remedyOpenClosedProjects } from "@/shared/lib/api";
-import type { IProjectData } from "@/shared/types/index.d";
+import { remedyOpenClosedProjects } from "@/features/admin/services/admin.service";
+import type { IProjectData } from "@/shared/types";
 import {
   Box,
   Button,

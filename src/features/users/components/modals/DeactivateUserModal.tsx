@@ -32,10 +32,10 @@ import {
   MutationError,
   MutationSuccess,
   deactivateUserAdmin,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
-import type { IUserData } from "@/shared/types/index.d";
+import type { IUserData } from "@/shared/types";
 
 interface IModalProps {
   isOpen: boolean;

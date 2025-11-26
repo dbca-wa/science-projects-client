@@ -1,7 +1,7 @@
-import { Head } from "@/shared/components/Base/Head";
+import { Head } from "@/shared/components/layout/base/Head";
 import HomeConfetti from "@/shared/components/Fun/HomeConfetti";
 import theme from "@/theme";
-import type { IUserMe } from "@/shared/types/index.d";
+import type { IUserMe } from "@/shared/types";
 import {
   Box,
   Button,

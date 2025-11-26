@@ -1,7 +1,7 @@
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
-import { useStaffProfileHero } from "@/shared/hooks/tanstack/useStaffProfileHero";
+import { useStaffProfileHero } from "@/features/staff-profiles/hooks/useStaffProfileHero";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import type { IStaffProfileBaseData, IUserMe } from "@/shared/types/index.d";
+import type { IStaffProfileBaseData, IUserMe } from "@/shared/types";
 import { Center, Button as ChakraButton, Spinner } from "@chakra-ui/react";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";

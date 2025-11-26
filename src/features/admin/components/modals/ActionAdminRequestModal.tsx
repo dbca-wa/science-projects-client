@@ -22,11 +22,11 @@ import {
   Box,
   type UseToastOptions,
 } from "@chakra-ui/react";
-import { actionAdminRequestCall } from "@/shared/lib/api";
+import { actionAdminRequestCall } from "@/features/admin/services/admin.service";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import type { IActionAdminTask, IAdminTask } from "@/shared/types/index.d";
+import type { IActionAdminTask, IAdminTask } from "@/shared/types";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "date-fns";

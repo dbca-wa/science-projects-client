@@ -9,10 +9,10 @@ import AddItemButton from "./Detail/AddItemButton";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdModeEditOutline } from "react-icons/md";
 import { useState } from "react";
-import EditStaffPublicationContent from "../Modals/EditStaffPublicationContent";
-import DeleteStaffPublicationContent from "../Modals/DeleteStaffPublicationContent";
-import AddStaffPublicationContent from "../Modals/AddPublicationContent";
-import type { IStaffPublicationEntry } from "@/shared/types/index.d";
+import EditStaffPublicationContent from "@/features/staff-profiles/components/modals/EditStaffPublicationContent";
+import DeleteStaffPublicationContent from "@/features/staff-profiles/components/modals/DeleteStaffPublicationContent";
+import AddStaffPublicationContent from "@/features/staff-profiles/components/modals/AddPublicationContent";
+import type { IStaffPublicationEntry } from "@/shared/types";
 
 export const PublicationDialog = ({
   staffProfilePk,

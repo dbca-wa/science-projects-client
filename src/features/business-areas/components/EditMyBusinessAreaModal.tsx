@@ -1,5 +1,5 @@
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import { type IMyBAUpdateSubmissionData, updateMyBa } from "@/shared/lib/api";
+import { updateMyBa, type IMyBAUpdateSubmissionData } from "@/features/users/services/users.service";
 import useDistilledHtml from "@/shared/hooks/useDistilledHtml";
 import {
   Button,
@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { StatefulMediaChanger } from "../Admin/StatefulMediaChanger";
+import { StatefulMediaChanger } from "@/features/admin/components/StatefulMediaChanger";
 
 interface IEditBA {
   pk: number;

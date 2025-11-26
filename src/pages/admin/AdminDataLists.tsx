@@ -1,9 +1,9 @@
-import { Head } from "@/shared/components/Base/Head";
-import { AllProblematicProjects } from "@/shared/components/Pages/Admin/Data/AllProblematicProjects";
-import { EmailLists } from "@/shared/components/Pages/Admin/Data/EmailLists";
-import StaffProfileEmails from "@/shared/components/Pages/Admin/Data/StaffProfileEmails";
-import { StaffUsers } from "@/shared/components/Pages/Admin/Data/StaffUsers";
-import UnapprovedProjectsThisFY from "@/shared/components/Pages/Admin/Data/UnapprovedProjectsThisFY";
+import { Head } from "@/shared/components/layout/base/Head";
+import { AllProblematicProjects } from "@/features/admin/components/data/AllProblematicProjects";
+import { EmailLists } from "@/features/admin/components/data/EmailLists";
+import StaffProfileEmails from "@/features/admin/components/data/StaffProfileEmails";
+import { StaffUsers } from "@/features/admin/components/data/StaffUsers";
+import UnapprovedProjectsThisFY from "@/features/admin/components/data/UnapprovedProjectsThisFY";
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { useState } from "react";
 

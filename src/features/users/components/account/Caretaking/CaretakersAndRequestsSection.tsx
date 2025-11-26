@@ -1,4 +1,4 @@
-import type { ICaretakerSubsections } from "@/shared/types/index.d";
+import type { ICaretakerSubsections } from "@/shared/types";
 import { Text } from "@chakra-ui/react";
 import ActiveCaretakerDisplay from "./ActiveCaretakerDisplay";
 import CaretakerRequestDisplay from "./CaretakerRequestDisplay";

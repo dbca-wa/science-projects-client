@@ -2,8 +2,8 @@
 // search bars to be placed anywhere on the screen and in separate components.
 // exposes variables in UserSearchContext to components via the useUserSearchContext hook.
 
-import { getUsersBasedOnSearchTerm } from "@/shared/lib/api";
-import type { IUserData } from "@/shared/types/index.d";
+import { getUsersBasedOnSearchTerm } from "@/features/users/services/users.service";
+import type { IUserData } from "@/shared/types";
 import {
   createContext,
   useContext,

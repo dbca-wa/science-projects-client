@@ -1,11 +1,11 @@
-import { Head } from "@/shared/components/Base/Head";
-import { UserSearchDropdown } from "@/shared/components/Navigation/UserSearchDropdown";
-import { ServiceItemDisplay } from "@/shared/components/Pages/Admin/ServiceItemDisplay";
+import { Head } from "@/shared/components/layout/base/Head";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
+import { ServiceItemDisplay } from "@/features/admin/components/ServiceItemDisplay";
 import {
   createDepartmentalService,
   getAllDepartmentalServices,
-} from "@/shared/lib/api";
-import type { IDepartmentalService } from "@/shared/types/index.d";
+} from "@/features/admin/services/admin.service";
+import type { IDepartmentalService } from "@/shared/types";
 import {
   Box,
   Button,

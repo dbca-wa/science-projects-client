@@ -47,7 +47,7 @@ import {
   deleteContentField,
   GuideSection,
   ContentField,
-} from "@/shared/lib/api";
+} from "@/features/admin/services/admin.service";
 import { GuideRichTextEditor } from "@/shared/components/RichTextEditor/Editors/GuideRichTextEditor";
 
 // Types

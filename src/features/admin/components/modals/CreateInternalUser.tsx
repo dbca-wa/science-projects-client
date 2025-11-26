@@ -1,15 +1,14 @@
 // Component/Route for handling user creation and the accomponying validation
 
-import { Head } from "@/shared/components/Base/Head";
+import { Head } from "@/shared/components/layout/base/Head";
+import { getAllBranches, getAllBusinessAreas } from "@/features/admin/services/admin.service";
 import {
   UserData,
   createUser,
-  getAllBranches,
-  getAllBusinessAreas,
   getDoesUserWithEmailExist,
   getDoesUserWithFullNameExist,
-} from "@/shared/lib/api";
-import type { IBranch, IBusinessArea, IDivision } from "@/shared/types/index.d";
+} from "@/features/users/services/users.service";
+import type { IBranch, IBusinessArea, IDivision } from "@/shared/types";
 import {
   Box,
   Button,

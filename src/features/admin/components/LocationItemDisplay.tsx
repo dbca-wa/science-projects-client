@@ -29,8 +29,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteLocation, updateLocation } from "@/shared/lib/api";
-import type { IAddLocationForm, ISimpleLocationData } from "@/shared/types/index.d";
+import { deleteLocation, updateLocation } from "@/features/admin/services/admin.service";
+import type { IAddLocationForm, ISimpleLocationData } from "@/shared/types";
 
 export const LocationItemDisplay = ({
   pk,

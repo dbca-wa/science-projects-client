@@ -2,10 +2,10 @@
 // still somewhat limited as not all functions have been created. Instead the other functions are
 // accessible to developers via the django admin panel.
 
-import { BatchApproveModal } from "@/shared/components/Modals/BatchApproveModal";
-import { BatchApproveOldModal } from "@/shared/components/Modals/BatchApproveOldModal";
-import { NewCycleModal } from "@/shared/components/Modals/NewCycleModal";
-import { ProjectLeadEmailModal } from "@/shared/components/Modals/ProjectLeadEmailModal";
+import { BatchApproveModal } from "@/features/documents/components/modals/BatchApproveModal";
+import { BatchApproveOldModal } from "@/features/documents/components/modals/BatchApproveOldModal";
+import { NewCycleModal } from "@/features/reports/components/modals/NewCycleModal";
+import { ProjectLeadEmailModal } from "@/features/projects/components/modals/ProjectLeadEmailModal";
 import {
   Center,
   Divider,

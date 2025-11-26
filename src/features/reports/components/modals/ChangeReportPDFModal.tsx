@@ -1,5 +1,5 @@
 // Modal for updating a report's pdf
-import type { ISmallReport } from "@/shared/types/index.d";
+import type { ISmallReport } from "@/shared/types";
 import {
   AbsoluteCenter,
   Box,
@@ -29,8 +29,8 @@ import {
   deleteLegacyFinalAnnualReportPDF,
   updateLegacyReportPDF,
   updateReportPDF,
-} from "@/shared/lib/api";
-import { SingleFileStateUpload } from "../SingleFileStateUpload";
+} from "@/features/reports/services/reports.service";
+import { SingleFileStateUpload } from "@/shared/components/SingleFileStateUpload";
 
 interface Props {
   isChangePDFOpen: boolean;

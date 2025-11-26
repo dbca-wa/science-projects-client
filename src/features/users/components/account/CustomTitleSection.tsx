@@ -1,5 +1,5 @@
-import { type IUpdateCustomTitle, updateCustomTitle } from "@/shared/lib/api";
-import type { IUserMe } from "@/shared/types/index.d";
+import { type IUpdateCustomTitle, updateCustomTitle } from "@/features/users/services/users.service";
+import type { IUserMe } from "@/shared/types";
 import {
   Button,
   Flex,

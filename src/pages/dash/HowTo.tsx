@@ -1,8 +1,8 @@
 // Route for how-to for website
 
-import { Head } from "@/shared/components/Base/Head";
-import { HowToSidebar } from "@/shared/components/Pages/HowTo/HowToSidebar";
-import { HowToView } from "@/shared/components/Pages/HowTo/HowToView";
+import { Head } from "@/shared/components/layout/base/Head";
+import { HowToSidebar } from "@/features/dashboard/components/howto/HowToSidebar";
+import { HowToView } from "@/features/dashboard/components/howto/HowToView";
 import { Flex } from "@chakra-ui/react";
 
 export const HowTo = () => {

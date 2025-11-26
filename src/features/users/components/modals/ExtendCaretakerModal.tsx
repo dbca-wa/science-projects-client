@@ -34,11 +34,11 @@ import {
   MutationError,
   MutationSuccess,
   IExtendCaretakerProps,
-} from "@/shared/lib/api";
-import type { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/shared/types/index.d";
+} from "@/features/users/services/users.service";
+import type { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/shared/types";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { type FC } from "react";
-import { ShadcnDatePicker } from "../../Pages/Account/ShadcnDatePicker";
+import { ShadcnDatePicker } from "@/features/users/components/account/ShadcnDatePicker";
 
 interface IModalProps {
   isOpen: boolean;

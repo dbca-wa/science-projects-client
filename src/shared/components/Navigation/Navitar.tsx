@@ -25,14 +25,14 @@ import { GoTriangleDown } from "react-icons/go";
 import { SiReadthedocs } from "react-icons/si";
 import { TbWorldWww } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-import { logOut } from "@/shared/lib/api";
+import { logOut } from "@/features/auth/services/auth.service";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import type { INavitar } from "@/shared/types/index.d";
+import { useUser } from "@/features/users/hooks/useUser";
+import type { INavitar } from "@/shared/types";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
-import { useMaintainer } from "@/shared/hooks/tanstack/useMaintainer";
+import { useMaintainer } from "@/features/admin/hooks/useMaintainer";
 import { MdSpeakerNotes } from "react-icons/md";
 
 export const Navitar = ({

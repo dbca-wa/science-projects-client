@@ -1,7 +1,7 @@
-import { useUserPublications } from "@/shared/hooks/tanstack/useUserPublications";
+import { useUserPublications } from "@/features/staff-profiles/hooks/useUserPublications";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import type { IUserMe } from "@/shared/types/index.d";
-import SimpleSkeletonSection from "../../SimpleSkeletonSection";
+import type { IUserMe } from "@/shared/types";
+import SimpleSkeletonSection from "@/features/staff-profiles/components/SimpleSkeletonSection";
 import LibraryPublications from "./LibraryPublications";
 
 const PublicationsSection = ({

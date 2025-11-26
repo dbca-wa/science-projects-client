@@ -1,5 +1,5 @@
-import { getDataForConceptPlanGeneration } from "@/shared/lib/api";
-import type { IConceptPlanGenerationData } from "@/shared/types/index.d";
+import { getDataForConceptPlanGeneration } from "@/features/projects/services/projects.service";
+import type { IConceptPlanGenerationData } from "@/shared/types";
 import { useEffect, useState } from "react";
 
 export const useGetConceptPlanData = (concept_plan_pk: number) => {

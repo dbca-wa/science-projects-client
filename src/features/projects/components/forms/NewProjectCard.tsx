@@ -13,7 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 import ParallaxTilt from "react-parallax-tilt";
-import { CreateProjectModal } from "../../Modals/CreateProjectModal";
+import { CreateProjectModal } from "@/features/projects/components/modals/CreateProjectModal";
 
 interface INewProjectCard {
   title: string;

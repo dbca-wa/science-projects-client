@@ -2,7 +2,7 @@
 // Exposes that data as well as the state of the query (loading or not)
 
 import { useQuery } from "@tanstack/react-query";
-import { getFullReport } from "@/shared/lib/api";
+import { getFullReport } from "@/features/admin/services/admin.service";
 
 export const useGetFullReport = (pk: number) => {
   const { isPending, data } = useQuery({

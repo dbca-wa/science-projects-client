@@ -1,8 +1,8 @@
 // Simple hook to get branches data and save it in a query key.
 // Exposes data and loading states of query
 
-import { getAllProblematicProjects } from "@/shared/lib/api";
-import type { IProjectData } from "@/shared/types/index.d";
+import { getAllProblematicProjects } from "@/features/admin/services/admin.service";
+import type { IProjectData } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export interface IProblematicData {

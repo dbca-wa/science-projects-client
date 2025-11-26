@@ -1,5 +1,5 @@
-import { createReport } from "@/shared/lib/api";
-import type { IReportCreation } from "@/shared/types/index.d";
+import { createReport } from "@/features/admin/services/admin.service";
+import type { IReportCreation } from "@/shared/types";
 import {
   Box,
   Button,

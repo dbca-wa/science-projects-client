@@ -14,15 +14,15 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import type { ISpecialEndorsement } from "@/shared/lib/api";
+import type { ISpecialEndorsement } from "@/features/documents/services/documents.service";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
-import type { ICaretakerPermissions, IProjectPlan, IUserMe } from "@/shared/types/index.d";
-import { SeekEndorsementModal } from "../../Modals/SeekEndorsementModal";
-import { SingleFileStateUpload } from "../../SingleFileStateUpload";
+import type { ICaretakerPermissions, IProjectPlan, IUserMe } from "@/shared/types";
+import { SeekEndorsementModal } from "@/features/documents/components/modals/SeekEndorsementModal";
+import { SingleFileStateUpload } from "@/shared/components/SingleFileStateUpload";
 
 import { BsFilePdfFill } from "react-icons/bs";
 // import { MdDeleteForever } from "react-icons/md";
-import { DeletePDFEndorsementModal } from "@/shared/components/Modals/DeletePDFEndorsementModal";
+import { DeletePDFEndorsementModal } from "@/features/documents/components/modals/DeletePDFEndorsementModal";
 import { TiDelete } from "react-icons/ti";
 
 interface IEndorsementProps extends ICaretakerPermissions {

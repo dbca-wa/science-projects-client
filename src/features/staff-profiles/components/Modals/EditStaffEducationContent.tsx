@@ -9,8 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { editEducation } from "@/shared/lib/api";
-import type { IStaffEducationEntry } from "@/shared/types/index.d";
+import { editEducation } from "@/features/staff-profiles/services/staff-profiles.service";
+import type { IStaffEducationEntry } from "@/shared/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";

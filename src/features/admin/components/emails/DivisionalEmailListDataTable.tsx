@@ -1,4 +1,4 @@
-import type { IDivision, IEmailListUser } from "@/shared/types/index.d";
+import type { IDivision, IEmailListUser } from "@/shared/types";
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ import {
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import { Input } from "@/shared/components/ui/input";
-import type { IProjectData, ProjectRoles } from "@/shared/types/index.d";
+import type { IProjectData, ProjectRoles } from "@/shared/types";
 import {
   Box,
   Button,

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaItalic } from "react-icons/fa";
-import type { IToolbarButton } from "@/shared/types/index.d";
+import type { IToolbarButton } from "@/shared/types";
 import { BaseToolbarButton } from "./BaseToolbarButton";
 
 export const ItalicsButton = ({ onClick }: IToolbarButton) => {

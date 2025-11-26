@@ -3,7 +3,7 @@ import { DrawerClose } from "@/shared/components/ui/drawer";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Textarea } from "@/shared/components/ui/textarea";
-import { IStaffPublicEmail, publicEmailStaffMember } from "@/shared/lib/api";
+import { IStaffPublicEmail, publicEmailStaffMember } from "@/features/staff-profiles/services/staff-profiles.service";
 import { useToast } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

@@ -1,4 +1,4 @@
-import { toggleStaffProfileVisibility } from "@/shared/lib/api";
+import { toggleStaffProfileVisibility } from "@/features/staff-profiles/services/staff-profiles.service";
 import {
   Text,
   Box,

@@ -16,10 +16,10 @@ import {
 } from "@/shared/components/ui/drawer";
 import { Button } from "@/shared/components/ui/button";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import type { IStaffUserResult } from "@/shared/types/index.d";
+import type { IStaffUserResult } from "@/shared/types";
 import { Building, Mail, MapPin, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import EmailStaffMemberContent from "../../Modals/EmailStaffMemberContent";
+import EmailStaffMemberContent from "@/features/staff-profiles/components/Modals/EmailStaffMemberContent";
 import { useState } from "react";
 import {
   Tooltip,

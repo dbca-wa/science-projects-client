@@ -38,11 +38,11 @@ import {
   promoteUserToLeader,
   removeTeamMemberFromProject,
   updateProjectMember,
-} from "@/shared/lib/api";
+} from "@/features/projects/services/projects.service";
 import { useCopyText } from "@/shared/hooks/useCopyText";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
+import { useUser } from "@/features/users/hooks/useUser";
 
 interface Props {
   pk: number;

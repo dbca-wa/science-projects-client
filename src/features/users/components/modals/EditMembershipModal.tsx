@@ -28,13 +28,13 @@ import {
   IProfileUpdateSuccess,
   MutationError,
   updateMembership,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import { useForm } from "react-hook-form";
-import type { IAffiliation, IBranch, IBusinessArea } from "@/shared/types/index.d";
-import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
-import { useBranches } from "@/shared/hooks/tanstack/useBranches";
-import { useAffiliations } from "@/shared/hooks/tanstack/useAffiliations";
-import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
+import type { IAffiliation, IBranch, IBusinessArea } from "@/shared/types";
+import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
+import { useBranches } from "@/features/admin/hooks/useBranches";
+import { useAffiliations } from "@/features/admin/hooks/useAffiliations";
+import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
 
 interface IEditMembershipModalProps {
   isOpen: boolean;

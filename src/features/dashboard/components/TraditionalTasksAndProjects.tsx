@@ -1,9 +1,9 @@
 // Used to display the tasks and projects of a user in the traditional layout
 
-import { useGetEndorsementsPendingMyAction } from "@/shared/hooks/tanstack/useGetEndorsementsPendingMyAction";
-import { useGetPendingAdminTasks } from "@/shared/hooks/tanstack/useGetPendingAdminTasks";
-import { useGetPendingCaretakerTasks } from "@/shared/hooks/tanstack/useGetPendingCaretakerTasks";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useGetEndorsementsPendingMyAction } from "@/features/documents/hooks/useGetEndorsementsPendingMyAction";
+import { useGetPendingAdminTasks } from "@/features/admin/hooks/useGetPendingAdminTasks";
+import { useGetPendingCaretakerTasks } from "@/features/users/hooks/useGetPendingCaretakerTasks";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   Accordion,
   AccordionButton,
@@ -18,8 +18,8 @@ import {
 import { motion } from "framer-motion";
 import { AiFillProject } from "react-icons/ai";
 import { FcHighPriority, FcOk } from "react-icons/fc";
-import { useGetDocumentsPendingMyAction } from "@/shared/hooks/tanstack/useGetDocumentsPendingMyAction";
-import { useGetMyProjects } from "@/shared/hooks/tanstack/useGetMyProjects";
+import { useGetDocumentsPendingMyAction } from "@/features/documents/hooks/useGetDocumentsPendingMyAction";
+import { useGetMyProjects } from "@/features/projects/hooks/useGetMyProjects";
 import { AdminTasksDataTable } from "./AdminTasksDataTable";
 import { DocumentsDataTable } from "./DocumentsDataTable";
 import { EndorsementsDataTable } from "./EndorsementsDataTable";

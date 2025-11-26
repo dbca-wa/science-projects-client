@@ -1,5 +1,5 @@
-import { remedyLeaderlessProjects } from "@/shared/lib/api";
-import type { IProjectData } from "@/shared/types/index.d";
+import { remedyLeaderlessProjects } from "@/features/admin/services/admin.service";
+import type { IProjectData } from "@/shared/types";
 import {
   Box,
   Button,

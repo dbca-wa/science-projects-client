@@ -1,11 +1,11 @@
-import { Head } from "@/shared/components/Base/Head";
-import { SideMenuButton } from "@/shared/components/Pages/Account/SideMenuButton";
-import { SideMenuSectionDivider } from "@/shared/components/Pages/UserGuide/SidebarSectionDivider";
+import { Head } from "@/shared/components/layout/base/Head";
+import { SideMenuButton } from "@/features/users/components/account/SideMenuButton";
+import { SideMenuSectionDivider } from "@/features/dashboard/components/guide/SidebarSectionDivider";
 import { GuideRichTextEditor } from "@/shared/components/RichTextEditor/Editors/GuideRichTextEditor";
-import { AccountPageViewWrapper } from "@/shared/components/Wrappers/AccountPageViewWrapper";
+import { AccountPageViewWrapper } from "@/shared/components/layout/wrappers/AccountPageViewWrapper";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
-import { useAdminOptions } from "@/shared/hooks/tanstack/useAdminOptions";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useAdminOptions } from "@/features/admin/hooks/useAdminOptions";
+import { useUser } from "@/features/users/hooks/useUser";
 import { Box, Flex, useColorMode } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 

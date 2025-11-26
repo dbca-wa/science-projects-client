@@ -29,13 +29,13 @@ import {
   MutationError,
   MutationSuccess,
   removeCaretaker,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import {
   ICaretakerEntry,
   ICaretakerObject,
   ISimpleIdProp,
   IUserData,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 
 interface IModalProps {

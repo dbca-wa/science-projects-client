@@ -29,8 +29,8 @@ import {
   type UseToastOptions,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
-import { ProjectSearchDropdown } from "../Navigation/ProjectSearchDropdown";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
+import { ProjectSearchDropdown } from "@/features/projects/components/ProjectSearchDropdown";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   RegisterOptions,
@@ -41,11 +41,11 @@ import {
 } from "react-hook-form";
 import {
   INewMember,
-  checkStaffStatusApiCall,
   createTeamMember,
-} from "@/shared/lib/api";
+} from "@/features/projects/services/projects.service";
+import { checkStaffStatusApiCall } from "@/features/users/services/users.service";
 import { useLocation, useNavigate } from "react-router-dom";
-import type { CustomAxiosError } from "@/shared/types/index.d";
+import type { CustomAxiosError } from "@/shared/types";
 
 interface IAddUserToProjectModalProps {
   isOpen: boolean;

@@ -1,10 +1,10 @@
 // Route for handling the dashboard
 
-import { Head } from "@/shared/components/Base/Head";
-import { ModernDashboard } from "@/shared/components/Pages/Dashboard/ModernDashboard";
-import { TraditionalDashboard } from "@/shared/components/Pages/Dashboard/TraditionalDashboard";
+import { Head } from "@/shared/components/layout/base/Head";
+import { ModernDashboard } from "@/features/dashboard/components/ModernDashboard";
+import { TraditionalDashboard } from "@/features/dashboard/components/TraditionalDashboard";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
-import { type IDashProps } from "@/shared/types/index.d";
+import { type IDashProps } from "@/shared/types";
 import { Box } from "@chakra-ui/react";
 
 export const Dashboard = ({ activeTab }: IDashProps) => {

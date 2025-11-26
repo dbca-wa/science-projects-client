@@ -5,7 +5,7 @@ import type {
   IApproveDocument,
   ISimplePkProp,
   IStaffPublicationEntry,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import instance from "@/shared/lib/api/axiosInstance";
 import type { QueryFunctionContext } from "@tanstack/react-query";
 
@@ -671,7 +671,7 @@ export const handleDocumentAction = async ({
 // Comments & Reactions
 // ============================================================================
 
-import type { ICommentReaction } from "@/shared/types/index.d";
+import type { ICommentReaction } from "@/shared/types";
 
 export const createCommentReaction = ({
   reaction,

@@ -1,7 +1,7 @@
 // Tab data for Project External Project info on the creation page.
 
-import { AffiliationCreateSearchDropdown } from "@/shared/components/Navigation/AffiliationCreateSearchDropdown";
-import type { IAffiliation } from "@/shared/types/index.d";
+import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
+import type { IAffiliation } from "@/shared/types";
 import {
   Button,
   Flex,
@@ -18,7 +18,7 @@ import {
 import { useEffect, useState } from "react";
 import { HiAcademicCap } from "react-icons/hi";
 import { IoIosCreate } from "react-icons/io";
-import type { ICreateProjectStudentDetails } from "@/shared/lib/api";
+import type { ICreateProjectStudentDetails } from "@/features/projects/services/projects.service";
 import "@/styles/modalscrollbar.css";
 
 interface IProjectStudentProps {

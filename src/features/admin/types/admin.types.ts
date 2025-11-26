@@ -1,6 +1,6 @@
 // Admin-related type definitions
 
-import type { IImageData } from "@/shared/types/index.d";
+import type { IImageData } from "@/shared/types";
 
 // ADMIN OPTIONS ============================================================================
 

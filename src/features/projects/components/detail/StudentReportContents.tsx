@@ -14,17 +14,17 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BsPlus } from "react-icons/bs";
-import { getStudentReportForYear } from "@/shared/lib/api";
-import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
-import { useGetStudentReportAvailableReportYears } from "@/shared/hooks/tanstack/useGetStudentReportAvailableReportYears";
+import { getStudentReportForYear } from "@/features/reports/services/reports.service";
+import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
+import { useGetStudentReportAvailableReportYears } from "@/features/reports/hooks/useGetStudentReportAvailableReportYears";
 import type {
   ICaretakerPermissions,
   IProjectMember,
   IStudentReport,
   IUserMe,
-} from "@/shared/types/index.d";
-import { CreateStudentReportModal } from "../../Modals/CreateStudentReportModal";
-import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
+} from "@/shared/types";
+import { CreateStudentReportModal } from "@/features/reports/components/modals/CreateStudentReportModal";
+import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 

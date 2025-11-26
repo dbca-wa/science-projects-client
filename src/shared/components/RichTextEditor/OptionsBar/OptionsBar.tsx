@@ -1,14 +1,14 @@
 // The options bar which sits below the text area in the simple rich text editor
 
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useUser } from "@/features/users/hooks/useUser";
 import { Flex, Grid } from "@chakra-ui/react";
-import type { EditorSections, EditorSubsections, EditorType } from "@/shared/types/index.d";
+import type { EditorSections, EditorSubsections, EditorType } from "@/shared/types";
 import { ClearButton } from "../Buttons/ClearButton";
 import { SaveButton } from "../Buttons/SaveButton";
 import { TreeButton } from "../Buttons/TreeButton";
 import { WordCount } from "./WordCount";
 import { PasteHTMLDataButton } from "../Buttons/PasteHTMLDataButton";
-import { useMaintainer } from "@/shared/hooks/tanstack/useMaintainer";
+import { useMaintainer } from "@/features/admin/hooks/useMaintainer";
 import { PopulationButton } from "../Buttons/PopulationButton";
 
 interface IOptionsBarProps {

@@ -1,5 +1,5 @@
 import { Maximize2, Minimize2, Minus, Plus } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@/shared/components/ui/button";
 import { useEffect, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";

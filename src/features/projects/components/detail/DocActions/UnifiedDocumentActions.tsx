@@ -1,14 +1,14 @@
-import { CreateProgressReportModal } from "@/shared/components/Modals/CreateProgressReportModal";
-import { DeleteDocumentModal } from "@/shared/components/Modals/DeleteDocumentModal";
-import { UnifiedDocumentActionModal } from "@/shared/components/Modals/DocumentActionModals/UnifiedDocumentActionModal";
-import { SetAreasModal } from "@/shared/components/Modals/SetAreasModal";
-import { type ISetProjectStatusProps, setProjectStatus } from "@/shared/lib/api";
+import { CreateProgressReportModal } from "@/features/reports/components/modals/CreateProgressReportModal";
+import { DeleteDocumentModal } from "@/features/documents/components/modals/DeleteDocumentModal";
+import { UnifiedDocumentActionModal } from "@/features/documents/components/modals/UnifiedDocumentActionModal";
+import { SetAreasModal } from "@/features/business-areas/components/modals/SetAreasModal";
+import { type ISetProjectStatusProps, setProjectStatus } from "@/features/projects/services/projects.service";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
-import { useBusinessArea } from "@/shared/hooks/tanstack/useBusinessArea";
-import { useDivisionDirectorateMembers } from "@/shared/hooks/tanstack/useDivisionDirectorateMembers";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
-import { useProjectTeam } from "@/shared/hooks/tanstack/useProjectTeam";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useBusinessArea } from "@/features/business-areas/hooks/useBusinessArea";
+import { useDivisionDirectorateMembers } from "@/features/admin/hooks/useDivisionDirectorateMembers";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
+import { useProjectTeam } from "@/features/projects/hooks/useProjectTeam";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   ICaretakerPermissions,
   IConceptPlan,
@@ -19,7 +19,7 @@ import {
   IProjectPlan,
   IStudentReport,
   ProjectStatus,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import {
   Box,
   Button,
@@ -38,7 +38,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { UserProfile } from "../../Users/UserProfile";
+import { UserProfile } from "@/features/users/components/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
 
 // Type for document type

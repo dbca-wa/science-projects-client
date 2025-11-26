@@ -21,11 +21,11 @@ import {
   Button,
   type UseToastOptions,
 } from "@chakra-ui/react";
-import { IDeleteDocument, deleteDocumentCall } from "@/shared/lib/api";
+import { IDeleteDocument, deleteDocumentCall } from "@/features/documents/services/documents.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { useGetStudentReportAvailableReportYears } from "@/shared/hooks/tanstack/useGetStudentReportAvailableReportYears";
-import { useGetProgressReportAvailableReportYears } from "@/shared/hooks/tanstack/useGetProgressReportAvailableReportYears";
+import { useGetStudentReportAvailableReportYears } from "@/features/reports/hooks/useGetStudentReportAvailableReportYears";
+import { useGetProgressReportAvailableReportYears } from "@/features/reports/hooks/useGetProgressReportAvailableReportYears";
 import { useRef } from "react";
 
 interface Props {

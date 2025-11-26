@@ -4,7 +4,7 @@ import type {
   IStaffEmploymentEntry,
   IStaffPublicationEntry,
   KeywordTag,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import instance from "@/shared/lib/api/axiosInstance";
 import { type QueryFunctionContext } from "@tanstack/react-query";
 

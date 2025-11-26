@@ -22,11 +22,11 @@ import {
   Box,
   type UseToastOptions,
 } from "@chakra-ui/react";
-import { openProjectCall } from "@/shared/lib/api";
+import { openProjectCall } from "@/features/projects/services/projects.service";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import type { ISimplePkProp } from "@/shared/types/index.d";
+import type { ISimplePkProp } from "@/shared/types";
 
 interface Props {
   projectPk: string | number;

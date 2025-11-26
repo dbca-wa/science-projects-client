@@ -1,7 +1,7 @@
 import { DisplayRTE } from "@/shared/components/RichTextEditor/Editors/DisplayRTE";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import type { BusinessAreaImage, IUserMe } from "@/shared/types/index.d";
+import type { BusinessAreaImage, IUserMe } from "@/shared/types";
 import {
   Box,
   Center,

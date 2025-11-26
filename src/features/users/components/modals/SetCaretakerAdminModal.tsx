@@ -37,13 +37,13 @@ import {
   adminSetCaretaker,
   deleteUserAdmin,
   requestCaretaker,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
-import type { ICaretakerEntry, IUserMe } from "@/shared/types/index.d";
+import type { ICaretakerEntry, IUserMe } from "@/shared/types";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
-import { ShadcnDatePicker } from "../../Pages/Account/ShadcnDatePicker";
-import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
+import { ShadcnDatePicker } from "@/features/users/components/account/ShadcnDatePicker";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import useCaretakingChain from "@/features/users/hooks/useCaretakingChain";
 
 interface IModalProps {

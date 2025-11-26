@@ -1,13 +1,13 @@
 import replaceDarkWithLight from "@/shared/utils/htmlHelpers";
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
-import { useInvolvedProjects } from "@/shared/hooks/tanstack/useInvolvedProjects";
+import { useInvolvedProjects } from "@/features/projects/hooks/useInvolvedProjects";
 import { useNavigate } from "react-router-dom";
-import SimpleSkeletonSection from "../../SimpleSkeletonSection";
+import SimpleSkeletonSection from "@/features/staff-profiles/components/SimpleSkeletonSection";
 import { Separator } from "@/shared/components/ui/separator";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import StaffProjectItem from "./StaffProjectItem";
 import ProjectsSubsection from "./ProjectsSubsection";
-import { useInvolvedStaffProfileProjects } from "@/shared/hooks/tanstack/useInvolvedStaffProfileProjects";
+import { useInvolvedStaffProfileProjects } from "@/features/projects/hooks/useInvolvedStaffProfileProjects";
 
 const ProjectsSection = ({
   userId,

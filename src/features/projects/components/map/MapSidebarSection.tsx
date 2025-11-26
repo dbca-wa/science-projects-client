@@ -1,7 +1,7 @@
 import { cn } from "@/shared/utils";
 import { Minus, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Separator } from "../ui/separator";
+import { Separator } from "@/shared/components/ui/separator";
 
 interface MapSidebarSectionProps {
   title: string;

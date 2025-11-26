@@ -27,19 +27,19 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import type { IDepartmentalService } from "@/shared/types/index.d";
+import type { IDepartmentalService } from "@/shared/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdMoreVert } from "react-icons/md";
 import { useForm } from "react-hook-form";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
-import { UserProfile } from "../Users/UserProfile";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
+import { UserProfile } from "@/features/users/components/UserProfile";
 import {
   deleteDepartmentalService,
   updateDepartmentalService,
-} from "@/shared/lib/api";
+} from "@/features/admin/services/admin.service";
 import { useState } from "react";
-import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
-import { TextButtonFlex } from "../../TextButtonFlex";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
+import { TextButtonFlex } from "@/shared/components/TextButtonFlex";
 // import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
 
 export const ServiceItemDisplay = ({

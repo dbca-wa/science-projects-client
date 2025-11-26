@@ -1,7 +1,7 @@
 // Simple hook to get services.
 // returns the loading and data variables.
 
-import { getAllDepartmentalServices } from "@/shared/lib/api";
+import { getAllDepartmentalServices } from "@/features/admin/services/admin.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useDepartmentalServices = () => {

@@ -1,5 +1,5 @@
-import { getAnnualReportPDF } from "@/shared/lib/api";
-import type { IAnnualReportPDFObject } from "@/shared/types/index.d";
+import { getAnnualReportPDF } from "@/features/admin/services/admin.service";
+import type { IAnnualReportPDFObject } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetAnnualReportPDF = (pk: number) => {

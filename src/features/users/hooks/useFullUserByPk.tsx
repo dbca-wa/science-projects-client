@@ -1,7 +1,7 @@
 // A simple hook which talks to the api to get the full user data.
 // Exposes that data as well as the state of the query (loading or not)
 
-import { getFullUser } from "@/shared/lib/api";
+import { getFullUser } from "@/features/users/services/users.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useFullUserByPk = (pk: number) => {
