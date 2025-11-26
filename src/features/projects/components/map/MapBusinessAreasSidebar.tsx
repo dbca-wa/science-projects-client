@@ -4,16 +4,16 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../ui/accordion";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
-import { Label } from "../ui/label";
+} from "@/shared/components/ui/accordion";
+import { Button } from "@/shared/components/ui/button";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Label } from "@/shared/components/ui/label";
 import MapSidebarSection from "./MapSidebarSection";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useGetLocationsGeojson } from "@/shared/hooks/tanstack/useGetLocationsGeojson";
-import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
-import type { IBusinessArea } from "@/shared/types/index.d";
+import { useGetLocationsGeojson } from "@/features/admin/hooks/useGetLocationsGeojson";
+import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
+import type { IBusinessArea } from "@/shared/types";
 
 interface LayerVisibility {
   dbcaRegions: boolean;

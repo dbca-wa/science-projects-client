@@ -18,10 +18,10 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import { addPDFToReport } from "@/shared/lib/api";
-import { useGetARARsWithoputPDF } from "@/shared/hooks/tanstack/useGetARARsWithoputPDF";
-import { SingleFileStateUpload } from "../SingleFileStateUpload";
+import { useUser } from "@/features/users/hooks/useUser";
+import { addPDFToReport } from "@/features/reports/services/reports.service";
+import { useGetARARsWithoputPDF } from "@/features/reports/hooks/useGetARARsWithoputPDF";
+import { SingleFileStateUpload } from "@/shared/components/SingleFileStateUpload";
 
 interface Props {
   isAddPDFOpen: boolean;

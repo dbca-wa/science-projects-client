@@ -1,4 +1,4 @@
-import type { IProjectData, ISimpleLocationData } from "@/shared/types/index.d";
+import type { IProjectData, ISimpleLocationData } from "@/shared/types";
 import L from "leaflet";
 import "leaflet.heat";
 import { useEffect, useRef } from "react";

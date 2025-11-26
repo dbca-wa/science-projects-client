@@ -28,8 +28,8 @@ import {
   MutationError,
   MutationSuccess,
   openNewCycle,
-} from "@/shared/lib/api";
-import { useLatestReportYear } from "@/shared/hooks/tanstack/useLatestReportYear";
+} from "@/features/users/services/users.service";
+import { useLatestReportYear } from "@/features/reports/hooks/useLatestReportYear";
 
 interface IModalProps {
   isOpen: boolean;

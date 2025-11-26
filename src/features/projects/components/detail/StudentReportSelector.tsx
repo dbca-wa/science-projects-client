@@ -1,5 +1,5 @@
 import { Select } from "@chakra-ui/react";
-import type { IStudentReport } from "@/shared/types/index.d";
+import type { IStudentReport } from "@/shared/types";
 
 // Similar component for Student Reports Tab
 interface StudentReportsTabProps {

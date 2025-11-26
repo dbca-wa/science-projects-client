@@ -33,10 +33,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaArrowLeft } from "react-icons/fa";
 import { HiAcademicCap } from "react-icons/hi";
-import { type IEditProject, updateProjectDetails } from "@/shared/lib/api";
-import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
-import { useDepartmentalServices } from "@/shared/hooks/tanstack/useDepartmentalServices";
-import { useGetLocations } from "@/shared/hooks/tanstack/useGetLocations";
+import { type IEditProject, updateProjectDetails } from "@/features/projects/services/projects.service";
+import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
+import { useDepartmentalServices } from "@/features/admin/hooks/useDepartmentalServices";
+import { useGetLocations } from "@/features/admin/hooks/useGetLocations";
 import {
   IAffiliation,
   IBusinessArea,
@@ -47,17 +47,18 @@ import {
   ISimpleLocationData,
   ISmallService,
   IStudentProjectDetails,
+  IUserData,
   ProjectImage,
-} from "@/shared/types/index.d";
-import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
-import { UserSearchDropdown } from "../Navigation/UserSearchDropdown";
-import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
-import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
-import { StartAndEndDateSelector } from "../Pages/CreateProject/StartAndEndDateSelector";
-import TagInput from "../Pages/CreateProject/TagInput";
-import { UnboundStatefulEditor } from "../RichTextEditor/Editors/UnboundStatefulEditor";
+} from "@/shared/types";
+import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
+import { StatefulMediaChanger } from "@/features/admin/components/StatefulMediaChanger";
+import { AreaCheckAndMaps } from "@/features/projects/components/forms/AreaCheckAndMaps";
+import { StartAndEndDateSelector } from "@/features/projects/components/forms/StartAndEndDateSelector";
+import TagInput from "@/features/projects/components/forms/TagInput";
+import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
-import { StatefulMediaChangerProject } from "../Pages/Admin/StatefulMediaChangerProject";
+import { StatefulMediaChangerProject } from "@/features/admin/components/StatefulMediaChangerProject";
 
 interface Props {
   projectPk: string | number;
@@ -347,6 +348,7 @@ export const EditProjectModal = ({
 
   const { register } = useForm<IEditProject>();
   const queryClient = useQueryClient();
+  const meData = queryClient.getQueryData<IUserData>(["me"]);
   const toast = useToast();
   const ToastIdRef = useRef<ToastId | undefined>(undefined);
   const addToast = (data: UseToastOptions) => {
@@ -492,6 +494,8 @@ export const EditProjectModal = ({
                   value={projectTitle}
                   setValueFunction={setProjectTitle}
                   setValueAsPlainText={false}
+                  hideBold={!meData?.is_superuser}
+                  hideUnderline={!meData?.is_superuser}
                 />
                 {(details?.external as IExternalProjectDetails)?.project ? (
                   <Grid

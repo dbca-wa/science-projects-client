@@ -1,8 +1,8 @@
 // A simple hook which talks to the api to get the full branch data.
 // Exposes that data as well as the state of the query (loading or not)
 
-import { getAdminOptionsByPk } from "@/shared/lib/api";
-import type { IAdminOptions } from "@/shared/types/index.d";
+import { getAdminOptionsByPk } from "@/features/admin/services/admin.service";
+import type { IAdminOptions } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useAdminOptions = (pk: number) => {

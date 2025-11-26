@@ -1,5 +1,5 @@
-import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
-import type { IBusinessArea, IReport } from "@/shared/types/index.d";
+import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
+import type { IBusinessArea, IReport } from "@/shared/types";
 import {
   Box,
   Button,
@@ -28,7 +28,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaFilePdf } from "react-icons/fa";
-import { IGeneratePDFProps, generateReportPDF } from "@/shared/lib/api";
+import { IGeneratePDFProps, generateReportPDF } from "@/features/reports/services/reports.service";
 
 interface Props {
   isOpen: boolean;

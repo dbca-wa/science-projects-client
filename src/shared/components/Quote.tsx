@@ -1,6 +1,6 @@
 // The quote that displays on the dashboard
 
-import { useQuote } from "@/shared/hooks/tanstack/useQuote";
+import { useQuote } from "@/features/dashboard/hooks/useQuote";
 import { Box, Flex, Spinner, Text, useColorMode } from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
 import { useEffect } from "react";

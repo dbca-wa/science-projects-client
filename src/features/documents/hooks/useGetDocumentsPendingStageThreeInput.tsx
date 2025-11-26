@@ -1,6 +1,6 @@
 // Simple hook for getting projects the user is involved in, for the dashboard.
 
-import { getDocumentsPendingStageThreeAction } from "@/shared/lib/api";
+import { getDocumentsPendingStageThreeAction } from "@/features/dashboard/services/dashboard.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetDocumentsPendingStageThreeInput = () => {

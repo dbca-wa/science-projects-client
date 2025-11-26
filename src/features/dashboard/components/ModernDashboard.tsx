@@ -13,15 +13,15 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import { Quote } from "../../Quote";
+import { useUser } from "@/features/users/hooks/useUser";
+import { Quote } from "@/shared/components/Quote";
 import { MyTasksSection } from "./MyTasksSection";
 
-import { useGetDocumentsPendingMyAction } from "@/shared/hooks/tanstack/useGetDocumentsPendingMyAction";
-import { useGetEndorsementsPendingMyAction } from "@/shared/hooks/tanstack/useGetEndorsementsPendingMyAction";
+import { useGetDocumentsPendingMyAction } from "@/features/documents/hooks/useGetDocumentsPendingMyAction";
+import { useGetEndorsementsPendingMyAction } from "@/features/documents/hooks/useGetEndorsementsPendingMyAction";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useGetMyProjects } from "@/shared/hooks/tanstack/useGetMyProjects";
-import type { IDashProps } from "@/shared/types/index.d";
+import { useGetMyProjects } from "@/features/projects/hooks/useGetMyProjects";
+import type { IDashProps } from "@/shared/types";
 import { Admin } from "./Admin";
 import { MyProjectsSection } from "./MyProjectsSection";
 

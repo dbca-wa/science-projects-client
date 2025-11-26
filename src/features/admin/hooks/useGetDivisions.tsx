@@ -1,8 +1,8 @@
 // Simple hook to get businessarea data and save it in a query key.
 // Exposes data and loading states of query
 
-import { getAllDivisions } from "@/shared/lib/api";
-import type { IDivision } from "@/shared/types/index.d";
+import { getAllDivisions } from "@/features/admin/services/admin.service";
+import type { IDivision } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetDivisions = () => {

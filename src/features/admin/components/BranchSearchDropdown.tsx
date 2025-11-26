@@ -21,9 +21,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { getBranchesBasedOnSearchTerm } from "@/shared/lib/api";
-import { useBranch } from "@/shared/hooks/tanstack/useBranch";
-import type { IBranch } from "@/shared/types/index.d";
+import { getBranchesBasedOnSearchTerm } from "@/features/admin/services/admin.service";
+import { useBranch } from "@/features/admin/hooks/useBranch";
+import type { IBranch } from "@/shared/types";
 
 interface IBranchSearchDropdown {
   isRequired: boolean;

@@ -1,4 +1,4 @@
-import type { IProjectMember } from "@/shared/types/index.d";
+import type { IProjectMember } from "@/shared/types";
 import { useEffect, useState } from "react";
 
 export const useCheckUserIsTeamLeader = (

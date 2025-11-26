@@ -8,7 +8,7 @@ import {
   ModalCloseButton,
   useColorMode,
 } from "@chakra-ui/react";
-import type { ITaskDisplayCard } from "@/shared/types/index.d";
+import type { ITaskDisplayCard } from "@/shared/types";
 
 interface Props {
   isOpen: boolean;

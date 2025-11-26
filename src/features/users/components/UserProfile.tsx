@@ -1,17 +1,17 @@
 // The drawer content that pops out when clicking on a user grid item
 
-import { BecomeCaretakerModal } from "@/shared/components/Modals/Caretakers/BecomeCaretakerModal";
-import { CancelCaretakerRequestModal } from "@/shared/components/Modals/Caretakers/CancelCaretakerRequestModal";
-import { CaretakerModeConfirmModal } from "@/shared/components/Modals/Caretakers/CaretakerModeConfirmModal";
-import { RemoveCaretakerModal } from "@/shared/components/Modals/Caretakers/RemoveCaretakerModal";
-import { SetCaretakerAdminModal } from "@/shared/components/Modals/Caretakers/SetCaretakerAdminModal";
-import { SetCaretakerForMyAccountModal } from "@/shared/components/Modals/Caretakers/SetCaretakerForMyAccountModal";
-import { DeactivateUserModal } from "@/shared/components/Modals/DeactivateUserModal";
-import { RequestMergeUserModal } from "@/shared/components/Modals/RequestMergeUserModal";
+import { BecomeCaretakerModal } from "@/features/users/components/modals/BecomeCaretakerModal";
+import { CancelCaretakerRequestModal } from "@/features/users/components/modals/CancelCaretakerRequestModal";
+import { CaretakerModeConfirmModal } from "@/features/users/components/modals/CaretakerModeConfirmModal";
+import { RemoveCaretakerModal } from "@/features/users/components/modals/RemoveCaretakerModal";
+import { SetCaretakerAdminModal } from "@/features/users/components/modals/SetCaretakerAdminModal";
+import { SetCaretakerForMyAccountModal } from "@/features/users/components/modals/SetCaretakerForMyAccountModal";
+import { DeactivateUserModal } from "@/features/users/components/modals/DeactivateUserModal";
+import { RequestMergeUserModal } from "@/features/users/components/modals/RequestMergeUserModal";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import { useCheckExistingCaretaker } from "@/shared/hooks/tanstack/useCheckExistingCaretaker";
-import { useInvolvedProjects } from "@/shared/hooks/tanstack/useInvolvedProjects";
+import { useCheckExistingCaretaker } from "@/features/users/hooks/useCheckExistingCaretaker";
+import { useInvolvedProjects } from "@/features/projects/hooks/useInvolvedProjects";
 import {
   Avatar,
   Box,
@@ -35,14 +35,14 @@ import { useNavigate } from "react-router-dom";
 import { useCopyText } from "@/shared/hooks/useCopyText";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { useUpdatePage } from "@/shared/hooks/useUpdatePage";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import type { IBranch, IBusinessArea } from "@/shared/types/index.d";
-import { AddUserToProjectModal } from "../../Modals/AddUserToProjectModal";
-import { DeleteUserModal } from "../../Modals/DeleteUserModal";
-import { EditUserDetailsModal } from "../../Modals/EditUserDetailsModal";
-import { PromoteUserModal } from "../../Modals/PromoteUserModal";
-import { UserProjectsDataTable } from "../Dashboard/UserProjectsDataTable";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
+import { useUser } from "@/features/users/hooks/useUser";
+import type { IBranch, IBusinessArea } from "@/shared/types";
+import { AddUserToProjectModal } from "@/features/projects/components/modals/AddUserToProjectModal";
+import { DeleteUserModal } from "@/features/users/components/modals/DeleteUserModal";
+import { EditUserDetailsModal } from "@/features/users/components/modals/EditUserDetailsModal";
+import { PromoteUserModal } from "@/features/users/components/modals/PromoteUserModal";
+import { UserProjectsDataTable } from "@/features/dashboard/components/UserProjectsDataTable";
 
 interface Props {
   pk: number;

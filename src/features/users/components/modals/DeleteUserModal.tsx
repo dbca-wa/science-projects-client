@@ -31,7 +31,7 @@ import {
   MutationError,
   MutationSuccess,
   deleteUserAdmin,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import { useMutation } from "@tanstack/react-query";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 

@@ -2,7 +2,7 @@ import type {
   EditorSections,
   EditorSubsections,
   EditorType,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import instance from "@/shared/lib/api/axiosInstance";
 
 // ============================================================================
@@ -446,7 +446,7 @@ export const deleteLegacyFinalAnnualReportPDF = async (
 // PDF Generation
 // ============================================================================
 
-import type { IConceptPlanGenerationData } from "@/shared/types/index.d";
+import type { IConceptPlanGenerationData } from "@/shared/types";
 
 export interface IDocGen {
   document_pk: number;

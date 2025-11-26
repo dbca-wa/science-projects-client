@@ -1,6 +1,6 @@
 // Handles Profile Page view
 
-import ScienceStaffSearchResult from "@/shared/components/StaffProfiles/Staff/All/ScienceStaffSearchResult";
+import ScienceStaffSearchResult from "@/features/staff-profiles/components/Staff/All/ScienceStaffSearchResult";
 import {
   Box,
   Button,
@@ -28,17 +28,17 @@ import { AiFillCloseCircle, AiFillEdit, AiFillEye } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import { EditMembershipModal } from "../../Modals/EditMembershipModal";
-import { EditPersonalInformationModal } from "../../Modals/EditPersonalInformationModal";
-import { EditProfileModal } from "../../Modals/EditProfileModal";
-import { UserGridItem } from "../Users/UserGridItem";
+import { useUser } from "@/features/users/hooks/useUser";
+import { EditMembershipModal } from "@/features/users/components/modals/EditMembershipModal";
+import { EditPersonalInformationModal } from "@/features/users/components/modals/EditPersonalInformationModal";
+import { EditProfileModal } from "@/features/users/components/modals/EditProfileModal";
+import { UserGridItem } from "@/features/users/components/UserGridItem";
 import { IoIosSave } from "react-icons/io";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { type IUpdatePublicEmail, updatePublicEmail } from "@/shared/lib/api";
+import { type IUpdatePublicEmail, updatePublicEmail } from "@/features/users/services/users.service";
 import { AxiosError } from "axios";
-import ToggleStaffProfileVisibilityModal from "@/shared/components/Modals/ToggleStaffProfileVisibilityModal";
+import ToggleStaffProfileVisibilityModal from "@/features/staff-profiles/components/modals/ToggleStaffProfileVisibilityModal";
 import PublicEmailSection from "./PublicEmailSection";
 import CustomTitleSection from "./CustomTitleSection";
 

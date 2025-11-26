@@ -2,7 +2,7 @@ import {
   IDocGen,
   cancelProjectDocumentGeneration,
   generateProjectDocument,
-} from "@/shared/lib/api";
+} from "@/features/reports/services/reports.service";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import {
   IConceptPlan,
@@ -10,7 +10,7 @@ import {
   IProjectClosure,
   IProjectPlan,
   IStudentReport,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import {
   Box,
   Button,

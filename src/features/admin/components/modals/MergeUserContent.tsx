@@ -1,9 +1,9 @@
 // Component/Route for handling user creation and the accomponying validation
 
-import { Head } from "@/shared/components/Base/Head";
-import { UserArraySearchDropdown } from "@/shared/components/Navigation/UserArraySearchDropdown";
-import { mergeUsers } from "@/shared/lib/api";
-import type { IMergeUser, IUserData } from "@/shared/types/index.d";
+import { Head } from "@/shared/components/layout/base/Head";
+import { UserArraySearchDropdown } from "@/features/users/components/UserArraySearchDropdown";
+import { mergeUsers } from "@/features/users/services/users.service";
+import type { IMergeUser, IUserData } from "@/shared/types";
 import {
   Box,
   Button,

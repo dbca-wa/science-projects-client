@@ -4,9 +4,9 @@ import { Input } from "@/shared/components/ui/input";
 import {
   type IUpdateStaffHeroSection,
   updateStaffHeroSection,
-} from "@/shared/lib/api";
+} from "@/features/staff-profiles/services/staff-profiles.service";
 // import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import type { IStaffOverviewData, IStaffProfileHeroData } from "@/shared/types/index.d";
+import type { IStaffOverviewData, IStaffProfileHeroData } from "@/shared/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";

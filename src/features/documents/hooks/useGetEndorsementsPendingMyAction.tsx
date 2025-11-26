@@ -1,7 +1,7 @@
 // Simple hook for getting projects the user is involved in, for the dashboard.
 
 import { useQuery } from "@tanstack/react-query";
-import { getEndorsementsPendingMyAction } from "@/shared/lib/api";
+import { getEndorsementsPendingMyAction } from "@/features/dashboard/services/dashboard.service";
 
 export const useGetEndorsementsPendingMyAction = () => {
   const { isPending, data } = useQuery({

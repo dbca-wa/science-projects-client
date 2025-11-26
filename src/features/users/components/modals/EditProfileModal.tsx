@@ -1,4 +1,4 @@
-import { useProfile } from "@/shared/hooks/tanstack/useProfile";
+import { useProfile } from "@/features/users/hooks/useProfile";
 import {
   Box,
   Button,
@@ -27,12 +27,12 @@ import {
   IProfileUpdateVariables,
   removeUserAvatar,
   updateProfile,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
-import type { IProfile } from "@/shared/types/index.d";
-import { StatefulMediaChangerAvatar } from "../Pages/Admin/StatefulMediaChangerAvatar";
-import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";
+import type { IProfile } from "@/shared/types";
+import { StatefulMediaChangerAvatar } from "@/features/admin/components/StatefulMediaChangerAvatar";
+import DatabaseRichTextEditor from "@/features/staff-profiles/components/Editor/DatabaseRichTextEditor";
 
 interface IEditProfileModalProps {
   isOpen: boolean;

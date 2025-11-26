@@ -2,8 +2,8 @@ import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
 import {
   ISaveProgressReportSection,
   updateProgressReportSection,
-} from "@/shared/lib/api";
-import type { IProjectData, IProjectMember } from "@/shared/types/index.d";
+} from "@/features/reports/services/reports.service";
+import type { IProjectData, IProjectMember } from "@/shared/types";
 import {
   Box,
   Button,
@@ -43,7 +43,7 @@ import ListMaxIndentLevelPlugin from "../Plugins/ListMaxIndentLevelPlugin";
 import { PrepopulateHTMLPlugin } from "../Plugins/PrepopulateHTMLPlugin";
 import { RevisedRichTextToolbar } from "../Toolbar/RevisedRichTextToolbar";
 import type { IProgressReportDisplayData } from "./ARProgressReportHandler";
-import { ApproveProgressReportModal } from "@/shared/components/Modals/RTEModals/ApproveProgressReportModal";
+import { ApproveProgressReportModal } from "@/features/reports/components/modals/ApproveProgressReportModal";
 import { TiTick } from "react-icons/ti";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 

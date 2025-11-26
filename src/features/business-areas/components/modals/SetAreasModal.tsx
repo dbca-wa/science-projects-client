@@ -1,4 +1,4 @@
-import { useGetLocations } from "@/shared/hooks/tanstack/useGetLocations";
+import { useGetLocations } from "@/features/admin/hooks/useGetLocations";
 import {
   Box,
   Button,
@@ -18,8 +18,8 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
-import { type ISetProjectAreas, setProjectAreas } from "@/shared/lib/api";
-import { AreaCheckAndMaps } from "../Pages/CreateProject/AreaCheckAndMaps";
+import { type ISetProjectAreas, setProjectAreas } from "@/features/projects/services/projects.service";
+import { AreaCheckAndMaps } from "@/features/projects/components/forms/AreaCheckAndMaps";
 
 interface Props {
   projectPk: string | number;

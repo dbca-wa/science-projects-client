@@ -1,6 +1,6 @@
 // Simple hook for getting the tasks of the user, for the dashboard
 
-import { getReportPDFs } from "@/shared/lib/api";
+import { getReportPDFs } from "@/features/admin/services/admin.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetReportPDFs = () => {

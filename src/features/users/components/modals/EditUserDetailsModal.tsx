@@ -1,6 +1,6 @@
 // Modal for editing user details
 
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   Box,
   Button,
@@ -48,13 +48,13 @@ import {
   MutationSuccess,
   adminUpdateUser,
   removeUserAvatar,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
-import type { IAffiliation, IBranch, IBusinessArea, IUserData } from "@/shared/types/index.d";
-import { AffiliationCreateSearchDropdown } from "../Navigation/AffiliationCreateSearchDropdown";
-import { StatefulMediaChanger } from "../Pages/Admin/StatefulMediaChanger";
-import DatabaseRichTextEditor from "../StaffProfiles/Editor/DatabaseRichTextEditor";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
+import type { IAffiliation, IBranch, IBusinessArea, IUserData } from "@/shared/types";
+import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
+import { StatefulMediaChanger } from "@/features/admin/components/StatefulMediaChanger";
+import DatabaseRichTextEditor from "@/features/staff-profiles/components/Editor/DatabaseRichTextEditor";
 
 interface IModalProps {
   isOpen: boolean;

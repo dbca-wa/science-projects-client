@@ -1,4 +1,4 @@
-import { getStaffProfiles } from "@/shared/lib/api";
+import { getStaffProfiles } from "@/features/staff-profiles/services/staff-profiles.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useScienceStaffProfileList = ({

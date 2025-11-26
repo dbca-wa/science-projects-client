@@ -3,8 +3,8 @@
 import {
   type IHandleMethodologyImage,
   handleMethodologyImage,
-} from "@/shared/lib/api";
-import type { IProjectPlan } from "@/shared/types/index.d";
+} from "@/features/projects/services/projects.service";
+import type { IProjectPlan } from "@/shared/types";
 import {
   Button,
   Center,

@@ -1,5 +1,5 @@
-import { getTeamLead } from "@/shared/lib/api";
-import type { IUserMe } from "@/shared/types/index.d";
+import { getTeamLead } from "@/features/staff-profiles/services/staff-profiles.service";
+import type { IUserMe } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useTeamLead = (projectPk: number) => {

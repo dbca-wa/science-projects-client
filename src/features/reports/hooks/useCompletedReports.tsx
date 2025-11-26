@@ -1,7 +1,7 @@
 // Simple hook to get completed reports.
 // Exposes data, error, and loading states of query
 
-import { getCompletedReports } from "@/shared/lib/api";
+import { getCompletedReports } from "@/features/admin/services/admin.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useCompletedReports = () => {

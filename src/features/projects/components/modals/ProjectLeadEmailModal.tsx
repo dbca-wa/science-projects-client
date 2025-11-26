@@ -1,6 +1,6 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
-import type { IProjectLeadsEmail } from "@/shared/types/index.d";
+import type { IProjectLeadsEmail } from "@/shared/types";
 import {
   Box,
   Button,
@@ -25,7 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { getEmailProjectList } from "@/shared/lib/api";
+import { getEmailProjectList } from "@/features/users/services/users.service";
 import { AxiosError } from "axios";
 
 interface IModalProps {

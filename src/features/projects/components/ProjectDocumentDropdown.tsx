@@ -18,9 +18,9 @@ import { useEffect, useState, type RefObject, type ReactNode } from "react";
 import {
   getFullProjectSimple,
   getMyProjectsBasedOnSearchTerm,
-} from "@/shared/lib/api";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import type { IMidDoc } from "@/shared/types/index.d";
+} from "@/features/projects/services/projects.service";
+import { useUser } from "@/features/users/hooks/useUser";
+import type { IMidDoc } from "@/shared/types";
 // import { useNoImage } from "@/shared/hooks/useNoImage";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";

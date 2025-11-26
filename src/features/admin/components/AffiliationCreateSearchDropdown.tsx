@@ -1,6 +1,6 @@
 // Dropdown search component for affiliations. Displays 5 affiliations below the search box.
 
-import { useAffiliation } from "@/shared/hooks/tanstack/useAffiliation";
+import { useAffiliation } from "@/features/admin/hooks/useAffiliation";
 import { CloseIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -21,7 +21,7 @@ import {
   useToast,
   type UseToastOptions,
 } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   forwardRef,
   useEffect,
@@ -37,8 +37,8 @@ import { GrOrganization } from "react-icons/gr";
 import {
   createAffiliation,
   getAffiliationsBasedOnSearchTerm,
-} from "@/shared/lib/api";
-import type { IAffiliation } from "@/shared/types/index.d";
+} from "@/features/admin/services/admin.service";
+import type { IAffiliation } from "@/shared/types";
 
 interface IAffiliationSearchDropdown {
   isRequired: boolean;
@@ -89,8 +89,12 @@ export const AffiliationCreateSearchDropdown = forwardRef(
         getAffiliationsBasedOnSearchTerm(searchTerm, 1)
           .then((data) => {
             // console.log(data.affiliations);
+            // Filter out affiliations that are already selected (by PK or by name)
             const filtr = data.affiliations.filter((item) => {
-              return !array?.some((arrayItem) => arrayItem.pk === item.pk);
+              return !array?.some((arrayItem) => 
+                arrayItem.pk === item.pk || 
+                arrayItem.name?.trim().toLowerCase() === item.name?.trim().toLowerCase()
+              );
             });
             console.log(filtr);
             setFilteredItems(filtr);
@@ -104,7 +108,7 @@ export const AffiliationCreateSearchDropdown = forwardRef(
       } else {
         setFilteredItems([]); // Clear the filtered items when the search term is empty
       }
-    }, [searchTerm]);
+    }, [searchTerm, array]);
 
     const { affiliationLoading, affiliationData } = useAffiliation(
       preselectedAffiliationPk !== undefined ? preselectedAffiliationPk : 0,
@@ -209,6 +213,7 @@ export const AffiliationCreateSearchDropdown = forwardRef(
                         // refetchAffiliationsFn={refetchAffiliations}
                         setFilteredItems={setFilteredItems}
                         array={array}
+                        arrayAddFunction={arrayAddFunction}
                       />
                     </CustomMenuList>
                   </CustomMenu>
@@ -303,15 +308,18 @@ interface ICreateAffiliationProps {
   // refetchAffiliationsFn: () => void;
   array: IAffiliation[];
   setFilteredItems: Dispatch<SetStateAction<IAffiliation[]>>;
+  arrayAddFunction?: (setAffiliationPk: IAffiliation) => void;
 }
 const DropdownCreateAffiliationMenuItem = ({
   name,
   // refetchAffiliationsFn,
   array,
   setFilteredItems,
+  arrayAddFunction,
   ...rest
 }: ICreateAffiliationProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const toast = useToast();
 
@@ -320,64 +328,162 @@ const DropdownCreateAffiliationMenuItem = ({
   const addToast = (data: UseToastOptions) => {
     ToastIdRef.current = toast(data);
   };
-  const createAffiliationMutation = useMutation({
-    mutationFn: createAffiliation,
-    onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Creating Affiliation...",
+
+  const { colorMode } = useColorMode();
+  
+  // Check if input contains semicolons (bulk add mode)
+  const isBulkAdd = name.includes(";");
+  
+  // Check if affiliation is already in the array (case-insensitive)
+  const isAlreadyAdded = !isBulkAdd && array?.some(
+    (item) => item.name?.trim().toLowerCase() === name.trim().toLowerCase()
+  );
+
+  // Smart bulk add handler
+  const handleBulkAdd = async () => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    
+    // Split by semicolons and clean up
+    const affiliationNames = name
+      .split(";")
+      .map((n) => n.trim())
+      .filter((n) => n.length > 0);
+
+    let created = 0;
+    let added = 0;
+    let skipped = 0;
+    let failed = 0;
+
+    addToast({
+      status: "loading",
+      title: `Processing ${affiliationNames.length} affiliation(s)...`,
+      position: "top-right",
+    });
+
+    for (const affiliationName of affiliationNames) {
+      const capitalizedName = `${affiliationName[0].toLocaleUpperCase()}${affiliationName.slice(1)}`;
+      
+      // Check if already in project
+      const alreadyInProject = array?.some(
+        (item) => item.name?.trim().toLowerCase() === affiliationName.toLowerCase()
+      );
+
+      if (alreadyInProject) {
+        skipped++;
+        continue;
+      }
+
+      try {
+        // Search for existing affiliation
+        const searchResult = await getAffiliationsBasedOnSearchTerm(affiliationName, 1);
+        const exactMatch = searchResult.affiliations.find(
+          (aff) => aff.name.toLowerCase() === affiliationName.toLowerCase()
+        );
+
+        if (exactMatch) {
+          // Affiliation exists, just add it to project
+          if (arrayAddFunction) {
+            arrayAddFunction(exactMatch);
+          }
+          added++;
+        } else {
+          // Create new affiliation
+          const newAffiliation = await createAffiliation({ name: capitalizedName });
+          if (arrayAddFunction) {
+            arrayAddFunction(newAffiliation);
+          }
+          created++;
+        }
+      } catch (error) {
+        console.error(`Failed to process ${affiliationName}:`, error);
+        failed++;
+      }
+    }
+
+    // Show summary toast
+    if (ToastIdRef.current) {
+      const messages = [];
+      if (created > 0) messages.push(`${created} created`);
+      if (added > 0) messages.push(`${added} added`);
+      if (skipped > 0) messages.push(`${skipped} already in project`);
+      if (failed > 0) messages.push(`${failed} failed`);
+
+      toast.update(ToastIdRef.current, {
+        title: "Bulk Add Complete",
+        description: messages.join(", "),
+        status: failed > 0 ? "warning" : "success",
         position: "top-right",
+        duration: 5000,
+        isClosable: true,
       });
-    },
-    onSuccess: () => {
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["affiliations"] });
+    setFilteredItems([]);
+    setIsProcessing(false);
+  };
+
+  // Single affiliation add handler
+  const handleSingleAdd = async () => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    const capitalizedName = `${name[0].toLocaleUpperCase()}${name.slice(1)}`;
+
+    addToast({
+      status: "loading",
+      title: "Creating Affiliation...",
+      position: "top-right",
+    });
+
+    try {
+      const newAffiliation = await createAffiliation({ name: capitalizedName });
+      
       if (ToastIdRef.current) {
         toast.update(ToastIdRef.current, {
           title: "Success",
-          description: `Created`,
+          description: `Created "${capitalizedName}"`,
           status: "success",
           position: "top-right",
           duration: 3000,
           isClosable: true,
         });
       }
-      //   onAddClose();
-      queryClient.invalidateQueries({ queryKey: ["affiliations"] });
-      // refetchAffiliationsFn();
-      getAffiliationsBasedOnSearchTerm(name, 1)
-        .then((data) => {
-          // console.log(data.affiliations);
-          const filtr = data.affiliations.filter((item) => {
-            return !array?.some((arrayItem) => arrayItem.pk === item.pk);
-          });
-          console.log(filtr);
-          setFilteredItems(filtr);
 
-          // setFilteredItems(data.affiliations);
-        })
-        .catch((error) => {
-          console.error("Error fetching affiliations:", error);
-          setFilteredItems([]);
-        });
-    },
-    onError: () => {
+      if (arrayAddFunction) {
+        arrayAddFunction(newAffiliation);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["affiliations"] });
+      setFilteredItems([]);
+    } catch (error) {
       if (ToastIdRef.current) {
         toast.update(ToastIdRef.current, {
           title: "Failed",
-          description: `Something went wrong!`,
+          description: `Could not create affiliation`,
           status: "error",
           position: "top-right",
           duration: 3000,
           isClosable: true,
         });
       }
-    },
-  });
-
-  const onSubmit = (formData: IAffiliation) => {
-    createAffiliationMutation.mutate(formData);
+    }
+    
+    setIsProcessing(false);
   };
 
-  const { colorMode } = useColorMode();
+  const handleClick = () => {
+    if (isAlreadyAdded || isProcessing) return;
+    
+    if (isBulkAdd) {
+      handleBulkAdd();
+    } else {
+      handleSingleAdd();
+    }
+  };
+
   return (
     <Flex
       as="button"
@@ -391,7 +497,6 @@ const DropdownCreateAffiliationMenuItem = ({
       alignItems="center"
       {...rest}
     >
-      {/* <form onSubmit={handleS}></form> */}
       <Box
         display="flex"
         alignItems="center"
@@ -400,25 +505,26 @@ const DropdownCreateAffiliationMenuItem = ({
         h="100%"
       >
         <Button
-          onClick={() =>
-            onSubmit({
-              name: `${name[0].toLocaleUpperCase()}${name.slice(1)}`,
-            })
-          }
-          isDisabled={name.includes(",")}
+          onClick={handleClick}
+          isDisabled={isAlreadyAdded || isProcessing}
+          isLoading={isProcessing}
           leftIcon={<GrOrganization />}
           variant={"ghost"}
           color={
-            name.includes(",")
-              ? "red.500"
-              : colorMode === "light"
-                ? "green.500"
-                : "green.300"
+            isAlreadyAdded
+              ? "orange.500"
+              : isBulkAdd
+                ? "blue.500"
+                : colorMode === "light"
+                  ? "green.500"
+                  : "green.300"
           }
         >
-          {name.includes(",")
-            ? `Can't add a name with commas`
-            : `Click to add "${name[0].toLocaleUpperCase()}${name.slice(1)}" as an organisation/affiliation`}
+          {isAlreadyAdded
+            ? `Already added`
+            : isBulkAdd
+              ? `Click to add ${name.split(";").filter((n) => n.trim()).length} affiliation(s)`
+              : `Click to add "${name[0].toLocaleUpperCase()}${name.slice(1)}" as an organisation/affiliation`}
         </Button>
       </Box>
     </Flex>

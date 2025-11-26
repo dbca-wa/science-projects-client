@@ -1,9 +1,9 @@
-import { ExtendCaretakerModal } from "@/shared/components/Modals/Caretakers/ExtendCaretakerModal";
-import { RemoveCaretakerModal } from "@/shared/components/Modals/Caretakers/RemoveCaretakerModal";
+import { ExtendCaretakerModal } from "@/features/users/components/modals/ExtendCaretakerModal";
+import { RemoveCaretakerModal } from "@/features/users/components/modals/RemoveCaretakerModal";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import { checkIfDateExpired } from "@/shared/utils/checkIfDateExpired";
-import type { ICaretakerSubsections } from "@/shared/types/index.d";
+import type { ICaretakerSubsections } from "@/shared/types";
 import {
   Avatar,
   Box,

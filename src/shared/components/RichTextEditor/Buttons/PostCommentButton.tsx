@@ -1,7 +1,7 @@
 import {
   createDocumentComment,
   sendMentionNotifications,
-} from "@/shared/lib/api";
+} from "@/features/documents/services/documents.service";
 import {
   Button,
   type ToastId,

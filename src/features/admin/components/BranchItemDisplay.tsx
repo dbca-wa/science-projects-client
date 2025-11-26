@@ -31,12 +31,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteBranch, updateBranch } from "@/shared/lib/api";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
-import type { IBranch } from "@/shared/types/index.d";
-import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
-import { TextButtonFlex } from "../../TextButtonFlex";
-import { UserProfile } from "../Users/UserProfile";
+import { deleteBranch, updateBranch } from "@/features/admin/services/admin.service";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
+import type { IBranch } from "@/shared/types";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
+import { TextButtonFlex } from "@/shared/components/TextButtonFlex";
+import { UserProfile } from "@/features/users/components/UserProfile";
 
 export const BranchItemDisplay = ({ pk, name, manager }: IBranch) => {
   const { register, handleSubmit, watch, reset } = useForm<IBranch>();

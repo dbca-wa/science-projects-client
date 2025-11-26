@@ -1,7 +1,7 @@
-import { GuideSections, saveGuideContentToDB } from "@/shared/lib/api";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { GuideSections, saveGuideContentToDB } from "@/features/admin/services/admin.service";
+import { useUser } from "@/features/users/hooks/useUser";
 import { Flex, Grid } from "@chakra-ui/react";
-import type { EditorType } from "@/shared/types/index.d";
+import type { EditorType } from "@/shared/types";
 import { ClearButton } from "../Buttons/ClearButton";
 import { GuideSaveButton } from "../Buttons/GuideSaveButton";
 import { TreeButton } from "../Buttons/TreeButton";

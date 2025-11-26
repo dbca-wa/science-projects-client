@@ -3,9 +3,9 @@ import type {
   ISearchTerm,
   ISimplePkProp,
   ProjectStatus,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import { type QueryFunctionContext } from "@tanstack/react-query";
-import instance from "../axiosInstance";
+import instance from "@/shared/lib/api/axiosInstance";
 
 // PROJECTS ==========================================================================
 

@@ -25,13 +25,13 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createDivision, getAllDivisions } from "@/shared/lib/api";
+import { createDivision, getAllDivisions } from "@/features/admin/services/admin.service";
 import _ from "lodash";
 import { useQueryClient } from "@tanstack/react-query";
-import type { IDivision } from "@/shared/types/index.d";
-import { DivisionItemDisplay } from "@/shared/components/Pages/Admin/DivisionItemDisplay";
-import { UserSearchDropdown } from "@/shared/components/Navigation/UserSearchDropdown";
-import { Head } from "@/shared/components/Base/Head";
+import type { IDivision } from "@/shared/types";
+import { DivisionItemDisplay } from "@/features/admin/components/DivisionItemDisplay";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
+import { Head } from "@/shared/components/layout/base/Head";
 
 export const DivisionsCRUD = () => {
   const { register, handleSubmit, watch } = useForm<IDivision>();

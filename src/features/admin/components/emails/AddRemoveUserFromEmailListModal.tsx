@@ -1,8 +1,8 @@
 import {
   addRemoveUserFromEmailListCall,
   IAdjustEmailListProps,
-} from "@/shared/lib/api";
-import type { EmailListPerson, IEmailListUser } from "@/shared/types/index.d";
+} from "@/features/admin/services/admin.service";
+import type { EmailListPerson, IEmailListUser } from "@/shared/types";
 import {
   Text,
   Button,
@@ -27,7 +27,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { UserArraySearchDropdown } from "../Navigation/UserArraySearchDropdown";
+import { UserArraySearchDropdown } from "@/features/users/components/UserArraySearchDropdown";
 
 interface IEmailListModalProps {
   isOpen: boolean;

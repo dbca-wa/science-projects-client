@@ -1,8 +1,8 @@
 // Section to handle the current report's media files such as images for each section, sds chart etc.
 
-import { useGetLatestReportMedia } from "@/shared/hooks/tanstack/useGetLatestReportMedia";
+import { useGetLatestReportMedia } from "@/features/reports/hooks/useGetLatestReportMedia";
 import { Box, Center, Grid, Spinner } from "@chakra-ui/react";
-import { ReportMediaChanger } from "../Admin/ReportMediaChanger";
+import { ReportMediaChanger } from "@/features/admin/components/ReportMediaChanger";
 // import { useEffect } from "react";
 
 interface Props {

@@ -1,5 +1,5 @@
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import { useGetDivisions } from "@/shared/hooks/tanstack/useGetDivisions";
+import { useGetDivisions } from "@/features/admin/hooks/useGetDivisions";
 import {
   Box,
   Button,
@@ -43,20 +43,20 @@ import {
   activateBusinessArea,
   deleteBusinessArea,
   updateBusinessArea,
-} from "@/shared/lib/api";
+} from "@/features/admin/services/admin.service";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import useDistilledHtml from "@/shared/hooks/useDistilledHtml";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
 import {
   BusinessAreaImage,
   IBusinessArea,
   IBusinessAreaUpdate,
   IDivision,
-} from "@/shared/types/index.d";
-import { UserSearchDropdown } from "../../Navigation/UserSearchDropdown";
-import { TextButtonFlex } from "../../TextButtonFlex";
-import { UserProfile } from "../Users/UserProfile";
+} from "@/shared/types";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
+import { TextButtonFlex } from "@/shared/components/TextButtonFlex";
+import { UserProfile } from "@/features/users/components/UserProfile";
 import { StatefulMediaChanger } from "./StatefulMediaChanger";
 
 export const BusinessAreaItemDisplay = ({

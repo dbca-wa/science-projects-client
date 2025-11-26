@@ -22,9 +22,9 @@ import {
 import { useRef, useState } from "react";
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { IconType } from "react-icons";
-import { ProjectDetailsSection } from "../Pages/CreateProject/ProjectDetailsSection";
-import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSection";
-import { ProjectBaseInformation } from "../Pages/CreateProject/ProjectBaseInformation";
+import { ProjectDetailsSection } from "@/features/projects/components/forms/ProjectDetailsSection";
+import { ProjectLocationSection } from "@/features/projects/components/forms/ProjectLocationSection";
+import { ProjectBaseInformation } from "@/features/projects/components/forms/ProjectBaseInformation";
 import "@/styles/modalscrollbar.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -33,14 +33,16 @@ import {
   ICreateProjectExternalDetails,
   ICreateProjectStudentDetails,
   IProjectCreationVariables,
+  createProject,
+} from "@/features/projects/services/projects.service";
+import {
   MutationError,
   ProjectCreationMutationSuccess,
-  createProject,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import { useNavigate } from "react-router-dom";
-import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
-import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { ProjectExternalSection } from "@/features/projects/components/forms/ProjectExternalSection";
+import { ProjectStudentSection } from "@/features/projects/components/forms/ProjectStudentSection";
+import { useUser } from "@/features/users/hooks/useUser";
 import { ExternalInternalSPConfirmationModal } from "./ExternalInternalSPConfirmationModal";
 
 interface INewProjectModalProps {

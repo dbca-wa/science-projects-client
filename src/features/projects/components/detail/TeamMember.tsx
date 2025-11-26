@@ -25,9 +25,9 @@ import {
   IImageData,
   IUserData,
   IUserMe,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import { ProjectUserDetails } from "./ProjectUserDetails";
-import { UserProfile } from "../Users/UserProfile";
+import { UserProfile } from "@/features/users/components/UserProfile";
 
 interface ITeamMember {
   user_id: number;

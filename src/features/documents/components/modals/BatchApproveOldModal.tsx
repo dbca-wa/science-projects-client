@@ -25,10 +25,10 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import {
-  MutationError,
-  MutationSuccess,
+  type MutationSuccess,
   batchApproveOLDProgressAndStudentReports,
-} from "@/shared/lib/api";
+  type MutationError,
+} from "@/features/users/services/users.service";
 
 interface IModalProps {
   isOpen: boolean;

@@ -1,4 +1,4 @@
-import type { LibraryPublicationResponse, Publication } from "@/shared/types/index.d";
+import type { LibraryPublicationResponse, Publication } from "@/shared/types";
 import Subsection from "./Subsection";
 
 interface ILibraryPublicationsProps {

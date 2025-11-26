@@ -1,15 +1,15 @@
 // Route for handling information regarding the report for the year.
 
-// import { AnnualReportPrintPreview } from "@/shared/components/Pages/CurrentReport/AnnualReportPrintPreview";
-import { Head } from "@/shared/components/Base/Head";
-import { PDFViewer } from "@/shared/components/HTMLPDFs/PDFViewer";
-import { AnnualReportDetails } from "@/shared/components/Pages/CurrentReport/AnnualReportDetails";
-import { AnnualReportMedia } from "@/shared/components/Pages/CurrentReport/AnnualReportMedia";
-import { LatestReportsNotYetApproved } from "@/shared/components/Pages/CurrentReport/LatestReportsNotYetApproved";
-import { ParticipatingProjectReports } from "@/shared/components/Pages/CurrentReport/ParticipatingProjectReports";
+// import { AnnualReportPrintPreview } from "@/features/reports/components/current/AnnualReportPrintPreview";
+import { Head } from "@/shared/components/layout/base/Head";
+import { PDFViewer } from "@/features/reports/components/pdfs/PDFViewer";
+import { AnnualReportDetails } from "@/features/reports/components/current/AnnualReportDetails";
+import { AnnualReportMedia } from "@/features/reports/components/current/AnnualReportMedia";
+import { LatestReportsNotYetApproved } from "@/features/reports/components/current/LatestReportsNotYetApproved";
+import { ParticipatingProjectReports } from "@/features/reports/components/current/ParticipatingProjectReports";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
-import { getLatestReportingYear } from "@/shared/lib/api";
-import type { IReport } from "@/shared/types/index.d";
+import { getLatestReportingYear } from "@/features/admin/services/admin.service";
+import type { IReport } from "@/shared/types";
 import {
   Box,
   Center,

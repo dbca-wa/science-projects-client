@@ -1,8 +1,8 @@
 import { Button } from "@/shared/components/ui/button";
 import { DrawerClose } from "@/shared/components/ui/drawer";
 import { Input } from "@/shared/components/ui/input";
-import { deleteEducation } from "@/shared/lib/api";
-import type { ISimplePkProp, IStaffEducationEntry } from "@/shared/types/index.d";
+import { deleteEducation } from "@/features/staff-profiles/services/staff-profiles.service";
+import type { ISimplePkProp, IStaffEducationEntry } from "@/shared/types";
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

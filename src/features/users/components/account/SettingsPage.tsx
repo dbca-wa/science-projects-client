@@ -1,6 +1,6 @@
 // WIP settings page. Will add functionality as/if needed.
 
-import type { IUserData } from "@/shared/types/index.d";
+import type { IUserData } from "@/shared/types";
 import { Box, Button, Flex, Text, useColorMode } from "@chakra-ui/react";
 
 interface Props {

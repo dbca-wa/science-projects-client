@@ -4,7 +4,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { PASTE_COMMAND } from "lexical";
 import { VscGitPullRequestGoToChanges } from "react-icons/vsc";
 import { BaseOptionsButton } from "./BaseOptionsButton";
-import { RTEPriorReportPopulationModal } from "@/shared/components/Modals/RTEPriorReportPopulationModal";
+import { RTEPriorReportPopulationModal } from "@/features/reports/components/modals/RTEPriorReportPopulationModal";
 import { useDisclosure } from "@chakra-ui/react";
 
 interface Props {

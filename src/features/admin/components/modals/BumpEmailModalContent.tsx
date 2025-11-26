@@ -1,5 +1,6 @@
-import { remedyExternallyLedProjects, sendBumpEmails } from "@/shared/lib/api";
-import type { BumpEmailData, IProjectData } from "@/shared/types/index.d";
+import { remedyExternallyLedProjects } from "@/features/admin/services/admin.service";
+import { sendBumpEmails } from "@/features/documents/services/documents.service";
+import type { BumpEmailData, IProjectData } from "@/shared/types";
 import {
   Box,
   Button,

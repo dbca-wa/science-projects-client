@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState, type ChangeEventHandler, type ChangeEvent } from "react";
 import { FiSearch } from "react-icons/fi";
-import { getAllProjectsYears } from "@/shared/lib/api";
+import { getAllProjectsYears } from "@/features/projects/services/projects.service";
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import SearchProjectsByUser from "./SearchProjectsByUser";
 

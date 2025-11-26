@@ -1,5 +1,5 @@
-import { getPublicProfileHeroData } from "@/shared/lib/api";
-import type { IStaffProfileHeroData } from "@/shared/types/index.d";
+import { getPublicProfileHeroData } from "@/features/staff-profiles/services/staff-profiles.service";
+import type { IStaffProfileHeroData } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useStaffProfileHero = (userPk: undefined | string | number) => {

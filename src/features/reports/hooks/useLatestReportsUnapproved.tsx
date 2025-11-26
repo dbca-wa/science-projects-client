@@ -1,7 +1,7 @@
 // A simple hook which talks to the api to get the latest report's inactive progress reports.
 // Exposes that data as well as the state of the query (loading or not)
 
-import { getLatestUnapprovedReports } from "@/shared/lib/api";
+import { getLatestUnapprovedReports } from "@/features/reports/services/reports.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useLatestYearsUnapprovedReports = () => {

@@ -1,10 +1,10 @@
 // A paginator for the projects page
 
-import type { IProjectData } from "@/shared/types/index.d";
+import type { IProjectData } from "@/shared/types";
 import { Box, Button, Center, Flex, Grid, Spinner } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
-import { ModernProjectCard } from "./ModernProjectCard";
+import { ModernProjectCard } from "./cards/ModernProjectCard";
 
 interface IPaginationProps {
   loading: boolean;

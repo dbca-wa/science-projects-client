@@ -1,18 +1,16 @@
-import { RemedyExternallyLedProjectsModalContent } from "@/shared/components/Modals/Admin/RemedyExternallyLedProjectsModalContent";
-import { RemedyLeaderlessProjectsModalContent } from "@/shared/components/Modals/Admin/RemedyLeaderlessProjectsModalContent";
-import { RemedyMemberlessProjectsModalContent } from "@/shared/components/Modals/Admin/RemedyMemberlessProjectsModalContent";
-import { RemedyMultipleLeaderProjectsModalContent } from "@/shared/components/Modals/Admin/RemedyMultipleLeaderProjectsModalContent";
+import { RemedyExternallyLedProjectsModalContent } from "@/features/admin/components/modals/RemedyExternallyLedProjectsModalContent";
+import { RemedyLeaderlessProjectsModalContent } from "@/features/admin/components/modals/RemedyLeaderlessProjectsModalContent";
+import { RemedyMemberlessProjectsModalContent } from "@/features/admin/components/modals/RemedyMemberlessProjectsModalContent";
+import { RemedyMultipleLeaderProjectsModalContent } from "@/features/admin/components/modals/RemedyMultipleLeaderProjectsModalContent";
 import { BaseModal } from "@/shared/components/Modals/BaseModal";
 import {
   Accordion,
   AccordionContent,
   AccordionTrigger,
 } from "@/shared/components/ui/accordion";
-import {
-  getAllProblematicProjects,
-  getEmailProjectList,
-} from "@/shared/lib/api";
-import { IProblematicData } from "@/shared/hooks/tanstack/useAllProblematicProjects";
+import { getAllProblematicProjects } from "@/features/admin/services/admin.service";
+import { getEmailProjectList } from "@/features/users/services/users.service";
+import { IProblematicData } from "@/features/projects/hooks/useAllProblematicProjects";
 import {
   Box,
   Button,
@@ -27,8 +25,8 @@ import {
 import { AccordionItem } from "@radix-ui/react-accordion";
 import { useState, useEffect } from "react";
 import { TbRefresh } from "react-icons/tb";
-import { UserProjectsDataTable } from "../../Dashboard/UserProjectsDataTable";
-import { RemedyOpenClosedModalContent } from "@/shared/components/Modals/Admin/RemedyOpenClosedModalContent";
+import { UserProjectsDataTable } from "@/features/dashboard/components/UserProjectsDataTable";
+import { RemedyOpenClosedModalContent } from "@/features/admin/components/modals/RemedyOpenClosedModalContent";
 import { FaFileDownload } from "react-icons/fa";
 
 export const AllProblematicProjects = () => {

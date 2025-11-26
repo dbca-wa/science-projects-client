@@ -1,5 +1,5 @@
-import { getDivisionDirectorateMembers } from "@/shared/lib/api";
-import type { IDivision } from "@/shared/types/index.d";
+import { getDivisionDirectorateMembers } from "@/features/projects/services/projects.service";
+import type { IDivision } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useDivisionDirectorateMembers = (

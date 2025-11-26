@@ -26,10 +26,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
-import { deleteAddress, updateAddress } from "@/shared/lib/api";
-import type { IAddress, IBranch } from "@/shared/types/index.d";
-import { BranchSearchDropdown } from "../../Navigation/BranchSearchDropdown";
-import { TextButtonFlex } from "../../TextButtonFlex";
+import { deleteAddress, updateAddress } from "@/features/admin/services/admin.service";
+import type { IAddress, IBranch } from "@/shared/types";
+import { BranchSearchDropdown } from "@/features/admin/components/BranchSearchDropdown";
+import { TextButtonFlex } from "@/shared/components/TextButtonFlex";
 
 export const AddressItemDisplay = ({
   pk,

@@ -1,7 +1,7 @@
 // A simple hook which talks to the api to get the latest reports active and approved student progress reports.
 // Exposes that data as well as the state of the query (loading or not)
 
-import { getLatestActiveStudentReports } from "@/shared/lib/api";
+import { getLatestActiveStudentReports } from "@/features/reports/services/reports.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useLatestYearsActiveStudentProjects = () => {

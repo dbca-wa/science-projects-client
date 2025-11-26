@@ -8,7 +8,7 @@ import "@/styles/texteditor.css";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 
-import type { IMainDoc, IProjectData, IProjectMember, IReport } from "@/shared/types/index.d";
+import type { IMainDoc, IProjectData, IProjectMember, IReport } from "@/shared/types";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { PREditor } from "./PREditor";
 

@@ -1,4 +1,4 @@
-import type { IUserMe } from "@/shared/types/index.d";
+import type { IUserMe } from "@/shared/types";
 import { CaretakeeDataTable } from "./CaretakeeDataTable";
 import { memo } from "react";
 import isEqual from "lodash.isequal";

@@ -1,6 +1,6 @@
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import type { KeywordTag } from "@/shared/types/index.d";
+import type { KeywordTag } from "@/shared/types";
 import React, { useState } from "react";
 import type {
   ControllerRenderProps,

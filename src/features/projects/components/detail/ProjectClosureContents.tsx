@@ -1,6 +1,6 @@
 // Maps out the document provided to the rich text editor components for project closure documents.
 
-import { setClosureOutcome } from "@/shared/lib/api";
+import { setClosureOutcome } from "@/features/projects/services/projects.service";
 import {
   Flex,
   Select,
@@ -14,15 +14,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
-import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
+import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
 import type {
   ICaretakerPermissions,
   IProjectClosure,
   IProjectDocuments,
   IProjectMember,
   IUserMe,
-} from "@/shared/types/index.d";
-import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
+} from "@/shared/types";
+import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 

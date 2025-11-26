@@ -12,17 +12,17 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/shared/components/ui/drawer";
-import { useStaffCV } from "@/shared/hooks/tanstack/useStaffCV";
+import { useStaffCV } from "@/features/staff-profiles/hooks/useStaffCV";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdModeEditOutline } from "react-icons/md";
-import AddStaffEducationContent from "../../Modals/AddStaffEducationContent";
-import AddStaffEmploymentContent from "../../Modals/AddStaffEmploymentContent";
-import DeleteStaffEducationContent from "../../Modals/DeleteStaffEducationContent";
-import DeleteStaffEmploymentContent from "../../Modals/DeleteStaffEmploymentContent";
-import EditStaffEducationContent from "../../Modals/EditStaffEducationContent";
-import EditStaffEmploymentContent from "../../Modals/EditStaffEmploymentContent";
+import AddStaffEducationContent from "@/features/staff-profiles/components/Modals/AddStaffEducationContent";
+import AddStaffEmploymentContent from "@/features/staff-profiles/components/Modals/AddStaffEmploymentContent";
+import DeleteStaffEducationContent from "@/features/staff-profiles/components/Modals/DeleteStaffEducationContent";
+import DeleteStaffEmploymentContent from "@/features/staff-profiles/components/Modals/DeleteStaffEmploymentContent";
+import EditStaffEducationContent from "@/features/staff-profiles/components/Modals/EditStaffEducationContent";
+import EditStaffEmploymentContent from "@/features/staff-profiles/components/Modals/EditStaffEmploymentContent";
 import AddItemButton from "./AddItemButton";
 import EducationEntry from "./EducationEntry";
 import EmploymentEntry from "./EmploymentEntry";
@@ -31,7 +31,7 @@ import type {
   IStaffEducationEntry,
   IStaffEmploymentEntry,
   IUserMe,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 
 const CVSection = ({
   userId,

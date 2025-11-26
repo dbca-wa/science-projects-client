@@ -1,6 +1,6 @@
 // Modal component for editing a user's personal information
 
-import { usePersonalInfo } from "@/shared/hooks/tanstack/usePersonalInfo";
+import { usePersonalInfo } from "@/features/users/hooks/usePersonalInfo";
 import {
   Button,
   FormControl,
@@ -38,7 +38,7 @@ import {
   IPIUpdateSuccess,
   IPIUpdateVariables,
   updatePersonalInformation,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 
 interface IEditPIModalProps {
   isOpen: boolean;

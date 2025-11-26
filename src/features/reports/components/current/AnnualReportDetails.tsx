@@ -2,10 +2,10 @@
 
 import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 // import { updateReport } from "@/shared/lib/api";
-import { useGetFullLatestReport } from "@/shared/hooks/tanstack/useGetFullLatestReport";
+import { useGetFullLatestReport } from "@/features/reports/hooks/useGetFullLatestReport";
 // import { useGetLatestReportMedia } from "@/shared/hooks/useGetLatestReportMedia";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import type { IReport } from "@/shared/types/index.d";
+import { useUser } from "@/features/users/hooks/useUser";
+import type { IReport } from "@/shared/types";
 import {
   Box,
   Center,

@@ -18,7 +18,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
-import type { IUserData } from "@/shared/types/index.d";
+import type { IUserData } from "@/shared/types";
 import { UserProfile } from "./UserProfile";
 
 interface BoxContainerProps extends BoxProps {

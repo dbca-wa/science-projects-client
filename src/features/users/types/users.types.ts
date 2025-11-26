@@ -6,4 +6,4 @@
 export type {
   IMiniUser,
   // Add other user-related types as they are identified
-} from "@/shared/types/index.d";
+} from "@/shared/types";

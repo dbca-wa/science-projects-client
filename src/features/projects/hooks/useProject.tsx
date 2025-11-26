@@ -1,7 +1,7 @@
 // Simple hook for getting the full project data
 // Exposes that data and the state of the query loading
 
-import { getFullProject } from "@/shared/lib/api";
+import { getFullProject } from "@/features/projects/services/projects.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useProject = (projectPk: undefined | string | number) => {

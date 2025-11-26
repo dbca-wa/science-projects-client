@@ -3,8 +3,8 @@
 import { ARProgressReportHandler } from "@/shared/components/RichTextEditor/Editors/ARProgressReportHandler";
 import { ARStudentReportHandler } from "@/shared/components/RichTextEditor/Editors/ARStudentReportHandler";
 // import whitePaperBackground from "@/images/white-texture.jpg";
-import { useLatestYearsUnapprovedReports } from "@/shared/hooks/tanstack/useLatestReportsUnapproved";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useLatestYearsUnapprovedReports } from "@/features/reports/hooks/useLatestReportsUnapproved";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   Accordion,
   AccordionButton,

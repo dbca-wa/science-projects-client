@@ -1,4 +1,4 @@
-import { getDirectorateMembers } from "@/shared/lib/api";
+import { getDirectorateMembers } from "@/features/users/services/users.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useDirectorateMembers = () => {

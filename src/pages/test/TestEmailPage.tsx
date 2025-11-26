@@ -1,8 +1,8 @@
-import { Head } from "@/shared/components/Base/Head";
+import { Head } from "@/shared/components/layout/base/Head";
 import DivisionalEmailLists from "@/features/admin/components/emails/DivisionalEmailLists";
 // import EmailStylingPage from "@/shared/components/Modals/Emails/EmailStylingPage"; // Component does not exist
-import { useMaintainer } from "@/shared/hooks/tanstack/useMaintainer";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useMaintainer } from "@/features/admin/hooks/useMaintainer";
+import { useUser } from "@/features/users/hooks/useUser";
 
 import {
   Center,

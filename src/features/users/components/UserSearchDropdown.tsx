@@ -27,11 +27,11 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import { getInternalUsersBasedOnSearchTerm } from "@/shared/lib/api";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
-import type { IUserData } from "@/shared/types/index.d";
-import { EmailSiteLinkModal } from "../Modals/Emails/EmailSiteLinkModal";
-import { CreateUserModal } from "../Modals/CreateUserModal";
+import { getInternalUsersBasedOnSearchTerm } from "@/features/users/services/users.service";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
+import type { IUserData } from "@/shared/types";
+import { EmailSiteLinkModal } from "@/features/users/components/modals/EmailSiteLinkModal";
+import { CreateUserModal } from "@/features/users/components/modals/CreateUserModal";
 import { createPortal } from "react-dom";
 
 interface IUserSearchDropdown {

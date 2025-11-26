@@ -15,7 +15,7 @@ import type {
   IReportCreation,
   ISimpleLocationData,
   OrganisedLocationData,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import type { QueryFunctionContext } from "@tanstack/react-query";
 import instance from "@/shared/lib/api/axiosInstance";
 
@@ -807,6 +807,12 @@ export const updateAffiliation = async (formData: IAffiliation) => {
 
 export const deleteAffiliation = async (pk: number) => {
   return instance.delete(`agencies/affiliations/${pk}`).then((res) => {
+    return res.data;
+  });
+};
+
+export const cleanOrphanedAffiliations = async () => {
+  return instance.post("agencies/affiliations/clean").then((res) => {
     return res.data;
   });
 };

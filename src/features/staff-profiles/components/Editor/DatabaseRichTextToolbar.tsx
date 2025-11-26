@@ -4,7 +4,7 @@ import { Box, Flex, FlexProps, Text, useDisclosure } from "@chakra-ui/react";
 
 import { InsertTableModal } from "@/shared/components/Modals/RTEModals/InsertTableModal";
 import { VerticalDivider } from "@/shared/components/RichTextEditor/Toolbar/VerticalDivider";
-import { ToolbarButton } from "@/shared/components/StaffProfiles/Editor/ToolbarButton";
+import { ToolbarButton } from "@/features/staff-profiles/components/Editor/ToolbarButton";
 import { MutableRefObject, useCallback, useEffect, useState } from "react";
 import { FaBold, FaItalic, FaRedo, FaUnderline, FaUndo } from "react-icons/fa";
 import { ImClearFormatting } from "react-icons/im";

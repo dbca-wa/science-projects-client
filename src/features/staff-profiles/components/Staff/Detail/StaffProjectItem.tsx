@@ -1,4 +1,4 @@
-import replaceDarkWithLight from "@/shared/utils/htmlHelpers";
+import { replaceDarkWithLight } from "@/shared/utils/htmlHelpers";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
 import EditStaffProjectDescrtiption from "./EditStaffProjectDescrtiption";

@@ -25,7 +25,7 @@ import {
   FormHelperText,
   type UseToastOptions,
 } from "@chakra-ui/react";
-import { type ICloseProjectProps, closeProjectCall } from "@/shared/lib/api";
+import { type ICloseProjectProps, closeProjectCall } from "@/features/projects/services/projects.service";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

@@ -1,7 +1,7 @@
 // Takes an instance of IUserMe (userData) and returns a list of pks of people that are in the caretaking chain.
 // List includes the user pk, any caretakees, and any subcaretakees.
 
-import type { IUserMe } from "@/shared/types/index.d";
+import type { IUserMe } from "@/shared/types";
 import { useMemo } from "react";
 
 const getCaretakingChainPks = (

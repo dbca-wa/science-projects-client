@@ -1,5 +1,5 @@
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import { useGetDivisions } from "@/shared/hooks/tanstack/useGetDivisions";
+import { useGetDivisions } from "@/features/admin/hooks/useGetDivisions";
 import {
   Box,
   Button,
@@ -29,12 +29,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createBusinessArea, getAllBusinessAreas } from "@/shared/lib/api";
-import type { IBusinessArea, IBusinessAreaCreate } from "@/shared/types/index.d";
-import { UserSearchDropdown } from "@/shared/components/Navigation/UserSearchDropdown";
-import { BusinessAreaItemDisplay } from "@/shared/components/Pages/Admin/BusinessAreaItemDisplay";
-import { StatefulMediaChanger } from "@/shared/components/Pages/Admin/StatefulMediaChanger";
-import { Head } from "@/shared/components/Base/Head";
+import { createBusinessArea, getAllBusinessAreas } from "@/features/business-areas/services/business-areas.service";
+import type { IBusinessArea, IBusinessAreaCreate } from "@/shared/types";
+import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
+import { BusinessAreaItemDisplay } from "@/features/admin/components/BusinessAreaItemDisplay";
+import { StatefulMediaChanger } from "@/features/admin/components/StatefulMediaChanger";
+import { Head } from "@/shared/components/layout/base/Head";
 
 export const BusinessAreasCRUD = () => {
   const {

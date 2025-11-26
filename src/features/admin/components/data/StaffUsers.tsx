@@ -1,5 +1,5 @@
-import { AddDBCAUserModal } from "@/shared/components/Modals/Admin/AddDBCAUserModal";
-import { MergeUsersModal } from "@/shared/components/Modals/Admin/MergeUsersModal";
+import { AddDBCAUserModal } from "@/features/admin/components/modals/AddDBCAUserModal";
+import { MergeUsersModal } from "@/features/admin/components/modals/MergeUsersModal";
 import {
   Box,
   Text,

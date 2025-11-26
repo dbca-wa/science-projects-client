@@ -3,7 +3,7 @@
 // Poll, Equation, Sticky Note, Collapsible Container, Tweet, Youtube Video,
 // Figma Document. Most are disabled depending on the editor type
 
-import { InsertTableModal } from "@/shared/components/Modals/RTEModals/InsertTableModal";
+import { InsertTableModal } from "@/features/staff-profiles/components/modals/InsertTableModal";
 import { useDisclosure } from "@chakra-ui/react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { AiOutlinePlus } from "react-icons/ai";

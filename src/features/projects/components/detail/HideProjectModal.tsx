@@ -1,7 +1,7 @@
 import {
   toggleProjectVisibilityOnStaffProfile,
   toggleStaffProfileVisibility,
-} from "@/shared/lib/api";
+} from "@/features/staff-profiles/services/staff-profiles.service";
 import {
   Text,
   Box,

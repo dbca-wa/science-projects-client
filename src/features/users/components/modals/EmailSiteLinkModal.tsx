@@ -1,9 +1,9 @@
+import { getDoesUserWithEmailExist } from "@/features/users/services/users.service";
 import {
-  getDoesUserWithEmailExist,
   IEmailRecipientsString,
   sendSPMSLinkEmail,
-} from "@/shared/lib/api";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+} from "@/features/documents/services/documents.service";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   Button,
   Flex,

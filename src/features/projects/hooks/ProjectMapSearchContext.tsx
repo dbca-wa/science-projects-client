@@ -1,5 +1,5 @@
-import { getMapProjectsBasedOnSearchTerm } from "@/shared/lib/api";
-import type { IProjectData } from "@/shared/types/index.d";
+import { getMapProjectsBasedOnSearchTerm } from "@/features/projects/services/projects.service";
+import type { IProjectData } from "@/shared/types";
 import {
   createContext,
   useCallback,

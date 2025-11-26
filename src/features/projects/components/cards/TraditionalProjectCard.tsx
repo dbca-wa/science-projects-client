@@ -12,7 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import { AiFillCalendar, AiFillTag } from "react-icons/ai";
 import { TbAlertOctagon } from "react-icons/tb";
-import PlaceHolderImage from "../../../assets/no-image-placeholder.png";
+import PlaceHolderImage from "@/assets/no-image-placeholder.png";
 
 export interface IProjectCardProps {
   pk: number;

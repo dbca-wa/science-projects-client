@@ -1,6 +1,6 @@
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import type { IStaffEducationEntry } from "@/shared/types/index.d";
+import type { IStaffEducationEntry } from "@/shared/types";
 import { useState } from "react";
 import { EducationDialog, EducationDrawer } from "./CVSection";
 

@@ -1,5 +1,6 @@
-import { ProjectLeadEmailModal } from "@/shared/components/Modals/ProjectLeadEmailModal";
-import { downloadBCSStaffCSV, getEmailProjectList } from "@/shared/lib/api";
+import { ProjectLeadEmailModal } from "@/features/projects/components/modals/ProjectLeadEmailModal";
+import { getEmailProjectList } from "@/features/users/services/users.service";
+import { downloadBCSStaffCSV } from "@/features/users/services/users.service";
 import {
   Box,
   Button,

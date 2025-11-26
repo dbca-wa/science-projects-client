@@ -1,7 +1,7 @@
 // A button to download the annual report based on the current data. Will be used to generate actual report.
 
-import { GenerateARPDFModal } from "@/shared/components/Modals/GenerateARPDFModal";
-import type { IReport } from "@/shared/types/index.d";
+import { GenerateARPDFModal } from "@/features/reports/components/modals/GenerateARPDFModal";
+import type { IReport } from "@/shared/types";
 import { Button, useColorMode, useDisclosure } from "@chakra-ui/react";
 import { FaDownload } from "react-icons/fa";
 

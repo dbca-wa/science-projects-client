@@ -18,20 +18,20 @@ import {
 import { useState } from "react";
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { IconType } from "react-icons";
-import { ProjectDetailsSection } from "../Pages/CreateProject/ProjectDetailsSection";
-import { ProjectLocationSection } from "../Pages/CreateProject/ProjectLocationSection";
-import { ProjectBaseInformation } from "../Pages/CreateProject/ProjectBaseInformation";
+import { ProjectDetailsSection } from "@/features/projects/components/forms/ProjectDetailsSection";
+import { ProjectLocationSection } from "@/features/projects/components/forms/ProjectLocationSection";
+import { ProjectBaseInformation } from "@/features/projects/components/forms/ProjectBaseInformation";
 import "@/styles/modalscrollbar.css";
 import {
   ICreateProjectBaseInfo,
   ICreateProjectDetails,
   ICreateProjectExternalDetails,
   ICreateProjectStudentDetails,
-} from "@/shared/lib/api";
-import { ProjectExternalSection } from "../Pages/CreateProject/ProjectExternalSection";
-import { ProjectStudentSection } from "../Pages/CreateProject/ProjectStudentSection";
-import type { IExtendedProjectDetails, IProjectData } from "@/shared/types/index.d";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+} from "@/features/projects/services/projects.service";
+import { ProjectExternalSection } from "@/features/projects/components/forms/ProjectExternalSection";
+import { ProjectStudentSection } from "@/features/projects/components/forms/ProjectStudentSection";
+import type { IExtendedProjectDetails, IProjectData } from "@/shared/types";
+import { useUser } from "@/features/users/hooks/useUser";
 
 interface IEditProjectDetailsProps {
   projectType: string;

@@ -1,9 +1,9 @@
 // WIP tab contents for participating projects. Features some additional info and the projects via AnnualReportProjectDisplay
 
 import { ARProgressReportHandler } from "@/shared/components/RichTextEditor/Editors/ARProgressReportHandler";
-import { useLatestYearsActiveProgressReports } from "@/shared/hooks/tanstack/useLatestYearsActiveProgressReports";
-import { useLatestYearsActiveStudentProjects } from "@/shared/hooks/tanstack/useLatestYearsActiveStudentProjects";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useLatestYearsActiveProgressReports } from "@/features/reports/hooks/useLatestYearsActiveProgressReports";
+import { useLatestYearsActiveStudentProjects } from "@/features/projects/hooks/useLatestYearsActiveStudentProjects";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   Accordion,
   AccordionButton,

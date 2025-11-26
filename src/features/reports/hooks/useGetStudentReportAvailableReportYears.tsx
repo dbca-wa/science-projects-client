@@ -1,6 +1,6 @@
 // Simple hook for getting the tasks of the user, for the dashboard
 
-import { getAvailableReportYearsForStudentReport } from "@/shared/lib/api";
+import { getAvailableReportYearsForStudentReport } from "@/features/admin/services/admin.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetStudentReportAvailableReportYears = (pk: number) => {

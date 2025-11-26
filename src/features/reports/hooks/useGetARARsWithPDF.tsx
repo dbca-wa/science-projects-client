@@ -1,6 +1,6 @@
 // Simple hook for getting the Annual Reports which do not yet have pdfs
 
-import { getArarsWithPDFs } from "@/shared/lib/api";
+import { getArarsWithPDFs } from "@/features/reports/services/reports.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetARARsWithPDF = () => {

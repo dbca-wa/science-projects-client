@@ -1,6 +1,6 @@
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import type { IStaffEmploymentEntry } from "@/shared/types/index.d";
+import type { IStaffEmploymentEntry } from "@/shared/types";
 import { useState } from "react";
 import { EmploymentDialog, EmploymentDrawer } from "./CVSection";
 import clsx from "clsx";

@@ -1,5 +1,5 @@
 import { type FC, type ReactNode } from "react";
-import type { IProjectData } from "@/shared/types/index.d";
+import type { IProjectData } from "@/shared/types";
 import DOMPurify from "dompurify";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";

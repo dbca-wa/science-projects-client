@@ -4,7 +4,7 @@ import type {
   IProjectData,
   IProjectMember,
   IUserMe,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import { checkIfDateExpired } from "@/shared/utils/checkIfDateExpired";
 import { useMemo } from "react";
 

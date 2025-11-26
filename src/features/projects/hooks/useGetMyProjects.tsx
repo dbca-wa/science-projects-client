@@ -1,6 +1,6 @@
 // Simple hook for getting projects the user is involved in, for the dashboard.
 
-import { getMyProjects } from "@/shared/lib/api";
+import { getMyProjects } from "@/features/dashboard/services/dashboard.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetMyProjects = () => {

@@ -18,7 +18,7 @@ import {
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import { Input } from "@/shared/components/ui/input";
-import type { IProjectData, ProjectRoles } from "@/shared/types/index.d";
+import type { IProjectData, ProjectRoles } from "@/shared/types";
 import {
   Box,
   Button,

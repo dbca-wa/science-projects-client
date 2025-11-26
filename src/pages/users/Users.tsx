@@ -1,13 +1,13 @@
 // Route for displaying users.
 
-import { BreadCrumb } from "@/shared/components/Base/BreadCrumb";
-import { Head } from "@/shared/components/Base/Head";
-import { CreateUserModal } from "@/shared/components/Modals/CreateUserModal";
-import { SearchUsers } from "@/shared/components/Navigation/SearchUsers";
-import { PaginatorUser } from "@/shared/components/Pages/Users/PaginatorUser";
+import { BreadCrumb } from "@/shared/components/layout/base/BreadCrumb";
+import { Head } from "@/shared/components/layout/base/Head";
+import { CreateUserModal } from "@/features/users/components/modals/CreateUserModal";
+import { SearchUsers } from "@/features/users/components/SearchUsers";
+import { PaginatorUser } from "@/features/users/components/PaginatorUser";
 import { useLayoutSwitcher } from "@/shared/hooks/LayoutSwitcherContext";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
-import { type IUserData } from "@/shared/types/index.d";
+import { type IUserData } from "@/shared/types";
 import {
   Box,
   Button,

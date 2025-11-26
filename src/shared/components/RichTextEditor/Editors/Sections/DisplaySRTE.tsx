@@ -12,7 +12,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { TreeViewPlugin } from "@/shared/lib/plugins/TreeViewPlugin";
-import type { EditorSubsections } from "@/shared/types/index.d";
+import type { EditorSubsections } from "@/shared/types";
 import { PrepopulateHTMLPlugin } from "../../Plugins/PrepopulateHTMLPlugin";
 
 interface Props {

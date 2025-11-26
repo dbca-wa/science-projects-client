@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import type { IProjectData } from "@/shared/types/index.d";
+import type { IProjectData } from "@/shared/types";
 import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
 
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";

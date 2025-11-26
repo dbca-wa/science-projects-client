@@ -1,4 +1,4 @@
-import type { IDivision } from "@/shared/types/index.d";
+import type { IDivision } from "@/shared/types";
 
 // Business Area Types
 

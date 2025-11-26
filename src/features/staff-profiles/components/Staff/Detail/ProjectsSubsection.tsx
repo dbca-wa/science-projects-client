@@ -1,6 +1,6 @@
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import type { IProjectData } from "@/shared/types/index.d";
+import type { IProjectData } from "@/shared/types";
 import { type FC, type ReactNode } from "react";
 import StaffProjectItem from "./StaffProjectItem";
 import Subsection from "./Subsection";

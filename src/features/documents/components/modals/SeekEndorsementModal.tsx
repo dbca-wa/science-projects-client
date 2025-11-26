@@ -24,7 +24,7 @@ import {
   Box,
   type UseToastOptions,
 } from "@chakra-ui/react";
-import { type ISpecialEndorsement, seekEndorsementAndSave } from "@/shared/lib/api";
+import { type ISpecialEndorsement, seekEndorsementAndSave } from "@/features/projects/services/projects.service";
 import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 

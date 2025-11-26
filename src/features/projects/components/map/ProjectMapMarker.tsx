@@ -1,4 +1,4 @@
-import type { IBusinessArea, IProjectData, ISimpleLocationData } from "@/shared/types/index.d";
+import type { IBusinessArea, IProjectData, ISimpleLocationData } from "@/shared/types";
 import L from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import {

@@ -2,7 +2,7 @@
 
 import {
   getPendingCaretakerTasks
-} from "@/shared/lib/api";
+} from "@/features/dashboard/services/dashboard.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetPendingCaretakerTasks = (userId: number) => {

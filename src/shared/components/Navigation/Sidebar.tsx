@@ -1,7 +1,7 @@
 // Sidebar for modern version
 
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useUser } from "@/features/users/hooks/useUser";
 import {
   Box,
   Button,

@@ -6,7 +6,7 @@ import type {
   LibraryPublicationResponse,
   CustomPublication,
   IUserMe,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import { PublicationDialog } from "../PublicationDialog";
 import PublicationDrawer from "../PublicationDrawer";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";

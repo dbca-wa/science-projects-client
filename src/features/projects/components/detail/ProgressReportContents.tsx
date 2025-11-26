@@ -14,18 +14,18 @@ import {
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BsPlus } from "react-icons/bs";
-import { getProgressReportForYear } from "@/shared/lib/api";
-import { useCheckUserInTeam } from "@/features/projects/hooks/useCheckUserInTeam";
-import { useGetProgressReportAvailableReportYears } from "@/shared/hooks/tanstack/useGetProgressReportAvailableReportYears";
+import { getProgressReportForYear } from "@/features/reports/services/reports.service";
+import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
+import { useGetProgressReportAvailableReportYears } from "@/features/reports/hooks/useGetProgressReportAvailableReportYears";
 import type {
   ICaretakerPermissions,
   IProgressReport,
   IProjectDocuments,
   IProjectMember,
   IUserMe,
-} from "@/shared/types/index.d";
-import { CreateProgressReportModal } from "../../Modals/CreateProgressReportModal";
-import { RichTextEditor } from "../../RichTextEditor/Editors/RichTextEditor";
+} from "@/shared/types";
+import { CreateProgressReportModal } from "@/features/reports/components/modals/CreateProgressReportModal";
+import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
 

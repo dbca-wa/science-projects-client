@@ -8,10 +8,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
+import { useUser } from "@/features/users/hooks/useUser";
 import { TraditionalTasksAndProjects } from "./TraditionalTasksAndProjects";
-// import type { IDashProps } from "@/shared/types/index.d";
-import { CreateProjectPageModal } from "@/shared/components/Modals/CreateProjectPageModal";
+// import type { IDashProps } from "@/shared/types";
+import { CreateProjectPageModal } from "@/features/projects/components/modals/CreateProjectPageModal";
 import theme from "@/theme";
 import { FaDatabase } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";

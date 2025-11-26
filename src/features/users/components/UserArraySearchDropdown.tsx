@@ -26,9 +26,9 @@ import {
   type ReactNode,
 } from "react";
 import { FaTrash } from "react-icons/fa";
-import { getUsersBasedOnSearchTerm } from "@/shared/lib/api";
-import type { IUserData, EmailListPerson } from "@/shared/types/index.d";
-import { useFullUserByPk } from "@/shared/hooks/tanstack/useFullUserByPk";
+import { getUsersBasedOnSearchTerm } from "@/features/users/services/users.service";
+import type { IUserData, EmailListPerson } from "@/shared/types";
+import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
 
 interface IUserArraySearchDropdown {
   isRequired: boolean;

@@ -19,11 +19,11 @@ import { useEffect, useState, type RefObject, type ReactNode } from "react";
 import {
   getFullProjectSimple,
   getMyProjectsBasedOnSearchTerm,
-} from "@/shared/lib/api";
+} from "@/features/projects/services/projects.service";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import type { IProjectData } from "@/shared/types/index.d";
-import { ExtractedHTMLTitle } from "../ExtractedHTMLTitle";
+import { useUser } from "@/features/users/hooks/useUser";
+import type { IProjectData } from "@/shared/types";
+import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
 
 interface IProjectSearchDropdown {
   allProjects: boolean;

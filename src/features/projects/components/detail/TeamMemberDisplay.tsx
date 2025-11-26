@@ -24,9 +24,9 @@ import type {
   IBusinessArea,
   ICaretakerSimpleUserData,
   IImageData,
-} from "@/shared/types/index.d";
+} from "@/shared/types";
 import { ProjectUserDetails } from "./ProjectUserDetails";
-import { UserProfile } from "../Users/UserProfile";
+import { UserProfile } from "@/features/users/components/UserProfile";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 
 interface ITeamMember {

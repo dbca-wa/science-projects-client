@@ -1,5 +1,5 @@
 // src/lib/hooks/tanstack/useGuideSections.ts
-import { getGuideSections } from "@/shared/lib/api";
+import { getGuideSections } from "@/features/admin/services/admin.service";
 import { useQuery } from "@tanstack/react-query";
 
 // Types

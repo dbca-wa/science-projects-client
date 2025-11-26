@@ -1,15 +1,15 @@
-import { Head } from "@/shared/components/Base/Head";
-// import MapHeatmapToggle from "@/shared/components/Map/HeatMapToggle";
-import MapBackAndSearch from "@/shared/components/Map/MapBackAndSearch";
-import MapBusinessAreasSidebar from "@/shared/components/Map/MapBusinessAreasSidebar";
-// import MapHeatLayer from "@/shared/components/Map/MapHeatLayer"; // Import new component
-import MapLocationsSidebar from "@/shared/components/Map/MapLocationsSidebar";
-import MapTopRightControls from "@/shared/components/Map/MapTopRightControls";
+import { Head } from "@/shared/components/layout/base/Head";
+// import MapHeatmapToggle from "@/features/projects/components/map/HeatMapToggle";
+import MapBackAndSearch from "@/features/projects/components/map/MapBackAndSearch";
+import MapBusinessAreasSidebar from "@/features/projects/components/map/MapBusinessAreasSidebar";
+// import MapHeatLayer from "@/features/projects/components/map/MapHeatLayer"; // Import new component
+import MapLocationsSidebar from "@/features/projects/components/map/MapLocationsSidebar";
+import MapTopRightControls from "@/features/projects/components/map/MapTopRightControls";
 import { useProjectMapSearchContext } from "@/features/projects/hooks/ProjectMapSearchContext";
-import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
-import { useGetLocations } from "@/shared/hooks/tanstack/useGetLocations";
-import { useGetLocationsGeojson } from "@/shared/hooks/tanstack/useGetLocationsGeojson";
-import type { IBusinessArea } from "@/shared/types/index.d";
+import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
+import { useGetLocations } from "@/features/admin/hooks/useGetLocations";
+import { useGetLocationsGeojson } from "@/features/admin/hooks/useGetLocationsGeojson";
+import type { IBusinessArea } from "@/shared/types";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";

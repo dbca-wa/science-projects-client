@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
-import { deleteAECPDFEndorsement } from "@/shared/lib/api";
+import { deleteAECPDFEndorsement } from "@/features/projects/services/projects.service";
 
 interface Props {
   projectPlanPk: number;

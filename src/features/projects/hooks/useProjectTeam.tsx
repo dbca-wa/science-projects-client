@@ -1,4 +1,4 @@
-import { getProjectTeam } from "@/shared/lib/api";
+import { getProjectTeam } from "@/features/projects/services/projects.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useProjectTeam = (projectPk: undefined | string) => {

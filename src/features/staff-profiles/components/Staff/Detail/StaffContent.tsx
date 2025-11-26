@@ -5,7 +5,7 @@ import OverviewSection from "./OverviewSection";
 import ProjectsSection from "./ProjectsSection";
 import PublicationsSection from "./PublicationsSection";
 import ScrollArea from "./ScrollArea";
-import type { IStaffProfileBaseData, IUserMe } from "@/shared/types/index.d";
+import type { IStaffProfileBaseData, IUserMe } from "@/shared/types";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import clsx from "clsx";
 import StaffProfileNavMenuItemButton from "./StaffProfileNavMenuItemButton";

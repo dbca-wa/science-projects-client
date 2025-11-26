@@ -1,4 +1,4 @@
-import type { Color, HSV, RGB } from "@/shared/types/index.d";
+import type { Color, HSV, RGB } from "@/shared/types";
 
 export const useColourPickerHelpers = () => {
   function clamp(value: number, max: number, min: number) {

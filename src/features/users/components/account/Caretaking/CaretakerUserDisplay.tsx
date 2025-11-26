@@ -1,7 +1,7 @@
-import { RemoveCaretakerModal } from "@/shared/components/Modals/Caretakers/RemoveCaretakerModal";
+import { RemoveCaretakerModal } from "@/features/users/components/modals/RemoveCaretakerModal";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import type { ICaretakerObject, ICaretakerSimpleUserData } from "@/shared/types/index.d";
+import type { ICaretakerObject, ICaretakerSimpleUserData } from "@/shared/types";
 import {
   Avatar,
   Button,

@@ -1,7 +1,7 @@
 // User Search component - works/appears on the Users page with UserSearchContext
 
-import { getAllBusinessAreas } from "@/shared/lib/api";
-import type { IBusinessArea, IDivision } from "@/shared/types/index.d";
+import { getAllBusinessAreas } from "@/features/business-areas/services/business-areas.service";
+import type { IBusinessArea, IDivision } from "@/shared/types";
 import {
   Flex,
   Input,

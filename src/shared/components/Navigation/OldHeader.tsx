@@ -60,11 +60,11 @@ import {
   PiListMagnifyingGlassDuotone,
 } from "react-icons/pi";
 import { RiAdminFill, RiOrganizationChart, RiTeamFill } from "react-icons/ri";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import { BatchApproveModal } from "../Modals/BatchApproveModal";
-import { BatchApproveOldModal } from "../Modals/BatchApproveOldModal";
-import { CreateUserModal } from "../Modals/CreateUserModal";
-import { NewCycleModal } from "../Modals/NewCycleModal";
+import { useUser } from "@/features/users/hooks/useUser";
+import { BatchApproveModal } from "@/features/documents/components/modals/BatchApproveModal";
+import { BatchApproveOldModal } from "@/features/documents/components/modals/BatchApproveOldModal";
+import { CreateUserModal } from "@/features/users/components/modals/CreateUserModal";
+import { NewCycleModal } from "@/features/reports/components/modals/NewCycleModal";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { NavButton } from "./NavButton";

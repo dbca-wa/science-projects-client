@@ -1,4 +1,4 @@
-import type { ILegacyPDF } from "@/shared/types/index.d";
+import type { ILegacyPDF } from "@/shared/types";
 import {
   Button,
   FormControl,
@@ -19,9 +19,9 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { addLegacyPDF } from "@/shared/lib/api";
-import { useUser } from "@/shared/hooks/tanstack/useUser";
-import { SingleFileStateUpload } from "../SingleFileStateUpload";
+import { addLegacyPDF } from "@/features/reports/services/reports.service";
+import { useUser } from "@/features/users/hooks/useUser";
+import { SingleFileStateUpload } from "@/shared/components/SingleFileStateUpload";
 
 interface Props {
   isAddLegacyPDFOpen: boolean;

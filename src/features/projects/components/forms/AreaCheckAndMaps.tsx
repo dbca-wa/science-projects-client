@@ -7,7 +7,7 @@ import {
   InputGroup,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import type { ISimpleLocationData } from "@/shared/types/index.d";
+import type { ISimpleLocationData } from "@/shared/types";
 
 interface Props {
   title: string;

@@ -9,7 +9,7 @@ import {
 } from "@/shared/components/ui/table";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import type { IMainDoc } from "@/shared/types/index.d";
+import type { IMainDoc } from "@/shared/types";
 import {
   Avatar,
   Box,

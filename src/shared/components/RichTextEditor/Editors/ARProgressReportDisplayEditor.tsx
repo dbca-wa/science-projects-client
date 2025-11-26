@@ -1,5 +1,5 @@
 import { useGetRTESectionPlaceholder } from "@/features/reports/utils/useGetRTESectionPlaceholder";
-import type { EditorSubsections } from "@/shared/types/index.d";
+import type { EditorSubsections } from "@/shared/types";
 import { Box, Spacer, Text } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {

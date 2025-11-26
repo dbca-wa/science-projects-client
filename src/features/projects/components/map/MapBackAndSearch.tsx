@@ -1,13 +1,13 @@
 import { MapSearchFilters } from "@/features/projects/hooks/ProjectMapSearchContext";
-import { useBusinessAreas } from "@/shared/hooks/tanstack/useBusinessAreas";
-import type { IBusinessArea, IProjectData, ISimpleLocationData } from "@/shared/types/index.d";
+import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
+import type { IBusinessArea, IProjectData, ISimpleLocationData } from "@/shared/types";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
-import { Input } from "../ui/input";
+import { Input } from "@/shared/components/ui/input";
 import MapSidebarSection from "./MapSidebarSection";
 import ProjectMapMarker from "./ProjectMapMarker";
-import SearchProjectsByUser from "../Navigation/SearchProjectsByUser";
+import SearchProjectsByUser from "@/features/projects/components/SearchProjectsByUser";
 import clsx from "clsx";
 
 interface MapLocationsSidebarProps {

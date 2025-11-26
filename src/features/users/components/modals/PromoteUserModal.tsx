@@ -29,7 +29,7 @@ import {
   MutationError,
   MutationSuccess,
   switchAdmin,
-} from "@/shared/lib/api";
+} from "@/features/users/services/users.service";
 import { useForm } from "react-hook-form";
 
 interface IModalProps {

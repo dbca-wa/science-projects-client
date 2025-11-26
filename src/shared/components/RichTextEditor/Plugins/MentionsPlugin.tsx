@@ -1,7 +1,7 @@
 // WIP
 
-import { getInternalUsersBasedOnSearchTerm } from "@/shared/lib/api";
-import type { IUserData } from "@/shared/types/index.d";
+import { getInternalUsersBasedOnSearchTerm } from "@/features/users/services/users.service";
+import type { IUserData } from "@/shared/types";
 import {
   Avatar,
   Box,

@@ -1,6 +1,6 @@
 // Simple hook for getting admin tasks for the dashboard.
 
-import { getPendingAdminTasks } from "@/shared/lib/api";
+import { getPendingAdminTasks } from "@/features/dashboard/services/dashboard.service";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetPendingAdminTasks = () => {
