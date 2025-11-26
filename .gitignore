@@ -1,6 +1,7 @@
 node_modules
 dist
 .docs
+.vscode
 README.md
 *.env
 *.unlighthouse/*
