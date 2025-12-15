@@ -23,12 +23,8 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import {
-  INewCycle,
-  MutationError,
-  MutationSuccess,
-  openNewCycle,
-} from "@/features/users/services/users.service";
+import { INewCycle, openNewCycle } from "@/features/users/services/users.service";
+import type { MutationError, MutationSuccess } from "@/shared/services/api";
 import { useLatestReportYear } from "@/features/reports/hooks/useLatestReportYear";
 
 interface IModalProps {

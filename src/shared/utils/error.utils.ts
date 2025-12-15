@@ -1,29 +1,11 @@
-import { type ApiError } from "@/shared/services/api";
-
-// Django-specific error response types
-interface DjangoFieldError {
-  [fieldName: string]: string | string[];
-}
-
-interface DjangoNonFieldError {
-  non_field_errors: string[];
-}
-
-interface DjangoDetailError {
-  detail: string;
-}
-
-interface DjangoMessageError {
-  message: string;
-}
-
-// Union type for all Django error formats
-type DjangoErrorResponse =
-  | DjangoFieldError
-  | DjangoNonFieldError
-  | DjangoDetailError
-  | DjangoMessageError
-  | string;
+import type {
+  ApiError,
+  DjangoFieldErrors,
+  DjangoNonFieldErrors,
+  DjangoDetailError,
+  DjangoMessageError,
+  DjangoErrorResponse,
+} from "@/shared/services/api";
 
 // Axios error response type
 interface AxiosErrorResponse {
@@ -61,12 +43,12 @@ export function isAxiosErrorResponse(
 // Django error type guards
 export function isDjangoNonFieldErrors(
   errorData: unknown,
-): errorData is DjangoNonFieldError {
+): errorData is DjangoNonFieldErrors {
   return (
     typeof errorData === "object" &&
     errorData !== null &&
     "non_field_errors" in errorData &&
-    Array.isArray((errorData as DjangoNonFieldError).non_field_errors)
+    Array.isArray((errorData as DjangoNonFieldErrors).non_field_errors)
   );
 }
 
@@ -98,7 +80,7 @@ export function isStringError(errorData: unknown): errorData is string {
 
 export function isDjangoFieldErrors(
   errorData: unknown,
-): errorData is DjangoFieldError {
+): errorData is DjangoFieldErrors {
   return (
     typeof errorData === "object" &&
     errorData !== null &&
@@ -189,7 +171,7 @@ export function extractDjangoErrorMessage(
 /**
  * Extracts field-specific error messages from Django field errors
  */
-export function extractFieldErrors(fieldErrors: DjangoFieldError): string[] {
+export function extractFieldErrors(fieldErrors: DjangoFieldErrors): string[] {
   return Object.entries(fieldErrors)
     .filter(([_, value]) => value !== undefined && value !== null)
     .map(([fieldName, errors]) => {

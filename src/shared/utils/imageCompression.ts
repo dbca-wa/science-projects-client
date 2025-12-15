@@ -16,7 +16,7 @@ interface ImageCompressionProps {
   setUploadProgressFn: React.Dispatch<React.SetStateAction<number>>;
   progressInterval: any;
   setProgressIntervalFn: (value: any) => void;
-  startSimulatedProgressFn: () => NodeJS.Timeout;
+  startSimulatedProgressFn: () => ReturnType<typeof setTimeout>;
 }
 
 /**
