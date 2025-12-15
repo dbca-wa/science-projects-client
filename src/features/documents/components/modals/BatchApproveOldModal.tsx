@@ -24,11 +24,8 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import {
-  type MutationSuccess,
-  batchApproveOLDProgressAndStudentReports,
-  type MutationError,
-} from "@/features/users/services/users.service";
+import { batchApproveOLDProgressAndStudentReports } from "@/features/users/services/users.service";
+import type { MutationSuccess, MutationError } from "@/shared/services/api";
 
 interface IModalProps {
   isOpen: boolean;

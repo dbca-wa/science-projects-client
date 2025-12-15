@@ -11,6 +11,11 @@ import type {
   // IStaffPublicationEntry,
   KeywordTag,
 } from "@/shared/types";
+import type {
+  MutationSuccess,
+  MutationError,
+  ProjectCreationMutationSuccess,
+} from "@/shared/services/api";
 import instance from "@/shared/lib/api/axiosInstance";
 import { type QueryFunctionContext } from "@tanstack/react-query";
 import { AxiosHeaders } from "axios";
@@ -657,30 +662,6 @@ export interface IPIUpdateVariables {
   fax: string;
 }
 
-export interface MutationSuccess {
-  ok: string;
-}
-
-export interface ProjectCreationMutationSuccess {
-  pk: number;
-  kind: string;
-}
-
-interface IMutationResponse {
-  data: Record<string, string>;
-  headers: AxiosHeaders;
-  request: XMLHttpRequest;
-  status: number;
-  statusText: string;
-}
-
-export interface MutationError {
-  code: string;
-  message: string;
-  name: string;
-  response: IMutationResponse;
-}
-
 export interface IPIUpdateSuccess {
   ok: string;
 }
@@ -1310,3 +1291,6 @@ export const getStaffProfiles = async ({
 //   });
 //   return res;
 // };
+
+// Re-export shared types for backward compatibility
+export type { MutationSuccess, MutationError, ProjectCreationMutationSuccess } from "@/shared/services/api";

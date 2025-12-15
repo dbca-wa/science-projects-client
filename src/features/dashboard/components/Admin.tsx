@@ -17,7 +17,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { IconType } from "react-icons";
+import { type IconType } from "react-icons/lib";
 import { FaAddressCard, FaLocationArrow } from "react-icons/fa";
 import { FcApproval } from "react-icons/fc";
 import { GoOrganization } from "react-icons/go";
