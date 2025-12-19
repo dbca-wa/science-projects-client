@@ -1,34 +1,31 @@
 // Display for a single user on the Users page (mapped over for each user on a grid). Also with drawer for more details.
 
+import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
+import type { IUserData } from "@/shared/types";
+import { UserProfile } from "./UserProfile";
+import { Box, type BoxProps } from "@chakra-ui/react/box";
+import type { FC, ReactNode } from "react";
+import { Grid } from "@chakra-ui/react/grid";
+import { useBreakpointValue } from "@chakra-ui/react/media-query";
+import { useColorMode } from "@chakra-ui/react/color-mode";
+import { useDisclosure } from "@chakra-ui/react";
 import {
-  Avatar,
-  Box,
-  BoxProps,
-  Button,
   Drawer,
   DrawerBody,
   DrawerContent,
   DrawerFooter,
   DrawerOverlay,
-  Flex,
-  Grid,
-  Text,
-  useBreakpointValue,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
-import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
-import type { IUserData } from "@/shared/types";
-import { UserProfile } from "./UserProfile";
+} from "@chakra-ui/react/modal";
+import { Flex } from "@chakra-ui/react/flex";
+import { Avatar } from "@chakra-ui/react/avatar";
+import { Button } from "@chakra-ui/react/button";
+import { cn } from "@/shared/utils";
 
 interface BoxContainerProps extends BoxProps {
   children: ReactNode;
 }
 
-export const BoxContainer: FC<BoxContainerProps> = ({
-  children,
-  ...props
-}) => {
+export const BoxContainer: FC<BoxContainerProps> = ({ children, ...props }) => {
   return (
     <Grid whiteSpace="normal" maxWidth="100%" {...props}>
       {children}
@@ -205,18 +202,17 @@ export const UserGridItem = ({
                       : fullName
                   : username}
               </Button>
-              <Text
-                fontSize={"sm"}
-                color={
+              <p
+                className={cn(
+                  "text-sm",
                   is_superuser
-                    ? role == "Executive"
-                      ? "orange.500"
-                      : "blue.500"
+                    ? role === "Executive"
+                      ? "text-orange-500"
+                      : "text-blue-500"
                     : is_staff
-                      ? "green.500"
-                      : // External user
-                        "gray.500"
-                }
+                      ? "text-green-500"
+                      : "text-gray-500",
+                )}
               >
                 {
                   // If no role set
@@ -233,22 +229,25 @@ export const UserGridItem = ({
                       : "External User"
                 }
                 {is_active === false && ` (Inactive)`}
-              </Text>
+              </p>
               {is_staff ? (
-                <Text
-                  // fontWeight={"medium"}
-                  fontSize={"xs"}
-                  color={colorMode === "light" ? "gray.600" : "gray.300"}
+                <p
+                  className={cn(
+                    "text-sm",
+                    colorMode === "light" ? "text-gray-500" : "text-gray-300",
+                  )}
                 >
                   {branch ? branch.name : `Branch Not Set`}
-                </Text>
+                </p>
               ) : (
-                <Text
-                  fontSize={"xs"}
-                  color={colorMode === "light" ? "gray.600" : "gray.300"}
+                <p
+                  className={cn(
+                    "text-sm",
+                    colorMode === "light" ? "text-gray-600" : "text-gray-300",
+                  )}
                 >
                   {affiliation?.pk ? affiliation.name : "No Affiliations"}
-                </Text>
+                </p>
               )}
             </BoxContainer>
           </Flex>
@@ -266,9 +265,7 @@ export const UserGridItem = ({
             textOverflow={"ellipsis"}
             draggable={false}
           >
-            <Text>
-              {email ? (email.endsWith("email.com") ? "-" : email) : email}
-            </Text>
+            <p>{email ? (email.endsWith("email.com") ? "-" : email) : email}</p>
           </Box>
         ) : !isOver690 ? (
           <Box
@@ -278,7 +275,7 @@ export const UserGridItem = ({
             textOverflow={"ellipsis"}
             draggable={false}
           >
-            <Text>
+            <p>
               {email
                 ? email.endsWith("email.com")
                   ? "(Not Provided)"
@@ -286,7 +283,7 @@ export const UserGridItem = ({
                     ? `${email.substring(0, 13)}...`
                     : email
                 : "-"}
-            </Text>
+            </p>
           </Box>
         ) : isLargerOrLarger ? (
           <Box
@@ -299,7 +296,7 @@ export const UserGridItem = ({
             textOverflow={"ellipsis"}
             draggable={false}
           >
-            <Text>
+            <p>
               {email
                 ? email.endsWith("email.com")
                   ? "(Not Provided)"
@@ -307,7 +304,7 @@ export const UserGridItem = ({
                     ? `${email.substring(0, 20)}...`
                     : email
                 : "-"}
-            </Text>
+            </p>
           </Box>
         ) : null}
 
@@ -319,7 +316,7 @@ export const UserGridItem = ({
             overflow="hidden"
             textOverflow={"ellipsis"}
           >
-            <Text>{business_area ? business_area.name : "-"}</Text>
+            <p>{business_area ? business_area.name : "-"}</p>
           </BoxContainer>
         ) : null}
       </Grid>

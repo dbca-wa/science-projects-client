@@ -12,21 +12,7 @@ import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import { useCheckExistingCaretaker } from "@/features/users/hooks/useCheckExistingCaretaker";
 import { useInvolvedProjects } from "@/features/projects/hooks/useInvolvedProjects";
-import {
-  Avatar,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  Image,
-  Spacer,
-  Spinner,
-  Text,
-  Tooltip,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { useDisclosure } from "@chakra-ui/react";
 import { useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
@@ -43,6 +29,17 @@ import { DeleteUserModal } from "@/features/users/components/modals/DeleteUserMo
 import { EditUserDetailsModal } from "@/features/users/components/modals/EditUserDetailsModal";
 import { PromoteUserModal } from "@/features/users/components/modals/PromoteUserModal";
 import { UserProjectsDataTable } from "@/features/dashboard/components/UserProjectsDataTable";
+import { useColorMode } from "@chakra-ui/react/color-mode";
+import { Center } from "@chakra-ui/react/center";
+import { Spinner } from "@chakra-ui/react/spinner";
+import { Flex } from "@chakra-ui/react/flex";
+import { Avatar } from "@radix-ui/react-avatar";
+import { cn } from "@/shared/utils";
+import { Button } from "@chakra-ui/react/button";
+import { Grid } from "@chakra-ui/react/grid";
+import { Spacer } from "@chakra-ui/react/spacer";
+import { Image } from "@chakra-ui/react/image";
+import { Tooltip } from "@chakra-ui/react/tooltip";
 
 interface Props {
   pk: number;
@@ -114,9 +111,9 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
       ) {
         const parent = element.parentNode;
         while (element.firstChild) {
-          parent.insertBefore(element.firstChild, element);
+          parent?.insertBefore(element.firstChild, element);
         }
-        parent.removeChild(element);
+        parent?.removeChild(element);
       } else {
         element.removeAttribute("style"); // Keep class if necessary for layout
       }
@@ -448,18 +445,18 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             ml={4}
             overflow={"auto"}
           >
-            <Text userSelect={"none"} fontWeight={"bold"}>
+            <p className={cn("font-bold select-none")}>
               {!user?.display_first_name?.startsWith("None")
                 ? `${user?.display_first_name ?? user?.first_name} ${user?.display_last_name ?? user?.last_name}`
                 : `${user?.username}`}
-            </Text>
-            <Text userSelect={"none"}>
+            </p>
+            <p className={cn("select-none")}>
               {user?.phone ? user.phone : "No Phone number"}
-            </Text>
+            </p>
             <Flex>
-              <Text userSelect={"none"}>
+              <p className={cn("select-none")}>
                 {user?.email?.startsWith("unset") ? "No Email" : user?.email}
-              </Text>
+              </p>
             </Flex>
             {!user?.email?.startsWith("unset") && (
               <Button
@@ -571,22 +568,32 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                 />
                 <Center>
                   <Flex ml={3} flexDir="column">
-                    <Text fontWeight="bold" color={sectionTitleColor}>
+                    <p
+                      className={cn("font-bold", `text-[${sectionTitleColor}]`)}
+                    >
                       {user.agency !== null
                         ? user.agency.name
                         : "agency returning none"}
-                    </Text>
-                    <Text
-                      fontSize="sm"
-                      color={colorMode === "light" ? "gray.600" : "gray.400"}
+                    </p>
+                    <p
+                      className={cn(
+                        "text-sm",
+                        colorMode === "light"
+                          ? "text-gray-600"
+                          : "text-gray-400",
+                      )}
                     >
                       {user.branch !== null
                         ? `${user.branch.name} Branch`
                         : "Branch not set"}
-                    </Text>
-                    <Text
-                      fontSize="sm"
-                      color={colorMode === "light" ? "blue.600" : "gray.400"}
+                    </p>
+                    <p
+                      className={cn(
+                        "text-sm",
+                        colorMode === "light"
+                          ? "text-blue-600"
+                          : "text-gray-400",
+                      )}
                     >
                       {user?.business_area?.name ? (
                         <>
@@ -605,20 +612,23 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                       ) : (
                         "Business Area not set"
                       )}
-                    </Text>
+                    </p>
                   </Flex>
                 </Center>
               </Flex>
             )}
             {!accountIsStaff && (
-              <Text color={colorMode === "light" ? "gray.600" : "gray.300"}>
+              <p
+                className={cn()}
+                color={colorMode === "light" ? "gray.600" : "gray.300"}
+              >
                 <b>External User</b> - This user does not belong to DBCA
-              </Text>
+              </p>
             )}
           </Flex>
         </Flex>
 
-        <Box mt={2}>
+        <div className={"mt-2"}>
           <Flex
             border={"1px solid"}
             rounded={"xl"}
@@ -629,18 +639,15 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             mt={2}
           >
             <Flex>
-              <Text
-                fontWeight={"bold"}
-                fontSize={"sm"}
-                mb={1}
+              <p
+                className={cn("mb-1 text-sm font-bold select-none")}
                 color={sectionTitleColor}
-                userSelect={"none"}
               >
                 About
-              </Text>
+              </p>
             </Flex>
-            <Box
-              mt={1}
+            <div
+              className="mt-1"
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(
                   colorMode === "dark"
@@ -666,24 +673,24 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               }}
             />
 
-            {/* <Text>
+            {/* <p className={
+            cn()}>
               {user.about
                 ? user.about
                 : "This user has not filled in this section."}
-            </Text> */}
+            </p> */}
             <Flex mt={4}>
-              <Text
-                fontWeight={"bold"}
-                fontSize={"sm"}
-                mb={1}
-                color={sectionTitleColor}
-                userSelect={"none"}
+              <p
+                className={cn(
+                  "mb-1 text-sm font-bold select-none",
+                  `text-[${sectionTitleColor}]`,
+                )}
               >
                 Expertise
-              </Text>
+              </p>
             </Flex>
-            <Box
-              mt={1}
+            <div
+              className="mt-1"
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(
                   colorMode === "dark"
@@ -711,11 +718,12 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               }}
             />
 
-            {/* <Text>
+            {/* <p className={
+            cn()}>
               {user?.expertise
                 ? user.expertise
                 : "This user has not filled in this section."}
-            </Text> */}
+            </p> */}
           </Flex>
 
           <Spacer />
@@ -732,15 +740,14 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             >
               {" "}
               <Flex>
-                <Text
-                  fontWeight={"bold"}
-                  fontSize={"sm"}
-                  mb={1}
-                  color={sectionTitleColor}
-                  userSelect={"none"}
+                <p
+                  className={cn(
+                    "mb-1 text-sm font-bold select-none",
+                    `text-[${sectionTitleColor}]`,
+                  )}
                 >
                   Involved Projects
-                </Text>
+                </p>
               </Flex>
               {!userProjectsLoading &&
                 (userProjectsData?.length === 0 ? (
@@ -778,33 +785,34 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             mt={2}
           >
             <Flex mb={3}>
-              <Text
-                color={sectionTitleColor}
-                userSelect={"none"}
-                fontSize={"sm"}
-                mr={2}
+              <p
+                className={cn(
+                  "mr-2 text-sm select-none",
+                  `text-[${sectionTitleColor}]`,
+                )}
               >
                 <b>Caretaker and Merging</b>
-              </Text>
+              </p>
             </Flex>
 
             <Flex flexDir={"column"} gap={2}>
-              <Text
-                color={subsectionTitleColor}
-                userSelect={"none"}
-                fontSize={"sm"}
-                mb={accountHasCaretakers ? 3 : 0}
+              <p
+                className={cn(
+                  "text-sm select-none",
+                  `text-${subsectionTitleColor}`,
+                  accountHasCaretakers ? "mb-3" : "mb-2",
+                )}
               >
                 <b>Caretaker</b>
-              </Text>
+              </p>
               {accountHasCaretakers ? (
-                <Box>
+                <div>
                   <Flex
                     justifyContent={"space-between"}
                     mb={4}
                     alignItems={"center"}
                   >
-                    <Box display={"flex"} alignItems={"center"} gap={2}>
+                    <div className="flex items-center gap-2">
                       <Avatar
                         size="md"
                         name={`${user?.caretakers[0]?.display_first_name} ${user?.caretakers[0]?.display_last_name}`}
@@ -817,24 +825,25 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         }
                         className="pointer-events-none select-none"
                       />
-                      <Box display={"flex"} flexDir={"column"}>
-                        <Text
-                          fontSize={"md"}
-                          fontWeight={"semibold"}
-                          color={
-                            colorMode === "light" ? "gray.800" : "gray.200"
-                          }
+                      <div className="flex flex-col">
+                        <p
+                          className={cn(
+                            "font-bold",
+                            colorMode === "light"
+                              ? "text-gray-800"
+                              : "text-gray-200",
+                          )}
                         >
                           {`${user?.caretakers[0]?.display_first_name} ${
                             user?.caretakers[0]?.display_last_name
                           }`}
-                        </Text>
-                      </Box>
-                    </Box>
+                        </p>
+                      </div>
+                    </div>
                     {(viewingUserIsAccount ||
                       caretakerIsMe ||
                       viewingUserIsSuper) && (
-                      <Box>
+                      <div>
                         <Button
                           bg={colorMode === "light" ? "red.600" : "red.700"}
                           color={
@@ -849,10 +858,10 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         >
                           Remove Caretaker
                         </Button>
-                      </Box>
+                      </div>
                     )}
                   </Flex>
-                </Box>
+                </div>
               ) : (
                 <>
                   {caretakerData?.caretaker_request_object?.status &&
@@ -889,7 +898,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                     mb={0}
                     alignItems={"center"}
                   >
-                    <Text>
+                    <p className={cn()}>
                       {caretakerData?.caretaker_request_object?.status &&
                       caretakerData?.caretaker_request_object?.status ===
                         "pending"
@@ -900,7 +909,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         : viewingUserIsAccount
                           ? "You have not set a caretaker."
                           : "No caretaker has been set for this user."}
-                    </Text>
+                    </p>
                     {!accountHasCaretakers && viewingUserIsAccount && (
                       <Button
                         // w={"100%"}
@@ -958,19 +967,24 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
 
                   {accountHasCaretakers && accountIsStaff ? (
                     <>
-                      <Text
-                        color={colorMode === "light" ? "gray.500" : "gray.400"}
-                        fontSize={"sm"}
-                        className="text-balance"
+                      <p
+                        className={cn(
+                          "text-sm text-balance",
+                          colorMode === "light"
+                            ? "text-gray-500"
+                            : "text-gray-400",
+                        )}
                       >
                         To set or become caretaker, visit your profile and
                         remove your current caretaker.
-                      </Text>
+                      </p>
 
                       {/* <Flex w={"100%"} justifyContent={"space-between"} pr={2}>
                         {" "}
-                        <Text>Click here to remove your caretaker</Text>
-                        <Text
+                        <p className={
+                        cn()}>Click here to remove your caretaker</p>
+                        <p className={
+                        cn()}
                           color={
                             colorMode === "light" ? "blue.500" : "blue.400"
                           }
@@ -978,7 +992,7 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                           onClick={}
                         >
                           Remove
-                        </Text>
+                        </p>
                       </Flex> */}
                     </>
                   ) : (
@@ -1002,16 +1016,17 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         >
                           {caretakerData?.become_caretaker_request_object
                             ?.secondary_users[0]?.pk === me?.userData?.pk && (
-                            <Text
-                              color={
-                                colorMode === "light" ? "gray.500" : "gray.400"
-                              }
-                              fontSize={"sm"}
-                              className="text-balance"
+                            <p
+                              className={cn(
+                                "text-sm text-balance",
+                                colorMode === "light"
+                                  ? "text-gray-500"
+                                  : "text-gray-400",
+                              )}
                             >
                               Your request has been made to become this user's
                               caretaker
-                            </Text>
+                            </p>
                           )}
 
                           <Button
@@ -1120,15 +1135,16 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               )}
 
               {/* {accountIsCaretaking && ( */}
-              <Box mt={2}>
-                <Text
-                  color={subsectionTitleColor}
-                  userSelect={"none"}
-                  fontSize={"sm"}
-                  mb={accountIsCaretaking ? 3 : 1}
+              <div className={"mt-2"}>
+                <p
+                  className={cn(
+                    "text-sm select-none",
+                    `text-[${subsectionTitleColor}]`,
+                    accountIsCaretaking ? "mb-3" : "mb-1",
+                  )}
                 >
                   <b>Caretaking For</b>
-                </Text>
+                </p>
                 {accountIsCaretaking ? (
                   <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
                     {user?.caretaking_for?.map((obj) => (
@@ -1186,9 +1202,9 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                                   : noImage
                               }
                             />
-                            <Text ml={2}>
+                            <p className={cn("ml-2")}>
                               {obj.display_first_name} {obj.display_last_name}
-                            </Text>
+                            </p>
                           </Flex>
                           {(viewingUserIsAccount ||
                             viewingUserIsSuper ||
@@ -1214,13 +1230,13 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                     ))}
                   </Grid>
                 ) : (
-                  <Text>
+                  <p className={cn()}>
                     {viewingUserIsAccount
                       ? "You are not caretaking for anyone."
                       : "This user is not caretaking for anyone."}
-                  </Text>
+                  </p>
                 )}
-              </Box>
+              </div>
               {/* )} */}
 
               {!viewingUserIsAccount && (
@@ -1235,16 +1251,17 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                         alignItems={"center"}
                         my={2}
                       >
-                        <Text
-                          color={
-                            colorMode === "light" ? "gray.500" : "gray.400"
-                          }
-                          fontSize={"sm"}
-                          className="text-balance"
+                        <p
+                          className={cn(
+                            "text-sm text-balance",
+                            colorMode === "light"
+                              ? "text-gray-500"
+                              : "text-gray-400",
+                          )}
                         >
                           Your request has been made to set this user as your
                           caretaker
-                        </Text>
+                        </p>
                         <Button
                           bg={colorMode === "light" ? "red.600" : "red.700"}
                           color={
@@ -1330,15 +1347,14 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
               mt={2}
             >
               <Flex pb={1}>
-                <Text
-                  fontWeight={"bold"}
-                  fontSize={"sm"}
-                  mb={1}
-                  color={sectionTitleColor}
-                  userSelect={"none"}
+                <p
+                  className={cn(
+                    "mb-1 text-sm font-bold select-none",
+                    `text-[${subsectionTitleColor}]`,
+                  )}
                 >
                   Admin
-                </Text>
+                </p>
               </Flex>
               <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
                 <Button
@@ -1446,30 +1462,32 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
             mt={2}
           >
             <Flex>
-              <Text
-                fontWeight={"bold"}
-                fontSize={"sm"}
-                mb={1}
-                color={sectionTitleColor}
-                userSelect={"none"}
+              <p
+                className={cn(
+                  "mb-1 text-sm font-bold select-none",
+                  `text-[${subsectionTitleColor}]`,
+                )}
               >
                 Details
-              </Text>
+              </p>
             </Flex>
 
             <Flex>
-              {/* <Text color={subsectionTitleColor}
+              {/* <p className={
+              cn()} color={subsectionTitleColor}
                                     userSelect={"none"}
                                     fontSize={"sm"}
-                                ><b>Role: </b></Text><Text >{user?.role ? user.role : "This user has not filled in their 'role' section."}</Text> */}
-              <Text
-                color={subsectionTitleColor}
-                userSelect={"none"}
-                fontSize={"sm"}
+                                ><b>Role: </b></p><p className={
+                                cn()} >{user?.role ? user.role : "This user has not filled in their 'role' section."}</p> */}
+              <p
+                className={cn(
+                  "text-sm select-none",
+                  `text-[${subsectionTitleColor}]`,
+                )}
               >
                 <b>Joined&nbsp;</b>
-              </Text>{" "}
-              <Text fontSize={"sm"}>{`${formatted_date}`}</Text>
+              </p>{" "}
+              <p className={cn("text-sm")}>{`${formatted_date}`}</p>
             </Flex>
             <Flex
               mt={4}
@@ -1486,19 +1504,24 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Text
-                    mb="8px"
-                    fontWeight={"bold"}
-                    color={subsectionTitleColor}
+                  <p
+                    className={cn(
+                      "mb-2 font-bold",
+                      `text-[${subsectionTitleColor}]`,
+                    )}
                   >
                     Active?
-                  </Text>
+                  </p>
                   {user?.is_active ? (
                     <FcApproval />
                   ) : (
-                    <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                    <div
+                      className={
+                        colorMode === "light" ? "text-red-500" : "text-red-600"
+                      }
+                    >
                       <AiFillCloseCircle />
-                    </Box>
+                    </div>
                   )}
                 </Grid>
 
@@ -1509,19 +1532,24 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Text
-                    mb="8px"
-                    fontWeight={"bold"}
-                    color={subsectionTitleColor}
+                  <p
+                    className={cn(
+                      "mb-2 font-bold",
+                      `text-[${subsectionTitleColor}]`,
+                    )}
                   >
                     Staff?
-                  </Text>
+                  </p>
                   {accountIsStaff ? (
                     <FcApproval />
                   ) : (
-                    <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                    <div
+                      className={cn(
+                        colorMode === "light" ? "text-red-500" : "text-red-600",
+                      )}
+                    >
                       <AiFillCloseCircle />
-                    </Box>
+                    </div>
                   )}
                 </Grid>
 
@@ -1532,25 +1560,31 @@ export const UserProfile = ({ pk, branches, businessAreas }: Props) => {
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Text
-                    mb="8px"
-                    fontWeight={"bold"}
-                    color={subsectionTitleColor}
+                  <p
+                    className={cn(
+                      "mb-2 font-bold",
+                      `text-[${subsectionTitleColor}]`,
+                    )}
                   >
                     Admin?
-                  </Text>
+                  </p>
                   {accountIsSuper ? (
                     <FcApproval />
                   ) : (
-                    <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                    <div
+                      className={cn(
+                        colorMode === "light" ? "text-red-500" : "text-red-600",
+                      )}
+                      color={colorMode === "light" ? "red.500" : "red.600"}
+                    >
                       <AiFillCloseCircle />
-                    </Box>
+                    </div>
                   )}
                 </Grid>
               </Grid>
             </Flex>
           </Flex>
-        </Box>
+        </div>
       </Flex>
     </>
   );

@@ -1,22 +1,5 @@
 // Dropdown search component for users. Displays 5 users below the search box.
 
-import { CloseIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  IconButton,
-  Input,
-  InputGroup,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
 import {
   forwardRef,
   useEffect,
@@ -29,6 +12,20 @@ import { FaTrash } from "react-icons/fa";
 import { getUsersBasedOnSearchTerm } from "@/features/users/services/users.service";
 import type { IUserData, EmailListPerson } from "@/shared/types";
 import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
+import {
+  FormControl,
+  FormHelperText,
+  FormLabel,
+} from "@chakra-ui/react/form-control";
+import { Box } from "@chakra-ui/react/box";
+import { Input, InputGroup } from "@chakra-ui/react/input";
+import { Button } from "@react-email/components";
+import { Flex } from "@chakra-ui/react/flex";
+import { Tag } from "@chakra-ui/react/tag";
+import { useColorMode } from "@chakra-ui/react/color-mode";
+import { IconButton } from "@chakra-ui/react/button";
+import { Text } from "@chakra-ui/react";
+import { CloseIcon } from "@chakra-ui/icons/Close";
 
 interface IUserArraySearchDropdown {
   isRequired: boolean;
