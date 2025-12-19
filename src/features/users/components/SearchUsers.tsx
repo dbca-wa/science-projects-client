@@ -3,16 +3,17 @@
 import { getAllBusinessAreas } from "@/features/business-areas/services/business-areas.service";
 import type { IBusinessArea, IDivision } from "@/shared/types";
 import {
-  Flex,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Select,
-  useColorMode,
-} from "@chakra-ui/react";
-import { useEffect, useState, type ChangeEventHandler, type ChangeEvent } from "react";
+  useEffect,
+  useState,
+  type ChangeEventHandler,
+  type ChangeEvent,
+} from "react";
 import { FiSearch } from "react-icons/fi";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
+import { useColorMode } from "@chakra-ui/react/color-mode";
+import { Flex } from "@chakra-ui/react/flex";
+import { Select } from "@chakra-ui/react/select";
+import { Input, InputGroup, InputRightElement } from "@chakra-ui/react/input";
 
 export const SearchUsers = () => {
   const {

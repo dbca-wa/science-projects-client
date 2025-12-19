@@ -2,22 +2,8 @@
 
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import { CloseIcon } from "@chakra-ui/icons";
-import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  IconButton,
-  Input,
-  InputGroup,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+// import { CloseIcon } from "@chakra-ui/icons";
+import { useDisclosure } from "@chakra-ui/react";
 import {
   forwardRef,
   useEffect,
@@ -33,6 +19,19 @@ import type { IUserData } from "@/shared/types";
 import { EmailSiteLinkModal } from "@/features/users/components/modals/EmailSiteLinkModal";
 import { CreateUserModal } from "@/features/users/components/modals/CreateUserModal";
 import { createPortal } from "react-dom";
+import { useColorMode } from "@chakra-ui/react/color-mode";
+import {
+  FormControl,
+  FormHelperText,
+  FormLabel,
+} from "@chakra-ui/react/form-control";
+import { Box } from "@chakra-ui/react/box";
+import { Input, InputGroup } from "@chakra-ui/react/input";
+import { Button, IconButton } from "@chakra-ui/react/button";
+import { Flex } from "@chakra-ui/react/flex";
+import { Avatar } from "@chakra-ui/react/avatar";
+import { CloseIcon } from "@chakra-ui/icons/Close";
+import { Text } from "@chakra-ui/react/typography";
 
 interface IUserSearchDropdown {
   onlyInternal?: boolean;
