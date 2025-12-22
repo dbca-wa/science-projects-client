@@ -4,19 +4,9 @@ import {
 } from "@/features/admin/services/admin.service";
 import { handleImageFileCompression } from "@/shared/utils/imageCompression";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
-import {
-  Box,
-  Center,
-  Flex,
-  Grid,
-  Image,
-  Progress,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Progress } from "@/shared/components/ui/progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import Dropzone from "react-dropzone";
@@ -71,11 +61,6 @@ export const ReportMediaChanger = ({
   const [progressInterval, setProgressInterval] = useState(null);
   const [selectedFile, setSelectedFile] = useState<File>(null);
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
   const queryClient = useQueryClient();
 
   const onFileDrop = async (acceptedFile) => {
@@ -131,25 +116,12 @@ export const ReportMediaChanger = ({
       const newProgressInterval = startSimulatedProgress();
       setProgressInterval(newProgressInterval);
 
-      addToast({
-        status: "loading",
-        title: `Uploading`,
-        position: "top-right",
-      });
+      toast.loading("Uploading");
 
       return mutationData;
     },
     onSuccess: async (data, mutationData) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Image Uploaded`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Image Uploaded");
       setUploadedFile(mutationData.file);
       setCurrentImage(URL.createObjectURL(mutationData.file));
 
@@ -165,16 +137,7 @@ export const ReportMediaChanger = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not upload image`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could not upload image: ${error}`);
       clearInterval(progressInterval);
       setUploadProgress(0);
     },
@@ -183,23 +146,10 @@ export const ReportMediaChanger = ({
   const deleteImageMutation = useMutation({
     mutationFn: deleteReportMediaImage,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Deleting File`,
-        position: "top-right",
-      });
+      toast.loading("Deleting File");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Image Deleted`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Image Deleted");
       setUploadedFile(null);
       setCurrentImage(null);
       setUploadProgress(0);
@@ -210,16 +160,7 @@ export const ReportMediaChanger = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not delete image`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could not delete image: ${error}`);
     },
   });
 
@@ -252,65 +193,46 @@ export const ReportMediaChanger = ({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Box
-      // bg={"red"}
-      height={"400px"}
-      pos={"relative"}
+    <div
+      className="h-[400px] relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      cursor={isHovered ? "pointer" : undefined}
+      style={{ cursor: isHovered ? "pointer" : undefined }}
     >
       {(isHovered && currentImage) || (isHovered && uploadedFile) ? (
-        <Box
-          //   bg={"pink"}
-          pos={"absolute"}
-          right={4}
-          bottom={4}
-          color={isHovered ? "red.500" : "green.500"}
-          _hover={{ color: "red.400" }}
+        <div
+          className="absolute right-4 bottom-4 z-[99999] text-red-500 hover:text-red-400 cursor-pointer"
           onClick={(e) => {
             onDeleteEntry(e);
           }}
-          zIndex={99999}
         >
           <ImCross size={"25px"} />
-        </Box>
+        </div>
       ) : null}
 
       <Dropzone multiple={false} onDrop={onFileDrop}>
         {({ getRootProps, getInputProps, acceptedFiles }) => (
-          <Box
+          <div
             {...getRootProps()}
-            h={"400px"}
-            width={"100%"}
-            background={colorMode === "light" ? "gray.100" : "gray.700"}
-            border={"1px dashed"}
-            borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-            rounded={"lg"}
+            className={`h-[400px] w-full border border-dashed rounded-lg ${
+              colorMode === "light" 
+                ? "bg-gray-100 border-gray-300" 
+                : "bg-gray-700 border-gray-500"
+            }`}
           >
             {(acceptedFiles &&
               !isError &&
               currentImage !== null &&
               acceptedFiles[0] instanceof File) ||
             currentImage !== null ? (
-              <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
-                <Box
-                  pos={"absolute"}
-                  bottom={0}
-                  w={"100%"}
-                  py={4}
-                  px={4}
-                  bg={"blackAlpha.800"}
-                  roundedBottom={"lg"}
-                  textAlign={"center"}
-                  zIndex={99}
-                >
-                  <Text color={"white"}>{titleDictionary[section]}</Text>
-                </Box>
+              <div className="w-full h-full relative rounded-lg">
+                <div className="absolute bottom-0 w-full py-4 px-4 bg-black/80 rounded-b-lg text-center z-[99]">
+                  <p className="text-white">{titleDictionary[section]}</p>
+                </div>
 
-                <Box overflow={"hidden"} w={"100%"} h={"100%"} rounded={"lg"}>
-                  <Image
-                    rounded={"lg"}
+                <div className="overflow-hidden w-full h-full rounded-lg">
+                  <img
+                    className="rounded-lg object-cover w-full h-full"
                     src={
                       acceptedFiles &&
                       !isError &&
@@ -321,76 +243,46 @@ export const ReportMediaChanger = ({
                           ? `${baseUrl}${currentImage}`
                           : undefined
                     }
-                    objectFit={"cover"}
-                    w={"100%"}
-                    h={"100%"}
+                    alt={titleDictionary[section]}
                   />
-                </Box>
-              </Box>
+                </div>
+              </div>
             ) : (
-              <Flex
-                rounded={"lg"}
-                flexDir={"column"}
-                justifyContent={"center"}
-                justifyItems={"center"}
-                w={"100%"}
-                h={"100%"}
-                background={"blackAlpha.800"}
-                zIndex={3}
-              >
-                <Center
-                  flexDir={"column"}
-                  justifyContent={"center"}
-                  justifyItems={"center"}
-                >
+              <div className="rounded-lg flex flex-col justify-center items-center w-full h-full bg-black/80 z-[3]">
+                <div className="flex flex-col justify-center items-center">
                   <BsCloudArrowUp size={"50px"} color={"white"} />
-                </Center>
+                </div>
 
-                <Grid
-                  flexDir={"column"}
-                  alignItems={"center"}
-                  textAlign={"center"}
-                  color={"white"}
-                >
-                  <Text px={8} textAlign={"center"}>
+                <div className="flex flex-col items-center text-center text-white">
+                  <p className="px-8 text-center">
                     {`Drag and drop an image for the`}
-                  </Text>
-                  <Text
-                    fontWeight={"semibold"}
-                  >{`${titleDictionary[section]}`}</Text>
-                </Grid>
+                  </p>
+                  <p className="font-semibold">{`${titleDictionary[section]}`}</p>
+                </div>
 
                 {isUploading ? (
-                  <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
-                    <Box w={"80%"} h={1} px={1}>
+                  <div className="w-full mt-4 max-w-xs mx-auto flex justify-center">
+                    <div className="w-4/5 h-1 px-1">
                       <Progress
-                        bg={colorMode === "light" ? "gray.200" : "gray.900"}
-                        colorScheme={
-                          uploadProgress === 100 && uploadedFile
-                            ? "green"
-                            : "blue"
-                        }
-                        // isIndeterminate
-                        size={"xs"}
                         value={uploadProgress}
-                        // hasStripe
-                        // animation={"step-start"}
-                        //
+                        className={`${
+                          colorMode === "light" ? "bg-gray-200" : "bg-gray-900"
+                        }`}
                       />
-                    </Box>
-                  </Center>
+                    </div>
+                  </div>
                 ) : null}
 
                 {isError ? (
-                  <Text color={"red.500"} mt={4}>
+                  <p className="text-red-500 mt-4">
                     That file is not of the correct type
-                  </Text>
+                  </p>
                 ) : null}
-              </Flex>
+              </div>
             )}
-          </Box>
+          </div>
         )}
       </Dropzone>
-    </Box>
+    </div>
   );
 };

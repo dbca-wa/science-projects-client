@@ -3,7 +3,7 @@ import { DrawerClose } from "@/shared/components/ui/drawer";
 import { Input } from "@/shared/components/ui/input";
 import { deletePublication } from "@/features/staff-profiles/services/staff-profiles.service";
 import type { ISimplePkProp, IStaffPublicationEntry } from "@/shared/types";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
@@ -27,15 +27,12 @@ const DeleteStaffPublicationContent = ({
   } = useForm<ISimplePkProp>({
     mode: "onChange", // or "onBlur"
   });
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: deletePublication,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Deleted",
-        position: "top-right",
+      toast.success("Deleted", {
+        description: "Publication deleted successfully",
       });
       await queryClient.invalidateQueries({
         queryKey: ["publications", usersPk],
@@ -45,10 +42,8 @@ const DeleteStaffPublicationContent = ({
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Could not delete publication",
       });
     },
     // onMutate: () => {

@@ -1,6 +1,7 @@
 // A template for a RTE toggalable button - props fill out its icons, colorSchemes, states and functionality
 
-import { Button, Icon, useColorMode } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { IconType } from "react-icons";
 import "@/styles/texteditor.css";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
@@ -59,67 +60,28 @@ export const BaseToggleOptionsButton = ({
   return (
     <div className="tooltip-container">
       <Button
-        bg={
-          colorMode === "light"
-            ? colorSchemeOne && colorSchemeTwo
-              ? currentState === false
-                ? `${colorSchemeOne}.500`
-                : `${colorSchemeTwo}.500`
-              : `${colorSchemeOne}.500` // For if colorSchemeTwo not provided
-            : colorSchemeOne && colorSchemeTwo // For dark mode
-              ? currentState === false
-                ? `${colorSchemeOne}.600`
-                : `${colorSchemeTwo}.600`
-              : "gray.500" //default for if colorSchemeTwo not provided in dark mode
-        }
-        color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.800"}
-        _hover={
-          colorMode === "light"
-            ? {
-                color: "white",
-                bg:
-                  colorSchemeOne && colorSchemeTwo
-                    ? currentState === false
-                      ? `${colorSchemeOne}.600`
-                      : `${colorSchemeTwo}.600`
-                    : "gray.500", //default for if colorSchemeTwo not provided in dark mode
-              }
-            : {
-                // For dark mode
-                color: "white",
-                bg:
-                  colorSchemeOne && colorSchemeTwo
-                    ? currentState === false
-                      ? `${colorSchemeOne}.500`
-                      : `${colorSchemeTwo}.500`
-                    : "gray.500", //default for if colorSchemeTwo not provided in dark mode
-              }
-        }
+        className={`
+          rounded-full w-[35px] h-[40px] text-white
+          ${
+            colorMode === "light"
+              ? colorSchemeOne && colorSchemeTwo
+                ? currentState === false
+                  ? `bg-${colorSchemeOne}-500 hover:bg-${colorSchemeOne}-600`
+                  : `bg-${colorSchemeTwo}-500 hover:bg-${colorSchemeTwo}-600`
+                : `bg-${colorSchemeOne}-500 hover:bg-gray-500`
+              : colorSchemeOne && colorSchemeTwo
+                ? currentState === false
+                  ? `bg-${colorSchemeOne}-600 hover:bg-${colorSchemeOne}-500`
+                  : `bg-${colorSchemeTwo}-600 hover:bg-${colorSchemeTwo}-500`
+                : "bg-gray-500 hover:bg-gray-500"
+          }
+        `}
         onClick={handleClick}
-        rounded={"full"}
-        w={"35px"}
-        h={"40px"}
       >
         {currentState === false ? (
-          <Icon
-            as={IconOne}
-            boxSize={{
-              base: 5,
-              lg: 6,
-            }}
-            w={{ base: "20px", lg: "20px" }}
-            h={{ base: "20px", lg: "20px" }}
-          />
+          <IconOne className="w-5 h-5" />
         ) : (
-          <Icon
-            as={IconTwo}
-            boxSize={{
-              base: 5,
-              lg: 6,
-            }}
-            w={{ base: "20px", lg: "20px" }}
-            h={{ base: "20px", lg: "20px" }}
-          />
+          <IconTwo className="w-5 h-5" />
         )}
       </Button>
       {toolTipText && <span className="tooltip-text">{toolTipText}</span>}

@@ -4,19 +4,6 @@ import {
   updateProgressReportSection,
 } from "@/features/reports/services/reports.service";
 import type { IProjectData, IProjectMember } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  Icon,
-  Image,
-  Text,
-  type ToastId,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import {
@@ -46,6 +33,9 @@ import type { IProgressReportDisplayData } from "./ARProgressReportHandler";
 import { ApproveProgressReportModal } from "@/features/reports/components/modals/ApproveProgressReportModal";
 import { TiTick } from "react-icons/ti";
 import { useNoImage } from "@/shared/hooks/useNoImage";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { toast } from "sonner";
 
 interface IPREditorProps {
   // isEditing: boolean;
@@ -93,6 +83,7 @@ interface IPRProjDetails {
   project: IProjectData;
   team_members: IProjectMember[];
 }
+
 const PRProjDetails = ({ project, team_members }: IPRProjDetails) => {
   const getOrderedTeam = (teamMembers) => {
     return Array.from(teamMembers)
@@ -116,50 +107,48 @@ const PRProjDetails = ({ project, team_members }: IPRProjDetails) => {
   const orderedTeam = getOrderedTeam(team_members);
 
   return (
-    <Box py={3}>
-      <Flex mb={0.5} flexWrap={"wrap"}>
-        <Text
-          fontWeight={"semibold"}
-          mr={1}
-          color={
+    <div className="py-3">
+      <div className="mb-0.5 flex flex-wrap">
+        <p
+          className={`font-semibold mr-1 ${
             project?.status === "completed" || project?.status === "terminated"
-              ? "green.500"
+              ? "text-green-500"
               : project?.status === "updating"
-                ? "red.500"
+                ? "text-red-500"
                 : project?.status === "suspended"
-                  ? "orange.500"
-                  : undefined
-          }
+                  ? "text-orange-500"
+                  : ""
+          }`}
         >
           Status:{" "}
-        </Text>
-        <Text
-          color={
+        </p>
+        <p
+          className={
             project?.status === "completed" || project?.status === "terminated"
-              ? "green.500"
+              ? "text-green-500"
               : project?.status === "updating"
-                ? "red.500"
+                ? "text-red-500"
                 : project?.status === "suspended"
-                  ? "orange.500"
-                  : undefined
+                  ? "text-orange-500"
+                  : ""
           }
         >
           {`${project?.status[0].toUpperCase()}${project?.status.slice(1)}`}
-        </Text>
-      </Flex>
-      <Flex mb={0.5} flexWrap={"wrap"}>
-        <Text fontWeight={"semibold"} mr={1}>
+        </p>
+      </div>
+      <div className="mb-0.5 flex flex-wrap">
+        <p className="font-semibold mr-1">
           Tag:{" "}
-        </Text>
-        <Text>{`${project.kind === "science" ? "SP" : project.kind === "external" ? "EXT" : "CF"}-${project?.year}-${project?.number}`}</Text>
-      </Flex>
-      <Flex mb={0.5} flexWrap={"wrap"}>
-        <Text fontWeight={"semibold"} mr={1}>
+        </p>
+        <p>{`${project.kind === "science" ? "SP" : project.kind === "external" ? "EXT" : "CF"}-${project?.year}-${project?.number}`}</p>
+      </div>
+      <div className="mb-0.5 flex flex-wrap">
+        <p className="font-semibold mr-1">
           Scientists:{" "}
-        </Text>
-        <Text>{orderedTeam.join(", ")}</Text>
-      </Flex>
-    </Box>
+        </p>
+        <p>{orderedTeam.join(", ")}</p>
+      </div>
+    </div>
   );
 };
 
@@ -306,44 +295,21 @@ IPREditorProps) => {
   const queryClient = useQueryClient();
   const { register, handleSubmit, reset } =
     useForm<ISaveProgressReportSection>();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+  
+  const [isApproveProgressReportOpen, setIsApproveProgressReportOpen] = useState(false);
+  const onOpenApproveProgressReport = () => setIsApproveProgressReportOpen(true);
+  const onCloseApproveProgressReport = () => setIsApproveProgressReportOpen(false);
 
   const saveMutation = useMutation({
     mutationFn: updateProgressReportSection,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Updating Progress Report",
-        position: "top-right",
-      });
+      toast.loading("Updating Progress Report");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Progress Report Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Progress Report Updated");
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Update Progress Report",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could Not Update Progress Report: ${error}`);
     },
   });
 
@@ -461,11 +427,6 @@ IPREditorProps) => {
     uneditableInitialConfig,
   ]);
 
-  const {
-    isOpen: isApproveProgressReportOpen,
-    onOpen: onOpenApproveProgressReport,
-    onClose: onCloseApproveProgressReport,
-  } = useDisclosure();
   const [reportHovered, setReportHovered] = useState(false);
   const [isActive, setIsActive] = useState(
     fullPRData?.document?.project?.status === "active",
@@ -485,76 +446,50 @@ IPREditorProps) => {
         isOpen={isApproveProgressReportOpen}
         onClose={onCloseApproveProgressReport}
       />
-      <Box
-        mx={4}
-        pos={"relative"}
-        roundedBottom={20}
-        roundedTop={20}
-        mb={4}
-        boxShadow={
-          "0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.1)"
-        }
-        bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
+      <div
+        className="mx-4 relative rounded-b-[20px] rounded-t-[20px] mb-4 shadow-[0_8px_24px_rgba(0,0,0,0.1),0_2px_8px_rgba(0,0,0,0.1)]"
+        style={{
+          backgroundColor: colorMode === "light" ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 0, 0, 0.5)"
+        }}
         onMouseOver={() => setReportHovered(true)}
         onMouseOut={() => setReportHovered(false)}
       >
         {reportHovered ? (
-          <Box pos={"absolute"} right={4} top={4}>
+          <div className="absolute right-4 top-4">
             <Button
-              ml={2}
-              bg={
+              className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
                 isActive
                   ? colorMode === "light"
-                    ? `orange.500`
-                    : `orange.600`
+                    ? "bg-orange-500 hover:bg-orange-600"
+                    : "bg-orange-600 hover:bg-orange-500"
                   : colorMode === "light"
-                    ? `green.500`
-                    : `green.600`
-              }
-              color={
-                colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.800"
-              }
-              _hover={
-                colorMode === "light"
-                  ? {
-                      bg: isActive ? `orange.600` : `green.600`,
-                      color: `white`,
-                    }
-                  : {
-                      bg: isActive ? `orange.500` : `green.500`,
-                      color: `white`,
-                    }
-              }
-              minW={"32px"}
-              minH={"32px"}
-              maxW={"32px"}
-              maxH={"32px"}
-              rounded={"full"}
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-green-600 hover:bg-green-500"
+              } ${
+                colorMode === "light" ? "text-white/90" : "text-white/80"
+              } hover:text-white`}
               data-tip="Click to edit"
               onClick={onOpenApproveProgressReport}
             >
-              <Icon as={isActive ? FaUndo : TiTick} />
+              {isActive ? <FaUndo /> : <TiTick />}
             </Button>
-          </Box>
+          </div>
         ) : null}
 
-        <Flex
+        <div
           id={`topContent_${fullPRData?.document?.project?.pk}`}
-          pt={6}
-          mx={8}
+          className="pt-6 mx-8 flex"
         >
           {!shouldAlternatePicture ? (
             <>
-              <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
-                <Image
+              <div className="rounded-md overflow-hidden w-[276px] h-[200px]">
+                <img
                   src={fullPRData?.document?.project?.image?.file ?? noImage}
-                  w={"100%"}
-                  h={"100%"}
-                  objectFit={"cover"}
+                  className="w-full h-full object-cover"
                 />
-              </Box>
-              <Box ml={4} flex={1}>
-                <Box>
+              </div>
+              <div className="ml-4 flex-1">
+                <div>
                   <ExtractedHTMLTitle
                     htmlContent={fullPRData?.document?.project?.title}
                     color={"blue.500"}
@@ -569,18 +504,18 @@ IPREditorProps) => {
                       // navigate(url);
                     }}
                   />
-                </Box>
+                </div>
 
                 <PRProjDetails
                   project={fullPRData?.document?.project}
                   team_members={fullPRData?.team_members}
                 />
-              </Box>
+              </div>
             </>
           ) : (
             <>
-              <Box mr={4} flex={1}>
-                <Box>
+              <div className="mr-4 flex-1">
+                <div>
                   <ExtractedHTMLTitle
                     htmlContent={fullPRData?.document?.project?.title}
                     color={"blue.500"}
@@ -595,24 +530,22 @@ IPREditorProps) => {
                     }}
                     noOfLines={4}
                   />
-                </Box>
+                </div>
 
                 <PRProjDetails
                   project={fullPRData?.document?.project}
                   team_members={fullPRData?.team_members}
                 />
-              </Box>
-              <Box rounded={"md"} overflow={"hidden"} w={"276px"} h={"200px"}>
-                <Image
+              </div>
+              <div className="rounded-md overflow-hidden w-[276px] h-[200px]">
+                <img
                   src={fullPRData?.document?.project?.image?.file ?? noImage}
-                  w={"100%"}
-                  h={"100%"}
-                  objectFit={"cover"}
+                  className="w-full h-full object-cover"
                 />
-              </Box>
+              </div>
             </>
           )}
-        </Flex>
+        </div>
         {/* Context */}
         <LexicalComposer
           key={`context-${initialConfigContext.editable}`}
@@ -642,10 +575,10 @@ IPREditorProps) => {
 
           {/* Text Area */}
           <RichTextPlugin
-            placeholder={<Text></Text>}
+            placeholder={<p></p>}
             contentEditable={
-              <Box
-                mt={4}
+              <div
+                className="mt-4"
                 onMouseOver={onMouseOverContext}
                 onMouseLeave={onMouseOutContext}
                 // bg={"red"}
@@ -658,44 +591,23 @@ IPREditorProps) => {
                   />
                 )}
 
-                <Box pos={"relative"}>
-                  <Text
-                    fontWeight={"bold"}
-                    fontSize={"lg"}
-                    px={8}
-                    ml={"2px"}
-                    mt={4}
+                <div className="relative">
+                  <p
+                    className="font-bold text-lg px-8 ml-0.5 mt-4"
                     // userSelect={"none"}
                   >
                     Context
-                  </Text>
+                  </p>
 
                   {isEditingContext === true ? (
-                    <Box pos={"absolute"} right={10} top={0}>
-                      <Flex flexDir={"row"}>
+                    <div className="absolute right-10 top-0">
+                      <div className="flex flex-row">
                         <Button
-                          bg={colorMode === "light" ? `green.500` : `green.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `green.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `green.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-green-500 hover:bg-green-600 text-white/90" 
+                              : "bg-green-600 hover:bg-green-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() =>
                             onSave({
@@ -705,77 +617,41 @@ IPREditorProps) => {
                             })
                           }
                         >
-                          <Icon as={FaSave} />
+                          <FaSave />
                         </Button>
 
                         <Button
-                          ml={2}
-                          bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `gray.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `gray.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                              : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() => setIsEditingContext(false)}
                         >
-                          <Icon as={AiFillEyeInvisible} />
+                          <AiFillEyeInvisible />
                         </Button>
-                      </Flex>
-                    </Box>
+                      </div>
+                    </div>
                   ) : isHoveredContext ? (
-                    <Box pos={"absolute"} right={10} top={0}>
+                    <div className="absolute right-10 top-0">
                       <Button
-                        ml={2}
-                        bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.800"
-                        }
-                        _hover={
-                          colorMode === "light"
-                            ? {
-                                bg: `gray.600`,
-                                color: `white`,
-                              }
-                            : {
-                                bg: `gray.500`,
-                                color: `white`,
-                              }
-                        }
-                        minW={"32px"}
-                        minH={"32px"}
-                        maxW={"32px"}
-                        maxH={"32px"}
-                        rounded={"full"}
+                        className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                          colorMode === "light" 
+                            ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                            : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                        } hover:text-white`}
                         data-tip="Click to Save"
                         onClick={() => setIsEditingContext(true)}
                       >
-                        <Icon as={AiFillEdit} />
+                        <AiFillEdit />
                       </Button>
-                    </Box>
+                    </div>
                   ) : null}
-                </Box>
+                </div>
 
-                <Box mt={"-15px"} className="editor-scroller">
-                  <Box
+                <div className="mt-[-15px] editor-scroller">
+                  <div
                     //   className="editor"
                     //   ref={onRef}
                     style={{
@@ -797,14 +673,14 @@ IPREditorProps) => {
 
                       // autoFocus
                     />
-                  </Box>
-                </Box>
-                {/* <Box>Editor: {editorText}</Box> */}
-              </Box>
+                  </div>
+                </div>
+                {/* <div>Editor: {editorText}</div> */}
+              </div>
             }
             // placeholder={
             //     isEditing ?
-            //         <Box
+            //         <div
             //             style={{
             //                 position: "absolute",
             //                 left: `${24 + dragBtnMargin}px`,
@@ -815,7 +691,7 @@ IPREditorProps) => {
             //             }}
             //         >
             //             {`Enter text...`}
-            //         </Box>
+            //         </div>
             //         : null
             // }
             ErrorBoundary={LexicalErrorBoundary}
@@ -855,10 +731,10 @@ IPREditorProps) => {
 
           {/* Text Area */}
           <RichTextPlugin
-            placeholder={<Text></Text>}
+            placeholder={<p></p>}
             contentEditable={
-              <Box
-                mt={4}
+              <div
+                className="mt-4"
                 onMouseOver={onMouseOverAims}
                 onMouseLeave={onMouseOutAims}
                 // bg={"red"}
@@ -871,44 +747,23 @@ IPREditorProps) => {
                   />
                 )}
 
-                <Box pos={"relative"}>
-                  <Text
-                    fontWeight={"bold"}
-                    fontSize={"lg"}
-                    px={8}
-                    ml={"2px"}
-                    mt={4}
+                <div className="relative">
+                  <p
+                    className="font-bold text-lg px-8 ml-0.5 mt-4"
                     // userSelect={"none"}
                   >
                     Aims
-                  </Text>
+                  </p>
 
                   {isEditingAims === true ? (
-                    <Box pos={"absolute"} right={10} top={0}>
-                      <Flex flexDir={"row"}>
+                    <div className="absolute right-10 top-0">
+                      <div className="flex flex-row">
                         <Button
-                          bg={colorMode === "light" ? `green.500` : `green.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `green.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `green.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-green-500 hover:bg-green-600 text-white/90" 
+                              : "bg-green-600 hover:bg-green-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() =>
                             onSave({
@@ -918,77 +773,41 @@ IPREditorProps) => {
                             })
                           }
                         >
-                          <Icon as={FaSave} />
+                          <FaSave />
                         </Button>
 
                         <Button
-                          ml={2}
-                          bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `gray.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `gray.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                              : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() => setIsEditingAims(false)}
                         >
-                          <Icon as={AiFillEyeInvisible} />
+                          <AiFillEyeInvisible />
                         </Button>
-                      </Flex>
-                    </Box>
+                      </div>
+                    </div>
                   ) : isHoveredAims ? (
-                    <Box pos={"absolute"} right={10} top={0}>
+                    <div className="absolute right-10 top-0">
                       <Button
-                        ml={2}
-                        bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.800"
-                        }
-                        _hover={
-                          colorMode === "light"
-                            ? {
-                                bg: `gray.600`,
-                                color: `white`,
-                              }
-                            : {
-                                bg: `gray.500`,
-                                color: `white`,
-                              }
-                        }
-                        minW={"32px"}
-                        minH={"32px"}
-                        maxW={"32px"}
-                        maxH={"32px"}
-                        rounded={"full"}
+                        className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                          colorMode === "light" 
+                            ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                            : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                        } hover:text-white`}
                         data-tip="Click to Save"
                         onClick={() => setIsEditingAims(true)}
                       >
-                        <Icon as={AiFillEdit} />
+                        <AiFillEdit />
                       </Button>
-                    </Box>
+                    </div>
                   ) : null}
-                </Box>
+                </div>
 
-                <Box mt={"-15px"} className="editor-scroller">
-                  <Box
+                <div className="mt-[-15px] editor-scroller">
+                  <div
                     //   className="editor"
                     //   ref={onRef}
                     style={{
@@ -1010,14 +829,14 @@ IPREditorProps) => {
 
                       // autoFocus
                     />
-                  </Box>
-                </Box>
-                {/* <Box>Editor: {editorText}</Box> */}
-              </Box>
+                  </div>
+                </div>
+                {/* <div>Editor: {editorText}</div> */}
+              </div>
             }
             // placeholder={
             //     isEditing ?
-            //         <Box
+            //         <div
             //             style={{
             //                 position: "absolute",
             //                 left: `${24 + dragBtnMargin}px`,
@@ -1028,7 +847,7 @@ IPREditorProps) => {
             //             }}
             //         >
             //             {`Enter text...`}
-            //         </Box>
+            //         </div>
             //         : null
             // }
             ErrorBoundary={LexicalErrorBoundary}
@@ -1068,10 +887,10 @@ IPREditorProps) => {
 
           {/* Text Area */}
           <RichTextPlugin
-            placeholder={<Text></Text>}
+            placeholder={<p></p>}
             contentEditable={
-              <Box
-                mt={4}
+              <div
+                className="mt-4"
                 onMouseOver={onMouseOverProgress}
                 onMouseLeave={onMouseOutProgress}
                 // bg={"red"}
@@ -1084,44 +903,23 @@ IPREditorProps) => {
                   />
                 )}
 
-                <Box pos={"relative"}>
-                  <Text
-                    fontWeight={"bold"}
-                    fontSize={"lg"}
-                    px={8}
-                    ml={"2px"}
-                    mt={4}
+                <div className="relative">
+                  <p
+                    className="font-bold text-lg px-8 ml-0.5 mt-4"
                     // userSelect={"none"}
                   >
                     Progress
-                  </Text>
+                  </p>
 
                   {isEditingProgress === true ? (
-                    <Box pos={"absolute"} right={10} top={0}>
-                      <Flex flexDir={"row"}>
+                    <div className="absolute right-10 top-0">
+                      <div className="flex flex-row">
                         <Button
-                          bg={colorMode === "light" ? `green.500` : `green.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `green.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `green.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-green-500 hover:bg-green-600 text-white/90" 
+                              : "bg-green-600 hover:bg-green-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() =>
                             onSave({
@@ -1131,77 +929,41 @@ IPREditorProps) => {
                             })
                           }
                         >
-                          <Icon as={FaSave} />
+                          <FaSave />
                         </Button>
 
                         <Button
-                          ml={2}
-                          bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `gray.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `gray.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                              : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() => setIsEditingProgress(false)}
                         >
-                          <Icon as={AiFillEyeInvisible} />
+                          <AiFillEyeInvisible />
                         </Button>
-                      </Flex>
-                    </Box>
+                      </div>
+                    </div>
                   ) : isHoveredProgress ? (
-                    <Box pos={"absolute"} right={10} top={0}>
+                    <div className="absolute right-10 top-0">
                       <Button
-                        ml={2}
-                        bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.800"
-                        }
-                        _hover={
-                          colorMode === "light"
-                            ? {
-                                bg: `gray.600`,
-                                color: `white`,
-                              }
-                            : {
-                                bg: `gray.500`,
-                                color: `white`,
-                              }
-                        }
-                        minW={"32px"}
-                        minH={"32px"}
-                        maxW={"32px"}
-                        maxH={"32px"}
-                        rounded={"full"}
+                        className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                          colorMode === "light" 
+                            ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                            : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                        } hover:text-white`}
                         data-tip="Click to Save"
                         onClick={() => setIsEditingProgress(true)}
                       >
-                        <Icon as={AiFillEdit} />
+                        <AiFillEdit />
                       </Button>
-                    </Box>
+                    </div>
                   ) : null}
-                </Box>
+                </div>
 
-                <Box mt={"-15px"} className="editor-scroller">
-                  <Box
+                <div className="mt-[-15px] editor-scroller">
+                  <div
                     //   className="editor"
                     //   ref={onRef}
                     style={{
@@ -1223,14 +985,14 @@ IPREditorProps) => {
 
                       // autoFocus
                     />
-                  </Box>
-                </Box>
-                {/* <Box>Editor: {editorText}</Box> */}
-              </Box>
+                  </div>
+                </div>
+                {/* <div>Editor: {editorText}</div> */}
+              </div>
             }
             // placeholder={
             //     isEditing ?
-            //         <Box
+            //         <div
             //             style={{
             //                 position: "absolute",
             //                 left: `${24 + dragBtnMargin}px`,
@@ -1241,7 +1003,7 @@ IPREditorProps) => {
             //             }}
             //         >
             //             {`Enter text...`}
-            //         </Box>
+            //         </div>
             //         : null
             // }
             ErrorBoundary={LexicalErrorBoundary}
@@ -1281,10 +1043,10 @@ IPREditorProps) => {
 
           {/* Text Area */}
           <RichTextPlugin
-            placeholder={<Text></Text>}
+            placeholder={<p></p>}
             contentEditable={
-              <Box
-                mt={4}
+              <div
+                className="mt-4"
                 onMouseOver={onMouseOverImplications}
                 onMouseLeave={onMouseOutImplications}
                 // bg={"red"}
@@ -1297,44 +1059,23 @@ IPREditorProps) => {
                   />
                 )}
 
-                <Box pos={"relative"}>
-                  <Text
-                    fontWeight={"bold"}
-                    fontSize={"lg"}
-                    px={8}
-                    ml={"2px"}
-                    mt={4}
+                <div className="relative">
+                  <p
+                    className="font-bold text-lg px-8 ml-0.5 mt-4"
                     // userSelect={"none"}
                   >
                     Management Implications
-                  </Text>
+                  </p>
 
                   {isEditingImplications === true ? (
-                    <Box pos={"absolute"} right={10} top={0}>
-                      <Flex flexDir={"row"}>
+                    <div className="absolute right-10 top-0">
+                      <div className="flex flex-row">
                         <Button
-                          bg={colorMode === "light" ? `green.500` : `green.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `green.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `green.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-green-500 hover:bg-green-600 text-white/90" 
+                              : "bg-green-600 hover:bg-green-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() =>
                             onSave({
@@ -1344,77 +1085,41 @@ IPREditorProps) => {
                             })
                           }
                         >
-                          <Icon as={FaSave} />
+                          <FaSave />
                         </Button>
 
                         <Button
-                          ml={2}
-                          bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `gray.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `gray.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                              : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() => setIsEditingImplications(false)}
                         >
-                          <Icon as={AiFillEyeInvisible} />
+                          <AiFillEyeInvisible />
                         </Button>
-                      </Flex>
-                    </Box>
+                      </div>
+                    </div>
                   ) : isHoveredImplications ? (
-                    <Box pos={"absolute"} right={10} top={0}>
+                    <div className="absolute right-10 top-0">
                       <Button
-                        ml={2}
-                        bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.800"
-                        }
-                        _hover={
-                          colorMode === "light"
-                            ? {
-                                bg: `gray.600`,
-                                color: `white`,
-                              }
-                            : {
-                                bg: `gray.500`,
-                                color: `white`,
-                              }
-                        }
-                        minW={"32px"}
-                        minH={"32px"}
-                        maxW={"32px"}
-                        maxH={"32px"}
-                        rounded={"full"}
+                        className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                          colorMode === "light" 
+                            ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                            : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                        } hover:text-white`}
                         data-tip="Click to Save"
                         onClick={() => setIsEditingImplications(true)}
                       >
-                        <Icon as={AiFillEdit} />
+                        <AiFillEdit />
                       </Button>
-                    </Box>
+                    </div>
                   ) : null}
-                </Box>
+                </div>
 
-                <Box mt={"-15px"} className="editor-scroller">
-                  <Box
+                <div className="mt-[-15px] editor-scroller">
+                  <div
                     //   className="editor"
                     //   ref={onRef}
                     style={{
@@ -1436,14 +1141,14 @@ IPREditorProps) => {
 
                       // autoFocus
                     />
-                  </Box>
-                </Box>
-                {/* <Box>Editor: {editorText}</Box> */}
-              </Box>
+                  </div>
+                </div>
+                {/* <div>Editor: {editorText}</div> */}
+              </div>
             }
             // placeholder={
             //     isEditing ?
-            //         <Box
+            //         <div
             //             style={{
             //                 position: "absolute",
             //                 left: `${24 + dragBtnMargin}px`,
@@ -1454,7 +1159,7 @@ IPREditorProps) => {
             //             }}
             //         >
             //             {`Enter text...`}
-            //         </Box>
+            //         </div>
             //         : null
             // }
             ErrorBoundary={LexicalErrorBoundary}
@@ -1494,10 +1199,10 @@ IPREditorProps) => {
 
           {/* Text Area */}
           <RichTextPlugin
-            placeholder={<Text></Text>}
+            placeholder={<p></p>}
             contentEditable={
-              <Box
-                mt={4}
+              <div
+                className="mt-4"
                 onMouseOver={onMouseOverFuture}
                 onMouseLeave={onMouseOutFuture}
                 // bg={"red"}
@@ -1510,44 +1215,23 @@ IPREditorProps) => {
                   />
                 )}
 
-                <Box pos={"relative"}>
-                  <Text
-                    fontWeight={"bold"}
-                    fontSize={"lg"}
-                    px={8}
-                    ml={"2px"}
-                    mt={4}
+                <div className="relative">
+                  <p
+                    className="font-bold text-lg px-8 ml-0.5 mt-4"
                     // userSelect={"none"}
                   >
                     Future Directions
-                  </Text>
+                  </p>
 
                   {isEditingFuture === true ? (
-                    <Box pos={"absolute"} right={10} top={0}>
-                      <Flex flexDir={"row"}>
+                    <div className="absolute right-10 top-0">
+                      <div className="flex flex-row">
                         <Button
-                          bg={colorMode === "light" ? `green.500` : `green.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `green.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `green.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-green-500 hover:bg-green-600 text-white/90" 
+                              : "bg-green-600 hover:bg-green-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() =>
                             onSave({
@@ -1557,77 +1241,41 @@ IPREditorProps) => {
                             })
                           }
                         >
-                          <Icon as={FaSave} />
+                          <FaSave />
                         </Button>
 
                         <Button
-                          ml={2}
-                          bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                          color={
-                            colorMode === "light"
-                              ? "whiteAlpha.900"
-                              : "whiteAlpha.800"
-                          }
-                          _hover={
-                            colorMode === "light"
-                              ? {
-                                  bg: `gray.600`,
-                                  color: `white`,
-                                }
-                              : {
-                                  bg: `gray.500`,
-                                  color: `white`,
-                                }
-                          }
-                          minW={"32px"}
-                          minH={"32px"}
-                          maxW={"32px"}
-                          maxH={"32px"}
-                          rounded={"full"}
+                          className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                            colorMode === "light" 
+                              ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                              : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                          } hover:text-white`}
                           data-tip="Click to Save"
                           onClick={() => setIsEditingFuture(false)}
                         >
-                          <Icon as={AiFillEyeInvisible} />
+                          <AiFillEyeInvisible />
                         </Button>
-                      </Flex>
-                    </Box>
+                      </div>
+                    </div>
                   ) : isHoveredFuture ? (
-                    <Box pos={"absolute"} right={10} top={0}>
+                    <div className="absolute right-10 top-0">
                       <Button
-                        ml={2}
-                        bg={colorMode === "light" ? `gray.500` : `gray.600`}
-                        color={
-                          colorMode === "light"
-                            ? "whiteAlpha.900"
-                            : "whiteAlpha.800"
-                        }
-                        _hover={
-                          colorMode === "light"
-                            ? {
-                                bg: `gray.600`,
-                                color: `white`,
-                              }
-                            : {
-                                bg: `gray.500`,
-                                color: `white`,
-                              }
-                        }
-                        minW={"32px"}
-                        minH={"32px"}
-                        maxW={"32px"}
-                        maxH={"32px"}
-                        rounded={"full"}
+                        className={`ml-2 min-w-8 min-h-8 max-w-8 max-h-8 rounded-full ${
+                          colorMode === "light" 
+                            ? "bg-gray-500 hover:bg-gray-600 text-white/90" 
+                            : "bg-gray-600 hover:bg-gray-500 text-white/80"
+                        } hover:text-white`}
                         data-tip="Click to Save"
                         onClick={() => setIsEditingFuture(true)}
                       >
-                        <Icon as={AiFillEdit} />
+                        <AiFillEdit />
                       </Button>
-                    </Box>
+                    </div>
                   ) : null}
-                </Box>
+                </div>
 
-                <Box mt={"-15px"} className="editor-scroller">
-                  <Box
+                <div className="mt-[-15px] editor-scroller">
+                  <div
                     //   className="editor"
                     //   ref={onRef}
                     style={{
@@ -1649,14 +1297,14 @@ IPREditorProps) => {
 
                       // autoFocus
                     />
-                  </Box>
-                </Box>
-                {/* <Box>Editor: {editorText}</Box> */}
-              </Box>
+                  </div>
+                </div>
+                {/* <div>Editor: {editorText}</div> */}
+              </div>
             }
             // placeholder={
             //     isEditing ?
-            //         <Box
+            //         <div
             //             style={{
             //                 position: "absolute",
             //                 left: `${24 + dragBtnMargin}px`,
@@ -1667,7 +1315,7 @@ IPREditorProps) => {
             //             }}
             //         >
             //             {`Enter text...`}
-            //         </Box>
+            //         </div>
             //         : null
             // }
             ErrorBoundary={LexicalErrorBoundary}
@@ -1677,7 +1325,7 @@ IPREditorProps) => {
           <ListMaxIndentLevelPlugin maxDepth={3} />
           <AutoFocusPlugin />
         </LexicalComposer>
-      </Box>
+      </div>
     </>
   );
 };

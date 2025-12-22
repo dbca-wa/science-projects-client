@@ -1,41 +1,8 @@
 // Modal for editing user details
 
 import { useUser } from "@/features/users/hooks/useUser";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Grid,
-  Icon,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputLeftElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  type ToastId,
-  type UseToastOptions,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { AiFillPhone } from "react-icons/ai";
 import { GiGraduateCap } from "react-icons/gi";
@@ -55,6 +22,31 @@ import type { IAffiliation, IBranch, IBusinessArea, IUserData } from "@/shared/t
 import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
 import { StatefulMediaChanger } from "@/features/admin/components/StatefulMediaChanger";
 import DatabaseRichTextEditor from "@/features/staff-profiles/components/Editor/DatabaseRichTextEditor";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -72,7 +64,7 @@ export const EditUserDetailsModal = ({
   businessAreas,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -81,7 +73,7 @@ export const EditUserDetailsModal = ({
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose(); // Close the modal when the toast is manually closed
   };
 
@@ -102,11 +94,11 @@ export const EditUserDetailsModal = ({
   const titleBorderColor = `${
     colorMode === "light"
       ? hoveredTitle
-        ? "blackAlpha.300"
-        : "blackAlpha.200"
+        ? "border-gray-300"
+        : "border-gray-200"
       : hoveredTitle
-        ? "whiteAlpha.400"
-        : "whiteAlpha.300"
+        ? "border-gray-400"
+        : "border-gray-300"
   }`;
 
   // // Regex for validity of phone variable
@@ -147,13 +139,6 @@ export const EditUserDetailsModal = ({
     }
   }, [userData, userLoading]);
 
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const { reFetch } = useUserSearchContext();
 
   // Mutation, query client, onsubmit, and api function
@@ -167,12 +152,8 @@ export const EditUserDetailsModal = ({
     // Start of mutation handling
     mutationFn: adminUpdateUser,
     onMutate: () => {
-      addToast({
-        title: "Updating membership...",
+      toast.loading("Updating membership...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
@@ -182,16 +163,9 @@ export const EditUserDetailsModal = ({
       queryClient.refetchQueries({ queryKey: [`membership`, user.pk] });
       queryClient.refetchQueries({ queryKey: [`profile`, user.pk] });
       reFetch();
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Information Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Information Updated`,
+      });
       onClose?.();
     },
     // Error handling based on API - file - declared interface
@@ -230,16 +204,9 @@ export const EditUserDetailsModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 

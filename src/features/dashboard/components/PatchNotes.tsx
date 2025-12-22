@@ -1,4 +1,3 @@
-import { Flex, List, Text } from "@chakra-ui/react";
 import PatchNoteEntry from "./PatchNoteEntry";
 
 const PatchNotes = () => {
@@ -6,16 +5,11 @@ const PatchNotes = () => {
 
   return (
     <div className="rounded-xl bg-gray-200 p-4">
-      <Flex flexDir={"column"}>
-        <Text
-          my={2}
-          fontSize={"16px"}
-          fontWeight={"semibold"}
-          // onClick={() => localStorage.removeItem("confettiCount")}
-        >
+      <div className="flex flex-col">
+        <h3 className="my-2 text-base font-semibold select-none">
           &#127881; SPMS {VERSION} Patch Notes &#127881;
-        </Text>
-        <List spacing={1} ml={2} userSelect={"none"}>
+        </h3>
+        <ul className="space-y-1 ml-2 select-none">
           <PatchNoteEntry
             title={"Prince Issues Fixed"}
             kind="fix"
@@ -28,8 +22,8 @@ const PatchNotes = () => {
             kind="update"
             description={"Servers and dependencies updated."}
           />
-        </List>
-      </Flex>
+        </ul>
+      </div>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { createEmployment } from "@/features/staff-profiles/services/staff-profiles.service";
 import type { IStaffEmploymentEntry } from "@/shared/types";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
@@ -30,16 +30,11 @@ const AddStaffEmploymentContent = ({
     mode: "onChange", // or "onBlur"
   });
 
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createEmployment,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
-      });
+      toast.success("Created");
       await queryClient.invalidateQueries({
         queryKey: ["employment", usersPk],
       });

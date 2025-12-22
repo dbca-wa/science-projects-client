@@ -1,6 +1,7 @@
 // Modern Breadcrumb component in header
 
-import { Button, Center, Flex, Icon, useColorMode } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { motion } from "framer-motion";
 import { Fragment } from "react";
 import { AiFillHome } from "react-icons/ai";
@@ -37,10 +38,9 @@ export const ModernBreadcrumb = () => {
             size="sm"
             onClick={handleClick}
             variant="link"
-            color={colorMode === "light" ? "blue.500" : "blue.300"}
-            _hover={{
-              color: colorMode === "light" ? "blue.400" : "blue.200",
-            }}
+            className={`${
+              colorMode === "light" ? "text-blue-500 hover:text-blue-400" : "text-blue-300 hover:text-blue-200"
+            }`}
           >
             {capitalizedPage}
           </Button>
@@ -51,11 +51,9 @@ export const ModernBreadcrumb = () => {
             size="sm"
             onClick={handleClick}
             variant="link"
-            color={colorMode === "light" ? "blue.500" : "blue.300"}
-            _hover={{
-              color: colorMode === "light" ? "blue.400" : "blue.200",
-            }}
-            fontWeight="normal" // Set fontWeight to normal for the last breadcrumb item
+            className={`font-normal ${
+              colorMode === "light" ? "text-blue-500 hover:text-blue-400" : "text-blue-300 hover:text-blue-200"
+            }`}
           >
             {capitalizedPage}
           </Button>
@@ -68,26 +66,23 @@ export const ModernBreadcrumb = () => {
 
   return (
     <motion.div initial={{ opacity: 1, y: 0 }}>
-      <Flex
-        bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
-        rounded={6}
-        pos="relative"
-        justifyContent="space-between"
-        userSelect="none"
-        ml="2.5rem"
-        py={1}
-        px={2}
+      <div
+        className={`${
+          colorMode === "dark" ? "bg-gray-700" : "bg-gray-100"
+        } rounded-md relative flex justify-between select-none ml-10 py-1 px-2`}
       >
         {isBaseRoute ? (
-          <Center
-            color={colorMode === "light" ? "blue.500" : "blue.300"}
+          <div
+            className={`flex items-center justify-center cursor-pointer ${
+              colorMode === "light" ? "text-blue-500" : "text-blue-300"
+            }`}
             onClick={updateHome}
           >
-            <Icon as={AiFillHome} />
-          </Center>
+            <AiFillHome />
+          </div>
         ) : null}
-        <Flex>{breadcrumbItems}</Flex>
-      </Flex>
+        <div className="flex">{breadcrumbItems}</div>
+      </div>
     </motion.div>
   );
 };

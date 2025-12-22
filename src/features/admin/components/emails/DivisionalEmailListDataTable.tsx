@@ -20,21 +20,14 @@ import {
 } from "@tanstack/react-table";
 import { Input } from "@/shared/components/ui/input";
 import type { IProjectData, ProjectRoles } from "@/shared/types";
+import { Button } from "@/shared/components/ui/button";
 import {
-  Box,
-  Button,
-  Flex,
-  Icon,
-  Image,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Text,
-  Tooltip,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
@@ -56,7 +49,7 @@ import { MdScience } from "react-icons/md";
 import { RiBook3Fill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/shared/components/ui/checkbox";
-import { AddIcon } from "@chakra-ui/icons";
+import { Plus } from "lucide-react";
 import AddRemoveUserFromEmailListModal from "./AddRemoveUserFromEmailListModal";
 
 export type EmailListColumnTypes = "name" | "slug" | "directorate_email_list";
@@ -106,27 +99,26 @@ const DivisionalEmailListDataTable = ({
         return (
           <Button
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex w-full justify-start"
-            rightIcon={sortIcon}
-            bg={"transparent"}
-            _hover={
+            className={`flex w-full justify-start ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
+            variant="ghost"
           >
             Name
+            {sortIcon}
           </Button>
         );
       },
       cell: ({ row }) => {
         const originalDivisionName = row?.original?.name || "Unset";
         return (
-          <Box className="text-start align-middle font-medium">
-            <Text className="pl-4 break-words whitespace-normal">
+          <div className="text-start align-middle font-medium">
+            <p className="pl-4 break-words whitespace-normal">
               {originalDivisionName}
-            </Text>
-          </Box>
+            </p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -152,29 +144,27 @@ const DivisionalEmailListDataTable = ({
 
         return (
           <Button
-            bg={"transparent"}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="flex w-full justify-start"
-            rightIcon={sortIcon}
-            justifyContent={"flex-start"}
-            _hover={
+            className={`flex w-full justify-start ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
+            variant="ghost"
           >
             Slug
+            {sortIcon}
           </Button>
         );
       },
       cell: ({ row }) => {
         const originalDivisionSlug = row?.original?.slug || "Unset";
         return (
-          <Box className="flex w-full justify-start pl-4">
-            <Text className="break-words whitespace-normal">
+          <div className="flex w-full justify-start pl-4">
+            <p className="break-words whitespace-normal">
               {originalDivisionSlug}
-            </Text>
-          </Box>
+            </p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -210,15 +200,14 @@ const DivisionalEmailListDataTable = ({
         }
         return (
           <Button
-            className="flex w-full justify-center"
-            leftIcon={<FaEnvelope />}
-            bg={"transparent"}
-            _hover={
+            className={`flex w-full justify-center ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white", cursor: "default" }
-                : { bg: "blue.50", color: "black", cursor: "default" }
-            }
+                ? "hover:bg-blue-400 hover:text-white cursor-default"
+                : "hover:bg-blue-50 hover:text-black cursor-default"
+            }`}
+            variant="ghost"
           >
+            <FaEnvelope className="mr-2" />
             Directorate Email List
           </Button>
         );
@@ -228,12 +217,13 @@ const DivisionalEmailListDataTable = ({
           "directorate_email_list",
         );
 
-        const { isOpen, onOpen, onClose } = useDisclosure();
-        const {
-          isOpen: isAddRemoveUserModalOpen,
-          onOpen: onAddRemoveUserModalOpen,
-          onClose: onAddRemoveUserModalClose,
-        } = useDisclosure();
+        const [isOpen, setIsOpen] = useState(false);
+        const onOpen = () => setIsOpen(true);
+        const onClose = () => setIsOpen(false);
+        
+        const [isAddRemoveUserModalOpen, setIsAddRemoveUserModalOpen] = useState(false);
+        const onAddRemoveUserModalOpen = () => setIsAddRemoveUserModalOpen(true);
+        const onAddRemoveUserModalClose = () => setIsAddRemoveUserModalOpen(false);
 
         const divisionPk = row.original.pk;
 
@@ -273,8 +263,8 @@ const DivisionalEmailListDataTable = ({
               //   action={action}
               currentList={listData}
             />
-            <Flex className="flex w-full justify-between">
-              <Box className="max-w-full overflow-hidden text-start align-middle font-medium">
+            <div className="flex w-full justify-between">
+              <div className="max-w-full overflow-hidden text-start align-middle font-medium">
                 {Array.isArray(listData) && listData.length > 0 ? (
                   <ul className="list-disc pl-5">
                     {listData.map((u) => (
@@ -287,30 +277,25 @@ const DivisionalEmailListDataTable = ({
                     ))}
                   </ul>
                 ) : (
-                  <Text color="gray.500">No users</Text>
+                  <p className="text-gray-500">No users</p>
                 )}
-              </Box>
-              <Box className="flex items-center justify-end">
-                <Menu isOpen={isOpen} onClose={onClose}>
-                  <MenuButton
-                    as={Button}
-                    size="sm"
-                    variant="ghost"
-                    onClick={onOpen}
-                  >
-                    <MoreVerticalIcon size={16} />
-                  </MenuButton>
-                  <MenuList>
-                    <MenuItem
-                      icon={<PencilIcon size={12} />}
-                      onClick={handleAddRemoveUser}
-                    >
+              </div>
+              <div className="flex items-center justify-end">
+                <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="sm" variant="ghost">
+                      <MoreVerticalIcon size={16} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={handleAddRemoveUser}>
+                      <PencilIcon size={12} className="mr-2" />
                       Adjust List
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              </Box>
-            </Flex>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
           </>
         );
       },

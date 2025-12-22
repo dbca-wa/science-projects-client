@@ -18,7 +18,7 @@ import {
 	createCommand,
 } from "lexical";
 
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { $generateNodesFromDOM } from "@lexical/html";
 import { useEffect } from "react";
 

@@ -1,17 +1,8 @@
 import { remedyLeaderlessProjects } from "@/features/admin/services/admin.service";
 import type { IProjectData } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  List,
-  ListItem,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef } from "react";
@@ -28,30 +19,18 @@ export const RemedyLeaderlessProjectsModalContent = ({
   onClose,
 }: Props) => {
   const { colorMode } = useColorMode();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+  const ToastIdRef = useRef<string | number | undefined>(undefined);
 
   const mutation = useMutation({
     mutationFn: remedyLeaderlessProjects,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Attempting to remedy leaderless Projects",
-        position: "top-right",
-      });
+      ToastIdRef.current = toast.loading("Attempting to remedy leaderless Projects");
     },
     onSuccess: async () => {
       if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Complete`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
+        toast.success("Success", {
+          description: "Complete",
+          id: ToastIdRef.current,
         });
       }
       refreshDataFn?.();
@@ -59,17 +38,13 @@ export const RemedyLeaderlessProjectsModalContent = ({
     },
     onError: (error: AxiosError) => {
       if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Encountered an error",
+        toast.error("Encountered an error", {
           description: error?.response?.data
             ? `${error.response.status}: ${
                 Object.values(error.response.data)[0]
               }`
             : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
+          id: ToastIdRef.current,
         });
       }
     },
@@ -81,37 +56,33 @@ export const RemedyLeaderlessProjectsModalContent = ({
 
   return (
     <>
-      <Box>
-        <List>
-          <ListItem>- All leaderless projects will be affected</ListItem>
-          <ListItem>
+      <div>
+        <ul className="list-disc ml-4">
+          <li>- All leaderless projects will be affected</li>
+          <li>
             - The function will check which member has the is_leader property
             set to true
-          </ListItem>
-          <ListItem>- This user will get the Project Lead tag</ListItem>
-          <ListItem>
+          </li>
+          <li>- This user will get the Project Lead tag</li>
+          <li>
             - This will weed out the remaining leaderless projects as they will
             not have the is_leader property anywhere
-          </ListItem>
-        </List>
-        <Text color={colorMode === "light" ? "blue.500" : "blue.300"} my={2}>
+          </li>
+        </ul>
+        <p className={`my-2 ${colorMode === "light" ? "text-blue-500" : "text-blue-300"}`}>
           Caution: This will update all projects with members but no leader tag.
-        </Text>
-        <Flex justifyContent={"flex-end"} py={4}>
-          <Box>
+        </p>
+        <div className="flex justify-end py-4">
+          <div>
             <Button
-              bg={"green.500"}
-              color={"white"}
-              _hover={{
-                bg: "green.400",
-              }}
+              className="bg-green-500 text-white hover:bg-green-400"
               onClick={onRemedy}
             >
               Remedy
             </Button>
-          </Box>
-        </Flex>
-      </Box>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

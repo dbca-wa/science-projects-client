@@ -1,31 +1,23 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
-import {
-  Button,
-  Center,
-  Flex,
-  Grid,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   MutationError,
   MutationSuccess,
   cancelCaretakerRequest,
 } from "@/features/users/services/users.service";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -41,7 +33,7 @@ export const CancelCaretakerRequestModal = ({
   taskPk,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -50,15 +42,8 @@ export const CancelCaretakerRequestModal = ({
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
-  };
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
   };
 
   const queryClient = useQueryClient();
@@ -71,26 +56,15 @@ export const CancelCaretakerRequestModal = ({
     // Start of mutation handling
     mutationFn: cancelCaretakerRequest,
     onMutate: () => {
-      addToast({
-        title: "Cancelling request...",
+      toast.loading("Cancelling request...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Your request has been cancelled.`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Your request has been cancelled.`,
+      });
       queryClient
         .invalidateQueries({
           queryKey: ["pendingAdminTasks"],
@@ -134,16 +108,9 @@ export const CancelCaretakerRequestModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -153,57 +120,59 @@ export const CancelCaretakerRequestModal = ({
       taskPk: formData.taskPk,
     });
   };
+  
   useEffect(() => {
     console.log({ taskPk: taskPk });
   }, [taskPk]);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
-      <ModalOverlay />
-      <Flex>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Cancel Request?</ModalHeader>
-          <ModalCloseButton />
-
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to cancel your caretaker request?
-              </Text>
-            </Center>
-            <Text mt={4}>Your request will be removed from the system.</Text>
-            <Text mt={4}>
-              If you would still like to proceed, press "Cancel Request".
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }} // isDisabled={!changesMade}
-                isLoading={cancelCaretakerRequestMutation.isPending}
-                onClick={() =>
-                  onSubmit({
-                    taskPk,
-                  })
-                }
-                ml={3}
-              >
-                Cancel Request
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent 
+        className={`max-w-lg ${
+          colorMode === "dark" 
+            ? "bg-gray-800 text-gray-400 border-gray-700" 
+            : "bg-white text-gray-900 border-gray-200"
+        }`}
+      >
+        <DialogHeader>
+          <DialogTitle>Cancel Request?</DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <p className="font-bold text-xl">
+                  Are you sure you want to cancel your caretaker request?
+                </p>
+              </div>
+              <p>Your request will be removed from the system.</p>
+              <p>
+                If you would still like to proceed, press "Cancel Request".
+              </p>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-red-500 hover:bg-red-400" 
+                  : "bg-red-600 hover:bg-red-500"
+              }`}
+              disabled={cancelCaretakerRequestMutation.isPending}
+              onClick={() =>
+                onSubmit({
+                  taskPk,
+                })
+              }
+            >
+              {cancelCaretakerRequestMutation.isPending ? "Loading..." : "Cancel Request"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

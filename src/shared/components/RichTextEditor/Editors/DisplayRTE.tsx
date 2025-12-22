@@ -1,6 +1,6 @@
 // An RTE SOLELY FOR displaying HTML RT Data - Guide and BA
 // No modals, no functions
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 // Lexical
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";

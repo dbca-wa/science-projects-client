@@ -1,14 +1,6 @@
 // Toolbar for the simple rich text editor
 
-import {
-  Box,
-  Flex,
-  Text,
-  useBreakpointValue,
-  useColorMode,
-} from "@chakra-ui/react";
-
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FaBold, FaItalic, FaRedo, FaUnderline, FaUndo } from "react-icons/fa";
 import { ImClearFormatting } from "react-icons/im";
 import { MdSubscript, MdSuperscript } from "react-icons/md";
@@ -53,6 +45,30 @@ import {
 
 import { $isCodeHighlightNode } from "@lexical/code";
 import { $isHeadingNode } from "@lexical/rich-text";
+
+// Import for ElementSelector
+import { BsChatSquareQuoteFill, BsTextParagraph } from "react-icons/bs";
+import { FaCaretDown, FaCode } from "react-icons/fa";
+import {
+  LuHeading1,
+  LuHeading2,
+  LuHeading3,
+  LuHeading4,
+  LuHeading5,
+  LuHeading6,
+} from "react-icons/lu";
+import { MdFormatListBulleted, MdFormatListNumbered } from "react-icons/md";
+import { TbChecklist } from "react-icons/tb";
+import AddImageButton from "../Buttons/AddImageButton";
+import { TableDropdown } from "../Buttons/TableDropdown";
+import { Button } from "@/shared/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { cn } from "@/shared/utils";
 
 interface ToolbarProps {
   editor: LexicalEditor;
@@ -314,38 +330,10 @@ export const RevisedRichTextToolbar = ({
       }
     };
 
-    const boldEtcCanRender = useBreakpointValue({
-      base: true,
-      sm: true,
-      md: true,
-      "768px": true,
-      mdlg: true,
-      lg: true,
-      xl: true,
-    });
-
-    const formattingCanRender = useBreakpointValue({
-      base: false,
-      sm: false,
-      md: false,
-      "768px": false,
-      mdlg: true,
-      lg: true,
-
-      "1200px": true,
-    });
-
-    const tableCanRender = useBreakpointValue({
-      base: false,
-      sm: false,
-      md: false,
-      "768px": false,
-      mdlg: false,
-      lg: true,
-      xl: true,
-    });
-
-    const { colorMode } = useColorMode();
+    // Responsive breakpoints using Tailwind classes
+    const boldEtcCanRender = true; // Always show on all breakpoints
+    const formattingCanRender = window.innerWidth >= 1024; // lg breakpoint
+    const tableCanRender = window.innerWidth >= 1024; // lg breakpoint
 
     return (
       <>
@@ -355,16 +343,9 @@ export const RevisedRichTextToolbar = ({
         onClose={onAddTableClose}
       /> */}
 
-        <Flex
+        <div
           ref={toolbarRef}
-          flexWrap="wrap"
-          justifyContent="flex-start"
-          px={1}
-          py={0.5}
-          bg={colorMode === "light" ? undefined : "gray.900"}
-          borderBottom={"1px solid"}
-          borderColor={colorMode === "dark" ? "gray.700" : "gray.200"}
-          width="100%" // Ensure the container takes up the full width
+          className="flex flex-wrap justify-start px-1 py-0.5 bg-background dark:bg-gray-900 border-b border-border w-full"
         >
           <RevisedBaseToolbarButton
             buttonSize="sm"
@@ -380,7 +361,7 @@ export const RevisedRichTextToolbar = ({
           </RevisedBaseToolbarButton>
           <RevisedBaseToolbarButton
             buttonSize="sm"
-            ariaLabel="Undo"
+            ariaLabel="Redo"
             // isActive={isBold}
             variant={"ghost"}
             isDisabled={!canRedo}
@@ -558,27 +539,12 @@ export const RevisedRichTextToolbar = ({
               <TableDropdown activeEditor={editor} />
             ) : null
           ) : null}
-        </Flex>
+        </div>
       </>
     );
   };
 
-import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
-import { useRef } from "react";
-import { BsChatSquareQuoteFill, BsTextParagraph } from "react-icons/bs";
-import { FaCaretDown, FaCode } from "react-icons/fa";
-import {
-  LuHeading1,
-  LuHeading2,
-  LuHeading3,
-  LuHeading4,
-  LuHeading5,
-  LuHeading6,
-} from "react-icons/lu";
-import { MdFormatListBulleted, MdFormatListNumbered } from "react-icons/md";
-import { TbChecklist } from "react-icons/tb";
-import AddImageButton from "../Buttons/AddImageButton";
-import { TableDropdown } from "../Buttons/TableDropdown";
+
 
 interface ElementProps {
   formatParagraph: () => void;
@@ -672,13 +638,11 @@ const ElementSelector = ({
   };
 
   const [buttonWidth, setButtonWidth] = useState(0);
-  const buttonRef = useRef(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const updateButtonWidth = () => {
       if (buttonRef.current) {
-        // eslint-disable-next-line
-        // @ts-ignore
         const width = buttonRef.current.offsetWidth;
         setButtonWidth(width);
       }
@@ -689,80 +653,54 @@ const ElementSelector = ({
     window.addEventListener("resize", updateButtonWidth); // Update width on window resize
 
     return () => {
-      window.removeEventListener("resize", updateButtonWidth); // Clean up for optomisation
+      window.removeEventListener("resize", updateButtonWidth); // Clean up for optimization
     };
   }, [buttonRef]);
 
   return (
-    <Menu
-      isLazy
-      // placement="bottom"
-    >
-      <Box className="tooltip-container grow">
-        <MenuButton
-          size={"sm"}
-          as={Button}
-          variant={"ghost"}
-          leftIcon={blockTypeToBlockIcon(blockType)}
-          rightIcon={<FaCaretDown />}
-          // px={8}
-          mx={1}
-          flex={1}
-          tabIndex={-1}
-          w={"100%"}
+    <DropdownMenu>
+      <div className="tooltip-container grow">
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="mx-1 flex-1 w-full"
+            ref={buttonRef}
+            tabIndex={-1}
+          >
+            {blockTypeToBlockIcon(blockType)}
+            <span className="ml-2">{blockTypeToBlockName(blockType)}</span>
+            <FaCaretDown className="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="w-fit z-[9999999999999] absolute"
+          style={{ minWidth: "200px", width: buttonWidth }}
         >
-          {blockTypeToBlockName(blockType)}
-        </MenuButton>
-        <MenuList
-          // minW={"200px"}
-          zIndex={9999999999999}
-          w={buttonWidth}
-          minW={"200px"}
-          pos={"absolute"}
-          // right={-500}
-        >
-          <MenuItem
+          <DropdownMenuItem
             onClick={formatParagraph}
-            // w={"100%"}
-            display={"inline-flex"}
-            alignItems={"center"}
-            zIndex={2}
+            className="w-full inline-flex items-center z-2"
           >
-            <BsTextParagraph />
-
-            <Box pl={4} zIndex={2}>
-              <span>Normal</span>
-            </Box>
-          </MenuItem>
-          <MenuItem
+            <BsTextParagraph className="mr-4" />
+            <span>Normal</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={formatBulletList}
-            w={"100%"}
-            display={"inline-flex"}
-            alignItems={"center"}
-            zIndex={2}
+            className="w-full inline-flex items-center z-2"
           >
-            <MdFormatListBulleted />
-
-            <Box pl={4} zIndex={2}>
-              <span>Bullet List</span>
-            </Box>
-          </MenuItem>
-          <MenuItem
+            <MdFormatListBulleted className="mr-4" />
+            <span>Bullet List</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={formatNumberList}
-            w={"100%"}
-            display={"inline-flex"}
-            alignItems={"center"}
-            zIndex={2}
+            className="w-full inline-flex items-center z-2"
           >
-            <MdFormatListNumbered />
-
-            <Box pl={4} zIndex={2}>
-              <span>Numbered List</span>
-            </Box>
-          </MenuItem>
-        </MenuList>
-        <Text className="tooltip-text">Select Type</Text>
-      </Box>
-    </Menu>
+            <MdFormatListNumbered className="mr-4" />
+            <span>Numbered List</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+        <span className="tooltip-text">Select Type</span>
+      </div>
+    </DropdownMenu>
   );
 };

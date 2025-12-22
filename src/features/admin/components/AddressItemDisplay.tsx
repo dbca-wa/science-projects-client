@@ -1,27 +1,3 @@
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  VStack,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -30,6 +6,25 @@ import { deleteAddress, updateAddress } from "@/features/admin/services/admin.se
 import type { IAddress, IBranch } from "@/shared/types";
 import { BranchSearchDropdown } from "@/features/admin/components/BranchSearchDropdown";
 import { TextButtonFlex } from "@/shared/components/TextButtonFlex";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 export const AddressItemDisplay = ({
   pk,
@@ -43,17 +38,8 @@ export const AddressItemDisplay = ({
 }: IAddress) => {
   const { register, handleSubmit, watch } = useForm<IAddress>();
 
-  const toast = useToast();
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onDeleteModalOpen,
-    onClose: onDeleteModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isUpdateaModalOpen,
-    onOpen: onUpdateModalOpen,
-    onClose: onUpdateModalClose,
-  } = useDisclosure();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const { colorMode } = useColorMode();
 
@@ -68,33 +54,20 @@ export const AddressItemDisplay = ({
   const updateMutation = useMutation({
     mutationFn: updateAddress,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Updated",
-        position: "top-right",
-      });
-      onUpdateModalClose();
+      toast.success("Updated");
+      setIsUpdateModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
     },
     onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
+      toast.error("Failed");
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteAddress,
     onSuccess: () => {
-      // console.log("success")
-      toast({
-        status: "success",
-        title: "Deleted",
-        position: "top-right",
-      });
-      onDeleteModalClose();
+      toast.success("Deleted");
+      setIsDeleteModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
     },
   });
@@ -110,131 +83,102 @@ export const AddressItemDisplay = ({
 
   return (
     <>
-      <Grid
-        gridTemplateColumns="2fr 4fr 2fr 2fr 1fr 1fr"
-        width="100%"
-        p={3}
-        borderWidth={1}
-        // bg={"red"}
-      >
+      <div className="grid grid-cols-[2fr_4fr_2fr_2fr_1fr_1fr] w-full p-3 border">
         <TextButtonFlex
           name={branchObj?.name ?? ""}
-          onClick={onUpdateModalOpen}
+          onClick={() => setIsUpdateModalOpen(true)}
         />
-        <Flex alignItems={"center"}>
-          <Text>{street}</Text>
-        </Flex>
-        <Flex alignItems={"center"}>
-          <Text>{city}</Text>
-        </Flex>
-        <Flex alignItems={"center"}>
-          <Text>{country}</Text>
-        </Flex>
-        <Flex alignItems={"center"}>
-          <Text>{pobox ? pobox : "-"}</Text>
-        </Flex>
+        <div className="flex items-center">
+          <p>{street}</p>
+        </div>
+        <div className="flex items-center">
+          <p>{city}</p>
+        </div>
+        <div className="flex items-center">
+          <p>{country}</p>
+        </div>
+        <div className="flex items-center">
+          <p>{pobox ? pobox : "-"}</p>
+        </div>
 
-        <Flex justifyContent="flex-end" mr={2} alignItems={"center"}>
-          <Menu>
-            <MenuButton
-              px={2}
-              py={2}
-              transition="all 0.2s"
-              rounded={4}
-              borderRadius="md"
-              borderWidth="1px"
-              _hover={{ bg: "gray.400" }}
-              _expanded={{ bg: "blue.400" }}
-              _focus={{ boxShadow: "outline-solid" }}
-              alignItems={"center"}
-              justifyContent={"center"}
-            >
-              <Flex alignItems={"center"} justifyContent={"center"}>
-                <MdMoreVert />
-              </Flex>
-            </MenuButton>
-            <MenuList>
-              <MenuItem onClick={onUpdateModalOpen}>Edit</MenuItem>
-              <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </Grid>
-      <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
-        <ModalOverlay />
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Delete Address</ModalHeader>
-          <ModalBody>
-            <Box>
-              <Text fontSize="lg" fontWeight="semibold">
-                Are you sure you want to delete the address for this branch?
-              </Text>
-
-              <Text
-                fontSize="lg"
-                fontWeight="semibold"
-                color={"blue.500"}
-                mt={4}
+        <div className="flex justify-end mr-2 items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="px-2 py-2 rounded-md border"
               >
-                "{branchObj?.name}"
-              </Text>
-            </Box>
-          </ModalBody>
-          <ModalFooter justifyContent="flex-end">
-            <Flex>
-              <Button onClick={onDeleteModalClose} colorScheme={"gray"}>
+                <div className="flex items-center justify-center">
+                  <MdMoreVert />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setIsUpdateModalOpen(true)}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsDeleteModalOpen(true)}>
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className={colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"}>
+          <DialogHeader>
+            <DialogTitle>Delete Address</DialogTitle>
+          </DialogHeader>
+          <div>
+            <p className="text-lg font-semibold">
+              Are you sure you want to delete the address for this branch?
+            </p>
+
+            <p className="text-lg font-semibold text-blue-500 mt-4">
+              "{branchObj?.name}"
+            </p>
+          </div>
+          <DialogFooter className="flex justify-end">
+            <div className="flex gap-3">
+              <Button onClick={() => setIsDeleteModalOpen(false)} variant="outline">
                 No
               </Button>
               <Button
                 onClick={deleteBtnClicked}
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                ml={3}
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                }`}
               >
                 Yes
               </Button>
-            </Flex>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      <Modal
-        isOpen={isUpdateaModalOpen}
-        onClose={onUpdateModalClose}
-        size={"xl"}
-      >
-        <ModalOverlay />
-        <ModalHeader>Update Address</ModalHeader>
-        <ModalBody>
-          <ModalContent
-            color={colorMode === "dark" ? "gray.400" : null}
-            bg={colorMode === "light" ? "white" : "gray.800"}
-            p={4}
-            px={6}
-          >
-            <FormControl>
-              {/* Hidden input to capture the pk */}
-              <input
-                type="hidden"
-                {...register("pk")}
-                defaultValue={pk} // Prefill with the 'pk' prop
-              />
-              <input
-                {...register("agency", { required: true })}
-                type="hidden"
-                defaultValue={1} // Prefill with the 'name' prop
-              />
-            </FormControl>
-            <VStack
-              spacing={6}
-              as="form"
-              id="update-form"
+      <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
+        <DialogContent className={`max-w-2xl ${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"} p-4 px-6`}>
+          <DialogHeader>
+            <DialogTitle>Update Address</DialogTitle>
+          </DialogHeader>
+          <div>
+            {/* Hidden input to capture the pk */}
+            <input
+              type="hidden"
+              {...register("pk")}
+              defaultValue={pk} // Prefill with the 'pk' prop
+            />
+            <input
+              {...register("agency", { required: true })}
+              type="hidden"
+              defaultValue={1} // Prefill with the 'name' prop
+            />
+            <div
+              className="space-y-6"
               onSubmit={handleSubmit(onUpdateSubmit)}
             >
               <BranchSearchDropdown
@@ -247,72 +191,69 @@ export const AddressItemDisplay = ({
                 placeholder="Search for a Branch"
                 helperText={"The branch the address belongs to."}
               />
-              <FormControl>
-                <FormLabel>Street</FormLabel>
+              <div>
+                <Label htmlFor="street">Street</Label>
                 <Input
+                  id="street"
                   {...register("street", { required: true })}
                   defaultValue={street} // Prefill
                 />
-              </FormControl>
+              </div>
 
-              <FormControl>
-                <FormLabel>Zip Code</FormLabel>
+              <div>
+                <Label htmlFor="zipcode">Zip Code</Label>
                 <Input
+                  id="zipcode"
                   {...register("zipcode", { required: true })}
                   defaultValue={zipcode}
                   type="number"
                 />
-              </FormControl>
-              <FormControl>
-                <FormLabel>City</FormLabel>
+              </div>
+              <div>
+                <Label htmlFor="city">City</Label>
                 <Input
+                  id="city"
                   {...register("city", { required: true })}
                   defaultValue={city}
                 />
-              </FormControl>
-              <FormControl>
-                <FormLabel>State</FormLabel>
+              </div>
+              <div>
+                <Label htmlFor="state">State</Label>
                 <Input
+                  id="state"
                   {...register("state", { required: true })}
                   defaultValue={state}
                 />
-              </FormControl>
+              </div>
 
-              <FormControl>
-                <FormLabel>Country</FormLabel>
+              <div>
+                <Label htmlFor="country">Country</Label>
                 <Input
+                  id="country"
                   {...register("country", { required: true })}
                   defaultValue={country}
                 />
-              </FormControl>
+              </div>
 
-              <FormControl>
-                <FormLabel>PO Box</FormLabel>
+              <div>
+                <Label htmlFor="pobox">PO Box</Label>
                 <Input
+                  id="pobox"
                   {...register("pobox", { required: true })}
                   defaultValue={pobox}
                 />
-              </FormControl>
+              </div>
               {updateMutation.isError ? (
-                <Text color={"red.500"}>Something went wrong</Text>
+                <p className="text-red-500">Something went wrong</p>
               ) : null}
-            </VStack>
-            <Grid
-              mt={10}
-              w={"100%"}
-              justifyContent={"end"}
-              gridTemplateColumns={"repeat(2, 1fr)"}
-              gridGap={4}
-            >
-              <Button onClick={onUpdateModalClose} size="lg">
+            </div>
+            <div className="mt-10 w-full flex justify-end grid grid-cols-2 gap-4">
+              <Button onClick={() => setIsUpdateModalOpen(false)} size="lg">
                 Cancel
               </Button>
               <Button
-                // form="update-form"
-                // type="submit"
                 onClick={() => {
                   onUpdateSubmit({
-                    // "old_id": 1, //default
                     pk: pk,
                     street: streetData,
                     city: cityData,
@@ -322,20 +263,20 @@ export const AddressItemDisplay = ({
                     pobox: poboxData,
                   });
                 }}
-                isLoading={updateMutation.isPending}
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                disabled={updateMutation.isPending}
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-blue-500 hover:bg-blue-400" 
+                    : "bg-blue-600 hover:bg-blue-500"
+                }`}
                 size="lg"
               >
                 Update
               </Button>
-            </Grid>
-          </ModalContent>
-        </ModalBody>
-      </Modal>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

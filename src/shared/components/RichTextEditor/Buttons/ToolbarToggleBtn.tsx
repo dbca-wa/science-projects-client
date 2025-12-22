@@ -2,7 +2,7 @@
 // If the screen is too small, buttons will appear on the sides to go to the next
 // and previous pages of toolbar buttons.
 
-import { Button, Flex, Icon } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
 import { FcNext, FcPrevious } from "react-icons/fc";
 
 interface IToolbarToggleBtnProps {
@@ -29,41 +29,41 @@ export const ToolbarToggleBtn = ({
   };
 
   return (
-    <Flex>
+    <div className="flex">
       {isSmall ? (
         <>
           {page <= maxPages && page !== 1 ? (
-            <Button variant={"ghost"} mx={1} onClick={goPrevPage}>
-              <Icon as={FcPrevious} />
+            <Button variant="ghost" className="mx-1" onClick={goPrevPage}>
+              <FcPrevious />
             </Button>
           ) : null}
 
           {page !== maxPages ? (
-            <Button variant={"ghost"} mx={1} onClick={goNextPage}>
-              <Icon as={FcNext} />
+            <Button variant="ghost" className="mx-1" onClick={goNextPage}>
+              <FcNext />
             </Button>
           ) : null}
         </>
       ) : (
         <>
           <Button
-            variant={"ghost"}
-            mx={1}
+            variant="ghost"
+            className="mx-1"
             onClick={goPrevPage}
-            isDisabled={page === minPages}
+            disabled={page === minPages}
           >
-            <Icon as={FcPrevious} />
+            <FcPrevious />
           </Button>
           <Button
-            variant={"ghost"}
-            mx={1}
+            variant="ghost"
+            className="mx-1"
             onClick={goNextPage}
-            isDisabled={page === maxPages}
+            disabled={page === maxPages}
           >
-            <Icon as={FcNext} />
+            <FcNext />
           </Button>
         </>
       )}
-    </Flex>
+    </div>
   );
 };

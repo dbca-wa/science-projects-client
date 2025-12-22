@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
@@ -66,7 +65,7 @@ export const SimpleEditableRTE = ({
         {/* Text Area */}
         <RichTextPlugin
           contentEditable={
-            <Box zIndex={2}>
+            <div className="z-[2]">
               {/* Toolbar */}
 
               <RevisedSimpleRichTextToolbar allowInserts={false} />
@@ -83,7 +82,7 @@ export const SimpleEditableRTE = ({
                   zIndex: 2,
                 }}
               />
-            </Box>
+            </div>
           }
           placeholder={
             <div

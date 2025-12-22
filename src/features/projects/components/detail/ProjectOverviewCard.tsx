@@ -1,25 +1,17 @@
 // Displayed when looking at the Project Details by selecting it on the projects page. Displays more data about the project and allows editing.
 
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Badge } from "@/shared/components/ui/badge";
 import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  Image,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Skeleton,
-  Tag,
-  Text,
-  type ToastId,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { toast } from "sonner";
+import { useEffect, useRef, useState } from "react";
 import { AiFillCalendar, AiFillTag } from "react-icons/ai";
 import {
   FaEdit,
@@ -45,7 +37,6 @@ import type {
 import { ProjectDetailEditModal } from "@/features/projects/components/modals/ProjectDetailEditModal";
 // import { AiFillDollarCircle } from "react-icons/ai";
 
-import { useEffect, useRef, useState } from "react";
 import { BsCaretDownFill } from "react-icons/bs";
 import { CgOrganisation } from "react-icons/cg";
 import { FaSackDollar } from "react-icons/fa6";
@@ -103,71 +94,46 @@ export const ProjectOverviewCard = ({
   userIsCaretakerOfMember,
   userIsCaretakerOfProjectLeader,
 }: IProjectOverviewCardProps) => {
-  // console.log(baseInformation);
-  // useEffect(() => {
-  //   console.log(details);
-  // }, [details]);
-  const {
-    isOpen: isEditProjectDetailModalOpen,
-    onClose: onEditProjectDetailModalClose,
-  } = useDisclosure();
-  const { colorMode } = useColorMode();
+  // State for all modals (replacing useDisclosure hooks)
+  const [isEditProjectDetailModalOpen, setIsEditProjectDetailModalOpen] = useState(false);
+  const [isSetStatusModalOpen, setIsSetStatusModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isRequestDeleteModalOpen, setIsRequestDeleteModalOpen] = useState(false);
+  const [isClosureModalOpen, setIsClosureModalOpen] = useState(false);
+  const [isReopenModalOpen, setIsReopenModalOpen] = useState(false);
+  const [isCreateStudentReportModalOpen, setIsCreateStudentReportModalOpen] = useState(false);
+  const [isCreateProgressReportModalOpen, setIsCreateProgressReportModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
+  const [isActionDeleteModalOpen, setIsActionDeleteModalOpen] = useState(false);
+  const [isHideProjectModalOpen, setIsHideProjectModalOpen] = useState(false);
 
-  const {
-    isOpen: isSetStatusModalOpen,
-    onOpen: onOpenSetStatusModal,
-    onClose: onCloseSetStatusModal,
-  } = useDisclosure();
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onOpenDeleteModal,
-    onClose: onCloseDeleteModal,
-  } = useDisclosure();
-  const {
-    isOpen: isRequestDeleteModalOpen,
-    onOpen: onOpenRequestDeleteModal,
-    onClose: onCloseRequestDeleteModal,
-  } = useDisclosure();
-  const {
-    isOpen: isClosureModalOpen,
-    onOpen: onOpenClosureModal,
-    onClose: onCloseClosureModal,
-  } = useDisclosure();
-  const {
-    isOpen: isReopenModalOpen,
-    onOpen: onOpenReopenModal,
-    onClose: onCloseReopenModal,
-  } = useDisclosure();
-  const {
-    isOpen: isCreateStudentReportModalOpen,
-    onOpen: onOpenCreateStudentReportModal,
-    onClose: onCloseCreateStudentReportModal,
-  } = useDisclosure();
-  const {
-    isOpen: isCreateProgressReportModalOpen,
-    onOpen: onOpenCreateProgressReportModal,
-    onClose: onCloseCreateProgressReportModal,
-  } = useDisclosure();
-  const {
-    isOpen: isEditModalOpen,
-    onOpen: onOpenEditModal,
-    onClose: onCloseEditModal,
-  } = useDisclosure();
-  const {
-    isOpen: isSuspendModalOpen,
-    onOpen: onOpenSuspendModal,
-    onClose: onCloseSuspendModal,
-  } = useDisclosure();
-  const {
-    isOpen: isActionDeleteModalOpen,
-    onOpen: onOpenActionDeleteModal,
-    onClose: onCloseActionDeleteModal,
-  } = useDisclosure();
-  const {
-    isOpen: isHideProjectModalOpen,
-    onOpen: onOpenHideProjectModal,
-    onClose: onCloseHideProjectModal,
-  } = useDisclosure();
+  // Modal control functions
+  const onEditProjectDetailModalClose = () => setIsEditProjectDetailModalOpen(false);
+  const onOpenSetStatusModal = () => setIsSetStatusModalOpen(true);
+  const onCloseSetStatusModal = () => setIsSetStatusModalOpen(false);
+  const onOpenDeleteModal = () => setIsDeleteModalOpen(true);
+  const onCloseDeleteModal = () => setIsDeleteModalOpen(false);
+  const onOpenRequestDeleteModal = () => setIsRequestDeleteModalOpen(true);
+  const onCloseRequestDeleteModal = () => setIsRequestDeleteModalOpen(false);
+  const onOpenClosureModal = () => setIsClosureModalOpen(true);
+  const onCloseClosureModal = () => setIsClosureModalOpen(false);
+  const onOpenReopenModal = () => setIsReopenModalOpen(true);
+  const onCloseReopenModal = () => setIsReopenModalOpen(false);
+  const onOpenCreateStudentReportModal = () => setIsCreateStudentReportModalOpen(true);
+  const onCloseCreateStudentReportModal = () => setIsCreateStudentReportModalOpen(false);
+  const onOpenCreateProgressReportModal = () => setIsCreateProgressReportModalOpen(true);
+  const onCloseCreateProgressReportModal = () => setIsCreateProgressReportModalOpen(false);
+  const onOpenEditModal = () => setIsEditModalOpen(true);
+  const onCloseEditModal = () => setIsEditModalOpen(false);
+  const onOpenSuspendModal = () => setIsSuspendModalOpen(true);
+  const onCloseSuspendModal = () => setIsSuspendModalOpen(false);
+  const onOpenActionDeleteModal = () => setIsActionDeleteModalOpen(true);
+  const onCloseActionDeleteModal = () => setIsActionDeleteModalOpen(false);
+  const onOpenHideProjectModal = () => setIsHideProjectModalOpen(true);
+  const onCloseHideProjectModal = () => setIsHideProjectModalOpen(false);
+
+  const { colorMode } = useColorMode();
 
   const determineAuthors = (members: IProjectMember[]) => {
     // Filters members with non-null first and last names
@@ -294,39 +260,39 @@ export const ProjectOverviewCard = ({
   const kindDictionary: {
     [key: string]: { label: string; color: string };
   }[] = [
-    { external: { label: "External", color: "gray.500" } },
-    { science: { label: "Science", color: "green.500" } },
-    { student: { label: "Student", color: "blue.500" } },
-    { core_function: { label: "Core Function", color: "red.500" } },
+    { external: { label: "External", color: "bg-gray-500" } },
+    { science: { label: "Science", color: "bg-green-500" } },
+    { student: { label: "Student", color: "bg-blue-500" } },
+    { core_function: { label: "Core Function", color: "bg-red-500" } },
   ];
 
   const getKindValue = (kind: string): { label: string; color: string } => {
     const matchedStatus = kindDictionary.find((item) => kind in item);
     return matchedStatus
       ? matchedStatus[kind]
-      : { label: "Unknown Kind", color: "gray.500" };
+      : { label: "Unknown Kind", color: "bg-gray-500" };
   };
 
   const statusDictionary: {
     [key: string]: { label: string; color: string };
   }[] = [
-    { new: { label: "New", color: "gray.500" } },
-    { pending: { label: "Pending Project Plan", color: "yellow.500" } },
-    { active: { label: "Active (Approved)", color: "green.500" } },
-    { updating: { label: "Update Requested", color: "red.500" } },
-    { closure_requested: { label: "Closure Requested", color: "red.500" } },
-    { closing: { label: "Closure Pending Final Update", color: "red.500" } },
-    { final_update: { label: "Final Update Requested", color: "red.500" } },
-    { completed: { label: "Completed and Closed", color: "blue.500" } },
-    { terminated: { label: "Terminated and Closed", color: "gray.800" } },
-    { suspended: { label: "Suspended", color: "gray.500" } },
+    { new: { label: "New", color: "bg-gray-500" } },
+    { pending: { label: "Pending Project Plan", color: "bg-yellow-500" } },
+    { active: { label: "Active (Approved)", color: "bg-green-500" } },
+    { updating: { label: "Update Requested", color: "bg-red-500" } },
+    { closure_requested: { label: "Closure Requested", color: "bg-red-500" } },
+    { closing: { label: "Closure Pending Final Update", color: "bg-red-500" } },
+    { final_update: { label: "Final Update Requested", color: "bg-red-500" } },
+    { completed: { label: "Completed and Closed", color: "bg-blue-500" } },
+    { terminated: { label: "Terminated and Closed", color: "bg-gray-800" } },
+    { suspended: { label: "Suspended", color: "bg-gray-500" } },
   ];
 
   const getStatusValue = (status: string): { label: string; color: string } => {
     const matchedStatus = statusDictionary.find((item) => status in item);
     return matchedStatus
       ? matchedStatus[status]
-      : { label: "Unknown Status", color: "gray.500" };
+      : { label: "Unknown Status", color: "bg-gray-500" };
   };
 
   const imageUrl = useServerImageUrl(baseInformation?.image?.file);
@@ -407,10 +373,23 @@ export const ProjectOverviewCard = ({
 
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const toastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (data: { status: string; title: string; position?: string; description?: string; duration?: number; isClosable?: boolean }) => {
+    if (data.status === "loading") {
+      toastIdRef.current = toast.loading(data.title);
+    } else if (data.status === "success") {
+      if (toastIdRef.current) {
+        toast.success(data.title, { description: data.description });
+      } else {
+        toast.success(data.title, { description: data.description });
+      }
+    } else if (data.status === "error") {
+      if (toastIdRef.current) {
+        toast.error(data.title, { description: data.description });
+      } else {
+        toast.error(data.title, { description: data.description });
+      }
+    }
   };
   const queryClient = useQueryClient();
 
@@ -424,16 +403,14 @@ export const ProjectOverviewCard = ({
       });
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Request Cancelled`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      addToast({
+        status: "success",
+        title: "Success",
+        description: `Request Cancelled`,
+        position: "top-right",
+        duration: 3000,
+        isClosable: true,
+      });
 
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["pendingAdminTasks"] });
@@ -443,16 +420,14 @@ export const ProjectOverviewCard = ({
       }, 350);
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not cancel request`,
-          description: `${error.response.data}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      addToast({
+        status: "error",
+        title: `Could not cancel request`,
+        description: `${error.response.data}`,
+        position: "top-right",
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
 
@@ -582,12 +557,10 @@ export const ProjectOverviewCard = ({
         </>
       )}
 
-      <Box
-        minH={"100px"}
-        bg={colorMode === "light" ? "gray.100" : "gray.700"}
-        color={colorMode === "light" ? "black" : "whiteAlpha.900"}
-        rounded={"lg"}
-        // overflow={"hidden"}
+      <div
+        className={`min-h-[100px] rounded-lg ${
+          colorMode === "light" ? "bg-gray-100 text-black" : "bg-gray-700 text-white"
+        }`}
       >
         {(me?.userData?.is_superuser ||
           userIsCaretakerOfAdmin ||
@@ -596,16 +569,8 @@ export const ProjectOverviewCard = ({
           userIsBaLead ||
           userIsCaretakerOfBaLeader ||
           me?.userData?.business_area?.name === "Directorate") && (
-          <Flex
-            // justifyContent={"flex-end"}
-            mt={6}
-            width={"100%"}
-            // right={10}
-            pr={14}
-            pl={6}
-            zIndex={1}
-            pos={"absolute"}
-            flexDir={"column"}
+          <div
+            className="mt-6 w-full pr-14 pl-6 z-10 absolute flex flex-col"
           >
             {/* <Flex
                             // bg={"pink"}
@@ -632,7 +597,7 @@ export const ProjectOverviewCard = ({
                                 Delete
                             </Button>
                         </Flex> */}
-          </Flex>
+          </div>
         )}
         {baseInformation?.deletion_requested ? (
           me?.userData?.is_superuser || userIsCaretakerOfAdmin ? (
@@ -644,92 +609,49 @@ export const ProjectOverviewCard = ({
                 refetch={refetchData}
                 taskPk={baseInformation?.deletion_request_id}
               />
-              <Flex
-                p={4}
-                bg={"red.100"}
-                rounded={"lg"}
-                mt={4}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-                color={"red.800"}
+              <div
+                className="p-4 bg-red-100 rounded-lg mt-4 flex justify-between items-center text-red-800"
               >
-                <Text>Deletion Requested</Text>
-                <Grid
-                  display={"flex"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                  gridTemplateColumns={"repeat(2, 1fr)"}
-                  gridColumnGap={2}
-                >
+                <p>Deletion Requested</p>
+                <div className="flex justify-between items-center gap-2">
                   <Button
                     onClick={
                       baseInformation?.deletion_requested
                         ? onOpenActionDeleteModal
                         : undefined
                     }
-                    bg={"red.500"}
-                    color={"white"}
-                    _hover={{ bg: "red.400" }}
+                    className="bg-red-500 text-white hover:bg-red-400"
                   >
                     Action
                   </Button>
-                </Grid>
-              </Flex>
+                </div>
+              </div>
             </>
           ) : (
-            <Flex
-              p={4}
-              bg={"red.100"}
-              rounded={"lg"}
-              mt={4}
-              justifyContent={"end"}
-              alignItems={"center"}
-              color={"red.800"}
+            <div
+              className="p-4 bg-red-100 rounded-lg mt-4 flex justify-end items-center text-red-800"
             >
-              <Text>Deletion Requested</Text>
-            </Flex>
+              <p>Deletion Requested</p>
+            </div>
           )
         ) : null}
-        <Grid
-          p={4}
-          pt={6}
-          px={6}
-          templateColumns={{
-            base: "1fr", // Single column layout for small screens (mobile)
-            lg: "minmax(300px, 4fr) 5fr", // Left column takes minimum 200px and can grow up to 4fr, right column takes 5fr
-          }}
-          gap={3}
+        <div
+          className="p-4 pt-6 px-6 grid gap-3 grid-cols-1 lg:grid-cols-[minmax(300px,4fr)_5fr]"
         >
-          <Box
-            // bg={"red"}
-            h={{
-              // base: "250px",
-              base: "380px",
-              xl: "400px",
-              "2xl": "600px",
-            }}
-            rounded={"xl"}
-            overflow={"hidden"}
-            position={"relative"}
+          <div
+            className="h-[380px] xl:h-[400px] 2xl:h-[600px] rounded-xl overflow-hidden relative"
           >
-            <Box pos={"absolute"} right={3} top={3} zIndex={2}>
-              <Tag
-                fontWeight={"bold"}
-                color={"white"}
-                ml={3}
-                textAlign={"center"}
-                justifyContent={"center"}
-                p={"10px"}
-                size={"lg"}
-                bgColor={
+            <div className="absolute right-3 top-3 z-20">
+              <Badge
+                className={`font-bold text-white ml-3 text-center justify-center p-2.5 text-lg ${
                   baseInformation?.kind === "core_function"
-                    ? "red.600"
+                    ? "bg-red-600"
                     : baseInformation?.kind === "science"
-                      ? "green.500"
+                      ? "bg-green-500"
                       : baseInformation?.kind === "student"
-                        ? "blue.400"
-                        : "gray.400"
-                }
+                        ? "bg-blue-400"
+                        : "bg-gray-400"
+                }`}
               >
                 {
                   baseInformation?.kind === "core_function"
@@ -741,40 +663,26 @@ export const ProjectOverviewCard = ({
                         : "STP" //Student
                 }
                 -{baseInformation?.year}-{baseInformation?.number}
-              </Tag>
-            </Box>
-            <Skeleton isLoaded={imageLoaded} w={"100%"} h={"100%"}>
-              <Image
+              </Badge>
+            </div>
+            <Skeleton className="w-full h-full" isLoaded={imageLoaded}>
+              <img
                 loading="lazy"
-                rounded={"2xl"}
+                className="rounded-2xl object-cover w-full h-full pointer-events-none select-none"
+                style={{ imageRendering: "crisp-edges", objectFit: "cover" }}
                 src={baseInformation?.image?.file ? imageUrl : noImage}
                 onLoad={() => setImageLoaded(true)}
-                objectFit={"cover"}
-                w={"100%"}
-                h={"100%"}
-                className="pointer-events-none select-none"
-                style={{ imageRendering: "crisp-edges", objectFit: "cover" }}
               />
             </Skeleton>
+          </div>
 
-            {/* <Box
-                            pos={"absolute"}
-                            right={0}
-                            top={0}
-                        >
-                            <p>{baseInformation.status}</p>
-                        </Box> */}
-          </Box>
-
-          <Box px={2} pos={"relative"}>
-            <Box pb={3}>
+          <div className="px-2 relative">
+            <div className="pb-3">
               <Button
-                fontSize="xl"
-                fontWeight="bold"
-                variant={"link"}
-                color={colorMode === "light" ? "blue.500" : "blue.300"}
-                whiteSpace={"normal"}
-                textAlign={"left"}
+                variant="link"
+                className={`text-xl font-bold whitespace-normal text-left p-0 h-auto ${
+                  colorMode === "light" ? "text-blue-500" : "text-blue-300"
+                }`}
                 onClick={() =>
                   navigate(
                     `/projects/${
@@ -785,21 +693,6 @@ export const ProjectOverviewCard = ({
                   )
                 }
               >
-                {/* <Link
-                                    to={
-                                        `/projects/${baseInformation.pk !== undefined ?
-                                            baseInformation.pk : baseInformation.id}`
-                                    }
-                                >
-                                    {baseInformation.title}
-                                </Link> */}
-                {/* <SimpleDisplaySRTE
-
-                                    data={baseInformation.title}
-                                    displayData={baseInformation.title}
-                                    displayArea="projectOverviewTitle"
-                                /> */}
-
                 <ExtractedHTMLTitle
                   htmlContent={`${baseInformation.title}`}
                   color={"#62a0f2"}
@@ -816,81 +709,62 @@ export const ProjectOverviewCard = ({
                 />
               </Button>
 
-              <Text
-                mt={2}
-                color={colorMode === "light" ? "gray.600" : "gray.400"}
-                fontSize={"sm"}
+              <p
+                className={`mt-2 text-sm ${
+                  colorMode === "light" ? "text-gray-600" : "text-gray-400"
+                }`}
               >
                 {authorsDisplay}
-              </Text>
-            </Box>
+              </p>
+            </div>
 
             {/*  */}
-            <Flex alignItems="center" pb={3}>
-              <Box fontSize="22px" mr={3}>
+            <div className="flex items-center pb-3">
+              <div className="text-2xl mr-3">
                 <GrStatusInfo />
-              </Box>
-              <Flex>
-                <Tag
-                  size={"sm"}
-                  textAlign={"center"}
-                  justifyContent={"center"}
-                  p={"10px"}
-                  bgColor={kindColor}
-                  color={"white"}
+              </div>
+              <div className="flex">
+                <Badge
+                  className={`text-sm text-center justify-center p-2.5 text-white ${kindColor}`}
                 >
                   {kindValue}
-                </Tag>
-                <Tag
-                  ml={3}
-                  size={"sm"}
-                  textAlign={"center"}
-                  justifyContent={"center"}
-                  p={"10px"}
-                  bgColor={statusColor}
-                  color={"white"}
+                </Badge>
+                <Badge
+                  className={`ml-3 text-sm text-center justify-center p-2.5 text-white ${statusColor}`}
                 >
                   {statusValue}
-                </Tag>
-              </Flex>
-            </Flex>
+                </Badge>
+              </div>
+            </div>
 
             {baseInformation?.business_area && (
-              <Flex alignItems="center" pb={3}>
-                <Box fontSize="22px" mr={3}>
+              <div className="flex items-center pb-3">
+                <div className="text-2xl mr-3">
                   <MdBusinessCenter />
-                </Box>
-                <Flex>
-                  <Tag
-                    size={"sm"}
-                    textAlign={"center"}
-                    justifyContent={"center"}
-                    p={"10px"}
-                    bgColor={colorMode === "light" ? "blue.500" : "blue.700"}
-                    color={"white"}
+                </div>
+                <div className="flex">
+                  <Badge
+                    className={`text-sm text-center justify-center p-2.5 text-white ${
+                      colorMode === "light" ? "bg-blue-500" : "bg-blue-700"
+                    }`}
                   >
                     {baseInformation?.business_area?.name}{" "}
                     {(baseInformation?.business_area?.division as IDivision)
                       ?.slug
                       ? `(${(baseInformation?.business_area?.division as IDivision)?.slug})`
                       : `(${(baseInformation?.business_area?.division as IDivision)?.name})`}
-                  </Tag>
-                </Flex>
-              </Flex>
+                  </Badge>
+                </div>
+              </div>
             )}
 
             {baseInformation?.kind === "student" ? (
-              <Grid
-                w={"100%"}
-                gridTemplateColumns={"repeat(1, 1fr)"}
-                gridGap={4}
-                pb={4}
-              >
-                <Flex alignItems="center">
-                  <Box fontSize="22px">
+              <div className="w-full grid grid-cols-1 gap-4 pb-4">
+                <div className="flex items-center">
+                  <div className="text-2xl">
                     <CgOrganisation />
-                  </Box>
-                  <Text ml={3}>
+                  </div>
+                  <p className="ml-3">
                     {(details?.student as IStudentProjectDetails)?.organisation
                       ? `${(
                           details?.student as IStudentProjectDetails
@@ -898,35 +772,30 @@ export const ProjectOverviewCard = ({
                           details?.student as IStudentProjectDetails
                         )?.organisation.slice(1)}`
                       : "No organisation listed"}
-                  </Text>
-                </Flex>
-                <Flex alignItems="center">
-                  <Box fontSize="22px">
+                  </p>
+                </div>
+                <div className="flex items-center">
+                  <div className="text-2xl">
                     <FaGraduationCap />
-                  </Box>
-                  <Text ml={3}>
+                  </div>
+                  <p className="ml-3">
                     {(details?.student as IStudentProjectDetails)?.level
                       ? levelToString(
                           (details?.student as IStudentProjectDetails)?.level,
                         )
                       : "No level selected"}
-                  </Text>
-                </Flex>
-              </Grid>
+                  </p>
+                </div>
+              </div>
             ) : null}
 
             {baseInformation?.kind === "external" ? (
-              <Grid
-                w={"100%"}
-                gridTemplateColumns={"repeat(1, 1fr)"}
-                gridGap={4}
-                pb={3}
-              >
-                <Flex alignItems="center">
-                  <Box fontSize="22px">
+              <div className="w-full grid grid-cols-1 gap-4 pb-3">
+                <div className="flex items-center">
+                  <div className="text-2xl">
                     <VscOrganization />
-                  </Box>
-                  <Text ml={3}>
+                  </div>
+                  <p className="ml-3">
                     {(details?.external as IExternalProjectDetails)
                       ?.collaboration_with
                       ? `${
@@ -934,116 +803,69 @@ export const ProjectOverviewCard = ({
                             ?.collaboration_with
                         }`
                       : null}
-                  </Text>
-                </Flex>
+                  </p>
+                </div>
 
-                <Flex alignItems="center">
-                  <Box fontSize="22px">
+                <div className="flex items-center">
+                  <div className="text-2xl">
                     <FaSackDollar />
-                  </Box>
-                  <Text ml={3}>
+                  </div>
+                  <p className="ml-3">
                     {(details?.external as IExternalProjectDetails)?.budget
                       ? `${
                           (details?.external as IExternalProjectDetails)?.budget
                         }`
                       : null}
-                  </Text>
-                </Flex>
-              </Grid>
+                  </p>
+                </div>
+              </div>
             ) : null}
 
-            <Box pt={2} pb={5} display="flex" alignItems="center">
-              <Box fontSize="22px">
+            <div className="pt-2 pb-5 flex items-center">
+              <div className="text-2xl">
                 <AiFillCalendar />
-              </Box>
-              <Grid
-                ml={3}
-                templateColumns={{
-                  base: "repeat(1, 1fr)",
-                  sm: "repeat(1, 1fr)",
-                  md: "repeat(1, 1fr)",
-                  lg: "repeat(1, 1fr)",
-                  xl: "repeat(1, 1fr)",
-                }}
-                gridTemplateRows={"28px"}
-                gap={4}
-              >
-                <Tag
-                  size={"sm"}
-                  textAlign={"center"}
-                  justifyContent={"center"}
-                  p={"10px"}
-                  bgColor={colorMode === "light" ? "gray.200" : "gray.800"}
-                  color={colorMode === "light" ? "black" : "white"}
+              </div>
+              <div className="ml-3 grid grid-cols-1 h-7 gap-4">
+                <Badge
+                  className={`text-sm text-center justify-center p-2.5 ${
+                    colorMode === "light" ? "bg-gray-200 text-black" : "bg-gray-800 text-white"
+                  }`}
                 >
                   {projectYears}
-                </Tag>
-              </Grid>
-            </Box>
+                </Badge>
+              </div>
+            </div>
 
             {/* Rest of the project details */}
 
-            <Box
-              // pb={4}
-              display="flex"
-              // alignItems="center"
-            >
-              <Box fontSize="22px" pt={4}>
+            <div className="flex">
+              <div className="text-2xl pt-4">
                 <AiFillTag />
-              </Box>
+              </div>
 
-              <Grid
-                ml={3}
-                templateColumns={
+              <div
+                className={`ml-3 gap-4 ${
                   layout === "traditional"
-                    ? {
-                        base: "repeat(1, 1fr)",
-                        sm: "repeat(2, 1fr)",
-                        md: "repeat(3, 1fr)",
-                        lg: "repeat(2, 1fr)",
-                        "1200px": "repeat(3, 1fr)",
-                        xl: "repeat(4, 1fr)",
-                        "2xl": "repeat(4, 1fr)",
-                      }
-                    : {
-                        base: "repeat(1, 1fr)",
-                        sm: "repeat(2, 1fr)",
-                        md: "repeat(3, 1fr)",
-                        lg: "repeat(3, 1fr)",
-                        xl: "repeat(5, 1fr)",
-                      }
-                }
-                // gridTemplateRows={"28px"}
-                gap={4}
+                    ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 1200px:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4"
+                    : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5"
+                }`}
               >
                 {keywords?.map((tag, index) => (
-                  <Tag
-                    height={"100%"}
-                    size={"sm"}
+                  <Badge
                     key={index}
-                    textAlign={"center"}
-                    justifyContent={"center"}
-                    // p={"10px"}
-                    minH={"50px"}
-                    bgColor={colorMode === "light" ? "gray.200" : "gray.800"}
-                    color={colorMode === "light" ? "black" : "white"}
-                    style={{ flex: "1" }} // Make each tag expand to fill available space
+                    className={`h-full text-sm text-center justify-center min-h-[50px] flex-1 ${
+                      colorMode === "light" ? "bg-gray-200 text-black" : "bg-gray-800 text-white"
+                    }`}
                   >
                     {tag}
-                  </Tag>
+                  </Badge>
                 ))}
-              </Grid>
-            </Box>
-          </Box>
-        </Grid>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Flex
-          // justifyContent={"flex-end"}
-          right={0}
-          zIndex={-1}
-          px={6}
-          //   gridTemplateColumns={"repeat(2, 1fr)"}
-        >
+        <div className="right-0 z-[-1] px-6">
           {me?.userData?.is_superuser ||
           userIsCaretakerOfAdmin ||
           userIsLeader ||
@@ -1051,82 +873,65 @@ export const ProjectOverviewCard = ({
           userIsBaLead ||
           userIsCaretakerOfBaLeader ||
           me?.userData?.business_area?.name === "Directorate" ? (
-            <Flex
-            //   justifyContent={"space-between"}
-            // flex={1}
-            >
-              <Menu>
-                <MenuButton
-                  px={2}
-                  py={2}
-                  transition="all 0.2s"
-                  rounded={4}
-                  borderRadius="md"
-                  borderWidth="1px"
-                  _hover={{ bg: "blue.400" }}
-                  _expanded={{ bg: "blue.400" }}
-                  _focus={{ boxShadow: "outline-solid" }}
-                  // mr={4}
-                  bg={"blue.500"}
-                  color={"white"}
-                  fontSize={"medium"}
-                >
-                  {/* <Flex alignItems={"center"} justifyContent={"center"}
-                                            zIndex={
-                                                -1}
-                                        > */}
-
-                  <Center>
-                    <Box mr={2}>
-                      <IoMdSettings />
-                    </Box>
-                    <Text>Edit Project</Text>
-                    <Box ml={2}>
-                      <BsCaretDownFill />
-                    </Box>
-                  </Center>
-
-                  {/* <MdMoreVert /> */}
-                  {/* </Flex> */}
-                </MenuButton>
-                <MenuList>
-                  <MenuItem onClick={onOpenEditModal}>
-                    <Flex
-                      alignItems={"center"}
-                      // color={"red"}
-                    >
-                      <Box mr={2}>
+            <div className="flex">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    className="px-2 py-2 rounded border transition-all duration-200 bg-blue-500 text-white text-base hover:bg-blue-400 focus:ring-2 focus:ring-blue-300"
+                  >
+                    <div className="flex items-center justify-center">
+                      <div className="mr-2">
+                        <IoMdSettings />
+                      </div>
+                      <span>Edit Project</span>
+                      <div className="ml-2">
+                        <BsCaretDownFill />
+                      </div>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={onOpenEditModal}>
+                    <div className="flex items-center">
+                      <div className="mr-2">
                         <FaEdit />
-                      </Box>
-                      <Box>
-                        <Text>Edit</Text>
-                      </Box>
-                    </Flex>
-                  </MenuItem>
+                      </div>
+                      <div>
+                        <span>Edit</span>
+                      </div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onOpenEditModal}>
+                    <div className="flex items-center">
+                      <div className="mr-2">
+                        <FaEdit />
+                      </div>
+                      <div>
+                        <span>Edit</span>
+                      </div>
+                    </div>
+                  </DropdownMenuItem>
                   {baseInformation?.kind === "student" && (
-                    <MenuItem
+                    <DropdownMenuItem
                       onClick={onOpenCreateStudentReportModal}
-                      isDisabled={baseInformation?.status === "suspended"}
+                      disabled={baseInformation?.status === "suspended"}
                     >
-                      <Flex
-                        alignItems={"center"}
-                        // color={"red"}
-                      >
-                        <Box mr={2}>
+                      <div className="flex items-center">
+                        <div className="mr-2">
                           <FaLockOpen />
-                        </Box>
-                        <Box>
-                          <Text>{"Create Student Report"}</Text>
-                        </Box>
-                      </Flex>
-                    </MenuItem>
+                        </div>
+                        <div>
+                          <span>Create Student Report</span>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
                   )}
 
                   {baseInformation?.kind !== "student" &&
                     baseInformation?.kind !== "external" && (
-                      <MenuItem
+                      <DropdownMenuItem
                         onClick={onOpenCreateProgressReportModal}
-                        isDisabled={
+                        disabled={
                           (documents.concept_plan &&
                             !documents?.concept_plan?.document
                               ?.directorate_approval_granted) ||
@@ -1135,23 +940,20 @@ export const ProjectOverviewCard = ({
                           baseInformation?.status === "suspended"
                         }
                       >
-                        <Flex
-                          alignItems={"center"}
-                          // color={"red"}
-                        >
-                          <Box mr={2}>
+                        <div className="flex items-center">
+                          <div className="mr-2">
                             <IoCreate />
-                          </Box>
-                          <Box>
-                            <Text>{"Create Progress Report"}</Text>
-                          </Box>
-                        </Flex>
-                      </MenuItem>
+                          </div>
+                          <div>
+                            <span>Create Progress Report</span>
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
                     )}
 
-                  <MenuItem
+                  <DropdownMenuItem
                     onClick={onOpenSuspendModal}
-                    isDisabled={
+                    disabled={
                       baseInformation?.status === "terminated" ||
                       baseInformation?.status === "completed" ||
                       baseInformation?.status === "closing" ||
@@ -1159,27 +961,24 @@ export const ProjectOverviewCard = ({
                       baseInformation?.status === "closed"
                     }
                   >
-                    <Flex
-                      alignItems={"center"}
-                      // color={"red"}
-                    >
-                      <Box mr={2}>
+                    <div className="flex items-center">
+                      <div className="mr-2">
                         <IoIosStopwatch />
-                      </Box>
-                      <Box>
-                        <Text>
+                      </div>
+                      <div>
+                        <span>
                           {baseInformation?.status === "suspended"
                             ? "Unsuspend Project"
                             : "Suspend Project"}
-                        </Text>
-                      </Box>
-                    </Flex>
-                  </MenuItem>
+                        </span>
+                      </div>
+                    </div>
+                  </DropdownMenuItem>
 
                   {documents?.project_closure?.document && (
-                    <MenuItem
+                    <DropdownMenuItem
                       onClick={onOpenReopenModal}
-                      isDisabled={
+                      disabled={
                         baseInformation?.status !== "closure_requested" &&
                         baseInformation?.status !== "closing" &&
                         baseInformation?.status !== "closed" &&
@@ -1187,27 +986,27 @@ export const ProjectOverviewCard = ({
                         baseInformation?.status !== "terminated"
                       }
                     >
-                      <Flex alignItems={"center"}>
-                        <Box mr={2}>
+                      <div className="flex items-center">
+                        <div className="mr-2">
                           {documents?.project_closure?.document ? (
                             <FaLockOpen />
                           ) : (
                             <FaLock />
                           )}
-                        </Box>
-                        <Box>
-                          <Text>
+                        </div>
+                        <div>
+                          <span>
                             {documents?.project_closure?.document
                               ? "Reopen Project"
                               : "Close Project"}
-                          </Text>
-                        </Box>
-                      </Flex>
-                    </MenuItem>
+                          </span>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
                   )}
 
                   {!documents?.project_closure?.document && (
-                    <MenuItem
+                    <DropdownMenuItem
                       onClick={
                         documents?.project_closure?.document ||
                         baseInformation?.status === "terminated" ||
@@ -1218,24 +1017,17 @@ export const ProjectOverviewCard = ({
                           ? onOpenReopenModal
                           : onOpenClosureModal
                       }
-                      // isDisabled={
-                      //   baseInformation?.status === "closure_requested" ||
-                      //   baseInformation?.status === "closing" ||
-                      //   baseInformation?.status === "closed" ||
-                      //   baseInformation?.status === "completed"
-
-                      // }
                     >
-                      <Flex alignItems={"center"}>
-                        <Box mr={2}>
+                      <div className="flex items-center">
+                        <div className="mr-2">
                           {documents?.project_closure?.document ? (
                             <FaLockOpen />
                           ) : (
                             <FaLock />
                           )}
-                        </Box>
-                        <Box>
-                          <Text>
+                        </div>
+                        <div>
+                          <span>
                             {documents?.project_closure?.document ||
                             baseInformation?.status === "terminated" ||
                             baseInformation?.status === "completed" ||
@@ -1244,115 +1036,67 @@ export const ProjectOverviewCard = ({
                             baseInformation?.status === "closed"
                               ? "Reopen Project"
                               : "Close Project"}
-                          </Text>
-                        </Box>
-                      </Flex>
-                    </MenuItem>
+                          </span>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
                   )}
 
-                  {/* <MenuItem
-                    onClick={
-                      documents?.project_closure?.document &&
-                      (baseInformation?.status === "closure_requested" ||
-                        baseInformation?.status === "closing" ||
-                        baseInformation?.status === "closed")
-                        ? onOpenReopenModal
-                        : onOpenClosureModal
-                    }
-                  >
-                    <Flex
-                      alignItems={"center"}
-                    >
-                      <Box mr={2}>
-                        {documents?.project_closure?.document ? (
-                          <FaLockOpen />
-                        ) : (
-                          <FaLock />
-                        )}
-                      </Box>
-                      <Box>
-                        <Text>
-                          {documents?.project_closure?.document
-                            ? "Reopen Project"
-                            : "Close Project"}
-                        </Text>
-                      </Box>
-                    </Flex>
-                  </MenuItem> */}
-
                   {me?.userData?.is_superuser ? (
-                    <MenuItem onClick={onOpenSetStatusModal}>
-                      <Flex
-                        alignItems={"center"}
-                        // color={"red"}
-                      >
-                        <Box mr={2}>
+                    <DropdownMenuItem onClick={onOpenSetStatusModal}>
+                      <div className="flex items-center">
+                        <div className="mr-2">
                           <GrStatusWarning />
-                        </Box>
-                        <Box>
-                          <Text>Set Status</Text>
-                        </Box>
-                      </Flex>
-                    </MenuItem>
+                        </div>
+                        <div>
+                          <span>Set Status</span>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
                   ) : null}
                   {me?.userData?.is_superuser ? (
-                    <MenuItem onClick={onOpenDeleteModal}>
-                      <Flex
-                        alignItems={"center"}
-                        // color={"red"}
-                      >
-                        <Box mr={2}>
+                    <DropdownMenuItem onClick={onOpenDeleteModal}>
+                      <div className="flex items-center">
+                        <div className="mr-2">
                           <FaTrash />
-                        </Box>
-                        <Box>
-                          <Text>Delete</Text>
-                        </Box>
-                      </Flex>
-                    </MenuItem>
+                        </div>
+                        <div>
+                          <span>Delete</span>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
                   ) : (
-                    <MenuItem
+                    <DropdownMenuItem
                       onClick={
                         baseInformation?.deletion_requested
                           ? cancelDeletionRequest
                           : onOpenRequestDeleteModal
                       }
                     >
-                      <Flex
-                        alignItems={"center"}
-                        // color={"red"}
-                      >
-                        <Box mr={2}>
+                      <div className="flex items-center">
+                        <div className="mr-2">
                           <FaTrash />
-                        </Box>
-                        <Box>
-                          <Text>
+                        </div>
+                        <div>
+                          <span>
                             {baseInformation?.deletion_requested
                               ? "Cancel Deletion Request"
                               : "Request Deletion"}
-                          </Text>
-                        </Box>
-                      </Flex>
-                    </MenuItem>
+                          </span>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
                   )}
-                </MenuList>
-              </Menu>
-            </Flex>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ) : null}
 
-          <Flex
-            pb={0}
-            alignItems={"center"}
-            justifyContent={"flex-end"}
-            flex={1}
-          >
-            <Text
-              color={colorMode === "dark" ? "blue.200" : "blue.400"}
-              fontWeight={"bold"}
-              cursor={"pointer"}
-              _hover={{
-                color: colorMode === "dark" ? "blue.100" : "blue.300",
-                textDecoration: "underline",
-              }}
+          <div className="pb-0 flex items-center justify-end flex-1">
+            <p
+              className={`font-bold cursor-pointer hover:underline ${
+                colorMode === "dark" ? "text-blue-200 hover:text-blue-100" : "text-blue-400 hover:text-blue-300"
+              }`}
               onClick={() => {
                 window.open(
                   `https://data.bio.wa.gov.au/dataset/?tags=${projectLabel}`,
@@ -1361,38 +1105,20 @@ export const ProjectOverviewCard = ({
               }}
             >
               Review datasets tagged with {projectLabel}
-            </Text>
-            <Box
-              mt={1}
-              ml={1.5}
-              color={colorMode === "dark" ? "blue.200" : "blue.400"}
-              alignItems={"center"}
-              alignContent={"center"}
+            </p>
+            <div
+              className={`mt-1 ml-1.5 flex items-center ${
+                colorMode === "dark" ? "text-blue-200" : "text-blue-400"
+              }`}
             >
               <HiOutlineExternalLink />
-            </Box>
-          </Flex>
-        </Flex>
+            </div>
+          </div>
+        </div>
 
         {/* Description and Edit Project Details */}
-        <Box p={6} pt={0}>
-          {/* <Box
-                        pb={2}
-                    >
-                        {baseInformation?.tagline
-                            ? <Text><b>Tagline:</b> {baseInformation.tagline}</Text>
-                            : <Text><b>Tagline:</b> This project has no tagline</Text>
-                        }
-                    </Box> */}
-          <Box mt={4}>
-            {/* {baseInformation?.description
-                            ? <Text><b>Description:</b> {baseInformation.description}</Text>
-                            : <Text><b>Description:</b> This project has no description</Text>} */}
-
-            {/* <TestRichTextEditor
-
-                        /> */}
-
+        <div className="p-6 pt-0">
+          <div className="mt-4">
             {/* Check if user is in members array by checking each member.user.id */}
             {members?.some(
               (member) =>
@@ -1411,12 +1137,10 @@ export const ProjectOverviewCard = ({
                   userPk={me?.userData?.pk}
                   refetch={refetchData}
                 />
-                <Box my={4}>
+                <div className="my-4">
                   <Button
                     onClick={onOpenHideProjectModal}
-                    background={"orange.500"}
-                    color={"white"}
-                    _hover={{ bg: "orange.400" }}
+                    className="bg-orange-500 text-white hover:bg-orange-400"
                   >
                     {baseInformation?.hidden_from_staff_profiles?.includes(
                       me?.userData?.pk,
@@ -1424,7 +1148,7 @@ export const ProjectOverviewCard = ({
                       ? "Show On Staff Profile"
                       : "Hide From Staff Profile"}
                   </Button>
-                </Box>
+                </div>
               </>
             )}
 
@@ -1482,9 +1206,9 @@ export const ProjectOverviewCard = ({
                 key={`description${colorMode}`} // Change the key to force a re-render
               />
             )}
-          </Box>
+          </div>
 
-          <Flex pt={6} justifyContent={"right"}>
+          <div className="flex pt-6 justify-right">
             <ProjectDetailEditModal
               projectType={
                 baseInformation.kind === "student"
@@ -1509,9 +1233,9 @@ export const ProjectOverviewCard = ({
               baseInformation={baseInformation}
               details={details}
             />
-          </Flex>
-        </Box>
-      </Box>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

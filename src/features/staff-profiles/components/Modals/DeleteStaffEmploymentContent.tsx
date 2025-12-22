@@ -3,7 +3,7 @@ import { DrawerClose } from "@/shared/components/ui/drawer";
 import { Input } from "@/shared/components/ui/input";
 import { deleteEmployment } from "@/features/staff-profiles/services/staff-profiles.service";
 import type { ISimplePkProp, IStaffEmploymentEntry } from "@/shared/types";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
@@ -27,16 +27,11 @@ const DeleteStaffEmploymentContent = ({
   } = useForm<ISimplePkProp>({
     mode: "onChange", // or "onBlur"
   });
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: deleteEmployment,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Deleted",
-        position: "top-right",
-      });
+      toast.success("Deleted");
       await queryClient.invalidateQueries({
         queryKey: ["employment", usersPk],
       });
@@ -45,9 +40,7 @@ const DeleteStaffEmploymentContent = ({
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
+      toast.error("Failed");
         position: "top-right",
       });
     },

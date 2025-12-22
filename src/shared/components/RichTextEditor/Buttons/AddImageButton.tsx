@@ -1,30 +1,20 @@
 // AddImageButton.tsx - Fixed implementation
 import React, { useState, useRef } from "react";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  Input,
-  FormControl,
-  FormLabel,
-  FormHelperText,
-  Box,
-  Flex,
-  Text,
-  Image as ChakraImage,
-  useToast,
-  useDisclosure,
-  useColorMode,
-} from "@chakra-ui/react";
 import { FaUpload, FaImage } from "react-icons/fa";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { INSERT_IMAGE_COMMAND } from "../Plugins/ImagesPlugin";
 import { RevisedBaseToolbarButton } from "./RevisedBaseToolbarButton";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { toast } from "sonner";
 
 interface AddImageModalProps {
   isOpen: boolean;
@@ -33,7 +23,6 @@ interface AddImageModalProps {
 
 const AddImageModal = ({ isOpen, onClose }: AddImageModalProps) => {
   const [editor] = useLexicalComposerContext();
-  const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Upload state
@@ -60,25 +49,13 @@ const AddImageModal = ({ isOpen, onClose }: AddImageModalProps) => {
 
       // Check file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please select an image smaller than 5MB",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        toast.error("File too large. Please select an image smaller than 5MB");
         return;
       }
 
       // Check file type
       if (!file.type.startsWith("image/")) {
-        toast({
-          title: "Invalid file type",
-          description: "Please select an image file",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        toast.error("Invalid file type. Please select an image file");
         return;
       }
 
@@ -93,36 +70,18 @@ const AddImageModal = ({ isOpen, onClose }: AddImageModalProps) => {
           setPreviewUrl(reader.result as string);
         } catch (error) {
           console.error("Error setting preview URL:", error);
-          toast({
-            title: "Preview error",
-            description: "Could not generate image preview",
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
+          toast.error("Could not generate image preview");
         }
       };
 
       reader.onerror = () => {
-        toast({
-          title: "File read error",
-          description: "Could not read the selected file",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        toast.error("Could not read the selected file");
       };
 
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Error in file selection:", error);
-      toast({
-        title: "Error",
-        description: "An error occurred processing the file",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.error("An error occurred processing the file");
     }
   };
 
@@ -153,112 +112,98 @@ const AddImageModal = ({ isOpen, onClose }: AddImageModalProps) => {
       handleClose();
     } catch (error) {
       console.error("Error inserting image:", error);
-      toast({
-        title: "Error inserting image",
-        description: "There was a problem inserting the image",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.error("There was a problem inserting the image");
     } finally {
       setIsUploading(false);
     }
   };
 
-  const { colorMode } = useColorMode();
-
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} size="xl">
-      <ModalOverlay />
-      <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
-        <ModalHeader>Add Image</ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Add Image</DialogTitle>
+        </DialogHeader>
 
-        <ModalBody>
-          <Flex direction="column" gap={4}>
-            <Box
-              borderWidth="2px"
-              borderRadius="md"
-              borderStyle="dashed"
-              p={6}
-              textAlign="center"
-              cursor="pointer"
-              bg={previewUrl ? "transparent" : "gray.50"}
-              onClick={handleUploadButtonClick}
-            >
-              {previewUrl ? (
-                <ChakraImage
-                  src={previewUrl}
-                  alt="Preview"
-                  maxH="200px"
-                  mx="auto"
-                />
-              ) : (
-                <Flex direction="column" alignItems="center" gap={2}>
-                  <FaUpload size={30} color="gray" />
-                  <Text>Click to select an image</Text>
-                  <Text fontSize="sm" color="gray.500">
-                    PNG, JPG, GIF up to 5MB
-                  </Text>
-                </Flex>
-              )}
-              <Input
-                type="file"
-                ref={fileInputRef}
-                hidden
-                accept="image/*"
-                onChange={handleFileChange}
+        <div className="flex flex-col gap-4">
+          <div
+            className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer ${
+              previewUrl ? "bg-transparent" : "bg-muted/50"
+            }`}
+            onClick={handleUploadButtonClick}
+          >
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="max-h-48 mx-auto"
               />
-            </Box>
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <FaUpload size={30} className="text-muted-foreground" />
+                <p>Click to select an image</p>
+                <p className="text-sm text-muted-foreground">
+                  PNG, JPG, GIF up to 5MB
+                </p>
+              </div>
+            )}
+            <Input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </div>
 
-            <FormControl>
-              <FormLabel>Alt Text</FormLabel>
-              <Input
-                value={altText}
-                onChange={(e) => setAltText(e.target.value)}
-                placeholder="Describe this image"
-              />
-              <FormHelperText>Helps with accessibility</FormHelperText>
-            </FormControl>
-          </Flex>
-        </ModalBody>
+          <div className="space-y-2">
+            <Label htmlFor="altText">Alt Text</Label>
+            <Input
+              id="altText"
+              value={altText}
+              onChange={(e) => setAltText(e.target.value)}
+              placeholder="Describe this image"
+            />
+            <p className="text-sm text-muted-foreground">
+              Helps with accessibility
+            </p>
+          </div>
+        </div>
 
-        <ModalFooter>
-          <Button variant="outline" mr={3} onClick={handleClose}>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
           <Button
-            colorScheme="blue"
-            isLoading={isUploading}
-            isDisabled={!selectedFile}
+            disabled={!selectedFile || isUploading}
             onClick={handleInsertUploadedImage}
           >
-            Insert Image
+            {isUploading ? "Inserting..." : "Insert Image"}
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
 const AddImageButton = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      <AddImageModal isOpen={isOpen} onClose={onClose} />
-      <Box className="tooltip-container">
+      <AddImageModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <div className="tooltip-container">
         <RevisedBaseToolbarButton
           buttonSize="sm"
           ariaLabel="Insert Image"
           variant="ghost"
           isDisabled={false}
-          onClick={onOpen}
+          onClick={() => setIsOpen(true)}
         >
           <FaImage />
         </RevisedBaseToolbarButton>
-        <Text className="tooltip-text">Insert Image</Text>
-      </Box>
+        <span className="tooltip-text">Insert Image</span>
+      </div>
     </>
   );
 };

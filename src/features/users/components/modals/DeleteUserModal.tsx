@@ -1,38 +1,26 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
-import {
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  Grid,
-  Input,
-  InputGroup,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import {
   AdminSwitchVar,
   MutationError,
   MutationSuccess,
   deleteUserAdmin,
 } from "@/features/users/services/users.service";
-import { useMutation } from "@tanstack/react-query";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 
 interface IModalProps {
@@ -49,7 +37,7 @@ export const DeleteUserModal = ({
   userPk,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -58,22 +46,14 @@ export const DeleteUserModal = ({
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
   };
 
   const { reFetch } = useUserSearchContext();
 
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const {
     register,
-    // setValue,
     handleSubmit,
   } = useForm<AdminSwitchVar>();
 
@@ -85,26 +65,15 @@ export const DeleteUserModal = ({
     // Start of mutation handling
     mutationFn: deleteUserAdmin,
     onMutate: () => {
-      addToast({
-        title: "Deleting...",
+      toast.loading("Deleting...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `User Deleted`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: "User Deleted",
+      });
       //  Close the modal
       onClose?.();
 
@@ -146,16 +115,9 @@ export const DeleteUserModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -165,69 +127,62 @@ export const DeleteUserModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"sm"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(onSubmit)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Delete User?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent className={`sm:max-w-md ${colorMode === "dark" ? "bg-gray-800 text-gray-400" : "bg-white"}`}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogHeader>
+            <DialogTitle>Delete User?</DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"bold"} fontSize={"xl"}>
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <p className="font-bold text-xl">
                 Are you sure you want to delete this user?
-              </Text>
-            </Center>
-            <Center mt={4}>
-              <UnorderedList>
-                <ListItem>They will be removed from all projects</ListItem>
-                <ListItem>
+              </p>
+            </div>
+            <div className="flex justify-center mt-4">
+              <ul className="list-disc list-inside space-y-1">
+                <li>They will be removed from all projects</li>
+                <li>
                   Any projects they were leading will require a new project lead
-                </ListItem>
-
-                <ListItem>Their comments will be deleted</ListItem>
-              </UnorderedList>
-            </Center>
-            <FormControl my={2} mb={4} userSelect="none">
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("userPk", { required: true, value: userPk })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <Center mt={6} p={5}>
-              <Text>
+                </li>
+                <li>Their comments will be deleted</li>
+              </ul>
+            </div>
+            <div className="my-2 mb-4">
+              <Input
+                type="hidden"
+                {...register("userPk", { required: true, value: userPk })}
+                readOnly
+              />
+            </div>
+            <div className="flex justify-center mt-6 p-5">
+              <p>
                 If this is okay or this is a duplicate account, please proceed.
-              </Text>
-            </Center>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                isDisabled={userIsSuper}
-                isLoading={deletionMutation.isPending}
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                }`}
+                disabled={userIsSuper || deletionMutation.isPending}
                 type="submit"
-                ml={3}
               >
-                Delete
+                {deletionMutation.isPending ? "Deleting..." : "Delete"}
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

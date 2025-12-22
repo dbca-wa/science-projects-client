@@ -2,16 +2,9 @@
 
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { useUser } from "@/features/users/hooks/useUser";
-import {
-  Box,
-  Button,
-  Center,
-  Divider,
-  Flex,
-  Grid,
-  Icon,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Separator } from "@/shared/components/ui/separator";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { AiOutlineFundProjectionScreen, AiOutlineLeft } from "react-icons/ai";

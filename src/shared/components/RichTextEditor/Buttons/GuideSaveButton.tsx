@@ -1,4 +1,4 @@
-import { type ToastId, useToast, type UseToastOptions } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { FaSave } from "react-icons/fa";
@@ -27,7 +27,6 @@ export const GuideSaveButton = ({
   onSave, // Dynamic saving function
   fieldKey, // Added fieldKey prop
 }: ExtendedIHTMLGuideSave) => {
-  const toast = useToast();
   const [btnLoading, setBtnLoading] = useState(false);
 
   // Implement the second handleSave function
@@ -56,12 +55,8 @@ export const GuideSaveButton = ({
 
         if (!htmlData) {
           console.error("HTML data is undefined or empty");
-          toast({
-            title: "Error",
+          toast.error("Error", {
             description: "No content to save",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
           });
           setBtnLoading(false);
           return;
@@ -99,12 +94,7 @@ export const GuideSaveButton = ({
       }
 
       if (success) {
-        toast({
-          title: "Content saved",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
+        toast.success("Content saved");
 
         // Make sure refetch is called
         if (softRefetch) {
@@ -117,8 +107,7 @@ export const GuideSaveButton = ({
           setIsEditorOpen(false);
         }, 300);
       } else {
-        toast({
-          title: "Error",
+        toast.error("Error", {
           description: "Failed to save content",
           status: "error",
           duration: 5000,
@@ -130,14 +119,12 @@ export const GuideSaveButton = ({
       toast({
         title: "Error",
         description: error.message || "Failed to save content",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
+          description: "Failed to save content",
+        });
+      }
 
-    setBtnLoading(false);
-  };
+      setBtnLoading(false);
+    };
 
   return (
     <BaseOptionsButton

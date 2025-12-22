@@ -6,7 +6,7 @@ import {
   updateStaffProfileOverviewSection,
 } from "@/features/staff-profiles/services/staff-profiles.service";
 import type { IStaffOverviewData } from "@/shared/types";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import DatabaseRichTextEditor from "../Editor/DatabaseRichTextEditor";
@@ -47,15 +47,12 @@ const EditStaffOverviewContent = ({
   });
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: updateStaffProfileOverviewSection,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Updated",
-        position: "top-right",
+      toast.success("Updated", {
+        description: "Staff overview updated successfully",
       });
       await queryClient.invalidateQueries({
         queryKey: ["staffOverview", usersPk],
@@ -65,10 +62,8 @@ const EditStaffOverviewContent = ({
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Could not update staff overview",
       });
     },
     // onMutate: () => {

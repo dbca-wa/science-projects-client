@@ -2,15 +2,8 @@ import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
 // import { useProjectSearchContext } from "@/shared/hooks/ProjectSearchContext";
 import { useBoxShadow } from "@/shared/hooks/useBoxShadow";
 import type { IMainDoc } from "@/shared/types";
-import {
-  Box,
-  Center,
-  Divider,
-  Flex,
-  Grid,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Separator } from "@/shared/components/ui/separator";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useNavigate } from "react-router-dom";
 import { HiDocumentCheck } from "react-icons/hi2";
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
@@ -113,18 +106,14 @@ export const TraditionalDocumentTaskDisplay = ({
   const boxShadow = useBoxShadow();
 
   return (
-    <Flex
-      alignItems={"center"}
-      border={"1px solid"}
-      borderTopWidth={0}
-      borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-      w={"100%"}
-      p={2}
-      _hover={{
-        color: colorMode === "dark" ? "blue.100" : "blue.300",
-        cursor: "pointer",
-        boxShadow: boxShadow,
-        zIndex: 999,
+    <div
+      className={`flex items-center border border-t-0 w-full p-2 cursor-pointer hover:z-[999] ${
+        colorMode === "light" 
+          ? "border-gray-200 hover:text-blue-300" 
+          : "border-gray-600 hover:text-blue-100"
+      }`}
+      style={{
+        boxShadow: "hover:" + boxShadow,
       }}
       onClick={(e) =>
         goToProjectDocument(
@@ -134,67 +123,57 @@ export const TraditionalDocumentTaskDisplay = ({
         )
       }
     >
-      <Flex minW={"156px"} maxW={"156px"}>
-        <Box
-          // bg={"yellow"}
-          alignItems={"center"}
-          display={"flex"}
-        >
-          <Center
-            color={colorMode === "light" ? "red.600" : "red.200"}
-            mr={3}
-            alignItems={"center"}
-            alignContent={"center"}
-            boxSize={5}
-            w={"20px"}
+      <div className="flex min-w-[156px] max-w-[156px]">
+        <div className="flex items-center">
+          <div
+            className={`flex items-center justify-center mr-3 w-5 h-5 ${
+              colorMode === "light" ? "text-red-600" : "text-red-200"
+            }`}
           >
             <HiDocumentCheck />
-          </Center>
-        </Box>
+          </div>
+        </div>
 
-        <Flex flexDir={"column"}>
-          <Box w={"100%"}>
-            <Text>{formattedDocumentKind(document?.kind)}</Text>
-          </Box>
-        </Flex>
-      </Flex>
+        <div className="flex flex-col">
+          <div className="w-full">
+            <p>{formattedDocumentKind(document?.kind)}</p>
+          </div>
+        </div>
+      </div>
 
-      <Divider orientation="vertical" mr={5} />
-      <Grid flex={1}>
-        <Flex>
+      <Separator orientation="vertical" className="mr-5" />
+      <div className="flex-1 grid">
+        <div className="flex">
           <ExtractedHTMLTitle
             htmlContent={`${document?.project?.title}`}
             color={colorMode === "dark" ? "blue.200" : "blue.400"}
             fontWeight={"bold"}
             cursor={"pointer"}
           />
-        </Flex>
-        <Flex>
-          <Text
-            color={`${
+        </div>
+        <div className="flex">
+          <span
+            className={`font-semibold text-sm mr-1 ${
               inputKind === "directorate"
-                ? "red"
+                ? "text-red-600"
                 : inputKind === "business_area_lead"
-                  ? "orange"
+                  ? "text-orange-600"
                   : inputKind === "team_member"
-                    ? "blue"
-                    : "green"
-            }.600`}
-            fontWeight={"semibold"}
-            fontSize={"small"}
-            mr={1}
+                    ? "text-blue-600"
+                    : "text-green-600"
+            }`}
           >
             {`${formattedInputKind(inputKind)}:`}
-          </Text>
-          <Text color={"gray.500"} fontWeight={"semibold"} fontSize={"small"}>
+          </span>
+          <span className="text-gray-500 font-semibold text-sm">
             {inputKind === "team_member"
               ? "Input required"
               : `Determine if the ${formattedDocumentKind(
                   document?.kind,
                 )} for this project is satisfactory`}
-          </Text>
-        </Flex>
-      </Grid>
-    </Flex>
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };

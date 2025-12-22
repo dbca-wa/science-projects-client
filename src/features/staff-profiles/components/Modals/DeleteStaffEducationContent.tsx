@@ -3,7 +3,7 @@ import { DrawerClose } from "@/shared/components/ui/drawer";
 import { Input } from "@/shared/components/ui/input";
 import { deleteEducation } from "@/features/staff-profiles/services/staff-profiles.service";
 import type { ISimplePkProp, IStaffEducationEntry } from "@/shared/types";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
@@ -27,15 +27,12 @@ const DeleteStaffEducationContent = ({
   } = useForm<ISimplePkProp>({
     mode: "onChange", // or "onBlur"
   });
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: deleteEducation,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Deleted",
-        position: "top-right",
+      toast.success("Deleted", {
+        description: "Education entry deleted successfully",
       });
       await queryClient.invalidateQueries({
         queryKey: ["education", usersPk],
@@ -45,10 +42,8 @@ const DeleteStaffEducationContent = ({
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Could not delete education entry",
       });
     },
     // onMutate: () => {

@@ -11,7 +11,7 @@ import {
 } from "@/shared/components/ui/select";
 import { editEducation } from "@/features/staff-profiles/services/staff-profiles.service";
 import type { IStaffEducationEntry } from "@/shared/types";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 
@@ -49,15 +49,12 @@ const EditStaffEducationContent = ({
     },
   });
 
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: editEducation,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Updated",
-        position: "top-right",
+      toast.success("Updated", {
+        description: "Education entry updated successfully",
       });
       await queryClient.invalidateQueries({
         queryKey: ["education", usersPk],
@@ -67,10 +64,8 @@ const EditStaffEducationContent = ({
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Could not update education entry",
       });
     },
     // onMutate: () => {

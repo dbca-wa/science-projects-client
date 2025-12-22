@@ -6,32 +6,15 @@ import type {
   ISimpleLocationData,
   OrganisedLocationData,
 } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Center,
-  Checkbox,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  Select,
-  Spinner,
-  Text,
-  VStack,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/shared/components/ui/sheet";
+import { Loader2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import _ from "lodash";
@@ -40,7 +23,6 @@ import { useForm } from "react-hook-form";
 
 export const LocationsCRUD = () => {
   const { register, handleSubmit } = useForm<IAddLocationForm>();
-  const toast = useToast();
   const { isLoading, data: slices } = useQuery<OrganisedLocationData>({
     queryFn: getAllLocations,
     queryKey: ["locations"],
@@ -50,31 +32,21 @@ export const LocationsCRUD = () => {
   const mutation = useMutation({
     mutationFn: createLocation,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
-      });
+      toast.success("Created");
       onAddClose();
       queryClient.invalidateQueries({ queryKey: ["locations"] });
     },
     onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
+      toast.error("Failed");
     },
   });
   const onSubmit = (formData: IAddLocationForm) => {
     mutation.mutate(formData);
   };
 
-  const {
-    isOpen: addIsOpen,
-    onOpen: onAddOpen,
-    onClose: onAddClose,
-  } = useDisclosure();
+  const [addIsOpen, setAddIsOpen] = useState(false);
+  const onAddOpen = () => setAddIsOpen(true);
+  const onAddClose = () => setAddIsOpen(false);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredSlices, setFilteredSlices] = useState<ISimpleLocationData[]>(
@@ -236,93 +208,91 @@ export const LocationsCRUD = () => {
       <Head title="Locations" />
 
       {isLoading ? (
-        <Center h={"200px"}>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center items-center h-[200px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       ) : (
         <>
-          <Box maxW={"100%"} maxH={"100%"}>
-            <Box>
-              <Text fontWeight={"semibold"} fontSize={"lg"}>
+          <div className="max-w-full max-h-full">
+            <div>
+              <p className="font-semibold text-lg">
                 Locations ({countOfItems})
-              </Text>
-            </Box>
-            <Flex width={"100%"} mt={4}>
+              </p>
+            </div>
+            <div className="flex w-full mt-4">
               <Input
                 type="text"
                 placeholder="Search locations by name"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                w={"65%"}
+                className="w-[65%]"
               />
-              <Flex
-                justifyContent={"space-between"}
-                px={4}
-                w={"100%"}
-                // bg={"red"}
-              >
+              <div className="flex justify-between px-4 w-full">
                 {Object.keys(areaTypeMap).map((key) => (
-                  <Checkbox
-                    key={key}
-                    value={key}
-                    isChecked={selectedAreaTypes.includes(key)}
-                    onChange={handleAreaTypeCheckboxChange}
-                  >
-                    {areaTypeMap[key].name}
-                  </Checkbox>
+                  <div key={key} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={key}
+                      checked={selectedAreaTypes.includes(key)}
+                      onCheckedChange={(checked) => {
+                        const event = {
+                          target: {
+                            value: key,
+                            checked: checked as boolean,
+                          },
+                        } as ChangeEvent<HTMLInputElement>;
+                        handleAreaTypeCheckboxChange(event);
+                      }}
+                    />
+                    <Label htmlFor={key} className="text-sm font-medium">
+                      {areaTypeMap[key].name}
+                    </Label>
+                  </div>
                 ))}
-              </Flex>
+              </div>
 
-              <Flex
-                justifyContent={"flex-end"}
-                // w={"100%"}
-                pl={10}
-              >
+              <div className="flex justify-end pl-10">
                 <Button
                   onClick={onAddOpen}
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  className={`text-white ${
+                    colorMode === "light" 
+                      ? "bg-green-500 hover:bg-green-400" 
+                      : "bg-green-600 hover:bg-green-500"
+                  }`}
                 >
                   Add
                 </Button>
-              </Flex>
-            </Flex>
+              </div>
+            </div>
             {countOfItems === 0 ? (
-              <Box py={10} fontWeight={"bold"}>
-                <Text>No results</Text>
-              </Box>
+              <div className="py-10 font-bold">
+                <p>No results</p>
+              </div>
             ) : (
               <>
-                <Grid
-                  gridTemplateColumns={"1fr 3fr"}
-                  mt={4}
-                  width="100%"
-                  p={3}
-                  borderWidth={1}
-                  borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
+                <div
+                  className="grid mt-4 w-full p-3 border"
+                  style={{ 
+                    gridTemplateColumns: "1fr 3fr",
+                    borderBottomWidth: filteredSlices.length === 0 ? "1px" : "0"
+                  }}
                 >
-                  <Flex>
-                    <Text as={"b"}>Location Name</Text>
-                  </Flex>
-                  <Flex justifyContent={"space-between"}>
-                    <Text as={"b"}>Location Type</Text>
-
-                    <Text as={"b"}>Change</Text>
-                  </Flex>
-                </Grid>
+                  <div className="flex">
+                    <p className="font-bold">Location Name</p>
+                  </div>
+                  <div className="flex justify-between">
+                    <p className="font-bold">Location Type</p>
+                    <p className="font-bold">Change</p>
+                  </div>
+                </div>
               </>
             )}
 
             {searchLoading ? (
-              <Center w={"100%"} minH="100px" pt={10}>
-                <Spinner size={"xl"} />
-              </Center>
+              <div className="flex justify-center w-full min-h-[100px] pt-10">
+                <Loader2 className="h-12 w-12 animate-spin" />
+              </div>
             ) : (
-              <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+              <div className="grid grid-cols-1">
                 {searchTerm !== "" || selectedAreaTypes.length !== 0
                   ? filteredSlices.map((s) => {
                       if (
@@ -353,89 +323,91 @@ export const LocationsCRUD = () => {
                           />
                         )),
                       )}
-              </Grid>
+              </div>
             )}
-          </Box>
+          </div>
 
-          <Drawer isOpen={addIsOpen} onClose={onAddClose} size={"lg"}>
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-              <DrawerHeader>Add Location</DrawerHeader>
-              <DrawerBody>
-                <VStack
-                  spacing={10}
-                  as="form"
+          <Sheet open={addIsOpen} onOpenChange={setAddIsOpen}>
+            <SheetContent className="w-[400px] sm:w-[540px]">
+              <SheetHeader>
+                <SheetTitle>Add Location</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                <form
+                  className="space-y-10"
                   id="add-form"
                   onSubmit={handleSubmit(onSubmit)}
                 >
-                  <FormControl>
-                    <FormLabel>Name</FormLabel>
-                    <InputGroup>
-                      <Input
-                        autoFocus
-                        autoComplete="off"
-                        {...register("name", { required: true })}
-                        required
-                        type="text"
-                      />
-                    </InputGroup>
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>Area Type</FormLabel>
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      autoFocus
+                      autoComplete="off"
+                      {...register("name", { required: true })}
+                      required
+                      type="text"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="area_type">Area Type</Label>
                     <Select {...register("area_type", { required: true })}>
-                      <option value={"dbcaregion"}>DBCA Region</option>
-                      <option value={"dbcadistrict"}>DBCA District</option>
-                      <option value={"ibra"}>
-                        Interim Biogeographic Regionalisation of Australia
-                      </option>
-                      <option value={"imcra"}>
-                        Integrated Marine and Coastal Regionisation of Australia
-                      </option>
-                      <option value={"nrm"}>
-                        Natural Resource Management Region
-                      </option>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select area type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dbcaregion">DBCA Region</SelectItem>
+                        <SelectItem value="dbcadistrict">DBCA District</SelectItem>
+                        <SelectItem value="ibra">
+                          Interim Biogeographic Regionalisation of Australia
+                        </SelectItem>
+                        <SelectItem value="imcra">
+                          Integrated Marine and Coastal Regionisation of Australia
+                        </SelectItem>
+                        <SelectItem value="nrm">
+                          Natural Resource Management Region
+                        </SelectItem>
+                      </SelectContent>
                     </Select>
-                  </FormControl>
+                  </div>
                   {mutation.isError ? (
-                    <Box mt={4}>
+                    <div className="mt-4">
                       {Object.keys(
                         (mutation.error as AxiosError).response.data,
                       ).map((key) => (
-                        <Box key={key}>
+                        <div key={key}>
                           {(
                             (mutation.error as AxiosError).response.data[
                               key
                             ] as string[]
                           ).map((errorMessage, index) => (
-                            <Text key={`${key}-${index}`} color="red.500">
+                            <p key={`${key}-${index}`} className="text-red-500">
                               {`${key}: ${errorMessage}`}
-                            </Text>
+                            </p>
                           ))}
-                        </Box>
+                        </div>
                       ))}
-                    </Box>
+                    </div>
                   ) : null}
-                </VStack>
-              </DrawerBody>
-              <DrawerFooter>
+                </form>
+              </div>
+              <SheetFooter>
                 <Button
                   form="add-form"
                   type="submit"
-                  isLoading={mutation.isPending}
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
-                  size="lg"
-                  width={"100%"}
+                  disabled={mutation.isPending}
+                  className={`text-white w-full ${
+                    colorMode === "light" 
+                      ? "bg-blue-500 hover:bg-blue-400" 
+                      : "bg-blue-600 hover:bg-blue-500"
+                  }`}
                 >
+                  {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Create
                 </Button>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </>
       )}
     </>

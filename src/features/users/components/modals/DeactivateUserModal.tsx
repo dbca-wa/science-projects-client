@@ -1,31 +1,6 @@
 // WIP: Delete User Modal - for removing users from the system all together. Admin only.
 
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  Grid,
-  Input,
-  InputGroup,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   AdminSwitchVar,
@@ -36,6 +11,18 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserSearchContext } from "@/features/users/hooks/UserSearchContext";
 import type { IUserData } from "@/shared/types";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -51,7 +38,7 @@ export const DeactivateUserModal = ({
   user,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -60,18 +47,12 @@ export const DeactivateUserModal = ({
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
   };
 
   const { reFetch } = useUserSearchContext();
 
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
   const queryClient = useQueryClient();
 
   const { register, handleSubmit } = useForm<AdminSwitchVar>();
@@ -84,28 +65,17 @@ export const DeactivateUserModal = ({
     // Start of mutation handling
     mutationFn: deactivateUserAdmin,
     onMutate: () => {
-      addToast({
-        title: "Deactivating Account...",
+      toast.loading("Deactivating Account...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: (data) => {
       console.log(data);
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `User Deactivated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `User Deactivated`,
+      });
       //  Close the modal
       if (onClose) {
         onClose();
@@ -149,16 +119,9 @@ export const DeactivateUserModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Deactivation failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Deactivation failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -168,76 +131,75 @@ export const DeactivateUserModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"sm"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(onSubmit)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent 
+        className={`max-w-sm ${
+          colorMode === "dark" 
+            ? "bg-gray-800 text-gray-400 border-gray-700" 
+            : "bg-white text-gray-900 border-gray-200"
+        }`}
+      >
+        <DialogHeader>
+          <DialogTitle>
             {user?.is_active ? "Deactivate" : "Reactivate"} User?
-          </ModalHeader>
-          <ModalCloseButton />
-
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to{" "}
-                {user?.is_active ? "deactivate" : "reactivate"} this user?
-              </Text>
-            </Center>
-            <Text mt={4}>
-              They will{" "}
-              {user?.is_active
-                ? "lose access to SPMS but their data will be retained"
-                : "regain access to SPMS"}
-              .
-            </Text>
-            <FormControl mt={0} mb={4} userSelect="none">
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("userPk", { required: true, value: user?.pk })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <Box mt={6}>
-              <Text>If this is okay, please proceed.</Text>
-            </Box>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                // isDisabled={!changesMade}
-                isDisabled={userIsSuper}
-                isLoading={deactivationMutation.isPending}
-                type="submit"
-                color={"white"}
-                background={
-                  colorMode === "light"
-                    ? user?.is_active
-                      ? "red.500"
-                      : "green.500"
-                    : user?.is_active
-                      ? "red.600"
-                      : "green.500"
-                }
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                ml={3}
-              >
-                {user?.is_active ? "Deactivate" : "Reactivate"}
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+          </DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <p className="font-bold text-xl">
+                  Are you sure you want to{" "}
+                  {user?.is_active ? "deactivate" : "reactivate"} this user?
+                </p>
+              </div>
+              <p>
+                They will{" "}
+                {user?.is_active
+                  ? "lose access to SPMS but their data will be retained"
+                  : "regain access to SPMS"}
+                .
+              </p>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="mt-0 mb-4 select-none">
+                  <Input
+                    type="hidden"
+                    {...register("userPk", { required: true, value: user?.pk })}
+                    readOnly
+                  />
+                </div>
+              </form>
+              <div className="mt-6">
+                <p>If this is okay, please proceed.</p>
+              </div>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              disabled={userIsSuper || deactivationMutation.isPending}
+              type="submit"
+              className={`text-white ${
+                colorMode === "light"
+                  ? user?.is_active
+                    ? "bg-red-500 hover:bg-red-400"
+                    : "bg-green-500 hover:bg-green-400"
+                  : user?.is_active
+                    ? "bg-red-600 hover:bg-red-500"
+                    : "bg-green-500 hover:bg-green-400"
+              }`}
+              onClick={handleSubmit(onSubmit)}
+            >
+              {deactivationMutation.isPending 
+                ? "Loading..." 
+                : (user?.is_active ? "Deactivate" : "Reactivate")
+              }
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

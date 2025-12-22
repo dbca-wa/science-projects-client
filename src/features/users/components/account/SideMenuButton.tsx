@@ -1,5 +1,5 @@
 // Handles creation of sidebar buttons on account page
-import { Box, Text, useBreakpointValue, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useEffect, useState } from "react";
 
 interface ISidebarMenuButtonProps {
@@ -27,58 +27,46 @@ export const SideMenuButton = ({
     setSelected(cleanedSelectedString === cleanedPageName);
   }, [selectedString, pageName]);
 
-  const isOver750 = useBreakpointValue({
-    false: true,
-    sm: false,
-    md: false,
-    "768px": true,
-    mdlg: true,
-    lg: true,
-    xlg: true,
-  });
+  // Replace useBreakpointValue with a simple media query hook or inline logic
+  const [isOver750, setIsOver750] = useState(window.innerWidth >= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsOver750(window.innerWidth >= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <Box
-      w={"100%"}
-      p={2}
-      mb={4}
-      // width={"100%"}
-      bg={
+    <div
+      className={`w-full p-2 mb-4 ${
         selected
           ? colorMode === "light"
-            ? "blue.400"
-            : "blue.500"
+            ? "bg-blue-400"
+            : "bg-blue-500"
           : "transparent"
       }
-      color={selected ? "white" : "inherit"}
-      _hover={
+          : "bg-transparent"
+      } ${selected ? "text-white" : ""} ${
         colorMode === "light"
-          ? {
-              bg: selected ? "blue.400" : "blue.100",
-              color: selected ? "white" : "black",
-            }
-          : {
-              bg: selected ? "blue.400" : "gray.300",
-              color: selected ? "white" : "black",
-            }
-      }
-      position={"relative"}
-      display={"flex"}
-      rounded={"lg"}
-      cursor={"pointer"}
-      transitionProperty={
-        "background-color, border-color, color, fill, stroke, opacity, box-shadow, transform"
-      }
+          ? selected
+            ? "hover:bg-blue-400 hover:text-white"
+            : "hover:bg-blue-100 hover:text-black"
+          : selected
+            ? "hover:bg-blue-400 hover:text-white"
+            : "hover:bg-gray-300 hover:text-black"
+      } relative flex rounded-lg cursor-pointer transition-all`}
       onClick={handleOnClick}
-      ml={isOver750 ? 4 : undefined}
+      style={{ marginLeft: isOver750 ? '1rem' : undefined }}
     >
-      <Box flex={1}>
-        <Box _focus={{ outline: "none" }}>
-          <Box textAlign={"center"}>
-            <Text textAlign={"center"}>{pageName}</Text>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+      <div className="flex-1">
+        <div className="focus:outline-none">
+          <div className="text-center">
+            <p className="text-center">{pageName}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

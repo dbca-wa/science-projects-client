@@ -2,16 +2,6 @@
 
 import { ChatUser } from "@/shared/components/ChatUser";
 import type { IBranch, IBusinessArea, ICommentReaction, IUserData } from "@/shared/types";
-import {
-  Box,
-  Center,
-  Flex,
-  type ToastId,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { BiSolidLike } from "react-icons/bi";
 
@@ -41,6 +31,8 @@ import { ImCross } from "react-icons/im";
 import { CustomPastePlugin } from "../../Plugins/CustomPastePlugin";
 import { MentionNode } from "../../Plugins/MentionsPlugin";
 import { PrepopulateCommentDisplayPlugin } from "../../Plugins/PrepopulateCommentDisplayPlugin";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
 
 interface Props {
   baseAPI: string;
@@ -170,39 +162,21 @@ export const CommentDisplayRTE = ({
       });
     }
   }, [authorControls, isHovered]);
-  const {
-    isOpen: isDeleteCommentModalOpen,
-    onOpen: onOpenDeleteCommentModal,
-    onClose: onCloseDeleteCommentModal,
-  } = useDisclosure();
+  
+  const [isDeleteCommentModalOpen, setIsDeleteCommentModalOpen] = useState(false);
+  const onOpenDeleteCommentModal = () => setIsDeleteCommentModalOpen(true);
+  const onCloseDeleteCommentModal = () => setIsDeleteCommentModalOpen(false);
 
   const queryClient = useQueryClient();
   const { reset } = useForm<ICommentReaction>();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+  
   const commentReactionMutation = useMutation({
     mutationFn: createCommentReaction,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Reacting...",
-        position: "top-right",
-      });
+      toast.loading("Reacting...");
     },
     onSuccess: (response) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: response.status === 204 ? `Reaction Removed` : `Reacted`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success(response.status === 204 ? "Reaction Removed" : "Reacted");
       reset();
 
       setTimeout(() => {
@@ -217,16 +191,7 @@ export const CommentDisplayRTE = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not React",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could Not React: ${error}`);
     },
   });
 
@@ -245,7 +210,7 @@ export const CommentDisplayRTE = ({
   }, [reactions, me?.userData?.pk]);
 
   return (
-    <Box>
+    <div>
       {(!otherUser || me?.userData?.is_superuser) && (
         <DeleteCommentModal
           commentPk={commentPk}
@@ -256,17 +221,13 @@ export const CommentDisplayRTE = ({
         />
       )}
 
-      <Flex>
-        <Box pb={2} w={"100%"} zIndex={2}>
-          <Box
-            pos={"relative"}
-            w={"100%"}
-            roundedBottom={20}
-            boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
-            bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
-            roundedTop={20}
-            zIndex={2}
-            pb={3}
+      <div className="flex">
+        <div className="pb-2 w-full z-[2]">
+          <div
+            className="relative w-full rounded-b-[20px] rounded-t-[20px] z-[2] pb-3 shadow-[rgba(100,100,111,0.1)_0px_7px_29px_0px]"
+            style={{
+              backgroundColor: colorMode === "light" ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 0, 0, 0.5)"
+            }}
           >
             {/* {colorMode === "light" ? ( */}
             <LexicalComposer
@@ -281,33 +242,27 @@ export const CommentDisplayRTE = ({
               <PrepopulateCommentDisplayPlugin data={payload} />
               <RichTextPlugin
                 contentEditable={
-                  <Box
-                    zIndex={2}
+                  <div
+                    className="z-[2]"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                   >
-                    <Box pos={"absolute"} right={2.5} top={"15px"}>
+                    <div className="absolute right-2.5 top-[15px]">
                       {!otherUser ? (
                         isHovered ? (
-                          <Center
+                          <div
+                            className="flex items-center justify-center mr-3 mt-2 w-[10px] h-[10px] rounded-full text-red-500 hover:text-red-400 cursor-pointer"
                             as={motion.div}
                             initial={{ opacity: 0, x: 10 }}
                             animate={authorControls}
-                            color={"red.500"}
-                            _hover={{ color: "red.400", cursor: "pointer" }}
-                            mr={3}
-                            mt={2}
-                            alignItems={"center"}
-                            boxSize={"10px"}
-                            borderRadius={"full"}
                             onClick={onOpenDeleteCommentModal}
                           >
                             <ImCross />
-                          </Center>
+                          </div>
                         ) : null
                       ) : null}
-                    </Box>
-                    <Box pl={3} pt={2} pr={3}>
+                    </div>
+                    <div className="pl-3 pt-2 pr-3">
                       <ChatUser
                         baseAPI={baseAPI}
                         otherUser={otherUser}
@@ -319,7 +274,7 @@ export const CommentDisplayRTE = ({
                         branches={branches}
                         businessAreas={businessAreas}
                       />
-                    </Box>
+                    </div>
                     <ContentEditable
                       style={{
                         // minHeight: "50px",
@@ -336,10 +291,8 @@ export const CommentDisplayRTE = ({
                         zIndex: 2,
                       }}
                     />
-                    <Box
-                      pos={"absolute"}
-                      right={5}
-                      bottom={4}
+                    <div
+                      className="absolute right-5 bottom-4 cursor-pointer"
                       onClick={() => {
                         // console.log("liked");
                         onLike({
@@ -350,42 +303,37 @@ export const CommentDisplayRTE = ({
                       }}
                     >
                       {isHovered ? (
-                        <Flex>
-                          <Flex
-                            alignItems={"center"}
-                            // color={"blue.500"}
-                            _hover={{
-                              color: "blue.400",
-                              cursor: "pointer",
-                            }}
+                        <div className="flex">
+                          <div
+                            className="flex items-center hover:text-blue-400 cursor-pointer"
                           >
                             {likeCount !== 0 ? (
-                              <Box mr={2}>{likeCount}</Box>
+                              <div className="mr-2">{likeCount}</div>
                             ) : null}
 
-                            <Box>
+                            <div>
                               <BiSolidLike />
-                            </Box>
-                          </Flex>
-                        </Flex>
+                            </div>
+                          </div>
+                        </div>
                       ) : (
-                        <Flex>
-                          <Flex
-                            alignItems={"center"}
-                            color={userHasLiked ? "blue.400" : "gray.500"}
-                            _hover={{ color: "gray.400", cursor: "pointer" }}
+                        <div className="flex">
+                          <div
+                            className={`flex items-center hover:text-gray-400 cursor-pointer ${
+                              userHasLiked ? "text-blue-400" : "text-gray-500"
+                            }`}
                           >
                             {likeCount !== 0 ? (
-                              <Box mr={2}>{likeCount}</Box>
+                              <div className="mr-2">{likeCount}</div>
                             ) : null}{" "}
-                            <Box>
+                            <div>
                               <BiSolidLike />
-                            </Box>
-                          </Flex>
-                        </Flex>
+                            </div>
+                          </div>
+                        </div>
                       )}
-                    </Box>
-                  </Box>
+                    </div>
+                  </div>
                 }
                 placeholder={
                   <div
@@ -405,9 +353,9 @@ export const CommentDisplayRTE = ({
               />
               <ClearEditorPlugin />
             </LexicalComposer>
-          </Box>
-        </Box>
-      </Flex>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

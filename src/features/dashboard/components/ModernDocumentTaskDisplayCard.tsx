@@ -1,7 +1,7 @@
 import { ExtractedHTMLTitle } from "@/shared/components/ExtractedHTMLTitle";
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import type { IMainDoc } from "@/shared/types";
-import { Box, Text, Flex, useColorMode, Center } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { HiDocumentCheck } from "react-icons/hi2";
@@ -115,27 +115,18 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
       }} // Scale to 0 when isAnimating is true
       transition={{ duration: 0.2 }} // Animation duration in seconds
     >
-      <Flex
-        p={4}
-        userSelect={"none"}
-        rounded="lg"
-        bg={colorMode === "light" ? "gray.50" : "gray.700"}
-        minH="230px"
-        // minW="300px"
-        // p={4}
-        boxShadow={
-          colorMode === "light"
-            ? "0px 7px 12px -3px rgba(0, 0, 0, 0.15), 0px 1.4px 1.75px -0.7px rgba(0, 0, 0, 0.03), -2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.0465), 2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.0465)"
-            : "0px 1.4px 2.1px -0.7px rgba(255, 255, 255, 0.0465), 0px 0.7px 1.4px -0.7px rgba(255, 255, 255, 0.028), -1.4px 0px 2.1px -0.7px rgba(255, 255, 255, 0.032)"
-        }
-        display="flex"
-        flexDirection="column"
-        // justifyContent="space-between"
-        alignItems="stretch"
-        pos={"relative"}
+      <div
+        className={`p-4 select-none rounded-lg min-h-[230px] flex flex-col relative cursor-pointer ${
+          colorMode === "light" ? "bg-gray-50" : "bg-gray-700"
+        }`}
+        style={{
+          boxShadow:
+            colorMode === "light"
+              ? "0px 7px 12px -3px rgba(0, 0, 0, 0.15), 0px 1.4px 1.75px -0.7px rgba(0, 0, 0, 0.03), -2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.0465), 2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.0465)"
+              : "0px 1.4px 2.1px -0.7px rgba(255, 255, 255, 0.0465), 0px 0.7px 1.4px -0.7px rgba(255, 255, 255, 0.028), -1.4px 0px 2.1px -0.7px rgba(255, 255, 255, 0.032)",
+        }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        cursor={"pointer"}
         onClick={(e) =>
           goToProjectDocument(
             e,
@@ -146,89 +137,58 @@ export const ModernDocumentTaskDisplayCard = ({ document, kind }: IProps) => {
           )
         }
       >
-        <Box w={"100%"}>
+        <div className="w-full">
           <ExtractedHTMLTitle
             htmlContent={document?.project?.title}
             color={colorMode === "light" ? "blue.500" : "blue.300"}
             fontWeight={"semibold"}
           />
-        </Box>
+        </div>
 
-        <Box
-        // pos={"absolute"}
-        // bottom={2}
-        // px={1}
-        >
-          <Text
-            as={"span"}
-            color={`${
+        <div>
+          <span
+            className={`font-semibold text-sm mr-1 ${
               kind === "directorate"
-                ? "red"
+                ? "text-red-600"
                 : kind === "ba_lead"
-                  ? "orange"
+                  ? "text-orange-600"
                   : kind === "team"
-                    ? "blue"
-                    : "green"
-            }.600`}
-            fontWeight={"semibold"}
-            fontSize={"small"}
-            mr={1}
+                    ? "text-blue-600"
+                    : "text-green-600"
+            }`}
           >
             {`${formattedInputKind(kind)}:`}
-          </Text>
-          <Text
-            as={"span"}
-            color={colorMode === "light" ? "gray.500" : "gray.200"}
-            fontWeight={"semibold"}
-            fontSize={"small"}
+          </span>
+          <span
+            className={`font-semibold text-sm ${
+              colorMode === "light" ? "text-gray-500" : "text-gray-200"
+            }`}
           >
             {kind === "team"
               ? "Input required"
               : `Determine if the ${formattedDocumentKind(
                   document?.kind,
                 )} for this project is satisfactory`}
-          </Text>
-        </Box>
+          </span>
+        </div>
 
-        <Box
-          pos={"absolute"}
-          bottom={2}
-          right={1.5}
-          px={1}
-          // bg={"red"}
-          // justifyContent={"center"}
-        >
-          <Flex>
-            <Center
-              textAlign={"center"}
-              color={colorMode === "light" ? "red.600" : "red.200"}
-              mr={2}
-              mt={0.5}
-              boxSize={5}
-              w={"20px"}
-
-              // w={"100%"}
-              // bg={"orange"}
+        <div className="absolute bottom-2 right-1.5 px-1">
+          <div className="flex">
+            <div
+              className={`text-center mr-2 mt-0.5 w-5 h-5 flex items-center justify-center ${
+                colorMode === "light" ? "text-red-600" : "text-red-200"
+              }`}
             >
               <HiDocumentCheck />
-            </Center>
-            <Box
-              // mx={0}
-              w={"100%"}
-            >
-              <Text
-                as={"span"}
-                color={`red.600`}
-                fontWeight={"semibold"}
-                fontSize={"small"}
-                mr={1}
-              >
+            </div>
+            <div className="w-full">
+              <span className="text-red-600 font-semibold text-sm mr-1">
                 {formattedDocumentKind(document?.kind)}
-              </Text>
-            </Box>
-          </Flex>
-        </Box>
-      </Flex>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 };

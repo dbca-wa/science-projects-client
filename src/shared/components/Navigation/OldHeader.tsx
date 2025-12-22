@@ -4,28 +4,21 @@
 import { CgBrowse, CgPlayListAdd } from "react-icons/cg";
 import { NavMenu } from "./NavMenu";
 
-// Chakra
+// Migrated imports
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
 import {
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  Grid,
-  HStack,
-  Link,
-  MenuDivider,
-  MenuGroup,
-  MenuItem,
-  Text,
-  VStack,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+} from "@/shared/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuGroup,
+  DropdownMenuSeparator,
+} from "@/shared/components/ui/dropdown-menu";
 
 // React, Settings, & Nav
 import { useEffect, useRef, useState } from "react";
@@ -77,13 +70,9 @@ const ProjectMenuContents = () => {
   const { colorMode } = useColorMode();
   return (
     <>
-      <MenuGroup
-        title="Create or Browse"
-        fontSize={"12px"}
-        color={"gray.500"}
-        textAlign={"center"}
-      >
-        <MenuItem
+      <DropdownMenuGroup>
+        <div className="text-xs text-gray-500 text-center mb-2">Create or Browse</div>
+        <DropdownMenuItem
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -93,12 +82,12 @@ const ProjectMenuContents = () => {
               navigate("/projects/browse");
             }
           }}
-          color={colorMode === "dark" ? "gray.400" : null}
+          className={colorMode === "dark" ? "text-gray-400" : ""}
         >
-          {<CgBrowse />}
-          <Text ml={2}>Browse Projects</Text>
-        </MenuItem>
-        <MenuItem
+          <CgBrowse className="mr-2" />
+          <span>Browse Projects</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -108,12 +97,12 @@ const ProjectMenuContents = () => {
               navigate("/projects/add");
             }
           }}
-          color={colorMode === "dark" ? "gray.400" : null}
+          className={colorMode === "dark" ? "text-gray-400" : ""}
         >
-          {<CgPlayListAdd />}
-          <Text ml={2}>Create New Project</Text>
-        </MenuItem>
-      </MenuGroup>
+          <CgPlayListAdd className="mr-2" />
+          <span>Create New Project</span>
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
     </>
   );
 };
@@ -125,14 +114,10 @@ const ReportMenuContents = () => {
   const { colorMode } = useColorMode();
   return (
     <>
-      <MenuGroup
-        title="Annual Research Activity Report"
-        fontSize={"12px"}
-        color={"gray.500"}
-        textAlign={"center"}
-      >
+      <DropdownMenuGroup>
+        <div className="text-xs text-gray-500 text-center mb-2">Annual Research Activity Report</div>
         {userData?.is_superuser ? (
-          <MenuItem
+          <DropdownMenuItem
             onClick={(e) => {
               if (e.ctrlKey || e.metaKey) {
                 // Handle Ctrl + Click (or Command + Click on Mac)
@@ -142,16 +127,14 @@ const ReportMenuContents = () => {
                 navigate("/reports/current");
               }
             }}
-            color={colorMode === "dark" ? "gray.400" : null}
+            className={colorMode === "dark" ? "text-gray-400" : ""}
           >
-            <MdOutlineAccessTimeFilled />
-
-            {/* {<AiFillPrinter />} */}
-            <Text ml={2}>Latest Report</Text>
-          </MenuItem>
+            <MdOutlineAccessTimeFilled className="mr-2" />
+            <span>Latest Report</span>
+          </DropdownMenuItem>
         ) : null}
 
-        <MenuItem
+        <DropdownMenuItem
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -161,23 +144,21 @@ const ReportMenuContents = () => {
               navigate("/reports");
             }
           }}
-          color={colorMode === "dark" ? "gray.400" : null}
+          className={colorMode === "dark" ? "text-gray-400" : ""}
         >
-          {<CgViewList />}
-          <Text ml={2}>Published Reports</Text>
-        </MenuItem>
-      </MenuGroup>
+          <CgViewList className="mr-2" />
+          <span>Published Reports</span>
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
     </>
   );
 };
 
 const UserMenuContents = () => {
   const navigate = useNavigate();
-  const {
-    isOpen: isCreateUserModalOpen,
-    onOpen: onCreateUserOpen,
-    onClose: onCreateUserClose,
-  } = useDisclosure();
+  const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
+  const onCreateUserOpen = () => setIsCreateUserModalOpen(true);
+  const onCreateUserClose = () => setIsCreateUserModalOpen(false);
   const { colorMode } = useColorMode();
 
   return (
@@ -187,13 +168,9 @@ const UserMenuContents = () => {
         onClose={onCreateUserClose}
       />
 
-      <MenuGroup
-        title="Users"
-        fontSize={"12px"}
-        color={"gray.500"}
-        textAlign={"center"}
-      >
-        <MenuItem
+      <DropdownMenuGroup>
+        <div className="text-xs text-gray-500 text-center mb-2">Users</div>
+        <DropdownMenuItem
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -203,20 +180,20 @@ const UserMenuContents = () => {
               navigate("/users");
             }
           }}
-          color={colorMode === "dark" ? "gray.400" : null}
+          className={colorMode === "dark" ? "text-gray-400" : ""}
         >
-          {<ImUsers />}
-          <Text ml={2}>Browse SPMS Users</Text>
-        </MenuItem>
+          <ImUsers className="mr-2" />
+          <span>Browse SPMS Users</span>
+        </DropdownMenuItem>
 
-        <MenuItem
+        <DropdownMenuItem
           onClick={onCreateUserOpen}
-          color={colorMode === "dark" ? "gray.400" : null}
+          className={colorMode === "dark" ? "text-gray-400" : ""}
         >
-          {<FaUserPlus />}
-          <Text ml={2}>Add New User</Text>
-        </MenuItem>
-      </MenuGroup>
+          <FaUserPlus className="mr-2" />
+          <span>Add New User</span>
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
     </>
   );
 };
@@ -241,31 +218,26 @@ const AdminMenuContents = ({
   const { colorMode } = useColorMode();
   return (
     <>
-      <MenuGroup
-        title="Manage"
-        fontSize={"12px"}
-        color={"gray.500"}
-        textAlign={"center"}
-      >
-        <MenuItem
+      <DropdownMenuGroup>
+        <div className="text-xs text-gray-500 text-center mb-2">Manage</div>
+        <DropdownMenuItem
           onClick={() => {
             navigate("/patchnotes");
           }}
-          color={colorMode === "dark" ? "gray.400" : null}
+          className={colorMode === "dark" ? "text-gray-400" : ""}
         >
-          {<MdSpeakerNotes />}
-
-          <Text ml={2}>Patch Notes</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <MdSpeakerNotes className="mr-2" />
+          <span>Patch Notes</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={handleReviewData}
         >
-          {<PiListMagnifyingGlassDuotone />}
-          <Text ml={2}>Lists</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <PiListMagnifyingGlassDuotone className="mr-2" />
+          <span>Lists</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -276,12 +248,12 @@ const AdminMenuContents = ({
             }
           }}
         >
-          {<MdEmail />}
-          <Text ml={2}>Emails</Text>
-        </MenuItem>
-        <MenuDivider />
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <MdEmail className="mr-2" />
+          <span>Emails</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -292,11 +264,11 @@ const AdminMenuContents = ({
             }
           }}
         >
-          {<FaAddressCard />}
-          <Text ml={2}>Addresses</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <FaAddressCard className="mr-2" />
+          <span>Addresses</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -307,11 +279,11 @@ const AdminMenuContents = ({
             }
           }}
         >
-          {<RiTeamFill />}
-          <Text ml={2}>Affiliations</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <RiTeamFill className="mr-2" />
+          <span>Affiliations</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -322,11 +294,11 @@ const AdminMenuContents = ({
             }
           }}
         >
-          {<RiOrganizationChart />}
-          <Text ml={2}>Branches</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <RiOrganizationChart className="mr-2" />
+          <span>Branches</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -337,11 +309,11 @@ const AdminMenuContents = ({
             }
           }}
         >
-          {<ImBriefcase />}
-          <Text ml={2}>Business Areas</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <ImBriefcase className="mr-2" />
+          <span>Business Areas</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -352,11 +324,11 @@ const AdminMenuContents = ({
             }
           }}
         >
-          {<GoOrganization />}
-          <Text ml={2}>Divisions</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <GoOrganization className="mr-2" />
+          <span>Divisions</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -367,11 +339,11 @@ const AdminMenuContents = ({
             }
           }}
         >
-          {<FaLocationArrow />}
-          <Text ml={2}>Locations</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <FaLocationArrow className="mr-2" />
+          <span>Locations</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -382,11 +354,11 @@ const AdminMenuContents = ({
             }
           }}
         >
-          {<MdManageHistory />}
-          <Text ml={2}>Report Info</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <MdManageHistory className="mr-2" />
+          <span>Report Info</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
               // Handle Ctrl + Click (or Command + Click on Mac)
@@ -397,69 +369,57 @@ const AdminMenuContents = ({
             }
           }}
         >
-          {<MdOutlineSettingsSuggest />}
-          <Text ml={2}>Services</Text>
-        </MenuItem>
-      </MenuGroup>
+          <MdOutlineSettingsSuggest className="mr-2" />
+          <span>Services</span>
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
 
-      <MenuGroup
-        title="AR Actions"
-        fontSize={"12px"}
-        color={"gray.500"}
-        textAlign={"center"}
-      >
-        {/* <MenuItem onClick={handleDataDump}>
-          {<FcDataBackup />}
-          <Text ml={2}>Dump Data</Text>
-        </MenuItem> */}
-
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+      <DropdownMenuGroup>
+        <div className="text-xs text-gray-500 text-center mb-2">AR Actions</div>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={handleBatchApproveOldReports}
         >
-          {<MdVerifiedUser />}
-          <Text ml={2}>Batch Approve Old Reports</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <MdVerifiedUser className="mr-2" />
+          <span>Batch Approve Old Reports</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={handleBatchApproveReports}
         >
-          {<FcApproval />}
-          <Text ml={2}>Batch Approve Reports</Text>
-        </MenuItem>
-        <MenuItem
-          color={colorMode === "dark" ? "gray.400" : null}
+          <FcApproval className="mr-2" />
+          <span>Batch Approve Reports</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={colorMode === "dark" ? "text-gray-400" : ""}
           onClick={handleNewReportCycle}
         >
-          {<HiDocumentPlus />}
-          <Text ml={2}>Open Annual Report Cycle</Text>
-        </MenuItem>
-        {/* <MenuItem onClick={handleSendEmailToProjectLeads}>
-          {<MdEmail />}
-          <Text ml={2}>Send Project Lead Email</Text>
-        </MenuItem> */}
-      </MenuGroup>
+          <HiDocumentPlus className="mr-2" />
+          <span>Open Annual Report Cycle</span>
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
     </>
   );
 };
 
 const OldHeader = () => {
   const navigate = useNavigate();
-  const {
-    isOpen: isBatchApproveOpen,
-    onClose: onBatchApproveClose,
-    onOpen: onBatchApproveOpen,
-  } = useDisclosure();
-  const {
-    isOpen: isBatchApproveOldOpen,
-    onClose: onBatchApproveOldClose,
-    onOpen: onBatchApproveOldOpen,
-  } = useDisclosure();
-  const {
-    isOpen: isNewCycleOpen,
-    onClose: onNewCycleClose,
-    onOpen: onNewCycleOpen,
-  } = useDisclosure();
+  
+  // State for all modals (replacing useDisclosure hooks)
+  const [isBatchApproveOpen, setIsBatchApproveOpen] = useState(false);
+  const [isBatchApproveOldOpen, setIsBatchApproveOldOpen] = useState(false);
+  const [isNewCycleOpen, setIsNewCycleOpen] = useState(false);
+  const [drawerIsOpen, setDrawerIsOpen] = useState(false);
+
+  // Modal control functions
+  const onBatchApproveClose = () => setIsBatchApproveOpen(false);
+  const onBatchApproveOpen = () => setIsBatchApproveOpen(true);
+  const onBatchApproveOldClose = () => setIsBatchApproveOldOpen(false);
+  const onBatchApproveOldOpen = () => setIsBatchApproveOldOpen(true);
+  const onNewCycleClose = () => setIsNewCycleOpen(false);
+  const onNewCycleOpen = () => setIsNewCycleOpen(true);
+  const onDrawerOpen = () => setDrawerIsOpen(true);
+  const onDrawerClose = () => setDrawerIsOpen(false);
 
   const handleDataDump = () => {
     console.log("Dumping data...");
@@ -493,11 +453,6 @@ const OldHeader = () => {
   const [shouldShowGuide, setShouldShowGuide] = useState(true);
   const [windowSizeValue, setWindowSizeValue] = useState<number>(480);
 
-  const {
-    isOpen: drawerIsOpen,
-    onOpen: onDrawerOpen,
-    onClose: onDrawerClose,
-  } = useDisclosure();
   const drawerBtnRef = useRef<HTMLButtonElement>(null);
 
   const handleResize = () => {
@@ -551,7 +506,7 @@ const OldHeader = () => {
   // const { layout } = useLayoutSwitcher();
 
   return (
-    <Box>
+    <div>
       {/* Nav background */}
 
       <BatchApproveModal
@@ -564,36 +519,17 @@ const OldHeader = () => {
       />
       <NewCycleModal isOpen={isNewCycleOpen} onClose={onNewCycleClose} />
 
-      <HStack
-        bg={colorMode === "light" ? "blackAlpha.800" : "gray.900"}
-        py={{
-          base: 4,
-          md: 4,
-          lg: 1,
-        }}
-        px={{
-          base: 4,
-          sm: 6,
-          md: "10%",
-          lg: "15%",
-        }}
-        roundedBottom={6}
-        alignItems="center"
-        justifyContent="space-between"
-        // className="w-screen"
+      <div
+        className={`${
+          colorMode === "light" ? "bg-black/80" : "bg-gray-900"
+        } py-4 md:py-4 lg:py-1 px-4 sm:px-6 md:px-[10%] lg:px-[15%] rounded-b-md flex items-center justify-between`}
       >
-        <HStack spacing={2} flexGrow={1}>
+        <div className="flex space-x-2 flex-grow">
           {/* SMPS Logo/Title */}
-          <Box>
-            <Link
-              as="a"
+          <div>
+            <a
               href="/"
-              px={5}
-              color={"whiteAlpha.700"}
-              display="inline-block"
-              fontSize={18}
-              textDecoration="none"
-              _hover={{ textDecoration: "none", color: "whiteAlpha.900" }}
+              className="px-5 text-white/70 inline-block text-lg no-underline hover:no-underline hover:text-white/90"
               onClick={(e) => {
                 if (
                   !(e.ctrlKey || e.metaKey || e.button === 2) &&
@@ -605,97 +541,41 @@ const OldHeader = () => {
               }}
             >
               <span className="text-xl font-bold select-none">SPMS</span>
-            </Link>
-            {/* <Button
-              px={5}
-              color={"whiteAlpha.700"}
-              size={"md"}
-              variant={"unstyled"}
-              onClick={(e) => {
-                if (e.ctrlKey || e.metaKey) {
-                  // Handle Ctrl + Click (or Command + Click on Mac)
-                  window.open("/", "_blank"); // Opens in a new tab
-                } else {
-                  // Normal click handling
-                  navigate("/");
-                }
-              }}
-            >
-              <Text fontSize={18}>SPMS</Text>
-            </Button> */}
-          </Box>
+            </a>
+          </div>
           {shouldShowHamburger ? (
-            <Box
-              flexGrow={1}
-              // bg={"red"}
-              justifyContent={"end"}
-              display={"flex"}
-            >
-              <Box mx={3}>
+            <div className="flex-grow flex justify-end">
+              <div className="mx-3">
                 <Button
                   ref={drawerBtnRef}
                   onClick={onDrawerOpen}
-                  variant={"solid"}
-                  color={"white"}
-                  bg={"gray.600"}
-                  _hover={{
-                    bg: "white",
-                    color: "black",
-                  }}
+                  className="text-white bg-gray-600 hover:bg-white hover:text-black"
                 >
                   <GiHamburgerMenu size={"22px"} />
                 </Button>
-                <Drawer
-                  isOpen={drawerIsOpen}
-                  placement="right"
-                  onClose={onDrawerClose}
-                  finalFocusRef={drawerBtnRef}
-                >
-                  <DrawerOverlay />
-                  <DrawerContent bg={"blackAlpha.900"}>
-                    <DrawerCloseButton color={"white"} />
-
-                    <DrawerHeader
-                      borderBottomWidth="1px"
-                      borderBottomColor={
-                        colorMode === "light" ? "gray.500" : "gray.500"
-                      }
-                      color="white"
-                    >
+                <Sheet open={drawerIsOpen} onOpenChange={(open) => !open && onDrawerClose()}>
+                  <SheetContent side="right" className="bg-black/90">
+                    <SheetHeader className="border-b border-gray-500 text-white">
                       SPMS
-                    </DrawerHeader>
-                    <DrawerBody>
-                      <VStack py={3}>
-                        <HStack w={"100%"} zIndex={60}>
-                          <Flex
-                            ml={"auto"}
-                            justifyContent={"right"}
-                            alignItems={"center"}
-                          >
-                            {/* <Center mr={4}> */}
-                            <Flex
-                              justifyContent={"center"}
-                              textAlign={"center"}
-                              // bg={"red"}
-                              flexDir={"row"}
-                              // pr={3}
-                              pr={0}
-                            >
+                    </SheetHeader>
+                    <div className="p-4">
+                      <div className="py-3 flex flex-col space-y-4">
+                        <div className="w-full z-60 flex">
+                          <div className="ml-auto flex justify-right items-center">
+                            <div className="flex justify-center text-center flex-row pr-0">
                               <ToggleLayout showText />
                               <ToggleDarkMode showText />
-                            </Flex>
-
-                            {/* </Center> */}
-                            <Box ml={3} flex={1}>
+                            </div>
+                            <div className="ml-3 flex-1">
                               <Navitar
                                 isModern={false}
                                 windowSize={windowSizeValue}
                               />
-                            </Box>
-                          </Flex>
-                        </HStack>
+                            </div>
+                          </div>
+                        </div>
 
-                        <Grid w={"100%"} py={2} zIndex={50}>
+                        <div className="w-full py-2 z-50 grid gap-2">
                           {/* Projects */}
                           <SidebarNavMenu
                             menuName="Projects"
@@ -738,39 +618,22 @@ const OldHeader = () => {
                           )}
 
                           {/* Guide */}
-                          {/* {!userLoading && userData.is_superuser && ( */}
                           <SidebarNavButton
                             leftIcon={FaBookBookmark}
                             buttonName="Guide"
                             onClick={() => navigate("/guide")}
                           />
-                          {/* {
-                            userData?.business_areas_led?.length > 0 ? (
-
-                              <SidebarNavButton
-                                leftIcon={FaBookBookmark}
-                                buttonName="My Business Area"
-                                onClick={() => navigate("/my_business_area")}
-                              />
-                            ) : null
-                          } */}
-                          {/* )} */}
-                        </Grid>
-                      </VStack>
-                    </DrawerBody>
-                  </DrawerContent>
-                </Drawer>
-              </Box>
-            </Box>
+                        </div>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
           ) : (
-            <Box
-              flexGrow={1}
-              justifyContent={"space-between"}
-              display={"flex"}
-              zIndex={99}
-            >
+            <div className="flex-grow flex justify-between z-[99]">
               {/* Basic Navigation */}
-              <HStack>
+              <div className="flex space-x-4">
                 {/* Projects */}
                 <NavMenu
                   menuName="Projects"
@@ -826,7 +689,6 @@ const OldHeader = () => {
                 ) : null}
 
                 {/* Guide */}
-                {/* {!userLoading && !userData.is_superuser && ( */}
                 {shouldShowGuide ? (
                   <NavButton
                     // leftIcon={FaBookBookmark}
@@ -842,23 +704,21 @@ const OldHeader = () => {
                     }}
                   />
                 ) : null}
-
-                {/* )} */}
-              </HStack>
+              </div>
 
               {/* RHS Items */}
-              <HStack px={3}>
+              <div className="flex items-center px-3">
                 <Navitar
                   shouldShowName
                   windowSize={windowSizeValue}
                   isModern={false}
                 />
-              </HStack>
-            </Box>
+              </div>
+            </div>
           )}
-        </HStack>
-      </HStack>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
 

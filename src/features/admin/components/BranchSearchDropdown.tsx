@@ -1,18 +1,10 @@
 // Dropdown search component for branches. Displays 5 branches below the search box.
 
-import { CloseIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  IconButton,
-  Input,
-  InputGroup,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { X } from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import {
   forwardRef,
   useEffect,
@@ -111,18 +103,18 @@ export const BranchSearchDropdown = forwardRef(
     }));
 
     return (
-      <FormControl isRequired={isRequired} mb={4}>
-        <FormLabel>{label}</FormLabel>
+      <div className={`mb-4 ${isRequired ? 'required' : ''}`}>
+        <Label>{label}</Label>
         {selectedBranch ? (
-          <Box mb={2} color="blue.500">
+          <div className="mb-2 text-blue-500">
             <SelectedBranchInput
               branch={selectedBranch}
               onClear={handleClearBranch}
               isEditable={isEditable}
             />
-          </Box>
+          </div>
         ) : (
-          <InputGroup>
+          <div>
             <Input
               ref={inputRef} // Attach the ref to the input element
               type="text"
@@ -132,11 +124,11 @@ export const BranchSearchDropdown = forwardRef(
               autoComplete="off"
               onFocus={() => setIsMenuOpen(true)}
             />
-          </InputGroup>
+          </div>
         )}
 
         {selectedBranch ? null : (
-          <Box pos="relative" w="100%">
+          <div className="relative w-full">
             <CustomMenu isOpen={filteredItems?.length > 0 && isMenuOpen}>
               <CustomMenuList minWidth="100%">
                 {filteredItems.map((branch) => (
@@ -148,11 +140,11 @@ export const BranchSearchDropdown = forwardRef(
                 ))}
               </CustomMenuList>
             </CustomMenu>
-          </Box>
+          </div>
         )}
 
-        <FormHelperText>{helperText}</FormHelperText>
-      </FormControl>
+        <p className="text-sm text-muted-foreground mt-1">{helperText}</p>
+      </div>
     );
   },
 );
@@ -177,17 +169,14 @@ interface CustomMenuListProps {
 const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
   const { colorMode } = useColorMode();
   return (
-    <Box
-      pos="absolute"
-      w="100%"
-      bg={colorMode === "light" ? "white" : "gray.700"}
-      boxShadow="md"
-      zIndex={1}
-      display={isOpen ? "block" : "none"}
+    <div
+      className={`absolute w-full ${
+        colorMode === "light" ? "bg-white" : "bg-gray-700"
+      } shadow-md z-10 ${isOpen ? "block" : "hidden"}`}
       {...rest}
     >
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -200,31 +189,24 @@ const CustomMenuItem = ({ onClick, branch, ...rest }: CustomMenuItemProps) => {
   const { colorMode } = useColorMode();
 
   return (
-    <Flex
-      as="button"
+    <button
       type="button"
-      w="100%"
-      textAlign="left"
-      p={2}
+      className={`w-full text-left p-2 flex items-center ${
+        isHovered ? "bg-gray-200" : "bg-transparent"
+      }`}
       onClick={handleClick}
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
-      bg={isHovered ? "gray.200" : "transparent"}
-      alignItems="center"
       {...rest}
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="start"
-        ml={3}
-        h="100%"
-      >
-        <Text ml={2} color={colorMode === "light" ? "green.500" : "green.300"}>
+      <div className="flex items-center justify-start ml-3 h-full">
+        <span className={`ml-2 ${
+          colorMode === "light" ? "text-green-500" : "text-green-300"
+        }`}>
           {`${branch.name}`}
-        </Text>
-      </Box>
-    </Flex>
+        </span>
+      </div>
+    </button>
   );
 };
 
@@ -234,9 +216,9 @@ const CustomMenuList = ({
   ...rest
 }: CustomMenuListProps) => {
   return (
-    <Box pos="relative" w="100%" minWidth={minWidth} {...rest}>
+    <div className="relative w-full" style={{ minWidth }} {...rest}>
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -254,30 +236,25 @@ const SelectedBranchInput = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Flex
-      align="center"
-      position="relative"
-      bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
-      borderRadius="md"
-      px={2}
-      py={1}
-      mr={2}
-    >
-      <Text ml={2} color={colorMode === "light" ? "green.500" : "green.400"}>
+    <div className={`flex items-center relative ${
+      colorMode === "dark" ? "bg-gray-700" : "bg-gray-100"
+    } rounded-md px-2 py-1 mr-2`}>
+      <span className={`ml-2 ${
+        colorMode === "light" ? "text-green-500" : "text-green-400"
+      }`}>
         {`${branch.name}`}
-      </Text>
+      </span>
       {isEditable ? (
-        <IconButton
-          aria-label="Clear selected branch"
-          icon={<CloseIcon />}
-          size="xs"
-          position="absolute"
-          top="50%"
-          right={2}
-          transform="translateY(-50%)"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute top-1/2 right-2 transform -translate-y-1/2 h-6 w-6 p-0"
           onClick={onClear}
-        />
+          aria-label="Clear selected branch"
+        >
+          <X className="h-3 w-3" />
+        </Button>
       ) : null}
-    </Flex>
+    </div>
   );
 };

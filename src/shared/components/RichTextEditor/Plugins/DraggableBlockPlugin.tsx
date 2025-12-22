@@ -24,7 +24,7 @@ import { createPortal } from "react-dom";
 import { isHTMLElement } from "@/shared/utils/guard";
 import { Point } from "@/shared/utils/point";
 import { Rect } from "@/shared/utils/rect";
-import { Box, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { MdDragIndicator } from "react-icons/md";
 
 const SPACE = 4;
@@ -454,7 +454,7 @@ function useDraggableBlockMenu(
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       >
-        <Box
+        <div
           className={
             isEditable
               ? colorMode === "light"
@@ -465,7 +465,7 @@ function useDraggableBlockMenu(
           style={{ pointerEvents: "none" }}
         >
           <MdDragIndicator style={{ userSelect: "none" }} />
-        </Box>
+        </div>
       </div>
       <div className="draggable-block-target-line" ref={targetLineRef} />
     </>,

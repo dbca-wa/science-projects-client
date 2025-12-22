@@ -1,43 +1,38 @@
 import React, { useState, useEffect } from "react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { Switch } from "@/shared/components/ui/switch";
 import {
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormLabel,
-  Heading,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
-  Switch,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/shared/components/ui/sheet";
+import {
   Tabs,
-  Text,
-  Textarea,
-  VStack,
-  HStack,
-  IconButton,
-  useDisclosure,
-  useToast,
-  useColorMode,
-} from "@chakra-ui/react";
-import { AddIcon, DeleteIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/components/ui/tabs";
 import {
   createGuideSection,
   updateGuideSection,
@@ -49,6 +44,9 @@ import {
   ContentField,
 } from "@/features/admin/services/admin.service";
 import { GuideRichTextEditor } from "@/shared/components/RichTextEditor/Editors/GuideRichTextEditor";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Plus, Trash2, Edit, X, Settings } from "lucide-react";
 
 // Types
 // interface ContentField {
@@ -79,7 +77,7 @@ interface GuideSectionFormProps {
 }
 
 // Form for creating/editing guide sections
-const GuideSectionForm: FC<GuideSectionFormProps> = ({
+const GuideSectionForm: React.FC<GuideSectionFormProps> = ({
   isOpen,
   onClose,
   initialData,
@@ -127,8 +125,7 @@ const GuideSectionForm: FC<GuideSectionFormProps> = ({
     setSection((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
+  const handleSwitchChange = (checked: boolean, name: string) => {
     setSection((prev) => ({ ...prev, [name]: checked }));
   };
 
@@ -161,8 +158,6 @@ const GuideSectionForm: FC<GuideSectionFormProps> = ({
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const toast = useToast();
-
   const removeField = (index: number) => {
     const newFields = [...contentFields];
     const fieldToRemove = newFields[index];
@@ -172,19 +167,10 @@ const GuideSectionForm: FC<GuideSectionFormProps> = ({
       setIsLoading(true);
       deleteContentField(fieldToRemove.id)
         .then(() => {
-          toast({
-            title: "Field deleted",
-            status: "success",
-            duration: 3000,
-          });
+          toast.success("Field deleted");
         })
         .catch((error) => {
-          toast({
-            title: "Error deleting field",
-            description: error.message || "Could not delete field",
-            status: "error",
-            duration: 5000,
-          });
+          toast.error(error.message || "Could not delete field");
 
           // If deletion fails, keep the field in the UI
           // This provides visual feedback that something went wrong
@@ -226,194 +212,189 @@ const GuideSectionForm: FC<GuideSectionFormProps> = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl">
-      <ModalOverlay />
-      <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
-        <ModalHeader>
-          {isEditing ? "Edit Guide Section" : "Create Guide Section"}
-        </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <Tabs>
-            <TabList>
-              <Tab>Basic Info</Tab>
-              <Tab>Content Fields ({contentFields.length})</Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                <VStack spacing={4} align="start">
-                  <FormControl isRequired>
-                    <FormLabel>Section Title</FormLabel>
-                    <Input
-                      name="title"
-                      value={section.title}
-                      onChange={handleInputChange}
-                      placeholder="e.g., Login Guide"
-                    />
-                  </FormControl>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`max-w-4xl ${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"}`}>
+        <DialogHeader>
+          <DialogTitle>
+            {isEditing ? "Edit Guide Section" : "Create Guide Section"}
+          </DialogTitle>
+        </DialogHeader>
+        
+        <Tabs defaultValue="basic" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="basic">Basic Info</TabsTrigger>
+            <TabsTrigger value="fields">Content Fields ({contentFields.length})</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="basic" className="space-y-4">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="title">Section Title *</Label>
+                <Input
+                  id="title"
+                  name="title"
+                  value={section.title}
+                  onChange={handleInputChange}
+                  placeholder="e.g., Login Guide"
+                  required
+                />
+              </div>
 
-                  <FormControl>
-                    <FormLabel>Section ID</FormLabel>
-                    <Input
-                      name="id"
-                      value={section.id}
-                      onChange={handleInputChange}
-                      placeholder="e.g., login_guide (auto-generated if empty)"
-                      isReadOnly={isEditing}
-                    />
-                    <Text fontSize="xs" color="gray.500">
-                      Unique identifier used in URLs and code. Auto-generated if
-                      empty.
-                    </Text>
-                  </FormControl>
+              <div>
+                <Label htmlFor="id">Section ID</Label>
+                <Input
+                  id="id"
+                  name="id"
+                  value={section.id}
+                  onChange={handleInputChange}
+                  placeholder="e.g., login_guide (auto-generated if empty)"
+                  readOnly={isEditing}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Unique identifier used in URLs and code. Auto-generated if empty.
+                </p>
+              </div>
 
-                  <FormControl>
-                    <FormLabel>Category</FormLabel>
-                    <HStack>
-                      <Select
-                        name="category"
-                        value={section.category}
-                        onChange={handleInputChange}
-                        placeholder="Select or type a category"
-                      >
-                        <option value="">No Category</option>
-                        {existingCategories.map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat}
-                          </option>
-                        ))}
-                      </Select>
-                      <Input
-                        placeholder="New category name"
-                        value={newCategory}
-                        onChange={(e) => setNewCategory(e.target.value)}
-                      />
-                      <Button onClick={addCustomCategory}>Add</Button>
-                    </HStack>
-                  </FormControl>
-
-                  <FormControl display="flex" alignItems="center">
-                    <FormLabel htmlFor="show-divider" mb="0">
-                      Show Divider After
-                    </FormLabel>
-                    <Switch
-                      id="show-divider"
-                      name="show_divider_after"
-                      isChecked={section.show_divider_after}
-                      onChange={handleSwitchChange}
-                    />
-                  </FormControl>
-
-                  <FormControl display="flex" alignItems="center">
-                    <FormLabel htmlFor="is-active" mb="0">
-                      Active
-                    </FormLabel>
-                    <Switch
-                      id="is-active"
-                      name="is_active"
-                      isChecked={section.is_active}
-                      onChange={handleSwitchChange}
-                    />
-                  </FormControl>
-                </VStack>
-              </TabPanel>
-
-              <TabPanel>
-                <Box mb={4}>
-                  <Button
-                    leftIcon={<AddIcon />}
-                    colorScheme="blue"
-                    onClick={addField}
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <div className="flex gap-2">
+                  <Select
+                    value={section.category}
+                    onValueChange={(value) => setSection(prev => ({ ...prev, category: value }))}
                   >
-                    Add Content Field
-                  </Button>
-                </Box>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select or type a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">No Category</SelectItem>
+                      {existingCategories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    placeholder="New category name"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                  />
+                  <Button onClick={addCustomCategory}>Add</Button>
+                </div>
+              </div>
 
-                {contentFields.length === 0 ? (
-                  <Text color="gray.500">
-                    No content fields added yet. Add at least one field.
-                  </Text>
-                ) : (
-                  <VStack spacing={4} align="stretch">
-                    {contentFields.map((field, index) => (
-                      <Box
-                        key={index}
-                        p={4}
-                        borderWidth={1}
-                        borderRadius="md"
-                        boxShadow="sm"
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="show-divider"
+                  checked={section.show_divider_after}
+                  onCheckedChange={(checked) => handleSwitchChange(checked, "show_divider_after")}
+                />
+                <Label htmlFor="show-divider">Show Divider After</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is-active"
+                  checked={section.is_active}
+                  onCheckedChange={(checked) => handleSwitchChange(checked, "is_active")}
+                />
+                <Label htmlFor="is-active">Active</Label>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="fields" className="space-y-4">
+            <div className="mb-4">
+              <Button onClick={addField} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add Content Field
+              </Button>
+            </div>
+
+            {contentFields.length === 0 ? (
+              <p className="text-gray-500">
+                No content fields added yet. Add at least one field.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {contentFields.map((field, index) => (
+                  <div
+                    key={index}
+                    className="p-4 border border-border rounded-md shadow-sm"
+                  >
+                    <div className="flex justify-between mb-2">
+                      <h4 className="text-sm font-medium">Field {index + 1}</h4>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => removeField(index)}
                       >
-                        <Flex justify="space-between" mb={2}>
-                          <Heading size="sm">Field {index + 1}</Heading>
-                          <IconButton
-                            aria-label="Remove field"
-                            icon={<DeleteIcon />}
-                            size="sm"
-                            colorScheme="red"
-                            onClick={() => removeField(index)}
-                          />
-                        </Flex>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
 
-                        <FormControl mb={2}>
-                          <FormLabel>Field Key</FormLabel>
-                          <Input
-                            value={field.field_key}
-                            onChange={(e) =>
-                              updateField(index, { field_key: e.target.value })
-                            }
-                            placeholder="e.g., login_instructions"
-                          />
-                          <Text fontSize="xs" color="gray.500">
-                            Unique identifier for this field
-                          </Text>
-                        </FormControl>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor={`field-key-${index}`}>Field Key</Label>
+                        <Input
+                          id={`field-key-${index}`}
+                          value={field.field_key}
+                          onChange={(e) =>
+                            updateField(index, { field_key: e.target.value })
+                          }
+                          placeholder="e.g., login_instructions"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Unique identifier for this field
+                        </p>
+                      </div>
 
-                        <FormControl mb={2}>
-                          <FormLabel>Display Title</FormLabel>
-                          <Input
-                            value={field.title || ""}
-                            onChange={(e) =>
-                              updateField(index, { title: e.target.value })
-                            }
-                            placeholder="e.g., Login Instructions"
-                          />
-                        </FormControl>
+                      <div>
+                        <Label htmlFor={`field-title-${index}`}>Display Title</Label>
+                        <Input
+                          id={`field-title-${index}`}
+                          value={field.title || ""}
+                          onChange={(e) =>
+                            updateField(index, { title: e.target.value })
+                          }
+                          placeholder="e.g., Login Instructions"
+                        />
+                      </div>
 
-                        <FormControl>
-                          <FormLabel>Description</FormLabel>
-                          <Textarea
-                            value={field.description || ""}
-                            onChange={(e) =>
-                              updateField(index, {
-                                description: e.target.value,
-                              })
-                            }
-                            placeholder="Brief description of what this field is for"
-                          />
-                        </FormControl>
-                      </Box>
-                    ))}
-                  </VStack>
-                )}
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        </ModalBody>
+                      <div>
+                        <Label htmlFor={`field-description-${index}`}>Description</Label>
+                        <Textarea
+                          id={`field-description-${index}`}
+                          value={field.description || ""}
+                          onChange={(e) =>
+                            updateField(index, {
+                              description: e.target.value,
+                            })
+                          }
+                          placeholder="Brief description of what this field is for"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
 
-        <ModalFooter>
-          <Button variant="ghost" mr={3} onClick={onClose}>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button
-            colorScheme="blue"
             onClick={handleSubmit}
-            isDisabled={!section.title || contentFields.length === 0}
+            disabled={!section.title || contentFields.length === 0}
           >
             {isEditing ? "Update" : "Create"}
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -428,7 +409,7 @@ interface ContentEditorProps {
   refetch: () => void;
 }
 
-const ContentEditor: FC<ContentEditorProps> = ({
+const ContentEditor: React.FC<ContentEditorProps> = ({
   isOpen,
   onClose,
   section,
@@ -438,13 +419,13 @@ const ContentEditor: FC<ContentEditorProps> = ({
   refetch,
 }) => {
   return (
-    <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="xl">
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader>Edit {field.title || field.field_key}</DrawerHeader>
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent side="right" className="w-full sm:max-w-4xl overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Edit {field.title || field.field_key}</SheetTitle>
+        </SheetHeader>
 
-        <DrawerBody>
+        <div className="py-4">
           <GuideRichTextEditor
             canEdit={true}
             data={currentContent || ""}
@@ -457,15 +438,15 @@ const ContentEditor: FC<ContentEditorProps> = ({
               onClose();
             }}
           />
-        </DrawerBody>
+        </div>
 
-        <DrawerFooter>
-          <Button variant="outline" mr={3} onClick={onClose}>
+        <SheetFooter>
+          <Button variant="outline" onClick={onClose}>
             Close
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 
@@ -477,28 +458,17 @@ interface GuideAdminPanelProps {
   adminOptionsData: any;
 }
 
-const GuideAdminPanel: FC<GuideAdminPanelProps> = ({
+const GuideAdminPanel: React.FC<GuideAdminPanelProps> = ({
   guideSections,
   adminOptionsPk,
   refetch,
   adminOptionsData,
 }) => {
-  const {
-    isOpen: isSectionFormOpen,
-    onOpen: openSectionForm,
-    onClose: closeSectionForm,
-  } = useDisclosure();
-  const {
-    isOpen: isEditorOpen,
-    onOpen: openEditor,
-    onClose: closeEditor,
-  } = useDisclosure();
-  const [selectedSection, setSelectedSection] = useState<GuideSection | null>(
-    null,
-  );
+  const [isSectionFormOpen, setIsSectionFormOpen] = useState(false);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [selectedSection, setSelectedSection] = useState<GuideSection | null>(null);
   const [selectedField, setSelectedField] = useState<ContentField | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const toast = useToast();
 
   // Get unique categories
   const categories = Array.from(
@@ -510,40 +480,22 @@ const GuideAdminPanel: FC<GuideAdminPanelProps> = ({
   const handleCreateSection = (section: GuideSection) => {
     createGuideSection(section)
       .then(() => {
-        toast({
-          title: "Section created",
-          status: "success",
-          duration: 3000,
-        });
+        toast.success("Section created");
         refetch();
       })
       .catch((error) => {
-        toast({
-          title: "Error creating section",
-          description: error.message,
-          status: "error",
-          duration: 5000,
-        });
+        toast.error(error.message || "Error creating section");
       });
   };
 
   const handleUpdateSection = (section: GuideSection) => {
     updateGuideSection(section)
       .then(() => {
-        toast({
-          title: "Section updated",
-          status: "success",
-          duration: 3000,
-        });
+        toast.success("Section updated");
         refetch();
       })
       .catch((error) => {
-        toast({
-          title: "Error updating section",
-          description: error.message,
-          status: "error",
-          duration: 5000,
-        });
+        toast.error(error.message || "Error updating section");
       });
   };
 
@@ -555,20 +507,11 @@ const GuideAdminPanel: FC<GuideAdminPanelProps> = ({
     ) {
       deleteGuideSection(sectionId)
         .then(() => {
-          toast({
-            title: "Section deleted",
-            status: "success",
-            duration: 3000,
-          });
+          toast.success("Section deleted");
           refetch();
         })
         .catch((error) => {
-          toast({
-            title: "Error deleting section",
-            description: error.message,
-            status: "error",
-            duration: 5000,
-          });
+          toast.error(error.message || "Error deleting section");
         });
     }
   };
@@ -576,147 +519,132 @@ const GuideAdminPanel: FC<GuideAdminPanelProps> = ({
   const openSectionEditor = (section: GuideSection) => {
     setSelectedSection(section);
     setIsEditing(true);
-    openSectionForm();
+    setIsSectionFormOpen(true);
   };
 
   const openContentEditor = (section: GuideSection, field: ContentField) => {
     setSelectedSection(section);
     setSelectedField(field);
-    openEditor();
+    setIsEditorOpen(true);
   };
 
   const handleNewSection = () => {
     setSelectedSection(null);
     setIsEditing(false);
-    openSectionForm();
+    setIsSectionFormOpen(true);
   };
 
+  const { colorMode } = useColorMode();
+
   return (
-    <Box p={4}>
-      <Flex justify="space-between" align="center" mb={6}>
-        <Heading size="lg">Guide Content Management</Heading>
-        <Button
-          leftIcon={<AddIcon />}
-          colorScheme="blue"
-          onClick={handleNewSection}
-        >
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Guide Content Management</h1>
+        <Button onClick={handleNewSection} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
           Create New Section
         </Button>
-      </Flex>
+      </div>
 
       {guideSections?.length === 0 ? (
-        <Box
-          p={8}
-          textAlign="center"
-          borderWidth={1}
-          borderRadius="md"
-          borderStyle="dashed"
-        >
-          <Text fontSize="lg" mb={4}>
-            No guide sections created yet
-          </Text>
-          <Button
-            leftIcon={<AddIcon />}
-            colorScheme="blue"
-            onClick={handleNewSection}
-          >
+        <div className={`p-8 text-center border-2 border-dashed rounded-md ${
+          colorMode === "dark" ? "border-gray-600" : "border-gray-300"
+        }`}>
+          <p className="text-lg mb-4">No guide sections created yet</p>
+          <Button onClick={handleNewSection} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
             Create Your First Section
           </Button>
-        </Box>
+        </div>
       ) : (
-        <Box>
+        <div>
           {guideSections?.map((section) => (
-            <Box
+            <div
               key={section.id}
-              mb={6}
-              p={4}
-              borderWidth={1}
-              borderRadius="md"
-              boxShadow="sm"
+              className={`mb-6 p-4 border rounded-md shadow-sm ${
+                colorMode === "dark" ? "border-gray-600 bg-gray-800" : "border-gray-200 bg-white"
+              }`}
             >
-              <Flex justify="space-between" align="center" mb={4}>
-                <Box>
-                  <Heading size="md">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold">
                     {section.title}
                     {!section.is_active && (
-                      <Text as="span" fontSize="sm" ml={2} color="gray.500">
+                      <span className="text-sm ml-2 text-gray-500">
                         (Inactive)
-                      </Text>
+                      </span>
                     )}
-                  </Heading>
+                  </h2>
                   {section.category && (
-                    <Text fontSize="sm" color="gray.500">
+                    <p className="text-sm text-gray-500">
                       Category: {section.category}
-                    </Text>
+                    </p>
                   )}
-                </Box>
-                <HStack>
-                  <IconButton
-                    aria-label="Edit section"
-                    icon={<EditIcon />}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => openSectionEditor(section)}
-                  />
-                  <IconButton
-                    aria-label="Delete section"
-                    icon={<DeleteIcon />}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="destructive"
                     size="sm"
-                    colorScheme="red"
                     onClick={() => handleDeleteSection(section.id)}
-                  />
-                </HStack>
-              </Flex>
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
 
-              <Box>
-                <Text fontWeight="medium" mb={2}>
-                  Content Fields:
-                </Text>
+              <div>
+                <p className="font-medium mb-2">Content Fields:</p>
                 {section.content_fields?.length > 0 ? (
-                  <VStack align="stretch" spacing={3}>
+                  <div className="space-y-3">
                     {section.content_fields
                       .sort((a, b) => a.order - b.order)
                       .map((field) => (
-                        <Flex
+                        <div
                           key={field.id || field.field_key}
-                          p={3}
-                          borderWidth={1}
-                          borderRadius="md"
-                          justify="space-between"
-                          align="center"
+                          className={`p-3 border rounded-md flex justify-between items-center ${
+                            colorMode === "dark" ? "border-gray-600" : "border-gray-200"
+                          }`}
                         >
-                          <Box>
-                            <Text fontWeight="bold">
+                          <div>
+                            <p className="font-bold">
                               {field.title || field.field_key}
-                            </Text>
+                            </p>
                             {field.description && (
-                              <Text fontSize="sm" color="gray.600">
+                              <p className="text-sm text-gray-600">
                                 {field.description}
-                              </Text>
+                              </p>
                             )}
-                          </Box>
+                          </div>
                           <Button
                             size="sm"
                             onClick={() => openContentEditor(section, field)}
                           >
                             Edit Content
                           </Button>
-                        </Flex>
+                        </div>
                       ))}
-                  </VStack>
+                  </div>
                 ) : (
-                  <Text color="gray.500">No content fields defined</Text>
+                  <p className="text-gray-500">No content fields defined</p>
                 )}
-              </Box>
-            </Box>
+              </div>
+            </div>
           ))}
-        </Box>
+        </div>
       )}
 
       {/* Section Form Modal */}
       {isSectionFormOpen && (
         <GuideSectionForm
           isOpen={isSectionFormOpen}
-          onClose={closeSectionForm}
+          onClose={() => setIsSectionFormOpen(false)}
           initialData={selectedSection || undefined}
           isEditing={isEditing}
           onSubmit={isEditing ? handleUpdateSection : handleCreateSection}
@@ -728,7 +656,7 @@ const GuideAdminPanel: FC<GuideAdminPanelProps> = ({
       {isEditorOpen && selectedSection && selectedField && (
         <ContentEditor
           isOpen={isEditorOpen}
-          onClose={closeEditor}
+          onClose={() => setIsEditorOpen(false)}
           section={selectedSection}
           field={selectedField}
           adminOptionsPk={adminOptionsPk}
@@ -738,7 +666,7 @@ const GuideAdminPanel: FC<GuideAdminPanelProps> = ({
           refetch={refetch}
         />
       )}
-    </Box>
+    </div>
   );
 };
 

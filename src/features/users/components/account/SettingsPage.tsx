@@ -1,7 +1,8 @@
 // WIP settings page. Will add functionality as/if needed.
 
 import type { IUserData } from "@/shared/types";
-import { Box, Button, Flex, Text, useColorMode } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface Props {
   user: IUserData;
@@ -13,35 +14,28 @@ export const SettingsPage = ({ user }: Props) => {
 
   return (
     <>
-      <Box>Settings</Box>
+      <div>Settings</div>
       {/* PASSWORD (RENDERED ONLY IF NOT STAFF) */}
       {user?.is_staff && (
-        <Flex
-          border={"1px solid"}
-          rounded={"xl"}
-          borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-          padding={4}
-          flexDir={"column"}
-          mb={4}
+        <div
+          className={`border rounded-xl p-4 flex flex-col mb-4 ${
+            colorMode === "light" ? "border-gray-300" : "border-gray-500"
+          }`}
         >
-          <Flex>
-            <Flex w={"100%"}>
-              <Flex
-                flex={1}
-                alignItems={"center"}
-                justifyContent={"flex-start"}
-              >
-                <Text fontWeight={"bold"} fontSize={"lg"}>
+          <div className="flex">
+            <div className="w-full flex">
+              <div className="flex-1 flex items-center justify-start">
+                <p className="font-bold text-lg">
                   Password
-                </Text>
-              </Flex>
+                </p>
+              </div>
 
-              <Flex flex={1} alignItems={"center"} justifyContent={"flex-end"}>
+              <div className="flex-1 flex items-center justify-end">
                 <Button>Set New Password</Button>
-              </Flex>
-            </Flex>
-          </Flex>
-        </Flex>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

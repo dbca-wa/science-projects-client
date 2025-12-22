@@ -1,25 +1,7 @@
 // Modal for creating new projects
 
-import {
-  Text,
-  Modal,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Box,
-  useColorMode,
-  useToast,
-  type ToastId,
-  useDisclosure,
-  type UseToastOptions,
-} from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { IconType } from "react-icons";
 import { ProjectDetailsSection } from "@/features/projects/components/forms/ProjectDetailsSection";
@@ -44,6 +26,14 @@ import { ProjectExternalSection } from "@/features/projects/components/forms/Pro
 import { ProjectStudentSection } from "@/features/projects/components/forms/ProjectStudentSection";
 import { useUser } from "@/features/users/hooks/useUser";
 import { ExternalInternalSPConfirmationModal } from "./ExternalInternalSPConfirmationModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface INewProjectModalProps {
   projectType: string;
@@ -112,12 +102,6 @@ export const CreateProjectModal = ({
     setActiveTabIndex(3);
   };
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
@@ -125,11 +109,9 @@ export const CreateProjectModal = ({
 
   const { userData } = useUser();
 
-  const {
-    isOpen: isExternalOrInternalScienceConfirmationModalOpen,
-    onOpen: onOpenExternalOrInternalScienceConfirmationModal,
-    onClose: onCloseExternalOrInternalScienceConfirmationModal,
-  } = useDisclosure();
+  const [isExternalOrInternalScienceConfirmationModalOpen, setIsExternalOrInternalScienceConfirmationModalOpen] = useState(false);
+  const onOpenExternalOrInternalScienceConfirmationModal = () => setIsExternalOrInternalScienceConfirmationModalOpen(true);
+  const onCloseExternalOrInternalScienceConfirmationModal = () => setIsExternalOrInternalScienceConfirmationModalOpen(false);
 
   const [isExternalSP, setIsExternalSP] = useState(false);
 
@@ -152,26 +134,15 @@ export const CreateProjectModal = ({
     // Start of mutation handling
     mutationFn: createProject,
     onMutate: () => {
-      addToast({
-        title: "Creating project...",
+      toast.loading("Creating project...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API-file-declared interface
     onSuccess: async (data) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Project Created`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Project Created`,
+      });
       // Close the modal
       onClose?.();
 
@@ -196,18 +167,59 @@ export const CreateProjectModal = ({
       const capitalizedErrorMessage =
         errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1);
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could not create project",
-          description: capitalizedErrorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Could not create project", {
+        description: capitalizedErrorMessage,
+      });
     },
   });
+
+  const getProjectTypeColor = () => {
+    switch (projectType) {
+      case "Core Function":
+        return "text-red-500";
+      case "Science Project":
+        return "text-green-500";
+      case "Student Project":
+        return "text-blue-500";
+      case "External Project":
+        return "text-gray-500";
+      default:
+        return "text-gray-500";
+    }
+  };
+
+  const getTabValue = () => {
+    switch (activeTabIndex) {
+      case 0:
+        return "base";
+      case 1:
+        return "details";
+      case 2:
+        return "location";
+      case 3:
+        return projectType.includes("External") ? "external" : "student";
+      default:
+        return "base";
+    }
+  };
+
+  const handleTabChange = (value: string) => {
+    switch (value) {
+      case "base":
+        setActiveTabIndex(0);
+        break;
+      case "details":
+        if (baseInformationFilled) setActiveTabIndex(1);
+        break;
+      case "location":
+        if (baseInformationFilled && projectDetailsFilled) setActiveTabIndex(2);
+        break;
+      case "external":
+      case "student":
+        if (locationFilled) setActiveTabIndex(3);
+        break;
+    }
+  };
 
   return (
     <>
@@ -218,146 +230,143 @@ export const CreateProjectModal = ({
         setIsExternalSP={setIsExternalSP}
         mutationFunction={kickOffMutation}
       />
-      <Modal isOpen={isOpen} onClose={controlledClose} size={"6xl"}>
-        <ModalOverlay />
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
+      <Dialog open={isOpen} onOpenChange={controlledClose}>
+        <DialogContent 
+          className={`max-w-6xl max-h-[90vh] overflow-y-auto ${
+            colorMode === "dark" 
+              ? "bg-gray-800 text-gray-400 border-gray-700" 
+              : "bg-white text-gray-900 border-gray-200"
+          }`}
         >
-          <ModalHeader display={"inline-flex"} alignItems={"center"}>
-            <Box
-              color={
-                projectType === "Core Function"
-                  ? "red.500"
-                  : projectType === "Science Project"
-                    ? "green.500"
-                    : projectType === "Student Project"
-                      ? "blue.500"
-                      : projectType === "External Project"
-                        ? "gray.500"
-                        : "gray.500"
-              }
-              mr={3}
-            >
-              <ButtonIcon />
-            </Box>
-            <Text>
-              New {projectType} - {currentYear}
-            </Text>
-          </ModalHeader>
-          <ModalCloseButton />
-          <Tabs
-            isFitted
-            // variant='enclosed'
-            index={activeTabIndex}
-          >
-            <TabList mb="1em">
-              <Tab>Base Information</Tab>
-              <Tab isDisabled={!baseInformationFilled}>Details</Tab>
-              <Tab isDisabled={!baseInformationFilled || !projectDetailsFilled}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <div className={`mr-3 ${getProjectTypeColor()}`}>
+                <ButtonIcon />
+              </div>
+              <span>
+                New {projectType} - {currentYear}
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <Tabs value={getTabValue()} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="base">Base Information</TabsTrigger>
+              <TabsTrigger value="details" disabled={!baseInformationFilled}>
+                Details
+              </TabsTrigger>
+              <TabsTrigger 
+                value="location" 
+                disabled={!baseInformationFilled || !projectDetailsFilled}
+              >
                 Location
-              </Tab>
+              </TabsTrigger>
               {projectType.includes("External") && (
-                <Tab isDisabled={!locationFilled}>External Details</Tab>
+                <TabsTrigger value="external" disabled={!locationFilled}>
+                  External Details
+                </TabsTrigger>
               )}
-
               {projectType === "Student Project" && (
-                <Tab isDisabled={!locationFilled}>Student Details</Tab>
+                <TabsTrigger value="student" disabled={!locationFilled}>
+                  Student Details
+                </TabsTrigger>
               )}
-            </TabList>
-            <TabPanels>
-              <TabPanel h={"100%"} px={10}>
-                <ProjectBaseInformation
-                  projectKind={
-                    projectType === "Core Function"
-                      ? "core_function"
-                      : projectType === "Student Project"
-                        ? "student"
-                        : projectType === "Science Project"
-                          ? "science"
-                          : "external"
-                  }
-                  nextClick={goToDetailsTab}
-                  currentYear={currentYear}
-                  onClose={onClose}
-                  colorMode={colorMode}
-                  baseInformationFilled={baseInformationFilled}
-                  setBaseInformationFilled={setBaseInformationFilled}
-                />
-              </TabPanel>
-              <TabPanel>
-                <ProjectDetailsSection
-                  thisUser={userData?.pk}
-                  backClick={goBack}
-                  nextClick={goToLocationTab}
+            </TabsList>
+            
+            <TabsContent value="base" className="h-full px-10">
+              <ProjectBaseInformation
+                projectKind={
+                  projectType === "Core Function"
+                    ? "core_function"
+                    : projectType === "Student Project"
+                      ? "student"
+                      : projectType === "Science Project"
+                        ? "science"
+                        : "external"
+                }
+                nextClick={goToDetailsTab}
+                currentYear={currentYear}
+                onClose={onClose}
+                colorMode={colorMode}
+                baseInformationFilled={baseInformationFilled}
+                setBaseInformationFilled={setBaseInformationFilled}
+              />
+            </TabsContent>
+            
+            <TabsContent value="details">
+              <ProjectDetailsSection
+                thisUser={userData?.pk}
+                backClick={goBack}
+                nextClick={goToLocationTab}
+                onClose={onClose}
+                projectType={projectType}
+                colorMode={colorMode}
+                projectDetailsFilled={projectDetailsFilled}
+                setProjectDetailsFilled={setProjectDetailsFilled}
+              />
+            </TabsContent>
+            
+            <TabsContent value="location">
+              {projectType.includes("External") ||
+              projectType.includes("Student") ? (
+                <ProjectLocationSection
+                  locationFilled={locationFilled}
+                  locationData={locationData}
+                  setLocationData={setLocationData}
+                  setLocationFilled={setLocationFilled}
                   onClose={onClose}
                   projectType={projectType}
+                  currentYear={currentYear}
                   colorMode={colorMode}
-                  projectDetailsFilled={projectDetailsFilled}
-                  setProjectDetailsFilled={setProjectDetailsFilled}
+                  backClick={goBack}
+                  nextClick={goToFinalTab}
+                  createClick={kickOffMutation}
                 />
-              </TabPanel>
-              <TabPanel>
-                {projectType.includes("External") ||
-                projectType.includes("Student") ? (
-                  <ProjectLocationSection
-                    locationFilled={locationFilled}
-                    locationData={locationData}
-                    setLocationData={setLocationData}
-                    setLocationFilled={setLocationFilled}
-                    onClose={onClose}
-                    projectType={projectType}
-                    currentYear={currentYear}
-                    colorMode={colorMode}
-                    backClick={goBack}
-                    nextClick={goToFinalTab}
-                    createClick={kickOffMutation}
-                  />
-                ) : (
-                  <ProjectLocationSection
-                    locationFilled={locationFilled}
-                    locationData={locationData}
-                    setLocationData={setLocationData}
-                    setLocationFilled={setLocationFilled}
-                    onClose={onClose}
-                    projectType={projectType}
-                    currentYear={currentYear}
-                    colorMode={colorMode}
-                    backClick={goBack}
-                    createClick={
-                      onOpenExternalOrInternalScienceConfirmationModal
-                    } // kickOffMutation
-                  />
-                )}
-              </TabPanel>
-              {projectType.includes("External") && (
-                <TabPanel>
-                  <ProjectExternalSection
-                    setExternalData={setExternalData}
-                    onClose={onClose}
-                    backClick={goBack}
-                    createClick={kickOffMutation}
-                  />
-                </TabPanel>
+              ) : (
+                <ProjectLocationSection
+                  locationFilled={locationFilled}
+                  locationData={locationData}
+                  setLocationData={setLocationData}
+                  setLocationFilled={setLocationFilled}
+                  onClose={onClose}
+                  projectType={projectType}
+                  currentYear={currentYear}
+                  colorMode={colorMode}
+                  backClick={goBack}
+                  createClick={
+                    onOpenExternalOrInternalScienceConfirmationModal
+                  } // kickOffMutation
+                />
               )}
+            </TabsContent>
+            
+            {projectType.includes("External") && (
+              <TabsContent value="external">
+                <ProjectExternalSection
+                  setExternalData={setExternalData}
+                  onClose={onClose}
+                  backClick={goBack}
+                  createClick={kickOffMutation}
+                />
+              </TabsContent>
+            )}
 
-              {projectType.includes("Student") && (
-                <TabPanel>
-                  <ProjectStudentSection
-                    studentFilled={studentFilled}
-                    studentData={studentData}
-                    setStudentData={setStudentData}
-                    setStudentFilled={setStudentFilled}
-                    onClose={onClose}
-                    backClick={goBack}
-                    createClick={kickOffMutation}
-                  />
-                </TabPanel>
-              )}
-            </TabPanels>
+            {projectType.includes("Student") && (
+              <TabsContent value="student">
+                <ProjectStudentSection
+                  studentFilled={studentFilled}
+                  studentData={studentData}
+                  setStudentData={setStudentData}
+                  setStudentFilled={setStudentFilled}
+                  onClose={onClose}
+                  backClick={goBack}
+                  createClick={kickOffMutation}
+                />
+              </TabsContent>
+            )}
           </Tabs>
-        </ModalContent>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

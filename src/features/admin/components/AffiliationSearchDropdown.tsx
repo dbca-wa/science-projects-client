@@ -1,23 +1,11 @@
 // Dropdown search component for affiliations. Displays 5 affiliations below the search box.
 
 import { useAffiliation } from "@/features/admin/hooks/useAffiliation";
-import { CloseIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  IconButton,
-  Input,
-  InputGroup,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { X, Trash2 } from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Badge } from "@/shared/components/ui/badge";
+import { Label } from "@/shared/components/ui/label";
 import {
   forwardRef,
   useEffect,
@@ -26,9 +14,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { FaTrash } from "react-icons/fa";
 import { getAffiliationsBasedOnSearchTerm } from "@/features/admin/services/admin.service";
 import type { IAffiliation } from "@/shared/types";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IAffiliationSearchDropdown {
   isRequired: boolean;
@@ -139,32 +127,33 @@ export const AffiliationSearchDropdown = forwardRef(
 
     return (
       <>
-        <FormControl isRequired={isRequired} mb={4}>
-          <FormLabel>{label}</FormLabel>
+        <div className={`mb-4 ${isRequired ? 'required' : ''}`}>
+          <Label className="block text-sm font-medium mb-2">{label}</Label>
           {selectedAffiliation ? (
-            <Box mb={2} color="blue.500">
+            <div className="mb-2 text-blue-500">
               <SelectedAffiliationPk
                 affiliation={selectedAffiliation}
                 onClear={handleClearAffiliation}
                 isEditable={isEditable}
               />
-            </Box>
+            </div>
           ) : (
-            <InputGroup>
+            <div className="relative">
               <Input
-                ref={inputRef} // Attach the ref to the input element
+                ref={inputRef}
                 type="text"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 placeholder={placeholder}
                 autoComplete="off"
                 onFocus={() => setIsMenuOpen(true)}
+                className="w-full"
               />
-            </InputGroup>
+            </div>
           )}
 
           {selectedAffiliation ? null : (
-            <Box pos="relative" w="100%">
+            <div className="relative w-full">
               <CustomMenu isOpen={filteredItems?.length > 0 && isMenuOpen}>
                 <CustomMenuList minWidth="100%">
                   {filteredItems.map((affiliation) => (
@@ -176,10 +165,10 @@ export const AffiliationSearchDropdown = forwardRef(
                   ))}
                 </CustomMenuList>
               </CustomMenu>
-            </Box>
+            </div>
           )}
 
-          <FormHelperText>{helperText}</FormHelperText>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{helperText}</p>
           {array?.length > 1 && (
             <Button
               onClick={() => {
@@ -187,42 +176,34 @@ export const AffiliationSearchDropdown = forwardRef(
                   ? arrayClearFunction()
                   : console.log("array clear function not defined");
               }}
-              size={"xs"}
-              pos={"absolute"}
-              bottom={-8}
-              right={2}
-              background={colorMode === "light" ? "red.500" : "red.800"}
-              px={2}
-              rightIcon={<FaTrash />}
-              color={"white"}
+              size="sm"
+              variant="destructive"
+              className="absolute -bottom-8 right-2 px-2"
             >
+              <Trash2 className="h-4 w-4 mr-1" />
               Clear Secondary Affiliations
             </Button>
           )}
-        </FormControl>
+        </div>
         {array?.length > 0 && (
-          <Flex flexWrap="wrap" gap={2} pt={array?.length > 1 ? 7 : 0} pb={2}>
+          <div className={`flex flex-wrap gap-2 ${array?.length > 1 ? 'pt-7' : ''} pb-2`}>
             {array?.map((aff, index) => (
-              <Tag
+              <Badge
                 key={index}
-                size="md"
-                borderRadius="full"
-                variant="solid"
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                variant="default"
+                className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded-full"
               >
-                <TagLabel pl={1}>{aff?.name}</TagLabel>
-                <TagCloseButton
+                {aff?.name}
+                <button
                   onClick={() => arrayRemoveFunction(aff)}
-                  userSelect={"none"}
+                  className="ml-2 hover:bg-blue-600 rounded-full p-1"
                   tabIndex={-1}
-                />
-              </Tag>
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
             ))}
-          </Flex>
+          </div>
         )}
       </>
     );
@@ -249,17 +230,16 @@ interface CustomMenuListProps {
 const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
   const { colorMode } = useColorMode();
   return (
-    <Box
-      pos="absolute"
-      w="100%"
-      bg={colorMode === "light" ? "white" : "gray.700"}
-      boxShadow="md"
-      display={isOpen ? "block" : "none"}
-      zIndex={99}
+    <div
+      className={`absolute w-full shadow-md z-50 ${
+        isOpen ? 'block' : 'hidden'
+      } ${
+        colorMode === "light" ? "bg-white border border-gray-200" : "bg-gray-700 border border-gray-600"
+      }`}
       {...rest}
     >
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -269,39 +249,31 @@ const CustomMenuItem = ({
   ...rest
 }: CustomMenuItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { colorMode } = useColorMode();
 
   const handleClick = () => {
     onClick();
   };
-  const { colorMode } = useColorMode();
 
   return (
-    <Flex
-      as="button"
+    <button
       type="button"
-      w="100%"
-      textAlign="left"
-      p={2}
+      className={`w-full text-left p-2 flex items-center z-50 ${
+        isHovered ? 'bg-gray-200 dark:bg-gray-600' : 'transparent'
+      }`}
       onClick={handleClick}
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
-      bg={isHovered ? "gray.200" : "transparent"}
-      alignItems="center"
-      zIndex={99}
       {...rest}
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="start"
-        ml={3}
-        h="100%"
-      >
-        <Text ml={2} color={colorMode === "light" ? "green.500" : "green.300"}>
-          {`${affiliation.name}`}
-        </Text>
-      </Box>
-    </Flex>
+      <div className="flex items-center justify-start ml-3 h-full">
+        <span className={`ml-2 ${
+          colorMode === "light" ? "text-green-500" : "text-green-300"
+        }`}>
+          {affiliation.name}
+        </span>
+      </div>
+    </button>
   );
 };
 
@@ -311,9 +283,9 @@ const CustomMenuList = ({
   ...rest
 }: CustomMenuListProps) => {
   return (
-    <Box pos="relative" w="100%" minWidth={minWidth} {...rest}>
+    <div className="relative w-full" style={{ minWidth }} {...rest}>
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -331,30 +303,23 @@ const SelectedAffiliationPk = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Flex
-      align="center"
-      position="relative"
-      bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
-      borderRadius="md"
-      px={2}
-      py={1}
-      mr={2}
-    >
-      <Text ml={2} color={colorMode === "light" ? "green.500" : "green.400"}>
-        {`${affiliation.name}`}
-      </Text>
-      {isEditable ? (
-        <IconButton
+    <div className={`flex items-center relative px-2 py-1 mr-2 rounded-md ${
+      colorMode === "dark" ? "bg-gray-700" : "bg-gray-100"
+    }`}>
+      <span className={`ml-2 ${
+        colorMode === "light" ? "text-green-500" : "text-green-400"
+      }`}>
+        {affiliation.name}
+      </span>
+      {isEditable && (
+        <button
           aria-label="Clear selected affiliation"
-          icon={<CloseIcon />}
-          size="xs"
-          position="absolute"
-          top="50%"
-          right={2}
-          transform="translateY(-50%)"
+          className="absolute top-1/2 right-2 transform -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
           onClick={onClear}
-        />
-      ) : null}
-    </Flex>
+        >
+          <X className="h-3 w-3" />
+        </button>
+      )}
+    </div>
   );
 };

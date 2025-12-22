@@ -1,32 +1,22 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
 import type { IProjectLeadsEmail } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Flex,
-  Grid,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { getEmailProjectList } from "@/features/users/services/users.service";
 import { AxiosError } from "axios";
+import { Button } from "@/shared/components/ui/button";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -35,7 +25,7 @@ interface IModalProps {
 
 export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -44,46 +34,27 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
   };
 
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
-  //   const queryClient = useQueryClient();
   const [shouldDownloadList, setShouldDownloadList] = useState(false);
 
   const projectLeadEmailMutation = useMutation({
     // Start of mutation handling
     mutationFn: getEmailProjectList,
     onMutate: () => {
-      addToast({
-        title: "Getting Email LIst...",
+      toast.loading("Getting Email List...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: (resdata) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Opening Mail${
-            shouldDownloadList === true ? " and downloading file" : ""
-          }.`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Opening Mail${
+          shouldDownloadList === true ? " and downloading file" : ""
+        }.`,
+      });
 
       const emailList = resdata["unique_dbca_emails_list"];
       const fileContent = resdata["file_content"];
@@ -163,16 +134,9 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could not get emails",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Could not get emails", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -181,79 +145,81 @@ export const ProjectLeadEmailModal = ({ isOpen, onClose }: IModalProps) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
-      <ModalOverlay />
-      <Flex
-      //   as={"form"} onSubmit={handleSubmit(onSubmit)}
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent 
+        className={`max-w-lg ${
+          colorMode === "dark" 
+            ? "bg-gray-800 text-gray-400 border-gray-700" 
+            : "bg-white text-gray-900 border-gray-200"
+        }`}
       >
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Get Email of Project Leads?</ModalHeader>
-          <ModalCloseButton />
+        <DialogHeader>
+          <DialogTitle>Get Email of Project Leads?</DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              <p>
+                Click 'Get Emails' to open your mail app and write a message to
+                project leads. This will send to users who meet these conditions:
+              </p>
+              <div>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>User is active</li>
+                  <li>
+                    User is staff, with an @dbca.wa.gov.au email
+                  </li>
+                  <li>User is a project lead</li>
+                  <li>
+                    Project led is in the "active", "suspended", or "update
+                    requested" state
+                  </li>
+                </ul>
+              </div>
 
-          <ModalBody>
-            <Text mt={4}>
-              Click 'Get Emails' to open your mail app and write a message to
-              project leads. This will send to users who meet these conditions:
-            </Text>
-            <Box mt={4}>
-              <UnorderedList>
-                <ListItem>User is active</ListItem>
-                <ListItem>
-                  User is staff, with an @dbca.wa.gov.au email
-                </ListItem>
-                <ListItem>User is a project lead</ListItem>
-                <ListItem>
-                  Project led is in the "active", "suspended", or "update
-                  requested" state
-                </ListItem>
-              </UnorderedList>
-            </Box>
-
-            <Text mt={4}>
-              To fetch users and proceed to your mail app, press "Send Emails".
-            </Text>
-            <Text mt={4} fontWeight={"bold"}>
-              If the list is too long, your browser/mail client may not create
-              the email. In which case, you should download the list and copy
-              paste it into your mail client. Any project leads without a DBCA
-              email will be shown in this list.
-            </Text>
-            <Checkbox
-              mt={4}
-              isChecked={shouldDownloadList}
-              onChange={() => setShouldDownloadList((prev) => !prev)}
+              <p>
+                To fetch users and proceed to your mail app, press "Send Emails".
+              </p>
+              <p className="font-bold">
+                If the list is too long, your browser/mail client may not create
+                the email. In which case, you should download the list and copy
+                paste it into your mail client. Any project leads without a DBCA
+                email will be shown in this list.
+              </p>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="download-list"
+                  checked={shouldDownloadList}
+                  onCheckedChange={(checked) => setShouldDownloadList(!!checked)}
+                />
+                <label htmlFor="download-list" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Also download the list of emails?
+                </label>
+              </div>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-green-500 hover:bg-green-400" 
+                  : "bg-green-600 hover:bg-green-500"
+              }`}
+              disabled={projectLeadEmailMutation.isPending}
+              onClick={() =>
+                onSubmit({
+                  shouldDownloadList: shouldDownloadList,
+                })
+              }
             >
-              Also download the list of emails?
-            </Checkbox>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }} // isDisabled={!changesMade}
-                isLoading={projectLeadEmailMutation.isPending}
-                onClick={() =>
-                  onSubmit({
-                    shouldDownloadList: shouldDownloadList,
-                  })
-                }
-                ml={3}
-              >
-                Get Emails
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+              {projectLeadEmailMutation.isPending ? "Loading..." : "Get Emails"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

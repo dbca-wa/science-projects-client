@@ -6,16 +6,7 @@ import { BatchApproveModal } from "@/features/documents/components/modals/BatchA
 import { BatchApproveOldModal } from "@/features/documents/components/modals/BatchApproveOldModal";
 import { NewCycleModal } from "@/features/reports/components/modals/NewCycleModal";
 import { ProjectLeadEmailModal } from "@/features/projects/components/modals/ProjectLeadEmailModal";
-import {
-  Center,
-  Divider,
-  Flex,
-  Grid,
-  Icon,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Separator } from "@/shared/components/ui/separator";
 import { motion } from "framer-motion";
 import { type IconType } from "react-icons/lib";
 import { FaAddressCard, FaLocationArrow } from "react-icons/fa";
@@ -31,29 +22,25 @@ import {
 } from "react-icons/md";
 import { RiOrganizationChart, RiTeamFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 export const Admin = () => {
-  const {
-    isOpen: isBatchApproveOpen,
-    onClose: onBatchApproveClose,
-    onOpen: onBatchApproveOpen,
-  } = useDisclosure();
-  const {
-    isOpen: isProjectLeadEmailModalOpen,
-    onOpen: onProjectLeadEmailModalOpen,
-    onClose: onProjectLeadEmailModalClose,
-  } = useDisclosure();
+  // State for all modals (replacing useDisclosure hooks)
+  const [isBatchApproveOpen, setIsBatchApproveOpen] = useState(false);
+  const [isProjectLeadEmailModalOpen, setIsProjectLeadEmailModalOpen] = useState(false);
+  const [isBatchApproveOldOpen, setIsBatchApproveOldOpen] = useState(false);
+  const [isNewCycleOpen, setIsNewCycleOpen] = useState(false);
 
-  const {
-    isOpen: isBatchApproveOldOpen,
-    onClose: onBatchApproveOldClose,
-    onOpen: onBatchApproveOldOpen,
-  } = useDisclosure();
-  const {
-    isOpen: isNewCycleOpen,
-    onClose: onNewCycleClose,
-    onOpen: onNewCycleOpen,
-  } = useDisclosure();
+  // Modal control functions
+  const onBatchApproveClose = () => setIsBatchApproveOpen(false);
+  const onBatchApproveOpen = () => setIsBatchApproveOpen(true);
+  const onProjectLeadEmailModalOpen = () => setIsProjectLeadEmailModalOpen(true);
+  const onProjectLeadEmailModalClose = () => setIsProjectLeadEmailModalOpen(false);
+  const onBatchApproveOldClose = () => setIsBatchApproveOldOpen(false);
+  const onBatchApproveOldOpen = () => setIsBatchApproveOldOpen(true);
+  const onNewCycleClose = () => setIsNewCycleOpen(false);
+  const onNewCycleOpen = () => setIsNewCycleOpen(true);
 
   const { colorMode } = useColorMode();
 
@@ -184,26 +171,14 @@ export const Admin = () => {
         onClose={onProjectLeadEmailModalClose}
       />
       <NewCycleModal isOpen={isNewCycleOpen} onClose={onNewCycleClose} />
-      <Text
-        my={3}
-        fontWeight={"bold"}
-        fontSize={"lg"}
-        color={colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.700"}
-      >
+      <p className={`my-3 font-bold text-lg ${
+        colorMode === "light" ? "text-black/70" : "text-white/70"
+      }`}>
         Manage
-      </Text>
-      <Divider my={4} />
+      </p>
+      <Separator className="my-4" />
 
-      <Grid
-        mt={6}
-        gridTemplateColumns={{
-          base: "repeat(1, 1fr)",
-          "740px": "repeat(2, 1fr)",
-          lg: "repeat(3, 1fr)",
-          xl: "repeat(4, 1fr)",
-        }}
-        gridGap={6}
-      >
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {sortedCrudAdminActions.map((action, index) => (
           <AdminOptionBox
             key={index}
@@ -214,18 +189,15 @@ export const Admin = () => {
             reactIcon={action.reactIcon}
           />
         ))}
-      </Grid>
-      <Text
-        my={3}
-        fontWeight={"bold"}
-        fontSize={"lg"}
-        color={colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.700"}
-      >
+      </div>
+      <p className={`my-3 font-bold text-lg ${
+        colorMode === "light" ? "text-black/70" : "text-white/70"
+      }`}>
         Actions
-      </Text>
-      <Divider my={4} />
+      </p>
+      <Separator className="my-4" />
 
-      <Grid mt={6} gridTemplateColumns={"repeat(2, 1fr)"} gridGap={6}>
+      <div className="mt-6 grid grid-cols-2 gap-6">
         {sortedAdminActions.map((action, index) => (
           <AdminOptionBox
             key={index}
@@ -236,7 +208,7 @@ export const Admin = () => {
             // route={action.route}
           />
         ))}
-      </Grid>
+      </div>
     </>
   );
 };
@@ -289,50 +261,35 @@ const AdminOptionBox = ({
       initial="rest"
       style={{ perspective: 1000 }}
     >
-      <Center
+      <div
         // onMouseOver={() => setHovered(true)}
         // onMouseLeave={() => setHovered(false)}
-        rounded={"2xl"}
-        pos={"relative"}
-        overflow={"hidden"}
+        className={`
+          rounded-2xl relative overflow-hidden p-8 cursor-pointer flex items-center justify-center
+          shadow-[0px_10px_20px_0px_rgba(0,0,0,0.1),0px_2px_3px_-1px_rgba(0,0,0,0.04),-2px_0px_5px_-1px_rgba(0,0,0,0.05),2px_-1px_5px_-1px_rgba(0,0,0,0.05)]
+          ${colorMode === "light" 
+            ? "bg-white text-gray-500 hover:text-gray-600" 
+            : "bg-black/50 text-gray-400 hover:text-gray-200"
+          }
+        `}
         style={{ transformStyle: "preserve-3d" }}
-        boxShadow="
-                0px 10px 20px 0px rgba(0, 0, 0, 0.1), 
-                0px 2px 3px -1px rgba(0, 0, 0, 0.04), 
-                -2px 0px 5px -1px rgba(0, 0, 0, 0.05), 
-                2px -1px 5px -1px rgba(0, 0, 0, 0.05)
-                "
-        padding={8}
-        bg={colorMode === "light" ? "white" : "blackAlpha.500"}
-        color={colorMode === "light" ? "gray.500" : "gray.400"}
-        _hover={{
-          color: colorMode === "light" ? "gray.600" : "gray.200",
-        }}
-        cursor={"pointer"}
         onClick={handleOnClick}
       >
-        <Icon as={IconComponent} boxSize={20} />
-      </Center>
-      <Flex
-        left={0}
-        bottom={0}
-        p={4}
-        flexDir={"column"}
-        cursor={"pointer"}
+        {IconComponent && <IconComponent className="w-20 h-20" />}
+      </div>
+      <div
+        className="left-0 bottom-0 p-4 flex flex-col cursor-pointer"
         onClick={handleOnClick}
       >
-        <Center zIndex={3}>
-          <Text
-            fontWeight={"semibold"}
-            color={colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.700"}
-            noOfLines={2}
-            // textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
-            userSelect={"none"}
-          >
+        <div className="flex items-center justify-center z-[3]">
+          <p className={`
+            font-semibold select-none line-clamp-2 text-center
+            ${colorMode === "light" ? "text-black/70" : "text-white/70"}
+          `}>
             {name}
-          </Text>
-        </Center>
-      </Flex>
+          </p>
+        </div>
+      </div>
     </motion.div>
   );
 };

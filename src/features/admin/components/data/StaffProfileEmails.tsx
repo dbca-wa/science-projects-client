@@ -1,17 +1,11 @@
 import { getStaffProfileEmailList } from "@/features/users/services/users.service";
-import {
-  Box,
-  Button,
-  Flex,
-  useColorMode,
-  Text,
-  Center,
-  Spinner,
-  Input,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useEffect, useState } from "react";
 import { MdEmail } from "react-icons/md";
 import { TbRefresh } from "react-icons/tb";
+import { Loader2 } from "lucide-react";
 import { UserDataTable } from "./UserDataTable";
 
 interface IUserDataTableEntry {
@@ -49,48 +43,43 @@ const StaffProfileEmails = () => {
 
   return (
     <>
-      <Box>
-        <Flex alignItems={"center"} mt={4}>
-          <Text fontSize={"x-large"} py={4} flex={1}>
+      <div>
+        <div className="flex items-center mt-4">
+          <p className="text-xl py-4 flex-1">
             Users with Staff Profiles{" "}
             {activeProjectLeadEmailList?.length > 0 &&
               `(${activeProjectLeadEmailList?.length})`}
-          </Text>
+          </p>
           {!fetchingData && activeProjectLeadEmailList?.length > 1 && (
-            <Flex justifyContent={"flex-end"}>
+            <div className="flex justify-end">
               <Button
-                bg={colorMode === "light" ? "blue.500" : "blue.500"}
-                color={"white"}
-                _hover={{
-                  bg: colorMode === "light" ? "blue.400" : "blue.400",
-                }}
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-blue-500 hover:bg-blue-400" 
+                    : "bg-blue-500 hover:bg-blue-400"
+                }`}
                 onClick={fetchLeadEmails}
-                isDisabled={fetchingData}
-                leftIcon={<TbRefresh />}
+                disabled={fetchingData}
               >
+                <TbRefresh className="mr-2 h-4 w-4" />
                 Refresh Data
               </Button>
-            </Flex>
+            </div>
           )}
-        </Flex>
-      </Box>
+        </div>
+      </div>
 
       {/* <ProjectLeadEmailModal
     isOpen={isProjectLeadEmailModalOpen}
     onClose={onProjectLeadEmailModalClose}
   /> */}
       {fetchingData && !activeProjectLeadEmailList ? (
-        <Center w={"100%"} h={"500px"}>
-          <Spinner />
-          <Text
-            ml={4}
-            color={"gray.500"}
-            fontSize={"x-large"}
-            fontWeight={"bold"}
-          >
+        <div className="flex justify-center items-center w-full h-[500px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <p className="ml-4 text-gray-500 text-xl font-bold">
             Fetching ...
-          </Text>
-        </Center>
+          </p>
+        </div>
       ) : (
         <>
           {activeProjectLeadEmailList ? (
@@ -113,29 +102,23 @@ const StaffProfileEmails = () => {
               />
             </>
           ) : (
-            <Center
-              w={"100%"}
-              h={"500px"}
-              flexDir={"column"}
-              //   bg={"Red"}
-            >
+            <div className="flex justify-center items-center w-full h-[500px] flex-col">
               <Button
-                bg={colorMode === "light" ? "blue.500" : "blue.500"}
-                color={"white"}
-                _hover={{
-                  bg: colorMode === "light" ? "blue.400" : "blue.400",
-                }}
+                className={`text-white my-4 ${
+                  colorMode === "light" 
+                    ? "bg-blue-500 hover:bg-blue-400" 
+                    : "bg-blue-500 hover:bg-blue-400"
+                }`}
                 onClick={fetchLeadEmails}
-                isDisabled={fetchingData}
-                size={"lg"}
-                my={4}
+                disabled={fetchingData}
+                size="lg"
               >
                 Check Data
               </Button>
-              <Text color={"gray.500"} fontSize={"x-large"} fontWeight={"bold"}>
+              <p className="text-gray-500 text-xl font-bold">
                 Press "Check Data" to get emails for users with staff profiles
-              </Text>
-            </Center>
+              </p>
+            </div>
           )}
         </>
       )}
@@ -180,38 +163,38 @@ const EmailInputWithCopy = ({ activeProjectLeadEmailList }) => {
   const { colorMode } = useColorMode();
 
   return (
-    <Box mb={4}>
-      <Text mb={2} ml={2}>
+    <div className="mb-4">
+      <p className="mb-2 ml-2">
         Some systems may block the email button due to large amount of emails.
         Copy and paste the email list into your email client if it is blocked.
-      </Text>
-      <Flex align="center">
+      </p>
+      <div className="flex items-center">
         <Input value={emailString} readOnly />
-        <Flex>
+        <div className="flex">
           <Button
             onClick={copyToClipboard}
-            mx={2}
-            bg={copySuccess ? "green.400" : "blue.400"}
-            color="white"
-            _hover={{ bg: copySuccess ? "green.500" : "blue.500" }}
+            className={`mx-2 text-white ${
+              copySuccess 
+                ? "bg-green-400 hover:bg-green-500" 
+                : "bg-blue-400 hover:bg-blue-500"
+            }`}
           >
             {copySuccess ? "Copied!" : "Copy"}
           </Button>
           <Button
-            bg={colorMode === "light" ? "green.500" : "green.500"}
-            color={"white"}
-            _hover={{
-              bg: colorMode === "light" ? "green.400" : "green.400",
-            }}
+            className={`text-white mr-2 ${
+              colorMode === "light" 
+                ? "bg-green-500 hover:bg-green-400" 
+                : "bg-green-500 hover:bg-green-400"
+            }`}
             onClick={handleSendClick}
-            isDisabled={activeProjectLeadEmailList?.length < 1}
-            mr={2}
-            leftIcon={<MdEmail />}
+            disabled={activeProjectLeadEmailList?.length < 1}
           >
+            <MdEmail className="mr-2 h-4 w-4" />
             Email
           </Button>
-        </Flex>
-      </Flex>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };

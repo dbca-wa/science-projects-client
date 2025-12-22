@@ -1,7 +1,6 @@
 // The options bar which sits below the text area in the simple rich text editor
 
 import { useUser } from "@/features/users/hooks/useUser";
-import { Flex, Grid } from "@chakra-ui/react";
 import type { EditorSections, EditorSubsections, EditorType } from "@/shared/types";
 import { ClearButton } from "../Buttons/ClearButton";
 import { SaveButton } from "../Buttons/SaveButton";
@@ -10,6 +9,7 @@ import { WordCount } from "./WordCount";
 import { PasteHTMLDataButton } from "../Buttons/PasteHTMLDataButton";
 import { useMaintainer } from "@/features/admin/hooks/useMaintainer";
 import { PopulationButton } from "../Buttons/PopulationButton";
+import { cn } from "@/shared/utils";
 
 interface IOptionsBarProps {
   // editor: LexicalEditor;
@@ -72,53 +72,39 @@ export const OptionsBar = ({
     editorText.length === 0 &&
     documentTypeCount > 1;
 
+  const getGridColumns = () => {
+    const isMaintainer = userData?.pk === maintainerData?.pk;
+    const hasText = editorText.length !== 0;
+    
+    if (showPopulationButton) {
+      if (isMaintainer) {
+        return hasText ? 6 : 7;
+      } else {
+        return hasText ? 2 : 3;
+      }
+    } else {
+      return isMaintainer ? 6 : 2;
+    }
+  };
+
   return (
     editorIsOpen && (
-      <Flex height={20} width={"100%"} bottom={0}>
-        <Flex justifyContent="flex-start" alignItems="center" flex={1} px={10}>
+      <div className="flex h-20 w-full bottom-0">
+        <div className="flex justify-start items-center flex-1 px-10">
           <WordCount
             text={editorText}
             wordLimit={wordLimit}
             limitCanBePassed={limitCanBePassed}
             setCanSave={setCanSave}
           />
-        </Flex>
+        </div>
 
-        <Flex justifyContent="flex-end" alignItems="center" flex={1}>
-          <Grid
-            p={4}
-            // px={10}
-            // py={4}
-            gridTemplateColumns={{
-              base: `repeat(${
-                showPopulationButton
-                  ? userData?.pk === maintainerData?.pk
-                    ? editorText.length !== 0
-                      ? 6
-                      : 7
-                    : editorText.length !== 0
-                      ? 2
-                      : 3
-                  : userData?.pk === maintainerData?.pk
-                    ? 3
-                    : 2
-              }, 1fr)`,
-              lg: `repeat(${
-                showPopulationButton
-                  ? userData?.pk === maintainerData?.pk
-                    ? editorText.length !== 0
-                      ? 6
-                      : 7
-                    : editorText.length !== 0
-                      ? 2
-                      : 3
-                  : userData?.pk === maintainerData?.pk
-                    ? 6
-                    : 2
-              }, 1fr)`,
-            }}
-            // width={"100%"}
-            gridColumnGap={2}
+        <div className="flex justify-end items-center flex-1">
+          <div
+            className={cn(
+              "p-4 grid gap-2",
+              `grid-cols-${getGridColumns()}`
+            )}
           >
             {showPopulationButton && (
               <PopulationButton
@@ -157,9 +143,9 @@ export const OptionsBar = ({
               document_pk={document_pk}
               section={section}
             />
-          </Grid>
-        </Flex>
-      </Flex>
+          </div>
+        </div>
+      </div>
     )
   );
 };

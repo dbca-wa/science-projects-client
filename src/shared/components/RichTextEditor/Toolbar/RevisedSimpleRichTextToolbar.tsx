@@ -1,9 +1,7 @@
 // Toolbar for the simple rich text editor
 
-import { Box, Flex, useColorMode, useDisclosure } from "@chakra-ui/react";
-
+import { useCallback, useEffect, useRef, useState } from "react";
 import { InsertTableModal } from "@/shared/components/Modals/RTEModals/InsertTableModal";
-import { useCallback, useEffect, useState } from "react";
 import { FaBold, FaItalic, FaRedo, FaUnderline, FaUndo } from "react-icons/fa";
 import { ImClearFormatting } from "react-icons/im";
 import { MdSubscript, MdSuperscript } from "react-icons/md";
@@ -48,6 +46,27 @@ import {
 
 import { $isCodeHighlightNode } from "@lexical/code";
 import { $isHeadingNode } from "@lexical/rich-text";
+
+// Import for ElementSelector
+import { BsChatSquareQuoteFill, BsTextParagraph } from "react-icons/bs";
+import { FaCaretDown, FaCode } from "react-icons/fa";
+import {
+  LuHeading1,
+  LuHeading2,
+  LuHeading3,
+  LuHeading4,
+  LuHeading5,
+  LuHeading6,
+} from "react-icons/lu";
+import { MdFormatListBulleted, MdFormatListNumbered } from "react-icons/md";
+import { TbChecklist } from "react-icons/tb";
+import { Button } from "@/shared/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 
 interface ToolbarProps {
   editor: LexicalEditor;
@@ -244,6 +263,169 @@ const useToolbar = ({
   ];
 };
 
+interface ElementProps {
+  buttonSize?: "sm" | "md" | "lg";
+  formatParagraph: () => void;
+  formatBulletList: () => void;
+  formatNumberList: () => void;
+  blockType:
+    | "number"
+    | "code"
+    | "h1"
+    | "h2"
+    | "h3"
+    | "h4"
+    | "h5"
+    | "h6"
+    | "bullet"
+    | "check"
+    | "paragraph"
+    | "quote";
+  allowInserts: boolean;
+}
+
+const ElementSelector = ({
+  formatParagraph,
+  formatBulletList,
+  formatNumberList,
+  blockType,
+  allowInserts,
+  buttonSize,
+}: ElementProps) => {
+  // blockType: "number" | "code" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "bullet" | "check" | "paragraph" | "quote"
+
+  const blockTypeToBlockName = (
+    blockType:
+      | "number"
+      | "code"
+      | "h1"
+      | "h2"
+      | "h3"
+      | "h4"
+      | "h5"
+      | "h6"
+      | "bullet"
+      | "check"
+      | "paragraph"
+      | "quote",
+  ) => {
+    const dict = {
+      code: "Code",
+      h1: "Heading 1",
+      h2: "Heading 2",
+      h3: "Heading 3",
+      h4: "Heading 4",
+      h5: "Heading 5",
+      h6: "Heading 6",
+      number: "Numbered List",
+      bullet: "Bullet List",
+      check: "Check List",
+      paragraph: "Normal",
+      quote: "Quote",
+    };
+    return dict[blockType];
+  };
+
+  const blockTypeToBlockIcon = (
+    blockType:
+      | "number"
+      | "code"
+      | "h1"
+      | "h2"
+      | "h3"
+      | "h4"
+      | "h5"
+      | "h6"
+      | "bullet"
+      | "check"
+      | "paragraph"
+      | "quote",
+  ) => {
+    const dict = {
+      code: <FaCode />,
+      h1: <LuHeading1 />,
+      h2: <LuHeading2 />,
+      h3: <LuHeading3 />,
+      h4: <LuHeading4 />,
+      h5: <LuHeading5 />,
+      h6: <LuHeading6 />,
+      number: <MdFormatListNumbered />,
+      bullet: <MdFormatListBulleted />,
+      check: <TbChecklist />,
+      paragraph: <BsTextParagraph />,
+      quote: <BsChatSquareQuoteFill />,
+    };
+    return dict[blockType];
+  };
+
+  const [buttonWidth, setButtonWidth] = useState(0);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const updateButtonWidth = () => {
+      if (buttonRef.current) {
+        const width = buttonRef.current.offsetWidth;
+        setButtonWidth(width);
+      }
+    };
+
+    updateButtonWidth(); // Get initial width
+
+    window.addEventListener("resize", updateButtonWidth); // Update width on window resize
+
+    return () => {
+      window.removeEventListener("resize", updateButtonWidth); // Clean up for optimization
+    };
+  }, [buttonRef]);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          size={buttonSize || "sm"}
+          variant="ghost"
+          className="mx-1 flex-1 tabIndex-[-1]"
+          ref={buttonRef}
+        >
+          {blockTypeToBlockIcon(blockType)}
+          <span className="ml-2">{blockTypeToBlockName(blockType)}</span>
+          <FaCaretDown className="ml-2 h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="z-[9999999999999] absolute"
+        style={{ minWidth: "200px", width: buttonWidth }}
+      >
+        <DropdownMenuItem
+          onClick={formatParagraph}
+          className="w-full inline-flex items-center z-2"
+        >
+          <BsTextParagraph className="mr-4" />
+          <span>Normal</span>
+        </DropdownMenuItem>
+        {allowInserts ? (
+          <>
+            <DropdownMenuItem
+              onClick={formatBulletList}
+              className="w-full inline-flex items-center z-2"
+            >
+              <MdFormatListBulleted className="mr-4" />
+              <span>Bullet List</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={formatNumberList}
+              className="w-full inline-flex items-center z-2"
+            >
+              <MdFormatListNumbered className="mr-4" />
+              <span>Numbered List</span>
+            </DropdownMenuItem>
+          </>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 interface Props {
   buttonSize?: "sm" | "md" | "lg";
   allowInserts?: boolean;
@@ -269,11 +451,7 @@ export const RevisedSimpleRichTextToolbar = ({
     canRedo,
     blockType,
   ] = useToolbar({ editor });
-  const {
-    isOpen: isAddTableOpen,
-    onClose: onAddTableClose,
-    // onOpen: onAddTableOpen,
-  } = useDisclosure();
+  const [isAddTableOpen, setIsAddTableOpen] = useState(false);
 
   const formatParagraph = () => {
     editor.update(() => {
@@ -301,24 +479,15 @@ export const RevisedSimpleRichTextToolbar = ({
     }
   };
 
-  const { colorMode } = useColorMode();
-
   return (
     <>
       <InsertTableModal
         isOpen={isAddTableOpen}
         activeEditor={editor}
-        onClose={onAddTableClose}
+        onClose={() => setIsAddTableOpen(false)}
       />
 
-      <Flex
-        px={buttonSize && buttonSize === "sm" ? 1 : 5}
-        py={buttonSize && buttonSize === "sm" ? 1 : 0.5}
-        bg={colorMode === "light" ? undefined : "gray.900"}
-        roundedTop={20}
-        borderBottom={"1px solid"}
-        borderColor={colorMode === "dark" ? "gray.700" : "gray.200"}
-      >
+      <div className={`flex border-b border-border bg-background dark:bg-gray-900 rounded-t-[20px] ${buttonSize === "sm" ? "px-1 py-1" : "px-5 py-0.5"}`}>
         <RevisedBaseToolbarButton
           buttonSize={buttonSize}
           ariaLabel="Undo"
@@ -333,7 +502,7 @@ export const RevisedSimpleRichTextToolbar = ({
         </RevisedBaseToolbarButton>
         <RevisedBaseToolbarButton
           buttonSize={buttonSize}
-          ariaLabel="Undo"
+          ariaLabel="Redo"
           // isActive={isBold}
           variant={"ghost"}
           isDisabled={!canRedo}
@@ -483,25 +652,12 @@ export const RevisedSimpleRichTextToolbar = ({
             <ImClearFormatting />
           </RevisedBaseToolbarButton>
         </>
-      </Flex>
+      </div>
     </>
   );
 };
 
-import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
-import { useRef } from "react";
-import { BsChatSquareQuoteFill, BsTextParagraph } from "react-icons/bs";
-import { FaCaretDown, FaCode } from "react-icons/fa";
-import {
-  LuHeading1,
-  LuHeading2,
-  LuHeading3,
-  LuHeading4,
-  LuHeading5,
-  LuHeading6,
-} from "react-icons/lu";
-import { MdFormatListBulleted, MdFormatListNumbered } from "react-icons/md";
-import { TbChecklist } from "react-icons/tb";
+
 
 interface ElementProps {
   buttonSize?: "sm" | "md" | "lg";
@@ -524,173 +680,4 @@ interface ElementProps {
   allowInserts: boolean;
 }
 
-const ElementSelector = ({
-  formatParagraph,
-  formatBulletList,
-  formatNumberList,
-  blockType,
-  allowInserts,
-  buttonSize,
-}: ElementProps) => {
-  // blockType: "number" | "code" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "bullet" | "check" | "paragraph" | "quote"
 
-  const blockTypeToBlockName = (
-    blockType:
-      | "number"
-      | "code"
-      | "h1"
-      | "h2"
-      | "h3"
-      | "h4"
-      | "h5"
-      | "h6"
-      | "bullet"
-      | "check"
-      | "paragraph"
-      | "quote",
-  ) => {
-    const dict = {
-      code: "Code",
-      h1: "Heading 1",
-      h2: "Heading 2",
-      h3: "Heading 3",
-      h4: "Heading 4",
-      h5: "Heading 5",
-      h6: "Heading 6",
-      number: "Numbered List",
-      bullet: "Bullet List",
-      check: "Check List",
-      paragraph: "Normal",
-      quote: "Quote",
-    };
-    return dict[blockType];
-  };
-
-  const blockTypeToBlockIcon = (
-    blockType:
-      | "number"
-      | "code"
-      | "h1"
-      | "h2"
-      | "h3"
-      | "h4"
-      | "h5"
-      | "h6"
-      | "bullet"
-      | "check"
-      | "paragraph"
-      | "quote",
-  ) => {
-    const dict = {
-      code: <FaCode />,
-      h1: <LuHeading1 />,
-      h2: <LuHeading2 />,
-      h3: <LuHeading3 />,
-      h4: <LuHeading4 />,
-      h5: <LuHeading5 />,
-      h6: <LuHeading6 />,
-      number: <MdFormatListNumbered />,
-      bullet: <MdFormatListBulleted />,
-      check: <TbChecklist />,
-      paragraph: <BsTextParagraph />,
-      quote: <BsChatSquareQuoteFill />,
-    };
-    return dict[blockType];
-  };
-
-  const [buttonWidth, setButtonWidth] = useState(0);
-  const buttonRef = useRef(null);
-
-  useEffect(() => {
-    const updateButtonWidth = () => {
-      if (buttonRef.current) {
-        // eslint-disable-next-line
-        // @ts-ignore
-        const width = buttonRef.current.offsetWidth;
-        setButtonWidth(width);
-      }
-    };
-
-    updateButtonWidth(); // Get initial width
-
-    window.addEventListener("resize", updateButtonWidth); // Update width on window resize
-
-    return () => {
-      window.removeEventListener("resize", updateButtonWidth); // Clean up for optomisation
-    };
-  }, [buttonRef]);
-
-  return (
-    <Menu
-      isLazy
-      // placement="bottom"
-    >
-      <MenuButton
-        size={buttonSize}
-        as={Button}
-        variant={"ghost"}
-        leftIcon={blockTypeToBlockIcon(blockType)}
-        rightIcon={<FaCaretDown />}
-        // px={8}
-        mx={1}
-        flex={1}
-        tabIndex={-1}
-      >
-        {/* {buttonSize} */}
-        {blockTypeToBlockName(blockType)}
-      </MenuButton>
-      <MenuList
-        // minW={"200px"}
-        zIndex={9999999999999}
-        w={buttonWidth}
-        minW={"200px"}
-        pos={"absolute"}
-        // right={-500}
-      >
-        <MenuItem
-          onClick={formatParagraph}
-          // w={"100%"}
-          display={"inline-flex"}
-          alignItems={"center"}
-          zIndex={2}
-        >
-          <BsTextParagraph />
-
-          <Box pl={4} zIndex={2}>
-            <span>Normal</span>
-          </Box>
-        </MenuItem>
-        {allowInserts ? (
-          <>
-            <MenuItem
-              onClick={formatBulletList}
-              w={"100%"}
-              display={"inline-flex"}
-              alignItems={"center"}
-              zIndex={2}
-            >
-              <MdFormatListBulleted />
-
-              <Box pl={4} zIndex={2}>
-                <span>Bullet List</span>
-              </Box>
-            </MenuItem>
-            <MenuItem
-              onClick={formatNumberList}
-              w={"100%"}
-              display={"inline-flex"}
-              alignItems={"center"}
-              zIndex={2}
-            >
-              <MdFormatListNumbered />
-
-              <Box pl={4} zIndex={2}>
-                <span>Numbered List</span>
-              </Box>
-            </MenuItem>
-          </>
-        ) : null}
-      </MenuList>
-    </Menu>
-  );
-};

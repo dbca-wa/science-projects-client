@@ -1,37 +1,26 @@
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
 import {
-  Box,
-  Button,
-  Center,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormHelperText,
-  Grid,
-  Input,
-  ListItem,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Spinner,
-  Text,
-  UnorderedList,
-  VStack,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+  Sheet,
+  SheetContent,
+} from "@/shared/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/shared/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { toast } from "sonner";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { MdMoreVert } from "react-icons/md";
@@ -41,7 +30,6 @@ import type { IReport } from "@/shared/types";
 import { UserProfile } from "@/features/users/components/UserProfile";
 // import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { AxiosError } from "axios";
-import { useState } from "react";
 import { useGetFullReport } from "@/features/reports/hooks/useGetFullReport";
 import { useGetReportMedia } from "@/features/reports/hooks/useGetReportMedia";
 import { useUser } from "@/features/users/hooks/useUser";
@@ -65,42 +53,27 @@ export const ReportItemDisplay = ({
   // }, [reportMediaData, reportMediaLoading]);
 
   const { register } = useForm<IReport>();
-  // const selectedDates = [date_open, date_closed];
 
-  // const dmData = watch("dm");
-  // const serviceDeliveryData = watch("service_delivery_intro");
-  // const researchIntroData = watch("research_intro");
-  // const studentIntroData = watch("student_intro");
+  // State for all modals (replacing useDisclosure hooks)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isUpdateMediaModalOpen, setIsUpdateMediaModalOpen] = useState(false);
+  const [isCreatorOpen, setIsCreatorOpen] = useState(false);
+  const [isModifierOpen, setIsModifierOpen] = useState(false);
 
-  // const publicationsData = watch("publications");
-
-  const toast = useToast();
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onDeleteModalOpen,
-    onClose: onDeleteModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isUpdateModalOpen,
-    onOpen: onUpdateModalOpen,
-    onClose: onUpdateModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isUpdateMediaModalOpen,
-    onOpen: onUpdateMediaModalOpen,
-    onClose: onUpdateMediaModalClose,
-  } = useDisclosure();
+  // Modal control functions
+  const onDeleteModalOpen = () => setIsDeleteModalOpen(true);
+  const onDeleteModalClose = () => setIsDeleteModalOpen(false);
+  const onUpdateModalOpen = () => setIsUpdateModalOpen(true);
+  const onUpdateModalClose = () => setIsUpdateModalOpen(false);
+  const onUpdateMediaModalOpen = () => setIsUpdateMediaModalOpen(true);
+  const onUpdateMediaModalClose = () => setIsUpdateMediaModalOpen(false);
+  const onCreatorOpen = () => setIsCreatorOpen(true);
+  const onCreatorClose = () => setIsCreatorOpen(false);
+  const onModifierOpen = () => setIsModifierOpen(true);
+  const onModifierClose = () => setIsModifierOpen(false);
 
   const queryClient = useQueryClient();
-
-  // const formattedDateOpen = useFormattedDate(date_open);
-  // const formattedDateClosed = useFormattedDate(date_closed);
-
-  // const partsOpen = formattedDateOpen.split("@");
-  // const firstPartDateOpen = partsOpen[0]?.trim();
-
-  // const partsClosed = formattedDateClosed.split("@");
-  // const firstPartDateClosed = partsClosed[0]?.trim();
 
   const { userLoading: modifierLoading, userData: modifierData } =
     useFullUserByPk(modifier);
@@ -110,31 +83,19 @@ export const ReportItemDisplay = ({
   const updateMutation = useMutation({
     mutationFn: updateReport,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Updated",
-        position: "top-right",
-      });
+      toast.success("Updated");
       onUpdateModalClose();
       queryClient.invalidateQueries({ queryKey: ["reports"] });
     },
     onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
+      toast.error("Failed");
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteReport,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Deleted",
-        position: "top-right",
-      });
+      toast.success("Deleted");
       onDeleteModalClose();
       queryClient.invalidateQueries({ queryKey: ["latestReport"] });
       queryClient.invalidateQueries({ queryKey: ["reports"] });
@@ -145,27 +106,10 @@ export const ReportItemDisplay = ({
     deleteMutation.mutate(pk);
   };
 
-  // const onUpdateSubmit = (formData: IReport) => {
-  //   // console.log(formData);
-  //   updateMutation.mutate(formData);
-  // };
-
-  const {
-    isOpen: isCreatorOpen,
-    onOpen: onCreatorOpen,
-    onClose: onCreatorClose,
-  } = useDisclosure();
-  const {
-    isOpen: isModifierOpen,
-    onOpen: onModifierOpen,
-    onClose: onModifierClose,
-  } = useDisclosure();
   const creatorDrawerFunction = () => {
-    // console.log(`${creatorData?.first_name} clicked`);
     onCreatorOpen();
   };
   const modifierDrawerFunction = () => {
-    // console.log(`${modifierData?.first_name} clicked`);
     onModifierOpen();
   };
 
@@ -180,52 +124,26 @@ export const ReportItemDisplay = ({
 
   return !creatorLoading && creatorData ? (
     <>
-      <Drawer
-        isOpen={isCreatorOpen}
-        placement="right"
-        onClose={onCreatorClose}
-        size={"sm"} //by default is xs
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerBody>
-            <UserProfile pk={creator} />
-          </DrawerBody>
-
-          <DrawerFooter></DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      <Sheet open={isCreatorOpen} onOpenChange={setIsCreatorOpen}>
+        <SheetContent side="right" className="w-96">
+          <UserProfile pk={creator} />
+        </SheetContent>
+      </Sheet>
       {!modifierLoading && modifierData && (
-        <Drawer
-          isOpen={isModifierOpen}
-          placement="right"
-          onClose={onModifierClose}
-          size={"sm"} //by default is xs
-        >
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerBody>
-              <UserProfile pk={modifier} />
-            </DrawerBody>
-
-            <DrawerFooter></DrawerFooter>
-          </DrawerContent>
-        </Drawer>
+        <Sheet open={isModifierOpen} onOpenChange={setIsModifierOpen}>
+          <SheetContent side="right" className="w-96">
+            <UserProfile pk={modifier} />
+          </SheetContent>
+        </Sheet>
       )}
 
-      <Grid
-        gridTemplateColumns="2fr 3fr 3fr 1fr"
-        width="100%"
-        p={3}
-        borderWidth={1}
-        // bg={"red"}
-      >
-        <Flex justifyContent="flex-start" alignItems={"center"}>
+      <div className="grid grid-cols-[2fr_3fr_3fr_1fr] w-full p-3 border border-border">
+        <div className="flex justify-start items-center">
           <TextButtonFlex
             name={year ? `FY ${year - 1} - ${String(year).slice(2)}` : ""}
             onClick={onUpdateModalOpen}
           />
-        </Flex>
+        </div>
 
         {/* <Grid alignItems={"center"}>
           <Box>
@@ -249,324 +167,276 @@ export const ReportItemDisplay = ({
         ) : (
           <TextButtonFlex />
         )}
-        <Flex justifyContent="flex-end" mr={2} alignItems={"center"}>
-          <Menu>
-            <MenuButton
-              px={2}
-              py={2}
-              transition="all 0.2s"
-              rounded={4}
-              borderRadius="md"
-              borderWidth="1px"
-              _hover={{ bg: "gray.400" }}
-              _expanded={{ bg: "blue.400" }}
-              _focus={{ boxShadow: "outline-solid" }}
-            >
-              <Flex alignItems={"center"} justifyContent={"center"}>
-                <MdMoreVert />
-              </Flex>
-            </MenuButton>
-            <MenuList>
-              <MenuItem onClick={onUpdateModalOpen}>Edit</MenuItem>
-              <MenuItem onClick={onUpdateMediaModalOpen}>Edit Media</MenuItem>
-              {userData?.is_superuser ? (
-                <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
-              ) : null}
-            </MenuList>
-          </Menu>
-          {/* </Button> */}
-        </Flex>
-      </Grid>
-
-      <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
-        <ModalOverlay />
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Delete Report</ModalHeader>
-          <ModalBody>
-            <Box>
-              <Text fontSize="lg" fontWeight="semibold">
-                Are you sure you want to delete this report?
-              </Text>
-
-              <Text
-                fontSize="lg"
-                fontWeight="semibold"
-                color={"blue.500"}
-                mt={4}
+        <div className="flex justify-end mr-2 items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="px-2 py-2 transition-all duration-200 rounded border hover:bg-gray-400 focus:ring-2 focus:ring-blue-500"
               >
-                "{year}"
-              </Text>
+                <div className="flex items-center justify-center">
+                  <MdMoreVert />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={onUpdateModalOpen}>Edit</DropdownMenuItem>
+              <DropdownMenuItem onClick={onUpdateMediaModalOpen}>Edit Media</DropdownMenuItem>
+              {userData?.is_superuser ? (
+                <DropdownMenuItem onClick={onDeleteModalOpen}>Delete</DropdownMenuItem>
+              ) : null}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
 
-              <Center my={6}>
-                <UnorderedList>
-                  <ListItem>
-                    This will delete all progress reports and their related
-                    document associated with the year
-                  </ListItem>
-                  <ListItem>
-                    This will delete all images associated with the year
-                  </ListItem>
-                </UnorderedList>
-              </Center>
-              <FormControl>
-                <Input onChange={(e) => setDeleteText(e.target.value)} />
-                <FormHelperText>
-                  Type "delete" in the box to continue
-                </FormHelperText>
-              </FormControl>
-            </Box>
-          </ModalBody>
-          <ModalFooter justifyContent="flex-end">
-            <Flex>
-              <Button onClick={onDeleteModalClose} colorScheme={"gray"}>
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className={`${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"}`}>
+          <DialogHeader>
+            <DialogTitle>Delete Report</DialogTitle>
+          </DialogHeader>
+          <div>
+            <p className="text-lg font-semibold">
+              Are you sure you want to delete this report?
+            </p>
+
+            <p className="text-lg font-semibold text-blue-500 mt-4">
+              "{year}"
+            </p>
+
+            <div className="flex justify-center my-6">
+              <ul className="list-disc list-inside space-y-2">
+                <li>
+                  This will delete all progress reports and their related
+                  document associated with the year
+                </li>
+                <li>
+                  This will delete all images associated with the year
+                </li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="delete-input">Type "delete" in the box to continue</Label>
+              <Input 
+                id="delete-input"
+                onChange={(e) => setDeleteText(e.target.value)} 
+                placeholder="Type 'delete' to confirm"
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex justify-end">
+            <div className="flex gap-3">
+              <Button onClick={() => setIsDeleteModalOpen(false)} variant="outline">
                 No
               </Button>
               <Button
                 onClick={deleteBtnClicked}
-                color={"white"}
-                isDisabled={deleteText !== "delete"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                ml={3}
+                disabled={deleteText !== "delete"}
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                }`}
               >
                 Yes
               </Button>
-            </Flex>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {reportMediaData ? (
-        <Modal
-          isOpen={isUpdateMediaModalOpen}
-          onClose={onUpdateMediaModalClose}
-          size={"6xl"}
-        >
-          <ModalOverlay />
+        <Dialog open={isUpdateMediaModalOpen} onOpenChange={setIsUpdateMediaModalOpen}>
+          <DialogContent className={`max-w-6xl ${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-gray-100"} p-4 pb-16 relative`}>
+            <DialogHeader>
+              <DialogTitle>Update {reportData?.year} Report Media</DialogTitle>
+            </DialogHeader>
 
-          <ModalBody>
-            <ModalContent
-              color={colorMode === "dark" ? "gray.400" : null}
-              bg={colorMode === "light" ? "gray.100" : "gray.800"}
-              p={4}
-              pb={16}
-              // w={"100%"}
-              // h={"100%"}
-              pos={"relative"}
-            >
-              <ModalHeader>Update {reportData?.year} Report Media</ModalHeader>
-              <ModalCloseButton />
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 mt-4 gap-8 mx-6">
+              {/* <ReportMediaChanger
+                reportMediaData={reportMediaData}
+                section={"cover"}
+                reportPk={pk}
+                refetchData={refetchMedia}
+              /> */}
 
-              <Grid
-                // h={"100%"}
-                gridTemplateColumns={{
-                  base: "repeat(1, 1fr)",
-                  lg: "repeat(2, 1fr)",
-                  xl: "repeat(3, 1fr)",
-                }}
-                mt={4}
-                gap={8}
-                mx={6}
-              >
-                {/* <ReportMediaChanger
-                  reportMediaData={reportMediaData}
-                  section={"cover"}
-                  reportPk={pk}
-                  refetchData={refetchMedia}
-                /> */}
+              <ReportMediaChanger
+                reportMediaData={reportMediaData}
+                section={"sdchart"}
+                reportPk={pk}
+                refetchData={refetchMedia}
+              />
 
-                <ReportMediaChanger
-                  reportMediaData={reportMediaData}
-                  section={"sdchart"}
-                  reportPk={pk}
-                  refetchData={refetchMedia}
-                />
+              <ReportMediaChanger
+                reportMediaData={reportMediaData}
+                section={"service_delivery"}
+                reportPk={pk}
+                refetchData={refetchMedia}
+              />
 
-                <ReportMediaChanger
-                  reportMediaData={reportMediaData}
-                  section={"service_delivery"}
-                  reportPk={pk}
-                  refetchData={refetchMedia}
-                />
+              <ReportMediaChanger
+                reportMediaData={reportMediaData}
+                section={"research"}
+                reportPk={pk}
+                refetchData={refetchMedia}
+              />
 
-                <ReportMediaChanger
-                  reportMediaData={reportMediaData}
-                  section={"research"}
-                  reportPk={pk}
-                  refetchData={refetchMedia}
-                />
+              <ReportMediaChanger
+                reportMediaData={reportMediaData}
+                section={"partnerships"}
+                reportPk={pk}
+                refetchData={refetchMedia}
+              />
 
-                <ReportMediaChanger
-                  reportMediaData={reportMediaData}
-                  section={"partnerships"}
-                  reportPk={pk}
-                  refetchData={refetchMedia}
-                />
+              <ReportMediaChanger
+                reportMediaData={reportMediaData}
+                section={"collaborations"}
+                reportPk={pk}
+                refetchData={refetchMedia}
+              />
 
-                <ReportMediaChanger
-                  reportMediaData={reportMediaData}
-                  section={"collaborations"}
-                  reportPk={pk}
-                  refetchData={refetchMedia}
-                />
+              <ReportMediaChanger
+                reportMediaData={reportMediaData}
+                section={"student_projects"}
+                reportPk={pk}
+                refetchData={refetchMedia}
+              />
 
-                <ReportMediaChanger
-                  reportMediaData={reportMediaData}
-                  section={"student_projects"}
-                  reportPk={pk}
-                  refetchData={refetchMedia}
-                />
+              <ReportMediaChanger
+                reportMediaData={reportMediaData}
+                section={"publications"}
+                reportPk={pk}
+                refetchData={refetchMedia}
+              />
 
-                <ReportMediaChanger
-                  reportMediaData={reportMediaData}
-                  section={"publications"}
-                  reportPk={pk}
-                  refetchData={refetchMedia}
-                />
-
-                {/* <ReportMediaChanger
-                  reportMediaData={reportMediaData}
-                  section={"rear_cover"}
-                  reportPk={pk}
-                  refetchData={refetchMedia}
-                /> */}
-              </Grid>
-            </ModalContent>
-          </ModalBody>
-        </Modal>
+              {/* <ReportMediaChanger
+                reportMediaData={reportMediaData}
+                section={"rear_cover"}
+                reportPk={pk}
+                refetchData={refetchMedia}
+              /> */}
+            </div>
+          </DialogContent>
+        </Dialog>
       ) : null}
 
-      <Modal
-        isOpen={isUpdateModalOpen}
-        onClose={onUpdateModalClose}
-        size={"6xl"}
-        // scrollBehavior="inside"
-      >
-        <ModalOverlay />
-        <ModalBody>
-          <ModalContent
-            color={colorMode === "dark" ? "gray.400" : null}
-            bg={colorMode === "light" ? "white" : "gray.800"}
-            p={4}
-          >
-            <ModalHeader>Update {reportData?.year} Report</ModalHeader>
+      <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
+        <DialogContent className={`max-w-6xl ${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"} p-4`}>
+          <DialogHeader>
+            <DialogTitle>Update {reportData?.year} Report</DialogTitle>
+          </DialogHeader>
 
-            <ModalCloseButton />
+          {reportLoading ? (
+            <div className="flex justify-center p-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <>
+              <div className="p-6 space-y-6">
+                <input
+                  type="hidden"
+                  {...register("pk")}
+                  defaultValue={pk} // Prefill with the 'pk' prop
+                />
+                <Input
+                  {...register("year", { required: true })}
+                  disabled
+                  required
+                  type="hidden"
+                  defaultValue={reportData.year} // Prefill with the 'name' prop
+                />
 
-            {reportLoading ? (
-              <Spinner />
-            ) : (
-              <>
-                <VStack p={6} spacing={6}>
-                  <input
-                    type="hidden"
-                    {...register("pk")}
-                    defaultValue={pk} // Prefill with the 'pk' prop
+                <div>
+                  <RichTextEditor
+                    canEdit={userData?.is_superuser}
+                    isUpdate={true}
+                    editorType="AnnualReport"
+                    key={`dm${editorKey}`} // Change the key to force a re-render
+                    data={reportData?.dm}
+                    section={"dm"}
+                    writeable_document_kind={"Annual Report"}
+                    writeable_document_pk={reportData?.id}
                   />
-                  <Input
-                    {...register("year", { required: true })}
-                    disabled
-                    required
-                    type="hidden"
-                    defaultValue={reportData.year} // Prefill with the 'name' prop
+                </div>
+
+                <div>
+                  <RichTextEditor
+                    canEdit={userData?.is_superuser}
+                    isUpdate={true}
+                    editorType="AnnualReport"
+                    key={`service_delivery_intro${editorKey}`} // Change the key to force a re-render
+                    data={reportData?.service_delivery_intro}
+                    section={"service_delivery_intro"}
+                    writeable_document_kind={"Annual Report"}
+                    writeable_document_pk={reportData?.id}
                   />
+                </div>
+                <div>
+                  <RichTextEditor
+                    canEdit={userData?.is_superuser}
+                    isUpdate={true}
+                    editorType="AnnualReport"
+                    key={`research_intro${editorKey}`} // Change the key to force a re-render
+                    data={reportData?.research_intro}
+                    section={"research_intro"}
+                    writeable_document_kind={"Annual Report"}
+                    writeable_document_pk={reportData?.id}
+                  />
+                </div>
 
-                  <FormControl>
-                    <RichTextEditor
-                      canEdit={userData?.is_superuser}
-                      isUpdate={true}
-                      editorType="AnnualReport"
-                      key={`dm${editorKey}`} // Change the key to force a re-render
-                      data={reportData?.dm}
-                      section={"dm"}
-                      writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.id}
-                    />
-                  </FormControl>
+                <div>
+                  <RichTextEditor
+                    canEdit={userData?.is_superuser}
+                    isUpdate={true}
+                    editorType="AnnualReport"
+                    key={`student_intro${editorKey}`} // Change the key to force a re-render
+                    data={reportData?.student_intro}
+                    section={"student_intro"}
+                    writeable_document_kind={"Annual Report"}
+                    writeable_document_pk={reportData?.id}
+                  />
+                </div>
 
-                  <FormControl>
-                    <RichTextEditor
-                      canEdit={userData?.is_superuser}
-                      isUpdate={true}
-                      editorType="AnnualReport"
-                      key={`service_delivery_intro${editorKey}`} // Change the key to force a re-render
-                      data={reportData?.service_delivery_intro}
-                      section={"service_delivery_intro"}
-                      writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.id}
-                    />
-                  </FormControl>
-                  <FormControl>
-                    <RichTextEditor
-                      canEdit={userData?.is_superuser}
-                      isUpdate={true}
-                      editorType="AnnualReport"
-                      key={`research_intro${editorKey}`} // Change the key to force a re-render
-                      data={reportData?.research_intro}
-                      section={"research_intro"}
-                      writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.id}
-                    />
-                  </FormControl>
+                <div>
+                  <RichTextEditor
+                    canEdit={userData?.is_superuser}
+                    isUpdate={true}
+                    editorType="AnnualReport"
+                    key={`publications${editorKey}`} // Change the key to force a re-render
+                    data={reportData?.publications}
+                    section={"publications"}
+                    writeable_document_kind={"Annual Report"}
+                    writeable_document_pk={reportData?.id}
+                  />
+                </div>
+              </div>
 
-                  <FormControl>
-                    <RichTextEditor
-                      canEdit={userData?.is_superuser}
-                      isUpdate={true}
-                      editorType="AnnualReport"
-                      key={`student_intro${editorKey}`} // Change the key to force a re-render
-                      data={reportData?.student_intro}
-                      section={"student_intro"}
-                      writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.id}
-                    />
-                  </FormControl>
-
-                  <FormControl>
-                    <RichTextEditor
-                      canEdit={userData?.is_superuser}
-                      isUpdate={true}
-                      editorType="AnnualReport"
-                      key={`publications${editorKey}`} // Change the key to force a re-render
-                      data={reportData?.publications}
-                      section={"publications"}
-                      writeable_document_kind={"Annual Report"}
-                      writeable_document_pk={reportData?.id}
-                    />
-                  </FormControl>
-                </VStack>
-
-                <Center>
-                  {updateMutation.isError ? (
-                    <Box mt={4}>
-                      {Object.keys(
-                        (updateMutation.error as AxiosError).response.data,
-                      ).map((key) => (
-                        <Box key={key}>
-                          {(
-                            (updateMutation.error as AxiosError).response.data[
-                              key
-                            ] as string[]
-                          ).map((errorMessage, index) => (
-                            <Text key={`${key}-${index}`} color="red.500">
-                              {`${key}: ${errorMessage}`}
-                            </Text>
-                          ))}
-                        </Box>
-                      ))}
-                    </Box>
-                  ) : null}
-                </Center>
-              </>
-            )}
-          </ModalContent>
-        </ModalBody>
-      </Modal>
+              <div className="flex justify-center">
+                {updateMutation.isError ? (
+                  <div className="mt-4">
+                    {Object.keys(
+                      (updateMutation.error as AxiosError).response.data,
+                    ).map((key) => (
+                      <div key={key}>
+                        {(
+                          (updateMutation.error as AxiosError).response.data[
+                            key
+                          ] as string[]
+                        ).map((errorMessage, index) => (
+                          <p key={`${key}-${index}`} className="text-red-500">
+                            {`${key}: ${errorMessage}`}
+                          </p>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   ) : null;
 };

@@ -1,17 +1,8 @@
-import {
-  Box,
-  Button,
-  Center,
-  Checkbox,
-  Flex,
-  Grid,
-  Icon,
-  Switch,
-  Tag,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Switch } from "@/shared/components/ui/switch";
+import { Badge } from "@/shared/components/ui/badge";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { ISpecialEndorsement } from "@/features/documents/services/documents.service";
@@ -50,7 +41,10 @@ export const ProjectPlanEndorsements = ({
     setUploadedPDF(null);
     setShouldSwitchBeChecked(false);
   };
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
 
   const aecEndReqValue = watch("aecEndorsementRequired");
 
@@ -138,11 +132,9 @@ export const ProjectPlanEndorsements = ({
 
   const [pdfAreaHovered, setPdfAreaHovered] = useState(false);
 
-  const {
-    isOpen: isDeletePDFEndorsementModalOpen,
-    onOpen: onOpenDeletePDFEndorsementModal,
-    onClose: onCloseDeletePDFEndorsementModal,
-  } = useDisclosure();
+  const [isDeletePDFEndorsementModalOpen, setIsDeletePDFEndorsementModalOpen] = useState(false);
+  const onOpenDeletePDFEndorsementModal = () => setIsDeletePDFEndorsementModalOpen(true);
+  const onCloseDeletePDFEndorsementModal = () => setIsDeletePDFEndorsementModalOpen(false);
 
   return (
     <>
@@ -166,169 +158,129 @@ export const ProjectPlanEndorsements = ({
         refetchEndorsements={refetchDocument}
         aecPDFFile={uploadedPDF}
       />
-      <Box
-        background={colorMode === "light" ? "gray.50" : "gray.700"}
-        rounded={"lg"}
-        p={4}
-        w={"100%"}
-        mb={6}
+      <div
+        className={`${
+          colorMode === "light" ? "bg-gray-50" : "bg-gray-700"
+        } rounded-lg p-4 w-full mb-6`}
       >
-        <Flex flexDir={"column"}>
+        <div className="flex flex-col">
           {/* Contents */}
-          <Grid
-            background={colorMode === "light" ? "gray.100" : "gray.700"}
-            rounded={"lg"}
-            p={6}
-            w={"100%"}
-            // gridRowGap={2}
+          <div
+            className={`${
+              colorMode === "light" ? "bg-gray-100" : "bg-gray-700"
+            } rounded-lg p-6 w-full`}
           >
             {/* Title */}
-            <Box mb={4}>
-              <Text fontWeight={"bold"} fontSize={"xl"}>
+            <div className="mb-4">
+              <h2 className="font-bold text-xl">
                 Endorsements
-              </Text>
-            </Box>
+              </h2>
+            </div>
 
             {/* Interaction with Animals */}
-            <Grid
-              gridTemplateColumns={"repeat(1, 1fr)"}
-              gridRowGap={4}
-              alignItems={"center"}
-              userSelect={"none"}
-              border={"1px solid"}
-              borderColor={"gray.300"}
-              p={4}
-              rounded={"xl"}
-              // roundedTop={0}
-              // borderTop={0}
-              // roundedBottom={0}
+            <div
+              className="grid grid-cols-1 gap-4 items-center select-none border border-gray-300 p-4 rounded-xl"
             >
-              <Flex
-                // ml={8}
-                // mt={2}
-                w={"100%"}
-              >
-                <Box flex={1}>
-                  <Text
-                    fontWeight={"semibold"}
-
-                    // color={involvesAnimalsValue ? "black" : "gray.500"}
-                  >
+              <div className="flex w-full">
+                <div className="flex-1">
+                  <p className="font-semibold">
                     Animal Ethics Committee Endorsement Required?
-                  </Text>
-                </Box>
-                <Box
-                  justifySelf={"flex-end"}
-                  // flex={1}
-                  alignItems={"center"}
-                >
+                  </p>
+                </div>
+                <div className="justify-self-end items-center">
                   <Checkbox
-                    borderColor={"blue.500"}
+                    className="border-blue-500 mr-3"
                     defaultChecked={aecEndRequired}
-                    mr={3}
-                    // onChange={handleTogglePlantsInvolved}
                     {...register("aecEndorsementRequired", {
                       value: aecEndRequired,
                     })}
                   />
-                </Box>
-              </Flex>
-              <Flex alignItems={"center"}>
-                <Box flex={1}>
-                  <Text
-                    color={
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="flex-1">
+                  <p
+                    className={
                       colorMode === "light"
                         ? aecEndReqValue
-                          ? "black"
-                          : "gray.500"
+                          ? "text-black"
+                          : "text-gray-500"
                         : aecEndReqValue
-                          ? "white"
-                          : "gray.500"
+                          ? "text-white"
+                          : "text-gray-500"
                     }
                   >
                     Animal Ethics Committee's Endorsement
-                  </Text>
-                </Box>
-                <Flex>
+                  </p>
+                </div>
+                <div className="flex">
                   {!userCanEditAECEndorsement ? (
-                    <Tag
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      display={"flex"}
-                      bg={
+                    <Badge
+                      className={`flex items-center justify-center ${
                         document?.endorsements?.ae_endorsement_provided === true
-                          ? "green.500"
-                          : "red.500"
-                      }
-                      color={"white"}
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      } text-white`}
                     >
                       {document?.endorsements?.ae_endorsement_provided === true
                         ? "Granted"
                         : "Required"}
-                    </Tag>
+                    </Badge>
                   ) : (
                     <Switch
-                      isDisabled={true} // Disable direct toggling
+                      disabled={true} // Disable direct toggling
                       defaultChecked={shouldSwitchBeChecked}
-                      isChecked={shouldSwitchBeChecked}
+                      checked={shouldSwitchBeChecked}
                       {...register("aecEndorsementProvided", {
                         value: shouldSwitchBeChecked,
                       })}
                     />
                   )}
-                </Flex>
-              </Flex>
+                </div>
+              </div>
               {document?.endorsements?.aec_pdf?.file ? (
-                <Flex
-                  mb={3}
+                <div
+                  className="mb-3 flex"
                   onMouseOver={() => setPdfAreaHovered(true)}
                   onMouseLeave={() => setPdfAreaHovered(false)}
                 >
-                  <Box flex={1}>
-                    <Text
-                      color={
+                  <div className="flex-1">
+                    <p
+                      className={
                         colorMode === "light"
                           ? aecEndReqValue
-                            ? "black"
-                            : "gray.500"
+                            ? "text-black"
+                            : "text-gray-500"
                           : aecEndReqValue
-                            ? "white"
-                            : "gray.500"
+                            ? "text-white"
+                            : "text-gray-500"
                       }
                     >
                       Current Approval PDF
-                    </Text>
-                  </Box>
-                  <Flex
+                    </p>
+                  </div>
+                  <div
+                    className="flex"
                     onMouseOver={() => setPdfAreaHovered(true)}
                     onMouseLeave={() => setPdfAreaHovered(false)}
                   >
                     {document?.endorsements?.aec_pdf?.file ? (
-                      <Flex
-                        justifyContent={"flex-end"}
+                      <div
+                        className="flex justify-end cursor-pointer hover:underline"
                         onClick={() => {
                           window.open(
                             `${baseApi}${document?.endorsements?.aec_pdf?.file}`,
                             "_blank",
                           );
                         }}
-                        _hover={{
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                        }}
                       >
-                        <Center
-                          color={"red.500"}
-                          // bg={"blue"}
-                          mr={1}
-                        >
+                        <div className="flex items-center justify-center text-red-500 mr-1">
                           <BsFilePdfFill />
-                        </Center>
-                        <Center>
-                          <Text
-                            // variant={"link"}
-                            color={
-                              colorMode === "light" ? "blue.700" : "blue.400"
+                        </div>
+                        <div className="flex items-center justify-center">
+                          <p
+                            className={
+                              colorMode === "light" ? "text-blue-700" : "text-blue-400"
                             }
                           >
                             {document?.endorsements?.aec_pdf?.file
@@ -339,32 +291,25 @@ export const ProjectPlanEndorsements = ({
                                     .split(".")[0]
                                 }.pdf`
                               : "No File"}
-                            {/* {baseApi}{document?.endorsements?.aec_pdf?.file} */}
-                          </Text>
-                        </Center>
-                      </Flex>
+                          </p>
+                        </div>
+                      </div>
                     ) : null}
-                  </Flex>
+                  </div>
                   {document?.endorsements?.aec_pdf?.file && pdfAreaHovered && (
-                    <Center
-                      ml={6}
-                      mr={4}
+                    <div
+                      className="flex items-center justify-center ml-6 mr-4 cursor-pointer"
                       onClick={() => {
                         console.log("HI");
                         onOpenDeletePDFEndorsementModal();
                       }}
                     >
-                      <Icon
-                        _hover={{ boxSize: 10 }}
-                        pos={"absolute"}
-                        color={"red"}
-                        as={TiDelete}
-                        cursor={"pointer"}
-                        boxSize={8}
+                      <TiDelete
+                        className="absolute text-red-500 hover:w-10 hover:h-10 w-8 h-8"
                       />
-                    </Center>
+                    </div>
                   )}
-                </Flex>
+                </div>
               ) : null}
 
               {userCanEditAECEndorsement && aecEndReqValue ? (
@@ -377,18 +322,17 @@ export const ProjectPlanEndorsements = ({
                   extraText={" to provide your endorsement or update the file"}
                 />
               ) : null}
-            </Grid>
+            </div>
 
-            <Flex pt={4} justifyContent={"flex-end"}>
+            <div className="pt-4 flex justify-end">
               <Button
-                mx={1}
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }}
+                className={`mx-1 text-white ${
+                  colorMode === "light" 
+                    ? "bg-green-500 hover:bg-green-400" 
+                    : "bg-green-600 hover:bg-green-500"
+                }`}
                 onClick={onOpen}
-                isDisabled={
+                disabled={
                   // bmEndRequiredValue === undefined ||
                   // bmEndProvidedValue === undefined ||
                   // hcEndReqValue === undefined ||
@@ -399,10 +343,10 @@ export const ProjectPlanEndorsements = ({
               >
                 Save
               </Button>
-            </Flex>
-          </Grid>
-        </Flex>
-      </Box>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

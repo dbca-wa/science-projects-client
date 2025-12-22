@@ -4,7 +4,7 @@
 // Figma Document. Most are disabled depending on the editor type
 
 import { InsertTableModal } from "@/features/staff-profiles/components/modals/InsertTableModal";
-import { useDisclosure } from "@chakra-ui/react";
+import { useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { AiOutlinePlus } from "react-icons/ai";
 import { BsTable } from "react-icons/bs";
@@ -15,11 +15,10 @@ interface Props {
   onClick: (event: string) => void;
 }
 export const InsertItemMenuButton = ({ onClick }: Props) => {
-  const {
-    isOpen: isAddTableOpen,
-    onClose: onAddTableClose,
-    onOpen: onAddTableOpen,
-  } = useDisclosure();
+  const [isAddTableOpen, setIsAddTableOpen] = useState(false);
+  const onAddTableClose = () => setIsAddTableOpen(false);
+  const onAddTableOpen = () => setIsAddTableOpen(true);
+  
   const TableFunc = () => {
     console.log("Table");
     // onClick('insertTable');

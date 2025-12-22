@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
   InitialConfigType,
@@ -87,7 +86,7 @@ export const SimpleStatefulRTE = ({
         {/* Text Area */}
         <RichTextPlugin
           contentEditable={
-            <Box zIndex={2}>
+            <div className="z-[2]">
               {/* Toolbar */}
 
               {showToolbar ? (
@@ -113,7 +112,7 @@ export const SimpleStatefulRTE = ({
                   zIndex: 2,
                 }}
               />
-            </Box>
+            </div>
           }
           placeholder={
             <div

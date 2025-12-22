@@ -1,13 +1,11 @@
 import {
-  Text,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  ModalCloseButton,
-  useColorMode,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import type { ITaskDisplayCard } from "@/shared/types";
 
 interface Props {
@@ -20,20 +18,16 @@ export const DocumentTaskDetailsModal = ({ isOpen, onClose, task }: Props) => {
   const { colorMode } = useColorMode();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg="white"
-        p={4}
-      >
-        <ModalHeader mt={5}>{task.name}</ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`${colorMode === "dark" ? "text-gray-400" : ""} bg-white p-4`}>
+        <DialogHeader className="mt-5">
+          <DialogTitle>{task.name}</DialogTitle>
+        </DialogHeader>
 
-        <ModalBody mb={5}>
-          <Text>{task.description}</Text>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+        <div className="mb-5">
+          <p>{task.description}</p>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

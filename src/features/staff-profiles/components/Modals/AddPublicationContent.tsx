@@ -4,7 +4,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { createEmployment, createPublication } from "@/features/staff-profiles/services/staff-profiles.service";
 import type { IStaffEmploymentEntry, IStaffPublicationEntry } from "@/shared/types";
-import { Textarea, useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import DatabaseRichTextEditor from "../Editor/DatabaseRichTextEditor";
@@ -32,15 +32,12 @@ const AddStaffPublicationContent = ({
     mode: "onChange", // or "onBlur"
   });
 
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createPublication,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
+      toast.success("Created", {
+        description: "Publication created successfully",
       });
       await queryClient.invalidateQueries({
         queryKey: ["publications", usersPk],
@@ -50,10 +47,8 @@ const AddStaffPublicationContent = ({
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Could not create publication",
       });
     },
     // onMutate: () => {

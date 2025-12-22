@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 
 // Styles and Styling Components
-import { Box, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 import "@/styles/texteditor.css";
 
@@ -175,8 +175,8 @@ export const PrintPreview = ({ data, section }: IProps) => {
 
   const html = { __html: prepopulationData };
   return (
-    <Box>
-      <Box dangerouslySetInnerHTML={html} />
+    <div>
+      <div dangerouslySetInnerHTML={html} />
       {/* <DisplaySRTE
                 key={prepopulationData}
                 initialConfig={uneditableInitialCOnfig}
@@ -199,6 +199,6 @@ export const PrintPreview = ({ data, section }: IProps) => {
             //   section === "description" ? "Description" : undefined
             // }
             /> */}
-    </Box>
+    </div>
   );
 };

@@ -1,22 +1,10 @@
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
-import {
-  Avatar,
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerOverlay,
-  Flex,
-  Grid,
-  HStack,
-  Text,
-  Tag,
-  useColorMode,
-  useDisclosure,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Avatar } from "@/shared/components/ui/avatar";
+import { Button } from "@/shared/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/shared/components/ui/sheet";
+import { Badge } from "@/shared/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/components/ui/tooltip";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { FaCrown } from "react-icons/fa";
 import {
   IBranch,
@@ -28,6 +16,7 @@ import {
 } from "@/shared/types";
 import { ProjectUserDetails } from "./ProjectUserDetails";
 import { UserProfile } from "@/features/users/components/UserProfile";
+import { useState } from "react";
 
 interface ITeamMember {
   user_id: number;
@@ -119,17 +108,13 @@ export const TeamMember = ({
     };
   });
 
-  const {
-    isOpen: isUserOpen,
-    onOpen: onUserOpen,
-    onClose: onUserClose,
-  } = useDisclosure();
+  const [isUserOpen, setIsUserOpen] = useState(false);
+  const onUserOpen = () => setIsUserOpen(true);
+  const onUserClose = () => setIsUserOpen(false);
 
-  const {
-    isOpen: isCaretakerOpen,
-    onOpen: onCaretakerOpen,
-    onClose: onCaretakerClose,
-  } = useDisclosure();
+  const [isCaretakerOpen, setIsCaretakerOpen] = useState(false);
+  const onCaretakerOpen = () => setIsCaretakerOpen(true);
+  const onCaretakerClose = () => setIsCaretakerOpen(false);
 
   const draggedStyles = {
     background: "blue.500",
@@ -143,72 +128,52 @@ export const TeamMember = ({
 
   return (
     <>
-      <Drawer
-        isOpen={isUserOpen}
-        placement="right"
-        onClose={onUserClose}
-        size="sm"
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerBody>
-            <ProjectUserDetails
-              ba_leader={ba_leader}
-              project_id={project_id}
-              pk={user_id}
-              is_leader={is_leader}
-              leader_pk={leader_pk}
-              role={role}
-              shortCode={short_code}
-              time_allocation={time_allocation}
-              usersCount={usersCount}
-              refetchTeamData={refetchTeamData}
-              onClose={onUserClose}
-            />
-          </DrawerBody>
-          <DrawerFooter></DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      <Sheet open={isUserOpen} onOpenChange={setIsUserOpen}>
+        <SheetContent side="right" className="w-96">
+          <ProjectUserDetails
+            ba_leader={ba_leader}
+            project_id={project_id}
+            pk={user_id}
+            is_leader={is_leader}
+            leader_pk={leader_pk}
+            role={role}
+            shortCode={short_code}
+            time_allocation={time_allocation}
+            usersCount={usersCount}
+            refetchTeamData={refetchTeamData}
+            onClose={onUserClose}
+          />
+        </SheetContent>
+      </Sheet>
 
-      <Drawer
-        isOpen={isCaretakerOpen}
-        placement="right"
-        onClose={onCaretakerClose}
-        size="lg"
-      >
-        <DrawerOverlay zIndex={999} />
-        <DrawerContent>
-          <DrawerBody>
-            <UserProfile
-              pk={caretaker?.pk}
-              branches={branchesData}
-              businessAreas={baData}
-            />
-          </DrawerBody>
-          <DrawerFooter></DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      <Sheet open={isCaretakerOpen} onOpenChange={setIsCaretakerOpen}>
+        <SheetContent side="right" className="w-[32rem] z-[999]">
+          <UserProfile
+            pk={caretaker?.pk}
+            branches={branchesData}
+            businessAreas={baData}
+          />
+        </SheetContent>
+      </Sheet>
 
-      <HStack
+      <div
         style={isCurrentlyDragging ? draggedStyles : {}}
-        bg={isCurrentlyDragging ? "blue.500" : backgroundColor}
-        justifyContent="space-between"
-        zIndex={isCurrentlyDragging ? 999 : 1}
-        _hover={{
-          boxShadow:
-            colorMode === "light"
-              ? "0px 10px 15px -5px rgba(0, 0, 0, 0.15), 0px 2px 2.5px -1px rgba(0, 0, 0, 0.03), -1.5px 0px 5px -1px rgba(0, 0, 0, 0.05), 1.5px 0px 5px -1px rgba(0, 0, 0, 0.05)"
-              : "0px 2px 3px -0.5px rgba(255, 255, 255, 0.05), 0px 1px 2px -0.5px rgba(255, 255, 255, 0.03)",
-          // zIndex: 999,
-        }}
-        border="1px solid"
-        borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
+        className={`flex justify-between items-center p-4 border ${
+          colorMode === "light" ? "border-gray-200" : "border-gray-600"
+        } ${
+          isCurrentlyDragging 
+            ? "bg-blue-500 z-[999]" 
+            : backgroundColor ? `bg-[${backgroundColor}]` : ""
+        } hover:shadow-lg ${
+          colorMode === "light"
+            ? "hover:shadow-black/15"
+            : "hover:shadow-white/5"
+        }`}
       >
-        <Flex p={4}>
-          <Box pos="relative">
+        <div className="flex p-4">
+          <div className="relative">
             <Avatar
-              mt={1}
-              size="lg"
+              className="mt-1 w-12 h-12 select-none pointer-events-none cursor-pointer"
               src={
                 image?.file
                   ? `${baseURL}${image.file}`
@@ -216,94 +181,77 @@ export const TeamMember = ({
                     ? `${baseURL}${image.old_file}`
                     : ""
               }
-              userSelect="none"
               onClick={onUserOpen}
-              cursor="pointer"
-              className="pointer-events-none select-none"
             />
             {is_leader && (
-              <Box pos="absolute" color="yellow.300" top={-1} right="38%">
+              <div className="absolute -top-1 right-[38%] text-yellow-300">
                 <FaCrown />
-              </Box>
+              </div>
             )}
-          </Box>
+          </div>
 
-          <Grid ml={4} gridTemplateColumns="repeat(1, 1fr)" userSelect="none">
-            <Box display="flex" flexDirection="row" gap={2} alignItems="center">
+          <div className="ml-4 grid grid-cols-1 select-none">
+            <div className="flex flex-row gap-2 items-center">
               <Button
-                ml="2px"
                 variant="link"
-                justifyContent="start"
-                color={
+                className={`ml-0.5 justify-start text-lg ${
                   isCurrentlyDragging
-                    ? "white"
+                    ? "text-white"
                     : colorMode === "light"
-                      ? "blue.500"
-                      : "blue.600"
-                }
-                _hover={{
-                  color: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
+                      ? "text-blue-500 hover:text-blue-400"
+                      : "text-blue-600 hover:text-blue-500"
+                } cursor-pointer`}
                 onClick={onUserOpen}
-                cursor="pointer"
-                fontSize="lg"
               >
                 {name !== "undefined undefined" && name !== "None None"
                   ? name
                   : username}
               </Button>
               {caretaker && (
-                <Tooltip
-                  label={`This user is away and ${caretaker.display_first_name} ${caretaker.display_last_name} is caretaking`}
-                  aria-label="Caretaker"
-                >
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    gap={2}
-                    userSelect="none"
-                    onClick={onCaretakerOpen}
-                    cursor="pointer"
-                  >
-                    <Avatar
-                      mt={1}
-                      size="xs"
-                      src={
-                        caretaker?.image ? `${baseURL}${caretaker?.image}` : ""
-                      }
-                      className="pointer-events-none select-none"
-                    />
-                    <Text
-                      color="blue.500"
-                      fontSize="xs"
-                      justifyContent="center"
-                    >
-                      ({caretaker.display_first_name}{" "}
-                      {caretaker.display_last_name} is caretaking)
-                    </Text>
-                  </Box>
-                </Tooltip>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        className="flex items-center gap-2 select-none cursor-pointer"
+                        onClick={onCaretakerOpen}
+                      >
+                        <Avatar
+                          className="mt-1 w-6 h-6 pointer-events-none select-none"
+                          src={
+                            caretaker?.image ? `${baseURL}${caretaker?.image}` : ""
+                          }
+                        />
+                        <p className="text-blue-500 text-xs flex justify-center">
+                          ({caretaker.display_first_name}{" "}
+                          {caretaker.display_last_name} is caretaking)
+                        </p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>This user is away and {caretaker.display_first_name} {caretaker.display_last_name} is caretaking</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
-            </Box>
+            </div>
 
-            <Box>
-              <Tag
-                mt={1}
-                mb={1}
-                bg={roleArray.find((item) => item.role === role)?.bg ?? ""}
-                color={
-                  roleArray.find((item) => item.role === role)?.color ?? ""
-                }
-                size="md"
-                justifyContent="center"
+            <div>
+              <Badge
+                className={`mt-1 mb-1 justify-center ${
+                  roleArray.find((item) => item.role === role)?.bg ? 
+                    `bg-${roleArray.find((item) => item.role === role)?.bg}` : ""
+                } ${
+                  roleArray.find((item) => item.role === role)?.color ?
+                    `text-${roleArray.find((item) => item.role === role)?.color}` : ""
+                }`}
               >
                 {roleArray.find((item) => item.role === role)?.displayName ??
                   ""}
-              </Tag>
-            </Box>
-          </Grid>
-        </Flex>
-      </HStack>
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

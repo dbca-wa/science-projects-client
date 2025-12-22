@@ -1,34 +1,6 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
-import {
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-  Text,
-  Textarea,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   AdminSwitchVar,
@@ -45,6 +17,26 @@ import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
 import { ShadcnDatePicker } from "@/features/users/components/account/ShadcnDatePicker";
 import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import useCaretakingChain from "@/features/users/hooks/useCaretakingChain";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Label } from "@/shared/components/ui/label";
+import { Textarea } from "@/shared/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -81,7 +73,7 @@ export const SetCaretakerForMyAccountModal = ({
   // }, [userPk, caretakerPk, endDate, reason, notes]);
 
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
 
   useEffect(() => {
     if (isToastOpen) {
@@ -90,19 +82,12 @@ export const SetCaretakerForMyAccountModal = ({
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
   };
   const queryClient = useQueryClient();
 
   const { reFetch } = useUserSearchContext();
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
 
   const requestCaretakerMutation = useMutation<
     MutationSuccess,
@@ -112,26 +97,15 @@ export const SetCaretakerForMyAccountModal = ({
     // Start of mutation handling
     mutationFn: requestCaretaker,
     onMutate: () => {
-      addToast({
-        title: "Requesting caretaker...",
+      toast.loading("Requesting caretaker...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Your request has been made.`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Your request has been made.`,
+      });
       queryClient
         .invalidateQueries({
           queryKey: ["pendingAdminTasks"],
@@ -175,16 +149,9 @@ export const SetCaretakerForMyAccountModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -205,135 +172,138 @@ export const SetCaretakerForMyAccountModal = ({
   const ignoreArray = useCaretakingChain(userData);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
-      <ModalOverlay />
-      <Flex>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Set a Caretaker?</ModalHeader>
-          <ModalCloseButton />
-
-          <ModalBody>
-            <Center mb={8} mt={2}>
-              <Text fontSize={"lg"}>
-                Are you sure you want to set a caretaker?
-              </Text>
-            </Center>
-            <div>
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Reason</FormLabel>
-                <Select
-                  variant="filled"
-                  placeholder="Select the reason for absence"
-                  isDisabled={false}
-                  onChange={(e) =>
-                    setReason(
-                      e.target.value as
-                        | "leave"
-                        | "resignation"
-                        | "other"
-                        | null,
-                    )
-                  }
-                  value={reason ?? undefined}
-                >
-                  <option value="leave">On Leave</option>
-                  <option value="resignation">Leaving the Department</option>
-                  <option value="other">Other</option>
-                </Select>
-              </FormControl>
-
-              {(reason === "other" ||
-                reason === "resignation" ||
-                reason === "leave") && (
-                <>
-                  {reason === "other" && (
-                    <FormControl my={2} mb={4} userSelect={"none"}>
-                      <FormLabel>Notes</FormLabel>
-                      <Textarea
-                        placeholder="Enter the reason"
-                        onChange={(e) => setNotes(e.target.value)}
-                        value={notes}
-                      />
-                      <FormHelperText>
-                        Please provide a reason for this user's absence.
-                      </FormHelperText>
-                    </FormControl>
-                  )}
-
-                  {reason !== "resignation" && (
-                    <Flex flexDir={"row"} gap={4}>
-                      <FormControl my={2} mb={4} userSelect={"none"}>
-                        <FormLabel>End Date</FormLabel>
-                        <InputGroup flexDir={"column"}>
-                          <ShadcnDatePicker
-                            placeholder={"Enter end date"}
-                            date={endDate}
-                            setDate={setEndDate}
-                          />
-                          <FormHelperText>
-                            When will the user return to the office?
-                          </FormHelperText>
-                        </InputGroup>
-                      </FormControl>
-                    </Flex>
-                  )}
-
-                  <UserSearchDropdown
-                    isRequired={false}
-                    onlyInternal
-                    setUserFunction={setCaretakerPk}
-                    label={"Caretaker"}
-                    placeholder={"Enter a caretaker"}
-                    helperText={
-                      "Who will look after their projects while they are gone?"
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent 
+        className={`max-w-lg ${
+          colorMode === "dark" 
+            ? "bg-gray-800 text-gray-400 border-gray-700" 
+            : "bg-white text-gray-900 border-gray-200"
+        }`}
+      >
+        <DialogHeader>
+          <DialogTitle>Set a Caretaker?</DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              <div className="flex justify-center mb-8 mt-2">
+                <p className="text-lg">
+                  Are you sure you want to set a caretaker?
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="my-2 mb-4 select-none">
+                  <Label>Reason</Label>
+                  <Select
+                    disabled={false}
+                    onValueChange={(value) =>
+                      setReason(
+                        value as
+                          | "leave"
+                          | "resignation"
+                          | "other"
+                          | null,
+                      )
                     }
-                    ignoreArray={ignoreArray}
-                  />
-                </>
-              )}
+                    value={reason ?? undefined}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select the reason for absence" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="leave">On Leave</SelectItem>
+                      <SelectItem value="resignation">Leaving the Department</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {(reason === "other" ||
+                  reason === "resignation" ||
+                  reason === "leave") && (
+                  <>
+                    {reason === "other" && (
+                      <div className="my-2 mb-4 select-none">
+                        <Label>Notes</Label>
+                        <Textarea
+                          placeholder="Enter the reason"
+                          onChange={(e) => setNotes(e.target.value)}
+                          value={notes}
+                        />
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Please provide a reason for this user's absence.
+                        </p>
+                      </div>
+                    )}
+
+                    {reason !== "resignation" && (
+                      <div className="flex flex-row gap-4">
+                        <div className="my-2 mb-4 select-none flex-1">
+                          <Label>End Date</Label>
+                          <div className="flex flex-col">
+                            <ShadcnDatePicker
+                              placeholder={"Enter end date"}
+                              date={endDate}
+                              setDate={setEndDate}
+                            />
+                            <p className="text-sm text-muted-foreground mt-1">
+                              When will the user return to the office?
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <UserSearchDropdown
+                      isRequired={false}
+                      onlyInternal
+                      setUserFunction={setCaretakerPk}
+                      label={"Caretaker"}
+                      placeholder={"Enter a caretaker"}
+                      helperText={
+                        "Who will look after their projects while they are gone?"
+                      }
+                      ignoreArray={ignoreArray}
+                    />
+                  </>
+                )}
+              </div>
             </div>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                disabled={
-                  !userPk ||
-                  !caretakerPk ||
-                  (reason !== "resignation" && !endDate) ||
-                  !reason ||
-                  (reason === "other" && !notes)
-                }
-                variant={"solid"}
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }}
-                isLoading={requestCaretakerMutation.isPending}
-                onClick={() =>
-                  onSubmit({
-                    userPk: userPk as number,
-                    caretakerPk: caretakerPk,
-                    // startDate: startDate,
-                    endDate: endDate,
-                    reason: reason,
-                    notes: notes,
-                  })
-                }
-                ml={3}
-              >
-                Request Caretaker
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              disabled={
+                !userPk ||
+                !caretakerPk ||
+                (reason !== "resignation" && !endDate) ||
+                !reason ||
+                (reason === "other" && !notes) ||
+                requestCaretakerMutation.isPending
+              }
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-green-500 hover:bg-green-400" 
+                  : "bg-green-600 hover:bg-green-500"
+              }`}
+              onClick={() =>
+                onSubmit({
+                  userPk: userPk as number,
+                  caretakerPk: caretakerPk,
+                  // startDate: startDate,
+                  endDate: endDate,
+                  reason: reason,
+                  notes: notes,
+                })
+              }
+            >
+              {requestCaretakerMutation.isPending ? "Loading..." : "Request Caretaker"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

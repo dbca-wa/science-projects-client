@@ -10,7 +10,6 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/shared/utils";
 import { Button } from "@/shared/components/ui/button";
 import { Calendar } from "@/shared/components/ui/calendar";
-import { useColorMode } from "@chakra-ui/react";
 
 interface IDatePickProps {
   placeholder: string;
@@ -32,17 +31,14 @@ export const ShadcnDatePicker = ({
     }
   };
 
-  const { colorMode } = useColorMode();
-
   return (
     <Popover open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <PopoverTrigger asChild className="z-9999">
         <Button
           variant={"outline"}
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal dark:bg-gray-800",
             !date && "text-muted-foreground",
-            colorMode === "dark" && "bg-gray-800",
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />

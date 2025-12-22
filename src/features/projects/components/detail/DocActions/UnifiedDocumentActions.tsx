@@ -20,23 +20,15 @@ import {
   IStudentReport,
   ProjectStatus,
 } from "@/shared/types";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Badge } from "@/shared/components/ui/badge";
 import {
-  Box,
-  Button,
-  Center,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerOverlay,
-  Flex,
-  Grid,
-  Spinner,
-  Tag,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+  Sheet,
+  SheetContent,
+  SheetFooter,
+} from "@/shared/components/ui/sheet";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UserProfile } from "@/features/users/components/UserProfile";
 import { ProjectDocumentPDFSection } from "./ProjectDocumentPDFSection";
@@ -133,29 +125,107 @@ export const UnifiedDocumentActions = ({
 }: UnifiedDocumentActionsProps) => {
   const { colorMode } = useColorMode();
 
-  // Disclosure hooks for all modals
-  const createModals = () => {
-    return {
-      s1Approval: useDisclosure(),
-      s2Approval: useDisclosure(),
-      s3Approval: useDisclosure(),
-      s1Recall: useDisclosure(),
-      s2Recall: useDisclosure(),
-      s3Recall: useDisclosure(),
-      s2SendBack: useDisclosure(),
-      s3SendBack: useDisclosure(),
-      s1Reopen: useDisclosure(),
-      s2Reopen: useDisclosure(),
-      s3Reopen: useDisclosure(),
-      deleteDocument: useDisclosure(),
-      modifier: useDisclosure(),
-      creator: useDisclosure(),
-      createProgressReport: useDisclosure(),
-      setAreas: useDisclosure(),
-    };
-  };
+  // State for all modals (replacing useDisclosure hooks)
+  const [s1ApprovalOpen, setS1ApprovalOpen] = useState(false);
+  const [s2ApprovalOpen, setS2ApprovalOpen] = useState(false);
+  const [s3ApprovalOpen, setS3ApprovalOpen] = useState(false);
+  const [s1RecallOpen, setS1RecallOpen] = useState(false);
+  const [s2RecallOpen, setS2RecallOpen] = useState(false);
+  const [s3RecallOpen, setS3RecallOpen] = useState(false);
+  const [s2SendBackOpen, setS2SendBackOpen] = useState(false);
+  const [s3SendBackOpen, setS3SendBackOpen] = useState(false);
+  const [s1ReopenOpen, setS1ReopenOpen] = useState(false);
+  const [s2ReopenOpen, setS2ReopenOpen] = useState(false);
+  const [s3ReopenOpen, setS3ReopenOpen] = useState(false);
+  const [deleteDocumentOpen, setDeleteDocumentOpen] = useState(false);
+  const [modifierOpen, setModifierOpen] = useState(false);
+  const [creatorOpen, setCreatorOpen] = useState(false);
+  const [createProgressReportOpen, setCreateProgressReportOpen] = useState(false);
+  const [setAreasOpen, setSetAreasOpen] = useState(false);
 
-  const modals = createModals();
+  // Modal control objects (maintaining useDisclosure-like API)
+  const modals = {
+    s1Approval: {
+      isOpen: s1ApprovalOpen,
+      onOpen: () => setS1ApprovalOpen(true),
+      onClose: () => setS1ApprovalOpen(false),
+    },
+    s2Approval: {
+      isOpen: s2ApprovalOpen,
+      onOpen: () => setS2ApprovalOpen(true),
+      onClose: () => setS2ApprovalOpen(false),
+    },
+    s3Approval: {
+      isOpen: s3ApprovalOpen,
+      onOpen: () => setS3ApprovalOpen(true),
+      onClose: () => setS3ApprovalOpen(false),
+    },
+    s1Recall: {
+      isOpen: s1RecallOpen,
+      onOpen: () => setS1RecallOpen(true),
+      onClose: () => setS1RecallOpen(false),
+    },
+    s2Recall: {
+      isOpen: s2RecallOpen,
+      onOpen: () => setS2RecallOpen(true),
+      onClose: () => setS2RecallOpen(false),
+    },
+    s3Recall: {
+      isOpen: s3RecallOpen,
+      onOpen: () => setS3RecallOpen(true),
+      onClose: () => setS3RecallOpen(false),
+    },
+    s2SendBack: {
+      isOpen: s2SendBackOpen,
+      onOpen: () => setS2SendBackOpen(true),
+      onClose: () => setS2SendBackOpen(false),
+    },
+    s3SendBack: {
+      isOpen: s3SendBackOpen,
+      onOpen: () => setS3SendBackOpen(true),
+      onClose: () => setS3SendBackOpen(false),
+    },
+    s1Reopen: {
+      isOpen: s1ReopenOpen,
+      onOpen: () => setS1ReopenOpen(true),
+      onClose: () => setS1ReopenOpen(false),
+    },
+    s2Reopen: {
+      isOpen: s2ReopenOpen,
+      onOpen: () => setS2ReopenOpen(true),
+      onClose: () => setS2ReopenOpen(false),
+    },
+    s3Reopen: {
+      isOpen: s3ReopenOpen,
+      onOpen: () => setS3ReopenOpen(true),
+      onClose: () => setS3ReopenOpen(false),
+    },
+    deleteDocument: {
+      isOpen: deleteDocumentOpen,
+      onOpen: () => setDeleteDocumentOpen(true),
+      onClose: () => setDeleteDocumentOpen(false),
+    },
+    modifier: {
+      isOpen: modifierOpen,
+      onOpen: () => setModifierOpen(true),
+      onClose: () => setModifierOpen(false),
+    },
+    creator: {
+      isOpen: creatorOpen,
+      onOpen: () => setCreatorOpen(true),
+      onClose: () => setCreatorOpen(false),
+    },
+    createProgressReport: {
+      isOpen: createProgressReportOpen,
+      onOpen: () => setCreateProgressReportOpen(true),
+      onClose: () => setCreateProgressReportOpen(false),
+    },
+    setAreas: {
+      isOpen: setAreasOpen,
+      onOpen: () => setSetAreasOpen(true),
+      onClose: () => setSetAreasOpen(false),
+    },
+  };
 
   // Common hooks needed by all document types
   const { userData, userLoading } = useUser();
@@ -277,15 +347,10 @@ export const UnifiedDocumentActions = ({
             refetchData={refetchData}
           />
           <Button
-            mt={3}
-            color={"white"}
-            background={colorMode === "light" ? "orange.500" : "orange.600"}
-            _hover={{
-              background: colorMode === "light" ? "orange.400" : "orange.500",
-            }}
-            size={"sm"}
+            className={`mt-3 text-white ${
+              colorMode === "light" ? "bg-orange-500 hover:bg-orange-400" : "bg-orange-600 hover:bg-orange-500"
+            } text-sm ml-2`}
             onClick={modals.createProgressReport.onOpen}
-            ml={2}
           >
             Create Progress Report
           </Button>
@@ -310,12 +375,9 @@ export const UnifiedDocumentActions = ({
             setToLastTab={setToLastTab}
           />
           <Button
-            color={"white"}
-            background={colorMode === "light" ? "green.500" : "green.600"}
-            _hover={{
-              background: colorMode === "light" ? "green.400" : "green.500",
-            }}
-            size={"sm"}
+            className={`text-white ${
+              colorMode === "light" ? "bg-green-500 hover:bg-green-400" : "bg-green-600 hover:bg-green-500"
+            } text-sm`}
             onClick={modals.setAreas.onOpen}
           >
             Set Areas
@@ -339,12 +401,9 @@ export const UnifiedDocumentActions = ({
     ) {
       return (
         <Button
-          color={"white"}
-          background={colorMode === "light" ? "orange.500" : "orange.600"}
-          _hover={{
-            background: colorMode === "light" ? "orange.400" : "orange.500",
-          }}
-          size={"sm"}
+          className={`text-white ${
+            colorMode === "light" ? "bg-orange-500 hover:bg-orange-400" : "bg-orange-600 hover:bg-orange-500"
+          } text-sm mt-3`}
           onClick={
             documentData?.document?.directorate_approval_granted
               ? modals.s3Reopen.onOpen
@@ -352,7 +411,6 @@ export const UnifiedDocumentActions = ({
                 ? modals.s2Reopen.onOpen
                 : modals.s1Reopen.onOpen
           }
-          mt={3}
         >
           {userData?.is_superuser || userIsCaretakerOfAdmin
             ? "Delete Closure"
@@ -392,98 +450,69 @@ export const UnifiedDocumentActions = ({
     <>
       {actionsReady && leaderMember ? (
         <>
-          {/* User Profile Drawers */}
-          <Drawer
-            isOpen={modals.creator.isOpen}
-            placement="right"
-            onClose={modals.creator.onClose}
-            size={"sm"}
-          >
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerBody>
+          {/* User Profile Sheets */}
+          <Sheet open={modals.creator.isOpen} onOpenChange={(open) => !open && modals.creator.onClose()}>
+            <SheetContent side="right" className="w-96">
+              <div className="p-4">
                 <UserProfile pk={creator?.pk} />
-              </DrawerBody>
-              <DrawerFooter />
-            </DrawerContent>
-          </Drawer>
+              </div>
+              <SheetFooter />
+            </SheetContent>
+          </Sheet>
 
-          <Drawer
-            isOpen={modals.modifier.isOpen}
-            placement="right"
-            onClose={modals.modifier.onClose}
-            size={"sm"}
-          >
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerBody>
+          <Sheet open={modals.modifier.isOpen} onOpenChange={(open) => !open && modals.modifier.onClose()}>
+            <SheetContent side="right" className="w-96">
+              <div className="p-4">
                 <UserProfile pk={modifier?.pk} />
-              </DrawerBody>
-              <DrawerFooter />
-            </DrawerContent>
-          </Drawer>
+              </div>
+              <SheetFooter />
+            </SheetContent>
+          </Sheet>
 
           {/* Main Grid Layout */}
-          <Grid
-            bg={colorMode === "light" ? "gray.50" : "gray.700"}
-            rounded={"lg"}
-            p={4}
-            my={6}
-            gridGap={4}
-            gridTemplateColumns={{
-              base: "repeat(1, 1fr)",
-              "1200px": "repeat(2, 1fr)",
-            }}
+          <div
+            className={`${
+              colorMode === "light" ? "bg-gray-50" : "bg-gray-700"
+            } rounded-lg p-4 my-6 grid gap-4 grid-cols-1 1200px:grid-cols-2`}
           >
             {/* Details Panel */}
-            <Box
-              bg={colorMode === "light" ? "gray.100" : "gray.700"}
-              rounded={"lg"}
-              p={4}
+            <div
+              className={`${
+                colorMode === "light" ? "bg-gray-100" : "bg-gray-700"
+              } rounded-lg p-4`}
             >
-              <Box flex={1} alignItems={"center"} display={"block"}>
-                <Text
-                  fontWeight={"bold"}
-                  fontSize={"lg"}
-                  color={colorMode === "light" ? "gray.800" : "gray.100"}
-                  userSelect={"none"}
+              <div className="flex-1 items-center block">
+                <h3
+                  className={`font-bold text-lg ${
+                    colorMode === "light" ? "text-gray-800" : "text-gray-100"
+                  } select-none`}
                 >
                   Details
-                </Text>
-              </Box>
-              <Grid pt={2}>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  roundedTop={"2xl"}
-                  borderBottom={"0px"}
-                  p={2}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Document Status
-                  </Text>
-                  <Tag
-                    bg={
+                </h3>
+              </div>
+              <div className="pt-2 grid">
+                <div className="flex border border-gray-300 rounded-t-2xl border-b-0 p-2">
+                  <p className="flex-1 font-semibold">Document Status</p>
+                  <Badge
+                    className={`${
                       documentData.document.status === "approved"
                         ? colorMode === "light"
-                          ? "green.500"
-                          : "green.600"
+                          ? "bg-green-500"
+                          : "bg-green-600"
                         : documentData.document.status === "inapproval"
                           ? colorMode === "light"
-                            ? "blue.500"
-                            : "blue.600"
+                            ? "bg-blue-500"
+                            : "bg-blue-600"
                           : documentData.document.status === "inreview"
                             ? colorMode === "light"
-                              ? "orange.500"
-                              : "orange.600"
+                              ? "bg-orange-500"
+                              : "bg-orange-600"
                             : documentData.document.status === "revising"
-                              ? "orange.500"
+                              ? "bg-orange-500"
                               : colorMode === "light"
-                                ? "red.500"
-                                : "red.600"
-                    }
-                    color={"white"}
-                    size={"md"}
+                                ? "bg-red-500"
+                                : "bg-red-600"
+                    } text-white`}
                   >
                     {documentData.document.status === "inapproval"
                       ? "Approval Requested"
@@ -494,52 +523,29 @@ export const UnifiedDocumentActions = ({
                           : documentData.document.status === "revising"
                             ? "Revising"
                             : "New Document"}
-                  </Tag>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  borderBottom={"0px"}
-                  p={2}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Project Tag
-                  </Text>
-                  <Tag
-                    bg={
+                  </Badge>
+                </div>
+                <div className="flex border border-gray-300 border-b-0 p-2">
+                  <p className="flex-1 font-semibold">Project Tag</p>
+                  <Badge
+                    className={`${
                       colorMode === "light"
-                        ? `${kindDict[documentData?.document?.project?.kind].color}.400`
-                        : `${kindDict[documentData?.document?.project?.kind].color}.500`
-                    }
-                    color={"white"}
-                    size={"md"}
+                        ? `bg-${kindDict[documentData?.document?.project?.kind].color}-400`
+                        : `bg-${kindDict[documentData?.document?.project?.kind].color}-500`
+                    } text-white`}
                   >
                     {kindDict[documentData?.document?.project?.kind].tag}-
                     {documentData?.document?.project?.year}-
                     {documentData?.document?.project?.number}
-                  </Tag>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  p={2}
-                  borderBottom={"0px"}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Project ID
-                  </Text>
-                  <Text>{documentData?.document?.project?.pk}</Text>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  borderBottom={0}
-                  p={2}
-                >
-                  <Text flex={1} fontWeight={"semibold"}>
-                    Document ID
-                  </Text>
-                  <Text>
+                  </Badge>
+                </div>
+                <div className="flex border border-gray-300 p-2 border-b-0">
+                  <p className="flex-1 font-semibold">Project ID</p>
+                  <p>{documentData?.document?.project?.pk}</p>
+                </div>
+                <div className="flex border border-gray-300 border-b-0 p-2">
+                  <p className="flex-1 font-semibold">Document ID</p>
+                  <p>
                     {documentData?.document?.pk
                       ? documentData?.document?.pk
                       : documentData?.document?.id}{" "}
@@ -554,139 +560,90 @@ export const UnifiedDocumentActions = ({
                             ? "R"
                             : "C"}{" "}
                     {documentData?.pk})
-                  </Text>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  borderBottom={"0px"}
-                  alignItems={"center"}
-                  p={2}
-                  flexDir={"column"}
-                >
-                  <Flex w={"100%"} justifyContent={"flex-end"}>
-                    <Text flex={1} fontWeight={"semibold"}>
-                      Created
-                    </Text>
-                    <Text>{creationDate}</Text>
-                  </Flex>
-                  <Flex w={"100%"} justifyContent={"flex-end"}>
-                    <Text flex={1} fontWeight={"semibold"}>
-                      By
-                    </Text>
+                  </p>
+                </div>
+                <div className="flex border border-gray-300 border-b-0 items-center p-2 flex-col">
+                  <div className="w-full justify-end flex">
+                    <p className="flex-1 font-semibold">Created</p>
+                    <p>{creationDate}</p>
+                  </div>
+                  <div className="w-full justify-end flex">
+                    <p className="flex-1 font-semibold">By</p>
                     <Button
-                      color={colorMode === "light" ? "blue.400" : "blue.300"}
-                      cursor={"pointer"}
-                      fontSize={"md"}
-                      fontWeight="semibold"
-                      whiteSpace={"normal"}
-                      textOverflow={"ellipsis"}
-                      variant={"link"}
+                      variant="link"
+                      className={`${
+                        colorMode === "light" ? "text-blue-400" : "text-blue-300"
+                      } cursor-pointer text-base font-semibold whitespace-normal text-ellipsis p-0 h-auto`}
                       onClick={modals.creator.onOpen}
                     >
                       {creator?.first_name} {creator?.last_name}
                     </Button>
-                  </Flex>
-                </Flex>
-                <Flex
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  p={2}
-                  roundedBottom={"2xl"}
-                  alignItems={"center"}
-                  flexDir={"column"}
-                >
-                  <Flex w={"100%"} justifyContent={"flex-end"}>
-                    <Text flex={1} fontWeight={"semibold"}>
-                      Last Modified
-                    </Text>
-                    <Text>{modifyDate}</Text>
-                  </Flex>
-                  <Flex w={"100%"} justifyContent={"flex-end"}>
-                    <Text flex={1} fontWeight={"semibold"}>
-                      By
-                    </Text>
+                  </div>
+                </div>
+                <div className="flex border border-gray-300 p-2 rounded-b-2xl items-center flex-col">
+                  <div className="w-full justify-end flex">
+                    <p className="flex-1 font-semibold">Last Modified</p>
+                    <p>{modifyDate}</p>
+                  </div>
+                  <div className="w-full justify-end flex">
+                    <p className="flex-1 font-semibold">By</p>
                     <Button
-                      color={colorMode === "light" ? "blue.400" : "blue.300"}
-                      cursor={"pointer"}
-                      fontSize={"md"}
-                      fontWeight="semibold"
-                      whiteSpace={"normal"}
-                      textOverflow={"ellipsis"}
-                      variant={"link"}
+                      variant="link"
+                      className={`${
+                        colorMode === "light" ? "text-blue-400" : "text-blue-300"
+                      } cursor-pointer text-base font-semibold whitespace-normal text-ellipsis p-0 h-auto`}
                       onClick={modals.modifier.onOpen}
                     >
                       {modifier?.first_name} {modifier?.last_name}
                     </Button>
-                  </Flex>
-                </Flex>
-              </Grid>
-            </Box>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Actions Panel */}
-            <Box
-              bg={colorMode === "light" ? "gray.100" : "gray.700"}
-              rounded={"lg"}
-              p={4}
-              mt={{ base: 0 }}
+            <div
+              className={`${
+                colorMode === "light" ? "bg-gray-100" : "bg-gray-700"
+              } rounded-lg p-4 mt-0`}
             >
-              <Box flex={1} alignItems={"center"} display={"block"}>
-                <Text
-                  fontWeight={"bold"}
-                  fontSize={"lg"}
-                  color={colorMode === "light" ? "gray.800" : "gray.100"}
-                  userSelect={"none"}
+              <div className="flex-1 items-center block">
+                <h3
+                  className={`font-bold text-lg ${
+                    colorMode === "light" ? "text-gray-800" : "text-gray-100"
+                  } select-none`}
                 >
                   Actions
-                </Text>
-              </Box>
+                </h3>
+              </div>
 
-              <Grid pt={2} gridTemplateColumns={"repeat(1, 1fr)"}>
+              <div className="pt-2 grid grid-cols-1">
                 {/* Project Lead Section */}
-                <Grid
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  roundedTop={"2xl"}
-                  borderBottom={"0px"}
-                  p={4}
-                >
-                  <Flex
-                    mt={1}
-                    justifyContent={"flex-end"}
-                    alignItems={"center"}
-                  >
-                    <Text flex={1} fontWeight={"semibold"}>
-                      Project Lead
-                    </Text>
-                    <Tag
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      display={"flex"}
-                      bg={
+                <div className="border border-gray-300 rounded-t-2xl border-b-0 p-4 grid">
+                  <div className="mt-1 justify-end items-center flex">
+                    <p className="flex-1 font-semibold">Project Lead</p>
+                    <Badge
+                      className={`items-center justify-center flex ${
                         documentData?.document
                           ?.project_lead_approval_granted === true
-                          ? "green.500"
-                          : "red.500"
-                      }
-                      color={"white"}
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      } text-white`}
                     >
                       {documentData?.document?.project_lead_approval_granted ===
                       true
                         ? "Granted"
                         : "Required"}
-                    </Tag>
-                  </Flex>
+                    </Badge>
+                  </div>
 
-                  <Grid
-                    justifyContent={"flex-end"}
-                    w={"100%"}
-                    mt={
+                  <div
+                    className={`justify-end w-full ${
                       documentData?.document
                         ?.business_area_lead_approval_granted
-                        ? 0
-                        : 3
-                    }
-                    gridTemplateColumns={"repeat(1, 1fr)"}
+                        ? "mt-0"
+                        : "mt-3"
+                    } grid grid-cols-1`}
                   >
                     {/* Recall Button (Only show when project lead approved but BA lead hasn't) */}
                     {documentData?.document
@@ -699,7 +656,7 @@ export const UnifiedDocumentActions = ({
                         userIsCaretakerOfProjectLeader ||
                         isBaLead ||
                         userIsCaretakerOfBaLeader) && (
-                        <Center justifyContent={"flex-end"}>
+                        <div className="justify-end flex">
                           <UnifiedDocumentActionModal
                             userData={userData}
                             refetchData={refetchData}
@@ -719,20 +676,14 @@ export const UnifiedDocumentActions = ({
                             callSameData={callSameData}
                           />
                           <Button
-                            color={"white"}
-                            background={
-                              colorMode === "light" ? "blue.500" : "blue.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light" ? "blue.400" : "blue.500",
-                            }}
-                            size={"sm"}
+                            className={`text-white ${
+                              colorMode === "light" ? "bg-blue-500 hover:bg-blue-400" : "bg-blue-600 hover:bg-blue-500"
+                            } text-sm`}
                             onClick={modals.s1Recall.onOpen}
                           >
                             Recall Approval
                           </Button>
-                        </Center>
+                        </div>
                       )}
 
                     {/* Submit/Approve & Delete Buttons */}
@@ -748,7 +699,7 @@ export const UnifiedDocumentActions = ({
                         userIsCaretakerOfProjectLeader ||
                         isBaLead ||
                         userIsCaretakerOfBaLeader) && (
-                        <Center justifyContent={"flex-end"}>
+                        <div className="justify-end flex">
                           <UnifiedDocumentActionModal
                             userData={userData}
                             refetchData={refetchData}
@@ -805,19 +756,10 @@ export const UnifiedDocumentActions = ({
                                 setToLastTab={setToLastTab}
                               />
                               <Button
-                                color={"white"}
-                                background={
-                                  colorMode === "light" ? "red.500" : "red.600"
-                                }
-                                _hover={{
-                                  background:
-                                    colorMode === "light"
-                                      ? "red.400"
-                                      : "red.500",
-                                }}
-                                size={"sm"}
+                                className={`text-white ${
+                                  colorMode === "light" ? "bg-red-500 hover:bg-red-400" : "bg-red-600 hover:bg-red-500"
+                                } text-sm mr-2`}
                                 onClick={modals.deleteDocument.onOpen}
-                                mr={2}
                               >
                                 Delete Document
                               </Button>
@@ -827,25 +769,17 @@ export const UnifiedDocumentActions = ({
                           {/* Document-specific buttons */}
                           {getDocumentSpecificButtons() || (
                             <Button
-                              color={"white"}
-                              background={
+                              className={`text-white ${
                                 colorMode === "light"
-                                  ? "green.500"
-                                  : "green.600"
-                              }
-                              _hover={{
-                                background:
-                                  colorMode === "light"
-                                    ? "green.400"
-                                    : "green.500",
-                              }}
-                              size={"sm"}
+                                  ? "bg-green-500 hover:bg-green-400"
+                                  : "bg-green-600 hover:bg-green-500"
+                              } text-sm`}
                               onClick={modals.s1Approval.onOpen}
                             >
                               Submit
                             </Button>
                           )}
-                        </Center>
+                        </div>
                       )}
 
                     {/* Document-specific advanced actions */}
@@ -854,56 +788,39 @@ export const UnifiedDocumentActions = ({
                         ?.business_area_lead_approval_granted &&
                       documentData?.document?.directorate_approval_granted &&
                       getDocumentSpecificButtons()}
-                  </Grid>
-                </Grid>
+                  </div>
+                </div>
 
                 {/* Business Area Lead Section */}
-                <Grid
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  borderBottom={"0px"}
-                  p={4}
-                >
-                  <Flex
-                    mt={1}
-                    justifyContent={"flex-end"}
-                    alignItems={"center"}
-                  >
-                    <Text flex={1} fontWeight={"semibold"}>
-                      Business Area Lead
-                    </Text>
-                    <Tag
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      display={"flex"}
-                      bg={
+                <div className="border border-gray-300 border-b-0 p-4 grid">
+                  <div className="mt-1 justify-end items-center flex">
+                    <p className="flex-1 font-semibold">Business Area Lead</p>
+                    <Badge
+                      className={`items-center justify-center flex ${
                         documentData?.document
                           ?.business_area_lead_approval_granted === true
-                          ? "green.500"
-                          : "red.500"
-                      }
-                      color={"white"}
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      } text-white`}
                     >
                       {documentData?.document
                         ?.business_area_lead_approval_granted === true
                         ? "Granted"
                         : "Required"}
-                    </Tag>
-                  </Flex>
+                    </Badge>
+                  </div>
 
-                  <Flex
-                    justifyContent={"flex-end"}
-                    w={"100%"}
-                    mt={
+                  <div
+                    className={`justify-end w-full ${
                       documentData?.document?.project?.status === "completed"
-                        ? 3
+                        ? "mt-3"
                         : documentData?.document
                               ?.project_lead_approval_granted &&
                             documentData?.document
                               ?.directorate_approval_granted === false
-                          ? 3
-                          : 0
-                    }
+                          ? "mt-3"
+                          : "mt-0"
+                    } flex`}
                   >
                     {/* Send Back Button */}
                     {documentData?.document?.project_lead_approval_granted &&
@@ -913,7 +830,7 @@ export const UnifiedDocumentActions = ({
                         userIsCaretakerOfAdmin ||
                         userData?.pk === baLead?.pk ||
                         userIsCaretakerOfBaLeader) && (
-                        <Center>
+                        <div className="flex justify-center">
                           <UnifiedDocumentActionModal
                             userData={userData}
                             refetchData={refetchData}
@@ -933,24 +850,16 @@ export const UnifiedDocumentActions = ({
                             callSameData={callSameData}
                           />
                           <Button
-                            color={"white"}
-                            background={
+                            className={`text-white ${
                               colorMode === "light"
-                                ? "orange.500"
-                                : "orange.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light"
-                                  ? "orange.400"
-                                  : "orange.500",
-                            }}
-                            size={"sm"}
+                                ? "bg-orange-500 hover:bg-orange-400"
+                                : "bg-orange-600 hover:bg-orange-500"
+                            } text-sm`}
                             onClick={modals.s2SendBack.onOpen}
                           >
                             Send Back
                           </Button>
-                        </Center>
+                        </div>
                       )}
 
                     {/* Reopen Project Button (for Project Closure) */}
@@ -966,17 +875,9 @@ export const UnifiedDocumentActions = ({
                         userData?.is_superuser ||
                         userIsCaretakerOfAdmin) && (
                         <Button
-                          color={"white"}
-                          background={
-                            colorMode === "light" ? "orange.500" : "orange.600"
-                          }
-                          _hover={{
-                            background:
-                              colorMode === "light"
-                                ? "orange.400"
-                                : "orange.500",
-                          }}
-                          size={"sm"}
+                          className={`text-white ${
+                            colorMode === "light" ? "bg-orange-500 hover:bg-orange-400" : "bg-orange-600 hover:bg-orange-500"
+                          } text-sm`}
                           onClick={modals.s2Reopen.onOpen}
                         >
                           Reopen Project
@@ -992,7 +893,7 @@ export const UnifiedDocumentActions = ({
                         userIsCaretakerOfAdmin ||
                         userData?.business_area?.leader === baData?.leader ||
                         userIsCaretakerOfBaLeader) && (
-                        <Center ml={3}>
+                        <div className="flex justify-center ml-3">
                           <UnifiedDocumentActionModal
                             userData={userData}
                             refetchData={refetchData}
@@ -1012,15 +913,9 @@ export const UnifiedDocumentActions = ({
                             callSameData={callSameData}
                           />
                           <Button
-                            color={"white"}
-                            background={
-                              colorMode === "light" ? "blue.500" : "blue.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light" ? "blue.400" : "blue.500",
-                            }}
-                            size={"sm"}
+                            className={`text-white ${
+                              colorMode === "light" ? "bg-blue-500 hover:bg-blue-400" : "bg-blue-600 hover:bg-blue-500"
+                            } text-sm`}
                             onClick={modals.s2Recall.onOpen}
                             disabled={
                               directorateData?.length < 1 &&
@@ -1029,7 +924,7 @@ export const UnifiedDocumentActions = ({
                           >
                             Recall Approval
                           </Button>
-                        </Center>
+                        </div>
                       )}
 
                     {/* Approve Button */}
@@ -1040,7 +935,7 @@ export const UnifiedDocumentActions = ({
                         userIsCaretakerOfAdmin ||
                         userData?.pk === baData?.leader ||
                         userIsCaretakerOfBaLeader) && (
-                        <Center ml={3}>
+                        <div className="flex justify-center ml-3">
                           <UnifiedDocumentActionModal
                             userData={userData}
                             refetchData={refetchData}
@@ -1060,17 +955,9 @@ export const UnifiedDocumentActions = ({
                             callSameData={callSameData}
                           />
                           <Button
-                            color={"white"}
-                            background={
-                              colorMode === "light" ? "green.500" : "green.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light"
-                                  ? "green.400"
-                                  : "green.500",
-                            }}
-                            size={"sm"}
+                            className={`text-white ${
+                              colorMode === "light" ? "bg-green-500 hover:bg-green-400" : "bg-green-600 hover:bg-green-500"
+                            } text-sm`}
                             onClick={modals.s2Approval.onOpen}
                             disabled={
                               !userData?.is_superuser &&
@@ -1079,9 +966,9 @@ export const UnifiedDocumentActions = ({
                           >
                             Approve
                           </Button>
-                        </Center>
+                        </div>
                       )}
-                  </Flex>
+                  </div>
 
                   {/* Additional Document-Specific buttons for BA */}
                   {documentType === "projectplan" &&
@@ -1097,72 +984,45 @@ export const UnifiedDocumentActions = ({
                       ?.business_area_lead_approval_granted === true &&
                     documentData?.document?.directorate_approval_granted ===
                       true && (
-                      <Flex justifyContent={"flex-end"}>
+                      <div className="justify-end flex">
                         <Button
-                          mt={3}
-                          color={"white"}
-                          background={
-                            colorMode === "light" ? "orange.500" : "orange.600"
-                          }
-                          _hover={{
-                            background:
-                              colorMode === "light"
-                                ? "orange.400"
-                                : "orange.500",
-                          }}
-                          size={"sm"}
+                          className={`mt-3 text-white ${
+                            colorMode === "light" ? "bg-orange-500 hover:bg-orange-400" : "bg-orange-600 hover:bg-orange-500"
+                          } text-sm ml-2`}
                           onClick={modals.createProgressReport.onOpen}
-                          ml={2}
                         >
                           Create Progress Report
                         </Button>
-                      </Flex>
+                      </div>
                     )}
-                </Grid>
+                </div>
 
                 {/* Directorate GRID */}
-                <Grid
-                  border={"1px solid"}
-                  borderColor={"gray.300"}
-                  roundedBottom={"2xl"}
-                  p={4}
-                >
-                  <Flex
-                    mt={1}
-                    justifyContent={"flex-end"}
-                    alignItems={"center"}
-                  >
-                    <Text flex={1} fontWeight={"semibold"}>
-                      Directorate
-                    </Text>
-                    <Tag
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      display={"flex"}
-                      bg={
+                <div className="border border-gray-300 rounded-b-2xl p-4 grid">
+                  <div className="mt-1 justify-end items-center flex">
+                    <p className="flex-1 font-semibold">Directorate</p>
+                    <Badge
+                      className={`items-center justify-center flex ${
                         documentData?.document?.directorate_approval_granted ===
                         true
-                          ? "green.500"
-                          : "red.500"
-                      }
-                      color={"white"}
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      } text-white`}
                     >
                       {documentData?.document?.directorate_approval_granted ===
                       true
                         ? "Granted"
                         : "Required"}
-                    </Tag>
-                  </Flex>
+                    </Badge>
+                  </div>
 
-                  <Flex
-                    justifyContent={"flex-end"}
-                    w={"100%"}
-                    mt={
+                  <div
+                    className={`justify-end w-full ${
                       documentData?.document
                         ?.business_area_lead_approval_granted
-                        ? 3
-                        : 0
-                    }
+                        ? "mt-3"
+                        : "mt-0"
+                    } flex`}
                   >
                     {/* Reopen Project Button */}
                     {documentType === "projectclosure" &&
@@ -1176,19 +1036,10 @@ export const UnifiedDocumentActions = ({
                         userIsCaretakerOfAdmin ||
                         userInDivisionalDirectorate) && (
                         <Button
-                          color={"white"}
-                          background={
-                            colorMode === "light" ? "orange.500" : "orange.600"
-                          }
-                          _hover={{
-                            background:
-                              colorMode === "light"
-                                ? "orange.400"
-                                : "orange.500",
-                          }}
-                          size={"sm"}
+                          className={`text-white ${
+                            colorMode === "light" ? "bg-orange-500 hover:bg-orange-400" : "bg-orange-600 hover:bg-orange-500"
+                          } text-sm ml-2`}
                           onClick={modals.s3Reopen.onOpen}
-                          ml={2}
                         >
                           Reopen Project
                         </Button>
@@ -1202,7 +1053,7 @@ export const UnifiedDocumentActions = ({
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
                         userInDivisionalDirectorate) && (
-                        <Center justifyContent={"flex-end"} ml={3}>
+                        <div className="justify-end flex ml-3">
                           <UnifiedDocumentActionModal
                             userData={userData}
                             refetchData={refetchData}
@@ -1222,24 +1073,16 @@ export const UnifiedDocumentActions = ({
                             callSameData={callSameData}
                           />
                           <Button
-                            color={"white"}
-                            background={
+                            className={`text-white ${
                               colorMode === "light"
-                                ? "orange.500"
-                                : "orange.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light"
-                                  ? "orange.400"
-                                  : "orange.500",
-                            }}
-                            size={"sm"}
+                                ? "bg-orange-500 hover:bg-orange-400"
+                                : "bg-orange-600 hover:bg-orange-500"
+                            } text-sm`}
                             onClick={modals.s3SendBack.onOpen}
                           >
                             Send Back
                           </Button>
-                        </Center>
+                        </div>
                       )}
 
                     {/* Recall Approval Button */}
@@ -1247,7 +1090,7 @@ export const UnifiedDocumentActions = ({
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
                         userInDivisionalDirectorate) && (
-                        <Center justifyContent={"flex-start"} ml={3}>
+                        <div className="justify-start flex ml-3">
                           <UnifiedDocumentActionModal
                             userData={userData}
                             refetchData={refetchData}
@@ -1267,20 +1110,14 @@ export const UnifiedDocumentActions = ({
                             callSameData={callSameData}
                           />
                           <Button
-                            color={"white"}
-                            background={
-                              colorMode === "light" ? "blue.500" : "blue.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light" ? "blue.400" : "blue.500",
-                            }}
-                            size={"sm"}
+                            className={`text-white ${
+                              colorMode === "light" ? "bg-blue-500 hover:bg-blue-400" : "bg-blue-600 hover:bg-blue-500"
+                            } text-sm`}
                             onClick={modals.s3Recall.onOpen}
                           >
                             Recall Approval
                           </Button>
-                        </Center>
+                        </div>
                       )}
 
                     {/* Create Progress Report Button (if needed) */}
@@ -1296,19 +1133,10 @@ export const UnifiedDocumentActions = ({
                         userIsCaretakerOfAdmin ||
                         userInDivisionalDirectorate) && (
                         <Button
-                          color={"white"}
-                          background={
-                            colorMode === "light" ? "orange.500" : "orange.600"
-                          }
-                          _hover={{
-                            background:
-                              colorMode === "light"
-                                ? "orange.400"
-                                : "orange.500",
-                          }}
-                          size={"sm"}
+                          className={`text-white ${
+                            colorMode === "light" ? "bg-orange-500 hover:bg-orange-400" : "bg-orange-600 hover:bg-orange-500"
+                          } text-sm ml-2`}
                           onClick={modals.createProgressReport.onOpen}
-                          ml={2}
                         >
                           Create Progress Report
                         </Button>
@@ -1321,7 +1149,7 @@ export const UnifiedDocumentActions = ({
                       (userData?.is_superuser ||
                         userIsCaretakerOfAdmin ||
                         userInDivisionalDirectorate) && (
-                        <Center ml={3} justifyContent={"flex-end"}>
+                        <div className="ml-3 justify-end flex">
                           <UnifiedDocumentActionModal
                             userData={userData}
                             refetchData={refetchData}
@@ -1341,34 +1169,26 @@ export const UnifiedDocumentActions = ({
                             callSameData={callSameData}
                           />
                           <Button
-                            color={"white"}
-                            background={
-                              colorMode === "light" ? "green.500" : "green.600"
-                            }
-                            _hover={{
-                              background:
-                                colorMode === "light"
-                                  ? "green.400"
-                                  : "green.500",
-                            }}
-                            size={"sm"}
+                            className={`text-white ${
+                              colorMode === "light" ? "bg-green-500 hover:bg-green-400" : "bg-green-600 hover:bg-green-500"
+                            } text-sm`}
                             onClick={modals.s3Approval.onOpen}
                           >
                             Approve
                           </Button>
-                        </Center>
+                        </div>
                       )}
-                  </Flex>
-                </Grid>
+                  </div>
+                </div>
 
                 {/* PDF and email buttons */}
                 <ProjectDocumentPDFSection
                   data_document={documentData}
                   refetchData={callSameData || refetchData}
                 />
-              </Grid>
-            </Box>
-          </Grid>
+              </div>
+            </div>
+          </div>
 
           {/* Document Action Modal Instances for projectclosure reopening */}
           {documentType === "projectclosure" && (
@@ -1428,38 +1248,30 @@ export const UnifiedDocumentActions = ({
           )}
         </>
       ) : baLoading === false && baData === undefined ? (
-        <Grid
-          my={4}
-          gridTemplateColumns={"repeat(1, 1fr)"}
-          justifyContent={"center"}
-        >
-          <Text textAlign={"center"} fontWeight={"semibold"}>
+        <div className="my-4 grid grid-cols-1 justify-center">
+          <p className="text-center font-semibold">
             Document Actions cannot be displayed as this project has no business
             area.
-          </Text>
-          <Text textAlign={"center"} fontWeight={"semibold"}>
+          </p>
+          <p className="text-center font-semibold">
             Please set a business area for this project from the project
             settings.
-          </Text>
-        </Grid>
+          </p>
+        </div>
       ) : actionsReady && !leaderMember ? (
-        <Grid
-          my={4}
-          gridTemplateColumns={"repeat(1, 1fr)"}
-          justifyContent={"center"}
-        >
-          <Text textAlign={"center"} fontWeight={"semibold"}>
+        <div className="my-4 grid grid-cols-1 justify-center">
+          <p className="text-center font-semibold">
             This project has no members/leader so document actions are not shown
             here.
-          </Text>
-          <Text textAlign={"center"} fontWeight={"semibold"}>
+          </p>
+          <p className="text-center font-semibold">
             Please add members to adjust document actions.
-          </Text>
-        </Grid>
+          </p>
+        </div>
       ) : (
-        <Center>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center">
+          <Loader2 className="animate-spin" />
+        </div>
       )}
     </>
   );

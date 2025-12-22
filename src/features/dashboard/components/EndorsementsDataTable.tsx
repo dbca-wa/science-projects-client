@@ -7,7 +7,8 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import type { IMiniEndorsement } from "@/shared/types";
-import { Box, Button, Icon, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
 
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import {
@@ -20,7 +21,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaUserFriends } from "react-icons/fa";
 import { FaShieldDog } from "react-icons/fa6";
 import { GiMaterialsScience } from "react-icons/gi";
@@ -117,21 +118,13 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
         }
         return (
           <Button
-            // variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            // px={"10px"}
-            bg={"transparent"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+            className={`w-full text-center bg-transparent hover:${
+              colorMode === "dark" ? "bg-blue-400 text-white" : "bg-blue-50 text-black"
+            }`}
           >
             Kind
+            {sortIcon}
           </Button>
         );
       },
@@ -142,15 +135,12 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
         const formattedColour = endorsementKindDict["aec"].color;
 
         return (
-          <Box className="text-center align-middle font-medium">
-            {/* <Text>{formattedString}</Text> */}
-            <Icon
-              as={formattedIcon}
-              color={`${formattedColour}.500`}
-              boxSize={"22px"}
-            />
-            <Text color={`${formattedColour}.500`}>{formattedString}</Text>
-          </Box>
+          <div className="text-center align-middle font-medium">
+            <div className={`text-${formattedColour}-500`}>
+              {React.createElement(formattedIcon, { size: 22 })}
+            </div>
+            <p className={`text-${formattedColour}-500`}>{formattedString}</p>
+          </div>
         );
       },
     },
@@ -167,18 +157,13 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
 
         return (
           <Button
-            bg={"transparent"}
+            className={`w-full text-left bg-transparent justify-start hover:${
+              colorMode === "dark" ? "bg-blue-400 text-white" : "bg-blue-50 text-black"
+            }`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-left"
-            rightIcon={sortIcon}
-            justifyContent={"flex-start"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
           >
             Title
+            {sortIcon}
           </Button>
         );
       },
@@ -187,26 +172,15 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
           row.original.project_plan.document.project.title;
         const formatted = returnHTMLTitle(originalTitleData);
         return (
-          <Box className="text-left font-medium">
-            <Text
-              color={colorMode === "dark" ? "blue.200" : "blue.400"}
-              fontWeight={"bold"}
-              _hover={{
-                color: colorMode === "dark" ? "blue.100" : "blue.300",
-                textDecoration:
-                  colorMode === "dark" ? "underline" : "undefined",
-              }}
-              cursor={"pointer"}
-              px={4}
+          <div className="text-left font-medium">
+            <p
+              className={`px-4 font-bold cursor-pointer hover:underline ${
+                colorMode === "dark" ? "text-blue-200 hover:text-blue-100" : "text-blue-400 hover:text-blue-300"
+              }`}
             >
               {formatted}
-            </Text>
-            <Text
-              color={"gray.400"}
-              fontWeight={"semibold"}
-              fontSize={"small"}
-              px={4}
-            >
+            </p>
+            <p className="text-gray-400 font-semibold text-sm px-4">
               {
                 projectKindDict[
                   row.original.project_plan.document.project
@@ -215,16 +189,11 @@ export const EndorsementsDataTable = ({ pendingEndorsementsData }: Props) => {
               }
               -{row.original.project_plan.document.project.year}-
               {row.original.project_plan.document.project.number}
-            </Text>
-            <Text
-              color={"gray.500"}
-              fontWeight={"semibold"}
-              fontSize={"small"}
-              px={4}
-            >
+            </p>
+            <p className="text-gray-500 font-semibold text-sm px-4">
               {endorsementKindDict["aec"].todoDescription}
-            </Text>
-          </Box>
+            </p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {

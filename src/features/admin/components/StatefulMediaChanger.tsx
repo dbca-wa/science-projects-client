@@ -1,16 +1,8 @@
 import { handleImageFileCompression } from "@/shared/utils/imageCompression";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
-import {
-  Box,
-  Center,
-  Flex,
-  Grid,
-  Image,
-  Progress,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Progress } from "@/shared/components/ui/progress";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone";
 import { BsCloudArrowUp } from "react-icons/bs";
@@ -116,11 +108,11 @@ export const StatefulMediaChanger = ({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Box
-      pos={"relative"}
+    <div
+      className="relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      cursor={isHovered ? "pointer" : undefined}
+      style={{ cursor: isHovered ? "pointer" : undefined }}
     >
       {/* Hidden file input */}
       <input
@@ -135,15 +127,8 @@ export const StatefulMediaChanger = ({
       selectedImageUrl &&
       selectedImageUrl !== null &&
       !selectedImageUrl.endsWith("undefined") ? (
-        <Box
-          bg={"white"}
-          padding={4}
-          rounded={"full"}
-          pos={"absolute"}
-          right={4}
-          top={4}
-          color={isHovered ? "red.500" : "green.500"}
-          _hover={{ color: "red.400" }}
+        <div
+          className="bg-white p-4 rounded-full absolute right-4 top-4 text-red-500 hover:text-red-400 z-[99999]"
           onClick={async (e) => {
             onDeleteEntry(e);
             if (clearImageAddedFunctionality) {
@@ -152,10 +137,9 @@ export const StatefulMediaChanger = ({
               console.log("cleared");
             }
           }}
-          zIndex={99999}
         >
           <ImCross size={"25px"} />
-        </Box>
+        </div>
       ) : null}
 
       <Dropzone multiple={false} onDrop={onFileDrop}>
@@ -164,13 +148,11 @@ export const StatefulMediaChanger = ({
           const { onClick, ...rootProps } = getRootProps();
 
           return (
-            <Box
+            <div
               {...rootProps}
-              h={72}
-              width={"100%"}
-              border={"1px dashed"}
-              borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-              rounded={"lg"}
+              className={`h-72 w-full border border-dashed rounded-lg ${
+                colorMode === "light" ? "border-gray-300" : "border-gray-500"
+              }`}
               onClick={(e) => {
                 // Prevent default onClick behavior from Dropzone
                 e.stopPropagation();
@@ -183,10 +165,10 @@ export const StatefulMediaChanger = ({
               selectedImageUrl !== undefined &&
               selectedImageUrl !== null &&
               !selectedImageUrl.endsWith("undefined") ? (
-                <Box w={"100%"} h={"100%"} pos={"relative"} rounded={"lg"}>
-                  <Box overflow={"hidden"} w={"100%"} h={"100%"} rounded={"lg"}>
-                    <Image
-                      rounded={"lg"}
+                <div className="w-full h-full relative rounded-lg">
+                  <div className="overflow-hidden w-full h-full rounded-lg">
+                    <img
+                      className="rounded-lg object-cover w-full h-full"
                       src={
                         selectedImageUrl
                           ? selectedImageUrl?.startsWith("/files")
@@ -194,72 +176,48 @@ export const StatefulMediaChanger = ({
                             : selectedImageUrl
                           : NoImageFile
                       }
-                      objectFit={"cover"}
-                      w={"100%"}
-                      h={"100%"}
+                      alt="Selected"
                     />
-                  </Box>
-                </Box>
+                  </div>
+                </div>
               ) : (
-                <Flex
-                  rounded={"lg"}
-                  flexDir={"column"}
-                  justifyContent={"center"}
-                  justifyItems={"center"}
-                  w={"100%"}
-                  h={"100%"}
-                  background={"blackAlpha.800"}
-                  zIndex={3}
-                >
-                  <Center
-                    flexDir={"column"}
-                    justifyContent={"center"}
-                    justifyItems={"center"}
-                  >
+                <div className="rounded-lg flex flex-col justify-center items-center w-full h-full bg-black/80 z-[3]">
+                  <div className="flex flex-col justify-center items-center">
                     <BsCloudArrowUp size={"50px"} color={"white"} />
-                  </Center>
+                  </div>
 
-                  <Grid
-                    flexDir={"column"}
-                    alignItems={"center"}
-                    textAlign={"center"}
-                    color={"white"}
-                  >
-                    <Text px={8} textAlign={"center"}>
+                  <div className="flex flex-col items-center text-center text-white">
+                    <p className="px-8 text-center">
                       {`${helperText || "Click or drop image here"}`}
-                    </Text>
-                  </Grid>
+                    </p>
+                  </div>
 
                   {isUploading ? (
-                    <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
-                      <Box w={"80%"} h={1} px={1}>
+                    <div className="w-full mt-4 max-w-xs mx-auto flex justify-center">
+                      <div className="w-4/5 h-1 px-1">
                         <Progress
-                          bg={colorMode === "light" ? "gray.200" : "gray.900"}
-                          colorScheme={
-                            uploadProgress === 100 && selectedFile
-                              ? "green"
-                              : "blue"
-                          }
-                          size={"xs"}
                           value={uploadProgress}
+                          className={`h-1 ${
+                            colorMode === "light" ? "bg-gray-200" : "bg-gray-900"
+                          }`}
                         />
-                      </Box>
-                    </Center>
+                      </div>
+                    </div>
                   ) : null}
 
                   {isError ? (
-                    <Center>
-                      <Text color={"red.500"} mt={4}>
+                    <div className="flex justify-center">
+                      <p className="text-red-500 mt-4">
                         That file is not of the correct type
-                      </Text>
-                    </Center>
+                      </p>
+                    </div>
                   ) : null}
-                </Flex>
+                </div>
               )}
-            </Box>
+            </div>
           );
         }}
       </Dropzone>
-    </Box>
+    </div>
   );
 };

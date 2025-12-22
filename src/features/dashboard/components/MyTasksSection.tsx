@@ -1,15 +1,7 @@
 // Component for displaying the tasks the user has on the dashboard (modern)
 
-import {
-  AbsoluteCenter,
-  Box,
-  Divider,
-  Flex,
-  Grid,
-  Heading,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Separator } from "@/shared/components/ui/separator";
+import { useColorMode } from "@/shared/utils/theme.utils";
 // import { TaskDisplayCard } from "./TaskDisplayCard"
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -103,11 +95,11 @@ export const MyTasksSection = ({
   };
 
   return total < 1 ? (
-    <Box w={"100%"} h={"100%"}>
-      <Text>Your tasks will be shown here...</Text>
-    </Box>
+    <div className="w-full h-full">
+      <p>Your tasks will be shown here...</p>
+    </div>
   ) : (
-    <Flex flexDir={"column"} w={"100%"} h={"100%"}>
+    <div className="flex flex-col w-full h-full">
       {/* documentTaskData?.directorate &&
 documentTaskData?.ba && */}
       {documentTaskData?.team &&
@@ -119,27 +111,22 @@ documentTaskData?.ba && */}
         // ...documentTaskData.ba,
       ].length >= 1 ? (
         <>
-          <Box position="relative" padding="10">
-            <Divider />
-            <AbsoluteCenter
-              bg={colorMode === "light" ? "white" : "gray.800"}
-              px="4"
+          <div className="relative p-10">
+            <Separator />
+            <div
+              className={`absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 ${
+                colorMode === "light" ? "bg-white" : "bg-gray-800"
+              }`}
             >
-              <Heading size={"md"}>Team Tasks</Heading>
-            </AbsoluteCenter>
-          </Box>
-          <Grid
-            gridTemplateColumns={{
-              base: "repeat(1, 1fr)",
-              md: "repeat(1, 1fr)",
-              mdlg: "repeat(2, 1fr)",
-              "1080px": "repeat(3, 1fr)",
-              xl: "repeat(4, 1fr)",
-              "2xl": "repeat(6, 1fr)",
+              <h3 className="text-lg font-semibold">Team Tasks</h3>
+            </div>
+          </div>
+          <div
+            className="grid gap-4 mb-6"
+            style={{
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridRowGap: "2rem",
             }}
-            gridGap={4}
-            gridRowGap={8}
-            mb={6}
           >
             {renderDocumentTaskCards(documentTaskData?.lead, "project_lead")}
             {renderDocumentTaskCards(documentTaskData?.team, "team")}
@@ -151,69 +138,59 @@ documentTaskData?.ba && */}
 							documentTaskData?.directorate,
 							"directorate"
 						)} */}
-          </Grid>
+          </div>
         </>
       ) : null}
 
       {documentTaskData?.ba && [...documentTaskData.ba].length >= 1 ? (
         <>
-          <Box position="relative" padding="10">
-            <Divider />
-            <AbsoluteCenter
-              bg={colorMode === "light" ? "white" : "gray.800"}
-              px="4"
+          <div className="relative p-10">
+            <Separator />
+            <div
+              className={`absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 ${
+                colorMode === "light" ? "bg-white" : "bg-gray-800"
+              }`}
             >
-              <Heading size={"md"}>Business Area Lead Tasks</Heading>
-            </AbsoluteCenter>
-          </Box>
-          <Grid
-            gridTemplateColumns={{
-              base: "repeat(1, 1fr)",
-              md: "repeat(1, 1fr)",
-              mdlg: "repeat(2, 1fr)",
-              "1080px": "repeat(3, 1fr)",
-              xl: "repeat(4, 1fr)",
-              "2xl": "repeat(6, 1fr)",
+              <h3 className="text-lg font-semibold">Business Area Lead Tasks</h3>
+            </div>
+          </div>
+          <div
+            className="grid gap-4 mb-6"
+            style={{
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridRowGap: "2rem",
             }}
-            gridGap={4}
-            gridRowGap={8}
-            mb={6}
           >
             {renderDocumentTaskCards(documentTaskData?.ba, "ba_lead")}
-          </Grid>
+          </div>
         </>
       ) : null}
 
       {documentTaskData?.directorate &&
       [...documentTaskData.directorate].length >= 1 ? (
         <>
-          <Box position="relative" padding="10">
-            <Divider />
-            <AbsoluteCenter
-              bg={colorMode === "light" ? "white" : "gray.800"}
-              px="4"
+          <div className="relative p-10">
+            <Separator />
+            <div
+              className={`absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 ${
+                colorMode === "light" ? "bg-white" : "bg-gray-800"
+              }`}
             >
-              <Heading size={"md"}>Directorate Tasks</Heading>
-            </AbsoluteCenter>
-          </Box>
-          <Grid
-            gridTemplateColumns={{
-              base: "repeat(1, 1fr)",
-              md: "repeat(1, 1fr)",
-              mdlg: "repeat(2, 1fr)",
-              "1080px": "repeat(3, 1fr)",
-              xl: "repeat(4, 1fr)",
-              "2xl": "repeat(6, 1fr)",
+              <h3 className="text-lg font-semibold">Directorate Tasks</h3>
+            </div>
+          </div>
+          <div
+            className="grid gap-4 mb-6"
+            style={{
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridRowGap: "2rem",
             }}
-            gridGap={4}
-            gridRowGap={8}
-            mb={6}
           >
             {renderDocumentTaskCards(
               documentTaskData?.directorate,
               "directorate",
             )}
-          </Grid>
+          </div>
         </>
       ) : null}
 
@@ -226,34 +203,29 @@ documentTaskData?.ba && */}
         ...endorsementTaskData.hc,
       ].length >= 1 ? (
         <>
-          <Box position="relative" padding="10">
-            <Divider />
-            <AbsoluteCenter
-              bg={colorMode === "light" ? "white" : "gray.800"}
-              px="4"
+          <div className="relative p-10">
+            <Separator />
+            <div
+              className={`absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 ${
+                colorMode === "light" ? "bg-white" : "bg-gray-800"
+              }`}
             >
-              <Heading size={"md"}>Endorsement Tasks</Heading>
-            </AbsoluteCenter>
-          </Box>
-          <Grid
-            gridTemplateColumns={{
-              base: "repeat(1, 1fr)",
-              md: "repeat(1, 1fr)",
-              mdlg: "repeat(2, 1fr)",
-              "1080px": "repeat(3, 1fr)",
-              xl: "repeat(4, 1fr)",
-              "2xl": "repeat(6, 1fr)",
+              <h3 className="text-lg font-semibold">Endorsement Tasks</h3>
+            </div>
+          </div>
+          <div
+            className="grid gap-4 mb-6"
+            style={{
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridRowGap: "2rem",
             }}
-            gridGap={4}
-            gridRowGap={8}
-            mb={6}
           >
             {renderEndorsementTaskCards(endorsementTaskData?.aec, "aec")}
             {renderEndorsementTaskCards(endorsementTaskData?.bm, "bm")}
             {renderEndorsementTaskCards(endorsementTaskData?.hc, "hc")}
-          </Grid>
+          </div>
         </>
       ) : null}
-    </Flex>
+    </div>
   );
 };

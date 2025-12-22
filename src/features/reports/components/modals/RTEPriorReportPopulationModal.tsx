@@ -1,34 +1,24 @@
 // Modal for promoting or demoting users
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  Grid,
-  Input,
-  InputGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import { useRef } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import {
   MutationError,
   PRPopulationVar,
   getPreviousDataForProgressReportPopulation,
 } from "@/features/users/services/users.service";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -48,18 +38,9 @@ export const RTEPriorReportPopulationModal = ({
   project_pk,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { onClose: closeToast } = useDisclosure();
 
   const handleToastClose = () => {
-    closeToast();
     onClose();
-  };
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
   };
 
   const populationMutation = useMutation<
@@ -70,28 +51,17 @@ export const RTEPriorReportPopulationModal = ({
     // Start of mutation handling
     mutationFn: getPreviousDataForProgressReportPopulation,
     onMutate: () => {
-      addToast({
-        title: "Getting Previous Data...",
+      toast.loading("Getting Previous Data...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: (data) => {
       console.log(data);
       functionToRun(data);
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Populated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Populated`,
+      });
       //  Close the modal
       if (onClose) {
         onClose();
@@ -133,16 +103,9 @@ export const RTEPriorReportPopulationModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Population failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Population failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -162,73 +125,76 @@ export const RTEPriorReportPopulationModal = ({
   const { register, handleSubmit } = useForm<PRPopulationVar>();
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent 
+        className={`max-w-md ${
+          colorMode === "dark" 
+            ? "bg-gray-800 text-gray-400 border-gray-700" 
+            : "bg-white text-gray-900 border-gray-200"
+        }`}
       >
-        <ModalHeader>Populate With Prior Data?</ModalHeader>
-        <ModalCloseButton />
-        <Flex as={"form"} id="promotion-form" onSubmit={handleSubmit(onSubmit)}>
-          <ModalBody>
-            <Text>
-              Would you like to populate this section with the previous progress
-              report's data?
-            </Text>
-            <Text mt={4} fontSize={"sm"} color={"blue.500"}>
-              Keep in mind that you will still need to update your report with
-              data for the latest this Financial Year.
-            </Text>
-            <FormControl userSelect="none">
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("project_pk", {
-                    required: true,
-                    value: project_pk,
-                  })}
-                  readOnly
-                />
-                <Input
-                  type="hidden"
-                  {...register("section", { required: true, value: section })}
-                  readOnly
-                />
-                <Input
-                  type="hidden"
-                  {...register("writeable_document_kind", {
-                    required: true,
-                    value: writeable_document_kind,
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-          </ModalBody>
-        </Flex>
-        <ModalFooter>
-          <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-            <Button colorScheme="gray" onClick={onClose}>
+        <DialogHeader>
+          <DialogTitle>Populate With Prior Data?</DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              <p>
+                Would you like to populate this section with the previous progress
+                report's data?
+              </p>
+              <p className="text-sm text-blue-500">
+                Keep in mind that you will still need to update your report with
+                data for the latest this Financial Year.
+              </p>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        
+        <form id="promotion-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="hidden">
+            <Input
+              type="hidden"
+              {...register("project_pk", {
+                required: true,
+                value: project_pk,
+              })}
+              readOnly
+            />
+            <Input
+              type="hidden"
+              {...register("section", { required: true, value: section })}
+              readOnly
+            />
+            <Input
+              type="hidden"
+              {...register("writeable_document_kind", {
+                required: true,
+                value: writeable_document_kind,
+              })}
+              readOnly
+            />
+          </div>
+        </form>
+        
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button
-              isLoading={populationMutation.isPending}
               form="promotion-form"
               type="submit"
-              bgColor={colorMode === "light" ? `green.500` : `green.600`}
-              color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-              _hover={{
-                bg: colorMode === "light" ? `green.600` : `green.400`,
-                color: colorMode === "light" ? `white` : `white`,
-              }}
-              ml={3}
+              disabled={populationMutation.isPending}
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-green-500 hover:bg-green-600" 
+                  : "bg-green-600 hover:bg-green-400"
+              }`}
             >
-              Yes
+              {populationMutation.isPending ? "Loading..." : "Yes"}
             </Button>
-          </Grid>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

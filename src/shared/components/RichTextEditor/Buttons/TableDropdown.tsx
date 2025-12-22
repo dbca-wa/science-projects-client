@@ -1,6 +1,9 @@
 // A template for a RTE simple button - props fill out its icon, text and functionality
 
-import { Box, Center, Grid, Text, useColorMode } from "@chakra-ui/react";
+import { useState } from "react";
+import { FaTable } from "react-icons/fa";
+import "@/styles/texteditor.css";
+import { BaseToolbarMenuButton } from "./BaseToolbarMenuButton";
 import { INSERT_TABLE_COMMAND } from "@lexical/table";
 import {
   $getSelection,
@@ -8,10 +11,7 @@ import {
   INSERT_PARAGRAPH_COMMAND,
   LexicalEditor,
 } from "lexical";
-import { useState } from "react";
-import { FaTable } from "react-icons/fa";
-import "@/styles/texteditor.css";
-import { BaseToolbarMenuButton } from "./BaseToolbarMenuButton";
+import { cn } from "@/shared/utils";
 
 interface TableGridProps {
   activeEditor: LexicalEditor;
@@ -20,7 +20,6 @@ interface TableGridProps {
 const TableGrid = ({ activeEditor }: TableGridProps) => {
   const [tableRows, setTableRows] = useState(0);
   const [tableColumns, setTableColumns] = useState(0);
-  // const [isDisabled, setIsDisabled] = useState(true);
 
   const onGridClick = () => {
     activeEditor.update(() => {
@@ -51,8 +50,6 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
     });
   };
 
-  const { colorMode } = useColorMode();
-
   const handleMouseEnter = (row: number, column: number) => {
     setTableRows(row + 1);
     setTableColumns(column + 1);
@@ -69,77 +66,42 @@ const TableGrid = ({ activeEditor }: TableGridProps) => {
         const isHighlighted = row < tableRows && col < tableColumns;
         const isFirstRowOrColumn = row === 0 || col === 0;
         cols.push(
-          <Box
+          <div
             key={`${row}-${col}`}
-            w="25px"
-            h="25px"
-            border="1px solid"
-            borderColor={
-              isHighlighted
-                ? colorMode === "light"
-                  ? "gray.300"
-                  : "gray.300"
-                : colorMode === "light"
-                  ? "gray.300"
-                  : "gray.400"
-            }
+            className={cn(
+              "w-6 h-6 border border-border cursor-pointer",
+              isFirstRowOrColumn
+                ? isHighlighted
+                  ? "bg-blue-300 dark:bg-blue-400"
+                  : "bg-muted"
+                : isHighlighted
+                  ? "bg-blue-200 dark:bg-blue-300"
+                  : "bg-background",
+              "hover:bg-blue-400 dark:hover:bg-blue-500"
+            )}
             onMouseEnter={() => handleMouseEnter(row, col)}
             onClick={onGridClick}
-            // backgroundColor={row < tableRows && col < tableColumns ? 'blue.300' : 'white'}
-            backgroundColor={
-              colorMode === "light"
-                ? isFirstRowOrColumn
-                  ? isHighlighted
-                    ? "blue.300"
-                    : "gray.200"
-                  : isHighlighted
-                    ? "blue.200"
-                    : "white"
-                : isFirstRowOrColumn
-                  ? isHighlighted
-                    ? "blue.400"
-                    : "gray.300"
-                  : isHighlighted
-                    ? "blue.300"
-                    : "white"
-            }
-            _hover={{
-              backgroundColor:
-                colorMode === "light"
-                  ? isFirstRowOrColumn
-                    ? "blue.400"
-                    : "green.100"
-                  : isFirstRowOrColumn
-                    ? "blue.500"
-                    : "green.200",
-            }}
-          />,
+          />
         );
       }
       grid.push(
-        <Grid templateColumns={`repeat(${columns}, 1fr)`} key={row}>
+        <div key={row} className="grid grid-cols-7 gap-0">
           {cols}
-        </Grid>,
+        </div>
       );
     }
     return grid;
   };
 
   return (
-    <Center display={"flex"} flexDir={"column"} w={"100%"}>
+    <div className="flex flex-col items-center w-full">
       {/* Table amount */}
-      <Text fontSize={"large"} pb={2}>
+      <p className="text-lg pb-2">
         {tableColumns} x {tableRows} table
-      </Text>
+      </p>
       {/* Table grid */}
-      <Box
-      // display={"flex"}
-      // flexDir={"column"}
-      // w={"100%"}
-      >
-        {createGrid()}
-      </Box>
-    </Center>
+      <div>{createGrid()}</div>
+    </div>
   );
 };
 
@@ -155,6 +117,6 @@ export const TableDropdown = ({ activeEditor }: TableGridProps) => {
           component: <TableGrid activeEditor={activeEditor} />,
         },
       ]}
-    ></BaseToolbarMenuButton>
+    />
   );
 };

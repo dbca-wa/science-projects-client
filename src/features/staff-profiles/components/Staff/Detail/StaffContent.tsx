@@ -1,4 +1,4 @@
-import { useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useState } from "react";
 import CVSection from "./CVSection";
 import OverviewSection from "./OverviewSection";

@@ -1,29 +1,7 @@
 // Delete User Modal - for removing users from the system all together. Admin only.
 
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   MutationError,
   MutationSuccess,
@@ -31,6 +9,17 @@ import {
 } from "@/features/users/services/users.service";
 import type { ICaretakerEntry, ICaretakerObject, ISimpleIdProp } from "@/shared/types";
 import { useFormattedDate } from "@/shared/hooks/useFormattedDate";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -46,7 +35,7 @@ export const RemoveCaretakerModal = ({
   refetch,
 }: IModalProps) => {
   const { colorMode } = useColorMode();
-  const { isOpen: isToastOpen, onClose: closeToast } = useDisclosure();
+  const [isToastOpen, setIsToastOpen] = useState(false);
   console.log(caretakerObject);
   useEffect(() => {
     if (isToastOpen) {
@@ -55,15 +44,8 @@ export const RemoveCaretakerModal = ({
   }, [isToastOpen, onClose]);
 
   const handleToastClose = () => {
-    closeToast();
+    setIsToastOpen(false);
     onClose();
-  };
-
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
   };
 
   const queryClient = useQueryClient();
@@ -77,26 +59,15 @@ export const RemoveCaretakerModal = ({
     mutationFn: removeCaretaker,
     onMutate: () => {
       console.log("onMutate");
-      addToast({
-        title: "Removing Caretaker...",
+      toast.loading("Removing Caretaker...", {
         description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
       });
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Caretaker removed.`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Caretaker removed.`,
+      });
 
       // Explicitly call refetch after invalidating queries
       queryClient
@@ -148,16 +119,9 @@ export const RemoveCaretakerModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Update failed", {
+        description: errorMessage,
+      });
     },
   });
 
@@ -174,61 +138,61 @@ export const RemoveCaretakerModal = ({
   const formattedEnd = useFormattedDate(caretakerObject?.end_date);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"lg"}>
-      <ModalOverlay />
-      <Flex>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Remove Caretaker?</ModalHeader>
-          <ModalCloseButton />
-
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"bold"} fontSize={"xl"}>
-                Are you sure you want to remove{" "}
-                {caretakerObject?.caretaker?.display_first_name}{" "}
-                {caretakerObject?.caretaker?.display_last_name} as caretaker?
-              </Text>
-            </Center>
-            <Text mt={4}>
-              They will immedediately lose permissions to act on the user's
-              behalf.
-            </Text>
-
-            <Text mt={4}>
-              If you would still like to proceed, press "Remove Caretaker".
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }} // isDisabled={!changesMade}
-                isLoading={removeCaretakerMutation.isPending}
-                onClick={() =>
-                  onSubmit({
-                    id:
-                      caretakerObject?.id !== undefined
-                        ? caretakerObject.id
-                        : caretakerObject?.caretaker_obj_id,
-                  })
-                }
-                ml={3}
-              >
-                Remove Caretaker
-              </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent 
+        className={`max-w-lg ${
+          colorMode === "dark" 
+            ? "bg-gray-800 text-gray-400 border-gray-700" 
+            : "bg-white text-gray-900 border-gray-200"
+        }`}
+      >
+        <DialogHeader>
+          <DialogTitle>Remove Caretaker?</DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <p className="font-bold text-xl">
+                  Are you sure you want to remove{" "}
+                  {caretakerObject?.caretaker?.display_first_name}{" "}
+                  {caretakerObject?.caretaker?.display_last_name} as caretaker?
+                </p>
+              </div>
+              <p>
+                They will immedediately lose permissions to act on the user's
+                behalf.
+              </p>
+              <p>
+                If you would still like to proceed, press "Remove Caretaker".
+              </p>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-red-500 hover:bg-red-400" 
+                  : "bg-red-600 hover:bg-red-500"
+              }`}
+              disabled={removeCaretakerMutation.isPending}
+              onClick={() =>
+                onSubmit({
+                  id:
+                    caretakerObject?.id !== undefined
+                      ? caretakerObject.id
+                      : caretakerObject?.caretaker_obj_id,
+                })
+              }
+            >
+              {removeCaretakerMutation.isPending ? "Loading..." : "Remove Caretaker"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

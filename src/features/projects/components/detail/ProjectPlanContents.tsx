@@ -1,6 +1,6 @@
 // Maps out the document provided to the rich text editor components for project plan documents.
 
-import { Box, Grid, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
@@ -243,11 +243,11 @@ export const ProjectPlanContents = ({
         section={"related_projects"}
       />
 
-      <Box pb={6} mt={4} w={"100%"}>
-        <Text fontWeight={"bold"} fontSize={"2xl"}>
+      <div className="pb-6 mt-4 w-full">
+        <p className="font-bold text-2xl">
           Funding
-        </Text>
-        <Grid mt={4} gridTemplateColumns={"repeat(1, 1fr)"} pos={"relative"}>
+        </p>
+        <div className="mt-4 grid grid-cols-1 relative">
           <RichTextEditor
             canEdit={canEditPermission}
             document_pk={document?.document?.pk}
@@ -273,8 +273,8 @@ export const ProjectPlanContents = ({
             data={document?.operating_budget_external}
             section={"operating_budget_external"}
           />
-        </Grid>
-      </Box>
+        </div>
+      </div>
       <ProjectPlanEndorsements
         document={document}
         userIsLeader={userIsLeader}
@@ -287,7 +287,7 @@ export const ProjectPlanContents = ({
         userIsCaretakerOfProjectLeader={userIsCaretakerOfProjectLeader}
       />
 
-      <Box pb={6} mt={4}>
+      <div className="pb-6 mt-4">
         <CommentSection
           // projectPk={document?.document?.project?.pk}
           baseAPI={baseAPI}
@@ -296,7 +296,7 @@ export const ProjectPlanContents = ({
           userData={userData}
           project={document?.document?.project}
         />
-      </Box>
+      </div>
     </motion.div>
   );
 };

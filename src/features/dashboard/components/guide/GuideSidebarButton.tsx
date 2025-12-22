@@ -1,4 +1,4 @@
-import { Box, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useEffect, useState } from "react";
 
 interface ISidebarMenuButtonProps {
@@ -37,46 +37,33 @@ export const GuideSidebarButton = ({
   }, [selectedString, pageName]);
 
   return (
-    <Box
-      p={2}
-      width={"100%"}
-      bg={
+    <div
+      className={`p-2 w-full relative flex rounded-lg cursor-pointer transition-all ${
         selected
           ? colorMode === "light"
-            ? "blue.400"
-            : "blue.500"
-          : "transparent"
-      }
-      color={selected ? "white" : "inherit"}
-      _hover={
+            ? "bg-blue-400 text-white"
+            : "bg-blue-500 text-white"
+          : "bg-transparent"
+      } ${
         colorMode === "light"
-          ? {
-              bg: selected ? "blue.400" : "blue.100",
-              color: selected ? "white" : "black",
-            }
-          : {
-              bg: selected ? "blue.400" : "gray.300",
-              color: selected ? "white" : "black",
-            }
-      }
-      position={"relative"}
-      display={"flex"}
-      rounded={"lg"}
-      cursor={"pointer"}
-      transitionProperty={
-        "background-color, border-color, color, fill, stroke, opacity, box-shadow, transform"
-      }
+          ? selected
+            ? "hover:bg-blue-400 hover:text-white"
+            : "hover:bg-blue-100 hover:text-black"
+          : selected
+            ? "hover:bg-blue-400 hover:text-white"
+            : "hover:bg-gray-300 hover:text-black"
+      }`}
       onClick={onClick}
     >
-      <Box flex={1} width={"100%"}>
-        <Box _focus={{ outline: "none" }} width={"100%"}>
-          <Box textAlign={"center"} width={"100%"}>
-            <Text textAlign={"center"} width={"100%"}>
+      <div className="flex-1 w-full">
+        <div className="w-full focus:outline-none">
+          <div className="text-center w-full">
+            <p className="text-center w-full">
               {pageName}
-            </Text>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

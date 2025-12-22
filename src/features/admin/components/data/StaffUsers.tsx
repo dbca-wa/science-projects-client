@@ -1,102 +1,75 @@
 import { AddDBCAUserModal } from "@/features/admin/components/modals/AddDBCAUserModal";
 import { MergeUsersModal } from "@/features/admin/components/modals/MergeUsersModal";
-import {
-  Box,
-  Text,
-  Button,
-  Divider,
-  Grid,
-  useColorMode,
-  useDisclosure,
-  Flex,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Separator } from "@/shared/components/ui/separator";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { useState } from "react";
 
 export const StaffUsers = () => {
   const { colorMode } = useColorMode();
-  const {
-    isOpen: isAddDBCAUserModalOpen,
-    onOpen: onOpenAddDBCAUserModal,
-    onClose: onCloseAddDBCAUserModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isMergeUserModalOpen,
-    onOpen: onOpenMergeUserModal,
-    onClose: onCloseMergeUserModal,
-  } = useDisclosure();
-
-  // const {
-  //   isOpen: isSetCaretakerModalOpen,
-  //   onOpen: onOpenSetCaretakerModal,
-  //   onClose: onCloseSetCaretakerModal,
-  // } = useDisclosure();
+  const [isAddDBCAUserModalOpen, setIsAddDBCAUserModalOpen] = useState(false);
+  const [isMergeUserModalOpen, setIsMergeUserModalOpen] = useState(false);
 
   return (
     <>
       <AddDBCAUserModal
         isOpen={isAddDBCAUserModalOpen}
-        onClose={onCloseAddDBCAUserModal}
+        onClose={() => setIsAddDBCAUserModalOpen(false)}
       />
       <MergeUsersModal
         isOpen={isMergeUserModalOpen}
-        onClose={onCloseMergeUserModal}
+        onClose={() => setIsMergeUserModalOpen(false)}
       />
-      {/* <SetCaretakerModal
-        isOpen={isSetCaretakerModalOpen}
-        onClose={onCloseSetCaretakerModal}
-      /> */}
-      <Box>
-        <Flex alignItems={"center"} mt={4}>
-          <Text fontSize={"x-large"} py={4} flex={1}>
+      <div>
+        <div className="flex items-center mt-4">
+          <p className="text-xl py-4 flex-1">
             Admin User Actions
-          </Text>
-        </Flex>
-      </Box>
+          </p>
+        </div>
+      </div>
 
-      <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
+      <div className="grid grid-cols-2 gap-4">
         <Button
-          bg={colorMode === "light" ? "blue.500" : "blue.600"}
-          color={"white"}
-          _hover={{
-            bg: colorMode === "light" ? "blue.400" : "blue.500",
-          }}
-          onClick={onOpenAddDBCAUserModal}
+          className={`text-white ${
+            colorMode === "light" 
+              ? "bg-blue-500 hover:bg-blue-400" 
+              : "bg-blue-600 hover:bg-blue-500"
+          }`}
+          onClick={() => setIsAddDBCAUserModalOpen(true)}
         >
           Add a DBCA User
         </Button>
         <Button
-          bg={colorMode === "light" ? "red.600" : "red.700"}
-          color={"white"}
-          _hover={{
-            bg: colorMode === "light" ? "red.500" : "red.600",
-          }}
-          // isDisabled={true}
-          onClick={onOpenMergeUserModal}
+          className={`text-white ${
+            colorMode === "light" 
+              ? "bg-red-600 hover:bg-red-500" 
+              : "bg-red-700 hover:bg-red-600"
+          }`}
+          onClick={() => setIsMergeUserModalOpen(true)}
         >
           Merge Users
         </Button>
         <Button
-          bg={colorMode === "light" ? "gray.800" : "gray.900"}
-          color={"white"}
-          _hover={{
-            bg: colorMode === "light" ? "gray.700" : "gray.800",
-          }}
-          isDisabled={true}
+          className={`text-white ${
+            colorMode === "light" 
+              ? "bg-gray-800 hover:bg-gray-700" 
+              : "bg-gray-900 hover:bg-gray-800"
+          }`}
+          disabled={true}
         >
           Set Maintainer
         </Button>
         <Button
-          bg={colorMode === "light" ? "orange.600" : "orange.700"}
-          color={"white"}
-          _hover={{
-            bg: colorMode === "light" ? "orange.500" : "orange.600",
-          }}
-          isDisabled={true}
-          // onClick={onOpenSetCaretakerModal}
+          className={`text-white ${
+            colorMode === "light" 
+              ? "bg-orange-600 hover:bg-orange-500" 
+              : "bg-orange-700 hover:bg-orange-600"
+          }`}
+          disabled={true}
         >
           Set User Caretaker
         </Button>
-      </Grid>
+      </div>
     </>
   );
 };

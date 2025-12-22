@@ -1,33 +1,25 @@
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
 import {
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerFooter,
-  DrawerOverlay,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  VStack,
-  useColorMode,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+  Sheet,
+  SheetContent,
+} from "@/shared/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/shared/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -49,17 +41,22 @@ export const DivisionItemDisplay = ({
 }: IDivision) => {
   const { register, handleSubmit, watch } = useForm<IDivision>();
 
-  const toast = useToast();
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onDeleteModalOpen,
-    onClose: onDeleteModalClose,
-  } = useDisclosure();
-  const {
-    isOpen: isUpdateaModalOpen,
-    onOpen: onUpdateModalOpen,
-    onClose: onUpdateModalClose,
-  } = useDisclosure();
+  // State for all modals (replacing useDisclosure hooks)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDirectorOpen, setIsDirectorOpen] = useState(false);
+  const [isApproverOpen, setIsApproverOpen] = useState(false);
+
+  // Modal control functions
+  const onDeleteModalOpen = () => setIsDeleteModalOpen(true);
+  const onDeleteModalClose = () => setIsDeleteModalOpen(false);
+  const onUpdateModalOpen = () => setIsUpdateModalOpen(true);
+  const onUpdateModalClose = () => setIsUpdateModalOpen(false);
+  const onDirectorOpen = () => setIsDirectorOpen(true);
+  const onDirectorClose = () => setIsDirectorOpen(false);
+  const onApproverOpen = () => setIsApproverOpen(true);
+  const onApproverClose = () => setIsApproverOpen(false);
+
   const queryClient = useQueryClient();
 
   const { userLoading: directorLoading, userData: directorData } =
@@ -74,31 +71,19 @@ export const DivisionItemDisplay = ({
   const updateMutation = useMutation({
     mutationFn: updateDivision,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Updated",
-        position: "top-right",
-      });
+      toast.success("Updated");
       onUpdateModalClose();
       queryClient.invalidateQueries({ queryKey: ["divisions"] });
     },
     onError: () => {
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
-      });
+      toast.error("Failed");
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteDivision,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Deleted",
-        position: "top-right",
-      });
+      toast.success("Deleted");
       onDeleteModalClose();
       queryClient.invalidateQueries({ queryKey: ["divisions"] });
     },
@@ -113,16 +98,6 @@ export const DivisionItemDisplay = ({
     updateMutation.mutate(formData);
   };
 
-  const {
-    isOpen: isDirectorOpen,
-    onOpen: onDirectorOpen,
-    onClose: onDirectorClose,
-  } = useDisclosure();
-  const {
-    isOpen: isApproverOpen,
-    onOpen: onApproverOpen,
-    onClose: onApproverClose,
-  } = useDisclosure();
   const directorDrawerFunction = () => {
     console.log(`${directorData?.first_name} clicked`);
     onDirectorOpen();
@@ -139,50 +114,24 @@ export const DivisionItemDisplay = ({
     !approverLoading &&
     approverData ? (
     <>
-      <Drawer
-        isOpen={isDirectorOpen}
-        placement="right"
-        onClose={onDirectorClose}
-        size={"sm"} //by default is xs
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerBody>
-            <UserProfile pk={director} />
-          </DrawerBody>
+      <Sheet open={isDirectorOpen} onOpenChange={setIsDirectorOpen}>
+        <SheetContent side="right" className="w-96">
+          <UserProfile pk={director} />
+        </SheetContent>
+      </Sheet>
 
-          <DrawerFooter></DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      <Sheet open={isApproverOpen} onOpenChange={setIsApproverOpen}>
+        <SheetContent side="right" className="w-96">
+          <UserProfile pk={approver} />
+        </SheetContent>
+      </Sheet>
 
-      <Drawer
-        isOpen={isApproverOpen}
-        placement="right"
-        onClose={onApproverClose}
-        size={"sm"} //by default is xs
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerBody>
-            <UserProfile pk={approver} />
-          </DrawerBody>
-
-          <DrawerFooter></DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-
-      <Grid
-        gridTemplateColumns="4fr 2fr 2fr 2fr 1fr"
-        width="100%"
-        p={3}
-        borderWidth={1}
-        // bg={"red"}
-      >
+      <div className="grid grid-cols-[4fr_2fr_2fr_2fr_1fr] w-full p-3 border border-border">
         <TextButtonFlex name={name} onClick={onUpdateModalOpen} />
 
-        <Flex alignItems={"center"}>
-          <Text fontWeight={"semibold"}>{slug}</Text>
-        </Flex>
+        <div className="flex items-center">
+          <p className="font-semibold">{slug}</p>
+        </div>
         <TextButtonFlex
           name={`${directorData.first_name} ${directorData.last_name}`}
           onClick={directorDrawerFunction}
@@ -191,196 +140,167 @@ export const DivisionItemDisplay = ({
           name={`${approverData.first_name} ${approverData.last_name}`}
           onClick={approverDrawerFunction}
         />
-        <Flex justifyContent="flex-end" mr={2} alignItems={"center"}>
-          <Menu>
-            <MenuButton
-              px={2}
-              py={2}
-              transition="all 0.2s"
-              rounded={4}
-              borderRadius="md"
-              borderWidth="1px"
-              _hover={{ bg: "gray.400" }}
-              _expanded={{ bg: "blue.400" }}
-              _focus={{ boxShadow: "outline-solid" }}
-            >
-              <Flex alignItems={"center"} justifyContent={"center"}>
-                <MdMoreVert />
-              </Flex>
-            </MenuButton>
-            <MenuList>
-              <MenuItem onClick={onUpdateModalOpen}>Edit</MenuItem>
-              <MenuItem onClick={onDeleteModalOpen}>Delete</MenuItem>
-            </MenuList>
-          </Menu>
-          {/* </Button> */}
-        </Flex>
-      </Grid>
-      <Modal isOpen={isDeleteModalOpen} onClose={onDeleteModalClose}>
-        <ModalOverlay />
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Delete Division</ModalHeader>
-          <ModalBody>
-            <Box>
-              <Text fontSize="lg" fontWeight="semibold">
-                Are you sure you want to delete this division?
-              </Text>
-
-              <Text
-                fontSize="lg"
-                fontWeight="semibold"
-                color={"blue.500"}
-                mt={4}
+        <div className="flex justify-end mr-2 items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="px-2 py-2 transition-all duration-200 rounded border hover:bg-gray-400 focus:ring-2 focus:ring-blue-500"
               >
-                "{name}"
-              </Text>
-            </Box>
-          </ModalBody>
-          <ModalFooter justifyContent="flex-end">
-            <Flex>
-              <Button onClick={onDeleteModalClose} colorScheme={"gray"}>
+                <div className="flex items-center justify-center">
+                  <MdMoreVert />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={onUpdateModalOpen}>Edit</DropdownMenuItem>
+              <DropdownMenuItem onClick={onDeleteModalOpen}>Delete</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className={`${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"}`}>
+          <DialogHeader>
+            <DialogTitle>Delete Division</DialogTitle>
+          </DialogHeader>
+          <div>
+            <p className="text-lg font-semibold">
+              Are you sure you want to delete this division?
+            </p>
+
+            <p className="text-lg font-semibold text-blue-500 mt-4">
+              "{name}"
+            </p>
+          </div>
+          <DialogFooter className="flex justify-end">
+            <div className="flex gap-3">
+              <Button onClick={() => setIsDeleteModalOpen(false)} variant="outline">
                 No
               </Button>
               <Button
                 onClick={deleteBtnClicked}
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                ml={3}
+                className={`text-white ${
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                }`}
               >
                 Yes
               </Button>
-            </Flex>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      <Modal isOpen={isUpdateaModalOpen} onClose={onUpdateModalClose}>
-        <ModalOverlay />
-        <ModalHeader>Update Division</ModalHeader>
-        <ModalBody>
-          <ModalContent
-            color={colorMode === "dark" ? "gray.400" : null}
-            bg={colorMode === "light" ? "white" : "gray.800"}
-            p={4}
-            px={6}
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
+        <DialogContent className={`${colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"} p-4 px-6`}>
+          <DialogHeader>
+            <DialogTitle>Update Division</DialogTitle>
+          </DialogHeader>
+          
+          <div>
+            {/* Hidden input to capture the pk */}
+            <input
+              type="hidden"
+              {...register("pk")}
+              defaultValue={pk} // Prefill with the 'pk' prop
+            />
+          </div>
+          <div>
+            {/* Hidden input to capture the old_id */}
+            <input
+              type="hidden"
+              {...register("old_id")}
+              defaultValue={old_id} // Prefill with the 'pk' prop
+            />
+          </div>
+
+          <div
+            className="space-y-6"
+            onSubmit={handleSubmit(onUpdateSubmit)}
           >
-            <FormControl>
-              {/* Hidden input to capture the pk */}
-              <input
-                type="hidden"
-                {...register("pk")}
-                defaultValue={pk} // Prefill with the 'pk' prop
-              />
-            </FormControl>
-            <FormControl>
-              {/* Hidden input to capture the old_id */}
-              <input
-                type="hidden"
-                {...register("old_id")}
-                defaultValue={old_id} // Prefill with the 'pk' prop
-              />
-            </FormControl>
-
-            <VStack
-              spacing={6}
-              as="form"
-              id="update-form"
-              onSubmit={handleSubmit(onUpdateSubmit)}
-            >
-              <FormControl>
-                <FormLabel>Name</FormLabel>
-                <InputGroup>
-                  {/* <InputLeftAddon children={<FaSign />} /> */}
-                  <Input
-                    {...register("name", { required: true })}
-                    required
-                    type="text"
-                    defaultValue={name} // Prefill with the 'name' prop
-                  />
-                </InputGroup>
-              </FormControl>
-              <FormControl>
-                <FormLabel>Slug</FormLabel>
-
-                {/* Hidden input to capture the slug */}
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <div>
                 <Input
+                  id="name"
+                  {...register("name", { required: true })}
+                  required
                   type="text"
-                  {...register("slug")}
-                  defaultValue={slug} // Prefill with the 'pk' prop
+                  defaultValue={name} // Prefill with the 'name' prop
                 />
-              </FormControl>
-              <FormControl>
-                <UserSearchDropdown
-                  {...register("director", { required: true })}
-                  onlyInternal={false}
-                  isRequired={true}
-                  setUserFunction={setSelectedDirector}
-                  label="Director"
-                  placeholder="Search for a user..."
-                  preselectedUserPk={director}
-                  isEditable
-                  helperText={"The director of the Division"}
-                />
-              </FormControl>
-              <FormControl>
-                <UserSearchDropdown
-                  {...register("approver", { required: true })}
-                  onlyInternal={false}
-                  isRequired={true}
-                  setUserFunction={setSelectedApprover}
-                  label="Approver"
-                  placeholder="Search for a user..."
-                  preselectedUserPk={approver}
-                  isEditable
-                  helperText={"The approver of the Division"}
-                />
-              </FormControl>
-              {updateMutation.isError ? (
-                <Text color={"red.500"}>Something went wrong</Text>
-              ) : null}
-            </VStack>
-            <Grid
-              mt={10}
-              w={"100%"}
-              justifyContent={"end"}
-              gridTemplateColumns={"repeat(2, 1fr)"}
-              gridGap={4}
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="slug">Slug</Label>
+              {/* Hidden input to capture the slug */}
+              <Input
+                id="slug"
+                type="text"
+                {...register("slug")}
+                defaultValue={slug} // Prefill with the 'pk' prop
+              />
+            </div>
+            <div>
+              <UserSearchDropdown
+                {...register("director", { required: true })}
+                onlyInternal={false}
+                isRequired={true}
+                setUserFunction={setSelectedDirector}
+                label="Director"
+                placeholder="Search for a user..."
+                preselectedUserPk={director}
+                isEditable
+                helperText={"The director of the Division"}
+              />
+            </div>
+            <div>
+              <UserSearchDropdown
+                {...register("approver", { required: true })}
+                onlyInternal={false}
+                isRequired={true}
+                setUserFunction={setSelectedApprover}
+                label="Approver"
+                placeholder="Search for a user..."
+                preselectedUserPk={approver}
+                isEditable
+                helperText={"The approver of the Division"}
+              />
+            </div>
+            {updateMutation.isError ? (
+              <p className="text-red-500">Something went wrong</p>
+            ) : null}
+          </div>
+          
+          <div className="mt-10 w-full flex justify-end gap-4">
+            <Button onClick={() => setIsUpdateModalOpen(false)} size="lg">
+              Cancel
+            </Button>
+            <Button
+              disabled={updateMutation.isPending}
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-blue-500 hover:bg-blue-400" 
+                  : "bg-blue-600 hover:bg-blue-500"
+              }`}
+              size="lg"
+              onClick={() => {
+                console.log("clicked");
+                onUpdateSubmit({
+                  pk: pk,
+                  name: nameData,
+                  slug: slugData,
+                  director: selectedDirector,
+                  approver: selectedApprover,
+                });
+              }}
             >
-              <Button onClick={onUpdateModalClose} size="lg">
-                Cancel
-              </Button>
-              <Button
-                // form="update-form"
-                // type="submit"
-                isLoading={updateMutation.isPending}
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
-                size="lg"
-                onClick={() => {
-                  console.log("clicked");
-                  onUpdateSubmit({
-                    pk: pk,
-                    name: nameData,
-                    slug: slugData,
-                    director: selectedDirector,
-                    approver: selectedApprover,
-                  });
-                }}
-              >
-                Update
-              </Button>
-            </Grid>
-          </ModalContent>
-        </ModalBody>
-      </Modal>
+              Update
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   ) : null;
 };

@@ -1,21 +1,11 @@
 // Display of users above their message in chat route
 
 import type { IBranch, IBusinessArea, IImageData, IUserData } from "@/shared/types";
-import {
-	Avatar,
-	Box,
-	Drawer,
-	DrawerBody,
-	DrawerContent,
-	DrawerFooter,
-	DrawerOverlay,
-	Flex,
-	Text,
-	useColorMode,
-	useDisclosure,
-} from "@chakra-ui/react";
-import { type FC, memo } from "react";
+import { type FC, memo, useState } from "react";
 import { UserProfile } from "@/features/users/components/UserProfile";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Sheet, SheetContent, SheetTrigger } from "@/shared/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 
 interface ChatUserProps {
 	baseAPI: string;
@@ -34,6 +24,17 @@ interface ChatUserProps {
 	branches: IBranch[];
 	usernameColour?: string;
 }
+
+const getAvatarSize = (size?: string) => {
+	switch (size) {
+		case "xs": return "h-6 w-6";
+		case "sm": return "h-8 w-8";
+		case "md": return "h-10 w-10";
+		case "lg": return "h-12 w-12";
+		case "xl": return "h-16 w-16";
+		default: return "h-10 w-10";
+	}
+};
 
 export const ChatUser: FC<ChatUserProps> = memo(
 	({
@@ -54,144 +55,101 @@ export const ChatUser: FC<ChatUserProps> = memo(
 	}) => {
 		const { colorMode } = useColorMode();
 
+		// Replace useDisclosure with React state
+		const [isUserOpen, setIsUserOpen] = useState(false);
+		const onUserOpen = () => setIsUserOpen(true);
+		const onUserClose = () => setIsUserOpen(false);
+
 		const openUserDrawer = () => {
 			onUserOpen();
 		};
-		const {
-			isOpen: isUserOpen,
-			onOpen: onUserOpen,
-			onClose: onUserClose,
-		} = useDisclosure();
+
+		const avatarUrl = avatarSrc?.file
+			? avatarSrc?.file?.startsWith("http")
+				? `${avatarSrc?.file}`
+				: `${baseAPI}${avatarSrc?.file}`
+			: avatarSrc?.old_file
+				? avatarSrc?.old_file
+				: undefined;
+
 		return (
 			<>
-				<Drawer
-					isOpen={isUserOpen}
-					placement="right"
-					onClose={onUserClose}
-					size={"sm"} //by default is xs
-				>
-					<DrawerOverlay />
-					<DrawerContent>
-						<DrawerBody>
-							<UserProfile
-								pk={user.pk}
-								branches={branches}
-								businessAreas={businessAreas}
-							/>
-						</DrawerBody>
-
-						<DrawerFooter></DrawerFooter>
-					</DrawerContent>
-				</Drawer>
-				<Flex
-					flexDir="row"
-					// color="gray.500"
-					sx={{
-						alignSelf:
-							displayName === "You" ? "flex-end" : "flex-start",
-					}}
-					mt={2}
+				<Sheet open={isUserOpen} onOpenChange={setIsUserOpen}>
+					<SheetContent className="w-full sm:max-w-sm">
+						<UserProfile
+							pk={user.pk}
+							branches={branches}
+							businessAreas={businessAreas}
+						/>
+					</SheetContent>
+				</Sheet>
+				
+				<div
+					className={`flex flex-row mt-2 ${
+						displayName === "You" ? "self-end" : "self-start"
+					}`}
 				>
 					{!withoutName ? (
-						<Flex w={"100%"}>
-							<Avatar
-								size={iconSize ? iconSize : "md"}
-								src={
-									avatarSrc?.file
-										? avatarSrc?.file?.startsWith("http")
-											? `${avatarSrc?.file}`
-											: `${baseAPI}${avatarSrc?.file}`
-										: avatarSrc?.old_file
-											? avatarSrc?.old_file
-											: undefined
-								}
-								name={displayName}
-								mr={2}
-								userSelect={"none"}
-								style={{ pointerEvents: "none" }}
-								draggable={false}
-							/>
-							<Flex
-								pl={1}
-								pr={0}
-								w={"100%"}
-								h={"100%"}
-								justifyContent={"space-between"}
-								paddingRight={"40px"}
-								// bg={"red"}
-								alignItems={
-									nameCentered === true ? "center" : undefined
-								}
+						<div className="flex w-full">
+							<Avatar className={`${getAvatarSize(iconSize)} mr-2 select-none pointer-events-none`}>
+								<AvatarImage 
+									src={avatarUrl}
+									draggable={false}
+								/>
+								<AvatarFallback>{displayName.charAt(0).toUpperCase()}</AvatarFallback>
+							</Avatar>
+							<div
+								className={`pl-1 pr-0 w-full h-full flex justify-between pr-10 ${
+									nameCentered === true ? "items-center" : ""
+								}`}
 							>
-								{/* {nameCentered ? } */}
-								<Box userSelect={"none"}>
-									<Text
-										onClick={
-											otherUser
-												? openUserDrawer
-												: undefined
-										}
-										cursor={
-											otherUser ? "pointer" : undefined
-										}
-										//   bg={"red"}
-										fontWeight="bold"
-										pl={1}
-										mt={0}
-										color={
-											usernameColour
+								<div className="select-none">
+									<p
+										onClick={otherUser ? openUserDrawer : undefined}
+										className={`font-bold pl-1 mt-0 ${
+											otherUser ? "cursor-pointer" : ""
+										}`}
+										style={{
+											color: usernameColour
 												? usernameColour
 												: otherUser
 													? colorMode === "light"
-														? "blue.500"
-														: "blue.300"
+														? "#3182ce"
+														: "#63b3ed"
 													: colorMode === "light"
-														? "blackAlpha.700"
-														: "whiteAlpha.800"
-										}
+														? "rgba(0, 0, 0, 0.7)"
+														: "rgba(255, 255, 255, 0.8)"
+										}}
 									>
 										{displayName}
-									</Text>
-								</Box>
+									</p>
+								</div>
 
 								{displayDate ? (
-									<Box
-										userSelect={"none"}
-										mt={"2px"}
-										//   right={12} pos={"absolute"}
-									>
-										<Text
-											alignItems={"center"}
-											fontSize={"sm"}
-											color={
+									<div className="select-none mt-0.5">
+										<p
+											className={`text-sm ${
 												colorMode === "light"
-													? "gray.500"
-													: "gray.300"
-											}
+													? "text-gray-500"
+													: "text-gray-300"
+											}`}
 										>
 											{displayDate}
-										</Text>
-									</Box>
+										</p>
+									</div>
 								) : null}
-							</Flex>
-						</Flex>
+							</div>
+						</div>
 					) : (
-						<Avatar
-							size={iconSize ? iconSize : "md"}
-							src={
-								avatarSrc?.file !== undefined &&
-								avatarSrc?.file !== null
-									? avatarSrc?.file
-									: undefined
-							}
-							name={displayName}
-							mr={2}
-							userSelect={"none"}
-							style={{ pointerEvents: "none" }}
-							draggable={false}
-						/>
+						<Avatar className={`${getAvatarSize(iconSize)} mr-2 select-none pointer-events-none`}>
+							<AvatarImage 
+								src={avatarSrc?.file !== undefined && avatarSrc?.file !== null ? avatarSrc?.file : undefined}
+								draggable={false}
+							/>
+							<AvatarFallback>{displayName.charAt(0).toUpperCase()}</AvatarFallback>
+						</Avatar>
 					)}
-				</Flex>
+				</div>
 			</>
 		);
 	}

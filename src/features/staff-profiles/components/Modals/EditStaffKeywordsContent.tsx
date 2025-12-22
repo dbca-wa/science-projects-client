@@ -7,7 +7,7 @@ import {
 } from "@/features/staff-profiles/services/staff-profiles.service";
 // import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import type { IStaffOverviewData, IStaffProfileHeroData } from "@/shared/types";
-import { useToast } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -42,15 +42,12 @@ const EditStaffKeywordsContent = ({
     },
   });
 
-  const toast = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: updateStaffHeroSection,
     onSuccess: async () => {
-      toast({
-        status: "success",
-        title: "Updated",
-        position: "top-right",
+      toast.success("Updated", {
+        description: "Keywords updated successfully",
       });
       await queryClient.invalidateQueries({
         queryKey: ["staffHero", usersPk],
@@ -60,10 +57,8 @@ const EditStaffKeywordsContent = ({
     },
     onError: () => {
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        position: "top-right",
+      toast.error("Failed", {
+        description: "Could not update keywords",
       });
     },
     // onMutate: () => {
