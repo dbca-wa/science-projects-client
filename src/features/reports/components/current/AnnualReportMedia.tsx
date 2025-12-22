@@ -1,7 +1,7 @@
 // Section to handle the current report's media files such as images for each section, sds chart etc.
 
 import { useGetLatestReportMedia } from "@/features/reports/hooks/useGetLatestReportMedia";
-import { Box, Center, Grid, Spinner } from "@chakra-ui/react";
+import { Loader2 } from "lucide-react";
 import { ReportMediaChanger } from "@/features/admin/components/ReportMediaChanger";
 // import { useEffect } from "react";
 
@@ -17,23 +17,13 @@ export const AnnualReportMedia = ({ reportId }: Props) => {
   // });
 
   return (
-    <Box>
+    <div>
       {!reportMediaData ? (
-        <Center>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
       ) : (
-        <Grid
-          // h={"100%"}
-          gridTemplateColumns={{
-            base: "repeat(1, 1fr)",
-            lg: "repeat(2, 1fr)",
-            xl: "repeat(3, 1fr)",
-          }}
-          mt={4}
-          gap={8}
-          mx={6}
-        >
+        <div className="mx-6 mt-4 grid gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {/* <ReportMediaChanger
                   reportMediaData={reportMediaData}
                   section={"cover"}
@@ -146,8 +136,8 @@ export const AnnualReportMedia = ({ reportId }: Props) => {
                   reportPk={pk}
                   refetchData={refetchMedia}
                 /> */}
-        </Grid>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

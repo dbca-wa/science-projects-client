@@ -1,30 +1,15 @@
 import { createReport } from "@/features/admin/services/admin.service";
 import type { IReportCreation } from "@/shared/types";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  VStack,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface Props {
   isOpen: boolean;
@@ -35,7 +20,6 @@ export const AddReportModal = ({ isOpen, onClose }: Props) => {
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
   const { register, watch, reset } = useForm<IReportCreation>();
-  const toast = useToast();
 
   const [thisYear, setThisYear] = useState(new Date().getFullYear());
 
@@ -44,11 +28,7 @@ export const AddReportModal = ({ isOpen, onClose }: Props) => {
   const mutation = useMutation({
     mutationFn: createReport,
     onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Created",
-        position: "top-right",
-      });
+      toast.success("Created");
       queryClient.invalidateQueries({ queryKey: ["reports"] });
       queryClient.invalidateQueries({ queryKey: ["latestReport"] });
       reset();
@@ -70,12 +50,7 @@ export const AddReportModal = ({ isOpen, onClose }: Props) => {
       }
 
       console.log("error");
-      toast({
-        status: "error",
-        title: "Failed",
-        description: `${errorDescription}`,
-        position: "top-right",
-      });
+      toast.error(`Failed: ${errorDescription}`);
     },
     onMutate: () => {
       console.log("mutation");
@@ -88,78 +63,69 @@ export const AddReportModal = ({ isOpen, onClose }: Props) => {
   };
 
   return thisYear ? (
-    <Modal isOpen={isOpen} onClose={onClose} size={"lg"}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>Create Annual Report Info</ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`${colorMode === "dark" ? "bg-gray-800 text-gray-400" : "bg-white"} max-w-lg`}>
+        <DialogHeader>
+          <DialogTitle>Create Annual Report Info</DialogTitle>
+        </DialogHeader>
 
-        <ModalBody>
-          <VStack spacing={10}>
-            <FormControl isRequired>
-              <FormLabel>Year</FormLabel>
-              <InputGroup>
-                <Input
-                  autoFocus
-                  autoComplete="off"
-                  defaultValue={thisYear}
-                  onChange={(e) => setThisYear(Number(e.target.value))}
-                  {...register("year", { required: true, value: thisYear })}
-                  required
-                  type="number"
-                />
-              </InputGroup>
-              <FormHelperText>
-                The year for the report. e.g. Type 2023 for financial year
-                2022-23.
-              </FormHelperText>
-            </FormControl>
+        <div className="space-y-10 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="year">Year *</Label>
+            <div className="relative">
+              <Input
+                id="year"
+                autoFocus
+                autoComplete="off"
+                defaultValue={thisYear}
+                onChange={(e) => setThisYear(Number(e.target.value))}
+                {...register("year", { required: true, value: thisYear })}
+                required
+                type="number"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              The year for the report. e.g. Type 2023 for financial year
+              2022-23.
+            </p>
+          </div>
 
-            {mutation.isError ? (
-              <Box mt={4}>
-                {Object.keys((mutation.error as AxiosError).response.data).map(
-                  (key) => (
-                    <Box key={key}>
-                      {(
-                        (mutation.error as AxiosError).response.data[
-                          key
-                        ] as string[]
-                      ).map((errorMessage, index) => (
-                        <Text key={`${key}-${index}`} color="red.500">
-                          {`${key}: ${errorMessage}`}
-                        </Text>
-                      ))}
-                    </Box>
-                  ),
-                )}
-              </Box>
-            ) : null}
-          </VStack>
-        </ModalBody>
+          {mutation.isError ? (
+            <div className="mt-4">
+              {Object.keys((mutation.error as AxiosError).response.data).map(
+                (key) => (
+                  <div key={key}>
+                    {(
+                      (mutation.error as AxiosError).response.data[
+                        key
+                      ] as string[]
+                    ).map((errorMessage, index) => (
+                      <p key={`${key}-${index}`} className="text-red-500">
+                        {`${key}: ${errorMessage}`}
+                      </p>
+                    ))}
+                  </div>
+                ),
+              )}
+            </div>
+          ) : null}
+        </div>
 
-        <ModalFooter>
-          <Grid gridTemplateColumns={"repeat(2, 1fr)"}>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-3 w-full">
             <Button
-              // variant="ghost"
-              mr={3}
+              variant="outline"
               onClick={onClose}
             >
               Cancel
             </Button>
             <Button
-              // form="add-form"
-              // type="submit"
-              isLoading={mutation.isPending}
-              color={"white"}
-              background={colorMode === "light" ? "blue.500" : "blue.600"}
-              _hover={{
-                background: colorMode === "light" ? "blue.400" : "blue.500",
-              }}
-              // size="lg"
-              width={"100%"}
+              disabled={mutation.isPending || !yearData}
+              className={`${
+                colorMode === "light" 
+                  ? "bg-blue-500 hover:bg-blue-400" 
+                  : "bg-blue-600 hover:bg-blue-500"
+              } text-white`}
               onClick={() => {
                 onSubmit({
                   old_id: 1,
@@ -174,13 +140,12 @@ export const AddReportModal = ({ isOpen, onClose }: Props) => {
                   seek_update: false,
                 });
               }}
-              isDisabled={!yearData}
             >
-              Create
+              {mutation.isPending ? "Creating..." : "Create"}
             </Button>
-          </Grid>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   ) : null;
 };

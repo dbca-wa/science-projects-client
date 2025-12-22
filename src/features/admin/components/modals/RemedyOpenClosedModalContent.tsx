@@ -1,23 +1,13 @@
 import { remedyOpenClosedProjects } from "@/features/admin/services/admin.service";
 import type { IProjectData } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  List,
-  ListItem,
-  Select,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Label } from "@/shared/components/ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 interface Props {
   projects: IProjectData[];
@@ -42,50 +32,26 @@ export const RemedyOpenClosedModalContent = ({
   const { colorMode } = useColorMode();
   const [selectedStatus, setSelectedStatus] = useState<StatusOption>("active");
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const mutation = useMutation({
     mutationFn: remedyOpenClosedProjects,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Attempting to remedy open closed projects to ${selectedStatus} status`,
-        position: "top-right",
-      });
+      toast.loading(`Attempting to remedy open closed projects to ${selectedStatus} status`);
     },
     onSuccess: async (data) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Successfully updated ${data.successful} project(s) to ${selectedStatus} status`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: `Successfully updated ${data.successful} project(s) to ${selectedStatus} status`,
+      });
       refreshDataFn?.();
       onClose();
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Encountered an error",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Encountered an error", {
+        description: error?.response?.data
+          ? `${error.response.status}: ${
+              Object.values(error.response.data)[0]
+            }`
+          : "Error",
+      });
     },
   });
 
@@ -115,32 +81,33 @@ export const RemedyOpenClosedModalContent = ({
 
   return (
     <>
-      <Box>
-        <FormControl mb={4}>
-          <FormLabel>Target Status</FormLabel>
-          <Select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value as StatusOption)}
-            placeholder="Select status"
-          >
-            {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
+      <div>
+        <div className="mb-4">
+          <Label>Target Status</Label>
+          <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as StatusOption)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
-        </FormControl>
-        <Box
-          p={3}
-          mb={4}
-          bg={colorMode === "light" ? "blue.50" : "blue.900"}
-          borderRadius="md"
-          border="1px solid"
-          borderColor={colorMode === "light" ? "blue.200" : "blue.700"}
+        </div>
+        <div
+          className={`p-3 mb-4 rounded-md border ${
+            colorMode === "light" 
+              ? "bg-blue-50 border-blue-200" 
+              : "bg-blue-900 border-blue-700"
+          }`}
         >
-          <Text
-            fontSize="sm"
-            color={colorMode === "light" ? "blue.700" : "blue.200"}
+          <p
+            className={`text-sm ${
+              colorMode === "light" ? "text-blue-700" : "text-blue-200"
+            }`}
           >
             <strong>
               Action for{" "}
@@ -149,34 +116,30 @@ export const RemedyOpenClosedModalContent = ({
             </strong>
             <br />
             {getActionDescription()}
-          </Text>
-        </Box>
+          </p>
+        </div>
 
-        <Text color={colorMode === "light" ? "red.500" : "red.300"} my={2}>
+        <p className={`my-2 ${colorMode === "light" ? "text-red-500" : "text-red-300"}`}>
           Caution: All projects with an approved project closure that are in the
           open update requested state will be affected. This will set the
           project status to{" "}
           {statusOptions.find((opt) => opt.value === selectedStatus)?.label}{" "}
           status
-        </Text>
+        </p>
 
-        <Flex justifyContent={"flex-end"} py={4}>
-          <Box>
+        <div className="flex justify-end py-4">
+          <div>
             <Button
-              bg={"green.500"}
-              color={"white"}
-              _hover={{
-                bg: "green.400",
-              }}
+              className="bg-green-500 text-white hover:bg-green-400"
               onClick={onRemedy}
-              isDisabled={!selectedStatus}
+              disabled={!selectedStatus}
             >
               Remedy to{" "}
               {statusOptions.find((opt) => opt.value === selectedStatus)?.label}
             </Button>
-          </Box>
-        </Flex>
-      </Box>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

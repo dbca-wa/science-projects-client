@@ -1,10 +1,9 @@
 /**
  * Component Conversion Utilities
  * 
- * Helper functions for converting Chakra UI component props to shadcn/ui equivalents
+ * Helper functions for converting component props between different UI libraries
  */
 
-import { type VariantProps } from "class-variance-authority";
 import { cn } from "@/shared/utils";
 
 // ============================================================================
@@ -12,9 +11,9 @@ import { cn } from "@/shared/utils";
 // ============================================================================
 
 /**
- * Convert Chakra UI Button props to shadcn/ui Button props
+ * Button props interface for conversion
  */
-export interface ChakraButtonProps {
+export interface ButtonConversionProps {
   colorScheme?: "blue" | "red" | "green" | "yellow" | "gray" | "teal" | "purple" | "pink" | "orange";
   variant?: "solid" | "outline" | "ghost" | "link";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
@@ -24,8 +23,8 @@ export interface ChakraButtonProps {
   rightIcon?: React.ReactNode;
 }
 
-export function convertButtonProps(chakraProps: ChakraButtonProps) {
-  const { colorScheme, variant, size, isLoading, isDisabled, leftIcon, rightIcon, ...rest } = chakraProps;
+export function convertButtonProps(props: ButtonConversionProps) {
+  const { colorScheme, variant, size, isLoading, isDisabled, leftIcon, rightIcon, ...rest } = props;
   
   // Convert variant
   let shadcnVariant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" = "default";
@@ -64,9 +63,9 @@ export function convertButtonProps(chakraProps: ChakraButtonProps) {
 // ============================================================================
 
 /**
- * Convert Chakra UI Input props to shadcn/ui Input props
+ * Input props interface for conversion
  */
-export interface ChakraInputProps {
+export interface InputConversionProps {
   size?: "xs" | "sm" | "md" | "lg";
   variant?: "outline" | "filled" | "flushed" | "unstyled";
   isInvalid?: boolean;
@@ -76,8 +75,8 @@ export interface ChakraInputProps {
   errorBorderColor?: string;
 }
 
-export function convertInputProps(chakraProps: ChakraInputProps) {
-  const { size, variant, isInvalid, isDisabled, isReadOnly, ...rest } = chakraProps;
+export function convertInputProps(props: InputConversionProps) {
+  const { size, variant, isInvalid, isDisabled, isReadOnly, ...rest } = props;
   
   let className = "";
   
@@ -115,9 +114,9 @@ export function convertInputProps(chakraProps: ChakraInputProps) {
 // ============================================================================
 
 /**
- * Convert Chakra UI Select props to shadcn/ui Select props
+ * Select props interface for conversion
  */
-export interface ChakraSelectProps {
+export interface SelectConversionProps {
   size?: "xs" | "sm" | "md" | "lg";
   variant?: "outline" | "filled" | "flushed" | "unstyled";
   placeholder?: string;
@@ -125,8 +124,8 @@ export interface ChakraSelectProps {
   isDisabled?: boolean;
 }
 
-export function convertSelectProps(chakraProps: ChakraSelectProps) {
-  const { size, variant, placeholder, isInvalid, isDisabled, ...rest } = chakraProps;
+export function convertSelectProps(props: SelectConversionProps) {
+  const { size, variant, placeholder, isInvalid, isDisabled, ...rest } = props;
   
   return {
     placeholder,
@@ -140,9 +139,9 @@ export function convertSelectProps(chakraProps: ChakraSelectProps) {
 // ============================================================================
 
 /**
- * Convert Chakra UI Modal props to shadcn/ui Dialog props
+ * Modal props interface for conversion
  */
-export interface ChakraModalProps {
+export interface ModalConversionProps {
   isOpen: boolean;
   onClose: () => void;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "full";
@@ -153,7 +152,7 @@ export interface ChakraModalProps {
   returnFocusOnClose?: boolean;
 }
 
-export function convertModalProps(chakraProps: ChakraModalProps) {
+export function convertModalProps(props: ModalConversionProps) {
   const { 
     isOpen, 
     onClose, 
@@ -161,7 +160,7 @@ export function convertModalProps(chakraProps: ChakraModalProps) {
     closeOnOverlayClick = true, 
     closeOnEsc = true,
     ...rest 
-  } = chakraProps;
+  } = props;
   
   // Convert size to className for DialogContent
   let sizeClassName = "";
@@ -209,7 +208,7 @@ export function convertModalProps(chakraProps: ChakraModalProps) {
     onOpenChange: (open: boolean) => {
       if (!open) onClose();
     },
-    modal: true, // Always modal for Chakra compatibility
+    modal: true, // Always modal for compatibility
     sizeClassName,
     closeOnOverlayClick,
     closeOnEsc,
@@ -222,9 +221,9 @@ export function convertModalProps(chakraProps: ChakraModalProps) {
 // ============================================================================
 
 /**
- * Convert Chakra UI Tabs props to shadcn/ui Tabs props
+ * Tabs props interface for conversion
  */
-export interface ChakraTabsProps {
+export interface TabsConversionProps {
   index?: number;
   defaultIndex?: number;
   onChange?: (index: number) => void;
@@ -235,7 +234,7 @@ export interface ChakraTabsProps {
   isLazy?: boolean;
 }
 
-export function convertTabsProps(chakraProps: ChakraTabsProps) {
+export function convertTabsProps(props: TabsConversionProps) {
   const { 
     index, 
     defaultIndex, 
@@ -244,7 +243,7 @@ export function convertTabsProps(chakraProps: ChakraTabsProps) {
     variant,
     size,
     ...rest 
-  } = chakraProps;
+  } = props;
   
   // Convert to value-based system
   const defaultValue = defaultIndex !== undefined ? `tab-${defaultIndex}` : undefined;
@@ -284,16 +283,16 @@ export function convertTabsProps(chakraProps: ChakraTabsProps) {
 // ============================================================================
 
 /**
- * Convert Chakra UI Table props to shadcn/ui Table props
+ * Table props interface for conversion
  */
-export interface ChakraTableProps {
+export interface TableConversionProps {
   variant?: "simple" | "striped" | "unstyled";
   colorScheme?: string;
   size?: "sm" | "md" | "lg";
 }
 
-export function convertTableProps(chakraProps: ChakraTableProps) {
-  const { variant, size, ...rest } = chakraProps;
+export function convertTableProps(props: TableConversionProps) {
+  const { variant, size, ...rest } = props;
   
   let className = "";
   
@@ -320,17 +319,17 @@ export function convertTableProps(chakraProps: ChakraTableProps) {
 // ============================================================================
 
 /**
- * Convert Chakra UI FormControl props to shadcn/ui form structure
+ * Form control props interface for conversion
  */
-export interface ChakraFormControlProps {
+export interface FormControlConversionProps {
   isRequired?: boolean;
   isInvalid?: boolean;
   isDisabled?: boolean;
   isReadOnly?: boolean;
 }
 
-export function convertFormControlProps(chakraProps: ChakraFormControlProps) {
-  const { isRequired, isInvalid, isDisabled, isReadOnly, ...rest } = chakraProps;
+export function convertFormControlProps(props: FormControlConversionProps) {
+  const { isRequired, isInvalid, isDisabled, isReadOnly, ...rest } = props;
   
   return {
     required: isRequired,
@@ -346,9 +345,9 @@ export function convertFormControlProps(chakraProps: ChakraFormControlProps) {
 // ============================================================================
 
 /**
- * Convert Chakra UI toast options to sonner toast options
+ * Toast options interface for conversion
  */
-export interface ChakraToastOptions {
+export interface ToastConversionOptions {
   title?: string;
   description?: string;
   status?: "success" | "error" | "warning" | "info";
@@ -358,7 +357,7 @@ export interface ChakraToastOptions {
   onCloseComplete?: () => void;
 }
 
-export function convertToastOptions(chakraOptions: ChakraToastOptions) {
+export function convertToastOptions(options: ToastConversionOptions) {
   const { 
     title, 
     description, 
@@ -368,7 +367,7 @@ export function convertToastOptions(chakraOptions: ChakraToastOptions) {
     position,
     onCloseComplete,
     ...rest 
-  } = chakraOptions;
+  } = options;
   
   const sonnerOptions = {
     description,
@@ -393,18 +392,18 @@ export function convertToastOptions(chakraOptions: ChakraToastOptions) {
 /**
  * Create a migration helper for any component
  */
-export function createMigrationHelper<TChakraProps, TShadcnProps>(
-  converter: (chakraProps: TChakraProps) => TShadcnProps
+export function createMigrationHelper<TSourceProps, TTargetProps>(
+  converter: (sourceProps: TSourceProps) => TTargetProps
 ) {
-  return (chakraProps: TChakraProps): TShadcnProps => {
-    return converter(chakraProps);
+  return (sourceProps: TSourceProps): TTargetProps => {
+    return converter(sourceProps);
   };
 }
 
 /**
- * Merge Chakra props with additional className
+ * Merge props with additional className
  */
-export function mergeChakraProps<T extends { className?: string }>(
+export function mergePropsWithClassName<T extends { className?: string }>(
   props: T,
   additionalClassName?: string
 ): T {
@@ -429,15 +428,15 @@ export function extractCommonProps<T extends Record<string, any>>(
 }
 
 /**
- * Convert event handlers from Chakra to standard React patterns
+ * Convert event handlers to standard React patterns
  */
-export function convertEventHandlers(chakraHandlers: {
+export function convertEventHandlers(handlers: {
   onClick?: () => void;
   onOpen?: () => void;
   onClose?: () => void;
   onChange?: (value: any) => void;
 }) {
-  const { onClick, onOpen, onClose, onChange, ...rest } = chakraHandlers;
+  const { onClick, onOpen, onClose, onChange, ...rest } = handlers;
   
   return {
     onClick,

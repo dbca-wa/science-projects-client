@@ -11,17 +11,10 @@ import {
   IProjectPlan,
   IStudentReport,
 } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  Input,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { motion } from "framer-motion";
@@ -30,6 +23,7 @@ import { useForm } from "react-hook-form";
 import { BsStars } from "react-icons/bs";
 import { FaFileDownload } from "react-icons/fa";
 import { FcCancel } from "react-icons/fc";
+import { cn } from "@/shared/utils/component.utils";
 
 interface IPDFSectionProps {
   data_document:
@@ -54,41 +48,28 @@ export const ProjectDocumentPDFSection = ({
   const apiEndpoint = useApiEndpoint();
   const queryClient = useQueryClient();
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const toastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (message: string) => {
+    toastIdRef.current = toast.loading(message);
   };
 
   const projectDocPDFGenerationMutation = useMutation({
     mutationFn: generateProjectDocument,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Generating PDF",
-        position: "top-right",
-      });
+      addToast("Generating PDF");
     },
     onSuccess: (response: { res: AxiosResponse<any, any> }) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `PDF Generated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
       }
-      // console.log(response);
-      // console.log(response.res)
+      toast.success("PDF Generated");
+      
       const fileUrl = `${apiEndpoint}${response?.res?.data?.file}`;
 
       if (fileUrl) {
         window.open(fileUrl, "_blank");
       }
 
-      // console.log(data_document);
       queryClient.invalidateQueries({
         queryKey: ["projects", data_document?.document?.project?.pk],
       });
@@ -97,43 +78,28 @@ export const ProjectDocumentPDFSection = ({
       }, 1000);
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Generate PDF",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
       }
+      toast.error(
+        error?.response?.data
+          ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
+          : "Could Not Generate PDF"
+      );
     },
   });
 
   const cancelDocGenerationMutation = useMutation({
     mutationFn: cancelProjectDocumentGeneration,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Canceling Generation",
-        position: "top-right",
-      });
+      addToast("Canceling Generation");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Canceled`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
       }
+      toast.success("Canceled");
+      
       queryClient.invalidateQueries({
         queryKey: ["projects", data_document.document.project.pk],
       });
@@ -142,20 +108,14 @@ export const ProjectDocumentPDFSection = ({
       }, 1000);
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Cancel",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
       }
+      toast.error(
+        error?.response?.data
+          ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
+          : "Could Not Cancel"
+      );
     },
   });
 
@@ -198,9 +158,7 @@ export const ProjectDocumentPDFSection = ({
 
   return (
     <>
-      {/* <Flex> */}
-      <Box
-        as="form"
+      <form
         id="cancel-pdf-generation-form"
         onSubmit={handleCancelGenSubmit(beginCancelDocGen)}
       >
@@ -211,10 +169,9 @@ export const ProjectDocumentPDFSection = ({
             value: data_document.document.pk,
           })}
         />
-      </Box>
+      </form>
 
-      <Box
-        as="form"
+      <form
         id="pdf-generation-form"
         onSubmit={handleGenSubmit(beginProjectDocPDFGeneration)}
       >
@@ -225,105 +182,86 @@ export const ProjectDocumentPDFSection = ({
             value: data_document.document.pk,
           })}
         />
-      </Box>
-      <Flex
-        bg={colorMode === "light" ? "gray.100" : "gray.700"}
-        rounded={"2xl"}
-        p={4}
-        w={"100%"}
-        // justifyContent={"flex-end"}
-        border={"1px solid"}
-        borderColor={"gray.300"}
-        my={2}
+      </form>
+      <div
+        className={cn(
+          "rounded-2xl p-4 w-full border border-gray-300 my-2 flex",
+          colorMode === "light" ? "bg-gray-100" : "bg-gray-700"
+        )}
       >
-        <Box
-          alignSelf={"center"}
-          // bg={"red"}
-          // justifyContent={""}
-        >
-          <Text fontWeight={"semibold"}>PDF</Text>
-        </Box>
+        <div className="self-center">
+          <p className="font-semibold">PDF</p>
+        </div>
 
-        <Flex flex={1} justifyContent={"flex-end"} w={"100%"}>
+        <div className="flex flex-1 justify-end w-full">
           {data_document?.document?.pdf?.file &&
           !projectDocPDFGenerationMutation.isPending &&
           !data_document?.document?.pdf_generation_in_progress ? (
             <Button
-              as={motion.div}
-              initial={{ y: -10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 10, opacity: 0 }}
-              sx={{ transitionDuration: 0.7, animationDelay: 1 }}
+              asChild
               size={"sm"}
-              ml={2}
-              variant={"solid"}
-              color={"white"}
-              background={colorMode === "light" ? "blue.500" : "blue.600"}
-              _hover={{
-                cursor: "pointer",
-                background: colorMode === "light" ? "blue.400" : "blue.500",
-              }}
+              className={cn(
+                "ml-2 text-white",
+                colorMode === "light" ? "bg-blue-500 hover:bg-blue-400" : "bg-blue-600 hover:bg-blue-500"
+              )}
               onClick={() => downloadPDF()}
             >
-              <Box mr={2}>
-                <FaFileDownload />
-              </Box>
-              Download PDF
+              <motion.div
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 10, opacity: 0 }}
+                style={{ transitionDuration: "0.7s", animationDelay: "1s" }}
+              >
+                <div className="mr-2">
+                  <FaFileDownload />
+                </div>
+                Download PDF
+              </motion.div>
             </Button>
           ) : projectDocPDFGenerationMutation.isPending ||
             data_document?.document?.pdf_generation_in_progress ? (
             <Button
               size={"sm"}
-              ml={2}
-              variant={"solid"}
-              color={"white"}
-              background={colorMode === "light" ? "gray.400" : "gray.500"}
-              _hover={{
-                background: colorMode === "light" ? "gray.300" : "gray.400",
-              }}
-              loadingText={"Canceling"}
-              isDisabled={cancelDocGenerationMutation.isPending}
+              className={cn(
+                "ml-2 text-white",
+                colorMode === "light" ? "bg-gray-400 hover:bg-gray-300" : "bg-gray-500 hover:bg-gray-400"
+              )}
+              disabled={cancelDocGenerationMutation.isPending}
               type="submit"
               form="cancel-pdf-generation-form"
-              isLoading={cancelDocGenerationMutation.isPending}
             >
-              <Box mr={2}>
+              <div className="mr-2">
                 <FcCancel />
-              </Box>
-              Cancel
+              </div>
+              {cancelDocGenerationMutation.isPending ? "Canceling" : "Cancel"}
             </Button>
           ) : null}
 
           <Button
             size={"sm"}
-            ml={2}
-            variant={"solid"}
-            color={"white"}
-            background={colorMode === "light" ? "green.500" : "green.600"}
-            _hover={{
-              background: colorMode === "light" ? "green.400" : "green.500",
-            }}
-            loadingText={"Generation In Progress"}
-            isDisabled={
+            className={cn(
+              "ml-2 text-white",
+              colorMode === "light" ? "bg-green-500 hover:bg-green-400" : "bg-green-600 hover:bg-green-500"
+            )}
+            disabled={
               projectDocPDFGenerationMutation.isPending ||
               data_document?.document?.pdf_generation_in_progress
             }
             type="submit"
             form="pdf-generation-form"
-            isLoading={
-              projectDocPDFGenerationMutation.isPending ||
-              data_document?.document?.pdf_generation_in_progress
-            }
           >
-            <Box mr={2}>
+            <div className="mr-2">
               <BsStars />
-            </Box>
-            {data_document?.document?.pdf?.file
-              ? "Generate New"
-              : "Generate PDF"}
+            </div>
+            {projectDocPDFGenerationMutation.isPending ||
+            data_document?.document?.pdf_generation_in_progress
+              ? "Generation In Progress"
+              : data_document?.document?.pdf?.file
+                ? "Generate New"
+                : "Generate PDF"}
           </Button>
-        </Flex>
-      </Flex>
+        </div>
+      </div>
     </>
   );
 };

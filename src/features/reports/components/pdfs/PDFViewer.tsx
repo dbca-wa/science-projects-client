@@ -41,20 +41,11 @@ Props) => {
     mutationFn: generateAnnualReportPDF,
     onMutate: () => {
       toast.loading("Generating AR PDF...");
-        position: "top-right",
-      });
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Annual Report PDF Generated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Success", {
+        description: "Annual Report PDF Generated",
+      });
       queryClient.invalidateQueries({
         queryKey: [
           "annualReportPDF",
@@ -113,10 +104,6 @@ Props) => {
       // Turn off the loading toast, set the pdfDocumentData?.report?.pdf_generation_in_progress to false
       // and set the pdfDocumentData to undefined
       // setPdfDocumentData(undefined);
-    },
-    onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        console.log(error);
     },
     onError: (error: AxiosError) => {
       toast.error("Could Not Cancel", {
@@ -285,8 +272,7 @@ Props) => {
               Download PDF
             </Button>
           ) : null}
-            </Button>
-          ) : null}
+
           <Button
             size="sm"
             className={`ml-2 text-white ${

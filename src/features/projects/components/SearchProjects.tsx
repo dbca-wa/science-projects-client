@@ -1,18 +1,13 @@
 // Project search component - works/appears on the Users page with ProjectSearchContext
 
-import {
-  Box,
-  Checkbox,
-  Flex,
-  Grid,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Select,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Input } from "@/shared/components/ui/input";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Search } from "lucide-react";
 import { useEffect, useState, type ChangeEventHandler, type ChangeEvent } from "react";
 import { FiSearch } from "react-icons/fi";
+import { cn } from "@/shared/utils/cn";
 import { getAllProjectsYears } from "@/features/projects/services/projects.service";
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import SearchProjectsByUser from "./SearchProjectsByUser";
@@ -104,11 +99,8 @@ export const SearchProjects = ({ orientation }: IProps) => {
     }
   };
 
-  const handleOnlySelectedYearChange: ChangeEventHandler<
-    HTMLSelectElement
-  > = (event) => {
-    const yearValue = Number(event.target.value);
-    // console.log(yearValue);
+  const handleOnlySelectedYearChange = (value: string) => {
+    const yearValue = Number(value);
     setSearchFilters({
       onlyActive: onlyActive,
       onlyInactive: onlyInactive,
@@ -171,125 +163,108 @@ export const SearchProjects = ({ orientation }: IProps) => {
   };
   if (orientation && orientation === "vertical") {
     return (
-      <Grid
-        // bg={"red"}
-        w={"100%"}
-        h={"100%"}
-        // gridRowGap={4}
-      >
-        {/* Project Business Area Filters */}
-
-        <InputGroup borderColor="gray.200" size="sm">
-          <InputRightElement
-            pointerEvents="none"
-            children={<FiSearch color={"#9CA3AF"} />}
-          />
+      <div className="w-full h-full space-y-4">
+        {/* Project Search Input */}
+        <div className="relative">
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <FiSearch className="h-4 w-4 text-gray-400" />
+          </div>
           <Input
-            bg="white"
             placeholder="Search projects by name, keyword or tag..."
-            rounded={"5px"}
             type="text"
             value={inputValue}
             onChange={handleChange}
-            background={"transparent"}
-            color={colorMode === "dark" ? "whiteAlpha.900" : ""}
-            _placeholder={{
-              color: colorMode === "dark" ? "gray.300" : "gray.500",
-              paddingLeft: "2px",
-            }}
+            className={cn(
+              "pr-10 rounded-md",
+              colorMode === "dark" 
+                ? "bg-transparent text-white placeholder:text-gray-300" 
+                : "bg-white text-gray-900 placeholder:text-gray-500"
+            )}
           />
-        </InputGroup>
+        </div>
 
-        <Box>
+        <div>
           <SearchProjectsByUser
             handleFilterUserChange={handleFilterUserChange}
           />
-        </Box>
+        </div>
 
-        <Grid
-          // mt={1}
-          gridGap={4}
-          gridTemplateColumns={{
-            base: "repeat(1, 1fr)",
-            md: "repeat(2, 1fr)",
-          }}
-          className="flex items-center justify-end"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
           <Select
-            onChange={handleOnlySelectedYearChange}
-            size={"sm"}
-            // mx={4}
-            rounded={"5px"}
-            style={
-              colorMode === "light"
-                ? {
-                    color: "black",
-                    backgroundColor: "white",
-                    borderColor: "gray.200",
-                    caretColor: "black !important",
-                  }
-                : {
-                    color: "white",
-                    borderColor: "white",
-                    caretColor: "black !important",
-                  }
-            }
+            value={filterYear?.toString() || "0"}
+            onValueChange={handleOnlySelectedYearChange}
           >
-            <option value={0} color={"black"}>
-              All Years
-            </option>
-            {availableYears &&
-              availableYears
-                .sort((a, b) => b - a) // Sort the array numerically
-                .map((year, index) => (
-                  <option key={`${year}${index}`} value={year}>
-                    {year}
-                  </option>
-                ))}
+            <SelectTrigger className="rounded-md">
+              <SelectValue placeholder="All Years" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0">All Years</SelectItem>
+              {availableYears &&
+                availableYears
+                  .sort((a, b) => b - a)
+                  .map((year, index) => (
+                    <SelectItem key={`${year}${index}`} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+            </SelectContent>
           </Select>
-          <Checkbox
-            size="md"
-            colorScheme="green"
-            onChange={handleOnlyActiveProjectsChange}
-            isChecked={onlyActive}
-            isDisabled={onlyInactive}
-          >
-            Active
-          </Checkbox>
-          <Checkbox
-            size="md"
-            colorScheme="gray"
-            onChange={handleOnlyInactiveProjectsChange}
-            isChecked={onlyInactive}
-            isDisabled={onlyActive}
-          >
-            Inactive
-          </Checkbox>
-        </Grid>
-      </Grid>
+          
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="active-projects"
+                checked={onlyActive}
+                onCheckedChange={handleOnlyActiveProjectsChange}
+                disabled={onlyInactive}
+              />
+              <label 
+                htmlFor="active-projects" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Active
+              </label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="inactive-projects"
+                checked={onlyInactive}
+                onCheckedChange={handleOnlyInactiveProjectsChange}
+                disabled={onlyActive}
+              />
+              <label 
+                htmlFor="inactive-projects" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Inactive
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   } else {
     return (
-      <Flex>
-        <InputGroup borderColor="gray.200" size="sm">
-          <InputRightElement
-            pointerEvents="none"
-            children={<FiSearch color={"#9CA3AF"} />}
-          />
+      <div className="flex">
+        <div className="relative w-full">
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <FiSearch className="h-4 w-4 text-gray-400" />
+          </div>
           <Input
-            color={colorMode === "dark" ? "blackAlpha.800" : ""}
-            _placeholder={{
-              color: colorMode === "dark" ? "gray.500" : "gray.500",
-            }}
-            bg="white"
             placeholder="Search Projects..."
-            rounded={"5px"}
             type="text"
             value={inputValue}
             onChange={handleChange}
+            className={cn(
+              "pr-10 rounded-md bg-white",
+              colorMode === "dark" 
+                ? "text-gray-800 placeholder:text-gray-500" 
+                : "text-gray-900 placeholder:text-gray-500"
+            )}
           />
-        </InputGroup>
-      </Flex>
+        </div>
+      </div>
     );
   }
 };

@@ -1,28 +1,21 @@
 /**
- * Migration Utilities Index
+ * Shared Utilities Index
  * 
- * Central export point for migration-specific utility functions
+ * Central export point for shared utility functions
  */
 
-// Export migration utilities
-export * from "./migration.utils";
+// Export utility modules
 export * from "./theme.utils";
 export * from "./component.utils";
 
 // Export types
 export type {
-  ChakraBoxProps,
-  ChakraFlexProps,
-  ChakraGridProps,
-} from "./migration.utils";
-
-export type {
-  ChakraButtonProps,
-  ChakraInputProps,
-  ChakraSelectProps,
-  ChakraModalProps,
-  ChakraTabsProps,
-  ChakraTableProps,
-  ChakraFormControlProps,
-  ChakraToastOptions,
+  ButtonConversionProps,
+  InputConversionProps,
+  SelectConversionProps,
+  ModalConversionProps,
+  TabsConversionProps,
+  TableConversionProps,
+  FormControlConversionProps,
+  ToastConversionOptions,
 } from "./component.utils";

@@ -1,29 +1,12 @@
 import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
 import type { IBusinessArea, IReport } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -42,53 +25,34 @@ export const GenerateARPDFModal = ({ isOpen, onClose, thisReport }: Props) => {
   const [isGenerateReportButtonDisabled, setIsGenerateReportButtonDisabled] =
     useState(false);
 
-  const toast = useToast();
-  const [onMutatetype ToastId, setOnMutatetype ToastId] = useState<ToastId>();
+  const [loadingToastId, setLoadingToastId] = useState<string | number | null>(null);
 
   const generatePDFMutation = useMutation({
     mutationFn: generateReportPDF,
     onMutate: () => {
       setIsGenerateReportButtonDisabled(true);
-      const ToastId = toast({
-        position: "top-right",
-        status: "loading",
-        title: "Generating",
-        description: "Generating PDF...",
-        duration: null,
-      });
-      setOnMutatetype ToastId(ToastId);
+      const toastId = toast.loading("Generating PDF...");
+      setLoadingToastId(toastId);
     },
     onSuccess: () => {
-      toast({
-        position: "top-right",
-        status: "success",
-        title: "Complete!",
-        isClosable: true,
-        description: "Generation Complete.",
-      });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
+      }
+      toast.success("Generation Complete.");
       setIsGenerateReportButtonDisabled(false);
 
       setTimeout(() => {
         onClose();
       }, 1000);
-      if (onMutatetype ToastId) {
-        toast.close(onMutatetype ToastId);
-      }
     },
     onError: () => {
-      toast({
-        position: "top-right",
-        status: "error",
-        title: "Error!",
-        isClosable: true,
-        description: "Unable to generate PDF.",
-      });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
+      }
+      toast.error("Unable to generate PDF.");
       setTimeout(() => {
         setIsGenerateReportButtonDisabled(false);
       }, 1000);
-      if (onMutatetype ToastId) {
-        toast.close(onMutatetype ToastId);
-      }
     },
   });
 
@@ -120,135 +84,111 @@ export const GenerateARPDFModal = ({ isOpen, onClose, thisReport }: Props) => {
   const selectedSection = watch("section");
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
-      <ModalOverlay />
-      <Flex
-        as={"form"}
-        onSubmit={handleSubmit(generatePDF)}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Generate PDF?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-6xl">
+        <form onSubmit={handleSubmit(generatePDF)} className={colorMode === "dark" ? "bg-gray-800 text-gray-400" : "bg-white"}>
+          <DialogHeader>
+            <DialogTitle>Generate PDF?</DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Grid
-              gridTemplateColumns={"repeat(1, 1fr)"}
-              gridGap={10}
-              bg={colorMode === "light" ? "white" : "gray.800"}
-            >
-              <Center mt={8} display={"flex"} flexDir={"column"}>
-                <Box px={4} mb={4}>
-                  <Text fontWeight={"semibold"} fontSize={"xl"}>
-                    You are about to generate a pdf
-                    {thisReport?.year &&
-                      ` for Annual Report FY ${thisReport.year}-${
-                        thisReport.year - 1
-                      }`}
-                    .{" "}
-                  </Text>
-                </Box>
+          <div className="grid grid-cols-1 gap-10 p-6">
+            <div className="mt-8 flex flex-col items-center">
+              <div className="px-4 mb-4">
+                <p className="font-semibold text-xl">
+                  You are about to generate a pdf
+                  {thisReport?.year &&
+                    ` for Annual Report FY ${thisReport.year}-${
+                      thisReport.year - 1
+                    }`}
+                  .{" "}
+                </p>
+              </div>
 
-                <FormControl>
-                  <InputGroup>
-                    <Input
-                      type="hidden"
-                      {...register("reportId", {
-                        required: true,
-                        value: Number(thisReport?.id),
-                      })}
-                      readOnly
-                    />
-                  </InputGroup>
-                </FormControl>
+              <div className="hidden">
+                <Input
+                  type="hidden"
+                  {...register("reportId", {
+                    required: true,
+                    value: Number(thisReport?.id),
+                  })}
+                  readOnly
+                />
+              </div>
 
-                <FormControl isRequired px={80} mt={8}>
-                  <FormLabel>Section</FormLabel>
-                  <Select
-                    {...register("section", { required: true })}
-                    variant="filled"
-                    placeholder="Select a Section To Generate"
-                  >
-                    <option value={"full"}>0. Full Report</option>
+              <div className="px-80 mt-8 w-full">
+                <Label htmlFor="section">Section *</Label>
+                <Select {...register("section", { required: true })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a Section To Generate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full">0. Full Report</SelectItem>
                     {Object.entries(sectionDictionary).map(
                       ([key, value], index) => (
-                        <option key={key} value={key}>
+                        <SelectItem key={key} value={key}>
                           {index + 1}. {value}
-                        </option>
+                        </SelectItem>
                       ),
                     )}
-                  </Select>
-                  <FormHelperText>
-                    Select the section of the annual report you would like to
-                    generate
-                  </FormHelperText>
-                </FormControl>
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Select the section of the annual report you would like to
+                  generate
+                </p>
+              </div>
 
-                {!baLoading && selectedSection === "progress" && (
-                  <FormControl px={80} mt={8}>
-                    <FormLabel>Business Area</FormLabel>
-                    <Select
-                      {...register("businessArea", { required: false })}
-                      variant="filled"
-                      placeholder="Select a Business Area"
-                    >
-                      <option value={0}>All</option>
+              {!baLoading && selectedSection === "progress" && (
+                <div className="px-80 mt-8 w-full">
+                  <Label htmlFor="businessArea">Business Area</Label>
+                  <Select {...register("businessArea", { required: false })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a Business Area" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">All</SelectItem>
                       {baData?.map((ba: IBusinessArea) => (
-                        <option key={ba.name} value={Number(ba?.pk)}>
+                        <SelectItem key={ba.name} value={String(ba?.pk)}>
                           {ba.name}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </Select>
-                    <FormHelperText>
-                      This is optional, but may save time. By default, all
-                      business areas will be included.
-                    </FormHelperText>
-                  </FormControl>
-                )}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    This is optional, but may save time. By default, all
+                    business areas will be included.
+                  </p>
+                </div>
+              )}
 
-                <Text
-                  fontWeight={"semibold"}
-                  color={"red.500"}
-                  mt={8}
-                  mb={12}
-                  px={80}
-                >
-                  Note: Further PDF generations for this report will be disabled
-                  until this operation has completed.
-                </Text>
-              </Center>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+              <p className="font-semibold text-red-500 mt-8 mb-12 px-80">
+                Note: Further PDF generations for this report will be disabled
+                until this operation has completed.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "blue.500" : "blue.600"}
-                _hover={{
-                  background: colorMode === "light" ? "blue.400" : "blue.500",
-                }}
-                isLoading={generatePDFMutation.isPending}
                 type="submit"
-                isDisabled={
+                disabled={
                   generatePDFMutation.isPending ||
                   isGenerateReportButtonDisabled ||
                   !selectedSection
                 }
-                ml={3}
-                leftIcon={<FaFilePdf />}
+                className="ml-3"
               >
+                <FaFilePdf className="mr-2 h-4 w-4" />
                 Generate PDF
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

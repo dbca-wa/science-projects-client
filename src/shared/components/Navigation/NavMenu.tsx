@@ -1,22 +1,16 @@
 // Component for handling hover opening of menus on Header/Nav
 
+import { Button } from "@/shared/components/ui/button";
 import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Icon,
-  Menu,
-  MenuButton,
-  MenuList,
-  Text,
-  type TextProps,
-} from "@chakra-ui/react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 import { useState, type ReactNode } from "react";
 import { type IconType } from "react-icons";
 import { GoTriangleDown } from "react-icons/go";
 
-interface INavMenuProps extends TextProps {
+interface INavMenuProps {
   menuName?: string;
   cScheme?: string;
   hoverColor?: string;
@@ -24,12 +18,13 @@ interface INavMenuProps extends TextProps {
   leftIcon?: IconType;
   children?: ReactNode;
   noChevron?: boolean;
+  textAlign?: "left" | "center" | "right";
 }
 
 export const NavMenu = ({
   menuName,
   cScheme,
-  leftIcon,
+  leftIcon: LeftIcon,
   fColor,
   hoverColor,
   children,
@@ -53,81 +48,65 @@ export const NavMenu = ({
     setIsOpen(false);
   };
 
-  const bgStyle = isHovered
-    ? cScheme
-      ? { bg: `${cScheme}.500` }
-      : {}
-    : cScheme
-      ? `${cScheme}.500`
-      : "transparent";
-
-  const fontColorStyle = isHovered
-    ? fColor
-      ? { color: fColor }
-      : "white"
-    : fColor
-      ? fColor
-      : "whiteAlpha.700";
-
   return (
-    <Box onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <Menu isOpen={isOpen}>
-        <MenuButton
-          colorScheme={cScheme}
-          bg={bgStyle}
-          color={fontColorStyle}
-          _hover={{
-            bg: hoverColor ? hoverColor : "white",
-            color: fColor ? fColor : "black",
-          }}
-          _active={{
-            bg: hoverColor ? hoverColor : "white",
-            color: fColor ? fColor : "black",
-          }}
-          as={Button}
-          size={"sm"}
-          px={2}
-          py={5}
+    <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`px-2 py-5 min-w-[60px] outline-none focus:shadow-none ${
+              isHovered
+                ? hoverColor
+                  ? `bg-[${hoverColor}]`
+                  : "bg-white text-black"
+                : cScheme
+                  ? `bg-${cScheme}-500`
+                  : "bg-transparent"
+            } ${
+              isHovered
+                ? fColor
+                  ? `text-[${fColor}]`
+                  : "text-white"
+                : fColor
+                  ? `text-[${fColor}]`
+                  : "text-white/70"
+            }`}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className="flex items-center">
+              {LeftIcon ? (
+                <div className="flex items-center">
+                  <div className={`flex items-center justify-center ${menuName ? "mr-1.5" : ""}`}>
+                    <LeftIcon />
+                  </div>
+                  <div className={`flex items-center justify-center ${menuName ? "mr-1.5" : ""}`}>
+                    <span>{menuName}</span>
+                  </div>
+                </div>
+              ) : (
+                <span className={textAlign ? `text-${textAlign}` : ""}>{menuName}</span>
+              )}
+
+              {!noChevron && (
+                <div className="flex items-center justify-center ml-1.5">
+                  <GoTriangleDown size="12px" />
+                </div>
+              )}
+            </div>
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          className="mt-[-7.5px]"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          outline="none"
-          _focus={{ boxShadow: "none" }}
-          minW={"60px"}
-        >
-          <Flex>
-            {leftIcon ? (
-              <Box display={"flex"}>
-                <Center mr={menuName ? 1.5 : 0}>
-                  <Icon as={leftIcon} />
-                </Center>
-
-                <Center mr={menuName ? 1.5 : 0}>
-                  <Text>{menuName}</Text>
-                </Center>
-              </Box>
-            ) : textAlign ? (
-              <Text>{menuName}</Text>
-            ) : (
-              <Text>{menuName}</Text>
-            )}
-
-            {noChevron ? null : (
-              <Center ml={1.5}>
-                <GoTriangleDown size={"12px"} />
-              </Center>
-            )}
-          </Flex>
-        </MenuButton>
-
-        <MenuList
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          mt={"-7.5px"}
           onClick={handleItemClick}
         >
           {children}
-        </MenuList>
-      </Menu>
-    </Box>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };

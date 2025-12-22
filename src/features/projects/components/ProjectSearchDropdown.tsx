@@ -1,20 +1,13 @@
 // Dropdown search component for users. Displays 5 users below the search box.
 
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
-import { CloseIcon } from "@chakra-ui/icons";
-import {
-  Avatar,
-  Box,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  IconButton,
-  Input,
-  InputGroup,
-  Skeleton,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Avatar, AvatarImage } from "@/shared/components/ui/avatar";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Button } from "@/shared/components/ui/button";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { X } from "lucide-react";
 import { useEffect, useState, type RefObject, type ReactNode } from "react";
 import {
   getFullProjectSimple,
@@ -126,16 +119,10 @@ export const ProjectSearchDropdown = ({
   return (
     // isLoading ||
     userLoading ? null : (
-      <FormControl
-        isRequired={isRequired}
-        mb={4}
-        // bg={"red"}
-        w={"100%"}
-        h={"100%"}
-      >
-        <FormLabel>{label}</FormLabel>
+      <div className={`mb-4 w-full h-full ${isRequired ? 'required' : ''}`}>
+        <Label>{label}</Label>
         {selectedProject ? (
-          <Box mb={2} color="blue.500">
+          <div className="mb-2 text-blue-500">
             <SelectedProjectInput
               project={selectedProject}
               onClear={handleClearProject}
@@ -144,9 +131,9 @@ export const ProjectSearchDropdown = ({
                 preselectedProjectPk !== undefined
               }
             />
-          </Box>
+          </div>
         ) : (
-          <InputGroup>
+          <div className="relative">
             <Input
               autoComplete="off"
               ref={inputRef}
@@ -157,13 +144,13 @@ export const ProjectSearchDropdown = ({
               onFocus={() => setIsMenuOpen(true)}
               autoFocus={autoFocus ? true : false}
             />
-          </InputGroup>
+          </div>
         )}
 
         {selectedProject
           ? null
           : filteredItems.length > 0 && (
-              <Box pos="relative" w="100%">
+              <div className="relative w-full">
                 <CustomMenu isOpen={filteredItems.length > 0 && isMenuOpen}>
                   <CustomMenuList minWidth="100%">
                     {filteredItems?.map((project) => (
@@ -175,10 +162,10 @@ export const ProjectSearchDropdown = ({
                     ))}
                   </CustomMenuList>
                 </CustomMenu>
-              </Box>
+              </div>
             )}
-        <FormHelperText>{helperText}</FormHelperText>
-      </FormControl>
+        <p className="text-sm text-muted-foreground mt-1">{helperText}</p>
+      </div>
     )
   );
 };
@@ -202,17 +189,12 @@ interface CustomMenuListProps {
 
 const CustomMenu = ({ isOpen, children, ...rest }: CustomMenuProps) => {
   return (
-    <Box
-      pos="absolute"
-      w="100%"
-      bg="white"
-      boxShadow="md"
-      zIndex={1}
-      display={isOpen ? "block" : "none"}
+    <div
+      className={`absolute w-full bg-background border border-border rounded-md shadow-lg z-10 ${isOpen ? 'block' : 'hidden'}`}
       {...rest}
     >
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -233,54 +215,42 @@ const CustomMenuItem = ({ onClick, project, ...rest }: CustomMenuItemProps) => {
 
   return project ? (
     serverUrl ? (
-      <Flex
-        as="button"
+      <button
         type="button"
-        w="100%"
-        textAlign="left"
-        p={2}
+        className={`w-full text-left p-3 flex items-center hover:bg-accent hover:text-accent-foreground transition-colors ${isHovered ? 'bg-accent' : 'bg-transparent'}`}
         onClick={handleClick}
         onMouseOver={() => setIsHovered(true)}
         onMouseOut={() => setIsHovered(false)}
-        bg={isHovered ? "gray.200" : "transparent"}
-        alignItems="center"
         {...rest}
       >
         {project?.image ? (
-          <Skeleton
-            isLoaded={imageLoaded}
-            startColor="gray.200"
-            endColor="gray.400"
-            rounded={"full"}
-          >
-            <Avatar
-              src={
-                project.image
-                  ? project.image?.file?.startsWith("http")
-                    ? `${project.image?.file}`
-                    : `${serverUrl}${project.image?.file}`
-                  : noImage
-              }
-              onLoad={handleImageLoad}
-            />
-          </Skeleton>
+          <div className={`${!imageLoaded ? 'animate-pulse' : ''}`}>
+            <Avatar className="w-8 h-8">
+              <AvatarImage
+                src={
+                  project.image
+                    ? project.image?.file?.startsWith("http")
+                      ? `${project.image?.file}`
+                      : `${serverUrl}${project.image?.file}`
+                    : noImage
+                }
+                onLoad={handleImageLoad}
+              />
+            </Avatar>
+          </div>
         ) : (
-          <Avatar src={noImage} onLoad={handleImageLoad} />
+          <Avatar className="w-8 h-8">
+            <AvatarImage src={noImage} onLoad={handleImageLoad} />
+          </Avatar>
         )}
 
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="start"
-          ml={3}
-          h="100%"
-        >
+        <div className="flex items-center justify-start ml-3 h-full">
           <ExtractedHTMLTitle
             htmlContent={`${project?.title}`}
             color={"green.500"}
           />
-        </Box>
-      </Flex>
+        </div>
+      </button>
     ) : null
   ) : null;
 };
@@ -291,9 +261,9 @@ const CustomMenuList = ({
   ...rest
 }: CustomMenuListProps) => {
   return (
-    <Box pos="relative" w="100%" minWidth={minWidth} {...rest}>
+    <div className={`relative w-full`} style={{ minWidth }} {...rest}>
       {children}
-    </Box>
+    </div>
   );
 };
 
@@ -314,42 +284,26 @@ const SelectedProjectInput = ({
   const { colorMode } = useColorMode();
   const serverUrl = useApiEndpoint();
 
-  // useEffect(() => {
-  //   console.log(`proj image alone: ${project.image?.file}`)
-  //   console.log(`proj image with serverurl: ${serverUrl}${project.image?.file}`,)
-  // })
   return serverUrl ? (
-    <Flex
-      align="center"
-      position="relative"
-      bgColor={colorMode === "dark" ? "gray.700" : "gray.100"}
-      borderRadius="md"
-      px={2}
-      py={1}
-      mr={2}
-    >
-      <Avatar
-        size="sm"
-        src={
-          project.image
-            ? project.image?.file?.startsWith("http")
-              ? `${project.image?.file}`
-              : `${serverUrl}${project.image?.file}`
-            : noImage
-          // project?.image?.file
-          //   ? project.image?.file
-          //   : project.image?.old_file
-          //     ? project.image.old_file
-          //     : noImage
-        }
-      />
-      <ExtractedHTMLTitle
-        ml={2}
-        htmlContent={`${project?.title}`}
-        color={colorMode === "light" ? "green.500" : "green.400"}
-      />
+    <div className={`flex items-center relative px-3 py-2 mr-2 rounded-md border ${colorMode === "dark" ? "bg-muted border-border" : "bg-muted border-border"}`}>
+      <Avatar className="w-8 h-8">
+        <AvatarImage
+          src={
+            project.image
+              ? project.image?.file?.startsWith("http")
+                ? `${project.image?.file}`
+                : `${serverUrl}${project.image?.file}`
+              : noImage
+          }
+        />
+      </Avatar>
+      <div className="ml-2 flex-1">
+        <ExtractedHTMLTitle
+          htmlContent={`${project?.title}`}
+          color={colorMode === "light" ? "green.500" : "green.400"}
+        />
+      </div>
       <input
-        // {...register("project", { required: true })}
         value={projectPk}
         onChange={() => {
           setProjectPk(project.pk);
@@ -358,17 +312,15 @@ const SelectedProjectInput = ({
       />
 
       {!isPreselected && (
-        <IconButton
-          aria-label="Clear selected user"
-          icon={<CloseIcon />}
-          size="xs"
-          position="absolute"
-          top="50%"
-          right={2}
-          transform="translateY(-50%)"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="ml-2 h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
           onClick={onClear}
-        />
+        >
+          <X className="h-3 w-3" />
+        </Button>
       )}
-    </Flex>
+    </div>
   ) : null;
 };

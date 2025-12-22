@@ -1,4 +1,5 @@
-import { extendTheme } from "@chakra-ui/react";
+// Legacy theme configuration - now handled by Tailwind CSS and next-themes
+// This file is kept for reference but no longer used
 
 const config = {
   initialColorMode: "light",
@@ -23,9 +24,10 @@ const breakpoints = {
   "4xl": "2832",
 };
 
-const theme = extendTheme({
-  config,
-  breakpoints,
-});
+// Theme configuration is now handled by:
+// - Tailwind CSS for styling and responsive breakpoints
+// - next-themes for theme switching
+// - shadcn/ui components for consistent design system
+// - CSS custom properties in globals.css
 
-export default theme;
+export default null;

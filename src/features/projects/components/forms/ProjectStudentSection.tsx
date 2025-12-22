@@ -2,19 +2,10 @@
 
 import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
 import type { IAffiliation } from "@/shared/types";
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Icon,
-  InputGroup,
-  InputLeftAddon,
-  Select,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useEffect, useState } from "react";
 import { HiAcademicCap } from "react-icons/hi";
 import { IoIosCreate } from "react-icons/io";
@@ -49,11 +40,11 @@ export const ProjectStudentSection = ({
   const titleBorderColor = `${
     colorMode === "light"
       ? hoveredTitle
-        ? "blackAlpha.300"
-        : "blackAlpha.200"
+        ? "border-gray-400"
+        : "border-gray-300"
       : hoveredTitle
-        ? "whiteAlpha.400"
-        : "whiteAlpha.300"
+        ? "border-white/40"
+        : "border-white/30"
   }`;
 
   const [level, setLevel] = useState<string>("");
@@ -130,18 +121,6 @@ export const ProjectStudentSection = ({
 
   return (
     <>
-      {/* <UnboundStatefulEditor
-        title="Organisation"
-        placeholder="Enter the academic organisation..."
-        helperText={"The academic organisation of the student"}
-        showToolbar={false}
-        showTitle={true}
-        isRequired={true}
-        value={organisation}
-        setValueFunction={setOrganisation}
-        setValueAsPlainText={true}
-      /> */}
-
       <AffiliationCreateSearchDropdown
         autoFocus
         isRequired
@@ -156,84 +135,69 @@ export const ProjectStudentSection = ({
       />
       {organisation}
 
-      <FormControl pb={6} isRequired userSelect={"none"}>
-        <FormLabel
+      <div className="pb-6 select-none">
+        <Label
           onMouseEnter={() => setHoveredTitle(true)}
           onMouseLeave={() => setHoveredTitle(false)}
+          className="required"
         >
           Level
-        </FormLabel>
-        <InputGroup>
-          <InputLeftAddon
-            left={0}
-            bg={colorMode === "light" ? "gray.100" : "whiteAlpha.300"}
-            px={4}
-            zIndex={1}
-            borderColor={titleBorderColor}
-            borderTopRightRadius={"none"}
-            borderBottomRightRadius={"none"}
-            borderRight={"none"}
-            // boxSize={10}
+        </Label>
+        <div className="flex">
+          <div
+            className={`flex items-center justify-center px-4 z-[1] border border-r-0 rounded-l-md ${titleBorderColor} ${
+              colorMode === "light" ? "bg-gray-100" : "bg-white/30"
+            }`}
           >
-            <Icon as={HiAcademicCap} boxSize={5} />
-          </InputLeftAddon>
+            <HiAcademicCap className="w-5 h-5" />
+          </div>
 
           <Select
-            placeholder={"Select a level"}
-            borderLeft={"none"}
-            borderTopLeftRadius={"none"}
-            borderBottomLeftRadius={"none"}
-            pl={"2px"}
-            borderLeftColor={"transparent"}
+            value={level}
+            onValueChange={setLevel}
             onMouseEnter={() => setHoveredTitle(true)}
             onMouseLeave={() => setHoveredTitle(false)}
-            // {...register("title", {
-            //     value: data?.title,
-            // })}
-            onChange={(e) => {
-              setLevel(e.target.value);
-            }}
-            value={level}
           >
-            <option value="phd">PhD</option>
-            <option value="msc">MSc</option>
-            <option value="honours">BSc Honours</option>
-            <option value="fourth_year">Fourth Year</option>
-            <option value="third_year">Third Year</option>
-            <option value="undergrad">Undergradate</option>
+            <SelectTrigger className="border-l-0 rounded-l-none pl-[2px] border-l-transparent">
+              <SelectValue placeholder="Select a level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="phd">PhD</SelectItem>
+              <SelectItem value="msc">MSc</SelectItem>
+              <SelectItem value="honours">BSc Honours</SelectItem>
+              <SelectItem value="fourth_year">Fourth Year</SelectItem>
+              <SelectItem value="third_year">Third Year</SelectItem>
+              <SelectItem value="undergrad">Undergradate</SelectItem>
+            </SelectContent>
           </Select>
-        </InputGroup>
+        </div>
 
-        <FormHelperText>
+        <p className="text-sm text-gray-500 mt-1">
           The level of the student and the project
-        </FormHelperText>
-      </FormControl>
-      <Flex w={"100%"} justifyContent={"flex-end"} pb={4}>
-        <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-          <Button colorScheme="gray" onClick={backClick}>
+        </p>
+      </div>
+      <div className="w-full flex justify-end pb-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Button variant="outline" onClick={backClick}>
             Back
           </Button>
 
           <Button
-            ml={3}
-            type="submit"
-            color={"white"}
-            background={colorMode === "light" ? "blue.500" : "blue.600"}
-            _hover={{
-              background: colorMode === "light" ? "blue.400" : "blue.500",
-            }}
-            isDisabled={!studentFilled}
+            className={`text-white ${
+              colorMode === "light" 
+                ? "bg-blue-500 hover:bg-blue-400" 
+                : "bg-blue-600 hover:bg-blue-500"
+            }`}
+            disabled={!studentFilled}
             onClick={() => {
-              // console.log("Here is the student data");
-              // console.log(studentData);
               createClick();
             }}
-            rightIcon={<IoIosCreate />}
           >
+            <IoIosCreate className="mr-2 h-4 w-4" />
             Create
           </Button>
-        </Grid>
-      </Flex>
+        </div>
+      </div>
     </>
   );
 };

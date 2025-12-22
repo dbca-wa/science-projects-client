@@ -1,24 +1,14 @@
 import type { ProjectStatus } from "@/shared/types";
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { IoIosCreate } from "react-icons/io";
+import { cn } from "@/shared/utils/cn";
 import { type ISetProjectStatusProps, setProjectStatus } from "@/features/projects/services/projects.service";
 
 interface Props {
@@ -36,36 +26,18 @@ export const SetProjectStatusModal = ({
   onClose,
   onFunctionSuccess,
 }: Props) => {
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
   const setProjectStatusMutation = useMutation({
     mutationFn: setProjectStatus,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Setting Project Status`,
-        position: "top-right",
-      });
+      toast.loading("Setting Project Status...");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Project status updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-        onFunctionSuccess?.();
-      }
+      toast.dismiss();
+      toast.success("Project status updated");
+      onFunctionSuccess?.();
 
       setTimeout(async () => {
         queryClient.invalidateQueries({
@@ -78,16 +50,8 @@ export const SetProjectStatusModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not set project status`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.error(`Could not set project status: ${error}`);
     },
   });
 
@@ -99,64 +63,65 @@ export const SetProjectStatusModal = ({
   const [statusData, setStatusData] = useState<ProjectStatus>(null);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
-      <ModalOverlay />
-      <Flex
-        as={"form"}
-        // onSubmit={handleSubmit(setAreas)}
-      >
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Set Project Areas</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn(
+        "max-w-2xl",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <DialogHeader>
+          <DialogTitle>Set Project Status</DialogTitle>
+        </DialogHeader>
 
-          <ModalBody>
-            <>
-              <FormControl isRequired>
-                <FormLabel>Status</FormLabel>
-                <Select
-                  onChange={(e) =>
-                    setStatusData(e.target.value as ProjectStatus)
-                  }
-                >
-                  <option value={"new"}>New</option>
-                  <option value={"pending"}>Pending</option>
-                  <option value={"active"}>Active</option>
-                  <option value={"updating"}>Update Requested</option>
-                  <option value={"closure_requested"}>Closure Requested</option>
-                  <option value={"completed"}>Completed</option>
-                  <option value={"terminated"}>Terminated</option>
-                  <option value={"suspended"}>Suspended</option>
-                </Select>
-              </FormControl>
-              <Flex w={"100%"} justifyContent={"flex-end"} my={4}>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button
-                  ml={3}
-                  // type="submit"
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
-                  rightIcon={<IoIosCreate />}
-                  isDisabled={!projectPk || !statusData}
-                  onClick={() =>
-                    onSetProjectStatus({
-                      projectId: Number(projectPk),
-                      status: statusData,
-                    })
-                  }
-                >
-                  Set Status
-                </Button>
-              </Flex>
-            </>
-          </ModalBody>
-        </ModalContent>
-      </Flex>
-    </Modal>
+        <div className="py-4">
+          <div className="space-y-2">
+            <Label className="required">Status</Label>
+            <Select
+              value={statusData || ""}
+              onValueChange={(value) => setStatusData(value as ProjectStatus)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="new">New</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="updating">Update Requested</SelectItem>
+                <SelectItem value="closure_requested">Closure Requested</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="terminated">Terminated</SelectItem>
+                <SelectItem value="suspended">Suspended</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <div className="flex justify-end gap-3 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className={cn(
+                "text-white",
+                colorMode === "light" 
+                  ? "bg-blue-500 hover:bg-blue-400" 
+                  : "bg-blue-600 hover:bg-blue-500"
+              )}
+              disabled={!projectPk || !statusData}
+              onClick={() =>
+                onSetProjectStatus({
+                  projectId: Number(projectPk),
+                  status: statusData,
+                })
+              }
+            >
+              <IoIosCreate className="mr-2 h-4 w-4" />
+              Set Status
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

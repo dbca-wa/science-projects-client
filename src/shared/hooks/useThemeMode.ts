@@ -1,7 +1,7 @@
 import { useTheme } from "next-themes";
 
 /**
- * Custom hook that provides a Chakra-like interface for theme management
+ * Custom hook that provides theme management interface
  * using next-themes under the hood
  */
 export const useThemeMode = () => {

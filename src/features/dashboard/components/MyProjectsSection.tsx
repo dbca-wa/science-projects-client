@@ -1,6 +1,6 @@
 // Component for displaying the projects the user is involved in on the dashboard (modern)
 
-import { Box, Center, Grid, Spinner, Text } from "@chakra-ui/react";
+import { Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { IProjectData } from "@/shared/types";
 import { ModernProjectCard } from "@/features/projects/components/cards/ModernProjectCard";
@@ -13,26 +13,17 @@ interface IProjectSection {
 export const MyProjectsSection = ({ data, loading }: IProjectSection) => {
   // Combine the arrays in the desired order: inprogress, todo, done
   return loading === true ? (
-    <Center height="200px">
-      <Spinner size="lg" />
-    </Center>
+    <div className="flex h-[200px] items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>
   ) : (
     <AnimatePresence>
       {data.length === 0 ? (
-        <Box w={"100%"} h={"100%"}>
-          <Text>Your projects will be shown here...</Text>
-        </Box>
+        <div className="h-full w-full">
+          <p>Your projects will be shown here...</p>
+        </div>
       ) : (
-        <Grid
-          mt={8}
-          gridTemplateColumns={{
-            base: "repeat(1, 1fr)",
-            "740px": "repeat(2, 1fr)",
-            lg: "repeat(3, 1fr)",
-            xl: "repeat(4, 1fr)",
-          }}
-          gridGap={8}
-        >
+        <div className="mt-8 grid gap-8 grid-cols-1 min-[740px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {data.map((project: IProjectData, index: number) => {
             return (
               <motion.div
@@ -69,7 +60,7 @@ export const MyProjectsSection = ({ data, loading }: IProjectSection) => {
               </motion.div>
             );
           })}
-        </Grid>
+        </div>
       )}
     </AnimatePresence>
   );

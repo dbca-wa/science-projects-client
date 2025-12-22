@@ -5,19 +5,13 @@ import {
   handleMethodologyImage,
 } from "@/features/projects/services/projects.service";
 import type { IProjectPlan } from "@/shared/types";
-import {
-  Button,
-  Center,
-  Icon,
-  Spinner,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
 import { FaSave, FaTrash } from "react-icons/fa";
+import { Loader2 } from "lucide-react";
 import "@/styles/texteditor.css";
 
 interface Props {
@@ -42,10 +36,20 @@ export const SaveMethodologyImageButton = ({
   const { colorMode } = useColorMode();
   const toolTipText = `${buttonType === "post" ? "Save" : buttonType === "update" ? "Update" : "Delete"} Methodology Image`;
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const toastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (message: string, type: "loading" | "success" | "error") => {
+    if (type === "loading") {
+      toastIdRef.current = toast.loading(message);
+    } else {
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
+      }
+      if (type === "success") {
+        toast.success(message);
+      } else {
+        toast.error(message);
+      }
+    }
   };
 
   // const { register, handleSubmit, watch } = useForm<IHandleMethodologyImage>();
@@ -56,50 +60,30 @@ export const SaveMethodologyImageButton = ({
   const handleMethImageMutation = useMutation({
     mutationFn: handleMethodologyImage,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title:
-          buttonType === "update"
-            ? "Updating..."
-            : buttonType === "delete"
-              ? "Deleting..."
-              : "Saving...",
-        position: "top-right",
-      });
+      addToast(
+        buttonType === "update"
+          ? "Updating..."
+          : buttonType === "delete"
+            ? "Deleting..."
+            : "Saving...",
+        "loading"
+      );
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `${buttonType === "update" ? "Updated" : buttonType === "delete" ? "Deleted" : "Saved"} Methodology Image`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      addToast(
+        `${buttonType === "update" ? "Updated" : buttonType === "delete" ? "Deleted" : "Saved"} Methodology Image`,
+        "success"
+      );
       if (buttonType === "delete") {
-        onDeleteEntry();
+        onDeleteEntry?.();
       }
       refetch();
-      //   setTimeout(() => {
-      //     if (softRefetch) {
-      //       softRefetch();
-      //     }
-      //     setIsEditorOpen(false);
-      //   }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could Not ${buttonType.charAt(0).toUpperCase() + buttonType.slice(1)}`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      addToast(
+        `Could Not ${buttonType.charAt(0).toUpperCase() + buttonType.slice(1)}: ${error}`,
+        "error"
+      );
     },
   });
 
@@ -110,28 +94,16 @@ export const SaveMethodologyImageButton = ({
   return (
     <div className="tooltip-container">
       <Button
-        bg={
-          colorMode === "light"
-            ? buttonType === "delete"
-              ? "red.500"
-              : "green.500"
-            : buttonType === "delete"
-              ? "red.600"
-              : "green.600"
-        }
-        color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.800"}
-        _hover={{
-          color: "white",
-          bg:
-            buttonType !== "delete"
-              ? colorMode === "light"
-                ? "green.600"
-                : "green.700"
-              : colorMode === "light"
-                ? "red.600"
-                : "red.700",
-        }}
-        isDisabled={
+        className={`rounded-full p-0 m-0 max-w-[35px] max-h-[40px] text-white ${
+          buttonType === "delete"
+            ? colorMode === "light"
+              ? "bg-red-500 hover:bg-red-600"
+              : "bg-red-600 hover:bg-red-700"
+            : colorMode === "light"
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-green-600 hover:bg-green-700"
+        }`}
+        disabled={
           handleMethImageMutation.isPending || buttonType === "delete"
             ? !document?.methodology_image
             : !canSave || !file
@@ -144,26 +116,19 @@ export const SaveMethodologyImageButton = ({
             file: file,
           });
         }}
-        rounded={"full"}
-        p={0}
-        m={0}
-        maxW={{ base: "35px", lg: "35px" }}
-        maxH={{ base: "40px", lg: "40px" }}
       >
         {handleMethImageMutation.isPending ? (
-          <Center>
-            <Spinner size="sm" />
-          </Center>
+          <div className="flex items-center justify-center">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
         ) : (
-          <Icon
-            as={buttonType === "delete" ? FaTrash : FaSave}
-            boxSize={{
-              base: 5,
-              lg: 6,
-            }}
-            w={{ base: "20px", lg: "20px" }}
-            h={{ base: "20px", lg: "20px" }}
-          />
+          <div className="flex items-center justify-center">
+            {buttonType === "delete" ? (
+              <FaTrash className="w-5 h-5 lg:w-6 lg:h-6" />
+            ) : (
+              <FaSave className="w-5 h-5 lg:w-6 lg:h-6" />
+            )}
+          </div>
         )}
       </Button>
       {toolTipText && <span className="tooltip-text">{toolTipText}</span>}

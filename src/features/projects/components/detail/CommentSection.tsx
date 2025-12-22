@@ -4,17 +4,12 @@ import { useBranches } from "@/features/admin/hooks/useBranches";
 import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
 import { useGetDocumentComments } from "@/features/documents/hooks/useGetDocumentComments";
 import type { IMainDoc, IProjectData, IUserData, IUserMe } from "@/shared/types";
-import {
-  Box,
-  Center,
-  Divider,
-  Grid,
-  Spinner,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Separator } from "@/shared/components/ui/separator";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { cn } from "@/shared/utils/component.utils";
+import { Loader2 } from "lucide-react";
 
 export interface IDocumentComment {
   document: IMainDoc;
@@ -62,23 +57,21 @@ export const CommentSection = ({
   const businessAreas = useBusinessAreas();
 
   return (
-    <Box
-      bg={colorMode === "light" ? "gray.100" : "gray.700"}
-      rounded={"lg"}
-      p={4}
-      my={2}
+    <div
+      className={cn(
+        "rounded-lg p-4 my-2",
+        colorMode === "light" ? "bg-gray-100" : "bg-gray-700"
+      )}
     >
       <div className="flex flex-col items-center justify-between">
-        <Text fontWeight={"bold"} fontSize={"xl"} mb={2}>
-          Comments
-        </Text>
-        <Text fontWeight={"semibold"} fontSize={"xs"} textColor={"gray.500"}>
+        <h2 className="font-bold text-xl mb-2">Comments</h2>
+        <p className="font-semibold text-xs text-gray-500">
           Type @ followed by a user's name to mention them. An email will be
           sent to mentioned users. Note: You can mention team members, BA leads,
           and admin.
-        </Text>
+        </p>
       </div>
-      <Box mt={4} mb={2}>
+      <div className="mt-4 mb-2">
         <CommentRichTextEditor
           baseAPI={baseAPI}
           userData={userData}
@@ -89,17 +82,17 @@ export const CommentSection = ({
           businessAreas={businessAreas?.baData}
           project={project}
         />
-      </Box>
+      </div>
       {!isRepainting && !documentCommentsLoading ? (
         <>
           {documentCommentsData.length >= 1 ? (
-            <Box mb={4}>
-              <Divider orientation="horizontal" colorScheme={"linkedin"} />
-            </Box>
+            <div className="mb-4">
+              <Separator orientation="horizontal" />
+            </div>
           ) : null}
 
           <AnimatePresence>
-            <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+            <div className="grid grid-cols-1">
               {documentCommentsData?.map((comment, index) => {
                 // if (comment.is_public && !comment.is_removed) {
                 return (
@@ -131,14 +124,14 @@ export const CommentSection = ({
                 );
                 // }
               })}
-            </Grid>
+            </div>
           </AnimatePresence>
         </>
       ) : (
-        <Center my={4}>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center items-center my-4">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

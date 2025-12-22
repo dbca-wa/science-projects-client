@@ -1,18 +1,10 @@
 // Maps out the document provided to the rich text editor components for student report documents.
 
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Select,
-  Spinner,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { useState, useEffect } from "react";
+import { Button } from "@/shared/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { BsPlus } from "react-icons/bs";
 import { getStudentReportForYear } from "@/features/reports/services/reports.service";
 import { useCheckUserInTeam } from "@/features/users/hooks/useCheckUserInTeam";
@@ -27,6 +19,8 @@ import { CreateStudentReportModal } from "@/features/reports/components/modals/C
 import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { CommentSection } from "./CommentSection";
 import { UnifiedDocumentActions } from "./DocActions/UnifiedDocumentActions";
+import { cn } from "@/shared/utils/component.utils";
+import { Loader2 } from "lucide-react";
 
 interface Props extends ICaretakerPermissions {
   documents: IStudentReport[];
@@ -131,11 +125,7 @@ export const StudentReportContents = ({
     setSelectedYear(Number(event.target.value));
   };
 
-  const {
-    isOpen: isCreateStudentReportModalOpen,
-    onOpen: onOpenCreateStudentReportModal,
-    onClose: onCloseCreateStudentReportModal,
-  } = useDisclosure();
+  const [isCreateStudentReportModalOpen, setIsCreateStudentReportModalOpen] = useState(false);
 
   const isBaLead = mePk === baLead;
   const isFullyApproved =
@@ -160,92 +150,78 @@ export const StudentReportContents = ({
       <CreateStudentReportModal
         projectPk={selectedStudentReport?.document?.project?.pk}
         documentKind="studentreport"
-        onClose={onCloseCreateStudentReportModal}
+        onClose={() => setIsCreateStudentReportModalOpen(false)}
         isOpen={isCreateStudentReportModalOpen}
         refetchData={refetch}
       />
 
       {/* Selector */}
-      <Box
-        padding={4}
-        rounded={"xl"}
-        border={"1px solid"}
-        borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-        mb={8}
-        width={"100%"}
+      <div
+        className={cn(
+          "p-4 rounded-xl border w-full mb-8",
+          colorMode === "light" ? "border-gray-300" : "border-gray-500"
+        )}
       >
-        <Flex width={"100%"} justifyContent={"space-between"}>
+        <div className="w-full flex justify-between">
           {(isBaLead || userInTeam || userData?.is_superuser) && (
-            <Center>
+            <div className="flex items-center justify-center">
               <Button
-                background={colorMode === "light" ? "orange.500" : "orange.600"}
-                color={"white"}
-                _hover={{
-                  background:
-                    colorMode === "light" ? "orange.400" : "orange.500",
-                }}
-                size={"sm"}
-                onClick={
-                  onOpenCreateStudentReportModal
-                  // () => spawnProgressReport(
-                  //     {
-                  //         project_pk: projectPlanData?.document?.project?.id ? projectPlanData.document.project.id : projectPlanData.document.project.pk,
-                  //         kind: "progressreport"
-                  //     }
-                  // )
-                }
-                isDisabled={
+                className={cn(
+                  "text-white",
+                  colorMode === "light" 
+                    ? "bg-orange-500 hover:bg-orange-400" 
+                    : "bg-orange-600 hover:bg-orange-500"
+                )}
+                size="sm"
+                onClick={() => setIsCreateStudentReportModalOpen(true)}
+                disabled={
                   availableStudentYearsData?.length < 1 ||
                   documents[0].document?.project?.status === "suspended"
                 }
-                leftIcon={<BsPlus size={"20px"} />}
               >
+                <BsPlus className="mr-2" size="20px" />
                 New Report
               </Button>
-            </Center>
+            </div>
           )}
 
-          <Center flex={1} justifyContent={"flex-end"}>
-            <Flex alignItems={"center"}>
-              <Text
-                mr={3}
-                fontWeight={"semibold"}
-                fontSize={"md"}
-                color={colorMode === "light" ? "gray.600" : "gray.200"}
+          <div className="flex-1 flex justify-end items-center">
+            <div className="flex items-center">
+              <p
+                className={cn(
+                  "mr-3 font-semibold text-base",
+                  colorMode === "light" ? "text-gray-600" : "text-gray-200"
+                )}
               >
                 Selected
-              </Text>
+              </p>
               <Select
-                value={selectedYear}
-                onChange={(event) => handleNewYearSelection(event)}
-                minW={"100px"}
+                value={selectedYear.toString()}
+                onValueChange={(value) => {
+                  setIsLoading(true);
+                  setSelectedYear(Number(value));
+                }}
               >
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {`FY ${year - 1} - ${String(year).slice(2)}`}
-                  </option>
-                ))}
+                <SelectTrigger className="min-w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {`FY ${year - 1} - ${String(year).slice(2)}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
-            </Flex>
-          </Center>
-        </Flex>
-      </Box>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {isLoading ? (
-        <Box
-          minH={"100vh"}
-          display="flex" // Use display: flex to enable flexbox layout
-          justifyContent="center" // Center horizontally
-          pt={"50px"}
-        >
-          <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="xl"
-          />
-        </Box>
+        <div className="min-h-screen flex justify-center pt-12">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        </div>
       ) : (
         <motion.div
           initial={{ y: -10, opacity: 0 }}

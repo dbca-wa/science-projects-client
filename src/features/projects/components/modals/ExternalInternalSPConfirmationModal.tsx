@@ -2,22 +2,15 @@
 // Will send an email out to users marked as is_biometrician, is_herb_curator, or is_aec
 
 import {
-  Box,
-  Text,
-  Button,
-  Checkbox,
-  Flex,
-  Grid,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  useColorMode,
-  Center,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useState } from "react";
 
 interface Props {
@@ -40,76 +33,73 @@ export const ExternalInternalSPConfirmationModal = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
-      <ModalOverlay />
-      <Flex>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Is this an externally led project?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`max-w-2xl ${
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      }`}>
+        <DialogHeader>
+          <DialogTitle>Is this an externally led project?</DialogTitle>
+        </DialogHeader>
 
-          <ModalBody>
-            <Center mt={6} display={"flex"} flexDir={"column"}>
-              <Grid mt={2}>
+        <div className="p-4">
+          <div className="mt-6 flex flex-col items-center">
+            <div className="mt-2">
+              <div className="flex items-center space-x-2">
                 <Checkbox
-                  defaultChecked={isExternalSP}
-                  // value={!isInternalSP}
-                  onChange={() => setIsExternalSP((prev) => !prev)}
-                >
+                  id="external-project"
+                  checked={isExternalSP}
+                  onCheckedChange={() => setIsExternalSP((prev) => !prev)}
+                />
+                <label htmlFor="external-project" className="text-sm font-medium">
                   Yes, this is an externally led project
-                </Checkbox>
-              </Grid>
-              {isExternalSP ? (
-                <Box my={4}>
-                  <Text color={"blue.500"}>
-                    As this is an externally led project, a concept plan will
-                    NOT be created.{" "}
-                  </Text>
-                  <Text color={"blue.500"}>
-                    Instead a project plan will be created.
-                  </Text>
-                </Box>
-              ) : (
-                <Box my={4}>
-                  <Text color={"blue.500"}>
-                    As this is not an externally led project, a concept plan
-                    will be created.
-                  </Text>
-                </Box>
-              )}
-            </Center>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
-                Cancel
-              </Button>
+                </label>
+              </div>
+            </div>
+            {isExternalSP ? (
+              <div className="my-4">
+                <p className="text-blue-500">
+                  As this is an externally led project, a concept plan will
+                  NOT be created.{" "}
+                </p>
+                <p className="text-blue-500">
+                  Instead a project plan will be created.
+                </p>
+              </div>
+            ) : (
+              <div className="my-4">
+                <p className="text-blue-500">
+                  As this is not an externally led project, a concept plan
+                  will be created.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
 
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }}
-                ml={3}
-                isDisabled={buttonDisabled}
-                onClick={async () => {
-                  setButtonDisabled(true);
-                  await mutationFunction();
-                  setButtonDisabled(false);
-
-                  onClose();
-                }}
-              >
-                Create
-              </Button>
-            </Grid>
-            {}
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            <Button
+              className={`text-white ${
+                colorMode === "light" 
+                  ? "bg-green-500 hover:bg-green-400" 
+                  : "bg-green-600 hover:bg-green-500"
+              }`}
+              disabled={buttonDisabled}
+              onClick={async () => {
+                setButtonDisabled(true);
+                await mutationFunction();
+                setButtonDisabled(false);
+                onClose();
+              }}
+            >
+              Create
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

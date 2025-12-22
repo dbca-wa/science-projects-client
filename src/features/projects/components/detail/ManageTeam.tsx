@@ -1,13 +1,6 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Grid,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { useState, useEffect } from "react";
+import { Button } from "@/shared/components/ui/button";
 import { BsPlus } from "react-icons/bs";
 import {
   DndContext,
@@ -35,6 +28,7 @@ import { TeamMemberDisplay } from "./TeamMemberDisplay";
 import { useBranches } from "@/features/admin/hooks/useBranches";
 import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
 import { SortableTeamMember } from "./SortableTeamMember";
+import { cn } from "@/shared/utils/component.utils";
 
 interface Props extends ICaretakerPermissions {
   project_id: number;
@@ -84,11 +78,7 @@ export const ManageTeam = ({
     }
   }, [teamData, isTeamLoading, rerenderKey]);
 
-  const {
-    isOpen: isAddUserModalOpen,
-    onOpen: onOpenAddUserModal,
-    onClose: onCloseAddUserModal,
-  } = useDisclosure();
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const { colorMode } = useColorMode();
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -162,26 +152,24 @@ export const ManageTeam = ({
   return (
     !userLoading &&
     !isTeamLoading && (
-      <Box
-        minH="100px"
+      <div
+        className={cn(
+          "min-h-[100px] rounded-lg mb-4 p-4 mt-6",
+          colorMode === "light" ? "bg-gray-100" : "bg-gray-700"
+        )}
         key={rerenderKey}
-        bg={colorMode === "light" ? "gray.100" : "gray.700"}
-        rounded="lg"
-        mb={4}
-        p={4}
-        mt={6}
       >
-        <Grid gridTemplateColumns="9fr 3fr" mb={4}>
-          <Text
-            fontWeight="bold"
-            fontSize="lg"
-            color={colorMode === "light" ? "gray.800" : "gray.100"}
-            userSelect="none"
+        <div className="grid grid-cols-[9fr_3fr] mb-4">
+          <h3
+            className={cn(
+              "font-bold text-lg select-none",
+              colorMode === "light" ? "text-gray-800" : "text-gray-100"
+            )}
           >
             Project Team
-          </Text>
+          </h3>
 
-          <Flex w="100%" justifyContent="flex-end">
+          <div className="w-full flex justify-end">
             {(userData.is_superuser ||
               userIsCaretakerOfAdmin ||
               userData.pk === ba_leader ||
@@ -191,31 +179,32 @@ export const ManageTeam = ({
               <>
                 <Button
                   size="sm"
-                  onClick={onOpenAddUserModal}
-                  leftIcon={<BsPlus />}
-                  bg={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    bg: colorMode === "light" ? "green.400" : "green.500",
-                  }}
-                  color="white"
-                  userSelect="none"
+                  onClick={() => setIsAddUserModalOpen(true)}
+                  className={cn(
+                    "text-white select-none",
+                    colorMode === "light" 
+                      ? "bg-green-500 hover:bg-green-400" 
+                      : "bg-green-600 hover:bg-green-500"
+                  )}
                 >
+                  <BsPlus className="mr-2" />
                   Invite Member
                 </Button>
                 <AddUserToProjectModal
                   isOpen={isAddUserModalOpen}
-                  onClose={onCloseAddUserModal}
+                  onClose={() => setIsAddUserModalOpen(false)}
                   preselectedProject={project_id}
                   refetchTeamData={refetchTeamData}
                 />
               </>
             )}
-          </Flex>
-          <Box>
-            <Text
-              fontSize="sm"
-              color={colorMode === "light" ? "gray.600" : "gray.400"}
-              userSelect="none"
+          </div>
+          <div>
+            <p
+              className={cn(
+                "text-sm select-none",
+                colorMode === "light" ? "text-gray-600" : "text-gray-400"
+              )}
             >
               To reassign the project leader, click a user's name and promote
               them. This will set other users with leader role to Science
@@ -223,9 +212,9 @@ export const ManageTeam = ({
               Click a member's name to adjust their details and role for this
               project. Project and Business Area leads can click and drag a user
               to re-arrange order.
-            </Text>
-          </Box>
-        </Grid>
+            </p>
+          </div>
+        </div>
 
         {teamData.length > 0 ? (
           canManageTeam ? (
@@ -262,7 +251,7 @@ export const ManageTeam = ({
               </SortableContext>
             </DndContext>
           ) : (
-            <Grid rounded="xl" mt={4} overflow="hidden">
+            <div className="rounded-xl mt-4 overflow-hidden">
               {rearrangedTeam.filter((tm) => tm.user).map((tm, index) => (
                 <TeamMemberDisplay
                   key={index}
@@ -289,10 +278,10 @@ export const ManageTeam = ({
                   baData={baData}
                 />
               ))}
-            </Grid>
+            </div>
           )
         ) : null}
-      </Box>
+      </div>
     )
   );
 };

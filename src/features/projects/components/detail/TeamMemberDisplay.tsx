@@ -1,6 +1,6 @@
 // Component for showing details regarding a team member. Dragging adjusts the position of the team member.
 
-import { Avatar } from "@/shared/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
 import { Sheet, SheetContent } from "@/shared/components/ui/sheet";
 import { Badge } from "@/shared/components/ui/badge";
@@ -61,15 +61,15 @@ export const TeamMemberDisplay = ({
   const { colorMode } = useColorMode();
 
   const roleColors: { [key: string]: { bg: string; color: string } } = {
-    "Science Support": { bg: "green.700", color: "white" },
-    "Project Leader": { bg: "orange.700", color: "white" },
-    "Academic Supervisor": { bg: "blue.500", color: "white" },
-    "Supervised Student": { bg: "blue.400", color: "whiteAlpha.900" },
-    "Technical Support": { bg: "orange.900", color: "white" },
-    "Consulted Peer": { bg: "green.200", color: "black" },
-    "External Collaborator": { bg: "gray.200", color: "black" },
-    "External Peer": { bg: "gray.300", color: "black" },
-    "Involved Group": { bg: "gray.500", color: "white" },
+    "Science Support": { bg: "bg-green-700", color: "text-white" },
+    "Project Leader": { bg: "bg-orange-700", color: "text-white" },
+    "Academic Supervisor": { bg: "bg-blue-500", color: "text-white" },
+    "Supervised Student": { bg: "bg-blue-400", color: "text-white" },
+    "Technical Support": { bg: "bg-orange-900", color: "text-white" },
+    "Consulted Peer": { bg: "bg-green-200", color: "text-black" },
+    "External Collaborator": { bg: "bg-gray-200", color: "text-black" },
+    "External Peer": { bg: "bg-gray-300", color: "text-black" },
+    "Involved Group": { bg: "bg-gray-500", color: "text-white" },
   };
 
   type Role =
@@ -149,8 +149,10 @@ export const TeamMemberDisplay = ({
         </SheetContent>
       </Sheet>
       <div
-        className={`flex justify-between items-center p-4 ${
-          colorMode === "light" ? "bg-white" : "bg-gray-800"
+        className={`flex justify-between items-center p-4 rounded-lg border transition-all duration-200 ${
+          colorMode === "light" 
+            ? "bg-background border-border" 
+            : "bg-background border-border"
         } hover:shadow-xl hover:z-[999] ${
           colorMode === "light"
             ? "hover:shadow-black/30"
@@ -158,19 +160,20 @@ export const TeamMemberDisplay = ({
         }`}
       >
         {/* Left Section */}
-        <div className="flex p-4">
+        <div className="flex p-4 w-full">
           <div className="relative">
-            <Avatar
-              className="mt-1 w-12 h-12 select-none pointer-events-none cursor-pointer"
-              src={
-                image?.file
-                  ? `${baseURL}${image.file}`
-                  : image?.old_file
-                    ? `${baseURL}${image.old_file}`
-                    : ""
-              }
-              onClick={onUserOpen}
-            />
+            <Avatar className="mt-1 w-12 h-12 select-none cursor-pointer">
+              <AvatarImage
+                src={
+                  image?.file
+                    ? `${baseURL}${image.file}`
+                    : image?.old_file
+                      ? `${baseURL}${image.old_file}`
+                      : ""
+                }
+                onClick={onUserOpen}
+              />
+            </Avatar>
             {is_leader && (
               <div className="absolute -top-1 right-[38%] text-yellow-300">
                 <FaCrown />
@@ -178,11 +181,11 @@ export const TeamMemberDisplay = ({
             )}
           </div>
 
-          <div className="ml-4 grid grid-cols-1 select-none">
+          <div className="ml-4 grid grid-cols-1 select-none flex-1">
             <div className="flex flex-row gap-2 items-center">
               <Button
                 variant="link"
-                className={`ml-0.5 justify-start text-lg cursor-pointer ${
+                className={`ml-0.5 justify-start text-lg cursor-pointer p-0 h-auto ${
                   colorMode === "light" 
                     ? "text-blue-500 hover:text-blue-400" 
                     : "text-blue-600 hover:text-blue-500"
@@ -202,12 +205,13 @@ export const TeamMemberDisplay = ({
                         className="flex items-center gap-2 select-none cursor-pointer"
                         onClick={onCaretakerOpen}
                       >
-                        <Avatar
-                          className="mt-1 w-6 h-6"
-                          src={
-                            caretaker?.image ? `${baseURL}${caretaker?.image}` : ""
-                          }
-                        />
+                        <Avatar className="mt-1 w-6 h-6">
+                          <AvatarImage
+                            src={
+                              caretaker?.image ? `${baseURL}${caretaker?.image}` : ""
+                            }
+                          />
+                        </Avatar>
                         <p className="text-blue-500 text-xs flex justify-center">
                           ({caretaker.display_first_name}{" "}
                           {caretaker.display_last_name} is caretaking)
@@ -224,11 +228,9 @@ export const TeamMemberDisplay = ({
             <div>
               <Badge
                 className={`justify-center ${
-                  roleArray.find((item) => item.role === role)?.bg ? 
-                    `bg-${roleArray.find((item) => item.role === role)?.bg}` : ""
+                  roleArray.find((item) => item.role === role)?.bg || "bg-gray-500"
                 } ${
-                  roleArray.find((item) => item.role === role)?.color ?
-                    `text-${roleArray.find((item) => item.role === role)?.color}` : ""
+                  roleArray.find((item) => item.role === role)?.color || "text-white"
                 }`}
               >
                 {roleArray.find((item) => item.role === role)?.displayName ??

@@ -1,11 +1,5 @@
-import {
-  Checkbox,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  InputGroup,
-} from "@chakra-ui/react";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Label } from "@/shared/components/ui/label";
 import { useEffect, useState } from "react";
 import type { ISimpleLocationData } from "@/shared/types";
 
@@ -76,35 +70,36 @@ export const AreaCheckAndMaps = ({
   };
 
   return (
-    <FormControl mb={4}>
-      <FormLabel>{title}</FormLabel>
-      <InputGroup>
-        <Grid
-          gridTemplateColumns={"repeat(3, 1fr)"}
-          gridGap={3}
-          py={4}
-          gridColumnGap={10}
-        >
+    <div className="mb-4">
+      <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2 block">
+        {title}
+      </Label>
+      <div>
+        <div className="grid grid-cols-3 gap-3 py-4 gap-x-10">
           {areas?.map((area, index) => {
             const isAllCheckbox = area.name.toLowerCase().startsWith("all ");
             const isChecked = selectedAreas.includes(area.pk);
             const isDisabled = isAllSelected && !isAllCheckbox;
 
             return (
-              <Flex key={index}>
+              <div key={index} className="flex items-center space-x-2">
                 <Checkbox
                   id={`checkbox-${area_type}-${area.pk}`}
-                  isChecked={isChecked}
-                  isDisabled={isDisabled}
-                  onChange={(e) => handleCheckboxChange(area, e.target.checked)}
+                  checked={isChecked}
+                  disabled={isDisabled}
+                  onCheckedChange={(checked) => handleCheckboxChange(area, checked)}
+                />
+                <Label
+                  htmlFor={`checkbox-${area_type}-${area.pk}`}
+                  className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   {area.name}
-                </Checkbox>
-              </Flex>
+                </Label>
+              </div>
             );
           })}
-        </Grid>
-      </InputGroup>
-    </FormControl>
+        </div>
+      </div>
+    </div>
   );
 };

@@ -2,14 +2,12 @@
 
 import { CreateProject } from "@/pages/projects/CreateProject";
 import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  useColorMode,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 interface IModalProps {
   isOpen: boolean;
@@ -20,19 +18,17 @@ export const CreateProjectPageModal = ({ isOpen, onClose }: IModalProps) => {
   const { colorMode } = useColorMode();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>Create Project</ModalHeader>
-        <ModalCloseButton />
-
-        <ModalBody>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`max-w-6xl ${
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      }`}>
+        <DialogHeader>
+          <DialogTitle>Create Project</DialogTitle>
+        </DialogHeader>
+        <div className="p-4">
           <CreateProject />
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

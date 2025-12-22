@@ -22,6 +22,7 @@ import { useUpdatePage } from "@/shared/hooks/useUpdatePage";
 import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { AnimatedToggleButton } from "./AnimatedToggleButton";
+import { cn } from "@/shared/utils/component.utils";
 
 const buttonWidthVariants = {
   open: {
@@ -160,65 +161,46 @@ export const Sidebar = () => {
   };
 
   return (
-    <Box
-      as={motion.div}
+    <motion.div
       initial={false}
       variants={sidebarVariants}
       animate={open ? "open" : "closed"}
-      pos={"relative"}
-      p={"1.5rem"}
-      px={open ? "1.25rem" : 4}
-      pt={"0.5rem"}
-      // maxW={"12.5rem"}
-      minH={"100vh"}
-      display={"flex"}
-      flexDir={"column"}
-      borderRightWidth="1px"
-      borderRightColor={colorMode === "light" ? "gray.300" : "whiteAlpha.400"}
-      bg={colorMode === "light" ? "white" : "blackAlpha.400"}
+      className={cn(
+        "relative p-6 pt-2 min-h-screen flex flex-col border-r",
+        open ? "px-5" : "px-4",
+        colorMode === "light" 
+          ? "border-gray-300 bg-white" 
+          : "border-white/40 bg-black/40"
+      )}
     >
-      <Box
-        w={5}
-        h={5}
-        pos={"absolute"}
-        cursor={"pointer"}
-        rounded={"full"}
-        top={"0.75rem"}
-        right={"-2rem"}
-        zIndex={2}
-        transitionDuration={"500ms"}
-        transform={!open ? "rotate(-180deg)" : undefined}
+      <div
+        className={cn(
+          "w-5 h-5 absolute cursor-pointer rounded-full top-3 -right-8 z-[2] transition-transform duration-500 border flex items-center justify-center",
+          !open ? "rotate-180" : "",
+          colorMode === "light" 
+            ? "text-black border-gray-400" 
+            : "text-white/90 border-white/60"
+        )}
         onClick={handleToggleSidebar}
-        color={colorMode === "light" ? "black" : "whiteAlpha.900"}
-        borderColor={colorMode === "light" ? "gray.400" : "whiteAlpha.600"}
-        borderWidth="1px"
       >
-        <Center rounded={"full"} ml={"-1.25px"} mt={"-1px"} w={5} h={5}>
-          <Icon as={AiOutlineLeft} boxSize={"2"} />
-        </Center>
-      </Box>
+        <AiOutlineLeft className="w-2 h-2 -ml-0.5 -mt-px" />
+      </div>
 
-      <Flex
-        flexDirection={open ? "row" : "column"}
-        transitionDuration={"500ms"}
-        w={"100%"}
-        alignItems={"center"}
+      <div
+        className={cn(
+          "transition-all duration-500 w-full flex items-center",
+          open ? "flex-row" : "flex-col"
+        )}
       >
         <Button
-          flex={1}
-          textColor={
-            colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
-          }
-          transformOrigin={"bottom"}
-          fontWeight={"500"}
-          fontSize={"xl"}
-          transitionDuration={"300ms"}
-          textAlign={"center"}
-          variant={"unstyled"}
+          className={cn(
+            "flex-1 font-medium text-xl transition-all duration-300 text-center",
+            colorMode === "light" ? "text-black/90" : "text-white/90"
+          )}
+          variant="ghost"
           onClick={(e) => {
             if (e.ctrlKey || e.metaKey) {
-              // Handle Ctrl + Click (or Command + Click on Mac)
-              window.open(`/`, "_blank"); // Opens in a new tab
+              window.open(`/`, "_blank");
             } else {
               setActiveMenu("Home");
               updatePageContext("/");
@@ -227,131 +209,74 @@ export const Sidebar = () => {
         >
           SPMS
         </Button>
-      </Flex>
+      </div>
 
-      <Grid
-        pt={2}
-        flexDirection={"column"}
-        justifyItems="center"
-        transitionDuration={"500ms"}
-      >
+      <div className="pt-2 flex flex-col items-center transition-all duration-500">
         {Menus.map((menu, index) => (
-          <Box key={index} width={"100%"}>
+          <div key={index} className="w-full">
             {menu.section && (
-              <Divider
-                mt={"1rem"}
-                mb={"1rem"}
-                dir="horizontal"
-                color={"white"}
-              />
+              <Separator className="mt-4 mb-4" />
             )}
             <Button
-              as={motion.div}
-              variants={buttonWidthVariants}
-              initial={false}
-              animate={buttonTransition}
-              position={"relative"}
-              display={"block"}
-              // display="inline-block"
-              overflow={"hidden"}
-              fontSize={"0.875rem"}
-              lineHeight={"1.25rem"}
-              borderRadius={"0.375rem"}
-              cursor={"pointer"}
-              mt={"0.5rem"}
-              p={"0.5rem"}
-              // px={open ? "1.25rem" : 0}
-              variant={"unstyled"}
-              bg={
+              asChild
+              className={cn(
+                "relative block overflow-hidden text-sm leading-5 rounded-md cursor-pointer mt-2 p-2 w-full justify-start",
                 colorMode === "light"
                   ? activeMenu === menu.title
-                    ? "blue.500"
-                    : undefined
+                    ? "bg-blue-500 text-white hover:bg-blue-500 hover:text-white"
+                    : "text-black/80 hover:text-black hover:bg-gray-100"
                   : activeMenu === menu.title
-                    ? "blue.500"
-                    : undefined
-              }
-              color={
-                colorMode === "light"
-                  ? activeMenu === menu.title
-                    ? "white"
-                    : "blackAlpha.800"
-                  : activeMenu === menu.title
-                    ? "whiteAlpha.800"
-                    : "whiteAlpha.800"
-              }
-              _hover={
-                colorMode === "light"
-                  ? activeMenu === menu.title
-                    ? {
-                        color: "white",
-                        bg: "blue.500",
-                      }
-                    : {
-                        color: "black",
-                        bg: "gray.100",
-                      }
-                  : activeMenu === menu.title
-                    ? {
-                        color: "whiteAlpha.800",
-                        bg: "blue.400",
-                      }
-                    : {
-                        color: "whiteAlpha.800",
-                        bg: "blue.400",
-                      }
-              }
-              onClick={(e) => {
-                if (e.ctrlKey || e.metaKey) {
-                  // Handle Ctrl + Click (or Command + Click on Mac)
-                  window.open(`${menu.route}`, "_blank"); // Opens in a new tab
-                } else {
-                  setActiveMenu(menu.title);
-                  updatePageContext(menu.route);
-                }
-              }}
+                    ? "bg-blue-500 text-white/80 hover:bg-blue-400 hover:text-white/80"
+                    : "text-white/80 hover:text-white/80 hover:bg-blue-400"
+              )}
             >
-              <Icon
-                color={
-                  colorMode === "light"
-                    ? activeMenu === menu.title
-                      ? "whiteAlpha.900"
-                      : "blackAlpha.700"
-                    : "whiteAlpha.800"
-                }
-                as={menu.img}
-                boxSize={5}
-                position="absolute"
-                left={open ? "1rem" : "50%"}
-                transform={open ? "none" : "translateX(-50%)"}
-              />
-              <motion.span
-                variants={textVariants}
+              <motion.div
+                variants={buttonWidthVariants}
                 initial={false}
-                animate={open ? "open" : "closed"}
-                style={{
-                  display: "inline-block",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  marginLeft: open ? "1rem" : 0,
+                animate={buttonTransition}
+                onClick={(e) => {
+                  if (e.ctrlKey || e.metaKey) {
+                    window.open(`${menu.route}`, "_blank");
+                  } else {
+                    setActiveMenu(menu.title);
+                    updatePageContext(menu.route);
+                  }
                 }}
-                onAnimationComplete={handleTextAnimationComplete}
               >
-                {menu.title}
-              </motion.span>
+                <menu.img
+                  className={cn(
+                    "w-5 h-5 absolute",
+                    open ? "left-4" : "left-1/2 -translate-x-1/2",
+                    colorMode === "light"
+                      ? activeMenu === menu.title
+                        ? "text-white/90"
+                        : "text-black/70"
+                      : "text-white/80"
+                  )}
+                />
+                <motion.span
+                  variants={textVariants}
+                  initial={false}
+                  animate={open ? "open" : "closed"}
+                  className="inline-block whitespace-nowrap overflow-hidden"
+                  style={{
+                    marginLeft: open ? "1rem" : 0,
+                  }}
+                  onAnimationComplete={handleTextAnimationComplete}
+                >
+                  {menu.title}
+                </motion.span>
+              </motion.div>
             </Button>
-          </Box>
+          </div>
         ))}
-      </Grid>
+      </div>
 
-      <Grid
-        mt={"auto"}
-        alignSelf={"end"}
-        justifyContent={"end"}
-        gridTemplateColumns={open ? "repeat(2, 1fr)" : "repeat(1, 1fr)"}
-        w="100%"
-        gap={open ? 4 : 0}
-        justifyItems="center"
+      <div
+        className={cn(
+          "mt-auto self-end justify-end w-full gap-4 flex items-center justify-center",
+          open ? "grid grid-cols-2" : "grid grid-cols-1 gap-0"
+        )}
       >
         <ToggleLayout />
         <AnimatedToggleButton
@@ -359,7 +284,7 @@ export const Sidebar = () => {
           buttonComponent={<ToggleDarkMode />}
           delay={200}
         />
-      </Grid>
-    </Box>
+      </div>
+    </motion.div>
   );
 };

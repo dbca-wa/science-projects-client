@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
 import { useEffect } from "react";
 
 interface IPublicationsProps {

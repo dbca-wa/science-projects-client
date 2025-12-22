@@ -47,6 +47,7 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { useColorMode } from "@/shared/utils/theme.utils";
+import { cn } from "@/shared/utils/cn";
 
 interface IModalProps {
   isOpen: boolean;
@@ -250,29 +251,28 @@ export const EditUserDetailsModal = ({
   // useEffect(() => console.log({ user, userData }), [user, userData]);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleToastClose} size={"3xl"}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>Edit User?</ModalHeader>
-        <ModalCloseButton />
-        <Flex as={"form"} onSubmit={handleSubmit(onSubmit)} id="edit-details">
-          <ModalBody>
+    <Dialog open={isOpen} onOpenChange={handleToastClose}>
+      <DialogContent className={cn(
+        "max-w-4xl",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <DialogHeader>
+          <DialogTitle>Edit User?</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)} id="edit-details" className="flex flex-col">
+          <div className="flex-1 px-6 py-4">
             {!userLoading && (
-              <Tabs isFitted variant="enclosed">
-                <TabList mb="1em">
-                  <Tab>Base Information</Tab>
-                  <Tab>Profile</Tab>
-                  <Tab>Organisation</Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
+              <Tabs defaultValue="base" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-4">
+                  <TabsTrigger value="base">Base Information</TabsTrigger>
+                  <TabsTrigger value="profile">Profile</TabsTrigger>
+                  <TabsTrigger value="organisation">Organisation</TabsTrigger>
+                </TabsList>
+                <TabsContent value="base" className="space-y-4">
                     {!userLoading && (
                       <>
-                        <FormControl my={2} mb={4} userSelect="none">
-                          <InputGroup>
+                        <div className="my-2 mb-4 select-none">
+                          <div className="w-full">
                             <Input
                               autoComplete="off"
                               type="hidden"
@@ -282,73 +282,63 @@ export const EditUserDetailsModal = ({
                               })}
                               readOnly
                             />
-                          </InputGroup>
-                        </FormControl>
-                        <Grid
-                          gridColumnGap={8}
-                          gridTemplateColumns={"repeat(2, 1fr)"}
-                        >
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-8">
                           {/* Title */}
-                          <FormControl my={2} mb={4} userSelect={"none"}>
-                            <FormLabel
+                          <div className="my-2 mb-4 select-none">
+                            <Label
                               onMouseEnter={() => setHoveredTitle(true)}
                               onMouseLeave={() => setHoveredTitle(false)}
                             >
                               Title
-                            </FormLabel>
+                            </Label>
 
-                            <InputGroup>
-                              <InputLeftAddon
-                                left={0}
-                                bg="transparent"
-                                pl={2}
-                                zIndex={1}
-                                borderColor={titleBorderColor}
-                                borderTopRightRadius={"none"}
-                                borderBottomRightRadius={"none"}
-                                borderRight={"none"}
-                              >
-                                <Icon as={GiGraduateCap} />
-                              </InputLeftAddon>
+                            <div className="flex">
+                              <div className={cn(
+                                "flex items-center justify-center px-3 bg-transparent border border-r-0 rounded-l-md",
+                                titleBorderColor
+                              )}>
+                                <GiGraduateCap className="h-4 w-4" />
+                              </div>
                               <Select
-                                placeholder={"Select a title"}
-                                borderLeft={"none"}
-                                borderTopLeftRadius={"none"}
-                                borderBottomLeftRadius={"none"}
-                                pl={"0.5px"}
-                                borderLeftColor={"transparent"}
-                                onMouseEnter={() => setHoveredTitle(true)}
-                                onMouseLeave={() => setHoveredTitle(false)}
-                                {...register("title", {
-                                  value: userData?.title,
-                                })}
+                                onValueChange={(value) => setValue("title", value)}
+                                defaultValue={userData?.title}
+                                onOpenChange={(open) => {
+                                  if (open) setHoveredTitle(true);
+                                  else setHoveredTitle(false);
+                                }}
                               >
-                                <option value="dr">Dr</option>
-                                <option value="mr">Mr</option>
-                                <option value="mrs">Mrs</option>
-                                <option value="ms">Ms</option>
-                                <option value="aprof">A/Prof</option>
-                                <option value="prof">Prof</option>
+                                <SelectTrigger className="rounded-l-none border-l-0">
+                                  <SelectValue placeholder="Select a title" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="dr">Dr</SelectItem>
+                                  <SelectItem value="mr">Mr</SelectItem>
+                                  <SelectItem value="mrs">Mrs</SelectItem>
+                                  <SelectItem value="ms">Ms</SelectItem>
+                                  <SelectItem value="aprof">A/Prof</SelectItem>
+                                  <SelectItem value="prof">Prof</SelectItem>
+                                </SelectContent>
                               </Select>
-                            </InputGroup>
+                            </div>
                             {errors.title && (
-                              <FormErrorMessage>
+                              <p className="text-red-500 text-sm mt-1">
                                 {errors.title.message}
-                              </FormErrorMessage>
+                              </p>
                             )}
-                          </FormControl>
+                          </div>
 
                           {/* Phone */}
-                          <FormControl my={2} mb={4} userSelect={"none"}>
-                            <FormLabel>Phone</FormLabel>
-                            <InputGroup>
-                              <InputLeftElement>
-                                <Icon as={AiFillPhone} />
-                              </InputLeftElement>
+                          <div className="my-2 mb-4 select-none">
+                            <Label>Phone</Label>
+                            <div className="relative">
+                              <AiFillPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                               <Input
                                 autoComplete="off"
                                 type="text"
-                                placeholder={"Enter a phone number"}
+                                placeholder="Enter a phone number"
+                                className="pl-10"
                                 {...register("phone", {
                                   pattern: {
                                     value: phoneValidationPattern,
@@ -357,25 +347,24 @@ export const EditUserDetailsModal = ({
                                   value: userData?.phone,
                                 })}
                               />
-                            </InputGroup>
+                            </div>
                             {errors.phone && (
-                              <FormErrorMessage>
+                              <p className="text-red-500 text-sm mt-1">
                                 {errors.phone.message}
-                              </FormErrorMessage>
+                              </p>
                             )}
-                          </FormControl>
+                          </div>
 
                           {/* Fax */}
-                          <FormControl my={2} mb={4} userSelect={"none"}>
-                            <FormLabel>Fax</FormLabel>
-                            <InputGroup>
-                              <InputLeftElement>
-                                <Icon as={MdFax} />
-                              </InputLeftElement>
+                          <div className="my-2 mb-4 select-none">
+                            <Label>Fax</Label>
+                            <div className="relative">
+                              <MdFax className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                               <Input
                                 autoComplete="off"
                                 type="text"
-                                placeholder={"Enter a fax number"}
+                                placeholder="Enter a fax number"
+                                className="pl-10"
                                 {...register("fax", {
                                   pattern: {
                                     value: phoneValidationPattern,
@@ -384,37 +373,34 @@ export const EditUserDetailsModal = ({
                                   value: userData?.fax,
                                 })}
                               />
-                            </InputGroup>
+                            </div>
                             {errors.fax && (
-                              <FormErrorMessage>
+                              <p className="text-red-500 text-sm mt-1">
                                 {errors.fax.message}
-                              </FormErrorMessage>
+                              </p>
                             )}
-                          </FormControl>
+                          </div>
 
                           {/* Email */}
-                          <FormControl my={2} mb={4} userSelect={"none"}>
-                            <FormLabel>Email</FormLabel>
-                            <InputGroup>
-                              <InputLeftElement>
-                                <Icon as={GrMail} />
-                              </InputLeftElement>
+                          <div className="my-2 mb-4 select-none">
+                            <Label>Email</Label>
+                            <div className="relative">
+                              <GrMail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                               <Input
                                 type="email"
                                 placeholder={userData?.email}
                                 value={userData?.email}
-                                isDisabled={true}
+                                disabled={true}
+                                className="pl-10"
                               />
-                            </InputGroup>
-                          </FormControl>
+                            </div>
+                          </div>
 
                           {/* First Name */}
-                          <FormControl my={2} mb={4} userSelect={"none"}>
-                            <FormLabel>First Name</FormLabel>
-                            <InputGroup>
-                              <InputLeftElement>
-                                <Icon as={RiNumber1} />
-                              </InputLeftElement>
+                          <div className="my-2 mb-4 select-none">
+                            <Label>First Name</Label>
+                            <div className="relative">
+                              <RiNumber1 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                               <Input
                                 autoComplete="off"
                                 type="text"
@@ -422,46 +408,46 @@ export const EditUserDetailsModal = ({
                                   userData?.display_first_name ??
                                   userData?.first_name
                                 }
+                                className="pl-10"
                                 {...register("display_first_name", {
                                   value:
                                     userData?.display_first_name ??
                                     userData?.first_name,
                                 })}
-                                isDisabled={!me?.userData?.is_superuser}
+                                disabled={!me?.userData?.is_superuser}
                               />
-                            </InputGroup>
-                          </FormControl>
+                            </div>
+                          </div>
 
                           {/* Last Name */}
-                          <FormControl my={2} mb={4} userSelect={"none"}>
-                            <FormLabel>Last Name</FormLabel>
-                            <InputGroup>
-                              <InputLeftElement>
-                                <Icon as={RiNumber2} />
-                              </InputLeftElement>
+                          <div className="my-2 mb-4 select-none">
+                            <Label>Last Name</Label>
+                            <div className="relative">
+                              <RiNumber2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                               <Input
                                 type="text"
-                                isDisabled={!me?.userData?.is_superuser}
+                                disabled={!me?.userData?.is_superuser}
                                 placeholder={
                                   userData?.display_last_name ??
                                   userData?.last_name
                                 }
+                                className="pl-10"
                                 {...register("display_last_name", {
                                   value:
                                     userData?.display_last_name ??
                                     userData?.last_name,
                                 })}
                               />
-                            </InputGroup>
-                          </FormControl>
-                        </Grid>
+                            </div>
+                          </div>
+                        </div>
                       </>
                     )}
-                  </TabPanel>
-                  <TabPanel>
+                </TabsContent>
+                <TabsContent value="profile" className="space-y-4">
                     {!userLoading && (
-                      <Grid>
-                        <Box my={2}>
+                      <div className="grid gap-4">
+                        <div className="my-2">
                           <Controller
                             name="about"
                             control={control}
@@ -479,8 +465,8 @@ export const EditUserDetailsModal = ({
                               />
                             )}
                           />
-                        </Box>
-                        <Box my={2}>
+                        </div>
+                        <div className="my-2">
                           <Controller
                             name="expertise"
                             control={control}
@@ -498,10 +484,10 @@ export const EditUserDetailsModal = ({
                               />
                             )}
                           />
-                        </Box>
+                        </div>
 
-                        <Box>
-                          <FormLabel>Image</FormLabel>
+                        <div>
+                          <Label>Image</Label>
                           <StatefulMediaChanger
                             helperText={"Upload an image that represents you."}
                             selectedImageUrl={selectedImageUrl}
@@ -517,65 +503,73 @@ export const EditUserDetailsModal = ({
                               });
                             }}
                           />
-                        </Box>
-                      </Grid>
+                        </div>
+                      </div>
                     )}
-                  </TabPanel>
-                  <TabPanel>
+                </TabsContent>
+                <TabsContent value="organisation" className="space-y-4">
                     {!userLoading && userData.is_staff && (
-                      <Grid>
+                      <div className="grid gap-4">
                         {/* Branch */}
-                        <FormControl my={2} mb={4} userSelect={"none"}>
-                          <FormLabel>Branch</FormLabel>
-                          <InputGroup>
+                        <div className="my-2 mb-4 select-none">
+                          <Label>Branch</Label>
+                          <div className="w-full">
                             {branches && (
                               <Select
-                                placeholder={"Select a Branch"}
-                                defaultValue={userData?.branch?.pk || ""}
-                                {...register("branch")}
+                                onValueChange={(value) => setValue("branch", value)}
+                                defaultValue={userData?.branch?.pk?.toString() || ""}
                               >
-                                {branches.map(
-                                  (branch: IBranch, index: number) => {
-                                    return (
-                                      <option key={index} value={branch.pk}>
-                                        {branch.name}
-                                      </option>
-                                    );
-                                  },
-                                )}
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a Branch" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {branches.map(
+                                    (branch: IBranch, index: number) => {
+                                      return (
+                                        <SelectItem key={index} value={branch.pk.toString()}>
+                                          {branch.name}
+                                        </SelectItem>
+                                      );
+                                    },
+                                  )}
+                                </SelectContent>
                               </Select>
                             )}
-                          </InputGroup>
-                        </FormControl>
+                          </div>
+                        </div>
 
                         {/* Business Area */}
-                        <FormControl my={2} mb={4} userSelect={"none"}>
-                          <FormLabel>Business Area</FormLabel>
-                          <InputGroup>
+                        <div className="my-2 mb-4 select-none">
+                          <Label>Business Area</Label>
+                          <div className="w-full">
                             {businessAreas && (
                               <Select
-                                placeholder={"Select a Business Area"}
-                                defaultValue={userData?.business_area?.pk || ""}
-                                {...register("business_area")}
+                                onValueChange={(value) => setValue("business_area", value)}
+                                defaultValue={userData?.business_area?.pk?.toString() || ""}
                               >
-                                {businessAreas
-                                  .sort((a: IBusinessArea, b: IBusinessArea) =>
-                                    a.name.localeCompare(b.name),
-                                  )
-                                  .map((ba: IBusinessArea, index: number) => {
-                                    return (
-                                      <option key={index} value={ba.pk}>
-                                        {ba.name}
-                                      </option>
-                                    );
-                                  })}
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a Business Area" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {businessAreas
+                                    .sort((a: IBusinessArea, b: IBusinessArea) =>
+                                      a.name.localeCompare(b.name),
+                                    )
+                                    .map((ba: IBusinessArea, index: number) => {
+                                      return (
+                                        <SelectItem key={index} value={ba.pk.toString()}>
+                                          {ba.name}
+                                        </SelectItem>
+                                      );
+                                    })}
+                                </SelectContent>
                               </Select>
                             )}
-                          </InputGroup>
-                        </FormControl>
+                          </div>
+                        </div>
 
                         {/* Affiliation */}
-                        <FormControl my={2} mb={4} userSelect={"none"}>
+                        <div className="my-2 mb-4 select-none">
                           <AffiliationCreateSearchDropdown
                             // autoFocus
                             isRequired={false}
@@ -595,18 +589,18 @@ export const EditUserDetailsModal = ({
                             placeholder="Search for or an affiliation"
                             helperText="The entity this user is affiliated with"
                           />
-                        </FormControl>
-                      </Grid>
+                        </div>
+                      </div>
                     )}
 
                     {!userLoading && !userData.is_staff && (
                       <>
-                        <Text>
+                        <p>
                           This user is external. You may only set their
                           affiliation.
-                        </Text>
+                        </p>
 
-                        <FormControl my={2} mb={4} userSelect={"none"}>
+                        <div className="my-2 mb-4 select-none">
                           <AffiliationCreateSearchDropdown
                             // autoFocus
                             isRequired={false}
@@ -626,39 +620,36 @@ export const EditUserDetailsModal = ({
                             placeholder="Search for or an affiliation"
                             helperText="The entity this user is affiliated with"
                           />
-                        </FormControl>
+                        </div>
                       </>
                     )}
-                  </TabPanel>
-                </TabPanels>
+                </TabsContent>
               </Tabs>
             )}
-          </ModalBody>
-        </Flex>
+          </div>
+        </form>
 
-        <ModalFooter>
-          <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-            <Button colorScheme="gray" onClick={onClose}>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4">
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button
-              isDisabled={!isValid}
-              isLoading={fullMutation.isPending}
+              disabled={!isValid}
               form="edit-details"
               type="submit"
-              bgColor={colorMode === "light" ? `green.500` : `green.600`}
-              color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-              _hover={{
-                bg: colorMode === "light" ? `green.600` : `green.400`,
-                color: colorMode === "light" ? `white` : `white`,
-              }}
-              ml={3}
+              className={cn(
+                "text-white ml-3",
+                colorMode === "light" 
+                  ? "bg-green-500 hover:bg-green-600" 
+                  : "bg-green-600 hover:bg-green-400"
+              )}
             >
               Update
             </Button>
-          </Grid>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

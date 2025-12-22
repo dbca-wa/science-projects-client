@@ -1,24 +1,10 @@
-import {
-  Button,
-  Text,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useColorMode,
-  useToast,
-  Box,
-  Checkbox,
-  Grid,
-  Center,
-  type UseToastOptions,
-  Textarea,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Label } from "@/shared/components/ui/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -31,6 +17,7 @@ import {
 import { handleDocumentAction } from "@/features/documents/services/documents.service";
 import { useFullUserByPk } from "@/features/users/hooks/useFullUserByPk";
 import EmailFeedbackRTE from "./EmailFeedbackRTE";
+import { cn } from "@/shared/utils/cn";
 
 export type DocumentType =
   | "concept"
@@ -73,13 +60,7 @@ export const UnifiedDocumentActionModal = ({
 }: UnifiedDocumentActionModalProps) => {
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
   const { register, handleSubmit, reset } = useForm<IApproveDocument>();
-
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
 
   const [shouldSendEmail, setShouldSendEmail] = useState(true);
   const [feedbackHtml, setFeedbackHtml] = useState("");
@@ -131,39 +112,26 @@ export const UnifiedDocumentActionModal = ({
   const documentActionMutation = useMutation({
     mutationFn: handleDocumentAction,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `${
-          action === "approve"
-            ? "Approving"
-            : action === "recall"
-              ? "Recalling"
-              : action === "reopen"
-                ? "Reopening"
-                : "Sending Back"
-        }`,
-        position: "top-right",
-      });
+      toast.loading(`${
+        action === "approve"
+          ? "Approving"
+          : action === "recall"
+            ? "Recalling"
+            : action === "reopen"
+              ? "Reopening"
+              : "Sending Back"
+      }`);
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `${documentTypeName} ${
-            action === "approve"
-              ? "Approved"
-              : action === "recall"
-                ? "Recalled"
-                : action === "reopen"
-                  ? "Reopened"
-                  : "Sent Back"
-          }`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success(`${documentTypeName} ${
+        action === "approve"
+          ? "Approved"
+          : action === "recall"
+            ? "Recalled"
+            : action === "reopen"
+              ? "Reopened"
+              : "Sent Back"
+      }`);
       reset();
 
       // Call the appropriate refresh function
@@ -180,24 +148,15 @@ export const UnifiedDocumentActionModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could Not ${
-            action === "approve"
-              ? "Approve"
-              : action === "recall"
-                ? "Recall"
-                : action === "reopen"
-                  ? "Reopen"
-                  : "Send Back"
-          } ${documentTypeName}`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could Not ${
+        action === "approve"
+          ? "Approve"
+          : action === "recall"
+            ? "Recall"
+            : action === "reopen"
+              ? "Reopen"
+              : "Send Back"
+      } ${documentTypeName}: ${error}`);
     },
   });
 
@@ -241,24 +200,19 @@ export const UnifiedDocumentActionModal = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size={"lg"}
-      scrollBehavior="inside"
-    >
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>{getModalHeaderText()}</ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn(
+        "max-w-lg max-h-[80vh] overflow-y-auto",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <DialogHeader>
+          <DialogTitle>{getModalHeaderText()}</DialogTitle>
+        </DialogHeader>
 
-        <ModalBody
-          as="form"
+        <form
           id="approval-form"
           onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
         >
           {!baLead ? null : (
             <>
@@ -281,50 +235,53 @@ export const UnifiedDocumentActionModal = ({
                 readOnly
               />
               {stage === 1 ? (
-                <Box>
-                  <Text fontWeight={"bold"}>Stage 1</Text>
+                <div>
+                  <p className="font-bold">Stage 1</p>
                   <br />
-                  <Text>
+                  <p>
                     {action === "approve"
                       ? `In your capacity as Project Lead, would you like to submit this ${documentTypeName.toLowerCase()} to the business area lead?`
                       : `In your capacity as Project Lead, would you like to ${action} this ${documentTypeName.toLowerCase()}?`}
-                  </Text>
+                  </p>
                   <br />
-                  <Text>
+                  <p>
                     {action === "approve"
                       ? "This will send an email to the Business Area Lead for approval."
                       : action === "reopen"
                         ? "This will delete the project closure document and set the status of the project to 'update requested'."
                         : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been recalled from your approval."}
-                  </Text>
+                  </p>
 
-                  <Checkbox
-                    isDisabled={!userData?.is_superuser}
-                    mt={8}
-                    isChecked={shouldSendEmail}
-                    onChange={() => setShouldSendEmail(!shouldSendEmail)}
-                  >
-                    Send an email to the business area lead{" "}
-                    {baLead && (
-                      <>
-                        <strong>
-                          ({baLead.first_name} {baLead.last_name} -{" "}
-                          {baLead.email})
-                        </strong>{" "}
-                      </>
-                    )}
-                    alerting them that you have{" "}
-                    {action === "approve"
-                      ? "submitted "
-                      : action === "reopen"
-                        ? "reopened "
-                        : "recalled "}
-                    this {action === "reopen" ? "project" : "document"}?
-                  </Checkbox>
+                  <div className="flex items-start space-x-2 mt-8">
+                    <Checkbox
+                      disabled={!userData?.is_superuser}
+                      checked={shouldSendEmail}
+                      onCheckedChange={() => setShouldSendEmail(!shouldSendEmail)}
+                      id="send-email"
+                    />
+                    <Label htmlFor="send-email" className="text-sm leading-relaxed">
+                      Send an email to the business area lead{" "}
+                      {baLead && (
+                        <>
+                          <strong>
+                            ({baLead.first_name} {baLead.last_name} -{" "}
+                            {baLead.email})
+                          </strong>{" "}
+                        </>
+                      )}
+                      alerting them that you have{" "}
+                      {action === "approve"
+                        ? "submitted "
+                        : action === "reopen"
+                          ? "reopened "
+                          : "recalled "}
+                      this {action === "reopen" ? "project" : "document"}?
+                    </Label>
+                  </div>
 
                   {showFeedbackField && (
-                    <Box mt={4}>
-                      <Text mb={2}>Add comment (optional):</Text>
+                    <div className="mt-4">
+                      <p className="mb-2">Add comment (optional):</p>
 
                       <EmailFeedbackRTE
                         onChange={(fcd) => {
@@ -333,22 +290,22 @@ export const UnifiedDocumentActionModal = ({
                           setFeedbackLimitExceeded(fcd.exceedsLimit);
                         }}
                       />
-                    </Box>
+                    </div>
                   )}
-                </Box>
+                </div>
               ) : stage === 2 ? (
-                <Box>
-                  <Text fontWeight={"bold"}>Stage 2</Text>
+                <div>
+                  <p className="font-bold">Stage 2</p>
                   <br />
-                  <Text>
+                  <p>
                     In your capacity as Business Area Lead, would you like to{" "}
                     {action === "send_back" ? "send back" : action} this{" "}
                     {documentTypeName.toLowerCase()}?
-                  </Text>
+                  </p>
                   <br />
                   {directorateData?.length < 1 ? null : (
                     <>
-                      <Text>
+                      <p>
                         {action === "approve"
                           ? "This will send an email to members of the Directorate for approval."
                           : action === "recall"
@@ -356,62 +313,61 @@ export const UnifiedDocumentActionModal = ({
                             : action === "reopen"
                               ? "This will delete the project closure document and set the status of the project to 'update requested'."
                               : "This will return the approval status from 'Granted' to 'Required' and send an email to the Project Lead letting them know the document has been sent back for revision."}
-                      </Text>
+                      </p>
 
                       {(action === "recall" || action === "approve") &&
                         stage === 2 && (
-                          <Box
-                            pt={4}
-                            border={"1px solid"}
-                            borderColor={"gray.500"}
-                            rounded={"2xl"}
-                            p={4}
-                            mt={4}
-                          >
-                            <Text fontWeight={"semibold"}>
+                          <div className="pt-4 border border-gray-500 rounded-2xl p-4 mt-4">
+                            <p className="font-semibold">
                               Directorate Members
-                            </Text>
-                            <Grid pt={2} gridTemplateColumns={"repeat(2, 1fr)"}>
+                            </p>
+                            <div className="pt-2 grid grid-cols-2 gap-2">
                               {!isDirectorateLoading &&
                                 directorateData?.map((member, index) => (
-                                  <Center key={index}>
-                                    <Box px={2} w={"100%"}>
-                                      <Text>{`${member.name}`}</Text>
-                                    </Box>
-                                  </Center>
+                                  <div key={index} className="flex justify-center">
+                                    <div className="px-2 w-full">
+                                      <p>{`${member.name}`}</p>
+                                    </div>
+                                  </div>
                                 ))}
-                            </Grid>
-                          </Box>
+                            </div>
+                          </div>
                         )}
                     </>
                   )}
 
-                  <Checkbox
-                    isDisabled={!userData?.is_superuser}
-                    mt={directorateData?.length < 1 ? 0 : 8}
-                    isChecked={shouldSendEmail}
-                    onChange={() => setShouldSendEmail(!shouldSendEmail)}
-                  >
-                    Send emails to
-                    {action === "send_back"
-                      ? stage === 2
-                        ? ` Project lead `
-                        : ` Business Area Lead (${baLead?.first_name} ${baLead?.last_name}) `
-                      : " members of the Directorate "}
-                    alerting them that you have{" "}
-                    {action === "approve"
-                      ? "approved"
-                      : action === "send_back"
-                        ? "sent back"
-                        : action === "reopen"
-                          ? "reopened"
-                          : "recalled"}{" "}
-                    this {action === "reopen" ? "project" : "document"}?
-                  </Checkbox>
+                  <div className={cn(
+                    "flex items-start space-x-2",
+                    directorateData?.length < 1 ? "mt-0" : "mt-8"
+                  )}>
+                    <Checkbox
+                      disabled={!userData?.is_superuser}
+                      checked={shouldSendEmail}
+                      onCheckedChange={() => setShouldSendEmail(!shouldSendEmail)}
+                      id="send-email-stage2"
+                    />
+                    <Label htmlFor="send-email-stage2" className="text-sm leading-relaxed">
+                      Send emails to
+                      {action === "send_back"
+                        ? stage === 2
+                          ? ` Project lead `
+                          : ` Business Area Lead (${baLead?.first_name} ${baLead?.last_name}) `
+                        : " members of the Directorate "}
+                      alerting them that you have{" "}
+                      {action === "approve"
+                        ? "approved"
+                        : action === "send_back"
+                          ? "sent back"
+                          : action === "reopen"
+                            ? "reopened"
+                            : "recalled"}{" "}
+                      this {action === "reopen" ? "project" : "document"}?
+                    </Label>
+                  </div>
 
                   {showFeedbackField && (
-                    <Box mt={4}>
-                      <Text mb={2}>Add comment (optional):</Text>
+                    <div className="mt-4">
+                      <p className="mb-2">Add comment (optional):</p>
                       <EmailFeedbackRTE
                         onChange={(fcd) => {
                           setFeedbackHtml(fcd.feedbackHtml);
@@ -419,20 +375,20 @@ export const UnifiedDocumentActionModal = ({
                           setFeedbackLimitExceeded(fcd.exceedsLimit);
                         }}
                       />
-                    </Box>
+                    </div>
                   )}
-                </Box>
+                </div>
               ) : (
-                <Box>
-                  <Text fontWeight={"bold"}>Stage 3</Text>
+                <div>
+                  <p className="font-bold">Stage 3</p>
                   <br />
-                  <Text>
+                  <p>
                     In your capacity as Directorate, would you like to{" "}
                     {action === "send_back" ? "send back" : action} this{" "}
                     {documentTypeName.toLowerCase()}?
-                  </Text>
+                  </p>
                   <br />
-                  <Text>
+                  <p>
                     {action === "approve"
                       ? getFinalApprovalDescription()
                       : action === "recall"
@@ -442,36 +398,32 @@ export const UnifiedDocumentActionModal = ({
                         : action === "reopen"
                           ? "This will delete the project closure document and set the status of the project to 'update requested'."
                           : "This will return the approval status from 'Granted' to 'Required' and send an email to the Business Area Lead letting them know the document has been sent back for revision."}
-                  </Text>
+                  </p>
 
                   {action === "send_back" && (
                     <>
-                      <Box
-                        pt={4}
-                        border={"1px solid"}
-                        borderColor={"gray.500"}
-                        rounded={"2xl"}
-                        p={4}
-                        mt={4}
-                      >
-                        <Text fontWeight={"semibold"}>Business Area Lead</Text>
-                        <Box pt={2}>
+                      <div className="pt-4 border border-gray-500 rounded-2xl p-4 mt-4">
+                        <p className="font-semibold">Business Area Lead</p>
+                        <div className="pt-2">
                           {baLead?.first_name} {baLead?.last_name}
-                        </Box>
-                      </Box>
-                      <Checkbox
-                        isDisabled={!userData?.is_superuser}
-                        mt={8}
-                        isChecked={shouldSendEmail}
-                        onChange={() => setShouldSendEmail(!shouldSendEmail)}
-                      >
-                        Send an email to Business Area Lead alerting them that
-                        you have sent this document back?
-                      </Checkbox>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-2 mt-8">
+                        <Checkbox
+                          disabled={!userData?.is_superuser}
+                          checked={shouldSendEmail}
+                          onCheckedChange={() => setShouldSendEmail(!shouldSendEmail)}
+                          id="send-email-stage3"
+                        />
+                        <Label htmlFor="send-email-stage3" className="text-sm leading-relaxed">
+                          Send an email to Business Area Lead alerting them that
+                          you have sent this document back?
+                        </Label>
+                      </div>
 
                       {showFeedbackField && (
-                        <Box mt={4}>
-                          <Text mb={2}>Add comment (optional):</Text>
+                        <div className="mt-4">
+                          <p className="mb-2">Add comment (optional):</p>
                           <EmailFeedbackRTE
                             onChange={(fcd) => {
                               setFeedbackHtml(fcd.feedbackHtml);
@@ -479,44 +431,44 @@ export const UnifiedDocumentActionModal = ({
                               setFeedbackLimitExceeded(fcd.exceedsLimit);
                             }}
                           />
-                        </Box>
+                        </div>
                       )}
                     </>
                   )}
-                </Box>
+                </div>
               )}
             </>
           )}
-        </ModalBody>
+        </form>
         {!baLead ? (
-          <Center p={4} flexDir={"column"}>
-            <Text>No business area leader has been set for {baData.name}.</Text>
-            <Text>
+          <div className="p-4 flex flex-col items-center">
+            <p>No business area leader has been set for {baData.name}.</p>
+            <p>
               Contact an admin to set the leader for this business area.
-            </Text>
-          </Center>
+            </p>
+          </div>
         ) : (
-          <ModalFooter>
-            <Button mr={3} onClick={onClose}>
+          <DialogFooter>
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
 
             <Button
               form="approval-form"
               type="submit"
-              isLoading={documentActionMutation.isPending}
               disabled={feedbackLimitExceeded}
-              bg={colorMode === "dark" ? "green.500" : "green.400"}
-              color={"white"}
-              _hover={{
-                bg: colorMode === "dark" ? "green.400" : "green.300",
-              }}
+              className={cn(
+                "text-white",
+                colorMode === "dark" 
+                  ? "bg-green-500 hover:bg-green-400" 
+                  : "bg-green-400 hover:bg-green-300"
+              )}
             >
               {getActionButtonText()}
             </Button>
-          </ModalFooter>
+          </DialogFooter>
         )}
-      </ModalContent>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   );
 };

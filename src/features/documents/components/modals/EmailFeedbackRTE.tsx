@@ -11,7 +11,6 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { HeadingNode } from "@lexical/rich-text";
-import { Box, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import "@/features/staff-profiles/components/Editor/staffprofileeditor.css";
 
@@ -56,17 +55,14 @@ const CharacterCountPlugin = ({
   }, [editor, maxCharCount, onChange]);
 
   return (
-    <Box
-      position="absolute"
-      bottom="5px"
-      right="10px"
-      fontSize="sm"
-      color={hasExceededLimit ? "red.500" : "gray.500"}
+    <div
+      className="absolute bottom-1 right-2 text-xs"
+      style={{ color: hasExceededLimit ? "#ef4444" : "#6b7280" }}
     >
-      <Text fontSize="xs">
+      <span className="text-xs">
         {charCount}/{maxCharCount}
-      </Text>
-    </Box>
+      </span>
+    </div>
   );
 };
 
@@ -216,7 +212,7 @@ const EmailFeedbackRTE = ({
   };
 
   return (
-    <Box position="relative" width="100%">
+    <div className="relative w-full">
       <LexicalComposer initialConfig={initialConfig}>
         <HistoryPlugin />
         <LinkPlugin />
@@ -232,15 +228,7 @@ const EmailFeedbackRTE = ({
 
         <RichTextPlugin
           contentEditable={
-            <Box
-              border="1px solid"
-              borderColor="gray.300"
-              borderRadius="md"
-              padding="10px"
-              minHeight="100px"
-              position="relative"
-              backgroundColor="white"
-            >
+            <div className="relative min-h-[100px] rounded-md border border-gray-300 bg-white p-2.5">
               <ContentEditable
                 style={{
                   height: "100%",
@@ -249,29 +237,23 @@ const EmailFeedbackRTE = ({
                   whiteSpace: "pre-wrap",
                 }}
               />
-            </Box>
+            </div>
           }
           placeholder={
-            <Box
-              position="absolute"
-              top="10px"
-              left="12px"
-              color="gray.400"
-              pointerEvents="none"
-            >
+            <div className="pointer-events-none absolute left-3 top-2.5 text-gray-400">
               Add optional comments...
-            </Box>
+            </div>
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
       </LexicalComposer>
 
       {exceedsLimit && (
-        <Text fontSize="xs" color="red.500" mt={1}>
+        <p className="mt-1 text-xs text-red-500">
           The feedback exceeds the maximum character limit.
-        </Text>
+        </p>
       )}
-    </Box>
+    </div>
   );
 };
 

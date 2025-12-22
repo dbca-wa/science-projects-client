@@ -205,303 +205,249 @@ export const AffiliationsCRUD = () => {
       <Head title="Affiliations" />
 
       {isLoading ? (
-        <Center h={"200px"}>
-          <Spinner />
-        </Center>
+        <div className="flex justify-center items-center h-48">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       ) : (
         <>
-          <Box maxW={"100%"} maxH={"100%"}>
-            <Box>
-              <Text fontWeight={"semibold"} fontSize={"lg"}>
+          <div className="max-w-full max-h-full">
+            <div>
+              <h2 className="font-semibold text-lg">
                 Affiliations ({countOfItems})
-              </Text>
-            </Box>
-            <Flex width={"100%"} mt={4}>
+              </h2>
+            </div>
+            <div className="flex w-full mt-4">
               <Input
                 type="text"
                 placeholder="Search affiliation by name"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                w={"65%"}
+                className="w-2/3"
               />
 
-              <Flex justifyContent={"flex-end"} w={"100%"}>
+              <div className="flex justify-end w-full gap-4">
                 <Button
-                  mr={4}
-                  onClick={onCleanOpen}
-                  color={"white"}
-                  background={
-                    colorMode === "light" ? "blue.500" : "blue.600"
-                  }
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
+                  onClick={() => setCleanIsOpen(true)}
+                  className={`text-white ${
+                    colorMode === "light" 
+                      ? "bg-blue-500 hover:bg-blue-400" 
+                      : "bg-blue-600 hover:bg-blue-500"
+                  }`}
                 >
                   Clean
                 </Button>
                 <Button
-                  mr={4}
-                  onClick={onMergeOpen}
-                  color={"white"}
-                  background={
-                    colorMode === "light" ? "orange.500" : "orange.600"
-                  }
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "orange.400" : "orange.500",
-                  }}
+                  onClick={() => setMergeIsOpen(true)}
+                  className={`text-white ${
+                    colorMode === "light" 
+                      ? "bg-orange-500 hover:bg-orange-400" 
+                      : "bg-orange-600 hover:bg-orange-500"
+                  }`}
                 >
                   Merge
                 </Button>
                 <Button
-                  onClick={onAddOpen}
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  onClick={() => setAddIsOpen(true)}
+                  className={`text-white ${
+                    colorMode === "light" 
+                      ? "bg-green-500 hover:bg-green-400" 
+                      : "bg-green-600 hover:bg-green-500"
+                  }`}
                 >
                   Add
                 </Button>
-              </Flex>
-            </Flex>
-            <Grid
-              gridTemplateColumns="9fr 3fr"
-              mt={4}
-              width="100%"
-              p={3}
-              borderWidth={1}
-              borderBottomWidth={filteredSlices.length === 0 ? 1 : 0}
+              </div>
+            </div>
+            <div
+              className={`grid grid-cols-[9fr_3fr] mt-4 w-full p-3 border ${
+                filteredSlices.length === 0 ? "border-b" : "border-b-0"
+              }`}
             >
-              <Flex justifyContent="flex-start">
-                <Text as="b">Affiliation</Text>
-              </Flex>
-              <Flex justifyContent="flex-end" mr={2}>
-                <Text as="b">Change</Text>
-              </Flex>
-            </Grid>
+              <div className="flex justify-start">
+                <span className="font-bold">Affiliation</span>
+              </div>
+              <div className="flex justify-end mr-2">
+                <span className="font-bold">Change</span>
+              </div>
+            </div>
 
-            <Grid gridTemplateColumns={"repeat(1,1fr)"}>
+            <div className="grid grid-cols-1">
               {filteredSlices
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((s) => (
                   <AffiliationItemDisplay key={s.pk} pk={s.pk} name={s.name} />
                 ))}
-            </Grid>
-          </Box>
+            </div>
+          </div>
 
-          <Drawer isOpen={addIsOpen} onClose={onAddClose} size={"lg"}>
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-              <DrawerHeader>Add Affiliation</DrawerHeader>
-              <DrawerBody>
-                <VStack
-                  spacing={10}
-                  as="form"
-                  id="add-form"
+          <Sheet open={addIsOpen} onOpenChange={setAddIsOpen}>
+            <SheetContent className="w-full sm:max-w-lg">
+              <SheetHeader>
+                <SheetTitle>Add Affiliation</SheetTitle>
+              </SheetHeader>
+              <div className="py-6">
+                <div
+                  className="space-y-10"
                   onSubmit={handleSubmit(onSubmitCreate)}
                 >
-                  <FormControl>
-                    <FormLabel>Name</FormLabel>
+                  <div>
+                    <Label htmlFor="name">Name</Label>
                     <Input
+                      id="name"
                       autoFocus
                       autoComplete="off"
                       {...register("name", { required: true })}
                     />
-                    <FormHelperText>
+                    <p className="text-sm text-gray-500 mt-1">
                       Note: Exclude "The" from the start of any names. For
                       example, "The University of Western Australia" should be
                       "University of Western Australia"
-                    </FormHelperText>
-                  </FormControl>
+                    </p>
+                  </div>
                   {creationMutation.isError ? (
-                    <Text color={"red.500"}>Something went wrong</Text>
+                    <p className="text-red-500">Something went wrong</p>
                   ) : null}
-                </VStack>
-              </DrawerBody>
-              <DrawerFooter>
+                </div>
+              </div>
+              <SheetFooter>
                 <Button
-                  form="add-form"
-                  type="submit"
-                  isLoading={creationMutation.isPending}
-                  color={"white"}
-                  background={colorMode === "light" ? "blue.500" : "blue.600"}
-                  _hover={{
-                    background: colorMode === "light" ? "blue.400" : "blue.500",
-                  }}
+                  onClick={handleSubmit(onSubmitCreate)}
+                  disabled={creationMutation.isPending || createIsDisabled}
+                  className={`text-white w-full ${
+                    colorMode === "light" 
+                      ? "bg-blue-500 hover:bg-blue-400" 
+                      : "bg-blue-600 hover:bg-blue-500"
+                  }`}
                   size="lg"
-                  width={"100%"}
-                  isDisabled={createIsDisabled}
                 >
                   Create
                 </Button>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
 
-          <Modal isOpen={mergeIsOpen} onClose={onMergeClose}>
-            <ModalOverlay />
-            <ModalHeader>Merge Affiliations</ModalHeader>
-            <ModalBody>
-              <ModalContent
-                color={colorMode === "dark" ? "gray.400" : null}
-                bg={colorMode === "light" ? "white" : "gray.800"}
-                p={4}
-                px={6}
-              >
-                <VStack
-                  spacing={4}
-                  // as="form"
-                  // id="merge-form"
+          <Dialog open={mergeIsOpen} onOpenChange={setMergeIsOpen}>
+            <DialogContent className={`${
+              colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+            } p-4 px-6`}>
+              <DialogHeader>
+                <DialogTitle>Merge Affiliations</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="w-full text-left">
+                  <p>Combine similar affiliations into one!</p>
+                </div>
+                <div>
+                  <AffiliationSearchDropdown
+                    autoFocus
+                    isRequired
+                    isEditable
+                    setterFunction={setPrimaryAffiliation}
+                    label="Primary Affiliation"
+                    placeholder="Search for an affiliation"
+                    helperText="The affiliation you would like to merge other affiliations into"
+                  />
+                </div>
+                <div>
+                  <AffiliationSearchDropdown
+                    isRequired
+                    isEditable
+                    array={secondaryAffiliations}
+                    arrayAddFunction={addSecondaryAffiliationPkToArray}
+                    arrayRemoveFunction={removeSecondaryAffiliationPkFromArray}
+                    arrayClearFunction={clearSecondaryAffiliationArray}
+                    label="Secondary Affiliation/s"
+                    placeholder="Search for an affiliation"
+                    helperText="The affiliation/s you would like to merge into the primary affiliation"
+                  />
+                </div>
+
+                {mergeMutation.isError ? (
+                  <p className="text-red-500">Something went wrong</p>
+                ) : null}
+              </div>
+
+              {secondaryAffiliations?.length >= 1 && (
+                <div className="py-2">
+                  <p className="text-red-500">
+                    Note: Users affiliated with the secondary affiliation/s,
+                    will now become affiliated with the primary affiliation.
+                    Each secondary affiliation you selected will also be
+                    deleted.
+                  </p>
+                </div>
+              )}
+
+              <DialogFooter className="grid grid-cols-2 gap-4">
+                <Button onClick={() => setMergeIsOpen(false)} size="lg">
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    onSubmitMerge({
+                      primaryAffiliation,
+                      secondaryAffiliations,
+                    });
+                  }}
+                  disabled={
+                    mergeMutation.isPending ||
+                    secondaryAffiliations?.length < 1 ||
+                    !primaryAffiliation
+                  }
+                  className={`text-white ${
+                    colorMode === "light" 
+                      ? "bg-orange-500 hover:bg-orange-400" 
+                      : "bg-orange-600 hover:bg-orange-500"
+                  }`}
+                  size="lg"
                 >
-                  <Box justifyContent={"start"} w={"100%"}>
-                    <Text>Combine similar affiliations into one!</Text>
-                  </Box>
-                  <FormControl>
-                    <AffiliationSearchDropdown
-                      autoFocus
-                      isRequired
-                      isEditable
-                      setterFunction={setPrimaryAffiliation}
-                      label="Primary Affiliation"
-                      placeholder="Search for an affiliation"
-                      helperText="The affiliation you would like to merge other affiliations into"
-                    />
-                  </FormControl>
-                  <FormControl>
-                    <AffiliationSearchDropdown
-                      // autoFocus
-                      isRequired
-                      isEditable
-                      array={secondaryAffiliations}
-                      arrayAddFunction={addSecondaryAffiliationPkToArray}
-                      arrayRemoveFunction={
-                        removeSecondaryAffiliationPkFromArray
-                      }
-                      arrayClearFunction={clearSecondaryAffiliationArray}
-                      label="Secondary Affiliation/s"
-                      placeholder="Search for an affiliation"
-                      helperText="The affiliation/s you would like to merge into the primary affiliation"
-                    />
-                  </FormControl>
+                  Merge
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
-                  {mergeMutation.isError ? (
-                    <Text color={"red.500"}>Something went wrong</Text>
-                  ) : null}
-                </VStack>
+          <Dialog open={cleanIsOpen} onOpenChange={setCleanIsOpen}>
+            <DialogContent className={`${
+              colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+            } p-4 px-6`}>
+              <DialogHeader>
+                <DialogTitle>Clean Orphaned Affiliations</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="w-full text-left">
+                  <p>
+                    This will remove all affiliations that have no links to any projects or users.
+                  </p>
+                  <p className="mt-2 text-orange-500">
+                    Warning: This action cannot be undone. Orphaned affiliations will be permanently deleted.
+                  </p>
+                </div>
 
-                {secondaryAffiliations?.length >= 1 && (
-                  <Box py={2}>
-                    <Text color={"red.500"}>
-                      Note: Users affiliated with the secondary affiliation/s,
-                      will now become affiliated with the primary affiliation.
-                      Each secondary affiliation you selected will also be
-                      deleted.
-                    </Text>
-                  </Box>
-                )}
+                {cleanMutation.isError ? (
+                  <p className="text-red-500">Something went wrong</p>
+                ) : null}
+              </div>
 
-                <Grid
-                  w={"100%"}
-                  justifyContent={"end"}
-                  gridTemplateColumns={"repeat(2, 1fr)"}
-                  gridGap={4}
-                  mt={secondaryAffiliations ? 4 : undefined}
+              <DialogFooter className="grid grid-cols-2 gap-4">
+                <Button onClick={() => setCleanIsOpen(false)} size="lg">
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => cleanMutation.mutate()}
+                  disabled={cleanMutation.isPending}
+                  className={`text-white ${
+                    colorMode === "light" 
+                      ? "bg-blue-500 hover:bg-blue-400" 
+                      : "bg-blue-600 hover:bg-blue-500"
+                  }`}
+                  size="lg"
                 >
-                  <Button onClick={onMergeClose} size="lg">
-                    Cancel
-                  </Button>
-                  <Button
-                    // form="add-form"
-                    // type="submit"
-
-                    onClick={() => {
-                      onSubmitMerge({
-                        primaryAffiliation,
-                        secondaryAffiliations,
-                      });
-                    }}
-                    isLoading={mergeMutation.isPending}
-                    color={"white"}
-                    background={
-                      colorMode === "light" ? "orange.500" : "orange.600"
-                    }
-                    _hover={{
-                      background:
-                        colorMode === "light" ? "orange.400" : "orange.500",
-                    }}
-                    size="lg"
-                    isDisabled={
-                      mergeMutation.isPending ||
-                      secondaryAffiliations?.length < 1 ||
-                      !primaryAffiliation
-                    }
-                  >
-                    Merge
-                  </Button>
-                </Grid>
-              </ModalContent>
-            </ModalBody>
-          </Modal>
-
-          <Modal isOpen={cleanIsOpen} onClose={onCleanClose}>
-            <ModalOverlay />
-            <ModalHeader>Clean Orphaned Affiliations</ModalHeader>
-            <ModalBody>
-              <ModalContent
-                color={colorMode === "dark" ? "gray.400" : null}
-                bg={colorMode === "light" ? "white" : "gray.800"}
-                p={4}
-                px={6}
-              >
-                <VStack spacing={4}>
-                  <Box justifyContent={"start"} w={"100%"}>
-                    <Text>
-                      This will remove all affiliations that have no links to any projects or users.
-                    </Text>
-                    <Text mt={2} color={"orange.500"}>
-                      Warning: This action cannot be undone. Orphaned affiliations will be permanently deleted.
-                    </Text>
-                  </Box>
-
-                  {cleanMutation.isError ? (
-                    <Text color={"red.500"}>Something went wrong</Text>
-                  ) : null}
-                </VStack>
-
-                <Grid
-                  w={"100%"}
-                  justifyContent={"end"}
-                  gridTemplateColumns={"repeat(2, 1fr)"}
-                  gridGap={4}
-                  mt={4}
-                >
-                  <Button onClick={onCleanClose} size="lg">
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={() => cleanMutation.mutate()}
-                    isLoading={cleanMutation.isPending}
-                    color={"white"}
-                    background={
-                      colorMode === "light" ? "blue.500" : "blue.600"
-                    }
-                    _hover={{
-                      background:
-                        colorMode === "light" ? "blue.400" : "blue.500",
-                    }}
-                    size="lg"
-                    isDisabled={cleanMutation.isPending}
-                  >
-                    Clean
-                  </Button>
-                </Grid>
-              </ModalContent>
-            </ModalBody>
-          </Modal>
+                  Clean
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       )}
     </>

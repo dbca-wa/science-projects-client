@@ -4,19 +4,9 @@ import { Head } from "@/shared/components/layout/base/Head";
 import { UserArraySearchDropdown } from "@/features/users/components/UserArraySearchDropdown";
 import { mergeUsers } from "@/features/users/services/users.service";
 import type { IMergeUser, IUserData } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  Grid,
-  ListItem,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 
@@ -32,12 +22,10 @@ export const CaretakerSetContent = ({
   onClose,
 }: IProps) => {
   const { colorMode } = useColorMode();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
   const queryClient = useQueryClient();
 
   const caretakerToast = (data) => {
-    ToastIdRef.current = toast(data);
+    toast.success(data.title);
   };
 
   const [primaryUser, setPrimaryUser] = useState<IUserData | null>(null);
@@ -58,39 +46,21 @@ export const CaretakerSetContent = ({
   //   const caretakerAdminMutation = useMutation({
   //     mutationFn: setCaretaker,
   //     onMutate: () => {
-  //       mergeToast({
-  //         status: "loading",
-  //         title: "Setting caretaker...",
-  //         position: "top-right",
-  //       });
+  //       toast.loading("Setting caretaker...");
   //     },
   //     onSuccess: () => {
-  //       if (ToastIdRef.current) {
-  //         toast.update(ToastIdRef.current, {
-  //           title: "Merged!",
-  //           description: `Caretaker set!`,
-  //           status: "success",
-  //           position: "top-right",
-  //           duration: 3000,
-  //           isClosable: true,
-  //         });
-  //       }
+  //       toast.success("Merged!", {
+  //         description: "Caretaker set!",
+  //       });
   //       clearSecondaryUserArray();
   //       setPrimaryUser(null);
   //       onClose?.();
   //       queryClient.invalidateQueries({ queryKey: ["users"] });
   //     },
   //     onError: () => {
-  //       if (ToastIdRef.current) {
-  //         toast.update(ToastIdRef.current, {
-  //           title: "Failed",
-  //           description: `Something went wrong!`,
-  //           status: "error",
-  //           position: "top-right",
-  //           duration: 3000,
-  //           isClosable: true,
-  //         });
-  //       }
+  //       toast.error("Failed", {
+  //         description: "Something went wrong!",
+  //       });
   //     },
   //   });
 
@@ -108,34 +78,33 @@ export const CaretakerSetContent = ({
     <>
       <Head title={"Merge Users"} />
       {!isModal && (
-        <Box>
-          <Text mb={8} fontWeight={"bold"} fontSize={"2xl"}>
+        <div>
+          <p className="mb-8 font-bold text-2xl">
             Set User Caretaker
-          </Text>
-        </Box>
+          </p>
+        </div>
       )}
 
-      <Box mb={3}>
-        <Text color={colorMode === "light" ? "blue.500" : "blue.400"}>
+      <div className="mb-3">
+        <p className={colorMode === "light" ? "text-blue-500" : "text-blue-400"}>
           This form is for setting a caretaker for a user who is on leave or has
           left the department.
-        </Text>
-        <UnorderedList ml={6} mt={2}>
-          <ListItem>
+        </p>
+        <ul className="ml-6 mt-2 list-disc">
+          <li>
             The primary user is the user who needs a caretaker
-          </ListItem>
-          <ListItem
-            textDecoration={"underline"}
-            color={colorMode === "light" ? "red.500" : "red.400"}
+          </li>
+          <li
+            className={`underline ${colorMode === "light" ? "text-red-500" : "text-red-400"}`}
           >
             The secondary user/s will be able to act on their behalf until
             caretaker status is removed.
-          </ListItem>
-        </UnorderedList>
-      </Box>
+          </li>
+        </ul>
+      </div>
 
-      <Grid gridColumnGap={8} gridTemplateColumns={"repeat(1, 1fr)"}>
-        <FormControl>
+      <div className="grid grid-cols-1 gap-8">
+        <div>
           <UserArraySearchDropdown
             isRequired
             autoFocus
@@ -146,8 +115,8 @@ export const CaretakerSetContent = ({
             placeholder="Search for primary user who is going away"
             helperText="This user will be able to act normally"
           />
-        </FormControl>
-        <FormControl>
+        </div>
+        <div>
           <UserArraySearchDropdown
             isRequired
             isEditable
@@ -160,21 +129,19 @@ export const CaretakerSetContent = ({
             placeholder="Search for users"
             helperText="The user/s you would like to become caretaker for the primary user"
           />
-        </FormControl>
-      </Grid>
+        </div>
+      </div>
 
       {/* ======================================================= */}
 
-      <Flex mt={5} justifyContent="end">
+      <div className="mt-5 flex justify-end">
         <Button
-          bgColor={colorMode === "light" ? `red.500` : `red.600`}
-          color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-          _hover={{
-            bg: colorMode === "light" ? `red.600` : `red.400`,
-            color: colorMode === "light" ? `white` : `white`,
-          }}
-          ml={3}
-          isDisabled={
+          className={`ml-3 ${
+            colorMode === "light" 
+              ? "bg-red-500 text-white hover:bg-red-600" 
+              : "bg-red-600 text-white hover:bg-red-400"
+          }`}
+          disabled={
             true
             // caretakerAdminMutation.isPending ||
             // secondaryUsers?.length < 1 ||
@@ -193,7 +160,7 @@ export const CaretakerSetContent = ({
         >
           Set Caretaker
         </Button>
-      </Flex>
+      </div>
     </>
   );
 };

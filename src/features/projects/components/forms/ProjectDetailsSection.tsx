@@ -1,14 +1,6 @@
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  InputGroup,
-  Select,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import "react-calendar/dist/Calendar.css";
 import { useBusinessAreas } from "@/features/business-areas/hooks/useBusinessAreas";
@@ -17,6 +9,7 @@ import "@/styles/modalscrollbar.css";
 import type { IBusinessArea, IDepartmentalService, IDivision } from "@/shared/types";
 import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import { StartAndEndDateSelector } from "./StartAndEndDateSelector";
+import { cn } from "@/shared/utils/component.utils";
 
 interface IProjectDetailSectionProps {
   thisUser: number;
@@ -148,45 +141,45 @@ export const ProjectDetailsSection = ({
 
   return (
     <>
-      <Grid gridTemplateColumns="repeat(1, 1fr)" gridGap={8} px={24}>
-        <Box>
-          <FormControl mb={4}>
-            <FormLabel>Departmental Service</FormLabel>
-            <InputGroup>
-              <Select
-                variant="filled"
-                placeholder="Select a Departmental Service"
-                onChange={(e) =>
-                  handleDepartmentalServiceChange(e.target.value)
-                }
-                value={formState.departmentalService}
-              >
+      <div className="grid grid-cols-1 gap-8 px-24">
+        <div>
+          <div className="mb-4">
+            <Label>Departmental Service</Label>
+            <Select
+              value={formState.departmentalService.toString()}
+              onValueChange={handleDepartmentalServiceChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a Departmental Service" />
+              </SelectTrigger>
+              <SelectContent>
                 {servicesList.map((service, index) => {
                   const serviceName = checkIsHtml(service.name)
                     ? sanitizeHtml(service.name)
                     : service.name;
                   return (
-                    <option key={index} value={service.pk}>
+                    <SelectItem key={index} value={service.pk.toString()}>
                       {serviceName}
-                    </option>
+                    </SelectItem>
                   );
                 })}
-              </Select>
-            </InputGroup>
-            <FormHelperText>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-gray-500 mt-1">
               The DBCA service that this project delivers outputs to.
-            </FormHelperText>
-          </FormControl>
+            </p>
+          </div>
 
-          <FormControl isRequired mb={4}>
-            <FormLabel>Business Area</FormLabel>
-            <InputGroup>
-              <Select
-                variant="filled"
-                placeholder="Select a Business Area"
-                onChange={(e) => handleBusinessAreaChange(e.target.value)}
-                value={formState.businessArea}
-              >
+          <div className="mb-4">
+            <Label>Business Area *</Label>
+            <Select
+              value={formState.businessArea.toString()}
+              onValueChange={handleBusinessAreaChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a Business Area" />
+              </SelectTrigger>
+              <SelectContent>
                 {orderedDivisionSlugs.flatMap((divSlug) => {
                   const divisionBusinessAreas = businessAreaList
                     .filter(
@@ -197,26 +190,26 @@ export const ProjectDetailsSection = ({
                     .sort((a, b) => a.name.localeCompare(b.name));
 
                   return divisionBusinessAreas.map((ba, index) => (
-                    <option key={`${ba.name}${index}`} value={ba.pk}>
+                    <SelectItem key={`${ba.name}${index}`} value={ba.pk.toString()}>
                       {ba?.division
                         ? `[${(ba?.division as IDivision)?.slug}] `
                         : ""}
                       {checkIsHtml(ba.name) ? sanitizeHtml(ba.name) : ba.name}
                       {ba.is_active ? "" : "(INACTIVE)"}
-                    </option>
+                    </SelectItem>
                   ));
                 })}
-              </Select>
-            </InputGroup>
-            <FormHelperText>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-gray-500 mt-1">
               The Business Area / Program that this project belongs to. Only
               active Business Areas are selectable.
-            </FormHelperText>
-          </FormControl>
-        </Box>
+            </p>
+          </div>
+        </div>
 
-        <Grid gridTemplateColumns="repeat(1, 1fr)">
-          <FormControl>
+        <div className="grid grid-cols-1">
+          <div>
             <StartAndEndDateSelector
               startDate={formState.startDate}
               endDate={formState.endDate}
@@ -228,10 +221,10 @@ export const ProjectDetailsSection = ({
               }
               helperText="These dates can be tentative and adjusted from project settings later"
             />
-          </FormControl>
+          </div>
 
-          <Grid gridTemplateColumns="repeat(2, 1fr)" gridGap={8}>
-            <Box mb={4}>
+          <div className="grid grid-cols-2 gap-8">
+            <div className="mb-4">
               <UserSearchDropdown
                 isRequired={true}
                 setUserFunction={handleLeaderChange}
@@ -244,9 +237,9 @@ export const ProjectDetailsSection = ({
                 placeholder="Search for a Project Leader"
                 helperText="The Project Leader."
               />
-            </Box>
+            </div>
 
-            <Box mb={4}>
+            <div className="mb-4">
               <UserSearchDropdown
                 isRequired={true}
                 setUserFunction={handleDataCustodianChange}
@@ -256,21 +249,21 @@ export const ProjectDetailsSection = ({
                 placeholder="Search for a data custodian"
                 helperText="The data custodian is responsible for data management, publishing, and metadata documentation on the data catalogue"
               />
-            </Box>
-          </Grid>
-        </Grid>
-      </Grid>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <Flex w="100%" justifyContent="flex-end" pb={4}>
-        <Button onClick={backClick}>Back</Button>
+      <div className="w-full flex justify-end pb-4">
+        <Button variant="outline" onClick={backClick}>Back</Button>
         <Button
-          ml={3}
-          backgroundColor={colorMode === "light" ? "blue.500" : "blue.600"}
-          color="white"
-          _hover={{
-            backgroundColor: colorMode === "light" ? "blue.600" : "blue.700",
-          }}
-          isDisabled={
+          className={cn(
+            "ml-3 text-white",
+            colorMode === "light" 
+              ? "bg-blue-500 hover:bg-blue-600" 
+              : "bg-blue-600 hover:bg-blue-700"
+          )}
+          disabled={
             !formState.businessArea ||
             !formState.startDate ||
             !formState.endDate
@@ -279,7 +272,7 @@ export const ProjectDetailsSection = ({
         >
           Next &rarr;
         </Button>
-      </Flex>
+      </div>
     </>
   );
 };

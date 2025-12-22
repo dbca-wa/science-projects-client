@@ -1,17 +1,11 @@
 // Used to input keywords and save them to a parametised state - similar to linkedin skill
 
-import {
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Input,
-  InputGroup,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Badge } from "@/shared/components/ui/badge";
+import { X } from "lucide-react";
+import { cn } from "@/shared/utils/cn";
 import React, { useEffect, useState } from "react";
 
 interface Props {
@@ -88,13 +82,12 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
   };
 
   // Variables
-
   const { colorMode } = useColorMode();
 
   return (
-    <FormControl isRequired mb={4} zIndex={1} pos={"relative"}>
-      <FormLabel pb={1}>Keywords</FormLabel>
-      <InputGroup>
+    <div className="space-y-2 mb-4 relative z-10">
+      <Label className="required pb-1">Keywords</Label>
+      <div>
         <Input
           value={inputValue}
           onChange={handleInputChange}
@@ -108,33 +101,35 @@ const TagInput = ({ setTagFunction, preExistingTags }: Props) => {
             setInputActive(false);
           }}
         />
-      </InputGroup>
-      <FormHelperText color={colorMode === "light" ? "gray.500" : "gray.400"}>
+      </div>
+      <p className={cn(
+        "text-sm",
+        colorMode === "light" ? "text-gray-500" : "text-gray-400"
+      )}>
         Add some keywords as a comma-separated list. Press enter or click away when you're done to add the tag/s.
-      </FormHelperText>
-      <Flex flexWrap="wrap" gap={2} pt={3}>
+      </p>
+      <div className="flex flex-wrap gap-2 pt-3">
         {tags?.map((tag, index) => (
-          <Tag
+          <Badge
             key={index}
-            size="md"
-            borderRadius="full"
-            variant="solid"
-            color={"white"}
-            background={colorMode === "light" ? "blue.500" : "blue.600"}
-            _hover={{
-              background: colorMode === "light" ? "blue.400" : "blue.500",
-            }}
+            variant="secondary"
+            className={cn(
+              "text-white rounded-full cursor-pointer select-none",
+              colorMode === "light" 
+                ? "bg-blue-500 hover:bg-blue-400" 
+                : "bg-blue-600 hover:bg-blue-500"
+            )}
           >
-            <TagLabel pl={1}>{tag}</TagLabel>
-            <TagCloseButton
+            <span className="pl-1">{tag}</span>
+            <X
+              className="ml-1 h-3 w-3 cursor-pointer"
               onClick={() => removeTag(tag)}
-              userSelect={"none"}
               tabIndex={-1}
             />
-          </Tag>
+          </Badge>
         ))}
-      </Flex>
-    </FormControl>
+      </div>
+    </div>
   );
 };
 

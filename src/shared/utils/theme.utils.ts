@@ -1,7 +1,7 @@
 /**
  * Theme Management Utilities
  * 
- * Utilities to help with theme management during the migration from Chakra UI to next-themes
+ * Utilities for theme management using next-themes
  */
 
 import { useTheme } from "next-themes";
@@ -12,8 +12,8 @@ import { useEffect, useState } from "react";
 // ============================================================================
 
 /**
- * Replacement for Chakra UI's useColorMode hook
- * Provides the same API but uses next-themes under the hood
+ * Theme hook for color mode management
+ * Provides a consistent API for theme switching
  */
 export function useColorMode() {
   const { theme, setTheme, systemTheme } = useTheme();
@@ -46,7 +46,7 @@ export function useColorMode() {
 }
 
 /**
- * Replacement for Chakra UI's useColorModeValue hook
+ * Hook for conditional values based on theme
  * Returns appropriate value based on current theme
  */
 export function useColorModeValue<T>(lightValue: T, darkValue: T): T {
@@ -76,7 +76,7 @@ export function useIsDarkMode(): boolean {
 // ============================================================================
 
 /**
- * Convert Chakra UI theme tokens to CSS custom properties
+ * Convert theme tokens to CSS custom properties
  */
 export const THEME_TOKENS = {
   colors: {
@@ -232,7 +232,7 @@ export function useBreakpointValue<T>(values: Partial<Record<keyof typeof BREAKP
 }
 
 /**
- * Media query hook (replacement for Chakra's useMediaQuery)
+ * Media query hook for responsive design
  */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false);

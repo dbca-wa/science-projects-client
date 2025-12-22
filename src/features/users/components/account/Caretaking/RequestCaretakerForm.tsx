@@ -1,18 +1,10 @@
 import type { IUserMe } from "@/shared/types";
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Input,
-  InputGroup,
-  Select,
-  Textarea,
-  useColorMode,
-  useDisclosure,
-  Text,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import React, { useEffect, useState } from "react";
 import { ShadcnDatePicker } from "../ShadcnDatePicker";
 import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
@@ -29,7 +21,6 @@ const RequestCaretakerForm = ({
 }) => {
   const { colorMode } = useColorMode();
 
-  // const [pk, setPk] = useState<number | undefined>(undefined);
   const [caretakerPk, setCaretakerPk] = useState<number | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [reason, setReason] = useState<
@@ -37,11 +28,9 @@ const RequestCaretakerForm = ({
   >(null);
   const [notes, setNotes] = useState<string | undefined>(undefined);
 
-  const {
-    isOpen: modalIsOpen,
-    onOpen: onOpenModal,
-    onClose: onModalClose,
-  } = useDisclosure();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const onOpenModal = () => setModalIsOpen(true);
+  const onModalClose = () => setModalIsOpen(false);
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,59 +60,61 @@ const RequestCaretakerForm = ({
 
       <form onSubmit={(e) => void onFormSubmit(e)}>
         <Input type="hidden" value={userData.pk} required={true} />
-        <FormControl my={2} mb={4} userSelect={"none"}>
-          <FormLabel>Reason</FormLabel>
+        <div className="my-2 mb-4 select-none">
+          <Label>Reason</Label>
           <Select
-            variant="filled"
-            placeholder="Select the reason for your absence"
-            isDisabled={false}
-            onChange={(e) =>
+            value={reason ?? undefined}
+            onValueChange={(value) =>
               setReason(
-                e.target.value as "leave" | "resignation" | "other" | null,
+                value as "leave" | "resignation" | "other" | null,
               )
             }
-            value={reason ?? undefined}
           >
-            <option value="leave">On Leave</option>
-            <option value="resignation">Leaving the Department</option>
-            <option value="other">Other</option>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select the reason for your absence" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="leave">On Leave</SelectItem>
+              <SelectItem value="resignation">Leaving the Department</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
           </Select>
-        </FormControl>
+        </div>
 
         {(reason === "other" ||
           reason === "resignation" ||
           reason === "leave") && (
           <>
             {reason === "other" && (
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Notes</FormLabel>
+              <div className="my-2 mb-4 select-none">
+                <Label>Notes</Label>
                 <Textarea
                   placeholder="Enter the reason"
                   onChange={(e) => setNotes(e.target.value)}
                   value={notes}
                 />
-                <FormHelperText>
+                <p className="text-sm text-gray-500 mt-1">
                   Please provide a reason for your absence.
-                </FormHelperText>
-              </FormControl>
+                </p>
+              </div>
             )}
 
             {reason !== "resignation" && (
-              <Flex flexDir={"row"} gap={4}>
-                <FormControl my={2} mb={4} userSelect={"none"}>
-                  <FormLabel>End Date</FormLabel>
-                  <InputGroup flexDir={"column"}>
+              <div className="flex flex-row gap-4">
+                <div className="my-2 mb-4 select-none flex-1">
+                  <Label>End Date</Label>
+                  <div className="flex flex-col">
                     <ShadcnDatePicker
                       placeholder={"Enter end date"}
                       date={endDate}
                       setDate={setEndDate}
                     />
-                    <FormHelperText>
+                    <p className="text-sm text-gray-500 mt-1">
                       When will you return to the office?
-                    </FormHelperText>
-                  </InputGroup>
-                </FormControl>
-              </Flex>
+                    </p>
+                  </div>
+                </div>
+              </div>
             )}
 
             <UserSearchDropdown
@@ -138,7 +129,7 @@ const RequestCaretakerForm = ({
               ignoreArray={ignoreArray}
             />
 
-            <Flex w={"100%"} justifyContent={"flex-end"} mt={2}>
+            <div className="w-full flex justify-end mt-2">
               <Button
                 disabled={
                   !userData?.pk ||
@@ -147,18 +138,17 @@ const RequestCaretakerForm = ({
                   !reason ||
                   (reason === "other" && !notes)
                 }
-                variant={"solid"}
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }}
+                className={`${
+                  colorMode === "light" 
+                    ? "bg-green-500 hover:bg-green-400" 
+                    : "bg-green-600 hover:bg-green-500"
+                } text-white`}
                 type="submit"
-                leftIcon={<FaRunning />}
               >
+                <FaRunning className="mr-2 h-4 w-4" />
                 Activate
               </Button>
-            </Flex>
+            </div>
           </>
         )}
       </form>

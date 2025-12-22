@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 
 // Styles and Styling Components
-import { Box, Flex, Grid, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 import "@/styles/texteditor.css";
 
@@ -263,57 +263,39 @@ export const GuideRichTextEditor = ({
 
   return (
     // Wrapper
-    <Box pb={6} maxW={"100%"}>
-      <Flex
-        bg={colorMode === "light" ? "gray.200" : "gray.700"}
-        roundedTop={20}
-        maxW={"100%"}
-      >
-        <Flex justifyContent="flex-start" alignItems={"center"}>
-          <Text
-            pl={8}
-            my={0}
-            py={2}
-            fontWeight={"bold"}
-            fontSize={titleTextSize ? titleTextSize : "xl"}
-            color={colorMode === "dark" ? "gray.400" : null}
-          >
+    <div className="pb-6 max-w-full">
+      <div className={`flex rounded-t-[20px] max-w-full ${
+        colorMode === "light" ? "bg-gray-200" : "bg-gray-700"
+      }`}>
+        <div className="flex justify-start items-center">
+          <p className={`pl-8 my-0 py-2 font-bold text-xl ${
+            colorMode === "dark" ? "text-gray-400" : ""
+          }`} style={{ fontSize: titleTextSize || "1.25rem" }}>
             {sectionTitle}
-          </Text>
-        </Flex>
+          </p>
+        </div>
 
-        <Flex justifyContent="flex-end" flex={1}>
-          <Grid
-            pr={8}
-            py={2}
-            gridTemplateColumns={"repeat(1, 1fr)"}
-            gridColumnGap={2}
-          >
+        <div className="flex justify-end flex-1">
+          <div className="pr-8 py-2 grid grid-cols-1 gap-2">
             {canEdit && (
               <HideEditorButton
                 setIsEditorOpen={setIsEditorOpen}
                 editorIsOpen={isEditorOpen}
               />
             )}
-          </Grid>
-        </Flex>
-      </Flex>
+          </div>
+        </div>
+      </div>
 
-      <Box
-        pos={"relative"}
-        maxW={"100%"}
-        roundedBottom={20}
-        boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
-        bg={
-          colorMode === "light"
-            ? isEditorOpen
-              ? "whiteAlpha.600"
-              : "whiteAlpha.400"
-            : isEditorOpen
-              ? "blackAlpha.500"
-              : "blackAlpha.400"
-        }
-      >
+      <div className={`relative max-w-full rounded-b-[20px] shadow-[rgba(100,100,111,0.1)_0px_7px_29px_0px] ${
+        colorMode === "light"
+          ? isEditorOpen
+            ? "bg-white/60"
+            : "bg-white/40"
+          : isEditorOpen
+            ? "bg-black/50"
+            : "bg-black/40"
+      }`}>
         {isEditorOpen ? (
           <EditableGuideSRTE
             adminOptionsPk={adminOptionsPk}
@@ -346,7 +328,7 @@ export const GuideRichTextEditor = ({
             shouldShowTree={shouldShowTree}
           />
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };

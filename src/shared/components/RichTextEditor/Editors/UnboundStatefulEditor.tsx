@@ -1,13 +1,7 @@
 // The basic rich text editor component; does not allow sticky notes, emotes, etc.
 
-import {
-  Box,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  InputGroup,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Label } from "@/shared/components/ui/label";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 import { ListItemNode, ListNode } from "@lexical/list";
 import { HeadingNode } from "@lexical/rich-text";
@@ -118,22 +112,16 @@ export const UnboundStatefulEditor = ({
   };
 
   return (
-    <FormControl isRequired={isRequired} pb={2} w={"100%"} zIndex={2}>
+    <div className={`pb-2 w-full z-[2] ${isRequired ? 'required' : ''}`}>
       {showTitle ? (
-        <FormLabel mb={3} ml={2}>
+        <Label className="mb-3 ml-2">
           {title}
-        </FormLabel>
+        </Label>
       ) : null}
-      <InputGroup>
-        <Box
-          pos={"relative"}
-          w={"100%"}
-          rounded={20}
-          //   boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
-          boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
-          bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
-          zIndex={2}
-        >
+      <div className="relative">
+        <div className={`relative w-full rounded-[20px] shadow-[rgba(100,100,111,0.1)_0px_7px_29px_0px] z-[2] ${
+          colorMode === "light" ? "bg-white/60" : "bg-black/50"
+        }`}>
           {isPlain ? (
             <SimpleStatefulPlainTE
               allowInsertButton={allowInsertButton}
@@ -162,13 +150,13 @@ export const UnboundStatefulEditor = ({
               hideUnderline={hideUnderline}
             />
           )}
-        </Box>
-      </InputGroup>
+        </div>
+      </div>
       {helperText ? (
-        <FormHelperText ml={2} color={helperTextColor ?? helperTextColor}>
+        <p className={`ml-2 text-sm text-muted-foreground ${helperTextColor ? `text-[${helperTextColor}]` : ''}`}>
           {helperText}
-        </FormHelperText>
+        </p>
       ) : null}
-    </FormControl>
+    </div>
   );
 };

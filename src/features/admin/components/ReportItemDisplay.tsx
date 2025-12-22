@@ -36,6 +36,7 @@ import { useUser } from "@/features/users/hooks/useUser";
 import { RichTextEditor } from "@/shared/components/RichTextEditor/Editors/RichTextEditor";
 import { TextButtonFlex } from "@/shared/components/TextButtonFlex";
 import { ReportMediaChanger } from "./ReportMediaChanger";
+import { cn } from "@/shared/utils/component.utils";
 
 export const ReportItemDisplay = ({
   pk,

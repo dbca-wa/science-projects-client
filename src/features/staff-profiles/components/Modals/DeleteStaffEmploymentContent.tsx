@@ -41,8 +41,6 @@ const DeleteStaffEmploymentContent = ({
     onError: () => {
       console.log("error");
       toast.error("Failed");
-        position: "top-right",
-      });
     },
     // onMutate: () => {
     //   console.log("mutation");

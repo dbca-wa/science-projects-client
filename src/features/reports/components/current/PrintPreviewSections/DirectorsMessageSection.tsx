@@ -1,5 +1,4 @@
 import { PrintPreview } from "@/shared/components/RichTextEditor/Editors/PrintPreview";
-import { Center, Flex, Text } from "@chakra-ui/react";
 
 interface IEDM {
   dm: string;
@@ -7,12 +6,12 @@ interface IEDM {
 
 export const DirectorsMessageSection = ({ dm }: IEDM) => {
   return (
-    <Flex flexDir={"column"}>
-      <Center mb={10}>
-        <Text fontWeight={"bold"} fontSize={"2xl"}>
+    <div className="flex flex-col">
+      <div className="flex justify-center mb-10">
+        <p className="text-2xl font-bold">
           Executive Director's Message
-        </Text>
-      </Center>
+        </p>
+      </div>
 
       <PrintPreview
         canEdit={false}
@@ -21,6 +20,6 @@ export const DirectorsMessageSection = ({ dm }: IEDM) => {
         editorType={"Comment"}
         isUpdate={false}
       />
-    </Flex>
+    </div>
   );
 };

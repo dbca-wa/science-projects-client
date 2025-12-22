@@ -1,38 +1,20 @@
 // Component that shows the details of a project member, including their role, time allocation, whether they are the leader, and their position in
 // the manage team component (drag and droppable by Admins and leader)
 
-import {
-  Avatar,
-  Box,
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  FormHelperText,
-  Grid,
-  Icon,
-  Image,
-  Input,
-  InputGroup,
-  Select,
-  Slider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
-  Spacer,
-  Spinner,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Slider } from "@/shared/components/ui/slider";
+import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { FiCopy } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/shared/utils/cn";
 import {
   RemoveUserMutationType,
   promoteUserToLeader,
@@ -133,9 +115,6 @@ export const ProjectUserDetails = ({
   const formatted_date = useFormattedDate(user?.date_joined);
 
   const { colorMode } = useColorMode();
-  const borderColor = colorMode === "light" ? "gray.300" : "gray.500";
-  const sectionTitleColor = colorMode === "light" ? "gray.600" : "gray.300";
-  const subsectionTitleColor = colorMode === "light" ? "gray.500" : "gray.500";
 
   const copyEmail = useCopyText(user?.email);
 
@@ -226,13 +205,6 @@ export const ProjectUserDetails = ({
     }
   };
 
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   // removeUserMutation.mutate()
   // await removeTeamMemberFromProject({ user: user.pk, project: project_id });
   const queryClient = useQueryClient();
@@ -247,25 +219,12 @@ export const ProjectUserDetails = ({
     mutationFn: updateProjectMember,
     onMutate: () => {
       console.log("Updating Project Membership");
-
-      addToast({
-        status: "loading",
-        title: "Updating Project Membership",
-        position: "top-right",
-      });
+      toast.loading("Updating Project Membership");
     },
 
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `User Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.success("User Updated");
       // reset()
 
       setTimeout(
@@ -290,16 +249,8 @@ export const ProjectUserDetails = ({
     },
     onError: (error) => {
       console.log(error);
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Promote User",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.error(`Could Not Update User: ${error}`);
     },
   });
 
@@ -307,25 +258,12 @@ export const ProjectUserDetails = ({
     mutationFn: promoteUserToLeader,
     onMutate: () => {
       console.log("Promoting user");
-
-      addToast({
-        status: "loading",
-        title: "Promoting Member",
-        position: "top-right",
-      });
+      toast.loading("Promoting Member");
     },
 
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `User Promoted`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.success("User Promoted");
       // reset()
 
       setTimeout(
@@ -350,16 +288,8 @@ export const ProjectUserDetails = ({
     },
     onError: (error) => {
       console.log(error);
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Promote User",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.error(`Could Not Promote User: ${error}`);
     },
   });
 
@@ -367,25 +297,12 @@ export const ProjectUserDetails = ({
     mutationFn: removeTeamMemberFromProject,
     onMutate: () => {
       console.log("Removing user");
-
-      addToast({
-        status: "loading",
-        title: "Removing Member",
-        position: "top-right",
-      });
+      toast.loading("Removing Member");
     },
 
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `User Removed`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.success("User Removed");
       // reset()
 
       onClose();
@@ -412,16 +329,8 @@ export const ProjectUserDetails = ({
     },
     onError: (error) => {
       console.log(error);
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Remove User",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.error(`Could Not Remove User: ${error}`);
     },
   });
 
@@ -433,42 +342,38 @@ export const ProjectUserDetails = ({
   });
 
   return loading || pk === undefined ? (
-    <Center w={"100%"} h={"100%"}>
-      <Spinner size={"xl"} />
-    </Center>
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+    </div>
   ) : (
-    <Flex flexDir={"column"} h={"100%"}>
-      <Flex mt={4}>
-        <Avatar
-          src={
-            user?.image?.file
-              ? user.image.file
-              : user?.image?.old_file
-                ? user.image.old_file
-                : ""
-          }
-          size={"2xl"}
-        />
+    <div className="flex flex-col h-full">
+      <div className="flex mt-4">
+        <Avatar className="w-16 h-16">
+          <AvatarImage
+            src={
+              user?.image?.file
+                ? user.image.file
+                : user?.image?.old_file
+                  ? user.image.old_file
+                  : ""
+            }
+          />
+          <AvatarFallback>
+            {user?.display_first_name?.[0] || user?.first_name?.[0] || user?.username?.[0] || "U"}
+          </AvatarFallback>
+        </Avatar>
 
-        <Flex
-          flexDir={"column"}
-          flex={1}
-          justifyContent={"center"}
-          ml={4}
-          overflow={"auto"}
-        >
-          <Text userSelect={"none"} fontWeight={"bold"}>
+        <div className="flex flex-col flex-1 justify-center ml-4 overflow-auto">
+          <p className="select-none font-bold">
             {!user?.display_first_name?.startsWith("None")
               ? `${user.display_first_name ?? user.first_name} ${user.display_last_name ?? user.last_name}`
               : `${user.username}`}
-          </Text>
-          {/* <Text userSelect={"none"}>{user?.expertise}</Text> */}
-          <Text userSelect={"none"}>
+          </p>
+          {/* <p className="select-none">{user?.expertise}</p> */}
+          <p className="select-none">
             {user?.phone ? user.phone : "No Phone number"}
-          </Text>
-          <Flex
-          // mt={1}
-          >
+          </p>
+          <div className="flex">
             {/* {!user?.email?.startsWith("unset") && (
               <Button
                 mr={2}
@@ -484,209 +389,190 @@ export const ProjectUserDetails = ({
                 <Icon as={FiCopy} />
               </Button>
             )} */}
-            <Text userSelect={"none"}>
+            <p className="select-none">
               {user?.email?.startsWith("unset") ? "No Email" : user?.email}
-            </Text>
-          </Flex>
+            </p>
+          </div>
           {!user?.email?.startsWith("unset") && (
             <Button
-              // ml={2}
-              size={"xs"}
-              variant={"ghost"}
-              color={"white"}
-              background={colorMode === "light" ? "blue.500" : "blue.600"}
-              _hover={{
-                background: colorMode === "light" ? "blue.400" : "blue.500",
-              }}
+              size="sm"
+              variant="ghost"
+              className={cn(
+                "text-white mt-2 px-4 w-fit rounded",
+                colorMode === "light" 
+                  ? "bg-blue-500 hover:bg-blue-400" 
+                  : "bg-blue-600 hover:bg-blue-500"
+              )}
               onClick={copyEmail}
-              leftIcon={<FiCopy />}
-              ml={0}
-              rounded={4}
-              mt={2}
-              px={4}
-              w={"fit-content"}
             >
+              <FiCopy className="mr-2 h-4 w-4" />
               Copy Email
-              {/* <Icon as={FiCopy} /> */}
             </Button>
           )}
-        </Flex>
-      </Flex>
+        </div>
+      </div>
 
-      <Grid
-        gridTemplateColumns={"repeat(2, 1fr)"}
-        gridGap={4}
-        mt={4}
-        pt={2}
-        pb={4}
-      >
+      <div className="grid grid-cols-2 gap-4 mt-4 pt-2 pb-4">
         {!user?.is_staff && (
           <Button
-            bg={colorMode === "light" ? "blue.500" : "blue.400"}
-            color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
-            isDisabled={user.email?.startsWith("unset")}
+            className={cn(
+              "text-white",
+              colorMode === "light" ? "bg-blue-500" : "bg-blue-400"
+            )}
+            disabled={user.email?.startsWith("unset")}
           >
             Email
           </Button>
         )}
         {user?.is_staff && (
           <Button
-            bg={colorMode === "light" ? "blue.500" : "blue.400"}
-            color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
-            isDisabled={true}
+            className={cn(
+              "text-white",
+              colorMode === "light" ? "bg-blue-500" : "bg-blue-400"
+            )}
+            disabled={true}
           >
             Chat
           </Button>
         )}
 
         <Button
-          bg={colorMode === "light" ? "red.500" : "red.600"}
-          color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.900"}
-          _hover={{
-            bg: colorMode === "light" ? "red.400" : "red.500",
-          }}
+          className={cn(
+            "text-white",
+            colorMode === "light" 
+              ? "bg-red-500 hover:bg-red-400" 
+              : "bg-red-600 hover:bg-red-500"
+          )}
           onClick={removeThisUser}
-          isDisabled={usersCount === 1}
+          disabled={usersCount === 1}
           // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
         >
           Remove from Project
         </Button>
-      </Grid>
+      </div>
 
-      <Flex
-        border={"1px solid"}
-        rounded={"xl"}
-        borderColor={borderColor}
-        padding={4}
-        mb={4}
-        flexDir={"column"}
-        mt={2}
-      >
+      <div className={cn(
+        "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+        colorMode === "light" ? "border-gray-300" : "border-gray-500"
+      )}>
         {humanReadableRoleName(userRole) === "Project Leader" &&
         !me?.userData.is_superuser ? (
           "Project Leaders cannot change to a different role."
         ) : (
           <>
-            <Flex>
-              <Text
-                fontWeight={"bold"}
-                fontSize={"sm"}
-                mb={1}
-                color={sectionTitleColor}
-              >
+            <div className="flex">
+              <p className={cn(
+                "font-bold text-sm mb-1",
+                colorMode === "light" ? "text-gray-600" : "text-gray-300"
+              )}>
                 Project Role (
                 {userRole ? humanReadableRoleName(userRole) : "None"})
-              </Text>
-            </Flex>
-            <FormControl py={2}>
-              <InputGroup>
+              </p>
+            </div>
+            <div className="py-2">
+              <div className="w-full">
                 <Select
-                  variant="filled"
-                  placeholder="Select a Role for the User" // This will show when no role is selected
-                  onChange={(e) => handleUpdateRole(e.target.value)}
                   value={userRole}
-                  isInvalid={!isRoleValid} // Show error state (all users need role)
-                  isDisabled={
+                  onValueChange={(value) => handleUpdateRole(value)}
+                  disabled={
                     humanReadableRoleName(userRole) === "Project Leader" &&
                     !me?.userData.is_superuser
                   }
                 >
-                  {/* NO empty option - force user to pick a real role */}
-                  {user?.is_staff ? (
-                    <>
-                      <option value="technical">Technical Support</option>
-                      <option value="research">Science Support</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="academicsuper">Academic Supervisor</option>
-                      <option value="consulted">Consulted Peer</option>
-                      <option value="externalcol">External Collaborator</option>
-                      <option value="group">Involved Group</option>
-                      <option value="student">Supervised Student</option>
-                    </>
-                  )}
-                </Select>{" "}
-              </InputGroup>
-              <FormHelperText color={!isRoleValid ? "red.500" : undefined}>
+                  <SelectTrigger className={cn(
+                    "w-full",
+                    !isRoleValid && "border-red-500"
+                  )}>
+                    <SelectValue placeholder="Select a Role for the User" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {user?.is_staff ? (
+                      <>
+                        <SelectItem value="technical">Technical Support</SelectItem>
+                        <SelectItem value="research">Science Support</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="academicsuper">Academic Supervisor</SelectItem>
+                        <SelectItem value="consulted">Consulted Peer</SelectItem>
+                        <SelectItem value="externalcol">External Collaborator</SelectItem>
+                        <SelectItem value="group">Involved Group</SelectItem>
+                        <SelectItem value="student">Supervised Student</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className={cn(
+                "text-sm mt-1",
+                !isRoleValid ? "text-red-500" : "text-gray-500"
+              )}>
                 {!isRoleValid
                   ? "Please select a role for this team member"
                   : "The role this team member fills within this project."}
-              </FormHelperText>
-            </FormControl>
+              </p>
+            </div>
           </>
         )}
 
-        <Flex mt={4}>
-          <Text
-            fontWeight={"bold"}
-            fontSize={"sm"}
-            mb={1}
-            color={sectionTitleColor}
-          >
+        <div className="flex mt-4">
+          <p className={cn(
+            "font-bold text-sm mb-1",
+            colorMode === "light" ? "text-gray-600" : "text-gray-300"
+          )}>
             Time Allocation ({fteValue} FTE)
-          </Text>
-        </Flex>
-        {/* <Text>-</Text> */}
+          </p>
+        </div>
+        {/* <p>-</p> */}
         <Slider
-          defaultValue={fteValue}
+          defaultValue={[fteValue]}
           min={0}
           max={1}
           step={0.1}
-          onChangeEnd={(sliderValue) => {
-            handleUpdateFTE(sliderValue);
-          }}
-        >
-          <SliderTrack bg="blue.100">
-            <Box position="relative" right={10} />
-            <SliderFilledTrack bg="blue.500" />
-          </SliderTrack>
-          <SliderThumb boxSize={6} bg="blue.300" />
-        </Slider>
+          onValueChange={(value) => handleUpdateFTE(value[0])}
+          className="w-full"
+        />
 
-        <Flex mt={4}>
-          <Text
-            fontWeight={"bold"}
-            fontSize={"sm"}
-            mb={1}
-            color={sectionTitleColor}
-          >
+        <div className="flex mt-4">
+          <p className={cn(
+            "font-bold text-sm mb-1",
+            colorMode === "light" ? "text-gray-600" : "text-gray-300"
+          )}>
             Short Code
-          </Text>
-        </Flex>
+          </p>
+        </div>
         <Input
           autoComplete="off"
-          defaultValue={shortCode}
+          defaultValue={shortCode?.toString()}
           onChange={(e) => setShortCodeValue(e.target.value)}
         />
-        {/* <Text>-</Text> */}
+        {/* <p>-</p> */}
         {!is_leader &&
           (me?.userData.is_superuser ||
             me?.userData.pk === ba_leader ||
             me?.userData?.pk === leader_pk) && (
             <Button
-              mt={4}
-              bg={colorMode === "dark" ? "green.600" : "green.500"}
-              color={"white"}
-              _hover={{
-                bg: colorMode === "dark" ? "green.500" : "green.400",
-              }}
-              isDisabled={!user?.is_staff}
+              className={cn(
+                "mt-4 text-white",
+                colorMode === "dark" 
+                  ? "bg-green-600 hover:bg-green-500" 
+                  : "bg-green-500 hover:bg-green-400"
+              )}
+              disabled={!user?.is_staff}
               onClick={promoteThisUser}
-
               // TODO: Disable also if not superuser and not in project or in project but not leader (superusers can do whatever unless only one user)
             >
               Promote to Leader
             </Button>
           )}
         <Button
-          color={"white"}
-          background={colorMode === "light" ? "blue.500" : "blue.600"}
-          _hover={{
-            background: colorMode === "light" ? "blue.400" : "blue.500",
-          }}
-          mt={4}
-          isDisabled={!isRoleValid} // Disable if no role selected
+          className={cn(
+            "text-white mt-4",
+            colorMode === "light" 
+              ? "bg-blue-500 hover:bg-blue-400" 
+              : "bg-blue-600 hover:bg-blue-500"
+          )}
+          disabled={!isRoleValid} // Disable if no role selected
           onClick={() =>
             updateProjectUser({
               projectPk: project_id,
@@ -699,75 +585,67 @@ export const ProjectUserDetails = ({
         >
           {!isRoleValid ? "Please Select a Role" : "Save Changes"}
         </Button>
-      </Flex>
+      </div>
 
-      <Box>
-        <Flex
-          border={"1px solid"}
-          rounded={"xl"}
-          borderColor={borderColor}
-          padding={4}
-          mb={4}
-          flexDir={"column"}
-        >
-          <Flex flexDir={"column"}>
+      <div>
+        <div className={cn(
+          "border rounded-xl p-4 mb-4 flex flex-col",
+          colorMode === "light" ? "border-gray-300" : "border-gray-500"
+        )}>
+          <div className="flex flex-col">
             {user?.is_staff && (
-              <Flex h={"60px"}>
-                <Image
-                  rounded={"lg"}
-                  w="60px"
-                  h="60px"
-                  src={"/dbca.jpg"}
-                  objectFit="cover"
+              <div className="flex h-15">
+                <img
+                  className="rounded-lg w-15 h-15 object-cover"
+                  src="/dbca.jpg"
+                  alt="DBCA Logo"
                 />
-                <Center>
-                  <Flex ml={3} flexDir="column">
-                    <Text fontWeight="bold" color={sectionTitleColor}>
+                <div className="flex items-center justify-center">
+                  <div className="ml-3 flex flex-col">
+                    <p className={cn(
+                      "font-bold",
+                      colorMode === "light" ? "text-gray-600" : "text-gray-300"
+                    )}>
                       {user.agency !== null
                         ? user.agency.name
                         : "agency returning none"}
-                    </Text>
-                    <Text
-                      fontSize="sm"
-                      color={colorMode === "light" ? "gray.600" : "gray.400"}
-                    >
+                    </p>
+                    <p className={cn(
+                      "text-sm",
+                      colorMode === "light" ? "text-gray-600" : "text-gray-400"
+                    )}>
                       {user.branch !== null
                         ? `${user.branch.name} Branch`
                         : "Branch not set"}
-                    </Text>
-                  </Flex>
-                </Center>
-              </Flex>
+                    </p>
+                  </div>
+                </div>
+              </div>
             )}
             {!user?.is_staff && (
-              <Text color={colorMode === "light" ? "gray.600" : "gray.300"}>
+              <p className={cn(
+                colorMode === "light" ? "text-gray-600" : "text-gray-300"
+              )}>
                 <b>External User</b> - This user does not belong to DBCA
-              </Text>
+              </p>
             )}
-          </Flex>
-        </Flex>
+          </div>
+        </div>
 
-        <Flex
-          border={"1px solid"}
-          rounded={"xl"}
-          borderColor={borderColor}
-          padding={4}
-          mb={4}
-          flexDir={"column"}
-          mt={2}
-        >
-          <Flex>
-            <Text
-              fontWeight={"bold"}
-              fontSize={"sm"}
-              mb={1}
-              color={sectionTitleColor}
-            >
+        <div className={cn(
+          "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+          colorMode === "light" ? "border-gray-300" : "border-gray-500"
+        )}>
+          <div className="flex">
+            <p className={cn(
+              "font-bold text-sm mb-1",
+              colorMode === "light" ? "text-gray-600" : "text-gray-300"
+            )}>
               About
-            </Text>
-          </Flex>
-          <Box
-            mt={1}
+            </p>
+          </div>
+          <div
+            className="mt-1"
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(
                 colorMode === "dark"
@@ -796,18 +674,16 @@ export const ProjectUserDetails = ({
               ? user.about
               : "This user has not filled in this section."}
           </Text> */}
-          <Flex mt={4}>
-            <Text
-              fontWeight={"bold"}
-              fontSize={"sm"}
-              mb={1}
-              color={sectionTitleColor}
-            >
+          <div className="flex mt-4">
+            <p className={cn(
+              "font-bold text-sm mb-1",
+              colorMode === "light" ? "text-gray-600" : "text-gray-300"
+            )}>
               Expertise
-            </Text>
-          </Flex>
-          <Box
-            mt={1}
+            </p>
+          </div>
+          <div
+            className="mt-1"
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(
                 colorMode === "dark"
@@ -832,35 +708,28 @@ export const ProjectUserDetails = ({
               ),
             }}
           />
-          {/* <Text>
+          {/* <p>
             {user?.expertise
               ? user.expertise
               : "This user has not filled in this section."}
-          </Text> */}
-        </Flex>
+          </p> */}
+        </div>
 
-        <Spacer />
+        <div className="flex-grow" />
 
-        <Flex
-          border={"1px solid"}
-          rounded={"xl"}
-          borderColor={borderColor}
-          padding={4}
-          mb={4}
-          flexDir={"column"}
-          mt={2}
-        >
-          <Flex>
-            <Text
-              fontWeight={"bold"}
-              fontSize={"sm"}
-              mb={1}
-              color={sectionTitleColor}
-            >
+        <div className={cn(
+          "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+          colorMode === "light" ? "border-gray-300" : "border-gray-500"
+        )}>
+          <div className="flex">
+            <p className={cn(
+              "font-bold text-sm mb-1",
+              colorMode === "light" ? "text-gray-600" : "text-gray-300"
+            )}>
               Details
-            </Text>
-          </Flex>
-          <Grid gridTemplateColumns="1fr 3fr">
+            </p>
+          </div>
+          <div className="grid grid-cols-[1fr_3fr]">
             {/* <Text color={subsectionTitleColor}>
               <b>Role: </b>
             </Text>
@@ -869,78 +738,64 @@ export const ProjectUserDetails = ({
                 ? user.role
                 : "This user has not filled in this section."}
             </Text> */}
-            <Text color={subsectionTitleColor}>
+            <p className="text-gray-500">
               <b>Joined: </b>
-            </Text>
-            <Text>{formatted_date}</Text>
-          </Grid>
-          <Flex
-            mt={4}
-            rounded="xl"
-            p={4}
-            bg={colorMode === "light" ? "gray.50" : "gray.600"}
-          >
-            <Grid gridTemplateColumns="repeat(3, 1fr)" gap={3} w="100%">
-              <Grid
-                gridTemplateColumns={"repeat(1, 1fr)"}
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Text mb="8px" fontWeight={"bold"} color={subsectionTitleColor}>
+            </p>
+            <p>{formatted_date}</p>
+          </div>
+          <div className={cn(
+            "mt-4 rounded-xl p-4",
+            colorMode === "light" ? "bg-gray-50" : "bg-gray-600"
+          )}>
+            <div className="grid grid-cols-3 gap-3 w-full">
+              <div className="flex flex-col justify-center items-center">
+                <p className="mb-2 font-bold text-gray-500">
                   Active?
-                </Text>
+                </p>
                 {user?.is_active ? (
                   <FcApproval />
                 ) : (
-                  <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                  <div className={cn(
+                    colorMode === "light" ? "text-red-500" : "text-red-600"
+                  )}>
                     <AiFillCloseCircle />
-                  </Box>
+                  </div>
                 )}
-              </Grid>
+              </div>
 
-              <Grid
-                gridTemplateColumns={"repeat(1, 1fr)"}
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Text mb="8px" fontWeight={"bold"} color={subsectionTitleColor}>
+              <div className="flex flex-col justify-center items-center">
+                <p className="mb-2 font-bold text-gray-500">
                   Staff?
-                </Text>
+                </p>
                 {user?.is_staff ? (
                   <FcApproval />
                 ) : (
-                  <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                  <div className={cn(
+                    colorMode === "light" ? "text-red-500" : "text-red-600"
+                  )}>
                     <AiFillCloseCircle />
-                  </Box>
+                  </div>
                 )}
-              </Grid>
+              </div>
 
-              <Grid
-                gridTemplateColumns={"repeat(1, 1fr)"}
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Text mb="8px" fontWeight={"bold"} color={subsectionTitleColor}>
+              <div className="flex flex-col justify-center items-center">
+                <p className="mb-2 font-bold text-gray-500">
                   Superuser?
-                </Text>
+                </p>
                 {user?.is_superuser ? (
                   <FcApproval />
                 ) : (
-                  <Box color={colorMode === "light" ? "red.500" : "red.600"}>
+                  <div className={cn(
+                    colorMode === "light" ? "text-red-500" : "text-red-600"
+                  )}>
                     <AiFillCloseCircle />
-                  </Box>
+                  </div>
                 )}
-              </Grid>
-            </Grid>
-          </Flex>
-        </Flex>
-      </Box>
-    </Flex>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

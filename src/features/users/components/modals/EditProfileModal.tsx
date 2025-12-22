@@ -1,23 +1,10 @@
 import { useProfile } from "@/features/users/hooks/useProfile";
-import {
-  Box,
-  Button,
-  FormLabel,
-  Grid,
-  Input,
-  InputGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -33,6 +20,7 @@ import useServerImageUrl from "@/shared/hooks/useServerImageUrl";
 import type { IProfile } from "@/shared/types";
 import { StatefulMediaChangerAvatar } from "@/features/admin/components/StatefulMediaChangerAvatar";
 import DatabaseRichTextEditor from "@/features/staff-profiles/components/Editor/DatabaseRichTextEditor";
+import { cn } from "@/shared/utils/component.utils";
 
 interface IEditProfileModalProps {
   isOpen: boolean;
@@ -86,10 +74,9 @@ export const EditProfileModal = ({
   } = useForm<IProfileUpdateVariables>();
 
   // Toast management
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const toastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (message: string) => {
+    toastIdRef.current = toast.loading(message);
   };
 
   // Query client and mutation setup
@@ -102,41 +89,24 @@ export const EditProfileModal = ({
   >({
     mutationFn: updateProfile,
     onMutate: () => {
-      addToast({
-        title: "Updating profile...",
-        description: "One moment!",
-        status: "loading",
-        position: "top-right",
-      });
+      addToast("Updating profile...");
     },
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: [`profile`, userId] });
       queryClient.refetchQueries({ queryKey: [`me`] });
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Information Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
       }
+      toast.success("Information Updated");
       onClose?.();
     },
     onError: (error) => {
       console.log(error);
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: `${error?.response?.data ? error.response.data : error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
       }
+      toast.error(`Update failed: ${error?.response?.data ? error.response.data : error}`);
     },
   });
 
@@ -191,39 +161,31 @@ export const EditProfileModal = ({
   }, [isOpen]);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size={"3xl"}
-      scrollBehavior="inside"
-      initialFocusRef={initialFocusRef}
-    >
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-        as="form"
-        onSubmit={handleSubmit(onSubmit)}
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent 
+        className={cn(
+          "max-w-3xl max-h-[80vh] overflow-y-auto",
+          colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+        )}
       >
-        <ModalHeader>Edit Profile</ModalHeader>
-        <ModalCloseButton />
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+        </DialogHeader>
         {!isLoading && (
-          <>
-            <ModalBody pos="relative" flex={1} ref={modalBodyRef}>
-              <Box userSelect="none">
-                <InputGroup>
-                  <Input
-                    type="hidden"
-                    {...register("userPk", { required: true, value: userId })}
-                    readOnly
-                  />
-                </InputGroup>
-              </Box>
-              <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4}>
-                <Box id="image-section">
-                  <FormLabel tabIndex={-1} ref={initialFocusRef}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="flex-1 relative" ref={modalBodyRef}>
+              <div className="select-none">
+                <Input
+                  type="hidden"
+                  {...register("userPk", { required: true, value: userId })}
+                  readOnly
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                <div id="image-section">
+                  <Label tabIndex={-1} ref={initialFocusRef}>
                     Image
-                  </FormLabel>
+                  </Label>
 
                   <StatefulMediaChangerAvatar
                     helperText={"Upload an image that represents you."}
@@ -238,9 +200,9 @@ export const EditProfileModal = ({
                       queryClient.refetchQueries();
                     }}
                   />
-                </Box>
+                </div>
 
-                <Box my={2}>
+                <div className="my-2">
                   <Controller
                     name="about"
                     control={control}
@@ -257,8 +219,8 @@ export const EditProfileModal = ({
                       />
                     )}
                   />
-                </Box>
-                <Box my={2}>
+                </div>
+                <div className="my-2">
                   <Controller
                     name="expertise"
                     control={control}
@@ -275,28 +237,26 @@ export const EditProfileModal = ({
                       />
                     )}
                   />
-                </Box>
-              </Grid>
-            </ModalBody>
-            <ModalFooter>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
               <Button
-                isLoading={mutation.isPending}
+                disabled={mutation.isPending || !isValid}
                 type="submit"
-                bgColor={colorMode === "light" ? `green.500` : `green.600`}
-                color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-                _hover={{
-                  bg: colorMode === "light" ? `green.600` : `green.400`,
-                  color: colorMode === "light" ? `white` : `white`,
-                }}
-                ml={3}
-                isDisabled={!isValid}
+                className={cn(
+                  "ml-3 text-white",
+                  colorMode === "light" 
+                    ? "bg-green-500 hover:bg-green-600" 
+                    : "bg-green-600 hover:bg-green-400"
+                )}
               >
-                Update
+                {mutation.isPending ? "Updating..." : "Update"}
               </Button>
-            </ModalFooter>
-          </>
+            </DialogFooter>
+          </form>
         )}
-      </ModalContent>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   );
 };

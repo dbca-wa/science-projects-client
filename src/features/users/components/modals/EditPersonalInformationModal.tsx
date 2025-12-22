@@ -1,32 +1,15 @@
 // Modal component for editing a user's personal information
 
 import { usePersonalInfo } from "@/features/users/hooks/usePersonalInfo";
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Grid,
-  Icon,
-  Input,
-  InputGroup,
-  InputLeftAddon,
-  InputLeftElement,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiFillPhone } from "react-icons/ai";
 import { GiGraduateCap } from "react-icons/gi";
@@ -56,15 +39,7 @@ export const EditPersonalInformationModal = ({
   const { colorMode } = useColorMode();
 
   const [hoveredTitle, setHoveredTitle] = useState(false);
-  const titleBorderColor = `${
-    colorMode === "light"
-      ? hoveredTitle
-        ? "blackAlpha.300"
-        : "blackAlpha.200"
-      : hoveredTitle
-        ? "whiteAlpha.400"
-        : "whiteAlpha.300"
-  }`;
+  const [loadingToastId, setLoadingToastId] = useState<string | number | null>(null);
 
   const handleCloseModal = () => {
     reset();
@@ -82,13 +57,6 @@ export const EditPersonalInformationModal = ({
     formState: { errors },
   } = useForm<IPIUpdateVariables>();
 
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
@@ -100,43 +68,26 @@ export const EditPersonalInformationModal = ({
     // Start of mutation handling
     mutationFn: updatePersonalInformation,
     onMutate: () => {
-      addToast({
-        title: "Updating personal information...",
-        description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        duration: 3000,
-      });
+      const toastId = toast.loading("Updating personal information...");
+      setLoadingToastId(toastId);
     },
     // Success handling based on API-file-declared interface
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: [`personalInfo`, userId] });
       queryClient.refetchQueries({ queryKey: [`me`] });
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Information Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
       }
+      toast.success("Information Updated");
       onClose?.();
     },
     // Error handling based on API-file-declared interface
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
       }
+      toast.error(`Update failed: ${error}`);
     },
   });
 
@@ -160,83 +111,58 @@ export const EditPersonalInformationModal = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleCloseModal}
-      size={"3xl"}
-      scrollBehavior="inside"
-    >
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>Edit Personal Information</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody as={"form"} onSubmit={handleSubmit(onSubmit)}>
+    <Dialog open={isOpen} onOpenChange={handleCloseModal}>
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Edit Personal Information</DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit(onSubmit)} className={`p-6 ${colorMode === "dark" ? "bg-gray-800 text-gray-400" : "bg-white"}`}>
           {!isLoading && (
-            <Grid gridColumnGap={8} gridTemplateColumns={"repeat(2, 1fr)"}>
+            <div className="grid grid-cols-2 gap-8">
               {/* Title */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel
+              <div className="my-2 mb-4 select-none">
+                <Label
                   onMouseEnter={() => setHoveredTitle(true)}
                   onMouseLeave={() => setHoveredTitle(false)}
                 >
                   Title
-                </FormLabel>
+                </Label>
 
-                <InputGroup>
-                  <InputLeftAddon
-                    left={0}
-                    bg="transparent"
-                    pl={2}
-                    zIndex={1}
-                    borderColor={titleBorderColor}
-                    borderTopRightRadius={"none"}
-                    borderBottomRightRadius={"none"}
-                    borderRight={"none"}
-                  >
-                    <Icon as={GiGraduateCap} />
-                  </InputLeftAddon>
-                  <Select
-                    placeholder={"Select a title"}
-                    borderLeft={"none"}
-                    borderTopLeftRadius={"none"}
-                    borderBottomLeftRadius={"none"}
-                    pl={"0.5px"}
-                    borderLeftColor={"transparent"}
-                    onMouseEnter={() => setHoveredTitle(true)}
-                    onMouseLeave={() => setHoveredTitle(false)}
-                    {...register("title", {
-                      value: data?.title,
-                    })}
-                  >
-                    <option value="dr">Dr</option>
-                    <option value="mr">Mr</option>
-                    <option value="mrs">Mrs</option>
-                    <option value="ms">Ms</option>
-                    <option value="aprof">A/Prof</option>
-                    <option value="prof">Prof</option>
+                <div className="flex">
+                  <div className="flex items-center px-2 border border-r-0 rounded-l-md bg-transparent">
+                    <GiGraduateCap className="h-4 w-4" />
+                  </div>
+                  <Select {...register("title", { value: data?.title })}>
+                    <SelectTrigger className="rounded-l-none border-l-0">
+                      <SelectValue placeholder="Select a title" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dr">Dr</SelectItem>
+                      <SelectItem value="mr">Mr</SelectItem>
+                      <SelectItem value="mrs">Mrs</SelectItem>
+                      <SelectItem value="ms">Ms</SelectItem>
+                      <SelectItem value="aprof">A/Prof</SelectItem>
+                      <SelectItem value="prof">Prof</SelectItem>
+                    </SelectContent>
                   </Select>
-                </InputGroup>
+                </div>
                 {errors.title && (
-                  <FormErrorMessage>{errors.title.message}</FormErrorMessage>
+                  <p className="text-sm text-red-500 mt-1">{errors.title.message}</p>
                 )}
-              </FormControl>
+              </div>
 
               {/* Phone */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Phone</FormLabel>
-                <InputGroup>
-                  <InputLeftElement>
-                    <Icon as={AiFillPhone} />
-                  </InputLeftElement>
+              <div className="my-2 mb-4 select-none">
+                <Label>Phone</Label>
+                <div className="relative">
+                  <AiFillPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
                     autoComplete="off"
                     type="text"
-                    placeholder={"Enter a phone number"}
+                    placeholder="Enter a phone number"
+                    className="pl-10"
                     {...register("phone", {
-                      // placeHolder: "Enter a phone number",
                       pattern: {
                         value: phoneValidationPattern,
                         message: "Invalid phone number",
@@ -244,25 +170,23 @@ export const EditPersonalInformationModal = ({
                       value: data?.phone,
                     })}
                   />
-                </InputGroup>
+                </div>
                 {errors.phone && (
-                  <FormErrorMessage>{errors.phone.message}</FormErrorMessage>
+                  <p className="text-sm text-red-500 mt-1">{errors.phone.message}</p>
                 )}
-              </FormControl>
+              </div>
 
               {/* Fax */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Fax</FormLabel>
-                <InputGroup>
-                  <InputLeftElement>
-                    <Icon as={MdFax} />
-                  </InputLeftElement>
+              <div className="my-2 mb-4 select-none">
+                <Label>Fax</Label>
+                <div className="relative">
+                  <MdFax className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
                     autoComplete="off"
                     type="text"
-                    placeholder={"Enter a fax number"}
+                    placeholder="Enter a fax number"
+                    className="pl-10"
                     {...register("fax", {
-                      // placeHolder: "Enter a phone number",
                       pattern: {
                         value: phoneValidationPattern,
                         message: "Invalid fax number",
@@ -270,99 +194,88 @@ export const EditPersonalInformationModal = ({
                       value: data?.fax,
                     })}
                   />
-                </InputGroup>
+                </div>
                 {errors.fax && (
-                  <FormErrorMessage>{errors.fax.message}</FormErrorMessage>
+                  <p className="text-sm text-red-500 mt-1">{errors.fax.message}</p>
                 )}
-              </FormControl>
+              </div>
 
               {/* Email */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Email</FormLabel>
-                <InputGroup>
-                  <InputLeftElement>
-                    <Icon as={GrMail} />
-                  </InputLeftElement>
+              <div className="my-2 mb-4 select-none">
+                <Label>Email</Label>
+                <div className="relative">
+                  <GrMail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
                     autoComplete="off"
                     type="email"
                     placeholder={data?.email}
                     value={data?.email}
-                    isDisabled={true}
+                    disabled={true}
+                    className="pl-10"
                   />
-                </InputGroup>
-              </FormControl>
+                </div>
+              </div>
 
               {/* First Name */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>First Name</FormLabel>
-                <InputGroup>
-                  <InputLeftElement>
-                    <Icon as={RiNumber1} />
-                  </InputLeftElement>
+              <div className="my-2 mb-4 select-none">
+                <Label>First Name</Label>
+                <div className="relative">
+                  <RiNumber1 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
                     autoComplete="off"
                     type="text"
                     placeholder={data?.display_first_name ?? data?.first_name}
+                    className="pl-10"
                     {...register("display_first_name", {
                       value: data?.display_first_name ?? data?.first_name,
                     })}
                   />
-                </InputGroup>
-              </FormControl>
+                </div>
+              </div>
 
               {/* Last Name */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Last Name</FormLabel>
-                <InputGroup>
-                  <InputLeftElement>
-                    <Icon as={RiNumber2} />
-                  </InputLeftElement>
+              <div className="my-2 mb-4 select-none">
+                <Label>Last Name</Label>
+                <div className="relative">
+                  <RiNumber2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
                     autoComplete="off"
                     type="text"
                     placeholder={data?.display_last_name ?? data?.last_name}
+                    className="pl-10"
                     {...register("display_last_name", {
                       value: data?.display_last_name ?? data?.last_name,
                     })}
                   />
-                </InputGroup>
-              </FormControl>
-            </Grid>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* UserPk */}
           {/* Prefilled and hidden */}
-          <FormControl my={2} mb={4} userSelect={"none"}>
-            <InputGroup>
-              <Input
-                type="hidden"
-                {...register("userPk", {
-                  required: true,
-                  value: userId,
-                })}
-                readOnly // Setting the input as read-only
-              />
-            </InputGroup>
-          </FormControl>
+          <div className="my-2 mb-4 select-none hidden">
+            <Input
+              type="hidden"
+              {...register("userPk", {
+                required: true,
+                value: userId,
+              })}
+              readOnly
+            />
+          </div>
 
-          <ModalFooter>
+          <DialogFooter>
             <Button
-              isLoading={mutation.isPending}
+              disabled={mutation.isPending}
               type="submit"
-              bgColor={colorMode === "light" ? `green.500` : `green.600`}
-              color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-              _hover={{
-                bg: colorMode === "light" ? `green.600` : `green.400`,
-                color: colorMode === "light" ? `white` : `white`,
-              }}
-              ml={3}
+              className="bg-green-500 hover:bg-green-600 text-white ml-3"
             >
               Update
             </Button>
-          </ModalFooter>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

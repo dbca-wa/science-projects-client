@@ -1,33 +1,12 @@
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Icon,
-  InputGroup,
-  InputLeftAddon,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-  Tag,
-  TagCloseButton,
-  TagLabel,
-  Text,
-  type ToastId,
-  type UseToastOptions,
-  VisuallyHiddenInput,
-  useColorMode,
-  useToast,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Badge } from "@/shared/components/ui/badge";
+import { X } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -59,6 +38,7 @@ import TagInput from "@/features/projects/components/forms/TagInput";
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import { useEditorContext } from "@/shared/hooks/EditorBlockerContext";
 import { StatefulMediaChangerProject } from "@/features/admin/components/StatefulMediaChangerProject";
+import { cn } from "@/shared/utils/cn";
 
 interface Props {
   projectPk: string | number;
@@ -254,15 +234,6 @@ export const EditProjectModal = ({
     (details?.student as IStudentProjectDetails)?.level,
   );
   const [hoveredTitle, setHoveredTitle] = useState(false);
-  const titleBorderColor = `${
-    colorMode === "light"
-      ? hoveredTitle
-        ? "blackAlpha.300"
-        : "blackAlpha.200"
-      : hoveredTitle
-        ? "whiteAlpha.400"
-        : "whiteAlpha.300"
-  }`;
 
   const [keywords, setKeywords] = useState(currentKeywords);
   const [startDate, setStartDate] = useState(currentDates[0]);
@@ -349,11 +320,6 @@ export const EditProjectModal = ({
   const { register } = useForm<IEditProject>();
   const queryClient = useQueryClient();
   const meData = queryClient.getQueryData<IUserData>(["me"]);
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
 
   const [isUpdating, setIsUpdating] = useState(false);
   const closeAllEditors = useCallback(() => {
@@ -378,31 +344,11 @@ export const EditProjectModal = ({
   const updateProjectMutation = useMutation({
     mutationFn: updateProjectDetails,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Updating Project`,
-        position: "top-right",
-      });
+      toast.loading("Updating Project...");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Project Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-
-      // setTimeout(() => {
-      //   queryClient.invalidateQueries({
-      //     queryKey: ["projects", projectPk],
-      //   });
-      //   refetchData();
-      //   onClose();
-      // }, 350);
+      toast.dismiss();
+      toast.success("Project Updated");
 
       // Enhanced cache invalidation for Safari
       setTimeout(async () => {
@@ -428,61 +374,40 @@ export const EditProjectModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could Not udpate project`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.error(`Could not update project: ${error}`);
     },
   });
   const orderedDivisionSlugs = ["BCS", "CEM", "RFMS"];
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size={"full"}>
-        <ModalOverlay />
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-          overflow={"hidden"}
-          w={"100%"}
-          // ref={modalContentRef}
-        >
-          <ModalHeader>
-            <Flex
-              alignItems={"center"}
-              w={"100%"}
-              justifyContent={"flex-start"}
-            >
-              <Center cursor={"pointer"} pr={4} onClick={onClose}>
-                <Box mr={3}>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className={cn(
+          "max-w-full w-full h-full overflow-hidden",
+          colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+        )}>
+          <DialogHeader>
+            <div className="flex items-center w-full justify-start">
+              <div className="flex items-center cursor-pointer pr-4" onClick={onClose}>
+                <div className="mr-3">
                   <FaArrowLeft />
-                </Box>
-                <Text>Go Back</Text>
-              </Center>
-            </Flex>
-          </ModalHeader>
-          <ModalCloseButton />
+                </div>
+                <span>Go Back</span>
+              </div>
+            </div>
+          </DialogHeader>
 
-          <ModalBody maxW={"100%"}>
-            <VisuallyHiddenInput
+          <div className="flex-1 max-w-full px-6 py-4">
+            <input
               type="text"
               placeholder="pk"
               value={projectPk}
               readOnly
+              className="sr-only"
             />
-            <Grid
-              gridTemplateColumns={"repeat(2, 1fr)"}
-              gridGap={8}
-              maxW={"100%"}
-              // overflow={"hidden"}
-            >
-              <Box>
+            <div className="grid grid-cols-2 gap-8 max-w-full">
+              <div>
                 <UnboundStatefulEditor
                   buttonSize="sm"
                   title="Project Title"
@@ -498,12 +423,7 @@ export const EditProjectModal = ({
                   hideUnderline={!meData?.is_superuser}
                 />
                 {(details?.external as IExternalProjectDetails)?.project ? (
-                  <Grid
-                    gridTemplateColumns={"repeat(1, 1fr)"}
-                    gridGap={2}
-                    mt={2}
-                    pb={2}
-                  >
+                  <div className="grid grid-cols-1 gap-2 mt-2 pb-2">
                     <UnboundStatefulEditor
                       buttonSize="sm"
                       title="External Description"
@@ -534,30 +454,25 @@ export const EditProjectModal = ({
                       helperText="The entity/s this project is in collaboration with"
                     />
 
-                    <Flex flexWrap="wrap" gap={2} pt={0} pb={2}>
+                    <div className="flex flex-wrap gap-2 pt-0 pb-2">
                       {collaborationWith?.length > 0 &&
                         collaborationWith
                           .split(", ")
                           .map((item) => item.trim())
                           ?.map((aff, index) => (
-                            <Tag
+                            <Badge
                               key={index}
-                              size="md"
-                              borderRadius="full"
-                              variant="solid"
-                              color={"white"}
-                              background={
-                                colorMode === "light" ? "blue.500" : "blue.600"
-                              }
-                              _hover={{
-                                background:
-                                  colorMode === "light"
-                                    ? "blue.400"
-                                    : "blue.500",
-                              }}
+                              variant="secondary"
+                              className={cn(
+                                "text-white rounded-full cursor-pointer",
+                                colorMode === "light" 
+                                  ? "bg-blue-500 hover:bg-blue-400" 
+                                  : "bg-blue-600 hover:bg-blue-500"
+                              )}
                             >
-                              <TagLabel pl={1}>{aff}</TagLabel>
-                              <TagCloseButton
+                              <span className="pl-1">{aff}</span>
+                              <X
+                                className="ml-1 h-3 w-3 cursor-pointer"
                                 onClick={() => {
                                   setCollaboratingPartnersArray([]);
                                   setCollaborationWith((prevString) => {
@@ -580,21 +495,14 @@ export const EditProjectModal = ({
                                     return modifiedString;
                                   });
                                 }}
-                                userSelect={"none"}
-                                tabIndex={-1}
                               />
-                            </Tag>
+                            </Badge>
                           ))}
-                    </Flex>
-                  </Grid>
+                    </div>
+                  </div>
                 ) : (details?.student as IStudentProjectDetails)
                     ?.organisation ? (
-                  <Grid
-                    gridTemplateColumns={"repeat(1, 1fr)"}
-                    gridGap={2}
-                    mt={2}
-                    pb={2}
-                  >
+                  <div className="grid grid-cols-1 gap-2 mt-2 pb-2">
                     <AffiliationCreateSearchDropdown
                       autoFocus
                       isRequired
@@ -611,30 +519,25 @@ export const EditProjectModal = ({
                       helperText="The entity/s this project is in collaboration with"
                     />
 
-                    <Flex flexWrap="wrap" gap={2} pt={0} pb={2}>
+                    <div className="flex flex-wrap gap-2 pt-0 pb-2">
                       {organisation?.length > 0 &&
                         organisation
                           .split(", ")
                           .map((item) => item.trim())
                           ?.map((aff, index) => (
-                            <Tag
+                            <Badge
                               key={index}
-                              size="md"
-                              borderRadius="full"
-                              variant="solid"
-                              color={"white"}
-                              background={
-                                colorMode === "light" ? "blue.500" : "blue.600"
-                              }
-                              _hover={{
-                                background:
-                                  colorMode === "light"
-                                    ? "blue.400"
-                                    : "blue.500",
-                              }}
+                              variant="secondary"
+                              className={cn(
+                                "text-white rounded-full cursor-pointer",
+                                colorMode === "light" 
+                                  ? "bg-blue-500 hover:bg-blue-400" 
+                                  : "bg-blue-600 hover:bg-blue-500"
+                              )}
                             >
-                              <TagLabel pl={1}>{aff}</TagLabel>
-                              <TagCloseButton
+                              <span className="pl-1">{aff}</span>
+                              <X
+                                className="ml-1 h-3 w-3 cursor-pointer"
                                 onClick={() => {
                                   setCollaboratingPartnersArray([]);
                                   if (collaborationWith !== undefined) {
@@ -680,16 +583,14 @@ export const EditProjectModal = ({
                                     });
                                   }
                                 }}
-                                userSelect={"none"}
-                                tabIndex={-1}
                               />
-                            </Tag>
+                            </Badge>
                           ))}
-                    </Flex>
-                  </Grid>
+                    </div>
+                  </div>
                 ) : null}
 
-                <Box w={"100%"} h={"100%"} mt={2} mx={2}>
+                <div className="w-full h-full mt-2 mx-2">
                   <StartAndEndDateSelector
                     startDate={startDate}
                     endDate={endDate}
@@ -714,22 +615,17 @@ export const EditProjectModal = ({
                     setSelectedFile={setSelectedFile}
                     projectTitle={projectTitle} // Optional: for better alt text
                   />
-                </Box>
-              </Box>
+                </div>
+              </div>
 
-              <Flex flexDir={"column"}>
+              <div className="flex flex-col">
                 <TagInput
                   setTagFunction={setKeywords}
                   preExistingTags={keywords}
                 />
 
                 {(details?.external as IExternalProjectDetails).project ? (
-                  <Grid
-                    gridTemplateColumns={"repeat(1, 1fr)"}
-                    gridGap={2}
-                    mt={2}
-                    pb={2}
-                  >
+                  <div className="grid grid-cols-1 gap-2 mt-2 pb-2">
                     <UnboundStatefulEditor
                       buttonSize="sm"
                       title="External Aims"
@@ -756,74 +652,57 @@ export const EditProjectModal = ({
                       setValueFunction={setBudget}
                       setValueAsPlainText={true}
                     />
-                  </Grid>
+                  </div>
                 ) : (details?.student as IStudentProjectDetails)?.level ? (
-                  <Grid
-                    gridTemplateColumns={"repeat(1, 1fr)"}
-                    gridGap={2}
-                    mt={6}
-                    pb={6}
-                  >
-                    <FormControl isRequired userSelect={"none"}>
-                      <FormLabel
+                  <div className="grid grid-cols-1 gap-2 mt-6 pb-6">
+                    <div className="space-y-2 select-none">
+                      <Label 
+                        className="required"
                         onMouseEnter={() => setHoveredTitle(true)}
                         onMouseLeave={() => setHoveredTitle(false)}
                       >
                         Level
-                      </FormLabel>
-                      <InputGroup>
-                        <InputLeftAddon
-                          left={0}
-                          bg={
-                            colorMode === "light"
-                              ? "gray.100"
-                              : "whiteAlpha.300"
-                          }
-                          px={4}
-                          zIndex={1}
-                          borderColor={titleBorderColor}
-                          borderTopRightRadius={"none"}
-                          borderBottomRightRadius={"none"}
-                          borderRight={"none"}
-                          // boxSize={10}
-                        >
-                          <Icon as={HiAcademicCap} boxSize={5} />
-                        </InputLeftAddon>
+                      </Label>
+                      <div className="flex">
+                        <div className={cn(
+                          "flex items-center justify-center px-4 border border-r-0 rounded-l-md z-10",
+                          colorMode === "light"
+                            ? "bg-gray-100 border-gray-300"
+                            : "bg-gray-700 border-gray-600"
+                        )}>
+                          <HiAcademicCap className="h-5 w-5" />
+                        </div>
 
                         <Select
-                          placeholder={"Select a level"}
-                          borderLeft={"none"}
-                          borderTopLeftRadius={"none"}
-                          borderBottomLeftRadius={"none"}
-                          pl={"2px"}
-                          borderLeftColor={"transparent"}
-                          onMouseEnter={() => setHoveredTitle(true)}
-                          onMouseLeave={() => setHoveredTitle(false)}
-                          // {...register("title", {
-                          //     value: data?.title,
-                          // })}
-                          onChange={(e) => {
-                            setLevel(e.target.value);
-                          }}
+                          onValueChange={(value) => setLevel(value)}
                           value={level}
                         >
-                          <option value="phd">PhD</option>
-                          <option value="msc">MSc</option>
-                          <option value="honours">BSc Honours</option>
-                          <option value="fourth_year">Fourth Year</option>
-                          <option value="third_year">Third Year</option>
-                          <option value="undergrad">Undergradate</option>
+                          <SelectTrigger 
+                            className="rounded-l-none border-l-0"
+                            onMouseEnter={() => setHoveredTitle(true)}
+                            onMouseLeave={() => setHoveredTitle(false)}
+                          >
+                            <SelectValue placeholder="Select a level" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="phd">PhD</SelectItem>
+                            <SelectItem value="msc">MSc</SelectItem>
+                            <SelectItem value="honours">BSc Honours</SelectItem>
+                            <SelectItem value="fourth_year">Fourth Year</SelectItem>
+                            <SelectItem value="third_year">Third Year</SelectItem>
+                            <SelectItem value="undergrad">Undergradate</SelectItem>
+                          </SelectContent>
                         </Select>
-                      </InputGroup>
+                      </div>
 
-                      <FormHelperText>
+                      <p className="text-sm text-gray-500">
                         The level of the student and the project
-                      </FormHelperText>
-                    </FormControl>
-                  </Grid>
+                      </p>
+                    </div>
+                  </div>
                 ) : null}
 
-                <Box py={2}>
+                <div className="py-2">
                   <UserSearchDropdown
                     {...register("dataCustodian", {
                       required: true,
@@ -837,19 +716,17 @@ export const EditProjectModal = ({
                     placeholder="Search for a user"
                     helperText={"The user you would like to handle data."}
                   />
-                </Box>
+                </div>
 
                 {!baLoading && baSet && (
                   <div>
-                    <FormControl isRequired className="pt-4">
-                      <FormLabel>Business Area</FormLabel>
+                    <div className="space-y-2 pt-4">
+                      <Label className="required">Business Area</Label>
 
-                      <InputGroup>
+                      <div className="w-full">
                         <Select
-                          variant="filled"
-                          placeholder="Select a Business Area"
-                          onChange={(event) => {
-                            const pkVal = event.target.value;
+                          onValueChange={(value) => {
+                            const pkVal = value;
                             const relatedBa = businessAreaList.find(
                               (ba) => Number(ba.pk) === Number(pkVal),
                             );
@@ -857,51 +734,54 @@ export const EditProjectModal = ({
                               setBusinessArea(relatedBa);
                             }
                           }}
-                          value={businessArea?.pk}
+                          value={businessArea?.pk?.toString()}
                         >
-                          {orderedDivisionSlugs.flatMap((divSlug) => {
-                            // Filter business areas for the current division
-                            const divisionBusinessAreas = businessAreaList
-                              .filter(
-                                (ba) =>
-                                  (ba.division as IDivision).slug === divSlug &&
-                                  ba.is_active,
-                              )
-                              .sort((a, b) => a.name.localeCompare(b.name));
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a Business Area" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {orderedDivisionSlugs.flatMap((divSlug) => {
+                              // Filter business areas for the current division
+                              const divisionBusinessAreas = businessAreaList
+                                .filter(
+                                  (ba) =>
+                                    (ba.division as IDivision).slug === divSlug &&
+                                    ba.is_active,
+                                )
+                                .sort((a, b) => a.name.localeCompare(b.name));
 
-                            return divisionBusinessAreas.map((ba, index) => (
-                              <option key={`${ba.name}${index}`} value={ba.pk}>
-                                {ba?.division
-                                  ? `[${(ba?.division as IDivision)?.slug}] `
-                                  : ""}
-                                {checkIsHtml(ba.name)
-                                  ? sanitizeHtml(ba.name)
-                                  : ba.name}{" "}
-                                {ba.is_active ? "" : "(INACTIVE)"}
-                              </option>
-                            ));
-                          })}
+                              return divisionBusinessAreas.map((ba, index) => (
+                                <SelectItem key={`${ba.name}${index}`} value={ba.pk.toString()}>
+                                  {ba?.division
+                                    ? `[${(ba?.division as IDivision)?.slug}] `
+                                    : ""}
+                                  {checkIsHtml(ba.name)
+                                    ? sanitizeHtml(ba.name)
+                                    : ba.name}{" "}
+                                  {ba.is_active ? "" : "(INACTIVE)"}
+                                </SelectItem>
+                              ));
+                            })}
+                          </SelectContent>
                         </Select>
-                      </InputGroup>
-                      <FormHelperText>
+                      </div>
+                      <p className="text-sm text-gray-500">
                         The Business Area / Program that this project belongs
                         to. Only active Business Areas are selectable.
-                      </FormHelperText>
+                      </p>
                       {!businessArea && (
-                        <Text color={"red.500"} fontWeight={"semibold"} mb={4}>
+                        <p className="text-red-500 font-semibold mb-4">
                           No Business Area has been selected!
-                        </Text>
+                        </p>
                       )}
-                    </FormControl>
+                    </div>
 
-                    <FormControl mb={4} className="pt-4">
-                      <FormLabel>Departmental Service</FormLabel>
-                      <InputGroup>
+                    <div className="space-y-2 mb-4 pt-4">
+                      <Label>Departmental Service</Label>
+                      <div className="w-full">
                         <Select
-                          variant="filled"
-                          placeholder="Select a Departmental Service"
-                          onChange={(event) => {
-                            const pkVal = event.target.value;
+                          onValueChange={(value) => {
+                            const pkVal = value;
                             const depService = servicesList.find(
                               (serv) => Number(serv.pk) === Number(pkVal),
                             );
@@ -909,55 +789,55 @@ export const EditProjectModal = ({
                               setService(depService);
                             }
                           }}
-                          value={service?.pk}
+                          value={service?.pk?.toString()}
                         >
-                          {servicesList.map((service, index) => {
-                            const checkIsHtml = (data: string) => {
-                              // Regular expression to check for HTML tags
-                              const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a Departmental Service" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {servicesList.map((service, index) => {
+                              const checkIsHtml = (data: string) => {
+                                // Regular expression to check for HTML tags
+                                const htmlRegex = /<\/?[a-z][\s\S]*>/i;
 
-                              // Check if the string contains any HTML tags
-                              return htmlRegex.test(data);
-                            };
+                                // Check if the string contains any HTML tags
+                                return htmlRegex.test(data);
+                              };
 
-                            const isHtml = checkIsHtml(service.name);
-                            let serviceName = service?.name;
-                            if (isHtml === true) {
-                              const parser = new DOMParser();
-                              const dom = parser.parseFromString(
-                                service.name,
-                                "text/html",
+                              const isHtml = checkIsHtml(service.name);
+                              let serviceName = service?.name;
+                              if (isHtml === true) {
+                                const parser = new DOMParser();
+                                const dom = parser.parseFromString(
+                                  service.name,
+                                  "text/html",
+                                );
+                                const content = dom.body.textContent;
+                                serviceName = content;
+                              }
+
+                              return (
+                                <SelectItem key={index} value={service.pk.toString()}>
+                                  {serviceName}
+                                </SelectItem>
                               );
-                              const content = dom.body.textContent;
-                              serviceName = content;
-                            }
-
-                            return (
-                              <option key={index} value={service.pk}>
-                                {serviceName}
-                              </option>
-                            );
-                          })}
+                            })}
+                          </SelectContent>
                         </Select>
-                      </InputGroup>
-                      <FormHelperText>
+                      </div>
+                      <p className="text-sm text-gray-500">
                         The DBCA service that this project delivers outputs to.
-                      </FormHelperText>
-                    </FormControl>
+                      </p>
+                    </div>
                   </div>
                 )}
-              </Flex>
-            </Grid>
+              </div>
+            </div>
 
-            <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={4} mt={4}>
+            <div className="grid grid-cols-1 gap-4 mt-4">
               {!locationsLoading && (
                 <>
-                  <Grid
-                    gridTemplateColumns={"repeat(2, 1fr)"}
-                    gridColumnGap={4}
-                    px={4}
-                    w={"100%"}
-                  >
+                  <div className="grid grid-cols-2 gap-4 px-4 w-full">
                     {dbcaDistricts && dbcaDistricts.length > 0 && (
                       <AreaCheckAndMaps
                         title="DBCA Districts"
@@ -1009,27 +889,25 @@ export const EditProjectModal = ({
                         setSelectedAreas={setLocationData}
                       />
                     )}
-                  </Grid>
+                  </div>
                 </>
               )}
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+            </div>
+          </div>
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 // ref={updateButtonRef}
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }}
-                isLoading={updateProjectMutation.isPending}
-                type="submit"
-                ml={3}
-                isDisabled={!canUpdate}
+                className={cn(
+                  "text-white ml-3",
+                  colorMode === "light" 
+                    ? "bg-green-500 hover:bg-green-400" 
+                    : "bg-green-600 hover:bg-green-500"
+                )}
+                disabled={!canUpdate}
                 onClick={async () => {
                   updateProject({
                     projectPk: projectPk,
@@ -1054,10 +932,10 @@ export const EditProjectModal = ({
               >
                 Update
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

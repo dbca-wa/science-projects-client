@@ -34,15 +34,8 @@ import { useState, useEffect, useMemo, useCallback, memo, useRef } from "react";
 import { Separator } from "@/shared/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import type { BumpEmailData } from "@/shared/types";
-import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
 import { BumpEmailModalContent } from "@/features/admin/components/modals/BumpEmailModalContent";
 
 // Types based on backend response
@@ -1676,23 +1669,23 @@ const UnapprovedProjectsThisFY = () => {
           <div className="space-y-4">
             {/* Bump Modal */}
             {isBumpModalOpen && (
-              <Modal isOpen={isBumpModalOpen} onClose={handleCloseBumpModal}>
-                <ModalOverlay />
-                <ModalContent color={colorMode === "dark" ? "gray.400" : null}>
-                  <ModalHeader>
-                    {isSingleBump ? "Send Bump Email" : "Send Bulk Bump Emails"}
-                  </ModalHeader>
-                  <ModalCloseButton />
-                  <ModalBody>
+              <Dialog open={isBumpModalOpen} onOpenChange={handleCloseBumpModal}>
+                <DialogContent className={colorMode === "dark" ? "text-gray-400" : ""}>
+                  <DialogHeader>
+                    <DialogTitle>
+                      {isSingleBump ? "Send Bump Email" : "Send Bulk Bump Emails"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="py-4">
                     <BumpEmailModalContent
                       documentsRequiringAction={bumpDocuments}
                       refreshDataFn={fetchUnapprovedProjectsThisFY}
                       onClose={handleCloseBumpModal}
                       isSingleDocument={isSingleBump}
                     />
-                  </ModalBody>
-                </ModalContent>
-              </Modal>
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
 
             {/* Summary and Bump Button */}

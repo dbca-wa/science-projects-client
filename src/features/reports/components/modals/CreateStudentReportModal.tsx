@@ -1,32 +1,12 @@
 // Modal for handling creation of student reports
 
-import {
-  Text,
-  Center,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useToast,
-  useColorMode,
-  UnorderedList,
-  ListItem,
-  FormControl,
-  InputGroup,
-  Input,
-  ModalFooter,
-  Grid,
-  Button,
-  Select,
-  FormHelperText,
-  Spinner,
-  Box,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Loader2 } from "lucide-react";
 import { type ISpawnDocument, spawnNewEmptyDocument } from "@/features/reports/services/reports.service";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -85,11 +65,7 @@ export const CreateStudentReportModal = ({
     refetchStudentYears();
   }, [selectedReportId]);
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+  const [loadingToastId, setLoadingToastId] = useState<string | number | null>(null);
 
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
@@ -97,26 +73,17 @@ export const CreateStudentReportModal = ({
   const createStudentReportMutation = useMutation({
     mutationFn: spawnNewEmptyDocument,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Creating Student Report`,
-        position: "top-right",
-      });
+      const toastId = toast.loading("Creating Student Report");
+      setLoadingToastId(toastId);
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Student Report Created`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-        refetchStudentYears(() => {
-          reset();
-        });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
       }
+      toast.success("Student Report Created");
+      refetchStudentYears(() => {
+        reset();
+      });
 
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
@@ -125,16 +92,10 @@ export const CreateStudentReportModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not create student report`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
       }
+      toast.error(`Could not create student report: ${error}`);
     },
   });
 
@@ -152,125 +113,114 @@ export const CreateStudentReportModal = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(createStudentReportFunc)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Create Student Report?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <form onSubmit={handleSubmit(createStudentReportFunc)} className={colorMode === "dark" ? "bg-gray-800 text-gray-400" : "bg-white"}>
+          <DialogHeader>
+            <DialogTitle>Create Student Report?</DialogTitle>
+          </DialogHeader>
           {!availableStudentYearsLoading ? (
             <>
-              <ModalBody>
+              <div className="p-6">
                 {availableStudentYearsData.length < 1 ? (
-                  <Box mt={6}>
-                    <Text>
+                  <div className="mt-6">
+                    <p>
                       A student report cannot be created for this project as it
                       already has reports for each available year
                       {/* since its creation - potentially adjust hook and api to only get available reports since its creation*/}
-                    </Text>
-                  </Box>
+                    </p>
+                  </div>
                 ) : (
                   <>
-                    <Center mt={8}>
-                      <UnorderedList>
-                        <ListItem>
+                    <div className="mt-8 flex justify-center">
+                      <ul className="list-disc list-inside space-y-2">
+                        <li>
                           This will create a student report for the selected
                           year.
-                        </ListItem>
-                        <ListItem>
+                        </li>
+                        <li>
                           Years will only appear based on whether an annual
                           report exists for that year
-                        </ListItem>
-                        <ListItem>
+                        </li>
+                        <li>
                           Years which already have student reports for this
                           project will not be selectable
-                        </ListItem>
-                      </UnorderedList>
-                    </Center>
-                    <FormControl>
-                      <InputGroup>
-                        <Input
-                          type="hidden"
-                          {...register("projectPk", {
-                            required: true,
-                            value: Number(projectPk),
-                          })}
-                          readOnly
-                        />
-                      </InputGroup>
-                    </FormControl>
+                        </li>
+                      </ul>
+                    </div>
+                    
+                    <div className="hidden">
+                      <Input
+                        type="hidden"
+                        {...register("projectPk", {
+                          required: true,
+                          value: Number(projectPk),
+                        })}
+                        readOnly
+                      />
+                    </div>
 
-                    <FormControl mt={6}>
-                      <Select
-                        placeholder={"Select a report year"}
-                        {...register("year", { required: true })}
-                      >
-                        {availableStudentYearsData
-                          ?.sort((a, b) => b.year - a.year) // Sort years in descending order
-                          .map((freeReportYear, index: number) => {
-                            return (
-                              <option key={index} value={freeReportYear.year}>
-                                {`FY ${freeReportYear.year - 1} - ${String(
-                                  freeReportYear.year,
-                                ).slice(2)}`}
-                              </option>
-                            );
-                          })}
+                    <div className="mt-6">
+                      <Select {...register("year", { required: true })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a report year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableStudentYearsData
+                            ?.sort((a, b) => b.year - a.year) // Sort years in descending order
+                            .map((freeReportYear, index: number) => {
+                              return (
+                                <SelectItem key={index} value={String(freeReportYear.year)}>
+                                  {`FY ${freeReportYear.year - 1} - ${String(
+                                    freeReportYear.year,
+                                  ).slice(2)}`}
+                                </SelectItem>
+                              );
+                            })}
+                        </SelectContent>
                       </Select>
-                      <FormHelperText>
+                      <p className="text-sm text-muted-foreground mt-1">
                         Select an annual report for this progress report
-                      </FormHelperText>
-                    </FormControl>
+                      </p>
+                    </div>
 
-                    <FormControl>
-                      <InputGroup>
-                        <Input
-                          type="hidden"
-                          {...register("kind", {
-                            required: true,
-                            value: documentKind,
-                          })}
-                          readOnly
-                        />
-                      </InputGroup>
-                    </FormControl>
+                    <div className="hidden">
+                      <Input
+                        type="hidden"
+                        {...register("kind", {
+                          required: true,
+                          value: documentKind,
+                        })}
+                        readOnly
+                      />
+                    </div>
                   </>
                 )}
-              </ModalBody>
-              <ModalFooter>
+              </div>
+              <DialogFooter>
                 {availableStudentYearsData.length >= 1 && (
-                  <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-                    <Button colorScheme="gray" onClick={onClose}>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button variant="outline" onClick={onClose}>
                       Cancel
                     </Button>
                     <Button
-                      color={"white"}
-                      background={
-                        colorMode === "light" ? "green.500" : "green.600"
-                      }
-                      _hover={{
-                        background:
-                          colorMode === "light" ? "green.400" : "green.500",
-                      }}
-                      isLoading={createStudentReportMutation.isPending}
-                      isDisabled={!yearValue || !selectedReportId || !projPk}
                       type="submit"
-                      ml={3}
+                      disabled={!yearValue || !selectedReportId || !projPk || createStudentReportMutation.isPending}
+                      className="ml-3"
                     >
                       Create
                     </Button>
-                  </Grid>
+                  </div>
                 )}
-              </ModalFooter>
+              </DialogFooter>
             </>
           ) : (
-            <Spinner />
+            <div className="flex justify-center p-6">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
           )}
-        </ModalContent>
-      </Flex>
-    </Modal>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

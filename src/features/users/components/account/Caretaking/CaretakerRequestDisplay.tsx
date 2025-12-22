@@ -2,15 +2,10 @@ import { CancelCaretakerRequestModal } from "@/features/users/components/modals/
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import type { ICaretakerSubsections } from "@/shared/types";
-import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { Button } from "@/shared/components/ui/button";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { useState } from "react";
 import { formatDate } from "date-fns";
 
 const CaretakerRequestDisplay = ({
@@ -18,45 +13,48 @@ const CaretakerRequestDisplay = ({
   caretakerData,
   refetchCaretakerData,
 }: ICaretakerSubsections) => {
-  const {
-    isOpen: cancelModalIsOpen,
-    onOpen: onCancelModalOpen,
-    onClose: onCancelModalClose,
-  } = useDisclosure();
+  const [cancelModalIsOpen, setCancelModalIsOpen] = useState(false);
+  const onCancelModalOpen = () => setCancelModalIsOpen(true);
+  const onCancelModalClose = () => setCancelModalIsOpen(false);
+  
   const baseAPI = useApiEndpoint();
   const noImage = useNoImage();
   const { colorMode } = useColorMode();
 
   return (
     <div>
-      <Text color={"red.500"} mt={4} fontSize={"md"}>
+      <p className="text-red-500 mt-4 text-base">
         You have an active caretaker request. Please wait for admin approval or
         cancel your request:
-      </Text>
-      <Flex justifyContent={"space-between"} mt={4} alignItems={"center"}>
-        <Box display={"flex"} alignItems={"center"} gap={2}>
-          <Avatar
-            size="md"
-            name={`${caretakerData?.caretaker_request_object?.secondary_users[0]?.display_first_name} ${caretakerData?.caretaker_request_object?.secondary_users[0]?.display_last_name}`}
-            src={
-              caretakerData?.caretaker_request_object?.secondary_users[0]?.image
-                ? caretakerData?.caretaker_request_object?.secondary_users[0]?.image?.file?.startsWith(
-                    "http",
-                  )
-                  ? `${caretakerData?.caretaker_request_object?.secondary_users[0]?.image?.file}`
-                  : `${baseAPI}${caretakerData?.caretaker_request_object?.secondary_users[0]?.image?.file}`
-                : caretakerData?.caretaker_request_object?.secondary_users[0]
-                      ?.image?.old_file
-                  ? caretakerData?.caretaker_request_object?.secondary_users[0]
-                      ?.image?.old_file
-                  : noImage
-            }
-          />
-          <Box display={"flex"} flexDir={"column"}>
-            <Text
-              fontSize={"md"}
-              fontWeight={"semibold"}
-              color={colorMode === "light" ? "gray.800" : "gray.200"}
+      </p>
+      <div className="flex justify-between mt-4 items-center">
+        <div className="flex items-center gap-2">
+          <Avatar className="w-12 h-12">
+            <AvatarImage
+              src={
+                caretakerData?.caretaker_request_object?.secondary_users[0]?.image
+                  ? caretakerData?.caretaker_request_object?.secondary_users[0]?.image?.file?.startsWith(
+                      "http",
+                    )
+                    ? `${caretakerData?.caretaker_request_object?.secondary_users[0]?.image?.file}`
+                    : `${baseAPI}${caretakerData?.caretaker_request_object?.secondary_users[0]?.image?.file}`
+                  : caretakerData?.caretaker_request_object?.secondary_users[0]
+                        ?.image?.old_file
+                    ? caretakerData?.caretaker_request_object?.secondary_users[0]
+                        ?.image?.old_file
+                    : noImage
+              }
+            />
+            <AvatarFallback>
+              {caretakerData?.caretaker_request_object?.secondary_users[0]?.display_first_name?.[0]}
+              {caretakerData?.caretaker_request_object?.secondary_users[0]?.display_last_name?.[0]}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <p
+              className={`text-base font-semibold ${
+                colorMode === "light" ? "text-gray-800" : "text-gray-200"
+              }`}
             >
               {`${
                 caretakerData?.caretaker_request_object?.secondary_users[0]
@@ -65,21 +63,21 @@ const CaretakerRequestDisplay = ({
                 caretakerData?.caretaker_request_object?.secondary_users[0]
                   ?.display_last_name
               }`}
-            </Text>
-            <Text fontSize={"sm"} color={"gray.500"}>
+            </p>
+            <p className="text-sm text-gray-500">
               Requested on{" "}
               {formatDate(
                 caretakerData?.caretaker_request_object?.created_at,
                 "dd/MM/yyyy",
               )}
-            </Text>
-          </Box>
-        </Box>
+            </p>
+          </div>
+        </div>
 
-        <Flex>
+        <div className="flex">
           <Button onClick={onCancelModalOpen}>Cancel</Button>
-        </Flex>
-      </Flex>
+        </div>
+      </div>
       <CancelCaretakerRequestModal
         isOpen={cancelModalIsOpen}
         onClose={onCancelModalClose}

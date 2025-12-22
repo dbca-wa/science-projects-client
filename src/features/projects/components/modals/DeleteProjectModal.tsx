@@ -1,32 +1,15 @@
-import {
-  Text,
-  Center,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useToast,
-  useColorMode,
-  UnorderedList,
-  ListItem,
-  FormControl,
-  InputGroup,
-  Input,
-  ModalFooter,
-  Grid,
-  Button,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import { deleteProjectCall } from "@/features/projects/services/projects.service";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { ISimplePkProp } from "@/shared/types";
+import { cn } from "@/shared/utils/component.utils";
 
 interface Props {
   projectPk: string | number;
@@ -37,10 +20,9 @@ interface Props {
 export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
   const navigate = useNavigate();
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const ToastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (data: { title: string; description?: string }) => {
+    ToastIdRef.current = toast(data.title, { description: data.description });
   };
 
   // Mutation, query client, onsubmit, and api function
@@ -50,22 +32,11 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
     mutationFn: deleteProjectCall,
     onMutate: () => {
       addToast({
-        status: "loading",
         title: `Deleting`,
-        position: "top-right",
       });
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Project Deleted`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Project Deleted");
 
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
@@ -73,16 +44,7 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could Not delete project`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could Not delete project: ${error}`);
     },
   });
 
@@ -94,80 +56,79 @@ export const DeleteProjectModal = ({ projectPk, isOpen, onClose }: Props) => {
   const { register, handleSubmit } = useForm<ISimplePkProp>();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(deleteProject)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Delete Project?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn(
+        "max-w-md",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <form onSubmit={handleSubmit(deleteProject)}>
+          <DialogHeader>
+            <DialogTitle>Delete Project?</DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"semibold"} fontSize={"xl"}>
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <p className="font-semibold text-xl text-center">
                 Are you sure you want to delete this project? There's no turning
                 back.
-              </Text>
-            </Center>
-            <Center mt={8}>
-              <UnorderedList>
-                <ListItem>The Project team and area will be cleared</ListItem>
-                <ListItem>The project photo will be deleted</ListItem>
-                <ListItem>Any related comments will be deleted</ListItem>
-                <ListItem>All related documents will be deleted</ListItem>
-              </UnorderedList>
-            </Center>
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("pk", {
-                    required: true,
-                    value: Number(projectPk),
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <Center mt={2} p={5} pb={3}>
-              <Text
-                fontWeight={"bold"}
-                color={"red.400"}
-                textDecoration={"underline"}
-              >
+              </p>
+            </div>
+            
+            <div className="flex justify-center mt-8">
+              <ul className="list-disc list-inside space-y-1">
+                <li>The Project team and area will be cleared</li>
+                <li>The project photo will be deleted</li>
+                <li>Any related comments will be deleted</li>
+                <li>All related documents will be deleted</li>
+              </ul>
+            </div>
+            
+            <div>
+              <Input
+                type="hidden"
+                {...register("pk", {
+                  required: true,
+                  value: Number(projectPk),
+                })}
+                readOnly
+              />
+            </div>
+            
+            <div className="flex justify-center mt-2 p-5 pb-3">
+              <p className="font-bold text-red-400 underline">
                 This is permanent.
-              </Text>
-            </Center>
-            <Center p={5}>
-              <Text fontWeight={"semibold"} color={"blue.500"}>
+              </p>
+            </div>
+            
+            <div className="flex justify-center p-5">
+              <p className="font-semibold text-blue-500 text-center">
                 If instead you wish to create a project closure, please press
                 cancel and select 'Create Closure' from the vertical ellipsis.
-              </Text>
-            </Center>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                isLoading={deleteProjectMutation.isPending}
+                className={cn(
+                  "text-white ml-3",
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                )}
+                disabled={deleteProjectMutation.isPending}
                 type="submit"
-                ml={3}
               >
-                Delete
+                {deleteProjectMutation.isPending ? "Deleting..." : "Delete"}
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

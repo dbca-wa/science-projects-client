@@ -1,16 +1,8 @@
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import type { IProjectPlan } from "@/shared/types";
-import {
-  Box,
-  Center,
-  Flex,
-  Grid,
-  Image,
-  Progress,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Progress } from "@/shared/components/ui/progress";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useEffect, useRef, useState } from "react"; // Added useRef
 import Dropzone from "react-dropzone";
 import { BsCloudArrowUp } from "react-icons/bs";
@@ -121,7 +113,7 @@ export const MethodologyImage = ({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Box pb={6}>
+    <div className="pb-6">
       {/* Hidden file input */}
       <input
         type="file"
@@ -131,22 +123,18 @@ export const MethodologyImage = ({
         onChange={handleFileInputChange}
       />
 
-      <Flex
-        bg={colorMode === "light" ? "gray.100" : "gray.700"}
-        roundedTop={20}
+      <div
+        className={`flex rounded-t-[20px] ${
+          colorMode === "light" ? "bg-gray-100" : "bg-gray-700"
+        }`}
       >
-        <Flex justifyContent="flex-start" alignItems={"center"}>
-          <Text pl={8} my={0} py={3} fontWeight={"bold"} fontSize={"xl"}>
+        <div className="flex justify-start items-center">
+          <h2 className="pl-8 my-0 py-3 font-bold text-xl">
             Methodology Image
-          </Text>
-        </Flex>
-        <Flex justifyContent="flex-end" flex={1}>
-          <Grid
-            pr={8}
-            py={2}
-            gridTemplateColumns={"repeat(2, 1fr)"}
-            gridColumnGap={2}
-          >
+          </h2>
+        </div>
+        <div className="flex justify-end flex-1">
+          <div className="pr-8 py-2 grid grid-cols-2 gap-2">
             <SaveMethodologyImageButton
               refetch={refetch}
               buttonType={"delete"}
@@ -166,45 +154,33 @@ export const MethodologyImage = ({
               canSave={true}
               projectPlanPk={document?.pk}
             />
-          </Grid>
-        </Flex>
-      </Flex>
+          </div>
+        </div>
+      </div>
 
-      <Box
-        pos={"relative"}
-        w={"100%"}
-        boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
-        bg={colorMode === "light" ? "whiteAlpha.400" : "blackAlpha.400"}
+      <div
+        className={`relative w-full shadow-[rgba(100,100,111,0.1)_0px_7px_29px_0px] ${
+          colorMode === "light" ? "bg-white/40" : "bg-black/40"
+        }`}
       >
-        <Box
-          pos={"relative"}
-          h={"500px"}
+        <div
+          className="relative h-[500px] cursor-pointer"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          cursor={"pointer"} // Always show pointer cursor to indicate clickability
         >
           {isHovered && selectedImageUrl && !document?.methodology_image ? (
-            <Grid
-              gridTemplateColumns={"repeat(1, 1fr)"}
-              gridRowGap={"10px"}
-              right={4}
-              top={4}
-              pos={"absolute"}
-            >
-              <Box
-                bg={"white"}
-                padding={2}
-                rounded={"full"}
-                color={isHovered ? "red.500" : "green.500"}
-                _hover={{ color: "red.400" }}
+            <div className="grid grid-cols-1 gap-[10px] right-4 top-4 absolute">
+              <div
+                className={`bg-white p-2 rounded-full z-[99999] ${
+                  isHovered ? "text-red-500 hover:text-red-400" : "text-green-500"
+                }`}
                 onClick={(e) => {
                   onDeleteEntry(e);
                 }}
-                zIndex={99999}
               >
                 <ImCross size={"25px"} />
-              </Box>
-            </Grid>
+              </div>
+            </div>
           ) : null}
 
           <Dropzone multiple={false} onDrop={onFileDrop}>
@@ -213,12 +189,11 @@ export const MethodologyImage = ({
               const { onClick, ...rootProps } = getRootProps();
 
               return (
-                <Box
+                <div
                   {...rootProps}
-                  h={"100%"}
-                  width={"100%"}
-                  borderColor={colorMode === "light" ? "gray.300" : "gray.500"}
-                  roundedBottom={"lg"}
+                  className={`h-full w-full rounded-b-lg border ${
+                    colorMode === "light" ? "border-gray-300" : "border-gray-500"
+                  }`}
                   onClick={(e) => {
                     // Prevent default onClick behavior from Dropzone
                     e.stopPropagation();
@@ -228,20 +203,10 @@ export const MethodologyImage = ({
                 >
                   <input {...getInputProps()} />
                   {selectedImageUrl && selectedImageUrl !== undefined ? (
-                    <Box
-                      w={"100%"}
-                      h={"100%"}
-                      pos={"relative"}
-                      roundedBottom={"lg"}
-                    >
-                      <Box
-                        overflow={"hidden"}
-                        w={"100%"}
-                        h={"100%"}
-                        roundedBottom={"lg"}
-                      >
-                        <Image
-                          roundedBottom={"lg"}
+                    <div className="w-full h-full relative rounded-b-lg">
+                      <div className="overflow-hidden w-full h-full rounded-b-lg">
+                        <img
+                          className="rounded-b-lg object-cover w-full h-full pointer-events-none select-none"
                           src={
                             selectedImageUrl
                               ? selectedImageUrl?.startsWith("/files")
@@ -249,78 +214,50 @@ export const MethodologyImage = ({
                                 : selectedImageUrl
                               : NoImageFile
                           }
-                          objectFit={"cover"}
-                          w={"100%"}
-                          h={"100%"}
                           draggable="false"
-                          className="pointer-events-none select-none"
                         />
-                      </Box>
-                    </Box>
+                      </div>
+                    </div>
                   ) : (
-                    <Flex
-                      roundedBottom={"lg"}
-                      flexDir={"column"}
-                      justifyContent={"center"}
-                      justifyItems={"center"}
-                      w={"100%"}
-                      h={"100%"}
-                      background={"blackAlpha.800"}
-                      zIndex={3}
-                    >
-                      <Center
-                        flexDir={"column"}
-                        justifyContent={"center"}
-                        justifyItems={"center"}
-                      >
+                    <div className="rounded-b-lg flex flex-col justify-center items-center w-full h-full bg-black/80 z-[3]">
+                      <div className="flex flex-col justify-center items-center">
                         <BsCloudArrowUp size={"50px"} color={"white"} />
-                      </Center>
+                      </div>
 
-                      <Grid
-                        flexDir={"column"}
-                        alignItems={"center"}
-                        textAlign={"center"}
-                        color={"white"}
-                      >
-                        <Text px={8} textAlign={"center"}>
+                      <div className="flex flex-col items-center text-center text-white">
+                        <p className="px-8 text-center">
                           {`${helperText || "Click or drop image here"}`}
-                        </Text>
-                      </Grid>
+                        </p>
+                      </div>
 
                       {isUploading ? (
-                        <Center w={"100%"} mt={4} maxW={"xs"} mx={"auto"}>
-                          <Box w={"80%"} h={1} px={1}>
+                        <div className="w-full mt-4 max-w-xs mx-auto flex justify-center">
+                          <div className="w-4/5 h-1 px-1">
                             <Progress
-                              bg={
-                                colorMode === "light" ? "gray.200" : "gray.900"
-                              }
-                              colorScheme={
-                                uploadProgress === 100 && selectedFile
-                                  ? "green"
-                                  : "blue"
-                              }
-                              size={"xs"}
+                              className={`${
+                                colorMode === "light" ? "bg-gray-200" : "bg-gray-900"
+                              }`}
                               value={uploadProgress}
                             />
-                          </Box>
-                        </Center>
+                          </div>
+                        </div>
                       ) : null}
 
                       {isError ? (
-                        <Center>
-                          <Text color={"red.500"} mt={4}>
+                        <div className="flex justify-center">
+                          <p className="text-red-500 mt-4">
                             That file is not of the correct type
-                          </Text>
-                        </Center>
+                          </p>
+                        </div>
                       ) : null}
-                    </Flex>
+                    </div>
                   )}
-                </Box>
+                </div>
               );
             }}
           </Dropzone>
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };

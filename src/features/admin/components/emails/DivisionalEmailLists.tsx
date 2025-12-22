@@ -1,5 +1,5 @@
 import { useGetDivisions } from "@/features/admin/hooks/useGetDivisions";
-import { Spinner } from "@chakra-ui/react";
+import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import DivisionalEmailListDataTable from "./DivisionalEmailListDataTable";
 
@@ -14,7 +14,7 @@ const DivisionalEmailLists = () => {
 
   return divsLoading ? (
     <div>
-      <Spinner />
+      <Loader2 className="h-6 w-6 animate-spin" />
     </div>
   ) : (
     <div>
