@@ -1,32 +1,14 @@
-import {
-  Text,
-  Center,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useToast,
-  useColorMode,
-  UnorderedList,
-  ListItem,
-  FormControl,
-  InputGroup,
-  Input,
-  ModalFooter,
-  Grid,
-  Button,
-  Box,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import { openProjectCall } from "@/features/projects/services/projects.service";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import type { ISimplePkProp } from "@/shared/types";
+import { cn } from "@/shared/utils/component.utils";
 
 interface Props {
   projectPk: string | number;
@@ -44,10 +26,9 @@ export const ProjectReopenModal = ({
   const { register, handleSubmit, watch } = useForm<ISimplePkProp>();
   const projPk = watch("pk");
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const ToastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (data: { title: string; description?: string }) => {
+    ToastIdRef.current = toast(data.title, { description: data.description });
   };
 
   // Mutation, query client, onsubmit, and api function
@@ -57,22 +38,11 @@ export const ProjectReopenModal = ({
     mutationFn: openProjectCall,
     onMutate: () => {
       addToast({
-        status: "loading",
-        title: `Repening Project`,
-        position: "top-right",
+        title: `Reopening Project`,
       });
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Project has been reopened`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Project has been reopened");
 
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
@@ -81,16 +51,7 @@ export const ProjectReopenModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not reopen project`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could not reopen project: ${error}`);
     },
   });
 
@@ -104,93 +65,85 @@ export const ProjectReopenModal = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(openProject)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>
-            Are you sure you want to reopen this project?
-          </ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn(
+        "max-w-md",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <form onSubmit={handleSubmit(openProject)}>
+          <DialogHeader>
+            <DialogTitle>
+              Are you sure you want to reopen this project?
+            </DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={10}>
-              <Box
-                bg={colorMode === "light" ? "gray.50" : "gray.700"}
-                rounded={"2xl"}
-                p={2}
-              >
-                <Box px={4}>
-                  <Text fontWeight={"semibold"} fontSize={"xl"}>
-                    Info
-                  </Text>
-                </Box>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-10">
+              <div className={cn(
+                "rounded-2xl p-2",
+                colorMode === "light" ? "bg-gray-50" : "bg-gray-700"
+              )}>
+                <div className="px-4">
+                  <p className="font-semibold text-xl">Info</p>
+                </div>
 
-                <Box mt={8}>
-                  <Box px={4}>
-                    <Text>The following will occur:</Text>
-                  </Box>
-                  <UnorderedList px={10} pt={4}>
-                    <ListItem>
+                <div className="mt-8">
+                  <div className="px-4">
+                    <p>The following will occur:</p>
+                  </div>
+                  <ul className="list-disc px-10 pt-4 space-y-2">
+                    <li>
                       The project will become active, with the status set to
                       'updating'
-                    </ListItem>
-                    <ListItem>
+                    </li>
+                    <li>
                       The project closure document will be deleted
-                    </ListItem>
-                    <ListItem>Progress Reports can be created again</ListItem>
-                  </UnorderedList>
-                </Box>
+                    </li>
+                    <li>Progress Reports can be created again</li>
+                  </ul>
+                </div>
 
-                <Center mt={2} p={5} pb={3}>
-                  <Text
-                    fontWeight={"bold"}
-                    color={"blue.400"}
-                    textDecoration={"underline"}
-                  >
+                <div className="flex justify-center mt-2 p-5 pb-3">
+                  <p className="font-bold text-blue-400 underline">
                     You can close the project again at any time.
-                  </Text>
-                </Center>
+                  </p>
+                </div>
 
-                <FormControl>
-                  <InputGroup>
-                    <Input
-                      type="hidden"
-                      {...register("pk", {
-                        required: true,
-                        value: Number(projectPk),
-                      })}
-                      readOnly
-                    />
-                  </InputGroup>
-                </FormControl>
-              </Box>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+                <div>
+                  <Input
+                    type="hidden"
+                    {...register("pk", {
+                      required: true,
+                      value: Number(projectPk),
+                    })}
+                    readOnly
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }}
-                isLoading={reopenMutation.isPending}
+                className={cn(
+                  "text-white ml-3",
+                  colorMode === "light" 
+                    ? "bg-green-500 hover:bg-green-400" 
+                    : "bg-green-600 hover:bg-green-500"
+                )}
+                disabled={reopenMutation.isPending}
                 type="submit"
-                ml={3}
               >
-                Open Project
+                {reopenMutation.isPending ? "Opening..." : "Open Project"}
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

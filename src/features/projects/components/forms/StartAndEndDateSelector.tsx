@@ -1,4 +1,4 @@
-import { Box, FormControl, FormHelperText, Grid, Text } from "@chakra-ui/react";
+import { Label } from "@/shared/components/ui/label";
 import { DatePicker } from "./DatePicker";
 
 interface Props {
@@ -17,14 +17,9 @@ export const StartAndEndDateSelector = ({
   helperText,
 }: Props) => {
   return (
-    <FormControl mb={4}>
-      <Grid
-        w="100%"
-        h="100%"
-        // textAlign="center"
-        gridRowGap={4}
-      >
-        <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridColumnGap={8}>
+    <div className="mb-4">
+      <div className="grid h-full w-full gap-4">
+        <div className="grid grid-cols-2 gap-8">
           <DatePicker
             label={"Start Date"}
             placeholder={startDate ? `${startDate}` : "Select Start Date"}
@@ -42,22 +37,19 @@ export const StartAndEndDateSelector = ({
             selectedDate={endDate}
             setSelectedDate={setEndDate}
           />
-        </Grid>
-      </Grid>
-      <Box mt={"6px"} mb={4}>
+        </div>
+      </div>
+      <div className="mb-4 mt-1.5">
         {startDate && endDate && startDate > endDate ? (
-          <Text fontSize={"14px"} color={"red"}>
+          <p className="text-sm text-red-500">
             The end date can't come before the start date!
-          </Text>
+          </p>
         ) : (
-          <FormHelperText
-            fontSize={"14px"}
-            // color={colorMode === "light" ? "gray.600" : "gray.400"}
-          >
+          <p className="text-sm text-gray-600">
             {helperText}
-          </FormHelperText>
+          </p>
         )}
-      </Box>
-    </FormControl>
+      </div>
+    </div>
   );
 };

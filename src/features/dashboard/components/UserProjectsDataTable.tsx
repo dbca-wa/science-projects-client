@@ -19,16 +19,9 @@ import {
 } from "@tanstack/react-table";
 import { Input } from "@/shared/components/ui/input";
 import type { IProjectData, ProjectRoles } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  Icon,
-  Image,
-  Text,
-  Tooltip,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/components/ui/tooltip";
 
 import { useProjectSearchContext } from "@/features/projects/hooks/ProjectSearchContext";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
@@ -316,20 +309,16 @@ export const UserProjectsDataTable = ({
           //   Kind
           // </Text>
           <Button
-            // variant="ghost"
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
+            className={`w-full text-center ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
             Area
+            {sortIcon}
           </Button>
         );
       },
@@ -342,9 +331,9 @@ export const UserProjectsDataTable = ({
 
         // console.log({ originalKindData, formattedString });
         return (
-          <Box className="text-center align-middle font-medium">
-            <Text>{formattedString}</Text>
-          </Box>
+          <div className="text-center align-middle font-medium">
+            <p>{formattedString}</p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -375,21 +364,16 @@ export const UserProjectsDataTable = ({
 
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-left"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-start"}
-            _hover={
+            className={`w-full text-left justify-start ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
             Title
+            {sortIcon}
           </Button>
         );
       },
@@ -398,16 +382,9 @@ export const UserProjectsDataTable = ({
         const formatted = returnHTMLTitle(originalTitleData);
         const originalImageData = row?.original?.image;
         return (
-          <Flex
-            className="text-left font-medium"
-            // alignItems={"center"}
-            flexDir={"column"}
-          >
-            <Box display={"flex"}>
-              <Image
-                // float={"left"}
-                mr={4}
-                objectFit={"cover"}
+          <div className="text-left font-medium flex flex-col">
+            <div className="flex">
+              <img
                 src={
                   originalImageData !== null && originalImageData !== undefined
                     ? originalImageData?.file
@@ -415,46 +392,31 @@ export const UserProjectsDataTable = ({
                       : noImage
                     : noImage
                 }
-                boxSize={"70px"}
-                rounded={"lg"}
-                ml={4}
-                className="pointer-events-none select-none"
+                alt="Project"
+                className="pointer-events-none select-none mr-4 ml-4 w-[70px] h-[70px] object-cover rounded-lg"
               />
-              <Box display={"flex"} flexDir={"column"}>
-                <Text
-                  color={colorMode === "dark" ? "blue.200" : "blue.400"}
-                  fontWeight={"bold"}
-                  _hover={{
-                    color: colorMode === "dark" ? "blue.100" : "blue.300",
-                    textDecoration:
-                      colorMode === "dark" ? "underline" : "undefined",
+              <div className="flex flex-col">
+                <p
+                  className={`${
+                    colorMode === "dark" ? "text-blue-200 hover:text-blue-100 hover:underline" : "text-blue-400 hover:text-blue-300"
+                  } font-bold cursor-pointer px-4`}
+                  onClick={(e) => {
+                    goToProject(e, row?.original?.pk);
                   }}
-                  cursor={"pointer"}
-                  px={4}
                 >
                   {formatted}
-                </Text>
-                <Text
-                  color={"gray.400"}
-                  fontWeight={"semibold"}
-                  fontSize={"small"}
-                  px={4}
-                >
+                </p>
+                <p className="text-gray-400 font-semibold text-sm px-4">
                   {row.original.tag}
-                </Text>
+                </p>
                 {disabledColumns.created_at === true ? (
-                  <Text
-                    color={"gray.400"}
-                    fontWeight={"semibold"}
-                    fontSize={"x-small"}
-                    px={4}
-                  >
+                  <p className="text-gray-400 font-semibold text-xs px-4">
                     Created on {formatDate(row?.original?.created_at)}
-                  </Text>
+                  </p>
                 ) : null}
-              </Box>
-            </Box>
-          </Flex>
+              </div>
+            </div>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -501,20 +463,16 @@ export const UserProjectsDataTable = ({
           //   Kind
           // </Text>
           <Button
-            // variant="ghost"
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
+            className={`w-full text-center ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
             Kind
+            {sortIcon}
           </Button>
         );
       },
@@ -527,15 +485,13 @@ export const UserProjectsDataTable = ({
 
         // console.log({ originalKindData, formattedString });
         return (
-          <Box className="text-center align-middle font-medium">
+          <div className="text-center align-middle font-medium">
             {/* <Text>{formattedString}</Text> */}
-            <Icon
-              as={formattedIcon}
-              color={`${formattedColour}.500`}
-              boxSize={"22px"}
+            <formattedIcon 
+              className={`text-${formattedColour}-500 w-[22px] h-[22px]`}
             />
-            <Text color={`${formattedColour}.500`}>{formattedString}</Text>
-          </Box>
+            <p className={`text-${formattedColour}-500`}>{formattedString}</p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -566,20 +522,16 @@ export const UserProjectsDataTable = ({
           //   Kind
           // </Text>
           <Button
-            // variant="ghost"
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-center"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            bg={"transparent"}
-            _hover={
+            className={`w-full text-center ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
             Role
+            {sortIcon}
           </Button>
         );
       },
@@ -592,9 +544,9 @@ export const UserProjectsDataTable = ({
 
         // console.log({ originalKindData, formattedString });
         return (
-          <Box className="text-center align-middle font-medium">
-            <Text color={`${formattedColour}.500`}>{formattedString}</Text>
-          </Box>
+          <div className="text-center align-middle font-medium">
+            <p className={`text-${formattedColour}-500`}>{formattedString}</p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -619,21 +571,16 @@ export const UserProjectsDataTable = ({
 
         return (
           <Button
-            // variant="ghost"
-            bg={"transparent"}
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-left"
-            rightIcon={sortIcon}
-            // p={0}
-            // m={0}
-            justifyContent={"flex-start"}
-            _hover={
+            className={`w-full text-left justify-start ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
             Created
+            {sortIcon}
           </Button>
         );
       },
@@ -641,11 +588,11 @@ export const UserProjectsDataTable = ({
         // const date:Date = row.getValue("created_at");
         // const formatted = returnHTMLTitle(originalTitleData);
         return (
-          <Box className="text-left font-medium">
-            <Text fontSize={"x-small"}>
+          <div className="text-left font-medium">
+            <p className="text-xs">
               {formatDate(row.getValue("created_at"))}
-            </Text>
-          </Box>
+            </p>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -675,18 +622,16 @@ export const UserProjectsDataTable = ({
         }
         return (
           <Button
-            bg={"transparent"}
+            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full text-right"
-            rightIcon={sortIcon}
-            justifyContent={"flex-end"}
-            _hover={
+            className={`w-full text-right justify-end ${
               colorMode === "dark"
-                ? { bg: "blue.400", color: "white" }
-                : { bg: "blue.50", color: "black" }
-            }
+                ? "hover:bg-blue-400 hover:text-white"
+                : "hover:bg-blue-50 hover:text-black"
+            }`}
           >
             Status
+            {sortIcon}
           </Button>
         );
       },
@@ -697,13 +642,13 @@ export const UserProjectsDataTable = ({
         const formatted = statusMapping[originalStatusData] || "Other";
 
         return (
-          <Box
-            className="text-right font-medium"
-            color={colorMode === "light" ? "gray.500" : "gray.300"}
-            px={4}
+          <div
+            className={`text-right font-medium px-4 ${
+              colorMode === "light" ? "text-gray-500" : "text-gray-300"
+            }`}
           >
             {formatted}
-          </Box>
+          </div>
         );
       },
       sortingFn: (rowA, rowB) => {
@@ -785,19 +730,23 @@ export const UserProjectsDataTable = ({
               }}
               aria-label="Hide Inactive"
             />
-            <Tooltip
-              label="Hides terminated, suspended and completed projects"
-              aria-label="A tooltip"
-            >
-              <label
-                htmlFor="hideInactive"
-                className={
-                  "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                }
-              >
-                Hide Inactive
-              </label>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <label
+                    htmlFor="hideInactive"
+                    className={
+                      "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    }
+                  >
+                    Hide Inactive
+                  </label>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Hides terminated, suspended and completed projects</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <Input
             placeholder="Filter projects by title..."

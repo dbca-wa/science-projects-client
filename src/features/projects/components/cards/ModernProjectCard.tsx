@@ -1,15 +1,9 @@
 // Modern implementation of project cards for display when searching projects and on the projects tab of dashboard
 
 import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
-import {
-  Box,
-  Flex,
-  Image,
-  Skeleton,
-  Tag,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Badge } from "@/shared/components/ui/badge";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -49,23 +43,23 @@ export const ModernProjectCard = ({
   const statusDictionary: {
     [key: string]: { label: string; color: string };
   }[] = [
-    { new: { label: "New", color: "gray.500" } },
-    { pending: { label: "Pending Project Plan", color: "yellow.500" } },
-    { active: { label: "Active (Approved)", color: "green.500" } },
-    { updating: { label: "Update Requested", color: "yellow.500" } }, // previously "red.500"
-    { closure_requested: { label: "Closure Requested", color: "orange.500" } }, // previously "red.500"
-    { closing: { label: "Closure Pending Final Update", color: "red.500" } }, // previously "red.500"
-    { final_update: { label: "Final Update Requested", color: "red.500" } }, // previously "red.500"
-    { completed: { label: "Completed and Closed", color: "red.500" } }, // preivously blue.500"
-    { terminated: { label: "Terminated and Closed", color: "gray.800" } },
-    { suspended: { label: "Suspended", color: "gray.500" } },
+    { new: { label: "New", color: "bg-gray-500" } },
+    { pending: { label: "Pending Project Plan", color: "bg-yellow-500" } },
+    { active: { label: "Active (Approved)", color: "bg-green-500" } },
+    { updating: { label: "Update Requested", color: "bg-yellow-500" } },
+    { closure_requested: { label: "Closure Requested", color: "bg-orange-500" } },
+    { closing: { label: "Closure Pending Final Update", color: "bg-red-500" } },
+    { final_update: { label: "Final Update Requested", color: "bg-red-500" } },
+    { completed: { label: "Completed and Closed", color: "bg-red-500" } },
+    { terminated: { label: "Terminated and Closed", color: "bg-gray-800" } },
+    { suspended: { label: "Suspended", color: "bg-gray-500" } },
   ];
 
   const getStatusValue = (status: string): { label: string; color: string } => {
     const matchedStatus = statusDictionary.find((item) => status in item);
     return matchedStatus
       ? matchedStatus[status]
-      : { label: "Unknown Status", color: "gray.500" };
+      : { label: "Unknown Status", color: "bg-gray-500" };
   };
 
   const [hovered, setHovered] = useState(false);
@@ -89,35 +83,24 @@ export const ModernProjectCard = ({
 
   const noImage = useNoImage();
   return (
-    <Box onClick={goToProject} cursor={"pointer"}>
+    <div onClick={goToProject} className="cursor-pointer">
       <Skeleton
-        isLoaded={imageLoaded}
-        rounded={"2xl"}
-        h={"325px"}
-        pos={"relative"}
-        overflow={"hidden"}
-        cursor={"pointer"}
+        className={`rounded-2xl h-[325px] relative overflow-hidden cursor-pointer shadow-[0px_15px_30px_-10px_rgba(0,0,0,0.5),0px_5px_10px_-5px_rgba(0,0,0,0.1),-2px_0px_10px_-2px_rgba(0,0,0,0.2),2px_0px_10px_-2px_rgba(0,0,0,0.2)] ${
+          colorMode === "dark" ? "border border-gray-700" : ""
+        }`}
         style={{ transformStyle: "preserve-3d" }}
-        boxShadow="0px 15px 30px -10px rgba(0, 0, 0, 0.5), 0px 5px 10px -5px rgba(0, 0, 0, 0.1), -2px 0px 10px -2px rgba(0, 0, 0, 0.2), 2px 0px 10px -2px rgba(0, 0, 0, 0.2)"
-        border={colorMode === "dark" ? "1px solid" : undefined}
-        borderColor={"gray.700"}
       >
-        <Box pos={"absolute"} left={0} top={0} p={2} zIndex={999}>
-          <Tag
-            fontWeight={"semibold"}
-            color={"white"}
-            px={2}
-            py={1}
-            fontSize={"xs"}
-            bgColor={
+        <div className="absolute left-0 top-0 p-2 z-[999]">
+          <Badge
+            className={`font-semibold text-white px-2 py-1 text-xs ${
               kind === "core_function"
-                ? "red.600"
+                ? "bg-red-600"
                 : kind === "science"
-                  ? "green.500"
+                  ? "bg-green-500"
                   : kind === "student"
-                    ? "blue.400"
-                    : "gray.400"
-            }
+                    ? "bg-blue-400"
+                    : "bg-gray-400"
+            }`}
           >
             {
               kind === "core_function"
@@ -129,37 +112,27 @@ export const ModernProjectCard = ({
                     : "STP" //Student
             }
             -{year}-{number}
-          </Tag>
-        </Box>
-        <Flex
-          pos={"absolute"}
-          left={0}
-          bottom={0}
-          p={4}
-          zIndex={999}
-          // onClick={goToProject}
+          </Badge>
+        </div>
+        <div
+          className="absolute left-0 bottom-0 p-4 z-[999] flex"
           onMouseOver={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
-          <Box zIndex={3}>
+          <div className="z-[3]">
             <ExtractedHTMLTitle
               htmlContent={title}
               color={"white"}
               fontWeight={"semibold"}
               fontSize={"17px"}
-              // fontSize={"xs"}
               noOfLines={3}
             />
-          </Box>
-        </Flex>
+          </div>
+        </div>
         {hovered && (
-          <Box
-            pos="absolute"
-            top={2}
-            right={0}
-            w="max-content"
+          <div
+            className="absolute top-2 right-0 w-max z-[999]"
             style={{ perspective: 500 }}
-            zIndex={999}
           >
             <motion.div
               initial={{ opacity: 0, x: "100%" }}
@@ -168,66 +141,46 @@ export const ModernProjectCard = ({
               transition={{ duration: 0.4 }}
               style={{ transformStyle: "preserve-3d", perspective: 1000 }}
             >
-              <Text
-                roundedStart="2xl"
-                fontWeight="normal"
-                color="white"
-                bg={getStatusValue(status).color}
-                px={5}
-                py={1}
-                fontSize="xs"
+              <p
+                className={`rounded-l-2xl font-normal text-white px-5 py-1 text-xs ${getStatusValue(status).color}`}
               >
                 {getStatusValue(status).label === "Unknown Status"
                   ? status
                   : getStatusValue(status).label}
-              </Text>
+              </p>
             </motion.div>
-          </Box>
+          </div>
         )}
 
         <AspectRatio ratio={16 / 9}>
-          <Box
-            as={motion.div}
+          <motion.div
             variants={cardVariants}
             whileHover="hover"
             initial="rest"
-            // style={{ perspective: 1000 }}
             onMouseOver={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
-            rounded={"2xl"}
-            h={"325px"}
-            pos={"relative"}
-            overflow={"hidden"}
-            cursor={"pointer"}
+            className={`rounded-2xl h-[325px] relative overflow-hidden cursor-pointer shadow-[0px_15px_30px_-10px_rgba(0,0,0,0.5),0px_5px_10px_-5px_rgba(0,0,0,0.1),-2px_0px_10px_-2px_rgba(0,0,0,0.2),2px_0px_10px_-2px_rgba(0,0,0,0.2)] border-gray-700 ${
+              colorMode === "dark" ? "bg-black" : ""
+            }`}
             style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-            boxShadow="0px 15px 30px -10px rgba(0, 0, 0, 0.5), 0px 5px 10px -5px rgba(0, 0, 0, 0.1), -2px 0px 10px -2px rgba(0, 0, 0, 0.2), 2px 0px 10px -2px rgba(0, 0, 0, 0.2)"
-            // onClick={goToProject}
-            borderColor={"gray.700"}
-            background={colorMode === "dark" ? "black" : undefined}
           >
-            <Image
+            <img
               loading="lazy"
-              rounded={"2xl"}
+              className="rounded-2xl pointer-events-none select-none h-full w-full object-cover"
               src={image ? imageurl : noImage}
-              objectFit={"cover"}
               onLoad={() => setImageLoaded(true)}
-              h={"100%"}
-              w={"100%"}
               style={{ imageRendering: "crisp-edges", objectFit: "cover" }}
-              className="pointer-events-none select-none"
             />
 
-            <Box
-              pos="absolute"
-              left={0}
-              bottom={0}
-              w="100%"
-              h="50%" // Increase the height of the gradient
-              bgGradient="linear(to-t, rgba(0,0,0,0.75), transparent)" // Strengthened gradient overlay
+            <div
+              className="absolute left-0 bottom-0 w-full h-1/2"
+              style={{
+                background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)"
+              }}
             />
-          </Box>
+          </motion.div>
         </AspectRatio>
       </Skeleton>
-    </Box>
+    </div>
   );
 };

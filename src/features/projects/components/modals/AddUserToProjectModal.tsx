@@ -1,33 +1,13 @@
 // Component for adding users to a project
 
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  Text,
-  Grid,
-  Input,
-  InputGroup,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-  useColorMode,
-  Slider,
-  SliderTrack,
-  Box,
-  SliderFilledTrack,
-  SliderThumb,
-  useToast,
-  type ToastId,
-  ModalCloseButton,
-  SliderProps,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Slider } from "@/shared/components/ui/slider";
+import { Label } from "@/shared/components/ui/label";
 import { useEffect, useRef, useState } from "react";
 import { UserSearchDropdown } from "@/features/users/components/UserSearchDropdown";
 import { ProjectSearchDropdown } from "@/features/projects/components/ProjectSearchDropdown";
@@ -46,6 +26,7 @@ import {
 import { checkStaffStatusApiCall } from "@/features/users/services/users.service";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { CustomAxiosError } from "@/shared/types";
+import { cn } from "@/shared/utils/component.utils";
 
 interface IAddUserToProjectModalProps {
   isOpen: boolean;
@@ -101,15 +82,11 @@ export const AddUserToProjectModal = ({
     return humanReadable;
   };
   const { colorMode } = useColorMode();
-  const borderColor = colorMode === "light" ? "gray.300" : "gray.500";
-  const sectionTitleColor = colorMode === "light" ? "gray.600" : "gray.300";
+  const borderColor = colorMode === "light" ? "border-gray-300" : "border-gray-500";
+  const sectionTitleColor = colorMode === "light" ? "text-gray-600" : "text-gray-300";
 
   // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+  const toastIdRef = useRef<string | number | undefined>(undefined);
 
   const location = useLocation();
 
@@ -127,21 +104,12 @@ export const AddUserToProjectModal = ({
   const membershipCreationMutation = useMutation({
     mutationFn: createTeamMember,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Creating Membership",
-        position: "top-right",
-      });
+      toastIdRef.current = toast.loading("Creating Membership");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Membership Created`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
+      if (toastIdRef.current) {
+        toast.success("Membership Created", {
+          id: toastIdRef.current,
         });
       }
       reset();
@@ -173,23 +141,18 @@ export const AddUserToProjectModal = ({
       }, 350);
     },
     onError: (error: CustomAxiosError) => {
-      if (ToastIdRef.current) {
-        const nonFieldErrors = error?.response?.data?.non_field_errors;
-        const errorMessage =
-          nonFieldErrors &&
-          nonFieldErrors.includes(
-            "The fields project, user must make a unique set.",
-          )
-            ? "Cannot add a user to a project they are already in."
-            : nonFieldErrors?.join(", ") || "An error occurred";
+      const nonFieldErrors = error?.response?.data?.non_field_errors;
+      const errorMessage =
+        nonFieldErrors &&
+        nonFieldErrors.includes(
+          "The fields project, user must make a unique set.",
+        )
+          ? "Cannot add a user to a project they are already in."
+          : nonFieldErrors?.join(", ") || "An error occurred";
 
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Create Project Membership",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
+      if (toastIdRef.current) {
+        toast.error(`Could Not Create Project Membership: ${errorMessage}`, {
+          id: toastIdRef.current,
         });
       }
     },
@@ -251,31 +214,21 @@ export const AddUserToProjectModal = ({
   }, [isOpen]);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size={"2xl"}
-      scrollBehavior="inside"
-    >
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>Add To Project</ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn(
+        "max-w-2xl max-h-[80vh] overflow-y-auto",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <DialogHeader>
+          <DialogTitle>Add To Project</DialogTitle>
+        </DialogHeader>
 
-        <ModalBody>
-          <Box>
-            <Flex
-              border={"1px solid"}
-              rounded={"xl"}
-              borderColor={borderColor}
-              padding={4}
-              mb={4}
-              flexDir={"column"}
-              mt={2}
-            >
+        <div className="space-y-4">
+          <div>
+            <div className={cn(
+              "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+              borderColor
+            )}>
               {preselectedProject ? (
                 <ProjectSearchDropdown
                   inputRef={projectSearchInputRef}
@@ -325,79 +278,62 @@ export const AddUserToProjectModal = ({
                   onlyInternal={false}
                   isRequired={true}
                   setUserFunction={setSelectedUser}
-                  // preselectedUserPk={preselectedUser}
                   label="User"
                   placeholder="Search for a user"
                   helperText={"The user you would like to add."}
                 />
               )}
-            </Flex>
+            </div>
             {selectedUser && selectedProject ? (
-              <Flex
-                border={"1px solid"}
-                rounded={"xl"}
-                borderColor={borderColor}
-                padding={4}
-                mb={4}
-                flexDir={"column"}
-                mt={2}
-              >
-                <Flex>
-                  <Text
-                    fontWeight={"bold"}
-                    fontSize={"sm"}
-                    mb={1}
-                    color={sectionTitleColor}
-                  >
+              <div className={cn(
+                "border rounded-xl p-4 mb-4 flex flex-col mt-2",
+                borderColor
+              )}>
+                <div className="flex">
+                  <p className={cn("font-bold text-sm mb-1", sectionTitleColor)}>
                     Project Role ({role ? humanReadableRoleName(role) : "None"})
-                  </Text>
-                </Flex>
-                <FormControl py={2}>
-                  <InputGroup>
-                    <Select
-                      {...register("role", { required: true })}
-                      variant="filled"
-                      placeholder="Select a Role for the User"
-                      defaultValue={userIsStaff ? "technical" : "consulted"}
-                    >
+                  </p>
+                </div>
+                <div className="py-2">
+                  <Select
+                    value={role || ""}
+                    onValueChange={(value) => setValue("role", value)}
+                    defaultValue={userIsStaff ? "technical" : "consulted"}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a Role for the User" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {userIsStaff ? (
                         <>
-                          <option value="technical">Technical Support</option>
-                          <option value="research">Science Support</option>
+                          <SelectItem value="technical">Technical Support</SelectItem>
+                          <SelectItem value="research">Science Support</SelectItem>
                         </>
                       ) : (
                         <>
-                          <option value="academicsuper">
-                            Academic Supervisor
-                          </option>
-                          <option value="consulted">Consulted Peer</option>
-                          <option value="externalcol">
-                            External Collaborator
-                          </option>
-                          {/* <option value="externalpeer">External Peer</option> */}
-                          <option value="group">Involved Group</option>
-                          {/* <option value="supervising">Project Leader</option> */}
-                          <option value="student">Supervised Student</option>
+                          <SelectItem value="academicsuper">Academic Supervisor</SelectItem>
+                          <SelectItem value="consulted">Consulted Peer</SelectItem>
+                          <SelectItem value="externalcol">External Collaborator</SelectItem>
+                          <SelectItem value="group">Involved Group</SelectItem>
+                          <SelectItem value="student">Supervised Student</SelectItem>
                         </>
                       )}
-                    </Select>
-                  </InputGroup>
-                  <FormHelperText>
+                    </SelectContent>
+                  </Select>
+                  <p className={cn(
+                    "text-sm mt-1",
+                    colorMode === "dark" ? "text-gray-400" : "text-gray-600"
+                  )}>
                     The role this team member fills within this project.
-                  </FormHelperText>
-                </FormControl>
+                  </p>
+                </div>
 
-                <Flex mt={4}>
-                  <Text
-                    fontWeight={"bold"}
-                    fontSize={"sm"}
-                    mb={1}
-                    color={sectionTitleColor}
-                  >
+                <div className="flex mt-4">
+                  <p className={cn("font-bold text-sm mb-1", sectionTitleColor)}>
                     Time Allocation ({timeAllocation} FTE)
-                  </Text>
-                </Flex>
-                <Box mx={2}>
+                  </p>
+                </div>
+                <div className="mx-2">
                   <FormSlider
                     name="timeAllocation"
                     defaultValue={0}
@@ -411,38 +347,32 @@ export const AddUserToProjectModal = ({
                       watch,
                     }}
                   />
-                </Box>
+                </div>
 
-                <Flex mt={4}>
-                  <Text
-                    fontWeight={"bold"}
-                    fontSize={"sm"}
-                    mb={1}
-                    color={sectionTitleColor}
-                  >
+                <div className="flex mt-4">
+                  <Label className={cn("font-bold text-sm mb-1", sectionTitleColor)}>
                     Short Code
-                  </Text>
-                </Flex>
+                  </Label>
+                </div>
                 <Input
                   {...register("shortCode", { required: false })}
                   type="number"
                   autoComplete="off"
                 />
-              </Flex>
+              </div>
             ) : null}
-          </Box>
-        </ModalBody>
+          </div>
+        </div>
 
-        <ModalFooter>
-          <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-            <Button colorScheme="gray" onClick={onClose}>
+        <DialogFooter>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
 
             <Button
-              isDisabled={selectedProject === 0 || !selectedUser}
+              disabled={selectedProject === 0 || !selectedUser}
               onClick={() => {
-                // console.log("clicked");
                 onSubmitMembershipCreation({
                   user: selectedUser,
                   project: selectedProject,
@@ -455,20 +385,19 @@ export const AddUserToProjectModal = ({
                   position: 100,
                 });
               }}
-              bgColor={colorMode === "light" ? `green.500` : `green.600`}
-              color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-              _hover={{
-                bg: colorMode === "light" ? `green.600` : `green.400`,
-                color: colorMode === "light" ? `white` : `white`,
-              }}
-              ml={3}
+              className={cn(
+                "ml-3",
+                colorMode === "light" 
+                  ? "bg-green-500 hover:bg-green-600 text-white" 
+                  : "bg-green-600 hover:bg-green-400 text-white"
+              )}
             >
               Add User
             </Button>
-          </Grid>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -483,7 +412,7 @@ type FormFieldNames =
   | "isLeader"
   | "oldId";
 
-interface FormSliderProps extends SliderProps {
+interface FormSliderProps {
   name: FormFieldNames;
   validation?: RegisterOptions;
   formContext: {
@@ -491,23 +420,26 @@ interface FormSliderProps extends SliderProps {
     setValue: UseFormSetValue<INewMember>;
     watch: UseFormWatch<INewMember>;
   };
+  defaultValue?: number;
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
 const FormSlider = ({ name, formContext, ...rest }: FormSliderProps) => {
-  const { setValue } = formContext;
+  const { setValue, watch } = formContext;
+  const currentValue = watch(name) || rest.defaultValue || 0;
 
   // Adapt the slider's onChange to work with react-hook-form
-  const adaptedOnChange = (value: number) => {
-    setValue(name, value);
+  const adaptedOnChange = (value: number[]) => {
+    setValue(name, value[0]);
   };
 
   return (
-    <Slider {...rest} onChange={adaptedOnChange}>
-      <SliderTrack bg="blue.100">
-        <Box position="relative" right={10} />
-        <SliderFilledTrack bg="blue.500" />
-      </SliderTrack>
-      <SliderThumb boxSize={6} bg="blue.300" zIndex={0} />
-    </Slider>
+    <Slider 
+      {...rest} 
+      value={[currentValue]} 
+      onValueChange={adaptedOnChange}
+    />
   );
 };

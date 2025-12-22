@@ -1,19 +1,12 @@
 // Handler for displaying card data for creation of new projects; core function etc.
 
-import {
-  Box,
-  Center,
-  Heading,
-  ListItem,
-  Text,
-  UnorderedList,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 import ParallaxTilt from "react-parallax-tilt";
 import { CreateProjectModal } from "@/features/projects/components/modals/CreateProjectModal";
+import { cn } from "@/shared/utils/component.utils";
 
 interface INewProjectCard {
   title: string;
@@ -35,14 +28,14 @@ export const NewProjectCard = ({
   const { colorMode } = useColorMode();
   const ButtonIcon = buttonIcon;
 
-  const {
-    isOpen: isModalOpen,
-    onOpen: onOpenModal,
-    onClose: onCloseModal,
-  } = useDisclosure();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openCreateProjectModal = () => {
-    onOpenModal();
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   const cardVariants = {
@@ -63,21 +56,17 @@ export const NewProjectCard = ({
       tiltMaxAngleX={0}
       style={{ perspective: 1000, height: "100%", minHeight: "320px" }}
     >
-      <Box
-        as={motion.div}
-        h={"full"}
-        bgColor={colorMode === "light" ? "blackAlpha.200" : "gray.700"}
-        rounded={"xl"}
-        flexDir={"column"}
-        p={6}
-        position={"relative"}
-        cursor="pointer"
+      <motion.div
+        className={cn(
+          "h-full rounded-xl flex flex-col p-6 relative cursor-pointer",
+          colorMode === "light" ? "bg-black/20" : "bg-gray-700"
+        )}
         style={{
           transformStyle: "preserve-3d",
           willChange: "transform",
           backfaceVisibility: "hidden",
+          boxShadow: "0px 14px 21px -7px rgba(0, 0, 0, 0.21), 0px 2.8px 3.5px -1.4px rgba(0, 0, 0, 0.042), -2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.07), 2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.07)"
         }}
-        boxShadow="0px 14px 21px -7px rgba(0, 0, 0, 0.21), 0px 2.8px 3.5px -1.4px rgba(0, 0, 0, 0.042), -2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.07), 2.1px 0px 7px -1.4px rgba(0, 0, 0, 0.07)"
         initial={"rest"}
         whileHover="hover" // Reference to the hover key in cardVariants
         variants={cardVariants} // Variants for the animations
@@ -88,36 +77,22 @@ export const NewProjectCard = ({
         <CreateProjectModal
           projectType={title}
           isOpen={isModalOpen}
-          onClose={onCloseModal}
+          onClose={closeModal}
           icon={buttonIcon}
         />
 
         {/* TITLE */}
-        <Box
-          display={"inline-flex"}
-          alignItems={"center"}
-          justifyContent={"center"}
-          w={"100%"}
-          h={"80px"}
-          rounded={"xl"}
-          pos={"relative"}
-          p={4}
-          // bg={
-          //   colorMode === "light" ? `${colorScheme}.500` : `${colorScheme}.600`
-          // }
-          background={color ? color : undefined}
-          color={"white"}
+        <div
+          className="inline-flex items-center justify-center w-full h-20 rounded-xl relative p-4 text-white"
           style={{
+            background: color ? color : undefined,
             transform: "translateZ(0)",
             transition: "transform 0.3s ease",
             textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
           }}
-          _hover={{
-            transform: "translateZ(50px)",
-          }}
         >
-          <Center
-            mr={4}
+          <div
+            className="mr-4"
             style={{
               textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
             }}
@@ -128,46 +103,45 @@ export const NewProjectCard = ({
                 textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
               }}
             />
-          </Center>
-          <Heading
-            size={"md"}
-            colorScheme={colorScheme}
+          </div>
+          <h3
+            className="text-lg font-semibold"
             style={{
               textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
             }}
           >
             {title}
-          </Heading>
-        </Box>
+          </h3>
+        </div>
 
-        <Box mx={8}>
+        <div className="mx-8">
           {/* DESCRIPTION */}
-          <Box
-            my={4}
-            py={4}
-            mx={2}
-            color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
+          <div
+            className={cn(
+              "my-4 py-4 mx-2",
+              colorMode === "light" ? "text-black/80" : "text-white/80"
+            )}
           >
-            <Text fontSize={"md"}>{description}</Text>
-          </Box>
+            <p className="text-base">{description}</p>
+          </div>
 
           {/* INFO */}
-          <Box
-            mx={6}
-            pb={4}
-            color={colorMode === "light" ? "blackAlpha.800" : "whiteAlpha.800"}
-            ml={10}
+          <div
+            className={cn(
+              "mx-6 pb-4 ml-10",
+              colorMode === "light" ? "text-black/80" : "text-white/80"
+            )}
           >
-            <UnorderedList mt={-1}>
+            <ul className="list-disc -mt-1">
               {bulletPoints.map((point, index2) => (
-                <ListItem key={index2} fontSize={"sm"}>
+                <li key={index2} className="text-sm">
                   {point}
-                </ListItem>
+                </li>
               ))}
-            </UnorderedList>
-          </Box>
-        </Box>
-      </Box>
+            </ul>
+          </div>
+        </div>
+      </motion.div>
     </ParallaxTilt>
   );
 };

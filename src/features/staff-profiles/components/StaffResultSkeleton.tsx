@@ -1,6 +1,5 @@
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
-import { Grid } from "@chakra-ui/react";
 
 export const StaffResultSkeleton = () => {
   const skeletonLight = `bg-gray-300`;
@@ -13,23 +12,17 @@ export const StaffResultSkeleton = () => {
       <Skeleton className={`h-6 w-[230px] ${skeletonLight} `} />
       <div className="pb-2"></div>
 
-      <Grid
-        gridTemplateColumns={
+      <div
+        className={`grid gap-4 py-4 ${
           isDesktop
-            ? {
-                md: "repeat(2, 4fr)",
-                lg: "repeat(4, 4fr)",
-                xl: "repeat(4, 4fr)",
-              }
-            : "repeat(1, 1fr)"
-        }
-        gridGap={4}
-        py={4}
+            ? "md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4"
+            : "grid-cols-1"
+        }`}
       >
         {resultsArray.map((_, index) => (
           <Skeleton key={index} className={`min-h-48 ${skeletonLight}`} />
         ))}
-      </Grid>
+      </div>
     </div>
   );
 };

@@ -1,13 +1,8 @@
 import { type INewCycleEmail } from "@/features/projects/services/projects.service";
 import type { IEmailModalProps, IUserMe } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { useState } from "react";
+import { Button } from "@/shared/components/ui/button";
 import { type AxiosError, type AxiosResponse } from "axios";
 import { type FC } from "react";
 import { renderToStaticMarkup } from "react-dom/server";

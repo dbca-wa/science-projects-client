@@ -21,7 +21,7 @@ export const BaseModal = ({
   modalTitle,
   children,
 }: IModalProps) => {
-  // Convert Chakra modal sizes to Tailwind classes
+  // Convert modal sizes to Tailwind classes
   const getSizeClass = (size?: string) => {
     switch (size) {
       case "xs":

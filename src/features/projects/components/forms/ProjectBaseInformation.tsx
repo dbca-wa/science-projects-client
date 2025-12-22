@@ -1,14 +1,7 @@
 // Section to provide base information on a project before proceeding to the details and location
 
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
-import {
-  Box,
-  Button,
-  Flex,
-  Grid,
-  InputGroup,
-  VisuallyHiddenInput,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -16,6 +9,7 @@ import "@/styles/modalscrollbar.css";
 import type { IUserData } from "@/shared/types";
 import { StatefulMediaChangerProject } from "@/features/admin/components/StatefulMediaChangerProject";
 import TagInput from "./TagInput";
+import { cn } from "@/shared/utils/component.utils";
 
 interface IProjectBaseInformationProps {
   projectKind: string;
@@ -123,26 +117,28 @@ export const ProjectBaseInformation = ({
   return (
     <>
       {/* ============================ HIDING PROJECT YEAR ============================ */}
-      <InputGroup>
-        <VisuallyHiddenInput
+      <div className="hidden">
+        <input
           type="text"
           placeholder="Year"
           value={currentYear}
+          readOnly
         />
-      </InputGroup>
+      </div>
 
       {/* ============================ HIDING PROJECT KIND ============================ */}
-      <InputGroup>
-        <VisuallyHiddenInput
+      <div className="hidden">
+        <input
           type="text"
           placeholder="Kind"
           value={projectKind}
+          readOnly
         />
-      </InputGroup>
+      </div>
 
       {/* ============================ FIRST ROW: PROJECT TITLE AND KEYWORDS ============================ */}
-      <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridColumnGap={6} mb={4}>
-        <Box>
+      <div className="grid grid-cols-2 gap-6 mb-4">
+        <div>
           <UnboundStatefulEditor
             title="Project Title"
             // allowInsertButton
@@ -165,15 +161,15 @@ export const ProjectBaseInformation = ({
             hideBold={!meData?.is_superuser}
             hideUnderline={!meData?.is_superuser}
           />
-        </Box>
+        </div>
 
-        <Box>
+        <div>
           <TagInput setTagFunction={setKeywords} />
-        </Box>
-      </Grid>
+        </div>
+      </div>
 
       {/* ============================ SECOND ROW: PROJECT SUMMARY ============================ */}
-      <Box mb={6}>
+      <div className="mb-6">
         <UnboundStatefulEditor
           title="Project Summary"
           // allowInsertButton
@@ -188,10 +184,10 @@ export const ProjectBaseInformation = ({
           setValueAsPlainText={false}
           shouldFocus={false}
         />
-      </Box>
+      </div>
 
       {/* ============================ THIRD ROW: IMAGE SECTION (SPANNING FULL WIDTH) ============================ */}
-      <Box mb={4}>
+      <div className="mb-4">
         <StatefulMediaChangerProject
           helperText={"Upload an image that represents the project."}
           selectedImageUrl={selectedImageUrl}
@@ -200,10 +196,10 @@ export const ProjectBaseInformation = ({
           setSelectedFile={setSelectedFile}
           projectTitle={getPlainTextFromHTML(projectTitle)}
         />
-      </Box>
+      </div>
 
       {/* ============================ SUBMISSION/CANCEL ============================ */}
-      <Flex w={"100%"} justifyContent={"flex-end"} pb={4}>
+      <div className="w-full flex justify-end pb-4">
         <Button onClick={onClose}>Cancel</Button>
         <motion.div
           animate={{
@@ -215,14 +211,13 @@ export const ProjectBaseInformation = ({
           }}
         >
           <Button
-            isDisabled={!baseInformationFilled}
-            // colorScheme="blue"
-            background={colorMode === "light" ? "blue.500" : "blue.600"}
-            color={"white"}
-            _hover={{
-              background: colorMode === "light" ? "blue.400" : "blue.500",
-            }}
-            ml={3}
+            disabled={!baseInformationFilled}
+            className={cn(
+              "ml-3 text-white",
+              colorMode === "light" 
+                ? "bg-blue-500 hover:bg-blue-400" 
+                : "bg-blue-600 hover:bg-blue-500"
+            )}
             onClick={() => {
               if (baseInformationFilled) {
                 nextClick({
@@ -240,7 +235,7 @@ export const ProjectBaseInformation = ({
             Next &rarr;
           </Button>
         </motion.div>
-      </Flex>
+      </div>
     </>
   );
 };

@@ -1,34 +1,15 @@
-import {
-  Text,
-  Center,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useToast,
-  useColorMode,
-  UnorderedList,
-  ListItem,
-  FormControl,
-  InputGroup,
-  Input,
-  ModalFooter,
-  Grid,
-  Button,
-  Select,
-  Box,
-  FormLabel,
-  FormHelperText,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { type ICloseProjectProps, closeProjectCall } from "@/features/projects/services/projects.service";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { cn } from "@/shared/utils/component.utils";
 
 interface Props {
   projectKind: string;
@@ -47,17 +28,13 @@ export const ProjectClosureModal = ({
   refetchData,
   setToLastTab,
 }: Props) => {
-  const { register, handleSubmit, watch } = useForm<ICloseProjectProps>();
+  const { register, handleSubmit, watch, setValue } = useForm<ICloseProjectProps>();
   const [closureReason, setClosureReason] = useState("");
   const reasonValue = watch("reason");
   const outcomeValue = watch("outcome");
   const projPk = watch("projectPk");
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+  const toastIdRef = useRef<string | number | undefined>(undefined);
 
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
@@ -65,21 +42,12 @@ export const ProjectClosureModal = ({
   const closureMutation = useMutation({
     mutationFn: closeProjectCall,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Closing`,
-        position: "top-right",
-      });
+      toastIdRef.current = toast.loading("Closing");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Closure Requested`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
+      if (toastIdRef.current) {
+        toast.success("Closure Requested", {
+          id: toastIdRef.current,
         });
       }
 
@@ -91,14 +59,9 @@ export const ProjectClosureModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could Not Request Closure`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
+      if (toastIdRef.current) {
+        toast.error(`Could Not Request Closure: ${error}`, {
+          id: toastIdRef.current,
         });
       }
     },
@@ -137,145 +100,132 @@ export const ProjectClosureModal = ({
   }, [colorMode, outcomeValue]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
-      <ModalOverlay />
-      <Flex
-        as={"form"}
-        onSubmit={handleSubmit(closeProject)}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-6xl">
+        <form
+          onSubmit={handleSubmit(closeProject)}
+          className={cn(
+            colorMode === "light" ? "bg-white" : "bg-gray-800"
+          )}
         >
-          <ModalHeader>
-            Are you sure you want to close this project?
-          </ModalHeader>
-          <ModalCloseButton />
+          <DialogHeader>
+            <DialogTitle>
+              Are you sure you want to close this project?
+            </DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Grid
-              gridTemplateColumns={"repeat(1, 1fr)"}
-              gridGap={10}
-              bg={colorMode === "light" ? "white" : "gray.800"}
-            >
-              <Box
-                bg={colorMode === "light" ? "white" : "gray.800"}
-                rounded={"2xl"}
-                p={2}
-              >
-                <Box px={4}>
-                  <Text fontWeight={"semibold"} fontSize={"xl"}>
-                    Info
-                  </Text>
-                </Box>
+          <div className="px-6 py-4">
+            <div className="grid grid-cols-1 gap-10">
+              <div className={cn(
+                "rounded-2xl p-2",
+                colorMode === "light" ? "bg-white" : "bg-gray-800"
+              )}>
+                <div className="px-4">
+                  <h3 className="font-semibold text-xl">Info</h3>
+                </div>
 
-                <Box mt={8}>
-                  <Box px={4}>
-                    <Text>
+                <div className="mt-8">
+                  <div className="px-4">
+                    <p>
                       The project will remain in the system, however, the
                       following will occur:
-                    </Text>
-                  </Box>
-                  <UnorderedList px={10} pt={4}>
-                    <ListItem>Spawns a project closure document</ListItem>
-                    <ListItem>Prevents any further reports</ListItem>
-                    <ListItem>
+                    </p>
+                  </div>
+                  <ul className="px-10 pt-4 list-disc list-inside space-y-1">
+                    <li>Spawns a project closure document</li>
+                    <li>Prevents any further reports</li>
+                    <li>
                       Sets the status of the project to closure requested, until
                       the closure document is approved
-                    </ListItem>
-                  </UnorderedList>
-                </Box>
+                    </li>
+                  </ul>
+                </div>
 
-                <Center mt={2} p={5} pb={3}>
-                  <Text
-                    fontWeight={"bold"}
-                    color={"red.400"}
-                    textDecoration={"underline"}
-                  >
+                <div className="mt-2 p-5 pb-3 flex justify-center">
+                  <p className="font-bold text-red-400 underline text-center">
                     You can re-open the project at any time and the closure form
                     will be deleted.
-                  </Text>
-                </Center>
-                <Center p={5}>
-                  <Text fontWeight={"semibold"} color={"blue.500"}>
+                  </p>
+                </div>
+                <div className="p-5 flex justify-center">
+                  <p className="font-semibold text-blue-500 text-center">
                     If instead you wish to permanently delete this project,
                     please press cancel and select 'Delete' from the menu.
-                  </Text>
-                </Center>
+                  </p>
+                </div>
 
-                <FormControl>
-                  <InputGroup>
-                    <Input
-                      type="hidden"
-                      {...register("projectPk", {
-                        required: true,
-                        value: Number(projectPk),
-                      })}
-                      readOnly
-                    />
-                  </InputGroup>
-                </FormControl>
+                <div className="w-full">
+                  <Input
+                    type="hidden"
+                    {...register("projectPk", {
+                      required: true,
+                      value: Number(projectPk),
+                    })}
+                    readOnly
+                  />
+                </div>
 
-                <Center p={5}>
-                  <FormControl isRequired>
-                    <FormLabel>Outcome</FormLabel>
+                <div className="p-5 flex justify-center">
+                  <div className="space-y-2 w-full max-w-md">
+                    <Label className="required">Outcome</Label>
                     <Select
-                      {...register("outcome", { required: true })}
-                      variant="filled"
-                      placeholder="Select a Closure Reason"
+                      onValueChange={(value) => {
+                        setValue("outcome", value);
+                      }}
                     >
-                      <option value={"completed"}>Completion</option>
-                      <option value={"terminated"}>Termination</option>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a Closure Reason" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="completed">Completion</SelectItem>
+                        <SelectItem value="terminated">Termination</SelectItem>
+                      </SelectContent>
                     </Select>
-                    <FormHelperText>
+                    <p className="text-sm text-muted-foreground">
                       Select an intended outcome for this project on closure.
-                    </FormHelperText>
-                  </FormControl>
-                </Center>
+                    </p>
+                  </div>
+                </div>
 
-                <FormControl>
-                  <InputGroup>
-                    <Input
-                      type="hidden"
-                      value={closureReason}
-                      {...register("reason", { required: true })}
-                    />
-                  </InputGroup>
-                </FormControl>
+                <div className="w-full">
+                  <Input
+                    type="hidden"
+                    value={closureReason}
+                    {...register("reason", { required: true })}
+                  />
+                </div>
 
-                <Center p={5}>
-                  <Text fontWeight={"semibold"} textDecoration={"underline"}>
+                <div className="p-5 flex justify-center">
+                  <p className="font-semibold underline text-center">
                     Once created, please fill out the scientific outputs,
                     knowledge transfer and data location sections on the closure
                     form.
-                  </Text>
-                </Center>
-              </Box>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                isLoading={closureMutation.isPending}
+                className={cn(
+                  "text-white ml-3",
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                )}
                 type="submit"
-                isDisabled={!closureReason || !outcomeValue || !projPk}
-                ml={3}
+                disabled={!closureReason || !outcomeValue || !projPk}
               >
                 Request Closure
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

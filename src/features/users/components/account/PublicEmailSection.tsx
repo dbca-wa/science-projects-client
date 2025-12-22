@@ -1,19 +1,11 @@
 import { type IUpdatePublicEmail, updatePublicEmail } from "@/features/users/services/users.service";
 import type { IUserMe } from "@/shared/types";
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Input,
-  InputGroup,
-  type ToastId,
-  Tooltip,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/components/ui/tooltip";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef } from "react";
@@ -22,14 +14,7 @@ import { IoIosSave } from "react-icons/io";
 
 const PublicEmailSection = ({ me }: { me: IUserMe }) => {
   const { colorMode } = useColorMode();
-
   const queryClient = useQueryClient();
-
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
 
   const {
     register: updatePublicEmailRegister,
@@ -51,59 +36,36 @@ const PublicEmailSection = ({ me }: { me: IUserMe }) => {
   const updatePublicEmailMutation = useMutation({
     mutationFn: updatePublicEmail,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Updating Email",
-        position: "top-right",
-      });
+      toast.loading("Updating Email");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Email Updated Successfully`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.success("Email Updated Successfully");
       queryClient.invalidateQueries({
         queryKey: ["publicStaffEmail", me?.staff_profile_pk],
       });
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Update Email",
-          description: error?.response?.data
-            ? `${error.response.status}: ${
-                Object.values(error.response.data)[0]
-              }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.error(
+        error?.response?.data
+          ? `${error.response.status}: ${Object.values(error.response.data)[0]}`
+          : "Error updating email"
+      );
     },
   });
 
   return (
-    <Flex
-      w={"100%"}
-      mb={8}
-      className="grow"
-      as="form"
+    <form
+      className="w-full mb-8 flex-grow"
       id="update-public-email-form"
       onSubmit={handleUpdatePublicEmailSubmit(beginUpdatePublicEmail)}
     >
-      <FormControl>
-        <FormLabel>Public Email</FormLabel>
-        <InputGroup className="-mt-3 items-center">
+      <div className="space-y-2">
+        <Label>Public Email</Label>
+        <div className="-mt-3 flex items-center gap-4">
           <Input
-            w={"100%"}
+            className="hidden"
             autoComplete="off"
             type="hidden"
             {...updatePublicEmailRegister("staff_profile_pk", {
@@ -113,7 +75,7 @@ const PublicEmailSection = ({ me }: { me: IUserMe }) => {
           />
           <Input
             placeholder={me?.public_email ?? me?.email ?? ""}
-            w={"100%"}
+            className="flex-1"
             autoComplete="off"
             type="email"
             {...updatePublicEmailRegister("public_email", {
@@ -124,47 +86,37 @@ const PublicEmailSection = ({ me }: { me: IUserMe }) => {
               },
             })}
           />
-          <Flex
-            justifyContent={{ base: "end" }}
-            alignItems={"center"}
-            w={"100%"}
-            py={4}
-            flex={0}
-            ml={4}
-          >
-            <Tooltip
-              label="Update the address for receiving public emails"
-              aria-label="A tooltip"
-            >
-              <Button
-                bg={colorMode === "light" ? "green.500" : "green.500"}
-                _hover={{
-                  bg: colorMode === "light" ? "green.500" : "green.500",
-                }}
-                color={"white"}
-                leftIcon={<IoIosSave />}
-                // onClick={() => {}}
-                loadingText={"Updating..."}
-                isDisabled={updatePublicEmailMutation.isPending || !isValid}
-                type="submit"
-                form="update-public-email-form"
-                isLoading={updatePublicEmailMutation.isPending}
-              >
-                Update Public Email
-              </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className={`${
+                    colorMode === "light" 
+                      ? "bg-green-500 hover:bg-green-500" 
+                      : "bg-green-500 hover:bg-green-500"
+                  } text-white`}
+                  disabled={updatePublicEmailMutation.isPending || !isValid}
+                  type="submit"
+                  form="update-public-email-form"
+                >
+                  <IoIosSave className="mr-2 h-4 w-4" />
+                  {updatePublicEmailMutation.isPending ? "Updating..." : "Update Public Email"}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Update the address for receiving public emails</p>
+              </TooltipContent>
             </Tooltip>
-          </Flex>
-        </InputGroup>
-        <FormHelperText
-          className="-mt-1"
-          color={colorMode === "light" ? "gray.500" : "gray.500"}
-          fontSize={"sm"}
+          </TooltipProvider>
+        </div>
+        <p
+          className={`-mt-1 text-sm ${colorMode === "light" ? "text-gray-500" : "text-gray-500"}`}
         >
           The email address used for receiving emails from the public. By
           default your DBCA email address is used.
-        </FormHelperText>
-      </FormControl>
-    </Flex>
+        </p>
+      </div>
+    </form>
   );
 };
 

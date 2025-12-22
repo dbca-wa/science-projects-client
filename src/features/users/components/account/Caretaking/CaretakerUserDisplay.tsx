@@ -2,14 +2,10 @@ import { RemoveCaretakerModal } from "@/features/users/components/modals/RemoveC
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import type { ICaretakerObject, ICaretakerSimpleUserData } from "@/shared/types";
-import {
-  Avatar,
-  Button,
-  Flex,
-  useColorMode,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { useState } from "react";
+import { Button } from "@/shared/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 import { type FC, type ReactNode } from "react";
 
 const CaretakerUserDisplay = ({
@@ -25,11 +21,7 @@ const CaretakerUserDisplay = ({
   const baseAPI = useApiEndpoint();
   const noImage = useNoImage();
 
-  const {
-    isOpen: removeModalIsOpen,
-    onOpen: onOpenRemoveModal,
-    onClose: onRemoveModalClose,
-  } = useDisclosure();
+  const [removeModalIsOpen, setRemoveModalIsOpen] = useState(false);
 
   console.log(caretakerObject);
   const caretakee = caretakerObject.user as ICaretakerSimpleUserData;

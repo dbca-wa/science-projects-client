@@ -1,15 +1,9 @@
 // Maps out the document provided to the rich text editor components for project closure documents.
 
 import { setClosureOutcome } from "@/features/projects/services/projects.service";
-import {
-  Flex,
-  Select,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { motion } from "framer-motion";
@@ -69,30 +63,17 @@ export const ProjectClosureContents = ({
   ];
 
   const queryClient = useQueryClient();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+  const toastIdRef = useRef<string | number | undefined>(undefined);
 
   const setClosureMutation = useMutation({
     mutationFn: setClosureOutcome,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Setting Closure Outcome",
-        position: "top-right",
-      });
+      toastIdRef.current = toast.loading("Setting Closure Outcome");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Closure Outcome Set`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
+      if (toastIdRef.current) {
+        toast.success("Closure Outcome Set", {
+          id: toastIdRef.current,
         });
       }
       queryClient.invalidateQueries({
@@ -101,25 +82,22 @@ export const ProjectClosureContents = ({
       refetch();
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Set Closure Outcome",
-          description: error?.response?.data
+      if (toastIdRef.current) {
+        toast.error(
+          error?.response?.data
             ? `${error.response.status}: ${
                 Object.values(error.response.data)[0]
               }`
-            : "Error",
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+            : "Could Not Set Closure Outcome",
+          {
+            id: toastIdRef.current,
+          }
+        );
       }
     },
   });
 
-  const handleNewOutcomeSelection = (event) => {
-    const outcome = event.target.value;
+  const handleNewOutcomeSelection = (outcome: string) => {
     const closurePk = document?.pk;
     const formData = {
       outcome: outcome,
@@ -179,34 +157,34 @@ export const ProjectClosureContents = ({
       {(document.document.project.kind === "science" ||
         userData?.is_superuser) &&
       !document?.document?.directorate_approval_granted ? (
-        <Flex
-          width={"100%"}
-          mb={8}
-          p={2}
-          px={4}
-          border={"1px solid"}
-          borderColor={colorMode === "light" ? "gray.200" : "gray.600"}
-          rounded={"2xl"}
-        >
-          <Flex flex={1} justifyContent={"flex-start"} alignItems={"center"}>
-            <Text fontSize={"lg"} fontWeight={"bold"}>
-              Select an Intended Outcome:
-            </Text>
-          </Flex>
-          <Flex justifyContent={"flex-end"}>
-            <Select
-              value={selectedOutcome}
-              onChange={(event) => handleNewOutcomeSelection(event)}
-              minW={"200px"}
-            >
-              {potentialOutcomes.map((outcome) => (
-                <option key={outcome} value={outcome}>
-                  {outcome.charAt(0).toUpperCase() + outcome.slice(1)}
-                </option>
-              ))}
-            </Select>
-          </Flex>
-        </Flex>
+        <div className={`w-full mb-8 p-4 border rounded-2xl ${
+          colorMode === "light" ? "border-gray-200" : "border-gray-600"
+        }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex-1 flex justify-start items-center">
+              <h3 className="text-lg font-bold">
+                Select an Intended Outcome:
+              </h3>
+            </div>
+            <div className="flex justify-end">
+              <Select
+                value={selectedOutcome}
+                onValueChange={handleNewOutcomeSelection}
+              >
+                <SelectTrigger className="min-w-[200px]">
+                  <SelectValue placeholder="Select outcome" />
+                </SelectTrigger>
+                <SelectContent>
+                  {potentialOutcomes.map((outcome) => (
+                    <SelectItem key={outcome} value={outcome}>
+                      {outcome.charAt(0).toUpperCase() + outcome.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
       ) : null}
 
       {document.document.project.kind === "science" && (

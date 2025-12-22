@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 
 // Styles and Styling Components
-import { Box, Flex, Grid, Text, useColorMode } from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
 
 import "@/styles/texteditor.css";
 
@@ -211,80 +211,62 @@ export const RichTextEditor = ({
 
   return (
     // Wrapper
-    <Box pb={6} maxW={"100%"}>
+    <div className="max-w-full pb-6">
       {/* <div>
            <p>An editor is open. Are you sure you want to leave?</p>
            <button onClick={blocker.proceed}>Yes, Leave</button>
            <button onClick={blocker.reset}>Cancel</button>
          </div> */}
 
-      <Flex
-        bg={
+      <div
+        className={`flex max-w-full rounded-t-[20px] px-4 ${
           colorMode === "light"
             ? section === "description" ||
               section === "externalAims" ||
               section === "externalDescription"
-              ? "gray.200"
-              : "gray.100"
+              ? "bg-gray-200"
+              : "bg-gray-100"
             : section === "description" ||
                 section === "externalAims" ||
                 section === "externalDescription"
-              ? "gray.800"
-              : "gray.700"
-        }
-        // roundedTop={"8px"}
-        roundedTop={20}
-        maxW={"100%"}
-        px={4}
+              ? "bg-gray-800"
+              : "bg-gray-700"
+        }`}
       >
-        <Flex justifyContent="flex-start" alignItems={"center"}>
-          <Text
-            // pt={1}
-            // pl={4}
-            // paddingBottom={"12px"}
-            color={colorMode === "dark" ? "gray.400" : null}
-            my={0}
-            py={2}
-            fontWeight={"bold"}
-            fontSize={titleTextSize ? titleTextSize : "xl"}
+        <div className="flex items-center justify-start">
+          <p
+            className={`my-0 py-2 text-xl font-bold ${
+              colorMode === "dark" ? "text-gray-400" : ""
+            }`}
+            style={{ fontSize: titleTextSize || "1.25rem" }}
           >
             {useGetRTESectionTitle(section)}
-          </Text>
-        </Flex>
+          </p>
+        </div>
 
-        <Flex justifyContent="flex-end" flex={1}>
-          <Grid
-            // pr={8}
-            py={2}
-            gridTemplateColumns={"repeat(1, 1fr)"}
-            gridColumnGap={2}
-          >
+        <div className="flex flex-1 justify-end">
+          <div className="grid grid-cols-1 gap-2 py-2">
             {canEdit && (
               <HideEditorButton
                 setIsEditorOpen={setIsEditorOpen}
                 editorIsOpen={isEditorOpen}
               />
             )}
-          </Grid>
-        </Flex>
-      </Flex>
+          </div>
+        </div>
+      </div>
 
-      <Box
-        pos={"relative"}
-        // w={"100%"}
-        maxW={"100%"}
-        // bg={"gray.100"}
-        roundedBottom={20}
-        boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
-        bg={
+      <div
+        className={`relative max-w-full rounded-b-[20px] ${
           colorMode === "light"
             ? isEditorOpen
-              ? "whiteAlpha.600"
-              : "whiteAlpha.400"
+              ? "bg-white/60"
+              : "bg-white/40"
             : isEditorOpen
-              ? "blackAlpha.500"
-              : "blackAlpha.400"
-        }
+              ? "bg-black/50"
+              : "bg-black/40"
+        }`}
+        style={{ boxShadow: "rgba(100, 100, 111, 0.1) 0px 7px 29px 0px" }}
       >
         {isEditorOpen ? (
           <EditableSRTE
@@ -325,7 +307,7 @@ export const RichTextEditor = ({
             shouldShowTree={shouldShowTree}
           />
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };

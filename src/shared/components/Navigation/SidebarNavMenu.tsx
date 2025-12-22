@@ -1,20 +1,15 @@
 // For handling the sidebar on smaller screens on traditional version
 
+import { Button } from "@/shared/components/ui/button";
 import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuList,
-  Text,
-  type TextProps,
-} from "@chakra-ui/react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 import { useState, type ReactNode } from "react";
 import { GoTriangleDown } from "react-icons/go";
 
-interface ISidebarNavMenuProps extends TextProps {
+interface ISidebarNavMenuProps {
   menuName?: string;
   cScheme?: string;
   hoverColor?: string;
@@ -22,6 +17,7 @@ interface ISidebarNavMenuProps extends TextProps {
   leftIcon?: ReactNode;
   children?: ReactNode;
   noChevron?: boolean;
+  textAlign?: string;
 }
 
 export const SidebarNavMenu = ({
@@ -51,87 +47,66 @@ export const SidebarNavMenu = ({
     setIsOpen(false);
   };
 
-  const bgStyle =
-    isHovered || isOpen
-      ? cScheme
-        ? { bg: `${cScheme}.500` }
-        : {}
-      : cScheme
-        ? `${cScheme}.500`
-        : "transparent";
-
-  const fontColorStyle =
-    isHovered || isOpen
-      ? fColor
-        ? { color: fColor }
-        : "white"
-      : fColor
-        ? fColor
-        : "whiteAlpha.700";
+  // Convert color scheme to Tailwind classes
+  const getColorClasses = () => {
+    const baseClasses = "w-full px-2 py-5 text-lg";
+    
+    if (isHovered || isOpen) {
+      return `${baseClasses} ${hoverColor ? 'bg-white text-black' : 'bg-white text-black'}`;
+    }
+    
+    const bgClass = cScheme ? `bg-${cScheme}-500` : 'bg-transparent';
+    const textClass = fColor ? `text-[${fColor}]` : 'text-white/70';
+    
+    return `${baseClasses} ${bgClass} ${textClass} hover:bg-white hover:text-black active:bg-white active:text-black`;
+  };
 
   return (
-    <Box zIndex={isOpen ? 2 : 1}>
-      <Menu isOpen={isOpen}>
-        <MenuButton
-          colorScheme={cScheme}
-          zIndex={isOpen ? 2 : 1}
-          bg={bgStyle}
-          color={fontColorStyle}
-          _hover={{
-            bg: hoverColor ? hoverColor : "white",
-            color: fColor ? fColor : "black",
-          }}
-          _active={{
-            bg: hoverColor ? hoverColor : "white",
-            color: fColor ? fColor : "black",
-          }}
-          as={Button}
-          size={"lg"}
-          w={"100%"}
-          px={2}
-          py={5}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <Flex justifyContent={"space-between"}>
-            {leftIcon ? (
-              <Box display={"flex"} justifyContent={"space-between"} w={"100%"}>
-                <Center mr={menuName ? 1.5 : 0}>
-                  <Box justifyContent={"end"} boxSize={5}>
-                    {leftIcon}
-                  </Box>
-                </Center>
+    <div className={`${isOpen ? 'z-[2]' : 'z-[1]'}`}>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className={`${getColorClasses()} ${isOpen ? 'z-[2]' : 'z-[1]'}`}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className="flex justify-between w-full">
+              {leftIcon ? (
+                <div className="flex justify-between w-full items-center">
+                  <div className={`flex items-center ${menuName ? 'mr-1.5' : ''}`}>
+                    <div className="flex justify-end w-5 h-5">
+                      {leftIcon}
+                    </div>
+                  </div>
 
-                <Center mr={menuName ? 1.5 : 0}>
-                  <Text>{menuName}</Text>
-                </Center>
-                <Center></Center>
-              </Box>
-            ) : textAlign ? (
-              <Text>{menuName}</Text>
-            ) : (
-              <Text>{menuName}</Text>
-            )}
+                  <div className={`flex items-center ${menuName ? 'mr-1.5' : ''}`}>
+                    <span>{menuName}</span>
+                  </div>
+                  <div className="flex items-center"></div>
+                </div>
+              ) : (
+                <span>{menuName}</span>
+              )}
 
-            {noChevron ? null : (
-              <Center ml={1.5}>
-                <GoTriangleDown size={"12px"} />
-              </Center>
-            )}
-          </Flex>
-        </MenuButton>
+              {!noChevron && (
+                <div className="flex items-center ml-1.5">
+                  <GoTriangleDown size={12} />
+                </div>
+              )}
+            </div>
+          </Button>
+        </DropdownMenuTrigger>
 
-        <MenuList
+        <DropdownMenuContent
+          className={`w-full -mt-[7.5px] ${isOpen ? 'z-[2]' : 'z-[19]'}`}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onClick={handleItemClick}
-          mt={"-7.5px"}
-          w={"100%"}
-          zIndex={isOpen ? 2 : 19}
         >
           {children}
-        </MenuList>
-      </Menu>
-    </Box>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };

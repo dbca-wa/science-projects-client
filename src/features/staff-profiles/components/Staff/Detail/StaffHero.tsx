@@ -2,7 +2,8 @@ import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useStaffProfileHero } from "@/features/staff-profiles/hooks/useStaffProfileHero";
 import { useMediaQuery } from "@/shared/utils/useMediaQuery";
 import type { IStaffProfileBaseData, IUserMe } from "@/shared/types";
-import { Center, Button as ChakraButton, Spinner } from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -45,15 +46,14 @@ const StaffHero = ({
         <div className="flex flex-col">
           {/* Back button */}
           <div className="mr-4 flex justify-center py-5">
-            <ChakraButton
+            <Button
               onClick={() => navigate("/staff")}
-              variant={"link"}
-              // bg={"gray.500"}
-              leftIcon={<ChevronLeft />}
-              color={"black"}
+              variant="link"
+              className="text-black"
             >
+              <ChevronLeft className="mr-2 h-4 w-4" />
               Back
-            </ChakraButton>
+            </Button>
           </div>
           {/* Image (if exists) */}
           {staffHeroData?.user?.avatar && !isImageError && (
@@ -131,16 +131,14 @@ const StaffHero = ({
         <div className="mt-6 flex flex-col">
           {/* Back button */}
           <div className="">
-            <ChakraButton
+            <Button
               onClick={() => navigate("/staff")}
-              variant={"link"}
-              // bg={"gray.500"}
-              leftIcon={<ChevronLeft />}
-              color={"black"}
-              ml={-2}
+              variant="link"
+              className="text-black -ml-2"
             >
+              <ChevronLeft className="mr-2 h-4 w-4" />
               Back to Search
-            </ChakraButton>
+            </Button>
           </div>
 
           {/* Main Content Container */}
@@ -218,9 +216,9 @@ const StaffHero = ({
     )
   ) : (
     // LOADING
-    <Center p={4}>
-      <Spinner />
-    </Center>
+    <div className="flex justify-center p-4">
+      <Loader2 className="h-6 w-6 animate-spin" />
+    </div>
   );
 };
 export default StaffHero;

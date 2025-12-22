@@ -1,28 +1,14 @@
 // Modal for editing a user's membership for their profile
 
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  useColorMode,
-  FormControl,
-  FormLabel,
-  InputGroup,
-  Grid,
-  useToast,
-  Select,
-  ModalFooter,
-  Button,
-  type ToastId,
-  Input,
-  Flex,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useState } from "react";
 import {
   IMembershipUpdateVariables,
   IProfileUpdateSuccess,
@@ -55,12 +41,7 @@ export const EditMembershipModal = ({
   userId,
 }: IEditMembershipModalProps) => {
   const { colorMode } = useColorMode();
-  // Toast
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+  const [loadingToastId, setLoadingToastId] = useState<string | number | null>(null);
 
   const { baLoading, baData } = useBusinessAreas();
   const { branchesLoading, branchesData } = useBranches();
@@ -77,29 +58,18 @@ export const EditMembershipModal = ({
     // Start of mutation handling
     mutationFn: updateMembership,
     onMutate: () => {
-      addToast({
-        title: "Updating membership...",
-        description: "One moment!",
-        status: "loading",
-        position: "top-right",
-        // duration: 3000
-      });
+      const toastId = toast.loading("Updating membership...");
+      setLoadingToastId(toastId);
     },
     // Success handling based on API- file - declared interface
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: [`membership`, userId] });
       queryClient.refetchQueries({ queryKey: [`me`] });
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Information Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
       }
+      toast.success("Information Updated");
       //  Close the modal
       onClose?.();
     },
@@ -139,16 +109,10 @@ export const EditMembershipModal = ({
         errorMessage = error.message; // Use the error message from the caught exception
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Update failed",
-          description: errorMessage,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
       }
+      toast.error(`Update failed: ${errorMessage}`);
     },
   });
 
@@ -167,57 +131,41 @@ export const EditMembershipModal = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size={"3xl"}
-      scrollBehavior="inside"
-    >
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <Flex
-          direction="column"
-          height="100%"
-          as="form"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <ModalHeader>Edit Membership</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl my={2} mb={4} userSelect="none">
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("userPk", { required: true, value: userId })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <Grid gridColumnGap={8} gridTemplateColumns={"repeat(1, 1fr)"}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col h-full ${colorMode === "dark" ? "bg-gray-800 text-gray-400" : "bg-white"}`}>
+          <DialogHeader>
+            <DialogTitle>Edit Membership</DialogTitle>
+          </DialogHeader>
+          
+          <div className="p-6">
+            <div className="my-2 mb-4 select-none hidden">
+              <Input
+                type="hidden"
+                {...register("userPk", { required: true, value: userId })}
+                readOnly
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 gap-8">
               {/* Organisation */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Organisation</FormLabel>
-                <InputGroup>
-                  <Select
-                    placeholder={
-                      "Department of Biodiversity, Conservation and Attractions"
-                    }
-                    isDisabled={true}
-                  >
-                    <option value="dbca">
+              <div className="my-2 mb-4 select-none">
+                <Label>Organisation</Label>
+                <Select disabled defaultValue="dbca">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Department of Biodiversity, Conservation and Attractions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dbca">
                       Department of Biodiversity, Conservation and Attractions
-                    </option>
-                  </Select>
-                </InputGroup>
-              </FormControl>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
               {/* Affiliation */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
+              <div className="my-2 mb-4 select-none">
                 <AffiliationCreateSearchDropdown
-                  // autoFocus
                   isRequired={false}
                   preselectedAffiliationPk={currentAffiliationData?.pk}
                   setterFunction={(
@@ -235,70 +183,69 @@ export const EditMembershipModal = ({
                   placeholder="Search for or an affiliation"
                   helperText="The entity this user is affiliated with"
                 />
-              </FormControl>
+              </div>
 
               {/* Branch */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Branch</FormLabel>
-                <InputGroup>
-                  {!branchesLoading && branchesData && (
-                    <Select
-                      placeholder={"Select a Branch"}
-                      defaultValue={currentBranchData?.pk || ""}
-                      {...register("branch")}
-                    >
+              <div className="my-2 mb-4 select-none">
+                <Label>Branch</Label>
+                {!branchesLoading && branchesData && (
+                  <Select
+                    defaultValue={String(currentBranchData?.pk) || ""}
+                    {...register("branch")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a Branch" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {branchesData.map((branch: IBranch, index: number) => {
                         return (
-                          <option key={index} value={branch.pk}>
+                          <SelectItem key={index} value={String(branch.pk)}>
                             {branch.name}
-                          </option>
+                          </SelectItem>
                         );
                       })}
-                    </Select>
-                  )}
-                </InputGroup>
-              </FormControl>
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
 
               {/* Business Area */}
-              <FormControl my={2} mb={4} userSelect={"none"}>
-                <FormLabel>Business Area</FormLabel>
-                <InputGroup>
-                  {!baLoading && baData && (
-                    <Select
-                      placeholder={"Select a Business Area"}
-                      defaultValue={currentBaData?.pk || ""}
-                      {...register("business_area")}
-                    >
+              <div className="my-2 mb-4 select-none">
+                <Label>Business Area</Label>
+                {!baLoading && baData && (
+                  <Select
+                    defaultValue={String(currentBaData?.pk) || ""}
+                    {...register("business_area")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a Business Area" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {baData.map((ba: IBusinessArea, index: number) => {
                         return (
-                          <option key={index} value={ba.pk}>
+                          <SelectItem key={index} value={String(ba.pk)}>
                             {ba.name}
-                          </option>
+                          </SelectItem>
                         );
                       })}
-                    </Select>
-                  )}
-                </InputGroup>
-              </FormControl>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
             <Button
-              isLoading={mutation.isPending}
+              disabled={mutation.isPending}
               type="submit"
-              bgColor={colorMode === "light" ? `green.500` : `green.600`}
-              color={colorMode === "light" ? `white` : `whiteAlpha.900`}
-              _hover={{
-                bg: colorMode === "light" ? `green.600` : `green.400`,
-                color: colorMode === "light" ? `white` : `white`,
-              }}
-              ml={3}
+              className="bg-green-500 hover:bg-green-600 text-white ml-3"
             >
               Update
             </Button>
-          </ModalFooter>
-        </Flex>
-      </ModalContent>
-    </Modal>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

@@ -20,7 +20,7 @@ import { Button } from "@/shared/components/ui/button";
 import DatabaseRichTextEditor from "@/features/staff-profiles/components/Editor/DatabaseRichTextEditor";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/shared/components/ui/input";
-import { type ToastId, useToast, type UseToastOptions } from "@chakra-ui/react";
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   type IUpdateProjectDescription,
@@ -108,11 +108,6 @@ const EditDecriptionContent = ({
   onClose,
 }: IEditDescriptionProps) => {
   const queryClient = useQueryClient();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
   const [isUpdating, setIsUpdating] = useState(false);
   const { openEditorsCount, closeEditor } = useEditorContext();
 
@@ -138,23 +133,10 @@ const EditDecriptionContent = ({
   const updateDescriptionMutation = useMutation({
     mutationFn: updateProjectDescription,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Updating Project`,
-        position: "top-right",
-      });
+      toast.loading("Updating Project");
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Project Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Project Updated");
 
       setTimeout(() => {
         queryClient.invalidateQueries({
@@ -165,16 +147,7 @@ const EditDecriptionContent = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could Not udpate project`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could not update project: ${error}`);
     },
   });
 

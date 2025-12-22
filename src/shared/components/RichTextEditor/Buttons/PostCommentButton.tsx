@@ -2,13 +2,9 @@ import {
   createDocumentComment,
   sendMentionNotifications,
 } from "@/features/documents/services/documents.service";
-import {
-  Button,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CLEAR_EDITOR_COMMAND } from "lexical";
@@ -42,7 +38,6 @@ export const PostCommentButton = ({
     }
   };
 
-  // Mutation for email notifications
   const sendNotificationsMutation = useMutation({
     mutationFn: sendMentionNotifications,
     onSuccess: (data) => {
@@ -53,33 +48,15 @@ export const PostCommentButton = ({
     },
   });
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const queryClient = useQueryClient();
   const postCommentMutation = useMutation({
     mutationFn: createDocumentComment,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Posting Comment`,
-        position: "top-right",
-      });
+      toast.loading("Posting Comment");
     },
     onSuccess: async (data) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Comment Posted`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.success("Comment Posted");
 
       console.log("Comment posted successfully:", data);
 
@@ -130,39 +107,20 @@ export const PostCommentButton = ({
     },
     onError: (error) => {
       console.error("Error posting comment:", error);
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not post comment`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.dismiss();
+      toast.error(`Could not post comment: ${error}`);
     },
   });
 
   return (
     <Button
-      bg={colorMode === "light" ? "blue.500" : "blue.600"}
-      color={colorMode === "light" ? "whiteAlpha.900" : "whiteAlpha.800"}
-      _hover={
-        colorMode === "light"
-          ? {
-              color: "white",
-              bg: "blue.400",
-            }
-          : {
-              color: "white",
-              bg: "blue.500",
-            }
-      }
-      isDisabled={distilled.length < 1}
+      className={`rounded-full w-10 h-10 w-full ${
+        colorMode === "light" 
+          ? "bg-blue-500 text-white/90 hover:bg-blue-400 hover:text-white" 
+          : "bg-blue-600 text-white/80 hover:bg-blue-500 hover:text-white"
+      }`}
+      disabled={distilled.length < 1}
       onClick={postComment}
-      rounded={"full"}
-      boxSize={"40px"}
-      w={"100%"}
     >
       <BsFillSendFill />
     </Button>

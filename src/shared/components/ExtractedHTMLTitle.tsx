@@ -6,10 +6,10 @@ interface Props {
   onClick?: (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void;
   textBefore?: string;
   extraText?: string;
-  className?: string; // For future Tailwind migration
-  style?: React.CSSProperties; // Standard CSS styles
+  className?: string;
+  style?: React.CSSProperties;
 
-  // Chakra-like props for backward compatibility
+  // Legacy props for backward compatibility
   color?: string;
   fontWeight?: string | number;
   fontSize?: string | number;
@@ -48,7 +48,7 @@ export const ExtractedHTMLTitle: React.FC<Props> = ({
     }
   }, [htmlContent]);
 
-  // Convert Chakra-like props to CSS styles
+  // Convert legacy props to CSS styles
   const combinedStyle: React.CSSProperties = {
     ...style,
     ...(color && { color }),
@@ -84,7 +84,7 @@ export const ExtractedHTMLTitle: React.FC<Props> = ({
     opacity,
     visibility,
     pointerEvents,
-    // Add any other Chakra props that might cause issues
+    // Add any other legacy props that might cause issues
     ...validDomProps
   } = otherProps;
 

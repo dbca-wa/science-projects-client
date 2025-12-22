@@ -116,12 +116,10 @@ export const GuideSaveButton = ({
       }
     } catch (error: any) {
       console.error("Error saving content:", error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: error.message || "Failed to save content",
-          description: "Failed to save content",
-        });
-      }
+      });
+    }
 
       setBtnLoading(false);
     };

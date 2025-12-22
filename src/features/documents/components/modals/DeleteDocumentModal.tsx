@@ -1,32 +1,13 @@
-import {
-  Text,
-  Center,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useToast,
-  useColorMode,
-  UnorderedList,
-  ListItem,
-  FormControl,
-  InputGroup,
-  Input,
-  ModalFooter,
-  Grid,
-  Button,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
 import { IDeleteDocument, deleteDocumentCall } from "@/features/documents/services/documents.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useGetStudentReportAvailableReportYears } from "@/features/reports/hooks/useGetStudentReportAvailableReportYears";
 import { useGetProgressReportAvailableReportYears } from "@/features/reports/hooks/useGetProgressReportAvailableReportYears";
-import { useRef } from "react";
 
 interface Props {
   projectPk: string | number;
@@ -61,43 +42,26 @@ export const DeleteDocumentModal = ({
     Number(projectPk),
   );
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   // Mutation, query client, onsubmit, and api function
   const queryClient = useQueryClient();
 
   const deleteDocumentMutation = useMutation({
     mutationFn: deleteDocumentCall,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: `Deleting Document`,
-        position: "top-right",
-      });
+      toast.loading("Deleting Document");
     },
     onSuccess: async () => {
       setToLastTab(-1);
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Document Deleted`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-        refetchStudentYears(() => {
-          reset();
-        });
-        refetchProgressYears(() => {
-          reset();
-        });
-        onDeleteSuccess?.();
-      }
+      toast.success("Success", {
+        description: "Document Deleted",
+      });
+      refetchStudentYears(() => {
+        reset();
+      });
+      refetchProgressYears(() => {
+        reset();
+      });
+      onDeleteSuccess?.();
 
       setTimeout(async () => {
         queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
@@ -107,16 +71,9 @@ export const DeleteDocumentModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not delete document`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error("Could not delete document", {
+        description: `${error}`,
+      });
     },
   });
 
@@ -128,102 +85,92 @@ export const DeleteDocumentModal = ({
   const { register, handleSubmit, reset } = useForm<IDeleteDocument>();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(deleteDocument)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Delete Document?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent
+        className={`${
+          colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-black bg-white"
+        }`}
+      >
+        <form onSubmit={handleSubmit(deleteDocument)}>
+          <DialogHeader>
+            <DialogTitle>Delete Document?</DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"semibold"} fontSize={"xl"}>
+          <div className="p-6">
+            <div className="text-center">
+              <p className="font-semibold text-xl">
                 Are you sure you want to delete this document? There's no
                 turning back.
-              </Text>
-            </Center>
-            <Center mt={8}>
-              <UnorderedList>
-                <ListItem>
+              </p>
+            </div>
+            <div className="text-center mt-8">
+              <ul className="list-disc text-left inline-block">
+                <li>
                   All fields for this document will be cleared
-                </ListItem>
-                <ListItem>The data will no longer be on the system</ListItem>
-                <ListItem>
+                </li>
+                <li>The data will no longer be on the system</li>
+                <li>
                   If you are recreating the document, you will need to go
                   through the approvals process again
-                </ListItem>
-              </UnorderedList>
-            </Center>
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("projectPk", {
-                    required: true,
-                    value: Number(projectPk),
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("documentPk", {
-                    required: true,
-                    value: Number(documentPk),
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("documentKind", {
-                    required: true,
-                    value: documentKind,
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <Center mt={2} p={5} pb={3}>
-              <Text
-                fontWeight={"bold"}
-                color={"red.400"}
-                textDecoration={"underline"}
-              >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <Input
+                type="hidden"
+                {...register("projectPk", {
+                  required: true,
+                  value: Number(projectPk),
+                })}
+                readOnly
+              />
+            </div>
+            <div>
+              <Input
+                type="hidden"
+                {...register("documentPk", {
+                  required: true,
+                  value: Number(documentPk),
+                })}
+                readOnly
+              />
+            </div>
+            <div>
+              <Input
+                type="hidden"
+                {...register("documentKind", {
+                  required: true,
+                  value: documentKind,
+                })}
+                readOnly
+              />
+            </div>
+            <div className="text-center mt-2 p-5 pb-3">
+              <p className="font-bold text-red-400 underline">
                 This is irreversible.
-              </Text>
-            </Center>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                isLoading={deleteDocumentMutation.isPending}
+                className={`text-white ml-3 ${
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                }`}
+                disabled={deleteDocumentMutation.isPending}
                 type="submit"
-                ml={3}
               >
                 Delete
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

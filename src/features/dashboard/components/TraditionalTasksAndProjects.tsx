@@ -21,6 +21,7 @@ import { DocumentsDataTable } from "./DocumentsDataTable";
 import { EndorsementsDataTable } from "./EndorsementsDataTable";
 import { UserProjectsDataTable } from "./UserProjectsDataTable";
 import { Loader2 } from "lucide-react";
+import { cn } from "@/shared/utils/cn";
 
 export const TraditionalTasksAndProjects = () => {
   const { colorMode } = useColorMode();
@@ -64,19 +65,15 @@ export const TraditionalTasksAndProjects = () => {
 
   return (
     <>
-      <Box mt={6}>
-        <Accordion
-          // defaultIndex={defaultIndex}
-          defaultIndex={[0]}
-          allowMultiple
-        >
+      <div className="mt-6">
+        <Accordion type="multiple" defaultValue={["item-0"]} className="w-full">
           {/* My Tasks */}
 
           {pendingProjectDocumentDataLoading ? (
             // null
-            <Center my={4}>
-              <Spinner />
-            </Center>
+            <div className="flex justify-center items-center my-4">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
           ) : (
             <motion.div
               initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
@@ -86,52 +83,42 @@ export const TraditionalTasksAndProjects = () => {
               transition={{ duration: 0.4 }} // Animation duration in seconds
             >
               <AccordionItem
-                borderColor={
-                  colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
-                }
-                borderBottom={"none"}
-                borderTop={
-                  "none"
-                  // me?.userData?.is_superuser === true ? "1px gray.300" : "none"
-                }
+                value="item-0"
+                className={cn(
+                  "border-b-0 border-t-0",
+                  colorMode === "light" ? "border-black/50" : "border-white/60"
+                )}
               >
-                <AccordionButton
-                  bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                  color={colorMode === "light" ? "black" : "white"}
-                  _hover={
-                    colorMode === "light"
-                      ? { bg: "gray.300", color: "black" }
-                      : { bg: "gray.500", color: "white" }
-                  }
-                  userSelect={"none"}
-                >
-                  <Box as="span" flex="1" textAlign="left">
-                    My Tasks
-                  </Box>
-
-                  {/* </Box> */}
-                  {pendingProjectDocumentData?.all?.length >= 1 ? (
-                    <Box
-                      display={"inline-flex"}
-                      justifyContent={"center"}
-                      alignItems={"center"}
-                    >
-                      <Box mr={2}>
-                        {pendingProjectDocumentData?.all?.length}
-                      </Box>
-                      <FcHighPriority />
-                    </Box>
-                  ) : (
-                    <FcOk />
+                <AccordionTrigger
+                  className={cn(
+                    "select-none px-4 py-3 hover:no-underline",
+                    colorMode === "light" 
+                      ? "bg-gray-200 text-black hover:bg-gray-300" 
+                      : "bg-gray-700 text-white hover:bg-gray-500"
                   )}
-                  <AccordionIcon />
-                </AccordionButton>
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="flex-1 text-left">My Tasks</span>
+                    <div className="flex items-center mr-2">
+                      {pendingProjectDocumentData?.all?.length >= 1 ? (
+                        <div className="inline-flex justify-center items-center">
+                          <div className="mr-2">
+                            {pendingProjectDocumentData?.all?.length}
+                          </div>
+                          <FcHighPriority />
+                        </div>
+                      ) : (
+                        <FcOk />
+                      )}
+                    </div>
+                  </div>
+                </AccordionTrigger>
 
-                <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+                <AccordionContent className="pb-4 select-none px-0 pt-0">
                   <DocumentsDataTable
                     pendingProjectDocumentData={pendingProjectDocumentData}
                   />
-                </AccordionPanel>
+                </AccordionContent>
               </AccordionItem>
             </motion.div>
           )}
@@ -139,9 +126,9 @@ export const TraditionalTasksAndProjects = () => {
           {/* Admin Tasks */}
           {me?.userData?.is_superuser === true ? (
             pendingAdminTasksLoading ? (
-              <Center my={4}>
-                <Spinner />
-              </Center>
+              <div className="flex justify-center items-center my-4">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
             ) : (
               <motion.div
                 initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
@@ -151,46 +138,40 @@ export const TraditionalTasksAndProjects = () => {
                 transition={{ duration: 0.4 }} // Animation duration in seconds
               >
                 <AccordionItem
-                  borderColor={
-                    colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
-                  }
-                  borderBottom={"none"}
-                  // borderTop={"none"}
+                  value="item-1"
+                  className={cn(
+                    "border-b-0",
+                    colorMode === "light" ? "border-black/50" : "border-white/60"
+                  )}
                 >
-                  <AccordionButton
-                    bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                    color={colorMode === "light" ? "black" : "white"}
-                    _hover={
-                      colorMode === "light"
-                        ? { bg: "gray.300", color: "black" }
-                        : { bg: "gray.500", color: "white" }
-                    }
-                    userSelect={"none"}
-                  >
-                    <Box as="span" flex="1" textAlign="left">
-                      Admin Tasks
-                    </Box>
-
-                    {pendingAdminTaskData?.length >= 1 ? (
-                      <Box
-                        display={"inline-flex"}
-                        justifyContent={"center"}
-                        alignItems={"center"}
-                      >
-                        <Box mr={2}>{pendingAdminTaskData?.length}</Box>
-                        <FcHighPriority />
-                      </Box>
-                    ) : (
-                      <FcOk />
+                  <AccordionTrigger
+                    className={cn(
+                      "select-none px-4 py-3 hover:no-underline",
+                      colorMode === "light" 
+                        ? "bg-gray-200 text-black hover:bg-gray-300" 
+                        : "bg-gray-700 text-white hover:bg-gray-500"
                     )}
-                    <AccordionIcon />
-                  </AccordionButton>
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span className="flex-1 text-left">Admin Tasks</span>
+                      <div className="flex items-center mr-2">
+                        {pendingAdminTaskData?.length >= 1 ? (
+                          <div className="inline-flex justify-center items-center">
+                            <div className="mr-2">{pendingAdminTaskData?.length}</div>
+                            <FcHighPriority />
+                          </div>
+                        ) : (
+                          <FcOk />
+                        )}
+                      </div>
+                    </div>
+                  </AccordionTrigger>
 
-                  <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+                  <AccordionContent className="pb-4 select-none px-0 pt-0">
                     <AdminTasksDataTable
                       pendingAdminTaskData={pendingAdminTaskData}
                     />
-                  </AccordionPanel>
+                  </AccordionContent>
                 </AccordionItem>
               </motion.div>
             )
@@ -199,9 +180,9 @@ export const TraditionalTasksAndProjects = () => {
           {/* Caretaker Tasks */}
           {me?.userData?.caretaking_for?.length > 0 ? (
             pendingCaretakerTasksLoading ? (
-              <Center my={4}>
-                <Spinner />
-              </Center>
+              <div className="flex justify-center items-center my-4">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
             ) : (
               <motion.div
                 initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
@@ -211,54 +192,43 @@ export const TraditionalTasksAndProjects = () => {
                 transition={{ duration: 0.4 }} // Animation duration in seconds
               >
                 <AccordionItem
-                  borderColor={
-                    colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
-                  }
-                  borderBottom={"none"}
-                  // borderTop={
-                  //   me?.userData?.is_superuser === true
-                  //     ? "1px gray.300"
-                  //     : "none"
-                  // }
+                  value="item-2"
+                  className={cn(
+                    "border-b-0",
+                    colorMode === "light" ? "border-black/50" : "border-white/60"
+                  )}
                 >
-                  <AccordionButton
-                    bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                    color={colorMode === "light" ? "black" : "white"}
-                    _hover={
-                      colorMode === "light"
-                        ? { bg: "gray.300", color: "black" }
-                        : { bg: "gray.500", color: "white" }
-                    }
-                    userSelect={"none"}
-                  >
-                    <Box as="span" flex="1" textAlign="left">
-                      Caretaker Tasks
-                    </Box>
-
-                    {/* </Box> */}
-                    {pendingCaretakerTaskData?.all?.length >= 1 ? (
-                      <Box
-                        display={"inline-flex"}
-                        justifyContent={"center"}
-                        alignItems={"center"}
-                      >
-                        <Box mr={2}>
-                          {pendingCaretakerTaskData?.all?.length}
-                        </Box>
-                        <FcHighPriority />
-                      </Box>
-                    ) : (
-                      <FcOk />
+                  <AccordionTrigger
+                    className={cn(
+                      "select-none px-4 py-3 hover:no-underline",
+                      colorMode === "light" 
+                        ? "bg-gray-200 text-black hover:bg-gray-300" 
+                        : "bg-gray-700 text-white hover:bg-gray-500"
                     )}
-                    <AccordionIcon />
-                  </AccordionButton>
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span className="flex-1 text-left">Caretaker Tasks</span>
+                      <div className="flex items-center mr-2">
+                        {pendingCaretakerTaskData?.all?.length >= 1 ? (
+                          <div className="inline-flex justify-center items-center">
+                            <div className="mr-2">
+                              {pendingCaretakerTaskData?.all?.length}
+                            </div>
+                            <FcHighPriority />
+                          </div>
+                        ) : (
+                          <FcOk />
+                        )}
+                      </div>
+                    </div>
+                  </AccordionTrigger>
 
-                  <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+                  <AccordionContent className="pb-4 select-none px-0 pt-0">
                     <DocumentsDataTable
                       pendingProjectDocumentData={pendingCaretakerTaskData}
                       isCaretakerTable
                     />
-                  </AccordionPanel>
+                  </AccordionContent>
                 </AccordionItem>
               </motion.div>
             )
@@ -267,9 +237,9 @@ export const TraditionalTasksAndProjects = () => {
           {/* Endorsement Tasks */}
           {(me?.userData?.is_aec || me?.userData?.is_superuser) ===
           false ? null : pendingEndorsementsDataLoading ? (
-            <Center my={4}>
-              <Spinner />
-            </Center>
+            <div className="flex justify-center items-center my-4">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
           ) : (
             <motion.div
               initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
@@ -279,65 +249,60 @@ export const TraditionalTasksAndProjects = () => {
               transition={{ duration: 0.4 }} // Animation duration in seconds
             >
               <AccordionItem
-                borderColor={
-                  colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
-                }
-                borderBottom={"none"}
-                // borderTop={"none"}
+                value="item-3"
+                className={cn(
+                  "border-b-0",
+                  colorMode === "light" ? "border-black/50" : "border-white/60"
+                )}
               >
-                <AccordionButton
-                  bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                  color={colorMode === "light" ? "black" : "white"}
-                  _hover={
-                    colorMode === "light"
-                      ? { bg: "gray.300", color: "black" }
-                      : { bg: "gray.500", color: "white" }
-                  }
-                  userSelect={"none"}
-                >
-                  <Box as="span" flex="1" textAlign="left">
-                    Endorsement Tasks
-                  </Box>
-                  {pendingEndorsementsData?.aec?.length >=
-                  // +
-                  //   pendingEndorsementsData?.bm?.length +
-                  //   pendingEndorsementsData?.hc?.length
-                  1 ? (
-                    <Box
-                      display={"inline-flex"}
-                      justifyContent={"center"}
-                      alignItems={"center"}
-                    >
-                      <Box mr={2}>
-                        {
-                          pendingEndorsementsData?.aec?.length
-                          // +
-                          //   pendingEndorsementsData?.bm?.length +
-                          //   pendingEndorsementsData?.hc?.length
-                        }
-                      </Box>
-                      <FcHighPriority />
-                    </Box>
-                  ) : (
-                    <FcOk />
+                <AccordionTrigger
+                  className={cn(
+                    "select-none px-4 py-3 hover:no-underline",
+                    colorMode === "light" 
+                      ? "bg-gray-200 text-black hover:bg-gray-300" 
+                      : "bg-gray-700 text-white hover:bg-gray-500"
                   )}
-                  <AccordionIcon />
-                </AccordionButton>
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="flex-1 text-left">Endorsement Tasks</span>
+                    <div className="flex items-center mr-2">
+                      {pendingEndorsementsData?.aec?.length >=
+                      // +
+                      //   pendingEndorsementsData?.bm?.length +
+                      //   pendingEndorsementsData?.hc?.length
+                      1 ? (
+                        <div className="inline-flex justify-center items-center">
+                          <div className="mr-2">
+                            {
+                              pendingEndorsementsData?.aec?.length
+                              // +
+                              //   pendingEndorsementsData?.bm?.length +
+                              //   pendingEndorsementsData?.hc?.length
+                            }
+                          </div>
+                          <FcHighPriority />
+                        </div>
+                      ) : (
+                        <FcOk />
+                      )}
+                    </div>
+                  </div>
+                </AccordionTrigger>
 
-                <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+                <AccordionContent className="pb-4 select-none px-0 pt-0">
                   <EndorsementsDataTable
                     pendingEndorsementsData={pendingEndorsementsData}
                   />
-                </AccordionPanel>
+                </AccordionContent>
               </AccordionItem>
             </motion.div>
           )}
 
           {/* My Projects */}
           {projectsLoading ? (
-            <Center my={4}>
-              <Spinner />
-            </Center>
+            <div className="flex justify-center items-center my-4">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
           ) : (
             <motion.div
               initial={{ scale: 1, opacity: 0 }} // Initial scale (no animation)
@@ -347,38 +312,34 @@ export const TraditionalTasksAndProjects = () => {
               transition={{ duration: 0.4 }} // Animation duration in seconds
             >
               <AccordionItem
-                borderColor={
-                  colorMode === "light" ? "blackAlpha.500" : "whiteAlpha.600"
-                }
-                borderBottom={"none"}
+                value="item-4"
+                className={cn(
+                  "border-b-0",
+                  colorMode === "light" ? "border-black/50" : "border-white/60"
+                )}
               >
-                <AccordionButton
-                  bg={colorMode === "light" ? "gray.200" : "gray.700"}
-                  color={colorMode === "light" ? "black" : "white"}
-                  _hover={
-                    colorMode === "light"
-                      ? { bg: "gray.300", color: "black" }
-                      : { bg: "gray.500", color: "white" }
-                  }
-                  userSelect={"none"}
+                <AccordionTrigger
+                  className={cn(
+                    "select-none px-4 py-3 hover:no-underline",
+                    colorMode === "light" 
+                      ? "bg-gray-200 text-black hover:bg-gray-300" 
+                      : "bg-gray-700 text-white hover:bg-gray-500"
+                  )}
                 >
-                  <Box as="span" flex="1" textAlign="left">
-                    My Projects
-                  </Box>
-                  {projectData?.length >= 1 ? (
-                    <Box
-                      display={"inline-flex"}
-                      justifyContent={"center"}
-                      alignItems={"center"}
-                    >
-                      <Box mr={2}>{projectData?.length}</Box>
-                      <AiFillProject />
-                    </Box>
-                  ) : null}
-                  <AccordionIcon />
-                </AccordionButton>
+                  <div className="flex items-center justify-between w-full">
+                    <span className="flex-1 text-left">My Projects</span>
+                    <div className="flex items-center mr-2">
+                      {projectData?.length >= 1 ? (
+                        <div className="inline-flex justify-center items-center">
+                          <div className="mr-2">{projectData?.length}</div>
+                          <AiFillProject />
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                </AccordionTrigger>
 
-                <AccordionPanel pb={4} userSelect={"none"} px={0} pt={0}>
+                <AccordionContent className="pb-4 select-none px-0 pt-0">
                   {!projectsLoading && (
                     <UserProjectsDataTable
                       projectData={projectData}
@@ -394,12 +355,12 @@ export const TraditionalTasksAndProjects = () => {
                       filters
                     />
                   )}
-                </AccordionPanel>
+                </AccordionContent>
               </AccordionItem>
             </motion.div>
           )}
         </Accordion>
-      </Box>
+      </div>
     </>
   );
 };

@@ -10,16 +10,10 @@ import {
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
 import { useNoImage } from "@/shared/hooks/useNoImage";
 import type { IMainDoc } from "@/shared/types";
-import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  Icon,
-  Text,
-  Tooltip,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { Button } from "@/shared/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/components/ui/tooltip";
 
 import {
   ColumnDef,
@@ -238,37 +232,40 @@ export const DocumentsDataTable = ({
       const user = row.original?.for_user;
       const hasImage = user?.image;
       return (
-        <Flex className="flex w-full flex-col items-center justify-center text-center align-middle font-medium">
-          <Avatar
-            name={
-              isDirectorate
-                ? "Directorate"
-                : `${user?.display_first_name} ${user?.display_last_name}`
-            }
-            src={
-              !isDirectorate
-                ? hasImage
-                  ? user.image?.startsWith("http")
-                    ? `${user.image}`
-                    : `${baseAPI}${user.image}`
-                  : noImage
-                : undefined
-            }
-            bg={isDirectorate ? "red.500" : undefined}
-            color={isDirectorate ? "white" : undefined}
-            size="sm"
-          />
-          <Text
-            color={isDirectorate ? "red.500" : undefined}
-            fontWeight={"semibold"}
-            px={2}
-            className="flex items-center"
+        <div className="flex w-full flex-col items-center justify-center text-center align-middle font-medium">
+          <Avatar className="w-8 h-8">
+            <AvatarImage
+              src={
+                !isDirectorate
+                  ? hasImage
+                    ? user.image?.startsWith("http")
+                      ? `${user.image}`
+                      : `${baseAPI}${user.image}`
+                    : noImage
+                  : undefined
+              }
+              alt={
+                isDirectorate
+                  ? "Directorate"
+                  : `${user?.display_first_name} ${user?.display_last_name}`
+              }
+            />
+            <AvatarFallback className={isDirectorate ? "bg-red-500 text-white" : ""}>
+              {isDirectorate
+                ? "D"
+                : `${user?.display_first_name?.[0] || ""}${user?.display_last_name?.[0] || ""}`}
+            </AvatarFallback>
+          </Avatar>
+          <p
+            className={`font-semibold px-2 flex items-center ${
+              isDirectorate ? "text-red-500" : ""
+            }`}
           >
             {isDirectorate
               ? "Directorate"
               : `${user?.display_first_name} ${user?.display_last_name}`}
-          </Text>
-        </Flex>
+          </p>
+        </div>
       );
     },
     sortingFn: (rowA, rowB) => {
@@ -334,14 +331,12 @@ export const DocumentsDataTable = ({
 
         if (originalKindData !== "all") {
           return (
-            <Box className="text-center align-middle font-medium">
-              <Icon
-                as={formattedIcon}
-                color={`${formattedColour}.500`}
-                boxSize={"22px"}
+            <div className="text-center align-middle font-medium">
+              <formattedIcon 
+                className={`text-${formattedColour}-500 w-[22px] h-[22px]`}
               />
-              <Text color={`${formattedColour}.500`}>{formattedString}</Text>
-            </Box>
+              <p className={`text-${formattedColour}-500`}>{formattedString}</p>
+            </div>
           );
         }
       },
@@ -390,9 +385,9 @@ export const DocumentsDataTable = ({
           const originalKindData: docKinds = row.original.kind as docKinds;
           //   console.log(originalKindData);
           return (
-            <Box className="text-center align-middle font-medium">
+            <div className="text-center align-middle font-medium">
               {docKindsDict[originalKindData].title}
-            </Box>
+            </div>
           );
         }
       },
@@ -440,38 +435,24 @@ export const DocumentsDataTable = ({
           const originalTitleData = row.original.project.title;
           const formatted = returnHTMLTitle(originalTitleData);
           return (
-            <Box className="text-left font-medium">
-              <Text
-                color={colorMode === "dark" ? "blue.200" : "blue.400"}
-                fontWeight={"bold"}
-                _hover={{
-                  color: colorMode === "dark" ? "blue.100" : "blue.300",
-                  textDecoration:
-                    colorMode === "dark" ? "underline" : "undefined",
-                }}
-                cursor={"pointer"}
-                px={4}
+            <div className="text-left font-medium">
+              <p
+                className={`${
+                  colorMode === "dark" 
+                    ? "text-blue-200 hover:text-blue-100 hover:underline" 
+                    : "text-blue-400 hover:text-blue-300"
+                } font-bold cursor-pointer px-4`}
               >
                 {formatted}
-              </Text>
-              <Text
-                color={"gray.400"}
-                fontWeight={"semibold"}
-                fontSize={"small"}
-                px={4}
-              >
+              </p>
+              <p className="text-gray-400 font-semibold text-sm px-4">
                 {kindDict[row.original.project.kind as kinds].tag}-
                 {row.original.project.year}-{row.original.project.number}
-              </Text>
-              <Text
-                color={"gray.400"}
-                fontWeight={"semibold"}
-                fontSize={"x-small"}
-                px={4}
-              >
+              </p>
+              <p className="text-gray-400 font-semibold text-xs px-4">
                 {taskKindsDict[row.original.taskType].description}
-              </Text>
-            </Box>
+              </p>
+            </div>
           );
         }
       },
@@ -581,19 +562,23 @@ export const DocumentsDataTable = ({
               }}
               aria-label="Hide Directorate Tasks"
             />
-            <Tooltip
-              label="Hides all tasks which belong to the directorate"
-              aria-label="A tooltip"
-            >
-              <label
-                htmlFor="hideDirectorate"
-                className={
-                  "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                }
-              >
-                Hide Directorate Tasks
-              </label>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <label
+                    htmlFor="hideDirectorate"
+                    className={
+                      "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    }
+                  >
+                    Hide Directorate Tasks
+                  </label>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Hides all tasks which belong to the directorate</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         )}
       <Table>

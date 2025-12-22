@@ -1,27 +1,11 @@
 // Modal for updating a report's pdf
 import type { ISmallReport } from "@/shared/types";
-import {
-  AbsoluteCenter,
-  Box,
-  Button,
-  Divider,
-  Flex,
-  FormControl,
-  FormLabel,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+import { Label } from "@/shared/components/ui/label";
+import { Separator } from "@/shared/components/ui/separator";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -31,6 +15,7 @@ import {
   updateReportPDF,
 } from "@/features/reports/services/reports.service";
 import { SingleFileStateUpload } from "@/shared/components/SingleFileStateUpload";
+import { toast } from "sonner";
 
 interface Props {
   isChangePDFOpen: boolean;
@@ -50,12 +35,6 @@ export const ChangeReportPDFModal = ({
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
-
   const [uploadedPDF, setUploadedPDF] = useState<File>();
   const [reportMediaId, setReportMediaId] = useState<number>();
   const [isError, setIsError] = useState(false);
@@ -68,23 +47,10 @@ export const ChangeReportPDFModal = ({
   const ararPDFChangeMutation = useMutation({
     mutationFn: isLegacy ? updateLegacyReportPDF : updateReportPDF,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Updating PDF",
-        position: "top-right",
-      });
+      toast.loading("Updating PDF");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `PDF Updated`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("PDF Updated");
       onChangePDFClose();
 
       setTimeout(() => {
@@ -95,16 +61,7 @@ export const ChangeReportPDFModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Update PDF",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could Not Update PDF: ${error}`);
     },
   });
 
@@ -113,23 +70,10 @@ export const ChangeReportPDFModal = ({
       ? deleteLegacyFinalAnnualReportPDF
       : deleteFinalAnnualReportPDF,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: "Deleting PDF",
-        position: "top-right",
-      });
+      toast.loading("Deleting PDF");
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `PDF Deleted`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("PDF Deleted");
       // reset()
       onChangePDFClose();
 
@@ -141,16 +85,7 @@ export const ChangeReportPDFModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Delete PDF",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could Not Delete PDF: ${error}`);
     },
   });
 
@@ -167,59 +102,56 @@ export const ChangeReportPDFModal = ({
   };
 
   return (
-    <Modal isOpen={isChangePDFOpen} onClose={onChangePDFClose} size={"lg"}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>Change PDF of {report?.year}</ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isChangePDFOpen} onOpenChange={onChangePDFClose}>
+      <DialogContent className={`${colorMode === "dark" ? "bg-gray-800 text-gray-400" : "bg-white"} max-w-lg`}>
+        <DialogHeader>
+          <DialogTitle>Change PDF of {report?.year}</DialogTitle>
+        </DialogHeader>
 
-        <ModalBody>
-          <Text mb={4}>
+        <div className="space-y-6 py-4">
+          <p className="text-sm text-muted-foreground">
             Use this form to change the finalised pdf of the report.
-          </Text>
+          </p>
 
           {report ? (
-            <>
-              <FormControl pb={6}>
-                <FormLabel>Selected Report</FormLabel>
-                <Select
-                  value={report?.pdf?.pk}
-                  onChange={(e) => setReportMediaId(Number(e.target.value))}
-                  isDisabled
-                >
-                  <option value={report?.pdf?.pk}>{report?.year}</option>
-                </Select>
-              </FormControl>
-            </>
+            <div className="space-y-2">
+              <Label>Selected Report</Label>
+              <Select value={String(report?.pdf?.pk)} disabled>
+                <SelectTrigger>
+                  <SelectValue placeholder={String(report?.year)} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={String(report?.pdf?.pk)}>{report?.year}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           ) : null}
-          <FormControl>
-            <Flex justifyContent={"flex-end"}>
-              <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
-                onClick={deleteFile}
-              >
-                Remove Current PDF
-              </Button>
-            </Flex>
-          </FormControl>
-          <Box position="relative" padding="10">
-            <Divider />
-            <AbsoluteCenter
-              bg={colorMode === "light" ? "white" : "gray.800"}
-              px="4"
+
+          <div className="flex justify-end">
+            <Button
+              variant="destructive"
+              onClick={deleteFile}
+              className={`${
+                colorMode === "light" 
+                  ? "bg-red-500 hover:bg-red-400" 
+                  : "bg-red-600 hover:bg-red-500"
+              } text-white`}
             >
-              OR
-            </AbsoluteCenter>
-          </Box>
-          <FormControl>
-            <FormLabel>Replace PDF File</FormLabel>
+              Remove Current PDF
+            </Button>
+          </div>
+
+          <div className="relative py-4">
+            <Separator />
+            <div className={`absolute inset-0 flex items-center justify-center`}>
+              <span className={`${colorMode === "light" ? "bg-white" : "bg-gray-800"} px-4 text-sm text-muted-foreground`}>
+                OR
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Replace PDF File</Label>
             <SingleFileStateUpload
               fileType={"pdf"}
               uploadedFile={uploadedPDF}
@@ -227,31 +159,34 @@ export const ChangeReportPDFModal = ({
               isError={isError}
               setIsError={setIsError}
             />
-          </FormControl>
-        </ModalBody>
+          </div>
+        </div>
 
-        <ModalFooter>
-          <Button mr={3} onClick={onChangePDFClose}>
+        <DialogFooter>
+          <Button variant="outline" onClick={onChangePDFClose}>
             Cancel
           </Button>
           <Button
-            isLoading={ararPDFChangeMutation.isPending}
-            bg={colorMode === "dark" ? "green.500" : "green.400"}
-            color={"white"}
-            _hover={{
-              bg: colorMode === "dark" ? "green.400" : "green.300",
-            }}
-            isDisabled={
-              !uploadedPDF || !reportMediaId || reportMediaId === 0 || isError
+            disabled={
+              ararPDFChangeMutation.isPending ||
+              !uploadedPDF || 
+              !reportMediaId || 
+              reportMediaId === 0 || 
+              isError
             }
+            className={`${
+              colorMode === "dark" 
+                ? "bg-green-500 hover:bg-green-400" 
+                : "bg-green-400 hover:bg-green-300"
+            } text-white`}
             onClick={() => {
               onSubmitPDFUpdate();
             }}
           >
-            Update
+            {ararPDFChangeMutation.isPending ? "Updating..." : "Update"}
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

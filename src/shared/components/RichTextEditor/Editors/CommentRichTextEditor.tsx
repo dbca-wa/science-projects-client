@@ -5,8 +5,10 @@ import type {
   IUserData,
   IUserMe,
 } from "@/shared/types";
-import { Avatar, Box, Flex, Text, useColorMode } from "@chakra-ui/react";
+import { Avatar } from "@/shared/components/ui/avatar";
+import { useColorMode } from "@/shared/utils/theme.utils";
 import { useState } from "react";
+import { cn } from "@/shared/utils/component.utils";
 // import { TreeViewPlugin } from "@/shared/lib/plugins/TreeViewPlugin";
 
 // Lexical
@@ -126,17 +128,15 @@ export const CommentRichTextEditor = ({
   };
 
   return (
-    <Box>
-      <Flex>
-        <Box pb={2} w={"100%"} zIndex={2}>
-          <Box
-            pos={"relative"}
-            w={"100%"}
-            roundedBottom={20}
-            boxShadow={"rgba(100, 100, 111, 0.1) 0px 7px 29px 0px"}
-            bg={colorMode === "light" ? "whiteAlpha.600" : "blackAlpha.500"}
-            roundedTop={20}
-            zIndex={2}
+    <div>
+      <div className="flex">
+        <div className="pb-2 w-full z-[2]">
+          <div
+            className={cn(
+              "relative w-full rounded-b-[20px] rounded-t-[20px] z-[2]",
+              "shadow-[rgba(100,100,111,0.1)_0px_7px_29px_0px]",
+              colorMode === "light" ? "bg-white/60" : "bg-black/50"
+            )}
           >
             <LexicalComposer
               key={`${colorMode}-${theme}`} // Add a key with the theme for re-rendering
@@ -159,7 +159,7 @@ export const CommentRichTextEditor = ({
               />
               <RichTextPlugin
                 contentEditable={
-                  <Box zIndex={2}>
+                  <div className="z-[2]">
                     <UserContainer
                       userData={userData as IUserData}
                       baseAPI={baseAPI}
@@ -180,7 +180,7 @@ export const CommentRichTextEditor = ({
                         zIndex: 2,
                       }}
                     />
-                    <Box pos={"absolute"} right={5} bottom={4}>
+                    <div className="absolute right-5 bottom-4">
                       <PostCommentButton
                         refetchComments={refetchDocumentComments}
                         distilled={distilled}
@@ -190,8 +190,8 @@ export const CommentRichTextEditor = ({
                         userData={userData}
                         project={project} // Pass project to the PostCommentButton
                       />
-                    </Box>
-                  </Box>
+                    </div>
+                  </div>
                 }
                 placeholder={
                   <div
@@ -212,10 +212,10 @@ export const CommentRichTextEditor = ({
               <ClearEditorPlugin />
               {/* <TreeViewPlugin /> */}
             </LexicalComposer>
-          </Box>
-        </Box>
-      </Flex>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -232,63 +232,47 @@ const UserContainer = ({ userData, baseAPI }: UserContainerProps) => {
   const { colorMode } = useColorMode();
 
   return (
-    <Box
-      pl={3}
-      pt={2}
+    <div
+      className="pl-3 pt-2"
       onClick={() => {
         // If the editor is not focused, focus it.
         editor.focus();
       }}
     >
-      <Flex flexDir="row" sx={{ alignSelf: "flex-start" }} mt={2}>
+      <div className="flex flex-row self-start mt-2">
         {userData?.image ? (
           <Avatar
-            size={"md"}
+            className="mr-2 select-none pointer-events-none"
             src={
               userData?.image?.file?.startsWith("http")
                 ? userData?.image?.file
                 : `${baseAPI}${userData?.image?.file}`
             }
             name={`${userData?.first_name} ${userData?.last_name}`}
-            mr={2}
-            userSelect={"none"}
-            style={{ pointerEvents: "none" }}
             draggable={false}
           />
         ) : (
           <Avatar
-            size={"md"}
+            className="mr-2 select-none pointer-events-none"
             src={""}
             name={`${userData?.first_name} ${userData?.last_name}`}
-            mr={2}
-            userSelect={"none"}
-            style={{ pointerEvents: "none" }}
             draggable={false}
           />
         )}
 
-        <Flex
-          pl={1}
-          pr={0}
-          w={"100%"}
-          h={"100%"}
-          justifyContent={"space-between"}
-          paddingRight={"40px"}
-        >
-          <Box userSelect={"none"}>
-            <Text
-              fontWeight="bold"
-              pl={1}
-              mt={0}
-              color={
-                colorMode === "light" ? "blackAlpha.700" : "whiteAlpha.800"
-              }
+        <div className="flex pl-1 pr-0 w-full h-full justify-between pr-10">
+          <div className="select-none">
+            <p
+              className={cn(
+                "font-bold pl-1 mt-0",
+                colorMode === "light" ? "text-black/70" : "text-white/80"
+              )}
             >
               {`${userData?.first_name} ${userData?.last_name}`}
-            </Text>
-          </Box>
-        </Flex>
-      </Flex>
-    </Box>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

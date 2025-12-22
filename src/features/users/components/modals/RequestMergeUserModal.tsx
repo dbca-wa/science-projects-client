@@ -1,32 +1,16 @@
-import {
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  Grid,
-  Input,
-  InputGroup,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { requestMergeUserCall } from "@/features/admin/services/admin.service";
 import type { IMakeRequestToAdmins } from "@/shared/types";
+import { cn } from "@/shared/utils/component.utils";
 
 interface Props {
   primaryUserPk: number;
@@ -43,10 +27,9 @@ export const RequestMergeUserModal = ({
   onClose,
   refetch,
 }: Props) => {
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const ToastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (data: { title: string; description?: string }) => {
+    ToastIdRef.current = toast(data.title, { description: data.description });
   };
 
   // Mutation, query client, onsubmit, and api function
@@ -56,22 +39,11 @@ export const RequestMergeUserModal = ({
     mutationFn: requestMergeUserCall,
     onMutate: () => {
       addToast({
-        status: "loading",
         title: `Requesting Merge`,
-        position: "top-right",
       });
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Request Made`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Request Made");
 
       setTimeout(() => {
         queryClient
@@ -81,20 +53,12 @@ export const RequestMergeUserModal = ({
       }, 350);
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not request deletion`,
-          description: `${error.response.data}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could not request deletion: ${error.response?.data}`);
+      
       if (
-        error.response.data ===
+        error.response?.data ===
           "A request for this project's deletion has already been made!" ||
-        error.response.data === "Project already has a pending deletion request"
+        error.response?.data === "Project already has a pending deletion request"
       ) {
         onClose();
       }
@@ -114,121 +78,118 @@ export const RequestMergeUserModal = ({
   } = useForm<IMakeRequestToAdmins>();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(requestUserMerge)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Request Merge?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn(
+        "max-w-2xl",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <form onSubmit={handleSubmit(requestUserMerge)}>
+          <DialogHeader>
+            <DialogTitle>Request Merge?</DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Center display={"flex"} flexDir={"column"}>
-              <Text color={colorMode === "light" ? "blue.500" : "blue.400"}>
+          <div className="space-y-6">
+            <div className="flex flex-col items-center">
+              <p className={cn(
+                colorMode === "light" ? "text-blue-500" : "text-blue-400"
+              )}>
                 This form is for merging duplicate users. Please ensure that the
                 user you merge has the correct information.
-              </Text>
-              <UnorderedList ml={6} mt={2}>
-                <ListItem>
+              </p>
+              <ul className="list-disc ml-6 mt-2 space-y-1">
+                <li>
                   The primary user (you) will receive any projects belonging to
                   the secondary user (account you merge with)
-                </ListItem>
-                <ListItem>
+                </li>
+                <li>
                   The primary user (you) will receive any comments belonging to
                   the secondary user (account you merge with)
-                </ListItem>
-                <ListItem>
+                </li>
+                <li>
                   The primary user (you) will receive any documents and roles
                   belonging to the secondary user (account you merge with) on
                   projects, where applicable (if primary user is already on the
                   project and has a higher role, they will maintain the higher
                   role)
-                </ListItem>
-                <ListItem
-                  textDecoration={"underline"}
-                  color={colorMode === "light" ? "red.500" : "red.400"}
-                >
+                </li>
+                <li className={cn(
+                  "underline",
+                  colorMode === "light" ? "text-red-500" : "text-red-400"
+                )}>
                   The secondary user (account you merge with) will be deleted
                   from the system. This is permanent.
-                </ListItem>
-              </UnorderedList>
-            </Center>
+                </li>
+              </ul>
+            </div>
 
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("action", {
-                    required: true,
-                    value: "mergeuser",
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("primaryUserPk", {
-                    required: true,
-                    value: Number(primaryUserPk),
-                  })}
-                  readOnly
-                />
-                <Input
-                  type="hidden"
-                  {...register("secondaryUserPks", {
-                    required: true,
-                    value: secondaryUserPks,
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <Center mt={2} p={5} pb={3}>
-              <Text
-                fontWeight={"bold"}
-                color={"red.400"}
-                textDecoration={"underline"}
-              >
+            <div>
+              <Input
+                type="hidden"
+                {...register("action", {
+                  required: true,
+                  value: "mergeuser",
+                })}
+                readOnly
+              />
+            </div>
+            
+            <div>
+              <Input
+                type="hidden"
+                {...register("primaryUserPk", {
+                  required: true,
+                  value: Number(primaryUserPk),
+                })}
+                readOnly
+              />
+              <Input
+                type="hidden"
+                {...register("secondaryUserPks", {
+                  required: true,
+                  value: secondaryUserPks,
+                })}
+                readOnly
+              />
+            </div>
+            
+            <div className="flex justify-center mt-2 p-5 pb-3">
+              <p className="font-bold text-red-400 underline">
                 Once approved by admins, this is permanent.
-              </Text>
-            </Center>
-            <Center p={5}>
-              <Text fontWeight={"semibold"} color={"blue.500"}>
+              </p>
+            </div>
+            
+            <div className="flex justify-center p-5">
+              <p className="font-semibold text-blue-500 text-center">
                 If you wish to proceed, click "Request Merge". Clicking the
                 button will send a request to the admins, so the process may
                 take time.
-              </Text>
-            </Center>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
+                className={cn(
+                  "text-white ml-3",
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                )}
                 disabled={
                   requestMergeUserMutation.isPending || !isValid || isSubmitting
                 }
-                isLoading={requestMergeUserMutation.isPending}
                 type="submit"
-                ml={3}
               >
-                Request Merge
+                {requestMergeUserMutation.isPending ? "Requesting..." : "Request Merge"}
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

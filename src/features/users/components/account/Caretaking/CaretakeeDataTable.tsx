@@ -16,20 +16,17 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { useState } from "react";
+import { Button } from "@/shared/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/shared/components/ui/avatar";
 import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Text,
-  Tooltip,
-  useColorMode,
-  useDisclosure,
-} from "@chakra-ui/react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/components/ui/tooltip";
 import { useMedia } from "react-use";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
@@ -38,9 +35,10 @@ import type { ICaretakerSimpleUserData, IUserMe } from "@/shared/types";
 import getAllIndirectCaretakees from "@/features/users/utils/getAllIndirectCaretakees";
 import { FaArrowRight, FaEllipsisVertical } from "react-icons/fa6";
 import { RemoveCaretakerModal } from "@/features/users/components/modals/RemoveCaretakerModal";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDown } from "lucide-react";
 import { BsArrow90DegDown, BsArrow90DegRight } from "react-icons/bs";
 import clsx from "clsx";
+import { cn } from "@/shared/utils/component.utils";
 
 interface CaretakerTableData extends ICaretakerSimpleUserData {
   type: "direct" | "indirect";
@@ -143,26 +141,31 @@ export const CaretakeeDataTable = React.memo(
           </Button>
         ),
         cell: ({ row }) => (
-          <Flex className="items-center gap-4">
-            <Avatar
-              size="md"
-              name={`${row.original.display_first_name} ${row.original.display_last_name}`}
-              src={
-                row.original.image
-                  ? row.original.image.startsWith("http")
-                    ? row.original.image
-                    : `${baseUrl}${row.original.image}`
-                  : noImage
-              }
-            />
-            <Text
-              fontSize="md"
-              fontWeight="semibold"
-              color={colorMode === "light" ? "gray.800" : "gray.200"}
+          <div className="flex items-center gap-4">
+            <Avatar className="w-10 h-10">
+              <AvatarImage
+                src={
+                  row.original.image
+                    ? row.original.image.startsWith("http")
+                      ? row.original.image
+                      : `${baseUrl}${row.original.image}`
+                    : noImage
+                }
+                alt={`${row.original.display_first_name} ${row.original.display_last_name}`}
+              />
+              <AvatarFallback>
+                {row.original.display_first_name?.charAt(0)}{row.original.display_last_name?.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <span
+              className={cn(
+                "text-base font-semibold",
+                colorMode === "light" ? "text-gray-800" : "text-gray-200"
+              )}
             >
               {row.original.display_first_name} {row.original.display_last_name}
-            </Text>
-          </Flex>
+            </span>
+          </div>
         ),
       },
       {
@@ -170,19 +173,16 @@ export const CaretakeeDataTable = React.memo(
         header: () => (
           <Button
             className="w-full justify-end"
-            variant={"ghost"}
-            bg={"transparent"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "transparent", color: "white", cursor: "default" }
-                : { bg: "transparent", color: "black", cursor: "default" }
-            }
+            variant="ghost"
           >
             Actions
           </Button>
         ),
         cell: ({ row }) => {
-          const { isOpen, onOpen, onClose } = useDisclosure();
+          const [isOpen, setIsOpen] = useState(false);
+          const onOpen = () => setIsOpen(true);
+          const onClose = () => setIsOpen(false);
+          
           const caretakerObj = {
             caretaker_obj_id: row.original.caretaker_obj_id,
             id: row.original.pk,
@@ -211,17 +211,22 @@ export const CaretakeeDataTable = React.memo(
                 caretakerObject={caretakerObj}
                 refetch={refetchCaretakerData}
               />
-              <Box className="flex justify-end">
-                <Menu>
-                  <MenuButton
-                    as={Button}
-                    color="black"
-                    background={colorMode === "light" ? "gray.100" : "gray.300"}
-                  >
-                    <FaEllipsisVertical />
-                  </MenuButton>
-                  <MenuList>
-                    <MenuItem
+              <div className="flex justify-end">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "text-black",
+                        colorMode === "light" ? "bg-gray-100" : "bg-gray-300"
+                      )}
+                    >
+                      <FaEllipsisVertical />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
                       onClick={() => {
                         console.log("Caretaker Obj", caretakerObj);
                         console.log(row.original);
@@ -229,10 +234,10 @@ export const CaretakeeDataTable = React.memo(
                       }}
                     >
                       Remove
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              </Box>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </>
           );
         },
@@ -242,26 +247,24 @@ export const CaretakeeDataTable = React.memo(
     const subCaretakeesColumn: ColumnDef<CaretakeeWithChain> = {
       accessorKey: "subCaretakees",
       header: () => (
-        <Tooltip
-          label="You receive tasks from these users as well."
-          aria-label="You receive tasks from these users as well."
-        >
-          <Button
-            className="w-full justify-start"
-            variant={"ghost"}
-            bg={"transparent"}
-            _hover={
-              colorMode === "dark"
-                ? { bg: "transparent", color: "white", cursor: "default" }
-                : { bg: "transparent", color: "black", cursor: "default" }
-            }
-          >
-            Sub-caretakees
-          </Button>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="w-full justify-start"
+                variant="ghost"
+              >
+                Sub-caretakees
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>You receive tasks from these users as well.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ),
       cell: ({ row }) => (
-        <Flex direction="column" gap={2}>
+        <div className="flex flex-col gap-2">
           {row.original.subCaretakees.length > 0 ? (
             row.original.subCaretakees.map((subCaretakee, index) => {
               const level = (subCaretakee as CaretakeeWithLevel).level;
@@ -271,53 +274,48 @@ export const CaretakeeDataTable = React.memo(
               const isLastOfParent = !nextItem || nextItem.level < level;
 
               return (
-                <Flex key={index} align="center" position="relative">
-                  <Box
-                    width={`${level * 24}px`}
-                    position="relative"
-                    height="32px"
-                    marginRight="12px"
+                <div key={index} className="flex items-center relative">
+                  <div
+                    className="relative h-8 mr-3"
+                    style={{ width: `${level * 24}px` }}
                   >
-                    <Box
-                      position="absolute"
-                      right="0"
-                      top="50%"
-                      transform="translateY(-50%) scale(-1) rotate(-270deg)"
-                      color="gray.300"
-                      fontSize="16px"
-                    >
+                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 scale-x-[-1] rotate-[-270deg] text-gray-300 text-base">
                       <BsArrow90DegDown />
-                    </Box>
-                  </Box>
+                    </div>
+                  </div>
 
-                  <Avatar
-                    size="sm"
-                    name={`${subCaretakee.display_first_name} ${subCaretakee.display_last_name}`}
-                    src={
-                      subCaretakee.image
-                        ? subCaretakee.image.startsWith("http")
-                          ? subCaretakee.image
-                          : `${baseUrl}${subCaretakee.image}`
-                        : noImage
-                    }
-                  />
-                  <Text fontSize="sm" ml={2}>
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage
+                      src={
+                        subCaretakee.image
+                          ? subCaretakee.image.startsWith("http")
+                            ? subCaretakee.image
+                            : `${baseUrl}${subCaretakee.image}`
+                          : noImage
+                      }
+                      alt={`${subCaretakee.display_first_name} ${subCaretakee.display_last_name}`}
+                    />
+                    <AvatarFallback>
+                      {subCaretakee.display_first_name?.charAt(0)}{subCaretakee.display_last_name?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm ml-2">
                     {subCaretakee.display_first_name}{" "}
                     {subCaretakee.display_last_name}
-                  </Text>
+                  </span>
 
-                  <Text fontSize="xs" color="gray.500" ml={2}>
+                  <span className="text-xs text-gray-500 ml-2">
                     (L{level})
-                  </Text>
-                </Flex>
+                  </span>
+                </div>
               );
             })
           ) : (
-            <Text fontSize="sm" color="gray.500" fontStyle="italic">
+            <span className="text-sm text-gray-500 italic">
               No subcaretakees
-            </Text>
+            </span>
           )}
-        </Flex>
+        </div>
       ),
     };
 
@@ -346,21 +344,21 @@ export const CaretakeeDataTable = React.memo(
       <div className="rounded-md border">
         {myData.caretaking_for.length > 0 ? (
           <div className="p-4">
-            <Text fontSize="lg" fontWeight="semibold">
+            <p className="text-lg font-semibold">
               Caretakee Relationships
-            </Text>
-            <Text fontSize="sm" color="gray.500">
+            </p>
+            <p className="text-sm text-gray-500">
               These are the users you are caretaking for.
-            </Text>
+            </p>
           </div>
         ) : (
           <div className="p-4">
-            <Text fontSize="lg" fontWeight="semibold">
+            <p className="text-lg font-semibold">
               Caretaking Relationships
-            </Text>
-            <Text fontSize="sm" color="gray.500">
+            </p>
+            <p className="text-sm text-gray-500">
               You are not caretaking for any users.
-            </Text>
+            </p>
           </div>
         )}
 

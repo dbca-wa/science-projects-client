@@ -1,5 +1,4 @@
 import { useGetRTESectionPlaceholder } from "@/features/reports/utils/useGetRTESectionPlaceholder";
-import { Box, Spacer, Text } from "@chakra-ui/react";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import {
   InitialConfigType,
@@ -57,28 +56,21 @@ export const DisplaySRTE = ({
           }
           placeholder={
             <>
-              <Box
-                style={{
-                  position: "absolute",
-                  left: "32px",
-                  top: "20px",
-                  userSelect: "none",
-                  pointerEvents: "none",
-                  color: "gray.500",
-                }}
+              <div
+                className="pointer-events-none absolute left-8 top-5 select-none text-gray-500"
               >
-                <Text color={"gray.500"} fontSize={"14px"}>
+                <p className="text-sm text-gray-500">
                   {`Press the edit button to add 
                         ${useGetRTESectionPlaceholder(section)}.`}
-                </Text>
-              </Box>
-              <Spacer pb={2} />
+                </p>
+              </div>
+              <div className="pb-2" />
             </>
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
 
-        <Box></Box>
+        <div></div>
         {shouldShowTree ? <TreeViewPlugin /> : null}
         <ClearEditorPlugin />
       </LexicalComposer>

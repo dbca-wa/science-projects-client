@@ -1,5 +1,5 @@
 import useApiEndpoint from "@/shared/hooks/useApiEndpoint";
-import { Avatar } from "@/shared/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/shared/components/ui/avatar";
 import { Button } from "@/shared/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/shared/components/ui/sheet";
 import { Badge } from "@/shared/components/ui/badge";
@@ -64,15 +64,15 @@ export const TeamMember = ({
   const { colorMode } = useColorMode();
 
   const roleColors: { [key: string]: { bg: string; color: string } } = {
-    "Science Support": { bg: "green.700", color: "white" },
-    "Project Leader": { bg: "orange.700", color: "white" },
-    "Academic Supervisor": { bg: "blue.500", color: "white" },
-    "Supervised Student": { bg: "blue.400", color: "whiteAlpha.900" },
-    "Technical Support": { bg: "orange.900", color: "white" },
-    "Consulted Peer": { bg: "green.200", color: "black" },
-    "External Collaborator": { bg: "gray.200", color: "black" },
-    "External Peer": { bg: "gray.300", color: "black" },
-    "Involved Group": { bg: "gray.500", color: "white" },
+    "Science Support": { bg: "bg-green-700", color: "text-white" },
+    "Project Leader": { bg: "bg-orange-700", color: "text-white" },
+    "Academic Supervisor": { bg: "bg-blue-500", color: "text-white" },
+    "Supervised Student": { bg: "bg-blue-400", color: "text-white" },
+    "Technical Support": { bg: "bg-orange-900", color: "text-white" },
+    "Consulted Peer": { bg: "bg-green-200", color: "text-black" },
+    "External Collaborator": { bg: "bg-gray-200", color: "text-black" },
+    "External Peer": { bg: "bg-gray-300", color: "text-black" },
+    "Involved Group": { bg: "bg-gray-500", color: "text-white" },
   };
 
   type Role =
@@ -117,7 +117,6 @@ export const TeamMember = ({
   const onCaretakerClose = () => setIsCaretakerOpen(false);
 
   const draggedStyles = {
-    background: "blue.500",
     transform: "scale(1.1)",
     borderRadius: "10px",
     cursor: "grabbing",
@@ -158,31 +157,32 @@ export const TeamMember = ({
 
       <div
         style={isCurrentlyDragging ? draggedStyles : {}}
-        className={`flex justify-between items-center p-4 border ${
+        className={`flex justify-between items-center p-4 border rounded-lg transition-all duration-200 ${
           colorMode === "light" ? "border-gray-200" : "border-gray-600"
         } ${
           isCurrentlyDragging 
-            ? "bg-blue-500 z-[999]" 
-            : backgroundColor ? `bg-[${backgroundColor}]` : ""
+            ? "bg-blue-500 z-[999] shadow-lg" 
+            : backgroundColor ? `bg-[${backgroundColor}]` : "bg-background"
         } hover:shadow-lg ${
           colorMode === "light"
             ? "hover:shadow-black/15"
             : "hover:shadow-white/5"
         }`}
       >
-        <div className="flex p-4">
+        <div className="flex p-4 w-full">
           <div className="relative">
-            <Avatar
-              className="mt-1 w-12 h-12 select-none pointer-events-none cursor-pointer"
-              src={
-                image?.file
-                  ? `${baseURL}${image.file}`
-                  : image?.old_file
-                    ? `${baseURL}${image.old_file}`
-                    : ""
-              }
-              onClick={onUserOpen}
-            />
+            <Avatar className="mt-1 w-12 h-12 select-none cursor-pointer">
+              <AvatarImage
+                src={
+                  image?.file
+                    ? `${baseURL}${image.file}`
+                    : image?.old_file
+                      ? `${baseURL}${image.old_file}`
+                      : ""
+                }
+                onClick={onUserOpen}
+              />
+            </Avatar>
             {is_leader && (
               <div className="absolute -top-1 right-[38%] text-yellow-300">
                 <FaCrown />
@@ -190,11 +190,11 @@ export const TeamMember = ({
             )}
           </div>
 
-          <div className="ml-4 grid grid-cols-1 select-none">
+          <div className="ml-4 grid grid-cols-1 select-none flex-1">
             <div className="flex flex-row gap-2 items-center">
               <Button
                 variant="link"
-                className={`ml-0.5 justify-start text-lg ${
+                className={`ml-0.5 justify-start text-lg p-0 h-auto ${
                   isCurrentlyDragging
                     ? "text-white"
                     : colorMode === "light"
@@ -215,12 +215,13 @@ export const TeamMember = ({
                         className="flex items-center gap-2 select-none cursor-pointer"
                         onClick={onCaretakerOpen}
                       >
-                        <Avatar
-                          className="mt-1 w-6 h-6 pointer-events-none select-none"
-                          src={
-                            caretaker?.image ? `${baseURL}${caretaker?.image}` : ""
-                          }
-                        />
+                        <Avatar className="mt-1 w-6 h-6 pointer-events-none select-none">
+                          <AvatarImage
+                            src={
+                              caretaker?.image ? `${baseURL}${caretaker?.image}` : ""
+                            }
+                          />
+                        </Avatar>
                         <p className="text-blue-500 text-xs flex justify-center">
                           ({caretaker.display_first_name}{" "}
                           {caretaker.display_last_name} is caretaking)
@@ -238,11 +239,9 @@ export const TeamMember = ({
             <div>
               <Badge
                 className={`mt-1 mb-1 justify-center ${
-                  roleArray.find((item) => item.role === role)?.bg ? 
-                    `bg-${roleArray.find((item) => item.role === role)?.bg}` : ""
+                  roleArray.find((item) => item.role === role)?.bg || "bg-gray-500"
                 } ${
-                  roleArray.find((item) => item.role === role)?.color ?
-                    `text-${roleArray.find((item) => item.role === role)?.color}` : ""
+                  roleArray.find((item) => item.role === role)?.color || "text-white"
                 }`}
               >
                 {roleArray.find((item) => item.role === role)?.displayName ??

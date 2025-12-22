@@ -22,7 +22,6 @@ import { HeadingNode } from "@lexical/rich-text";
 
 import { Label } from "@/shared/components/ui/label";
 import { TextareaProps } from "@/shared/components/ui/textarea";
-import { Box } from "@chakra-ui/react";
 import { ControllerRenderProps, Path, UseFormRegister } from "react-hook-form";
 import { DatabaseRichTextToolbar } from "./DatabaseRichTextToolbar";
 
@@ -135,9 +134,9 @@ const DatabaseRichTextEditor = <T,>({
   return (
     <>
       {isEdit && !hideLabel && (
-        <Box className="mb-2">
+        <div className="mb-2">
           <Label htmlFor={htmlFor as string}>{label}</Label>
-        </Box>
+        </div>
       )}
 
       <LexicalComposer
@@ -165,7 +164,7 @@ const DatabaseRichTextEditor = <T,>({
               ? register(htmlFor as unknown as Path<T>, { required: true })
               : {})} // Conditionally apply register
             contentEditable={
-              <Box zIndex={2}>
+              <div className="z-[2]">
                 {/* Toolbar */}
                 {isEdit && (
                   <DatabaseRichTextToolbar
@@ -174,8 +173,8 @@ const DatabaseRichTextEditor = <T,>({
                     referenceFlex={componentRef}
                   />
                 )}
-                <Box className="editor-scroller">
-                  <Box
+                <div className="editor-scroller">
+                  <div
                     className="editor"
                     ref={onRef}
                     style={{
@@ -206,9 +205,9 @@ const DatabaseRichTextEditor = <T,>({
                           : undefined,
                       }}
                     />
-                  </Box>
-                </Box>
-              </Box>
+                  </div>
+                </div>
+              </div>
             }
             placeholder={
               <div

@@ -1,20 +1,8 @@
 // Modal Component for editing the Project Details
 
-import {
-  Text,
-  Modal,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Box,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useState } from "react";
 import { useCurrentYear } from "@/shared/hooks/useCurrentYear";
 import { IconType } from "react-icons";
@@ -32,6 +20,7 @@ import { ProjectExternalSection } from "@/features/projects/components/forms/Pro
 import { ProjectStudentSection } from "@/features/projects/components/forms/ProjectStudentSection";
 import type { IExtendedProjectDetails, IProjectData } from "@/shared/types";
 import { useUser } from "@/features/users/hooks/useUser";
+import { cn } from "@/shared/utils/component.utils";
 
 interface IEditProjectDetailsProps {
   projectType: string;
@@ -115,147 +104,135 @@ export const ProjectDetailEditModal = ({
   const { userData: me } = useUser();
 
   return baseInformation && details ? (
-    <Modal
-      isOpen={isOpen}
-      onClose={controlledClose}
-      size={"3xl"}
-      scrollBehavior="inside"
-    >
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader
-          display={"inline-flex"}
-          // justifyContent={"center"}
-          alignItems={"center"}
-          // pb={6}
-        >
-          <Box
-            color={
-              projectType === "Core Function"
-                ? "red.500"
-                : projectType === "Science Project"
-                  ? "green.500"
-                  : projectType === "Student Project"
-                    ? "blue.500"
-                    : projectType === "External Project"
-                      ? "gray.500"
-                      : "gray.500"
-            }
-            mr={3}
-          >
+    <Dialog open={isOpen} onOpenChange={controlledClose}>
+      <DialogContent className={cn(
+        "max-w-3xl max-h-[80vh] overflow-y-auto",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <DialogHeader className="flex flex-row items-center">
+          <div className={cn(
+            "mr-3",
+            projectType === "Core Function"
+              ? "text-red-500"
+              : projectType === "Science Project"
+                ? "text-green-500"
+                : projectType === "Student Project"
+                  ? "text-blue-500"
+                  : projectType === "External Project"
+                    ? "text-gray-500"
+                    : "text-gray-500"
+          )}>
             <ButtonIcon />
-          </Box>
-          <Text>{baseInformation.title}</Text>
-        </ModalHeader>
-        <ModalCloseButton />
-        <Tabs isFitted variant="enclosed" index={activeTabIndex}>
-          <TabList mb="1em">
-            <Tab>Base Information</Tab>
-            <Tab isDisabled={!baseInformationFilled}>Details</Tab>
-            <Tab isDisabled={!baseInformationFilled || !projectDetailsFilled}>
+          </div>
+          <DialogTitle>{baseInformation.title}</DialogTitle>
+        </DialogHeader>
+        
+        <Tabs value={activeTabIndex.toString()} onValueChange={(value) => setActiveTabIndex(parseInt(value))}>
+          <TabsList className="grid w-full grid-cols-4 mb-4">
+            <TabsTrigger value="0">Base Information</TabsTrigger>
+            <TabsTrigger value="1" disabled={!baseInformationFilled}>Details</TabsTrigger>
+            <TabsTrigger value="2" disabled={!baseInformationFilled || !projectDetailsFilled}>
               Location
-            </Tab>
+            </TabsTrigger>
             {projectType.includes("External") && (
-              <Tab isDisabled={!locationFilled}>External Details</Tab>
+              <TabsTrigger value="3" disabled={!locationFilled}>External Details</TabsTrigger>
             )}
-
             {projectType === "Student Project" && (
-              <Tab isDisabled={!locationFilled}>Student Details</Tab>
+              <TabsTrigger value="3" disabled={!locationFilled}>Student Details</TabsTrigger>
             )}
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <ProjectBaseInformation
-                projectKind={
-                  projectType === "Core Function"
-                    ? "core_function"
-                    : projectType === "Student Project"
-                      ? "student"
-                      : projectType === "Science Project"
-                        ? "science"
-                        : "external"
-                }
-                nextClick={goToDetailsTab}
-                currentYear={currentYear}
-                onClose={onClose}
-                colorMode={colorMode}
-                baseInformationFilled={baseInformationFilled}
-                setBaseInformationFilled={setBaseInformationFilled}
-              />
-            </TabPanel>
-            <TabPanel>
-              <ProjectDetailsSection
-                backClick={goBack}
-                nextClick={goToLocationTab}
-                thisUser={me?.pk}
+          </TabsList>
+          
+          <TabsContent value="0">
+            <ProjectBaseInformation
+              projectKind={
+                projectType === "Core Function"
+                  ? "core_function"
+                  : projectType === "Student Project"
+                    ? "student"
+                    : projectType === "Science Project"
+                      ? "science"
+                      : "external"
+              }
+              nextClick={goToDetailsTab}
+              currentYear={currentYear}
+              onClose={onClose}
+              colorMode={colorMode}
+              baseInformationFilled={baseInformationFilled}
+              setBaseInformationFilled={setBaseInformationFilled}
+            />
+          </TabsContent>
+          
+          <TabsContent value="1">
+            <ProjectDetailsSection
+              backClick={goBack}
+              nextClick={goToLocationTab}
+              thisUser={me?.pk}
+              onClose={onClose}
+              projectType={projectType}
+              colorMode={colorMode}
+              projectDetailsFilled={projectDetailsFilled}
+              setProjectDetailsFilled={setProjectDetailsFilled}
+            />
+          </TabsContent>
+          
+          <TabsContent value="2">
+            {projectType.includes("External") ||
+            projectType.includes("Student") ? (
+              <ProjectLocationSection
+                locationFilled={locationFilled}
+                locationData={locationData}
+                setLocationData={setLocationData}
+                setLocationFilled={setLocationFilled}
                 onClose={onClose}
                 projectType={projectType}
+                currentYear={currentYear}
                 colorMode={colorMode}
-                projectDetailsFilled={projectDetailsFilled}
-                setProjectDetailsFilled={setProjectDetailsFilled}
+                backClick={goBack}
+                nextClick={goToFinalTab}
+                createClick={kickOffMutation}
               />
-            </TabPanel>
-            <TabPanel>
-              {projectType.includes("External") ||
-              projectType.includes("Student") ? (
-                <ProjectLocationSection
-                  locationFilled={locationFilled}
-                  locationData={locationData}
-                  setLocationData={setLocationData}
-                  setLocationFilled={setLocationFilled}
-                  onClose={onClose}
-                  projectType={projectType}
-                  currentYear={currentYear}
-                  colorMode={colorMode}
-                  backClick={goBack}
-                  nextClick={goToFinalTab}
-                  createClick={kickOffMutation}
-                />
-              ) : (
-                <ProjectLocationSection
-                  locationFilled={locationFilled}
-                  locationData={locationData}
-                  setLocationData={setLocationData}
-                  setLocationFilled={setLocationFilled}
-                  onClose={onClose}
-                  projectType={projectType}
-                  currentYear={currentYear}
-                  colorMode={colorMode}
-                  backClick={goBack}
-                  createClick={kickOffMutation}
-                />
-              )}
-            </TabPanel>
-            {projectType.includes("External") && (
-              <TabPanel>
-                <ProjectExternalSection
-                  setExternalData={setExternalData}
-                  onClose={onClose}
-                  backClick={goBack}
-                  createClick={kickOffMutation}
-                />
-              </TabPanel>
+            ) : (
+              <ProjectLocationSection
+                locationFilled={locationFilled}
+                locationData={locationData}
+                setLocationData={setLocationData}
+                setLocationFilled={setLocationFilled}
+                onClose={onClose}
+                projectType={projectType}
+                currentYear={currentYear}
+                colorMode={colorMode}
+                backClick={goBack}
+                createClick={kickOffMutation}
+              />
             )}
+          </TabsContent>
+          
+          {projectType.includes("External") && (
+            <TabsContent value="3">
+              <ProjectExternalSection
+                setExternalData={setExternalData}
+                onClose={onClose}
+                backClick={goBack}
+                createClick={kickOffMutation}
+              />
+            </TabsContent>
+          )}
 
-            {projectType.includes("Student") && (
-              <TabPanel>
-                <ProjectStudentSection
-                  studentFilled={studentFilled}
-                  studentData={studentData}
-                  setStudentData={setStudentData}
-                  setStudentFilled={setStudentFilled}
-                  onClose={onClose}
-                  backClick={goBack}
-                  createClick={kickOffMutation}
-                />
-              </TabPanel>
-            )}
-          </TabPanels>
+          {projectType.includes("Student") && (
+            <TabsContent value="3">
+              <ProjectStudentSection
+                studentFilled={studentFilled}
+                studentData={studentData}
+                setStudentData={setStudentData}
+                setStudentFilled={setStudentFilled}
+                onClose={onClose}
+                backClick={goBack}
+                createClick={kickOffMutation}
+              />
+            </TabsContent>
+          )}
         </Tabs>
-      </ModalContent>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   ) : null;
 };

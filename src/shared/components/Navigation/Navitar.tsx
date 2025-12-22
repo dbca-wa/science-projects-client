@@ -31,6 +31,7 @@ import { ToggleDarkMode } from "../ToggleDarkMode";
 import { ToggleLayout } from "../ToggleLayout";
 import { useMaintainer } from "@/features/admin/hooks/useMaintainer";
 import { MdSpeakerNotes } from "react-icons/md";
+import { cn } from "@/shared/utils/component.utils";
 
 export const Navitar = ({
   isModern,
@@ -62,8 +63,6 @@ export const Navitar = ({
       toast.success("Logged out", {
         description: "Thank you, come again!",
       });
-        });
-      }
       // queryClient.refetchQueries(['me']);
       queryClient.invalidateQueries({ queryKey: ["me"] });
       console.log("DATA IS:", data);
@@ -114,24 +113,24 @@ export const Navitar = ({
     .VITE_PRODUCTION_PROFILES_BASE_URL;
 
   return (
-    <Box userSelect={"none"} zIndex={isOpen ? 2 : 1}>
-      <Menu isOpen={isOpen}>
-        <MenuButton
-          zIndex={isOpen ? 2 : 1}
+    <div className={cn("select-none", isOpen ? "z-20" : "z-10")}>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger
+          className={cn("z-20 outline-none", isOpen ? "z-20" : "z-10")}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <Center>
+          <div className="flex items-center justify-center">
             {shouldShowName ? (
-              <Text
-                color={
+              <span
+                className={cn(
+                  "mx-3",
                   isModern
                     ? colorMode === "dark"
-                      ? "whiteAlpha.800"
-                      : "blackAlpha.800"
-                    : "whiteAlpha.900"
-                }
-                mx={3}
+                      ? "text-white/80"
+                      : "text-black/80"
+                    : "text-white/90"
+                )}
               >
                 {userData !== undefined &&
                   userData &&
@@ -142,138 +141,120 @@ export const Navitar = ({
                         ? userData.display_first_name
                         : `${userData?.display_first_name.substring(0, 9)}...`
                     : userData.username)}
-              </Text>
+              </span>
             ) : null}
-            <Avatar
-              size="sm"
-              name={userData?.username}
-              src={
-                userData?.image
-                  ? userData.image?.file?.startsWith("http")
-                    ? `${userData.image?.file}`
-                    : `${baseAPI}${userData.image?.file}`
-                  : userData.image?.old_file
-                    ? userData.image?.old_file
-                    : noImage
-              }
-            ></Avatar>
-            <Center
-              color={
+            <Avatar className="w-8 h-8">
+              <AvatarImage
+                src={
+                  userData?.image
+                    ? userData.image?.file?.startsWith("http")
+                      ? `${userData.image?.file}`
+                      : `${baseAPI}${userData.image?.file}`
+                    : userData.image?.old_file
+                      ? userData.image?.old_file
+                      : noImage
+                }
+                alt={userData?.username}
+              />
+              <AvatarFallback>{userData?.username?.charAt(0)?.toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div
+              className={cn(
+                "flex items-center justify-center ml-1",
                 isModern
                   ? colorMode === "dark"
-                    ? "whiteAlpha.800"
-                    : "blackAlpha.800"
-                  : "whiteAlpha.900"
-              }
-              ml={1}
+                    ? "text-white/80"
+                    : "text-black/80"
+                  : "text-white/90"
+              )}
             >
-              <GoTriangleDown size={"13px"} />
-            </Center>
-          </Center>
-        </MenuButton>
+              <GoTriangleDown size={13} />
+            </div>
+          </div>
+        </DropdownMenuTrigger>
 
-        <MenuList
+        <DropdownMenuContent
+          className={cn("mt-[-7.5px]", isOpen ? "z-20" : "z-10")}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          mt={"-7.5px"}
-          zIndex={isOpen ? 2 : 1}
         >
-          <MenuGroup
-            title="Docs & Layout"
-            fontSize={"12px"}
-            color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
-            textAlign={"center"}
-            zIndex={isOpen ? 2 : 1}
-          >
+          <DropdownMenuLabel className="text-xs text-center text-gray-500 dark:text-white/70">
+            Docs & Layout
+          </DropdownMenuLabel>
+          <DropdownMenuGroup>
             {userData?.pk === maintainerData?.pk && (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    navigate("/crud/test");
-                  }}
-                  zIndex={isOpen ? 2 : 1}
-                  color={colorMode === "dark" ? "gray.400" : null}
-                >
-                  {<FaGamepad />}
-
-                  <Text ml={2}>Test</Text>
-                </MenuItem>
-              </>
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate("/crud/test");
+                }}
+                className={cn("cursor-pointer", colorMode === "dark" ? "text-gray-400" : "")}
+              >
+                <FaGamepad className="mr-2" />
+                <span>Test</span>
+              </DropdownMenuItem>
             )}
 
-            <MenuItem
+            <DropdownMenuItem
               onClick={() => {
                 navigate("/guide");
-                // window.open("https://sdis.readthedocs.io", "_blank");
               }}
-              zIndex={isOpen ? 2 : 1}
-              color={colorMode === "dark" ? "gray.400" : null}
+              className={cn("cursor-pointer", colorMode === "dark" ? "text-gray-400" : "")}
             >
-              {<SiReadthedocs />}
-              <Text ml={2}>Quick Guide</Text>
-            </MenuItem>
+              <SiReadthedocs className="mr-2" />
+              <span>Quick Guide</span>
+            </DropdownMenuItem>
 
             <ToggleLayout asMenuItem />
             <ToggleDarkMode asMenuItem />
-          </MenuGroup>
+          </DropdownMenuGroup>
 
-          {/* {isModern && ( */}
-          <MenuGroup
-            title="Links"
-            fontSize={"12px"}
-            color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
-            textAlign={"center"}
-            zIndex={isOpen ? 2 : 1}
-          >
-            <MenuItem
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuLabel className="text-xs text-center text-gray-500 dark:text-white/70">
+            Links
+          </DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuItem
               onClick={() => {
                 window.open("https://data.bio.wa.gov.au/", "_blank");
               }}
-              zIndex={isOpen ? 2 : 1}
-              color={colorMode === "dark" ? "gray.400" : null}
+              className={cn("cursor-pointer", colorMode === "dark" ? "text-gray-400" : "")}
             >
-              {<FaBook />}
-              <Text ml={2}>Data Catalogue</Text>
-            </MenuItem>
-            <MenuItem
+              <FaBook className="mr-2" />
+              <span>Data Catalogue</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
               onClick={() => {
                 window.open(
                   "https://scientificsites.dpaw.wa.gov.au/",
                   "_blank",
                 );
               }}
-              zIndex={isOpen ? 2 : 1}
-              color={colorMode === "dark" ? "gray.400" : null}
+              className={cn("cursor-pointer", colorMode === "dark" ? "text-gray-400" : "")}
             >
-              {<TbWorldWww />}
-              <Text ml={2}>Scientific Sites Register</Text>
-            </MenuItem>
-          </MenuGroup>
-          {/* )} */}
+              <TbWorldWww className="mr-2" />
+              <span>Scientific Sites Register</span>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
 
-          <MenuGroup
-            title="DBCA Account"
-            fontSize={"12px"}
-            color={colorMode === "light" ? "gray.500" : "whiteAlpha.700"}
-            textAlign={"center"}
-            zIndex={isOpen ? 2 : 1}
-          >
-            <MenuItem
+          <DropdownMenuSeparator />
+
+          <DropdownMenuLabel className="text-xs text-center text-gray-500 dark:text-white/70">
+            DBCA Account
+          </DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuItem
               onClick={() => {
                 navigate("/users/me");
               }}
-              zIndex={isOpen ? 2 : 1}
-              color={colorMode === "dark" ? "gray.400" : null}
+              className={cn("cursor-pointer", colorMode === "dark" ? "text-gray-400" : "")}
             >
-              {<FaUserCircle />}
-              <Text ml={2}>
+              <FaUserCircle className="mr-2" />
+              <span>
                 {layout === "modern" ? "My Profile" : "My SPMS Profile"}
-              </Text>
-            </MenuItem>
-            <MenuItem
-              // onClick={() => {
-              //   window.open("https://sww.dpaw.wa.gov.au/", "_blank");
-              // }}
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
               onClick={() => {
                 if (import.meta.env.MODE === "development") {
                   navigate(`/staff/${userData?.pk}`);
@@ -283,26 +264,24 @@ export const Navitar = ({
                   );
                 }
               }}
-              zIndex={isOpen ? 2 : 1}
-              color={colorMode === "dark" ? "gray.400" : null}
+              className={cn("cursor-pointer", colorMode === "dark" ? "text-gray-400" : "")}
             >
-              {<FaUserCircle />}
-              <Text ml={2}>My Public Profile</Text>
-            </MenuItem>
+              <FaUserCircle className="mr-2" />
+              <span>My Public Profile</span>
+            </DropdownMenuItem>
 
             {userData?.is_superuser && (
-              <MenuItem
+              <DropdownMenuItem
                 onClick={onLogOut}
-                zIndex={isOpen ? 2 : 1}
-                color={colorMode === "dark" ? "gray.400" : null}
+                className={cn("cursor-pointer", colorMode === "dark" ? "text-gray-400" : "")}
               >
-                {<FiLogOut />}
-                <Text ml={2}>Logout</Text>
-              </MenuItem>
+                <FiLogOut className="mr-2" />
+                <span>Logout</span>
+              </DropdownMenuItem>
             )}
-          </MenuGroup>
-        </MenuList>
-      </Menu>
-    </Box>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };

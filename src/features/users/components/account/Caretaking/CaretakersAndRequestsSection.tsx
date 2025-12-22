@@ -1,5 +1,4 @@
 import type { ICaretakerSubsections } from "@/shared/types";
-import { Text } from "@chakra-ui/react";
 import ActiveCaretakerDisplay from "./ActiveCaretakerDisplay";
 import CaretakerRequestDisplay from "./CaretakerRequestDisplay";
 import RequestCaretakerForm from "./RequestCaretakerForm";
@@ -13,15 +12,15 @@ const CaretakersAndRequestsSection = ({
   return (
     <div className="rounded-md border p-4">
       <div className="">
-        <Text fontSize="lg" fontWeight="semibold">
+        <p className="text-lg font-semibold">
           Caretaker
-        </Text>
-        <Text fontSize="sm" color="gray.500">
+        </p>
+        <p className="text-sm text-gray-500">
           {caretakerData?.caretaker_object === null &&
           caretakerData?.caretaker_request_object === null
             ? "You have no caretaker set. Apply for one below."
             : "Your caretaker is shown below."}
-        </Text>
+        </p>
       </div>
 
       {/* Caretaker Request Form (if neither request or caretaker) */}
@@ -35,19 +34,19 @@ const CaretakersAndRequestsSection = ({
 
       <div className="mt-4 border-t border-gray-200">
         <div className="mt-4">
-          <Text fontSize="lg" fontWeight="semibold">
+          <p className="text-lg font-semibold">
             Requests
-          </Text>
+          </p>
 
           {caretakerData?.caretaker_request_object === null &&
             caretakerData?.become_caretaker_request_object === null &&
             caretakerData?.caretaker_object === null && (
-              <Text fontSize="sm" color="gray.500">
+              <p className="text-sm text-gray-500">
                 {caretakerData?.caretaker_object === null &&
                 caretakerData?.caretaker_request_object === null
                   ? "You have made no caretaker requests."
                   : "Your requests are shown below."}
-              </Text>
+              </p>
             )}
         </div>
 

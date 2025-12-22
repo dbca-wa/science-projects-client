@@ -1,30 +1,23 @@
 // Component for handling hover opening of menus on Header/Nav
 
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Icon,
-  Text,
-  type TextProps,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
 import { useState } from "react";
 import { type IconType } from "react-icons";
 
-interface INavButtonProps extends TextProps {
+interface INavButtonProps {
   buttonName?: string;
   cScheme?: string;
   hoverColor?: string;
   fColor?: string;
   leftIcon?: IconType;
   onClick: (e) => void;
+  textAlign?: string;
 }
 
 export const NavButton = ({
   buttonName,
   cScheme,
-  leftIcon,
+  leftIcon: LeftIcon,
   fColor,
   hoverColor,
   textAlign,
@@ -44,63 +37,46 @@ export const NavButton = ({
     onClick(e);
   };
 
-  const bgStyle = isHovered
-    ? cScheme
-      ? { bg: `${cScheme}.500` }
-      : {}
-    : cScheme
-    ? `${cScheme}.500`
-    : "transparent";
-
-  const fontColorStyle = isHovered
-    ? fColor
-      ? { color: fColor }
-      : "white"
-    : fColor
-    ? fColor
-    : "whiteAlpha.700";
+  // Convert color scheme to Tailwind classes
+  const getColorClasses = () => {
+    const baseClasses = "px-2 py-5 min-w-[60px] text-sm outline-none focus:shadow-none";
+    
+    if (isHovered) {
+      return `${baseClasses} ${hoverColor ? 'bg-white text-black' : 'bg-white text-black'}`;
+    }
+    
+    const bgClass = cScheme ? `bg-${cScheme}-500` : 'bg-transparent';
+    const textClass = fColor ? `text-[${fColor}]` : 'text-white/70';
+    
+    return `${baseClasses} ${bgClass} ${textClass} hover:bg-white hover:text-black active:bg-white active:text-black`;
+  };
 
   return (
-    <Box onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <Button
-        colorScheme={cScheme}
-        bg={bgStyle}
-        color={fontColorStyle}
-        _hover={{
-          bg: hoverColor ? hoverColor : "white",
-          color: fColor ? fColor : "black",
-        }}
-        _active={{
-          bg: hoverColor ? hoverColor : "white",
-          color: fColor ? fColor : "black",
-        }}
-        size={"sm"}
-        px={2}
-        py={5}
+        variant="ghost"
+        className={getColorClasses()}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        outline="none"
-        _focus={{ boxShadow: "none" }}
-        minW={"60px"}
         onClick={(e) => handleItemClick(e)}
       >
-        <Flex>
-          {leftIcon ? (
-            <Box display={"flex"}>
-              <Center mr={buttonName ? 1.5 : 0}>
-                <Icon as={leftIcon} />
-              </Center>
-              <Center mr={buttonName ? 1.5 : 0}>
-                <Text>{buttonName}</Text>
-              </Center>
-            </Box>
-          ) : textAlign ? (
-            <Text>{buttonName}</Text>
+        <div className="flex items-center">
+          {LeftIcon ? (
+            <div className="flex items-center">
+              <div className={`flex items-center ${buttonName ? 'mr-1.5' : ''}`}>
+                <LeftIcon className="w-4 h-4" />
+              </div>
+              {buttonName && (
+                <div className="flex items-center mr-1.5">
+                  <span>{buttonName}</span>
+                </div>
+              )}
+            </div>
           ) : (
-            <Text>{buttonName}</Text>
+            <span>{buttonName}</span>
           )}
-        </Flex>
+        </div>
       </Button>
-    </Box>
+    </div>
   );
 };

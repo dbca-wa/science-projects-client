@@ -5,29 +5,13 @@ import {
   IApproveProgressReport,
   approveProgressReport,
 } from "@/features/users/services/users.service";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  Grid,
-  Input,
-  InputGroup,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { toast } from "sonner";
+import { Button } from "@/shared/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface Props {
@@ -49,38 +33,28 @@ export const ApproveProgressReportModal = ({
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
   const { register, handleSubmit, reset } = useForm<IApproveProgressReport>();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
-  };
+  const [loadingToastId, setLoadingToastId] = useState<string | number | null>(null);
 
   const approveProgressReportMutation = useMutation({
     mutationFn: approveProgressReport,
     onMutate: () => {
-      addToast({
-        status: "loading",
-        title: isActive
-          ? `Setting Progress Report to Pending`
-          : `Approving Progress Report`,
-        position: "top-right",
-      });
+      const toastId = toast.loading(
+        isActive
+          ? "Setting Progress Report to Pending"
+          : "Approving Progress Report"
+      );
+      setLoadingToastId(toastId);
     },
     onSuccess: () => {
       if (setIsAnimating) {
         setIsAnimating(true);
       }
 
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: isActive ? `Set to Pending` : `Approved`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
       }
+      toast.success(isActive ? "Set to Pending" : "Approved");
+      
       reset();
       queryClient.invalidateQueries({
         queryKey: ["latestUnapprovedProgressReports"],
@@ -96,16 +70,12 @@ export const ApproveProgressReportModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: isActive ? `Could Not Set to Pending` : `Could Not Approve`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
       }
+      toast.error(
+        `${isActive ? "Could Not Set to Pending" : "Could Not Approve"}: ${error}`
+      );
     },
   });
 
@@ -114,203 +84,136 @@ export const ApproveProgressReportModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"lg"}>
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-      >
-        <ModalHeader>
-          {isActive ? "Return" : "Approve"} Progress Report?
-        </ModalHeader>
-        <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>
+            {isActive ? "Return" : "Approve"} Progress Report?
+          </DialogTitle>
+        </DialogHeader>
 
-        <ModalBody
-          as="form"
+        <form
           id="progressreportapprove-form"
           onSubmit={handleSubmit(onBeginApprovalMutation)}
+          className={`p-6 ${colorMode === "dark" ? "bg-gray-800 text-gray-400" : "bg-white"}`}
         >
-          <FormControl pb={6}>
-            <InputGroup>
-              <Input
-                {...register("kind", { required: true })}
-                type="hidden"
-                defaultValue={report.document.kind}
-              />
-              <Input
-                {...register("reportPk", { required: true })}
-                type="hidden"
-                defaultValue={report.pk}
-              />
-              <Input
-                {...register("documentPk", { required: true })}
-                type="hidden"
-                defaultValue={report.document.pk}
-              />
-              <Input
-                {...register("isActive", { required: true })}
-                type="hidden"
-                defaultValue={isActive ? 1 : 0}
-              />
-            </InputGroup>
-          </FormControl>
+          <div className="pb-6 hidden">
+            <Input
+              {...register("kind", { required: true })}
+              type="hidden"
+              defaultValue={report.document.kind}
+            />
+            <Input
+              {...register("reportPk", { required: true })}
+              type="hidden"
+              defaultValue={report.pk}
+            />
+            <Input
+              {...register("documentPk", { required: true })}
+              type="hidden"
+              defaultValue={report.document.pk}
+            />
+            <Input
+              {...register("isActive", { required: true })}
+              type="hidden"
+              defaultValue={isActive ? 1 : 0}
+            />
+          </div>
 
-          <Box>
-            <Text fontWeight={"bold"}>
+          <div>
+            <p className="font-bold">
               {isActive
                 ? "Set this progress report to pending"
                 : "Provide final sign off for this progress report"}
               ?
-            </Text>
-            <Text>
+            </p>
+            <p>
               {isActive
                 ? "Note: this will set the project back to update requested and set the document's directorate approval to Required"
                 : "Note: If not already approved by project lead and business area lead, the report will be fast-tracked and provided with all approvals"}
-            </Text>
-            <Grid gridTemplateColumns={"repeat(1, 1fr)"} mt={2}>
-              <Flex mb={4} mt={2}>
-                <Box>
+            </p>
+            <div className="grid grid-cols-1 mt-2">
+              <div className="mb-4 mt-2 flex">
+                <div>
                   <ExtractedHTMLTitle
                     htmlContent={report?.document?.project?.title}
                     color={"green.400"}
                   />
-                </Box>
-              </Flex>
-              <Box
-                justifyContent={"center"}
-                textAlign={"center"}
-                display={"flex"}
-                ml={"-10%"}
-              >
-                <Flex w={"50%"}>
-                  {" "}
-                  <Box
-                    flex={1}
-                    justifyContent={"flex-end"}
-                    textAlign={"end"}
-                    mr={4}
-                  >
-                    <Text fontWeight={"bold"}>Kind:</Text>
-                  </Box>
-                  <Box minW={"120px"} textAlign={"start"}>
-                    <Text>{report?.document?.kind}</Text>
-                  </Box>
-                </Flex>
-              </Box>
+                </div>
+              </div>
+              
+              <div className="flex justify-center text-center -ml-[10%]">
+                <div className="w-1/2 flex">
+                  <div className="flex-1 text-end mr-4">
+                    <p className="font-bold">Kind:</p>
+                  </div>
+                  <div className="min-w-[120px] text-start">
+                    <p>{report?.document?.kind}</p>
+                  </div>
+                </div>
+              </div>
 
-              <Box
-                justifyContent={"center"}
-                textAlign={"center"}
-                display={"flex"}
-                ml={"-10%"}
-              >
-                <Flex w={"50%"}>
-                  {" "}
-                  <Box
-                    flex={1}
-                    justifyContent={"flex-end"}
-                    textAlign={"end"}
-                    mr={4}
-                  >
-                    <Text fontWeight={"bold"}>Year:</Text>
-                  </Box>
-                  <Box minW={"120px"} textAlign={"start"}>
-                    <Text>{report?.year}</Text>
-                  </Box>
-                </Flex>
-              </Box>
+              <div className="flex justify-center text-center -ml-[10%]">
+                <div className="w-1/2 flex">
+                  <div className="flex-1 text-end mr-4">
+                    <p className="font-bold">Year:</p>
+                  </div>
+                  <div className="min-w-[120px] text-start">
+                    <p>{report?.year}</p>
+                  </div>
+                </div>
+              </div>
 
-              <Box
-                justifyContent={"center"}
-                textAlign={"center"}
-                display={"flex"}
-                ml={"-10%"}
-              >
-                <Flex w={"50%"}>
-                  {" "}
-                  <Box
-                    flex={1}
-                    justifyContent={"flex-end"}
-                    textAlign={"end"}
-                    mr={4}
-                  >
-                    <Text fontWeight={"bold"}>Report PK:</Text>
-                  </Box>
-                  <Box minW={"120px"} textAlign={"start"}>
-                    <Text>{report?.pk}</Text>
-                  </Box>
-                </Flex>
-              </Box>
+              <div className="flex justify-center text-center -ml-[10%]">
+                <div className="w-1/2 flex">
+                  <div className="flex-1 text-end mr-4">
+                    <p className="font-bold">Report PK:</p>
+                  </div>
+                  <div className="min-w-[120px] text-start">
+                    <p>{report?.pk}</p>
+                  </div>
+                </div>
+              </div>
 
-              <Box
-                justifyContent={"center"}
-                textAlign={"center"}
-                display={"flex"}
-                ml={"-10%"}
-              >
-                <Flex w={"50%"}>
-                  {" "}
-                  <Box
-                    flex={1}
-                    justifyContent={"flex-end"}
-                    textAlign={"end"}
-                    mr={4}
-                  >
-                    <Text fontWeight={"bold"}>Document PK:</Text>
-                  </Box>
-                  <Box minW={"120px"} textAlign={"start"}>
-                    <Text>{report?.document?.pk}</Text>
-                  </Box>
-                </Flex>
-              </Box>
+              <div className="flex justify-center text-center -ml-[10%]">
+                <div className="w-1/2 flex">
+                  <div className="flex-1 text-end mr-4">
+                    <p className="font-bold">Document PK:</p>
+                  </div>
+                  <div className="min-w-[120px] text-start">
+                    <p>{report?.document?.pk}</p>
+                  </div>
+                </div>
+              </div>
 
-              <Box
-                justifyContent={"center"}
-                textAlign={"center"}
-                display={"flex"}
-                ml={"-10%"}
-              >
-                <Flex w={"50%"}>
-                  {" "}
-                  <Box
-                    flex={1}
-                    justifyContent={"flex-end"}
-                    textAlign={"end"}
-                    mr={4}
-                  >
-                    <Text fontWeight={"bold"}>Action:</Text>
-                  </Box>
-                  <Box minW={"120px"} textAlign={"start"}>
-                    <Text>{isActive ? "Set to Pending" : "Approve"}</Text>
-                  </Box>
-                </Flex>
-              </Box>
-            </Grid>
-          </Box>
-        </ModalBody>
+              <div className="flex justify-center text-center -ml-[10%]">
+                <div className="w-1/2 flex">
+                  <div className="flex-1 text-end mr-4">
+                    <p className="font-bold">Action:</p>
+                  </div>
+                  <div className="min-w-[120px] text-start">
+                    <p>{isActive ? "Set to Pending" : "Approve"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
 
-        <ModalFooter>
-          <Button
-            // variant="ghost"
-            mr={3}
-            onClick={onClose}
-          >
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} className="mr-3">
             Cancel
           </Button>
           <Button
             form="progressreportapprove-form"
             type="submit"
-            isLoading={approveProgressReportMutation.isPending}
-            bg={colorMode === "dark" ? "green.500" : "green.400"}
-            color={"white"}
-            _hover={{
-              bg: colorMode === "dark" ? "green.400" : "green.300",
-            }}
+            disabled={approveProgressReportMutation.isPending}
+            className="bg-green-500 hover:bg-green-400 text-white"
           >
             {isActive ? "Set to Pending" : "Approve"}
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

@@ -2,14 +2,7 @@
 
 import { getInternalUsersBasedOnSearchTerm } from "@/features/users/services/users.service";
 import type { IUserData } from "@/shared/types";
-import {
-  Avatar,
-  Box,
-  Flex,
-  ListItem,
-  Text,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   LexicalTypeaheadMenuPlugin,
@@ -398,74 +391,54 @@ const CustomMentionsTypeheadMenuItem = ({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <ListItem
+    <li
       key={option.key}
-      margin={0}
-      minWidth={"180px"}
-      fontSize={"14px"}
-      outline={"none"}
-      cursor={"pointer"}
-      borderRadius={
+      className={`m-0 min-w-[180px] text-sm outline-none cursor-pointer border-0 bg-white flex-shrink-0 flex-row items-center flex z-[999999999] ${
         index === 1
-          ? "8px 8px 0px 0px"
+          ? "rounded-t-lg"
           : index === optionLength
-            ? "0px 0px 8px 8px"
-            : "8px"
-      }
-      border={0}
-      backgroundColor={"#fff"}
-      flexShrink={0}
-      flexDirection={"row"}
-      alignContent={"center"}
-      display={"flex"}
-      zIndex={999999999}
+            ? "rounded-b-lg"
+            : "rounded-lg"
+      }`}
       tabIndex={-1}
       role="option"
       aria-selected={isSelected}
       id={`typehead-item-${index}`}
       ref={option.setRefElement}
     >
-      <Flex
-        as="button"
+      <button
         type="button"
-        w="100%"
-        textAlign="left"
-        p={2}
+        className={`w-full text-left p-2 flex items-center ${
+          isSelected ? "bg-gray-200" : isHovered ? "bg-gray-100" : "bg-transparent"
+        }`}
         onMouseEnter={onMouseEnter}
         onClick={onClick}
         onMouseOver={() => setIsHovered(true)}
         onMouseOut={() => setIsHovered(false)}
-        bg={isSelected ? "gray.200" : isHovered ? "gray.100" : "transparent"}
-        alignItems="center"
       >
-        <Avatar
-          src={
-            option.user?.image?.file
-              ? option.user.image.file
-              : option.user?.image?.old_file
-                ? option.user.image.old_file
-                : undefined
-          }
-          h={"30px"}
-          w={"30px"}
-        />
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="start"
-          ml={3}
-          h="100%"
-        >
-          <Text
-            ml={2}
-            color={
+        <Avatar className="h-[30px] w-[30px]">
+          <AvatarImage
+            src={
+              option.user?.image?.file
+                ? option.user.image.file
+                : option.user?.image?.old_file
+                  ? option.user.image.old_file
+                  : undefined
+            }
+          />
+          <AvatarFallback>
+            {option.user.first_name?.[0]}{option.user.last_name?.[0]}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex items-center justify-start ml-3 h-full">
+          <span
+            className={`ml-2 ${
               option.user.is_staff
                 ? option.user.is_superuser
-                  ? "blue.500"
-                  : "green.500"
-                : "gray.500"
-            }
-            fontWeight={isSelected ? "medium" : "normal"}
+                  ? "text-blue-500"
+                  : "text-green-500"
+                : "text-gray-500"
+            } ${isSelected ? "font-medium" : "font-normal"}`}
           >
             {`${
               option.user.first_name === "None"
@@ -480,10 +453,10 @@ const CustomMentionsTypeheadMenuItem = ({
                   : "(Staff)"
                 : "(External)"
             }`}
-          </Text>
-        </Box>
-      </Flex>
-    </ListItem>
+          </span>
+        </div>
+      </button>
+    </li>
   );
 };
 
@@ -620,15 +593,12 @@ export default function NewMentionsPlugin({
       ) =>
         anchorElementRef.current && results.length
           ? ReactDOM.createPortal(
-              <Box
-                background={"#fff"}
-                w={"250px"}
-                boxShadow={"0px 5px 10px rgba(0, 0, 0, 0.3)"}
-                borderRadius={"8px"}
-                zIndex={999999999}
-                position="absolute"
-                top={`${anchorElementRef.current.offsetHeight - 15}px`}
-                left={`${anchorElementRef.current.offsetWidth - 17.5}px`}
+              <div
+                className="bg-white w-[250px] shadow-[0px_5px_10px_rgba(0,0,0,0.3)] rounded-lg z-[999999999] absolute"
+                style={{
+                  top: `${anchorElementRef.current.offsetHeight - 15}px`,
+                  left: `${anchorElementRef.current.offsetWidth - 17.5}px`,
+                }}
                 onKeyDown={(e) => {
                   // Handle keyboard navigation
                   if (e.key === "ArrowDown") {
@@ -661,21 +631,12 @@ export default function NewMentionsPlugin({
                   // removed auto-focus logic
                 }}
               >
-                <UnorderedList
-                  css={{
+                <ul
+                  className="p-0 m-0 rounded-lg max-h-[200px] z-[999999999] overflow-y-scroll list-none"
+                  style={{
                     msOverflowStyle: "none",
                     scrollbarWidth: "none",
-                    listStyle: "none",
-                    "::-webkit-scrollbar": {
-                      display: "none",
-                    },
                   }}
-                  padding={0}
-                  margin={0}
-                  borderRadius={"8px"}
-                  maxH={"200px"}
-                  zIndex={999999999}
-                  overflowY={"scroll"}
                 >
                   {options.map((option, i: number) => (
                     <CustomMentionsTypeheadMenuItem
@@ -693,8 +654,8 @@ export default function NewMentionsPlugin({
                       optionLength={options.length}
                     />
                   ))}
-                </UnorderedList>
-              </Box>,
+                </ul>
+              </div>,
               anchorElementRef.current,
             )
           : null

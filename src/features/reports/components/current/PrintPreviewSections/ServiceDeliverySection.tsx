@@ -1,5 +1,4 @@
 import { PrintPreview } from "@/shared/components/RichTextEditor/Editors/PrintPreview";
-import { Center, Flex, Text } from "@chakra-ui/react";
 
 interface ServiceDeliveryProps {
   intro: string;
@@ -7,12 +6,12 @@ interface ServiceDeliveryProps {
 
 export const ServiceDeliverySection = ({ intro }: ServiceDeliveryProps) => {
   return (
-    <Flex flexDir={"column"}>
-      <Center>
-        <Text fontWeight={"bold"} fontSize={"2xl"}>
+    <div className="flex flex-col">
+      <div className="flex justify-center">
+        <p className="text-2xl font-bold">
           SDS
-        </Text>
-      </Center>
+        </p>
+      </div>
 
       <PrintPreview
         canEdit={false}
@@ -21,6 +20,6 @@ export const ServiceDeliverySection = ({ intro }: ServiceDeliveryProps) => {
         editorType={"Comment"}
         isUpdate={false}
       />
-    </Flex>
+    </div>
   );
 };

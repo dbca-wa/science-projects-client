@@ -1,34 +1,16 @@
-import {
-  Text,
-  Center,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  type ToastId,
-  useToast,
-  useColorMode,
-  UnorderedList,
-  ListItem,
-  FormControl,
-  InputGroup,
-  Input,
-  ModalFooter,
-  Grid,
-  Button,
-  Select,
-  Box,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 import { requestDeleteProjectCall } from "@/features/admin/services/admin.service";
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import type { IMakeRequestToAdmins } from "@/shared/types";
 import { AxiosError } from "axios";
+import { cn } from "@/shared/utils/component.utils";
 
 interface Props {
   projectPk: string | number;
@@ -43,10 +25,9 @@ export const RequestDeleteProjectModal = ({
   onClose,
   refetch,
 }: Props) => {
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const ToastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (data: { title: string; description?: string }) => {
+    ToastIdRef.current = toast(data.title, { description: data.description });
   };
 
   // Mutation, query client, onsubmit, and api function
@@ -56,22 +37,11 @@ export const RequestDeleteProjectModal = ({
     mutationFn: requestDeleteProjectCall,
     onMutate: () => {
       addToast({
-        status: "loading",
         title: `Requesting Deletion`,
-        position: "top-right",
       });
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Request Made`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Request Made");
 
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["pendingAdminTasks"] });
@@ -82,20 +52,12 @@ export const RequestDeleteProjectModal = ({
       }, 350);
     },
     onError: (error: AxiosError) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not request deletion`,
-          description: `${error.response.data}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could not request deletion: ${error.response?.data}`);
+      
       if (
-        error.response.data ===
+        error.response?.data ===
           "A request for this project's deletion has already been made!" ||
-        error.response.data === "Project already has a pending deletion request"
+        error.response?.data === "Project already has a pending deletion request"
       ) {
         onClose();
       }
@@ -115,107 +77,111 @@ export const RequestDeleteProjectModal = ({
   } = useForm<IMakeRequestToAdmins>();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(requestDeletion)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>Request Deletion?</ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn(
+        "max-w-md",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <form onSubmit={handleSubmit(requestDeletion)}>
+          <DialogHeader>
+            <DialogTitle>Request Deletion?</DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Center>
-              <Text fontWeight={"semibold"} fontSize={"xl"}>
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <p className="font-semibold text-xl text-center">
                 Are you sure you want to delete this project? There's no turning
                 back.
-              </Text>
-            </Center>
-            <Center mt={8}>
-              <UnorderedList>
-                <ListItem>The Project team and area will be cleared</ListItem>
-                <ListItem>The project photo will be deleted</ListItem>
-                <ListItem>Any related comments will be deleted</ListItem>
-                <ListItem>All related documents will be deleted</ListItem>
-              </UnorderedList>
-            </Center>
+              </p>
+            </div>
+            
+            <div className="flex justify-center mt-8">
+              <ul className="list-disc list-inside space-y-1">
+                <li>The Project team and area will be cleared</li>
+                <li>The project photo will be deleted</li>
+                <li>Any related comments will be deleted</li>
+                <li>All related documents will be deleted</li>
+              </ul>
+            </div>
 
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("action", {
-                    required: true,
-                    value: "deleteproject",
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <FormControl>
-              <InputGroup>
-                <Input
-                  type="hidden"
-                  {...register("project", {
-                    required: true,
-                    value: Number(projectPk),
-                  })}
-                  readOnly
-                />
-              </InputGroup>
-            </FormControl>
-            <Center mt={2} p={5} pb={3}>
-              <Text
-                fontWeight={"bold"}
-                color={"red.400"}
-                textDecoration={"underline"}
-              >
+            <div>
+              <Input
+                type="hidden"
+                {...register("action", {
+                  required: true,
+                  value: "deleteproject",
+                })}
+                readOnly
+              />
+            </div>
+            
+            <div>
+              <Input
+                type="hidden"
+                {...register("project", {
+                  required: true,
+                  value: Number(projectPk),
+                })}
+                readOnly
+              />
+            </div>
+            
+            <div className="flex justify-center mt-2 p-5 pb-3">
+              <p className="font-bold text-red-400 underline">
                 Once approved by admins, this is permanent.
-              </Text>
-            </Center>
-            <Center p={5}>
-              <Text fontWeight={"semibold"} color={"blue.500"}>
+              </p>
+            </div>
+            
+            <div className="flex justify-center p-5">
+              <p className="font-semibold text-blue-500 text-center">
                 If you wish to proceed, select a deletion reason and click
                 "Request Deletion". Clicking the button will send a request to
                 the admins, so the process may take time.
-              </Text>
-            </Center>
+              </p>
+            </div>
 
-            <Box>
-              <Select {...register("reason", { required: true })}>
+            <div>
+              <select 
+                {...register("reason", { required: true })}
+                className={cn(
+                  "w-full px-3 py-2 border rounded-md",
+                  colorMode === "dark" 
+                    ? "bg-gray-700 border-gray-600 text-white" 
+                    : "bg-white border-gray-300 text-gray-900"
+                )}
+              >
                 <option value="duplicate">Duplicate</option>
                 <option value="mistake">Made by Mistake</option>
                 <option value="other">Other</option>
-              </Select>
-            </Box>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+              </select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "red.500" : "red.600"}
-                _hover={{
-                  background: colorMode === "light" ? "red.400" : "red.500",
-                }}
+                className={cn(
+                  "text-white ml-3",
+                  colorMode === "light" 
+                    ? "bg-red-500 hover:bg-red-400" 
+                    : "bg-red-600 hover:bg-red-500"
+                )}
                 disabled={
                   requestDeleteProjectMutation.isPending ||
                   !isValid ||
                   isSubmitting
                 }
-                isLoading={requestDeleteProjectMutation.isPending}
                 type="submit"
-                ml={3}
               >
-                Request Deletion
+                {requestDeleteProjectMutation.isPending ? "Requesting..." : "Request Deletion"}
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

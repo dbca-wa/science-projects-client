@@ -1,32 +1,14 @@
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  Grid,
-  Input,
-  InputGroup,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  UnorderedList,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { suspendProjectCall } from "@/features/projects/services/projects.service";
 import type { ISimplePkProp } from "@/shared/types";
+import { cn } from "@/shared/utils/component.utils";
 
 interface Props {
   projectPk: string | number;
@@ -46,10 +28,9 @@ export const ProjectSuspensionModal = ({
   const { register, handleSubmit, watch } = useForm<ISimplePkProp>();
   const projPk = watch("pk");
 
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const ToastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (data: { title: string; description?: string }) => {
+    ToastIdRef.current = toast(data.title, { description: data.description });
   };
 
   // Mutation, query client, onsubmit, and api function
@@ -59,26 +40,15 @@ export const ProjectSuspensionModal = ({
     mutationFn: suspendProjectCall,
     onMutate: () => {
       addToast({
-        status: "loading",
         title: `${
           projectStatus !== "suspended" ? "Suspending" : "Unsuspending "
         } Project`,
-        position: "top-right",
       });
     },
     onSuccess: async () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Project has been ${
-            projectStatus !== "suspended" ? "suspended" : "unsuspended"
-          }`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success(`Project has been ${
+        projectStatus !== "suspended" ? "suspended" : "unsuspended"
+      }`);
 
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ["projects", projectPk] });
@@ -87,18 +57,9 @@ export const ProjectSuspensionModal = ({
       }, 350);
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: `Could not ${
-            projectStatus !== "suspended" ? "suspend" : "unsuspend"
-          } project`,
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could not ${
+        projectStatus !== "suspended" ? "suspend" : "unsuspend"
+      } project: ${error}`);
     },
   });
 
@@ -113,112 +74,105 @@ export const ProjectSuspensionModal = ({
   const { colorMode } = useColorMode();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"md"}>
-      <ModalOverlay />
-      <Flex as={"form"} onSubmit={handleSubmit(suspendProject)}>
-        <ModalContent
-          color={colorMode === "dark" ? "gray.400" : null}
-          bg={colorMode === "light" ? "white" : "gray.800"}
-        >
-          <ModalHeader>
-            Are you sure you want to{" "}
-            {projectStatus !== "suspended" ? "suspend" : "unsuspend"} this
-            project?
-          </ModalHeader>
-          <ModalCloseButton />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={cn(
+        "max-w-md",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
+        <form onSubmit={handleSubmit(suspendProject)}>
+          <DialogHeader>
+            <DialogTitle>
+              Are you sure you want to{" "}
+              {projectStatus !== "suspended" ? "suspend" : "unsuspend"} this
+              project?
+            </DialogTitle>
+          </DialogHeader>
 
-          <ModalBody>
-            <Grid gridTemplateColumns={"repeat(1, 1fr)"} gridGap={10}>
-              <Box
-                bg={colorMode === "light" ? "gray.50" : "gray.700"}
-                rounded={"2xl"}
-                p={2}
-              >
-                <Box px={4}>
-                  <Text fontWeight={"semibold"} fontSize={"xl"}>
-                    Info
-                  </Text>
-                </Box>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-10">
+              <div className={cn(
+                "rounded-2xl p-2",
+                colorMode === "light" ? "bg-gray-50" : "bg-gray-700"
+              )}>
+                <div className="px-4">
+                  <p className="font-semibold text-xl">Info</p>
+                </div>
 
-                <Box mt={8}>
-                  <Box px={4}>
-                    <Text>The following will occur:</Text>
-                  </Box>
-                  <UnorderedList px={10} pt={4}>
-                    <ListItem>
+                <div className="mt-8">
+                  <div className="px-4">
+                    <p>The following will occur:</p>
+                  </div>
+                  <ul className="list-disc px-10 pt-4 space-y-2">
+                    <li>
                       {projectStatus !== "suspended"
                         ? "The project will become inactive, with the status set to 'suspended'"
                         : "The project will become active, with the status set to 'active'"}
-                    </ListItem>
-                    <ListItem>
+                    </li>
+                    <li>
                       {projectStatus !== "suspended"
                         ? "The project will not be closed, but it's progress reports will not be included on the Annual Report."
                         : "The project's progress reports will be included on the Annual Report, if one exists/is created for that FY."}
-                    </ListItem>
+                    </li>
                     {projectStatus !== "suspended" && (
-                      <ListItem>
+                      <li>
                         When a new Annual Reporting cycle begins, you will be
                         sent a request to update your progress report. Either
                         update the report or re-suspend the project.
-                      </ListItem>
+                      </li>
                     )}
-
-                    <ListItem>
+                    <li>
                       This will not create or delete any Project Closures
-                    </ListItem>
-                  </UnorderedList>
-                </Box>
+                    </li>
+                  </ul>
+                </div>
 
-                <Center mt={2} p={5} pb={3}>
-                  <Text
-                    fontWeight={"bold"}
-                    color={"blue.400"}
-                    textDecoration={"underline"}
-                  >
+                <div className="flex justify-center mt-2 p-5 pb-3">
+                  <p className="font-bold text-blue-400 underline text-center">
                     {projectStatus !== "suspended"
                       ? "You can unsuspend the project again at any time, setting the status of the project to 'active'"
                       : "You can suspend the project again at any time, immediately setting the status of the project to 'suspended'"}
-                  </Text>
-                </Center>
+                  </p>
+                </div>
 
-                <FormControl>
-                  <InputGroup>
-                    <Input
-                      type="hidden"
-                      {...register("pk", {
-                        required: true,
-                        value: Number(projectPk),
-                      })}
-                      readOnly
-                    />
-                  </InputGroup>
-                </FormControl>
-              </Box>
-            </Grid>
-          </ModalBody>
-          <ModalFooter>
-            <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-              <Button colorScheme="gray" onClick={onClose}>
+                <div>
+                  <Input
+                    type="hidden"
+                    {...register("pk", {
+                      required: true,
+                      value: Number(projectPk),
+                    })}
+                    readOnly
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                color={"white"}
-                background={colorMode === "light" ? "green.500" : "green.600"}
-                _hover={{
-                  background: colorMode === "light" ? "green.400" : "green.500",
-                }}
-                isLoading={suspendMutation.isPending}
+                className={cn(
+                  "text-white ml-3",
+                  colorMode === "light" 
+                    ? "bg-green-500 hover:bg-green-400" 
+                    : "bg-green-600 hover:bg-green-500"
+                )}
+                disabled={suspendMutation.isPending}
                 type="submit"
-                ml={3}
               >
-                {projectStatus !== "suspended"
-                  ? "Suspend Project"
-                  : "Unsuspend Project"}
+                {suspendMutation.isPending 
+                  ? "Processing..." 
+                  : projectStatus !== "suspended"
+                    ? "Suspend Project"
+                    : "Unsuspend Project"}
               </Button>
-            </Grid>
-          </ModalFooter>
-        </ModalContent>
-      </Flex>
-    </Modal>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

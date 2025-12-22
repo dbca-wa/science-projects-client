@@ -4,30 +4,16 @@ import {
   sendSPMSLinkEmail,
 } from "@/features/documents/services/documents.service";
 import { useUser } from "@/features/users/hooks/useUser";
-import {
-  Button,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Grid,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  type ToastId,
-  useColorMode,
-  useToast,
-  type UseToastOptions,
-} from "@chakra-ui/react";
+import { toast } from "sonner";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/components/ui/dialog";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { cn } from "@/shared/utils/component.utils";
 
 interface Props {
   isOpen: boolean;
@@ -120,154 +106,131 @@ export const EmailSiteLinkModal = ({ isOpen, onClose }: Props) => {
   };
 
   const { colorMode } = useColorMode();
-  // const queryClient = useQueryClient();
-  const toast = useToast();
-  const ToastIdRef = useRef<ToastId | undefined>(undefined);
-  const addToast = (data: UseToastOptions) => {
-    ToastIdRef.current = toast(data);
+  const ToastIdRef = useRef<string | number | undefined>(undefined);
+  const addToast = (data: { title: string; description?: string }) => {
+    ToastIdRef.current = toast(data.title, { description: data.description });
   };
+  
   const sendLinkMutation = useMutation({
     mutationFn: sendSPMSLinkEmail,
     onMutate: () => {
       addToast({
-        status: "loading",
         title: "Sending Email",
-        position: "top-right",
       });
     },
     onSuccess: () => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Success",
-          description: `Email Sent`,
-          status: "success",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.success("Email Sent");
       onClose();
     },
     onError: (error) => {
-      if (ToastIdRef.current) {
-        toast.update(ToastIdRef.current, {
-          title: "Could Not Send Email",
-          description: `${error}`,
-          status: "error",
-          position: "top-right",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
+      toast.error(`Could Not Send Email: ${error}`);
     },
   });
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={() => {
-        resetData();
-        onClose();
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open) {
+          resetData();
+          onClose();
+        }
       }}
-      size={"md"}
-      // isCentered={true}
     >
-      {" "}
-      <ModalOverlay />
-      <ModalContent
-        color={colorMode === "dark" ? "gray.400" : null}
-        bg={colorMode === "light" ? "white" : "gray.800"}
-        p={4}
-      >
+      <DialogContent className={cn(
+        "max-w-md p-4",
+        colorMode === "dark" ? "text-gray-400 bg-gray-800" : "text-gray-900 bg-white"
+      )}>
         {!userLoading ? (
           <>
-            <ModalHeader mt={5}>Send Link to SPMS</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody mb={5}>
-              <Grid gridRowGap={4}>
-                <input
-                  type="hidden"
-                  value={fromUserEmail}
-                  {...register("fromUserEmail", {
-                    required: true,
-                    value: fromUserEmail,
-                  })}
+            <DialogHeader className="mt-5">
+              <DialogTitle>Send Link to SPMS</DialogTitle>
+            </DialogHeader>
+            
+            <div className="mb-5 space-y-4">
+              <input
+                type="hidden"
+                value={fromUserEmail}
+                {...register("fromUserEmail", {
+                  required: true,
+                  value: fromUserEmail,
+                })}
+              />
+              
+              <div className="mb-2">
+                <Label>Email (@dbca.wa.gov.au)</Label>
+                <Input
+                  placeholder="...@dbca.wa.gov.au"
+                  value={toUserEmail}
+                  onChange={(e) => setToUserEmail(e.target.value)}
                 />
-                <FormControl mb={2}>
-                  <FormLabel>Email (@dbca.wa.gov.au)</FormLabel>
-                  <Input
-                    placeholder="...@dbca.wa.gov.au"
-                    value={toUserEmail}
-                    onChange={(e) => setToUserEmail(e.target.value)}
-                  />
-                  <FormHelperText color={emailExists ? "red.500" : undefined}>
-                    {emailExists
-                      ? "That email is already registered"
-                      : "Enter a DBCA email address which isn't already registered"}
-                  </FormHelperText>
-                </FormControl>
+                <p className={cn(
+                  "text-sm mt-1",
+                  emailExists ? "text-red-500" : "text-gray-500"
+                )}>
+                  {emailExists
+                    ? "That email is already registered"
+                    : "Enter a DBCA email address which isn't already registered"}
+                </p>
+              </div>
 
-                {canSend ? (
-                  <>
-                    <Grid gridTemplateColumns={"2fr 10fr"} px={1} mt={4}>
-                      <Text fontWeight={"bold"}>From: </Text>
-                      <Text textAlign={"right"}>{fromUserEmail}</Text>
-                    </Grid>
-                    <Text
-                      fontSize={"x-small"}
-                      textAlign={"right"}
-                      color={"gray.500"}
-                    >
-                      The email will be sent by the system, but this email may
-                      be listed
-                    </Text>
-                    <Grid gridTemplateColumns={"2fr 10fr"} px={1}>
-                      <Text fontWeight={"bold"}>To:</Text>
-                      <Text textAlign={"right"}>{toUserEmail}</Text>
-                    </Grid>
-                  </>
-                ) : null}
-              </Grid>
-              <Text fontSize={"xs"} color={"gray.500"}>
+              {canSend ? (
+                <>
+                  <div className="grid grid-cols-[2fr_10fr] px-1 mt-4 gap-2">
+                    <span className="font-bold">From: </span>
+                    <span className="text-right">{fromUserEmail}</span>
+                  </div>
+                  <p className="text-xs text-right text-gray-500">
+                    The email will be sent by the system, but this email may
+                    be listed
+                  </p>
+                  <div className="grid grid-cols-[2fr_10fr] px-1 gap-2">
+                    <span className="font-bold">To:</span>
+                    <span className="text-right">{toUserEmail}</span>
+                  </div>
+                </>
+              ) : null}
+              
+              <p className="text-xs text-gray-500">
                 Note: This will send an email with a link to access SPMS. Once
                 the user logs in, you will be able to find their account and add
                 them to projects
-              </Text>
-            </ModalBody>
-            <ModalFooter>
-              <Flex>
+              </p>
+            </div>
+            
+            <DialogFooter>
+              <div className="flex gap-3">
                 <Button
+                  variant="outline"
                   onClick={() => {
                     resetData();
                     onClose();
                   }}
-                  mr={3}
-                  colorScheme={"gray"}
                 >
                   Cancel
                 </Button>
                 <Button
-                  isDisabled={!canSend || sendLinkMutation.isPending}
+                  disabled={!canSend || sendLinkMutation.isPending}
                   onClick={() => {
                     onClick({
                       fromUserEmail: fromUserEmail,
                       toUserEmail: toUserEmail,
                     });
                   }}
-                  color={"white"}
-                  background={colorMode === "light" ? "green.500" : "green.600"}
-                  _hover={{
-                    background:
-                      colorMode === "light" ? "green.400" : "green.500",
-                  }}
+                  className={cn(
+                    "text-white",
+                    colorMode === "light" 
+                      ? "bg-green-500 hover:bg-green-400" 
+                      : "bg-green-600 hover:bg-green-500"
+                  )}
                 >
-                  Send
+                  {sendLinkMutation.isPending ? "Sending..." : "Send"}
                 </Button>
-              </Flex>
-            </ModalFooter>
+              </div>
+            </DialogFooter>
           </>
         ) : null}
-      </ModalContent>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   );
 };

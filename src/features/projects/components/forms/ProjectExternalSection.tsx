@@ -3,14 +3,9 @@
 import { AffiliationCreateSearchDropdown } from "@/features/admin/components/AffiliationCreateSearchDropdown";
 import { UnboundStatefulEditor } from "@/shared/components/RichTextEditor/Editors/UnboundStatefulEditor";
 import type { IAffiliation } from "@/shared/types";
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  Grid,
-  useColorMode,
-} from "@chakra-ui/react";
+import { useColorMode } from "@/shared/utils/theme.utils";
+import { Button } from "@/shared/components/ui/button";
+import { cn } from "@/shared/utils/cn";
 import { useEffect, useState } from "react";
 import { IoIosCreate } from "react-icons/io";
 // import { ICreateProjectExternalDetails } from "@/shared/lib/api";
@@ -127,7 +122,7 @@ export const ProjectExternalSection = ({
   useEffect(() => {});
 
   return (
-    <Box px={8}>
+    <div className="px-8">
       {/* <UnboundStatefulEditor
         title="Collaboration With"
         placeholder="Enter collaborating entities..."
@@ -142,7 +137,7 @@ export const ProjectExternalSection = ({
         setValueAsPlainText={true}
       /> */}
 
-      <FormControl>
+      <div>
         <AffiliationCreateSearchDropdown
           autoFocus
           isRequired={false}
@@ -155,7 +150,7 @@ export const ProjectExternalSection = ({
           placeholder="Search for or add a collaboration partner"
           helperText="The entity/s this project is in collaboration with"
         />
-      </FormControl>
+      </div>
 
       {/* <Text>Collab with: {collaborationWith}</Text> */}
 
@@ -194,30 +189,29 @@ export const ProjectExternalSection = ({
         setValueAsPlainText={false}
       />
 
-      <Flex w={"100%"} justifyContent={"flex-end"} pb={4}>
-        <Grid gridTemplateColumns={"repeat(2, 1fr)"} gridGap={4}>
-          <Button colorScheme="gray" onClick={backClick}>
+      <div className="flex w-full justify-end pb-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Button variant="outline" onClick={backClick}>
             Back
           </Button>
 
           <Button
-            ml={3}
-            type="submit"
-            color={"white"}
-            background={colorMode === "light" ? "blue.500" : "blue.600"}
-            _hover={{
-              background: colorMode === "light" ? "blue.400" : "blue.500",
-            }}
+            className={cn(
+              "text-white ml-3",
+              colorMode === "light" 
+                ? "bg-blue-500 hover:bg-blue-400" 
+                : "bg-blue-600 hover:bg-blue-500"
+            )}
             // isDisabled={!externalFilled}
             onClick={() => {
               createClick();
             }}
-            rightIcon={<IoIosCreate />}
           >
+            <IoIosCreate className="mr-2 h-4 w-4" />
             Create
           </Button>
-        </Grid>
-      </Flex>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };

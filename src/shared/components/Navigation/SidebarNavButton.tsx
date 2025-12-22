@@ -1,18 +1,10 @@
 // For handling the sidebar on smaller screens on traditional version
 
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Icon,
-  Text,
-  type TextProps,
-} from "@chakra-ui/react";
+import { Button } from "@/shared/components/ui/button";
 import { useState } from "react";
 import { type IconType } from "react-icons";
 
-interface ISidebarNavButtonProps extends TextProps {
+interface ISidebarNavButtonProps {
   buttonName?: string;
   cScheme?: string;
   hoverColor?: string;
@@ -24,7 +16,7 @@ interface ISidebarNavButtonProps extends TextProps {
 export const SidebarNavButton = ({
   buttonName,
   cScheme,
-  leftIcon,
+  leftIcon: LeftIcon,
   fColor,
   hoverColor,
   onClick,
@@ -39,67 +31,51 @@ export const SidebarNavButton = ({
     setIsHovered(false);
   };
 
-  const bgStyle = isHovered
-    ? cScheme
-      ? { bg: `${cScheme}.500` }
-      : {}
-    : cScheme
-    ? `${cScheme}.500`
-    : "transparent";
-
-  const fontColorStyle = isHovered
-    ? fColor
-      ? { color: fColor }
-      : "white"
-    : fColor
-    ? fColor
-    : "whiteAlpha.700";
+  // Convert color scheme to Tailwind classes
+  const getColorClasses = () => {
+    const baseClasses = "z-[1] w-full px-2 py-5 text-lg";
+    
+    if (isHovered) {
+      return `${baseClasses} ${hoverColor ? 'bg-white text-black' : 'bg-white text-black'}`;
+    }
+    
+    const bgClass = cScheme ? `bg-${cScheme}-500` : 'bg-transparent';
+    const textClass = fColor ? `text-[${fColor}]` : 'text-white/70';
+    
+    return `${baseClasses} ${bgClass} ${textClass} hover:bg-white hover:text-black active:bg-white active:text-black`;
+  };
 
   return (
-    <Box zIndex={1}>
+    <div className="z-[1]">
       <Button
-        colorScheme={cScheme}
-        zIndex={1}
-        bg={bgStyle}
-        color={fontColorStyle}
-        _hover={{
-          bg: hoverColor ? hoverColor : "white",
-          color: fColor ? fColor : "black",
-        }}
-        _active={{
-          bg: hoverColor ? hoverColor : "white",
-          color: fColor ? fColor : "black",
-        }}
-        as={Button}
-        size={"lg"}
-        w={"100%"}
-        px={2}
-        py={5}
+        variant="ghost"
+        className={getColorClasses()}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={onClick}
       >
-        <Flex w={"100%"}>
-          {leftIcon ? (
-            <Box display={"flex"} justifyContent={"space-between"} w={"100%"}>
-              <Center mr={buttonName ? 1.5 : 0}>
-                <Box justifyContent={"end"} boxSize={5}>
-                  <Icon as={leftIcon} />
-                </Box>
-              </Center>
+        <div className="flex w-full">
+          {LeftIcon ? (
+            <div className="flex justify-between w-full items-center">
+              <div className={`flex items-center ${buttonName ? 'mr-1.5' : ''}`}>
+                <div className="flex justify-end w-5 h-5">
+                  <LeftIcon className="w-5 h-5" />
+                </div>
+              </div>
 
-              <Center mr={buttonName ? 1.5 : 0}>
-                <Text>{buttonName}</Text>
-              </Center>
-              <Center display={"hidden"}>
-                <Icon as={leftIcon} display={"hidden"} opacity={0} />
-              </Center>
-            </Box>
+              <div className={`flex items-center ${buttonName ? 'mr-1.5' : ''}`}>
+                <span>{buttonName}</span>
+              </div>
+              
+              <div className="flex items-center invisible">
+                <LeftIcon className="w-5 h-5 opacity-0" />
+              </div>
+            </div>
           ) : (
-            <Text>{buttonName}</Text>
+            <span>{buttonName}</span>
           )}
-        </Flex>
+        </div>
       </Button>
-    </Box>
+    </div>
   );
 };
